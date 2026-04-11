@@ -1,5 +1,5 @@
-use iced::{widget::text, Element};
-use snora_core::contract::Icon;
+use iced::{Element, widget::text};
+use snora_core::contract::ui::Icon;
 
 pub fn render_icon<'a, Message>(icon: &Icon) -> Element<'a, Message>
 where

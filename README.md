@@ -80,11 +80,11 @@ Map widgets for each area into the `PageLayout` struct and pass it to the `build
 
 ```rust
 use snora::PageLayout;
-use snora::components::header::standard_header;
+use snora::components::header::app_header;
 use snora::layout::build_layout;
 
 // Generate header
-let header = standard_header("My Snora App", items, None);
+let header = app_header("My Snora App", items, None);
 
 // Define skeleton
 let layout = PageLayout {

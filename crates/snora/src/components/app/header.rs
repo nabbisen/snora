@@ -1,16 +1,16 @@
 use iced::{
-    widget::{button, container, row, space, text},
     Alignment::Center,
     Element, Length, Padding,
+    widget::{button, container, row, space, text},
 };
-use snora_core::contract::MenuItem;
+use snora_core::contract::app::MenuItem;
 
 use crate::{
     components::icon::render_icon,
     style::{container_box_style, menu_button_style},
 };
 
-pub fn standard_header<'a, Message: Clone + 'a>(
+pub fn app_header<'a, Message: Clone + 'a>(
     app_title: &'a str,
     items: Vec<MenuItem<Message>>,
     right_controls: Option<Element<'a, Message>>,

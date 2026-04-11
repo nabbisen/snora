@@ -1,9 +1,9 @@
 use iced::{
-    widget::{button, column, container, row, scrollable, space, text},
     Alignment::Center,
     Element, Length, Padding,
+    widget::{button, column, container, row, scrollable, space, text},
 };
-use snora_core::contract::ToastIntent;
+use snora_core::contract::stack::ToastIntent;
 
 use crate::style::container_box_style;
 
@@ -14,7 +14,7 @@ pub struct LogEntry {
     pub message: String,
 }
 
-pub fn standard_footer<'a, Message: Clone + 'a>(
+pub fn app_footer<'a, Message: Clone + 'a>(
     status_text: &'a str,
     logs: &'a [LogEntry],
     is_log_expanded: bool,
