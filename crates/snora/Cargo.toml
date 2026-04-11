@@ -1,0 +1,13 @@
+[package]
+name = "snora"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+lucide-icons = ["snora-core/lucide-icons", "dep:lucide-icons"]
+svg-icons = ["snora-core/svg-icons", "iced/svg"]
+
+[dependencies]
+snora-core = { path = "../snora-core" }
+iced = { workspace = true }
+lucide-icons = { workspace = true, optional = true }

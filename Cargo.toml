@@ -1,0 +1,23 @@
+[workspace]
+members = [
+    "crates/snora-core",
+    "crates/snora",
+    "examples/hei_snora"
+]
+resolver = "2"
+
+[profile.release]     # shrink executable size
+opt-level = "z"
+lto = true
+# panic = "abort"
+strip = true
+codegen-units = 1
+
+[profile.dev]         # to improve productivity
+opt-level = 1         # slightly optimize
+lto = false           # disable link-time optimizations
+incremental = false
+
+[workspace.dependencies]
+iced = { version = "0.14", feactures = ["canvas", "svg", "tokio"] }
+lucide-icons = { version = "0", features = ["iced"] }

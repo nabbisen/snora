@@ -1,0 +1,9 @@
+[package]
+name = "hei_snora"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+snora = { path = "../../crates/snora", features = ["lucide-icons"] }
+iced = { workspace = true }
+
