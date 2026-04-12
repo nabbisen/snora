@@ -5,8 +5,10 @@ pub mod style;
 
 pub use snora_core::contract::{
     app::{
-        AppLayout, AppSideBar, AppSideBarItem, BottomSheet,
+        AppLayout,
+        bottom_sheet::BottomSheet,
         header::menu::{Menu, MenuAction, MenuItem},
+        side_bar::{AppSideBar, AppSideBarItem},
     },
     page::PageLayout,
     rtl::LayoutDirection,

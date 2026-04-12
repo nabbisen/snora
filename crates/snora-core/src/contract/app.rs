@@ -1,13 +1,16 @@
 use std::fmt::Debug;
 
+pub mod bottom_sheet;
 pub mod header;
+pub mod side_bar;
 
-use super::stack::Dialog;
-use super::stack::Toast;
-use super::ui::Icon;
-use crate::contract::rtl::LayoutDirection;
+use crate::contract::{
+    rtl::LayoutDirection,
+    stack::{Dialog, Toast},
+};
+use bottom_sheet::BottomSheet;
 
-/// ページ全体の骨格
+/// アプリ全体の骨格
 pub struct AppLayout<Node, Message, MenuId>
 where
     MenuId: Clone + Debug + PartialEq,
@@ -21,29 +24,4 @@ where
     pub bottom_sheet: Option<BottomSheet<Node, Message>>,
     pub toasts: Vec<Toast<Message>>,
     pub direction: LayoutDirection,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppSideBarItem<Message, ViewId>
-where
-    ViewId: PartialEq,
-{
-    pub view_id: ViewId,
-    pub icon: Icon,
-    pub tooltip: String,
-    pub action: Message,
-}
-
-#[derive(Debug, Clone)]
-pub struct AppSideBar<Message, ViewId>
-where
-    ViewId: PartialEq,
-{
-    pub items: Vec<AppSideBarItem<Message, ViewId>>,
-    pub active_view_id: ViewId,
-}
-
-pub struct BottomSheet<Node, Message> {
-    pub content: Node,
-    pub on_close: Option<Message>, // シート外（背景）クリック時などに発火するイベント
 }

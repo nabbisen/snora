@@ -4,7 +4,7 @@ use iced::{
         text, {button, column, container, tooltip},
     },
 };
-use snora_core::contract::app::AppSideBar;
+use snora_core::contract::app::side_bar::AppSideBar;
 
 use crate::components::icon::render_icon;
 

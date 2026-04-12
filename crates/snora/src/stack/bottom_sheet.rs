@@ -2,7 +2,7 @@ use iced::{
     Background, Color, Element, Length,
     widget::{column, container, mouse_area, opaque, space, stack},
 };
-use snora_core::contract::app::BottomSheet;
+use snora_core::contract::app::bottom_sheet::BottomSheet;
 
 pub fn render_bottom_sheet<'a, Message>(
     bottom_sheet: Option<BottomSheet<Element<'a, Message>, Message>>,
