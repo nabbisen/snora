@@ -1,5 +1,5 @@
 use iced::Task;
-use snora::{LayoutDirection, ToastIntent};
+use snora::{LayoutDirection, MenuAction, ToastIntent};
 
 use super::{App, log::LogEntry, message::Message};
 
@@ -20,13 +20,29 @@ impl App {
                     message: format!("Switched to view: {}", view_id),
                 });
             }
-            Message::MenuAction(menu_item_id) => {
-                self.logs.push(LogEntry {
-                    intent: ToastIntent::Info,
-                    timestamp: "Just now".into(),
-                    message: format!("Clicked: {}", menu_item_id),
-                });
-            }
+            Message::HeaderAction(header_action) => match header_action {
+                MenuAction::MenuPressed(menu_id) => {
+                    // 同じメニューが押されたら閉じる(None)、違うなら開く(Some)
+                    if self.active_menu_id.as_ref() == Some(&menu_id) {
+                        self.active_menu_id = None;
+                    } else {
+                        self.active_menu_id = Some(menu_id);
+                    }
+                }
+                MenuAction::MenuItemPressed {
+                    menu_id,
+                    menu_item_id,
+                } => {
+                    // 項目が選ばれたら、アクションを実行しつつメニューを閉じる
+                    self.active_menu_id = None;
+
+                    self.logs.push(LogEntry {
+                        intent: ToastIntent::Info,
+                        timestamp: "Just now".into(),
+                        message: format!("Clicked: {} - {}", menu_id, menu_item_id),
+                    });
+                }
+            },
             Message::ToggleLogSheet => {
                 self.is_bottom_sheet_open = !self.is_bottom_sheet_open;
             }

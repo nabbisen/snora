@@ -1,23 +1,29 @@
+use std::fmt::Debug;
+
 use iced::{
     Alignment::Center,
     Element, Length, Padding,
-    widget::{button, column, container, row, space, text},
+    widget::{container, row, space, text},
 };
-use snora_core::contract::app::Menu;
+use snora_core::contract::app::header::menu::{Menu, MenuAction};
 
-use crate::{
-    components::icon::render_icon,
-    style::{container_box_style, menu_button_style},
-};
+mod menu;
 
-pub fn app_header<'a, Message: Clone + 'a, MenuId: PartialEq + Clone + std::fmt::Debug + 'a, F>(
+use crate::style::container_box_style;
+use menu::render_menu;
+
+pub fn app_header<'a, Message, MenuId, MenuItemId, F>(
     app_title: &'a str,
-    menus: Vec<Menu<MenuId>>,
-    menu_on_select: &'a F,
+    menus: Vec<Menu<MenuId, MenuItemId>>,
+    menus_on_action: &'a F,
+    active_menu_id: Option<&MenuId>,
     right_controls: Option<Element<'a, Message>>,
 ) -> Element<'a, Message>
 where
-    F: Fn(MenuId) -> Message + 'a,
+    Message: Clone + 'a,
+    MenuId: Clone + Debug + PartialEq + 'a,
+    MenuItemId: Clone + Debug + 'a,
+    F: Fn(MenuAction<MenuId, MenuItemId>) -> Message + 'a,
 {
     let mut left_row = row![
         text(app_title)
@@ -32,7 +38,8 @@ where
     .spacing(12);
 
     for menu in menus {
-        let menu = render_menu(menu, menu_on_select);
+        let is_active = Some(&menu.id) == active_menu_id;
+        let menu = render_menu(menu, menus_on_action, is_active);
         left_row = left_row.push(menu);
     }
 
@@ -47,28 +54,4 @@ where
         .padding(Padding::from([8.0, 16.0]))
         .style(container_box_style)
         .into()
-}
-
-fn render_menu<'a, MenuId, Message>(
-    menu: Menu<MenuId>,
-    menu_on_select: impl Fn(MenuId) -> Message + 'a,
-) -> Element<'a, Message>
-where
-    MenuId: PartialEq + Clone + std::fmt::Debug + 'a,
-    Message: Clone + 'a,
-{
-    let mut content = column![text(menu.label).size(14)];
-
-    for item in menu.items {
-        let mut btn_content = row![].spacing(6).align_y(Center);
-        if let Some(ref ic) = item.icon {
-            btn_content = btn_content.push(render_icon(ic));
-        }
-        btn_content = btn_content.push(text(item.label).size(14));
-
-        let msg = menu_on_select(item.menu_id.clone()); // ここでアプリの Message に変換
-        content = content.push(button(btn_content).style(menu_button_style).on_press(msg));
-    }
-
-    container(content).into()
 }

@@ -1,8 +1,11 @@
 [package]
 name = "hei_snora"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2024"
 
 [dependencies]
 snora = { path = "../../crates/snora", features = ["lucide-icons"] }
 iced = { workspace = true }
+
+strum = "0"
+strum_macros = "0"

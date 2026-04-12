@@ -1,10 +1,12 @@
-use super::{MenuItemId, ViewId};
+use snora::MenuAction;
+
+use super::{MenuId, MenuItemId, ViewId};
 
 #[derive(Debug, Clone)]
 pub enum Message {
     ToggleDirection,
     SelectView(ViewId),
-    MenuAction(MenuItemId),
+    HeaderAction(MenuAction<MenuId, MenuItemId>),
     ToggleLogSheet,
     AddDummyLog,
 }

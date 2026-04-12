@@ -4,7 +4,10 @@ mod stack;
 pub mod style;
 
 pub use snora_core::contract::{
-    app::{AppLayout, AppSideBar, AppSideBarItem, BottomSheet, Menu, MenuItem},
+    app::{
+        AppLayout, AppSideBar, AppSideBarItem, BottomSheet,
+        header::menu::{Menu, MenuAction, MenuItem},
+    },
     page::PageLayout,
     rtl::LayoutDirection,
     stack::{Dialog, Toast, ToastIntent},

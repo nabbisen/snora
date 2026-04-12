@@ -1,13 +1,20 @@
-use crate::contract::rtl::LayoutDirection;
+use std::fmt::Debug;
+
+pub mod header;
 
 use super::stack::Dialog;
 use super::stack::Toast;
 use super::ui::Icon;
+use crate::contract::rtl::LayoutDirection;
 
 /// ページ全体の骨格
-pub struct AppLayout<Node, Message> {
+pub struct AppLayout<Node, Message, MenuId>
+where
+    MenuId: Clone + Debug + PartialEq,
+{
     pub body: Node,
     pub header: Option<Node>,
+    pub active_menu_id: Option<MenuId>,
     pub side_bar: Option<Node>,
     pub footer: Option<Node>,
     pub dialog: Option<Dialog<Node, Message>>,
@@ -34,24 +41,6 @@ where
 {
     pub items: Vec<AppSideBarItem<Message, ViewId>>,
     pub active_view_id: ViewId,
-}
-
-pub struct Menu<MenuId>
-where
-    MenuId: PartialEq + Clone + std::fmt::Debug,
-{
-    pub label: String,
-    pub icon: Option<Icon>,
-    pub items: Vec<MenuItem<MenuId>>,
-}
-
-pub struct MenuItem<MenuId>
-where
-    MenuId: PartialEq + Clone + std::fmt::Debug,
-{
-    pub menu_id: MenuId,
-    pub label: String,
-    pub icon: Option<Icon>,
 }
 
 pub struct BottomSheet<Node, Message> {

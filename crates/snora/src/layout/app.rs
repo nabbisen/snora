@@ -1,14 +1,17 @@
+use std::fmt::Debug;
+
 use iced::widget::{column, container, row, stack};
 use iced::{Element, Length};
 use snora_core::contract::{app::AppLayout, rtl::LayoutDirection};
 
 use crate::stack::{bottom_sheet::render_bottom_sheet, dialog::render_dialog, toast::render_toast};
 
-pub fn render_app<'a, Message>(
-    layout: AppLayout<Element<'a, Message>, Message>,
+pub fn render_app<'a, Message, MenuId>(
+    layout: AppLayout<Element<'a, Message>, Message, MenuId>,
 ) -> Element<'a, Message>
 where
     Message: 'a + Clone,
+    MenuId: Clone + Debug + PartialEq,
 {
     // ==========================================
     // 1. Base Layer (Header -> Body/Sidebar -> Footer)

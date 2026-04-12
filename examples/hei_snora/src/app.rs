@@ -1,5 +1,6 @@
 use iced::Task;
 use snora::LayoutDirection;
+use strum_macros::Display;
 
 mod log;
 mod message;
@@ -26,25 +27,45 @@ impl std::fmt::Display for ViewId {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Display)]
+#[strum(serialize_all = "PascalCase")]
+pub enum MenuId {
+    File,
+    Settings,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum MenuItemId {
-    FileDummy,
-    SettingsDummy,
+    File(FileMenuItemId),
+    Settings(SettingsMenuItemId),
 }
 
 impl std::fmt::Display for MenuItemId {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, w: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            MenuItemId::FileDummy => write!(f, "FileDummy"),
-            MenuItemId::SettingsDummy => write!(f, "SettingsDummy"),
+            MenuItemId::File(x) => write!(w, "{}", x),
+            MenuItemId::Settings(x) => write!(w, "{}", x),
         }
     }
+}
+
+#[derive(Clone, Debug, PartialEq, Display)]
+#[strum(serialize_all = "PascalCase")]
+pub enum FileMenuItemId {
+    New,
+}
+
+#[derive(Clone, Debug, PartialEq, Display)]
+#[strum(serialize_all = "PascalCase")]
+pub enum SettingsMenuItemId {
+    About,
 }
 
 pub struct App {
     direction: LayoutDirection,
     active_view_id: ViewId, // 現在選択されているAppレベルのビューID
     logs: Vec<LogEntry>,
+    active_menu_id: Option<MenuId>,
     is_bottom_sheet_open: bool,
 }
 
@@ -55,6 +76,7 @@ impl App {
                 direction: LayoutDirection::Ltr,
                 active_view_id: ViewId::Home,
                 logs: vec![],
+                active_menu_id: None,
                 is_bottom_sheet_open: false,
             },
             Task::none(),

@@ -11,7 +11,9 @@ use snora::{
     style::container_box_style,
 };
 
-use super::{App, MenuItemId, ViewId, message::Message};
+use super::{
+    App, FileMenuItemId, MenuId, MenuItemId, SettingsMenuItemId, ViewId, message::Message,
+};
 
 impl App {
     pub fn view(&self) -> Element<'_, Message> {
@@ -59,29 +61,36 @@ impl App {
         // --- 2. App Level の構築 ---
 
         // App Header
+        let menus = vec![
+            Menu {
+                id: MenuId::File,
+                label: "File".into(),
+                icon: Some(Icon::Lucide(icons::FileText)),
+                items: vec![MenuItem {
+                    menu_id: MenuId::File,
+                    id: MenuItemId::File(FileMenuItemId::New),
+                    label: "New".into(),
+                    icon: None,
+                }],
+            },
+            Menu {
+                id: MenuId::Settings,
+                label: "Settings".into(),
+                icon: Some(Icon::Lucide(icons::Settings)),
+                items: vec![MenuItem {
+                    menu_id: MenuId::Settings,
+                    id: MenuItemId::Settings(SettingsMenuItemId::About),
+                    label: "About".into(),
+                    icon: None,
+                }],
+            },
+        ];
+
         let app_header = app_header(
             "Snora App",
-            vec![
-                Menu {
-                    label: "File".into(),
-                    icon: Some(Icon::Lucide(icons::FileText)),
-                    items: vec![MenuItem {
-                        menu_id: MenuItemId::FileDummy,
-                        label: "Dummy".into(),
-                        icon: Some(Icon::Lucide(icons::FileText)),
-                    }],
-                },
-                Menu {
-                    label: "Settings".into(),
-                    icon: Some(Icon::Lucide(icons::Settings)),
-                    items: vec![MenuItem {
-                        menu_id: MenuItemId::SettingsDummy,
-                        label: "Settings".into(),
-                        icon: Some(Icon::Lucide(icons::Settings)),
-                    }],
-                },
-            ],
-            &Message::MenuAction,
+            menus,
+            &|action| Message::HeaderAction(action),
+            self.active_menu_id.as_ref(),
             None,
         );
 
@@ -175,6 +184,7 @@ impl App {
         let app_layout = AppLayout {
             body: page_node,
             header: Some(app_header),
+            active_menu_id: self.active_menu_id.clone(),
             side_bar: Some(sidebar_node),
             footer,
             dialog: None,
