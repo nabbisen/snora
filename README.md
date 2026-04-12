@@ -1,4 +1,4 @@
-# Snora Framework Documentation
+# Snora iced-based GUI Framework Documentation
 
 ## 1. Overview
 **Snora** is a declarative and structured UI framework built atop the pure Rust GUI library `iced`.
