@@ -3,7 +3,7 @@ pub mod layout;
 pub mod style;
 
 pub use snora_core::contract::{
-    app::{AppLayout, AppSideBar, AppSideBarItem, MenuItem},
+    app::{AppLayout, AppSideBar, AppSideBarItem, BottomSheet, MenuItem},
     page::PageLayout,
     rtl::LayoutDirection,
     stack::{Dialog, Toast, ToastIntent},

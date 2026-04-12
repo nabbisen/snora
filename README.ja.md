@@ -97,6 +97,7 @@ let layout = PageLayout {
     aside: Some(sidebar_widget),
     footer: None,
     dialog: None,
+    bottom_sheet: None,
     toasts: vec![],
 };
 
