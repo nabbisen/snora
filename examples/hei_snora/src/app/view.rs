@@ -4,16 +4,16 @@ use iced::{
     widget::{button, column, container, row, scrollable, space, text},
 };
 use snora::{
-    AppLayout, AppSideBar, AppSideBarItem, BottomSheet, Icon, MenuItem, PageLayout,
+    AppLayout, AppSideBar, AppSideBarItem, BottomSheet, Icon, Menu, MenuItem, PageLayout,
     components::app::{header::app_header, side_bar::app_side_bar},
     icons,
     layout::{app::render_app, page::render_page},
     style::container_box_style,
 };
 
-use super::{HeiSnora, ViewId, message::Message};
+use super::{App, MenuItemId, ViewId, message::Message};
 
-impl HeiSnora {
+impl App {
     pub fn view(&self) -> Element<'_, Message> {
         // --- 1. Page Level の構築 ---
 
@@ -62,17 +62,26 @@ impl HeiSnora {
         let app_header = app_header(
             "Snora App",
             vec![
-                MenuItem {
+                Menu {
                     label: "File".into(),
                     icon: Some(Icon::Lucide(icons::FileText)),
-                    action: Some(Message::MenuAction("File")),
+                    items: vec![MenuItem {
+                        menu_id: MenuItemId::FileDummy,
+                        label: "Dummy".into(),
+                        icon: Some(Icon::Lucide(icons::FileText)),
+                    }],
                 },
-                MenuItem {
+                Menu {
                     label: "Settings".into(),
                     icon: Some(Icon::Lucide(icons::Settings)),
-                    action: Some(Message::MenuAction("Settings")),
+                    items: vec![MenuItem {
+                        menu_id: MenuItemId::SettingsDummy,
+                        label: "Settings".into(),
+                        icon: Some(Icon::Lucide(icons::Settings)),
+                    }],
                 },
             ],
+            &Message::MenuAction,
             None,
         );
 
@@ -122,6 +131,7 @@ impl HeiSnora {
         )
         .padding(16)
         .into();
+        let footer = Some(footer_content);
 
         let bottom_sheet = if self.is_bottom_sheet_open {
             // 💡 所有権を奪わず、参照から UI を組み立てる
@@ -166,7 +176,7 @@ impl HeiSnora {
             body: page_node,
             header: Some(app_header),
             side_bar: Some(sidebar_node),
-            footer: Some(footer_content),
+            footer,
             dialog: None,
             bottom_sheet,
             toasts: vec![],

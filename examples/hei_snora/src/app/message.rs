@@ -1,10 +1,10 @@
-use super::ViewId;
+use super::{MenuItemId, ViewId};
 
 #[derive(Debug, Clone)]
 pub enum Message {
     ToggleDirection,
     SelectView(ViewId),
-    MenuAction(&'static str),
+    MenuAction(MenuItemId),
     ToggleLogSheet,
     AddDummyLog,
 }

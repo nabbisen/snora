@@ -1,9 +1,9 @@
 use iced::Task;
 use snora::{LayoutDirection, ToastIntent};
 
-use super::{HeiSnora, log::LogEntry, message::Message};
+use super::{App, log::LogEntry, message::Message};
 
-impl HeiSnora {
+impl App {
     pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::ToggleDirection => {
@@ -20,11 +20,11 @@ impl HeiSnora {
                     message: format!("Switched to view: {}", view_id),
                 });
             }
-            Message::MenuAction(name) => {
+            Message::MenuAction(menu_item_id) => {
                 self.logs.push(LogEntry {
                     intent: ToastIntent::Info,
                     timestamp: "Just now".into(),
-                    message: format!("Clicked: {}", name),
+                    message: format!("Clicked: {}", menu_item_id),
                 });
             }
             Message::ToggleLogSheet => {

@@ -26,14 +26,29 @@ impl std::fmt::Display for ViewId {
     }
 }
 
-pub struct HeiSnora {
+#[derive(Debug, Clone, PartialEq)]
+pub enum MenuItemId {
+    FileDummy,
+    SettingsDummy,
+}
+
+impl std::fmt::Display for MenuItemId {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            MenuItemId::FileDummy => write!(f, "FileDummy"),
+            MenuItemId::SettingsDummy => write!(f, "SettingsDummy"),
+        }
+    }
+}
+
+pub struct App {
     direction: LayoutDirection,
     active_view_id: ViewId, // 現在選択されているAppレベルのビューID
     logs: Vec<LogEntry>,
     is_bottom_sheet_open: bool,
 }
 
-impl HeiSnora {
+impl App {
     pub fn new() -> (Self, Task<Message>) {
         (
             Self {

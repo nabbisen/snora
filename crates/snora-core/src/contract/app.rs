@@ -36,10 +36,22 @@ where
     pub active_view_id: ViewId,
 }
 
-pub struct MenuItem<Message> {
+pub struct Menu<MenuId>
+where
+    MenuId: PartialEq + Clone + std::fmt::Debug,
+{
     pub label: String,
     pub icon: Option<Icon>,
-    pub action: Option<Message>,
+    pub items: Vec<MenuItem<MenuId>>,
+}
+
+pub struct MenuItem<MenuId>
+where
+    MenuId: PartialEq + Clone + std::fmt::Debug,
+{
+    pub menu_id: MenuId,
+    pub label: String,
+    pub icon: Option<Icon>,
 }
 
 pub struct BottomSheet<Node, Message> {
