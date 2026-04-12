@@ -9,9 +9,26 @@ mod view;
 use crate::app::log::LogEntry;
 use message::Message;
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum ViewId {
+    Home,
+    Search,
+    Settings,
+}
+
+impl std::fmt::Display for ViewId {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            ViewId::Home => write!(f, "Home"),
+            ViewId::Search => write!(f, "Search"),
+            ViewId::Settings => write!(f, "Settings"),
+        }
+    }
+}
+
 pub struct HeiSnora {
     direction: LayoutDirection,
-    active_view: String, // 現在選択されているAppレベルのビューID
+    active_view_id: ViewId, // 現在選択されているAppレベルのビューID
     logs: Vec<LogEntry>,
     is_bottom_sheet_open: bool,
 }
@@ -21,7 +38,7 @@ impl HeiSnora {
         (
             Self {
                 direction: LayoutDirection::Ltr,
-                active_view: "home".into(),
+                active_view_id: ViewId::Home,
                 logs: vec![],
                 is_bottom_sheet_open: false,
             },

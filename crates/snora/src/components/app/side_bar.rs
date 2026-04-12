@@ -8,15 +8,18 @@ use snora_core::contract::app::AppSideBar;
 
 use crate::components::icon::render_icon;
 
-pub fn app_side_bar<'a, Message>(side_bar: AppSideBar<Message>) -> iced::Element<'a, Message>
+pub fn app_side_bar<'a, Message, ViewId>(
+    side_bar: AppSideBar<Message, ViewId>,
+) -> iced::Element<'a, Message>
 where
     Message: Clone + 'a,
+    ViewId: PartialEq + 'a,
 {
     let mut col = column![].spacing(16).align_x(Alignment::Center);
 
     for item in side_bar.items {
         // アクティブ状態の判定（今回は見た目の変化のプレースホルダーとして）
-        let _is_active = item.id == side_bar.active_id;
+        let _is_active = item.view_id == side_bar.active_view_id;
 
         let icon_el = render_icon(&item.icon);
 

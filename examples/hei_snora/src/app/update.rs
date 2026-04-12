@@ -12,12 +12,12 @@ impl HeiSnora {
                     LayoutDirection::Rtl => LayoutDirection::Ltr,
                 };
             }
-            Message::SelectView(id) => {
-                self.active_view = id.clone();
+            Message::SelectView(view_id) => {
+                self.active_view_id = view_id.clone();
                 self.logs.push(LogEntry {
                     intent: ToastIntent::Info,
                     timestamp: "Now".into(),
-                    message: format!("Switched to view: {}", id),
+                    message: format!("Switched to view: {}", view_id),
                 });
             }
             Message::MenuAction(name) => {

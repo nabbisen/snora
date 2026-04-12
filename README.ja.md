@@ -96,9 +96,9 @@ let layout = PageLayout {
     body: main_content_widget,
     aside: Some(sidebar_widget),
     footer: None,
-    dialog: None,
-    bottom_sheet: None,
-    toasts: vec![],
+    dialog: None, // todo: moved to AppLayout
+    bottom_sheet: None, // todo: moved to AppLayout
+    toasts: vec![], // todo: moved to AppLayout
 };
 
 // iced::Element への最終変換

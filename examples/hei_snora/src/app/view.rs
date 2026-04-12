@@ -11,7 +11,7 @@ use snora::{
     style::container_box_style,
 };
 
-use super::{HeiSnora, message::Message};
+use super::{HeiSnora, ViewId, message::Message};
 
 impl HeiSnora {
     pub fn view(&self) -> Element<'_, Message> {
@@ -19,7 +19,7 @@ impl HeiSnora {
 
         let page_body = container(
             column![
-                text(format!("Current View: {}", self.active_view)).size(32),
+                text(format!("Current View: {}", self.active_view_id)).size(32),
                 text("This is the main page content area.").size(18),
                 button("Toggle LTR / RTL").on_press(Message::ToggleDirection)
             ]
@@ -80,19 +80,25 @@ impl HeiSnora {
         let sidebar_data = AppSideBar {
             items: vec![
                 AppSideBarItem {
-                    id: "home".into(),
+                    view_id: ViewId::Home,
                     icon: Icon::Lucide(icons::Home),
                     tooltip: "Home".into(),
-                    action: Message::SelectView("home".into()),
+                    action: Message::SelectView(ViewId::Home),
                 },
                 AppSideBarItem {
-                    id: "search".into(),
+                    view_id: ViewId::Search,
                     icon: Icon::Lucide(icons::Search),
                     tooltip: "Search".into(),
-                    action: Message::SelectView("search".into()),
+                    action: Message::SelectView(ViewId::Search),
+                },
+                AppSideBarItem {
+                    view_id: ViewId::Settings,
+                    icon: Icon::Lucide(icons::Settings),
+                    tooltip: "Settings".into(),
+                    action: Message::SelectView(ViewId::Settings),
                 },
             ],
-            active_id: self.active_view.clone(),
+            active_view_id: self.active_view_id.clone(),
         };
         let sidebar_node = app_side_bar(sidebar_data);
 
