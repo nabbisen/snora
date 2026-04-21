@@ -1,7 +1,4 @@
-use iced::{
-    Background, Color, Element, Length,
-    widget::{center, container, mouse_area, opaque, space, stack},
-};
+use iced::{Element, widget::center};
 use snora_core::contract::stack::Dialog;
 
 pub fn render_dialog<'a, Message>(
@@ -16,23 +13,7 @@ where
         return None;
     };
 
-    let backdrop = container(space())
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .style(|_theme| container::Style {
-            background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.5))),
-            ..Default::default()
-        });
-
-    let backdrop_interactive = if let Some(on_close) = dialog.on_outside_click {
-        mouse_area(opaque(backdrop)).on_press(on_close)
-    } else {
-        mouse_area(opaque(backdrop))
-    };
-
     let dialog_content = center(dialog.content);
 
-    let dialog_stack = stack![backdrop_interactive, dialog_content];
-
-    Some(dialog_stack.into())
+    Some(dialog_content.into())
 }

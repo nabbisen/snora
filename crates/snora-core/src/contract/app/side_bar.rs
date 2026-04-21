@@ -19,5 +19,5 @@ where
     ViewId: PartialEq,
 {
     pub items: Vec<AppSideBarItem<Message, ViewId>>,
-    pub active_view_id: ViewId,
+    pub view_id: ViewId,
 }

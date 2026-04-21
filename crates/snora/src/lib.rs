@@ -10,7 +10,7 @@ pub use snora_core::contract::{
         header::menu::{Menu, MenuAction, MenuItem},
         side_bar::{AppSideBar, AppSideBarItem},
     },
-    page::PageLayout,
+    page::{PageContract, PageLayout},
     rtl::LayoutDirection,
     stack::{Dialog, Toast, ToastIntent},
     ui::Icon,

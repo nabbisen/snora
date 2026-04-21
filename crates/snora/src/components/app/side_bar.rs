@@ -19,7 +19,7 @@ where
 
     for item in side_bar.items {
         // アクティブ状態の判定（今回は見た目の変化のプレースホルダーとして）
-        let _is_active = item.view_id == side_bar.active_view_id;
+        let _is_active = item.view_id == side_bar.view_id;
 
         let icon_el = render_icon(&item.icon);
 

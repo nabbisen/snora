@@ -1,7 +1,11 @@
 use iced::Task;
 use snora::{LayoutDirection, MenuAction, ToastIntent};
 
-use super::{App, log::LogEntry, message::Message};
+use super::{
+    App, FileMenuItemId, HelpMenuItemId, MenuId, MenuItemId, Message, ToastData, ToastFlavor,
+    ViewMenuItemId,
+    log::LogEntry,
+};
 
 impl App {
     pub fn update(&mut self, message: Message) -> Task<Message> {
@@ -11,47 +15,166 @@ impl App {
                     LayoutDirection::Ltr => LayoutDirection::Rtl,
                     LayoutDirection::Rtl => LayoutDirection::Ltr,
                 };
+                self.log_info(format!("Direction → {:?}", self.direction));
             }
             Message::SelectView(view_id) => {
-                self.active_view_id = view_id.clone();
-                self.logs.push(LogEntry {
-                    intent: ToastIntent::Info,
-                    timestamp: "Now".into(),
-                    message: format!("Switched to view: {}", view_id),
-                });
+                self.log_info(format!("Switched view: {}", view_id));
+                self.active_view_id = view_id;
             }
-            Message::HeaderAction(header_action) => match header_action {
+            Message::HeaderAction(action) => match action {
                 MenuAction::MenuPressed(menu_id) => {
-                    // 同じメニューが押されたら閉じる(None)、違うなら開く(Some)
-                    if self.active_menu_id.as_ref() == Some(&menu_id) {
-                        self.active_menu_id = None;
+                    // Same menu pressed → close; different menu → switch.
+                    self.active_menu_id = if self.active_menu_id.as_ref() == Some(&menu_id) {
+                        None
                     } else {
-                        self.active_menu_id = Some(menu_id);
-                    }
+                        Some(menu_id)
+                    };
                 }
                 MenuAction::MenuItemPressed {
                     menu_id,
                     menu_item_id,
                 } => {
-                    // 項目が選ばれたら、アクションを実行しつつメニューを閉じる
                     self.active_menu_id = None;
-
-                    self.logs.push(LogEntry {
-                        intent: ToastIntent::Info,
-                        timestamp: "Just now".into(),
-                        message: format!("Clicked: {} - {}", menu_id, menu_item_id),
-                    });
+                    self.handle_menu_item(menu_id, menu_item_id);
                 }
             },
-            Message::ToggleLogSheet => {
-                self.is_bottom_sheet_open = !self.is_bottom_sheet_open;
+
+            Message::OpenContextMenu(pos) => {
+                self.context_menu_pos = Some(pos);
             }
-            Message::AddDummyLog => self.logs.push(LogEntry {
-                intent: ToastIntent::Debug,
-                timestamp: "Now".into(),
-                message: "Dummy log entry".into(),
-            }),
+            Message::OpenDialog => {
+                self.show_dialog = true;
+            }
+            Message::ToggleSheet => {
+                self.show_bottom_sheet = !self.show_bottom_sheet;
+            }
+
+            // Close sinks — the framework's transparent / dimmed backdrops call these.
+            Message::CloseMenus => {
+                self.active_menu_id = None;
+                self.context_menu_pos = None;
+            }
+            Message::CloseModals => {
+                self.show_dialog = false;
+                self.show_bottom_sheet = false;
+            }
+
+            Message::AddLog => {
+                let ts = format!("t+{}", self.logs.len());
+                self.logs.push(LogEntry {
+                    intent: ToastIntent::Debug,
+                    timestamp: ts,
+                    message: "Manual log entry".into(),
+                });
+            }
+            Message::ShowToast(flavor) => {
+                self.push_toast(flavor);
+            }
+            Message::DismissToast(id) => {
+                self.toasts.retain(|t| t.id != id);
+            }
+            Message::SearchChanged(q) => {
+                self.search_query = q;
+            }
+            Message::SubmitSearch => {
+                let q = self.search_query.trim().to_string();
+                if q.is_empty() {
+                    self.push_toast_with(
+                        ToastFlavor::Warning,
+                        "Empty query",
+                        "Type something before submitting.",
+                    );
+                } else {
+                    self.push_toast_with(
+                        ToastFlavor::Success,
+                        "Search dispatched",
+                        format!("Searched for: “{}”", q),
+                    );
+                    self.log_info(format!("Search submitted: '{}'", q));
+                }
+            }
         }
         Task::none()
+    }
+
+    fn handle_menu_item(&mut self, _menu_id: MenuId, item: MenuItemId) {
+        match item {
+            MenuItemId::File(FileMenuItemId::New) => {
+                self.log_info("File → New (placeholder)".into());
+                self.push_toast_with(ToastFlavor::Info, "File", "New document created (demo)");
+            }
+            MenuItemId::File(FileMenuItemId::Open) => {
+                self.log_info("File → Open (placeholder)".into());
+                self.push_toast_with(ToastFlavor::Info, "File", "Open dialog would appear here");
+            }
+            MenuItemId::File(FileMenuItemId::Quit) => {
+                self.log_info("File → Quit (placeholder)".into());
+                self.push_toast_with(
+                    ToastFlavor::Warning,
+                    "Quit",
+                    "Quit is a no-op in this showcase.",
+                );
+            }
+            MenuItemId::View(ViewMenuItemId::ToggleLogs) => {
+                self.show_bottom_sheet = !self.show_bottom_sheet;
+            }
+            MenuItemId::View(ViewMenuItemId::FlipDirection) => {
+                self.direction = match self.direction {
+                    LayoutDirection::Ltr => LayoutDirection::Rtl,
+                    LayoutDirection::Rtl => LayoutDirection::Ltr,
+                };
+                self.log_info(format!("Direction → {:?} (from menu)", self.direction));
+            }
+            MenuItemId::Help(HelpMenuItemId::Documentation) => {
+                self.push_toast_with(
+                    ToastFlavor::Info,
+                    "Docs",
+                    "See README.md in the workspace root.",
+                );
+            }
+            MenuItemId::Help(HelpMenuItemId::About) => {
+                self.show_dialog = true;
+            }
+        }
+    }
+
+    fn log_info(&mut self, msg: String) {
+        self.logs.push(LogEntry {
+            intent: ToastIntent::Info,
+            timestamp: format!("t+{}", self.logs.len()),
+            message: msg,
+        });
+    }
+
+    fn push_toast(&mut self, flavor: ToastFlavor) {
+        let (title, body) = match flavor {
+            ToastFlavor::Info => ("Info", "A neutral notification."),
+            ToastFlavor::Success => ("Success", "Operation completed."),
+            ToastFlavor::Warning => ("Warning", "Something deserves attention."),
+            ToastFlavor::Error => ("Error", "Something went wrong (demo only)."),
+        };
+        self.push_toast_with(flavor, title, body);
+    }
+
+    fn push_toast_with(
+        &mut self,
+        flavor: ToastFlavor,
+        title: impl Into<String>,
+        body: impl Into<String>,
+    ) {
+        let intent = match flavor {
+            ToastFlavor::Info => ToastIntent::Info,
+            ToastFlavor::Success => ToastIntent::Success,
+            ToastFlavor::Warning => ToastIntent::Warning,
+            ToastFlavor::Error => ToastIntent::Error,
+        };
+        let id = self.next_toast_id;
+        self.next_toast_id += 1;
+        self.toasts.push(ToastData {
+            id,
+            title: title.into(),
+            message: body.into(),
+            intent,
+        });
     }
 }

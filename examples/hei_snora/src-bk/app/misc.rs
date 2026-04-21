@@ -1,6 +1,6 @@
 use strum_macros::Display;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ViewId {
     Home,
     Search,
@@ -17,49 +17,36 @@ impl std::fmt::Display for ViewId {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Display)]
+#[derive(Clone, Debug, PartialEq, Display)]
 #[strum(serialize_all = "PascalCase")]
 pub enum MenuId {
     File,
-    View,
-    Help,
+    Settings,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum MenuItemId {
     File(FileMenuItemId),
-    View(ViewMenuItemId),
-    Help(HelpMenuItemId),
+    Settings(SettingsMenuItemId),
 }
 
 impl std::fmt::Display for MenuItemId {
     fn fmt(&self, w: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             MenuItemId::File(x) => write!(w, "{}", x),
-            MenuItemId::View(x) => write!(w, "{}", x),
-            MenuItemId::Help(x) => write!(w, "{}", x),
+            MenuItemId::Settings(x) => write!(w, "{}", x),
         }
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Display)]
+#[derive(Clone, Debug, PartialEq, Display)]
 #[strum(serialize_all = "PascalCase")]
 pub enum FileMenuItemId {
     New,
-    Open,
-    Quit,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Display)]
+#[derive(Clone, Debug, PartialEq, Display)]
 #[strum(serialize_all = "PascalCase")]
-pub enum ViewMenuItemId {
-    ToggleLogs,
-    FlipDirection,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Display)]
-#[strum(serialize_all = "PascalCase")]
-pub enum HelpMenuItemId {
-    Documentation,
+pub enum SettingsMenuItemId {
     About,
 }
