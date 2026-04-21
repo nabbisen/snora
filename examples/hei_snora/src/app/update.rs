@@ -1,3 +1,5 @@
+use std::time::{Duration, Instant};
+
 use iced::Task;
 use snora::{LayoutDirection, MenuAction, ToastIntent};
 
@@ -67,12 +69,43 @@ impl App {
                     message: "Manual log entry".into(),
                 });
             }
+
+            // --- Toast entry points ---
             Message::ShowToast(flavor) => {
-                self.push_toast(flavor);
+                // Default duration pulled from app settings.
+                self.push_toast_default(flavor);
+            }
+            Message::ShowCustomToast(flavor, millis) => {
+                let (title, body) = Self::default_copy(flavor);
+                self.push_toast_with(
+                    flavor,
+                    title,
+                    format!("{body} (auto-dismiss in {millis} ms)"),
+                    Some(Duration::from_millis(millis)),
+                );
+            }
+            Message::ShowPersistentToast(flavor) => {
+                let (title, body) = Self::default_copy(flavor);
+                self.push_toast_with(
+                    flavor,
+                    title,
+                    format!("{body} (manual dismiss only)"),
+                    None,
+                );
             }
             Message::DismissToast(id) => {
                 self.toasts.retain(|t| t.id != id);
             }
+            Message::Tick => {
+                // Sweep expired toasts. Persistent toasts (`expires_at: None`)
+                // are always retained and must be closed by the user.
+                let now = Instant::now();
+                self.toasts.retain(|t| match t.expires_at {
+                    None => true,
+                    Some(e) => now < e,
+                });
+            }
+
             Message::SearchChanged(q) => {
                 self.search_query = q;
             }
@@ -83,12 +116,14 @@ impl App {
                         ToastFlavor::Warning,
                         "Empty query",
                         "Type something before submitting.",
+                        Some(self.default_toast_duration),
                     );
                 } else {
                     self.push_toast_with(
                         ToastFlavor::Success,
                         "Search dispatched",
                         format!("Searched for: “{}”", q),
+                        Some(self.default_toast_duration),
                     );
                     self.log_info(format!("Search submitted: '{}'", q));
                 }
@@ -101,15 +136,23 @@ impl App {
         match item {
             MenuItemId::File(FileMenuItemId::New) => {
                 self.log_info("File → New (placeholder)".into());
-                self.push_toast_with(ToastFlavor::Info, "File", "New document created (demo)");
+                self.push_toast_default_with(
+                    ToastFlavor::Info,
+                    "File",
+                    "New document created (demo)",
+                );
             }
             MenuItemId::File(FileMenuItemId::Open) => {
                 self.log_info("File → Open (placeholder)".into());
-                self.push_toast_with(ToastFlavor::Info, "File", "Open dialog would appear here");
+                self.push_toast_default_with(
+                    ToastFlavor::Info,
+                    "File",
+                    "Open dialog would appear here",
+                );
             }
             MenuItemId::File(FileMenuItemId::Quit) => {
                 self.log_info("File → Quit (placeholder)".into());
-                self.push_toast_with(
+                self.push_toast_default_with(
                     ToastFlavor::Warning,
                     "Quit",
                     "Quit is a no-op in this showcase.",
@@ -126,7 +169,7 @@ impl App {
                 self.log_info(format!("Direction → {:?} (from menu)", self.direction));
             }
             MenuItemId::Help(HelpMenuItemId::Documentation) => {
-                self.push_toast_with(
+                self.push_toast_default_with(
                     ToastFlavor::Info,
                     "Docs",
                     "See README.md in the workspace root.",
@@ -146,21 +189,40 @@ impl App {
         });
     }
 
-    fn push_toast(&mut self, flavor: ToastFlavor) {
-        let (title, body) = match flavor {
+    /// Canonical title/body copy used when the caller didn't supply their own.
+    fn default_copy(flavor: ToastFlavor) -> (&'static str, &'static str) {
+        match flavor {
             ToastFlavor::Info => ("Info", "A neutral notification."),
             ToastFlavor::Success => ("Success", "Operation completed."),
             ToastFlavor::Warning => ("Warning", "Something deserves attention."),
             ToastFlavor::Error => ("Error", "Something went wrong (demo only)."),
-        };
-        self.push_toast_with(flavor, title, body);
+        }
     }
 
+    fn push_toast_default(&mut self, flavor: ToastFlavor) {
+        let (title, body) = Self::default_copy(flavor);
+        self.push_toast_with(flavor, title, body, Some(self.default_toast_duration));
+    }
+
+    fn push_toast_default_with(
+        &mut self,
+        flavor: ToastFlavor,
+        title: impl Into<String>,
+        body: impl Into<String>,
+    ) {
+        let default = self.default_toast_duration;
+        self.push_toast_with(flavor, title, body, Some(default));
+    }
+
+    /// Enqueue a toast with explicit duration.
+    /// * `Some(d)` — auto-dismiss after `d`
+    /// * `None` — persistent; only the close button removes it
     fn push_toast_with(
         &mut self,
         flavor: ToastFlavor,
         title: impl Into<String>,
         body: impl Into<String>,
+        duration: Option<Duration>,
     ) {
         let intent = match flavor {
             ToastFlavor::Info => ToastIntent::Info,
@@ -170,11 +232,17 @@ impl App {
         };
         let id = self.next_toast_id;
         self.next_toast_id += 1;
+        // `Instant::now()` here is an intentional impurity — time travel
+        // replay would regenerate different `expires_at` values, but that's
+        // acceptable for a showcase; correctness doesn't depend on replay
+        // determinism.
+        let expires_at = duration.map(|d| Instant::now() + d);
         self.toasts.push(ToastData {
             id,
             title: title.into(),
             message: body.into(),
             intent,
+            expires_at,
         });
     }
 }

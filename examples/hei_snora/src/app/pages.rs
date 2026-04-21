@@ -1,10 +1,10 @@
 //! The three showcase views. `body` dispatches to one of them based on the
 //! sidebar's active view id; each is a plain `Element` producer.
 //!
-//! Together they exercise: toasts (all four intents), dialog, bottom sheet,
-//! context menu, search input with submit, and read-only state reporting.
-//! Nothing here knows about the framework's composition rules — that's the
-//! whole point of the `PageContract` / `Section` layer above.
+//! Together they exercise: toasts (all four intents × three lifetimes), dialog,
+//! bottom sheet, context menu, search input with submit, and read-only state
+//! reporting. Nothing here knows about the framework's composition rules —
+//! that's the whole point of the `PageContract` / `Section` layer above.
 
 use iced::{
     Alignment::Center,
@@ -26,10 +26,12 @@ pub fn body(app: &App) -> Element<'_, Message> {
 
 // --------------------------------------------------------------------------
 // Home — the headline view. Buttons for every feedback surface so a user can
-// poke each overlay from one place.
+// poke each overlay from one place. The toast rows are grouped by *lifetime*
+// (default vs. custom vs. persistent) rather than intent, because lifetime is
+// the feature this view is demonstrating.
 // --------------------------------------------------------------------------
 
-fn home(_app: &App) -> Element<'_, Message> {
+fn home(app: &App) -> Element<'_, Message> {
     let intro = column![
         text("Home").size(28),
         text(
@@ -41,12 +43,41 @@ fn home(_app: &App) -> Element<'_, Message> {
     ]
     .spacing(8);
 
-    let toast_row = row![
-        text("Toasts:").size(14),
+    // Default-duration row: uses App::default_toast_duration. Same intent per
+    // button as the original showcase — this is the "normal" channel.
+    let default_secs = app.default_toast_duration.as_secs_f32();
+    let default_row = row![
+        text(format!("Default ({default_secs:.1}s):")).size(14),
         button(text("Info").size(12)).on_press(Message::ShowToast(ToastFlavor::Info)),
         button(text("Success").size(12)).on_press(Message::ShowToast(ToastFlavor::Success)),
         button(text("Warning").size(12)).on_press(Message::ShowToast(ToastFlavor::Warning)),
         button(text("Error").size(12)).on_press(Message::ShowToast(ToastFlavor::Error)),
+    ]
+    .spacing(8)
+    .align_y(Center);
+
+    // Custom-duration row: per-toast override of the app default. 1 s is a
+    // blink-and-you-miss-it confirmation; 10 s is an "important but not
+    // blocking" heads-up.
+    let custom_row = row![
+        text("Custom:").size(14),
+        button(text("Quick Info (1s)").size(12))
+            .on_press(Message::ShowCustomToast(ToastFlavor::Info, 1_000)),
+        button(text("Slow Success (10s)").size(12))
+            .on_press(Message::ShowCustomToast(ToastFlavor::Success, 10_000)),
+    ]
+    .spacing(8)
+    .align_y(Center);
+
+    // Persistent row: no auto-dismiss. The only way to clear these is the
+    // close button on the toast itself. Used for errors that must be
+    // acknowledged.
+    let persistent_row = row![
+        text("Persistent:").size(14),
+        button(text("Warning (manual close)").size(12))
+            .on_press(Message::ShowPersistentToast(ToastFlavor::Warning)),
+        button(text("Error (manual close)").size(12))
+            .on_press(Message::ShowPersistentToast(ToastFlavor::Error)),
     ]
     .spacing(8)
     .align_y(Center);
@@ -75,11 +106,15 @@ fn home(_app: &App) -> Element<'_, Message> {
         column![
             intro,
             space().height(Length::Fixed(16.0)),
-            toast_row,
+            text("Toasts").size(18),
+            default_row,
+            custom_row,
+            persistent_row,
+            space().height(Length::Fixed(12.0)),
             overlay_row,
             misc_row,
         ]
-        .spacing(12),
+        .spacing(10),
     )
     .padding(Padding::from([24.0, 32.0]))
     .width(Length::Fill)
@@ -154,13 +189,31 @@ fn settings(app: &App) -> Element<'_, Message> {
     .spacing(12)
     .align_y(Center);
 
+    let transient_count = app
+        .toasts
+        .iter()
+        .filter(|t| t.expires_at.is_some())
+        .count();
+    let persistent_count = app.toasts.len() - transient_count;
+
     let stats = column![
-        text(format!("Logs queued:   {}", app.logs.len())).size(13),
-        text(format!("Toasts queued: {}", app.toasts.len())).size(13),
-        text(format!("Dialog open:   {}", app.show_dialog)).size(13),
-        text(format!("Sheet open:    {}", app.show_bottom_sheet)).size(13),
         text(format!(
-            "Active menu:   {}",
+            "Default toast duration: {:.1}s",
+            app.default_toast_duration.as_secs_f32()
+        ))
+        .size(13),
+        text(format!(
+            "Toasts queued:  {} (auto-dismiss: {}, persistent: {})",
+            app.toasts.len(),
+            transient_count,
+            persistent_count,
+        ))
+        .size(13),
+        text(format!("Logs queued:    {}", app.logs.len())).size(13),
+        text(format!("Dialog open:    {}", app.show_dialog)).size(13),
+        text(format!("Sheet open:     {}", app.show_bottom_sheet)).size(13),
+        text(format!(
+            "Active menu:    {}",
             match &app.active_menu_id {
                 Some(id) => format!("{}", id),
                 None => "—".to_string(),
