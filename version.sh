@@ -1,15 +1,15 @@
 #!/bin/sh
 #
-# workspace_version.sh – Cargo ワークスペースのクレートバージョンを
+# version.sh – Cargo ワークスペースのクレートバージョンを
 #   * 一覧表示 (--list)
 #   * 任意のバージョンに一括更新 (--update <ver>)
 #
 # 必要ツール: cargo, jq, awk, grep
 #
 # 使い方例:
-#   ./workspace_version.sh --list
-#   ./workspace_version.sh --update 1.2.3
-#   ./workspace_version.sh --update 1.2.3 --dry-run
+#   sh version.sh --list
+#   sh version.sh -u 1.2.3
+#   sh version.sh --update 1.2.3 --dry-run
 #
 
 # ---------- 定数 ----------
