@@ -1,10 +1,22 @@
 [package]
-name = "snora-core"
-version = "0.3.4"
-edition = "2024"
+name        = "snora-core"
+version     = "0.4.0"
+edition     = "2024"
+
+description             = "Vocabulary and contract layer for the Snora iced GUI framework."
+authors.workspace        = true
+license.workspace       = true
+categories.workspace    = true
+keywords                = ["gui", "framework", "productivity", "layout", "widget"]
+repository.workspace    = true
+readme.workspace        = true
 
 [features]
+# When enabled, the `Icon::Lucide` variant is compiled in.
 lucide-icons = ["dep:lucide-icons"]
+# When enabled, the `Icon::Svg` variant is compiled in. This only affects the
+# core vocabulary; actual SVG rendering is done by the `snora` crate with the
+# matching feature.
 svg-icons = []
 
 [dependencies]

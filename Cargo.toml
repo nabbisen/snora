@@ -2,20 +2,34 @@
 members = [
     "crates/snora-core",
     "crates/snora",
-    "examples/hei_snora"
+    "examples/hello",
+    "examples/skeleton",
+    "examples/toast",
+    "examples/dialog",
+    "examples/bottom_sheet",
+    "examples/context_menu",
+    "examples/header_menu",
+    "examples/multi_view",
+    "examples/rtl",
 ]
 resolver = "2"
 
-[profile.release]     # shrink executable size
+[workspace.package]
+authors       = ["nabbisen <nabbisen@scqr.net>"]
+license       = "Apache-2.0"
+categories    = ["gui", "development-tools", "accessibility", "asynchronous"]
+repository    = "https://github.com/nabbisen/snora"
+readme        = "README.md"
+
+[profile.release]
 opt-level = "z"
 lto = true
-# panic = "abort"
 strip = true
 codegen-units = 1
 
-[profile.dev]         # to improve productivity
-opt-level = 1         # slightly optimize
-lto = false           # disable link-time optimizations
+[profile.dev]
+opt-level = 1
+lto = false
 incremental = false
 
 [workspace.dependencies]
