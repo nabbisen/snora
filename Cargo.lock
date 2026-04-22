@@ -1710,9 +1710,9 @@ checksum = "7f66e8d5d03f609abc3a39e6f08e4164ebf1447a732906d39eb9b99b7919ef39"
 
 [[package]]
 name = "lucide-icons"
-version = "0.576.0"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "684c86b9784061d9053c6d96b69b102160bce20d59d9e72673f3b7390f04eaef"
+checksum = "47cfdf7a593d295de1896e9a86b0e6454927ed382ffe3b97686e0f90f2ef4530"
 dependencies = [
  "iced",
 ]
@@ -3006,7 +3006,7 @@ dependencies = [
 
 [[package]]
 name = "snora"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "lucide-icons",
@@ -3015,14 +3015,14 @@ dependencies = [
 
 [[package]]
 name = "snora-core"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "lucide-icons",
 ]
 
 [[package]]
 name = "snora-example-bottom-sheet"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3030,7 +3030,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-context-menu"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3038,7 +3038,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-dialog"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3046,7 +3046,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-header-menu"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3054,7 +3054,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-hello"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3062,7 +3062,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-multi-view"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3070,7 +3070,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-rtl"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3078,7 +3078,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-skeleton"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",
@@ -3086,7 +3086,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-toast"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "iced",
  "snora",

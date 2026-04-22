@@ -1,10 +1,10 @@
 [package]
 name        = "snora-core"
-version     = "0.4.0"
+version = "0.4.1"
 edition     = "2024"
 
 description             = "Vocabulary and contract layer for the Snora iced GUI framework."
-authors.workspace        = true
+authors.workspace       = true
 license.workspace       = true
 categories.workspace    = true
 keywords                = ["gui", "framework", "productivity", "layout", "widget"]

@@ -1,5 +1,13 @@
 # Snora — iced GUI Framework
 
+[![snora](https://img.shields.io/crates/v/snora?label=snora)](https://crates.io/crates/snora)
+[![snora Docs](https://docs.rs/snora/badge.svg?version=latest)](https://docs.rs/snora)
+[![snora Deps Status](https://deps.rs/crate/snora/latest/status.svg)](https://deps.rs/crate/snora)    
+[![snora-core](https://img.shields.io/crates/v/snora-core?label=snora-core)](https://crates.io/crates/snora-core)
+[![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core)
+[![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core)    
+[![License](https://img.shields.io/github/license/nabbisen/snora)](https://github.com/nabbisen/snora/blob/main/LICENSE)
+
 ## 1. Overview
 
 **Snora** is a minimal iced-based GUI framework that provides the

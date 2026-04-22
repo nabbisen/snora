@@ -34,4 +34,4 @@ incremental = false
 
 [workspace.dependencies]
 iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
-lucide-icons = { version = "0", features = ["iced"] }
+lucide-icons = { version = "1", features = ["iced"] }
