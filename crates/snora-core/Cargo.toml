@@ -1,15 +1,14 @@
 [package]
-name        = "snora-core"
-version = "0.4.1"
-edition     = "2024"
-
-description             = "Vocabulary and contract layer for the Snora iced GUI framework."
-authors.workspace       = true
-license.workspace       = true
-categories.workspace    = true
-keywords                = ["gui", "framework", "productivity", "layout", "widget"]
-repository.workspace    = true
-readme.workspace        = true
+name = "snora-core"
+version.workspace = true
+edition.workspace = true
+description = "Vocabulary and contract layer for the Snora iced GUI framework."
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+readme = "../../README.md"
+keywords = ["gui", "iced", "ui", "framework"]
+categories = ["gui"]
 
 [features]
 # When enabled, the `Icon::Lucide` variant is compiled in.

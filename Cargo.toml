@@ -14,12 +14,15 @@ members = [
 ]
 resolver = "2"
 
+# Shared package metadata. Member crates pull these in via
+# `<field>.workspace = true` so that license, edition, and authorship
+# stay declared in exactly one place.
 [workspace.package]
+version = "0.4.2"
+edition = "2024"
+license = "Apache-2.0"
 authors       = ["nabbisen <nabbisen@scqr.net>"]
-license       = "Apache-2.0"
-categories    = ["gui", "development-tools", "accessibility", "asynchronous"]
 repository    = "https://github.com/nabbisen/snora"
-readme        = "README.md"
 
 [profile.release]
 opt-level = "z"

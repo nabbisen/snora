@@ -1,15 +1,14 @@
 [package]
-name        = "snora"
-version = "0.4.1"
-edition     = "2024"
-
-description             = "iced engine for the Snora GUI framework. Consumes snora-core vocabulary."
-authors.workspace       = true
-license.workspace       = true
-categories.workspace    = true
-keywords                = ["iced", "gui", "framework", "layout", "widget"]
-repository.workspace    = true
-readme.workspace        = true
+name = "snora"
+version.workspace = true
+edition.workspace = true
+description = "iced engine for the Snora GUI framework. Consumes snora-core vocabulary."
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+readme = "../../README.md"
+categories    = ["gui", "development-tools", "accessibility", "asynchronous"]
+keywords = ["gui", "iced", "ui", "framework", "rtl"]
 
 [features]
 default = []
