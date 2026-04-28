@@ -57,6 +57,7 @@ patch releases are accepted. Bump it only on a minor.
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
 [ ] cargo test --workspace --all-features
+[ ] mdbook build docs               # validates the book renders
 [ ] cargo package -p snora-core    --no-verify    # check .crate contents
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents

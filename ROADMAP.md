@@ -8,7 +8,7 @@ real-world usage and feedback. Items move from this document into
 
 For released history, see [CHANGELOG.md](CHANGELOG.md). For the
 *why* behind closed design decisions, see
-[`docs/contributing/design-decisions.md`](docs/contributing/design-decisions.md).
+[`docs/src/contributing/design-decisions.md`](docs/src/contributing/design-decisions.md).
 
 ## Guiding principles (unchanging)
 
@@ -31,7 +31,7 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.8 (next release)
+## Near-term: 0.9 (next release)
 
 These items have either concrete demand or a small enough scope
 that they fit a single release.
@@ -39,13 +39,18 @@ that they fit a single release.
 ### Likely
 
 - **Establish a binary-size baseline.** Per
-  [feature-gating-criteria.md](docs/contributing/feature-gating-criteria.md),
+  [feature-gating-criteria.md](src/contributing/feature-gating-criteria.md),
   indicator (2) needs a baseline measurement (`snora-example-hello`
   with and without `--no-default-features`) recorded so future
   releases can detect drift.
-- **Doctest coverage for the new widget vocab.** `Tab`, `TabBar`,
-  `Crumb` should have small `cargo test --doc` examples to lock
-  the surface against accidental signature change.
+- **Doctest coverage for the widget vocab introduced in 0.7.**
+  `Tab`, `TabBar`, `Crumb` should grow small `cargo test --doc`
+  examples to lock the surface against accidental signature change.
+- **Tooltip vocabulary.** Currently `SideBarItem.tooltip: String` is
+  the only typed tooltip in snora. If a second widget grows a
+  tooltip slot, it warrants pulling tooltips out into shared
+  vocabulary (`Tooltip { text: String, side: Edge }` or similar).
+  Watch for the second consumer.
 
 ### Maybe
 
@@ -53,13 +58,25 @@ that they fit a single release.
   pattern (used in apps for "Export complete" style notifications)
   recurs enough that a small ergonomic helper might be worth
   shipping. Not a vocabulary change — pure ergonomics.
-- **Tooltip vocabulary.** Currently `SideBarItem.tooltip: String` is
-  the only typed tooltip in snora. If a second widget grows a
-  tooltip slot, it warrants pulling tooltips out into shared
-  vocabulary (`Tooltip { text: String, side: Edge }` or similar).
-  Watch for the second consumer.
+- **`mdbook test docs` integration.** Once the doctest pattern is
+  established for the Rust source, run mdBook's own doctest
+  facility on the Markdown so code blocks stay valid alongside
+  vocabulary changes.
 
-## Middle-term: 0.9 — 0.10
+## Recently shipped
+
+- **0.8** — mdBook documentation, GitHub Pages deployment, Docs CI
+  workflow, project-level GitHub conventions
+  (`.github/CONTRIBUTING.md`, security policy, code of conduct,
+  issue templates).
+- **0.7** — `Tab` + `Crumb` vocabulary and widgets; removal of
+  the deprecated 0.6 sheet aliases; documented feature-gating
+  criteria.
+- **0.6** — `Sheet` overlay generalization (4 edges, axis-relative
+  size); 3-crate workspace split (`snora-core` / `snora-widgets` /
+  `snora`).
+
+## Middle-term: 0.10 — 0.11
 
 Things we expect to want but that need design work or signal from
 real applications first.
@@ -78,7 +95,7 @@ real applications first.
   the engine — an iced `Point` or a layout reference. Out of scope
   until a concrete need arrives.
 - **Command palette overlay.** Discussed in
-  [adding-an-overlay.md](docs/contributing/adding-an-overlay.md) as
+  [adding-an-overlay.md](docs/src/contributing/adding-an-overlay.md) as
   a hypothetical example. If multiple applications request it, it
   becomes a real candidate.
 - **`#[doc(cfg(feature = ...))]` polish.** Make sure every feature-
@@ -87,11 +104,11 @@ real applications first.
 ### Investigation
 
 - **Per-widget feature gates.** Coarse gating
-  ([feature-gating-criteria.md](docs/contributing/feature-gating-criteria.md))
+  ([feature-gating-criteria.md](docs/src/contributing/feature-gating-criteria.md))
   is the current decision. Re-evaluate at each release; split when
   the documented thresholds are met.
 - **Snapshot of compile time and binary size in CI.** Once the
-  baseline from 0.8 exists, automate the measurement so the
+  baseline from 0.9 exists, automate the measurement so the
   feature-gating thresholds are checked without human effort.
 
 ## Longer-term: 1.0
@@ -135,7 +152,7 @@ here so the answer is visible.
   to write in a few lines; absorbing them into snora would expand
   the surface without commensurate value.
 - **A `snora-test` crate.** The
-  [testing guide](docs/guides/testing.md) covers what `pub` fields
+  [testing guide](docs/src/guides/testing.md) covers what `pub` fields
   on the vocabulary types already enable. A dedicated test-helper
   crate would freeze internal shapes into the public API.
 - **Game-loop or real-time rendering support.** snora is

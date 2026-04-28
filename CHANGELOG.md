@@ -11,13 +11,57 @@ are bug fixes and additive changes only.
 
 This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
-[`docs/guides/`](docs/guides/).
+[`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
 Nothing yet.
 
-## [0.7.0] — 2026-04-29
+## [0.8.0] — 2026-04-29
+
+### Added
+
+- **Documentation is now an mdBook.** The `docs/` directory has been
+  reorganized into a standard mdBook layout (`docs/book.toml`,
+  `docs/src/`, `docs/src/SUMMARY.md`). All long-form documentation is
+  authored as before; the new structure adds a searchable, themed,
+  hosted view at <https://nabbisen.github.io/snora/>.
+  - The Markdown source remains GitHub-readable. Internal cross-links
+    use relative paths so both render targets work.
+  - `docs/book/` is git-ignored; only the source under `docs/src/` is
+    versioned.
+- **GitHub Actions docs workflow.** A new
+  `.github/workflows/docs.yaml` builds the mdBook on every push to
+  `main` and deploys the result to GitHub Pages. The workflow
+  status is exposed as a Docs badge in the README.
+- **Project-level GitHub conventions.** `.github/` now ships:
+  - `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`.
+  - Issue templates (`ISSUE_TEMPLATE/{bug_report,feature_request,question}.yml`)
+    and `config.yml`.
+- **README Quick start now points to runnable examples.** A direct
+  link to <https://github.com/nabbisen/snora/tree/main/examples>
+  sits alongside the existing pointer to the getting-started chapter,
+  so readers who want to skim working code rather than tutorials
+  get there in one click.
+
+### Changed
+
+- The `docs/README.md` entry page was rewritten as the entry to the
+  full snora documentation (not as an mdBook welcome). It links into
+  `docs/src/...` and explains how to read the docs locally
+  (`mdbook serve docs --open`) or in CI-published form on GitHub
+  Pages.
+- `docs/src/contributing/release-process.md` gained an `mdbook build
+  docs` step in the release checklist so the book is validated as
+  part of every release.
+
+### Tests
+
+- 17 unit tests in `snora-core` (unchanged from 0.7.0).
+
+[Unreleased]: https://github.com/nabbisen/snora/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/nabbisen/snora/releases/tag/v0.8.0
+[0.7.0]: https://github.com/nabbisen/snora/releases/tag/v0.7.0
 
 ### Removed
 
@@ -49,13 +93,13 @@ Nothing yet.
     (`›` under LTR, `‹` under RTL).
 - New focused examples: `snora-example-tab` and `snora-example-breadcrumb`.
 - New contributor doc:
-  [`docs/contributing/feature-gating-criteria.md`](docs/contributing/feature-gating-criteria.md)
+  [`docs/contributing/feature-gating-criteria.md`](docs/src/contributing/feature-gating-criteria.md)
   records the indicators that would justify splitting the coarse
   `widgets` feature into per-widget gates. The decision for 0.7 is
   to keep the coarse gate; the document captures the criteria for
   revisiting it in future releases.
 - New migration guide:
-  [`docs/guides/migration-0.6-to-0.7.md`](docs/guides/migration-0.6-to-0.7.md).
+  [`docs/guides/migration-0.6-to-0.7.md`](docs/src/guides/migration-0.6-to-0.7.md).
 
 ### Changed
 
@@ -69,6 +113,3 @@ Nothing yet.
 ### Tests
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
-
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.7.0...HEAD
-[0.7.0]: https://github.com/nabbisen/snora/releases/tag/v0.7.0

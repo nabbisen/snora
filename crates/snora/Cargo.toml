@@ -34,7 +34,7 @@ svg-icons = [
 ]
 
 [dependencies]
-snora-core = { path = "../snora-core", version = "0.7" }
-snora-widgets = { path = "../snora-widgets", version = "0.7", optional = true }
+snora-core = { path = "../snora-core", version = "0.8" }
+snora-widgets = { path = "../snora-widgets", version = "0.8", optional = true }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

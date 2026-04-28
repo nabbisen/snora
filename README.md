@@ -7,6 +7,7 @@
 [![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core)
 [![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core)    
 [![License](https://img.shields.io/github/license/nabbisen/snora)](https://github.com/nabbisen/snora/blob/main/LICENSE)
+[![Docs](https://github.com/nabbisen/snora/actions/workflows/docs.yaml/badge.svg)](https://github.com/nabbisen/snora/actions/workflows/docs.yaml)
 
 **An iced GUI framework that gets out of the way of your application.**
 
@@ -31,7 +32,7 @@ snora is a good fit when you are building:
 
 snora is *not* the right tool for games, real-time visualization,
 or web-first applications. See
-[docs/getting-started/05-when-to-use.md](docs/getting-started/05-when-to-use.md)
+[docs/getting-started/05-when-to-use.md](docs/src/getting-started/05-when-to-use.md)
 for fuller fit guidance.
 
 ## Quick start
@@ -39,7 +40,7 @@ for fuller fit guidance.
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.7"
+snora = "0.8"
 ```
 
 ```rust
@@ -69,7 +70,10 @@ fn main() -> iced::Result {
 
 That's the whole program. Adding a header, sidebar, and footer is
 three more chained calls — see
-[docs/getting-started](docs/getting-started/).
+[docs/getting-started](docs/src/getting-started/) for the step-by-step
+walk-through, or jump straight to the runnable
+[examples directory](https://github.com/nabbisen/snora/tree/main/examples)
+for one-shot demos of every overlay and widget.
 
 ## Features
 
@@ -108,10 +112,10 @@ three more chained calls — see
 
 For the full picture, head to **[docs/](docs/)**:
 
-- New to snora? Start with [Getting started](docs/getting-started/).
-- Looking up something specific? [Reference](docs/reference/) and
-  [Guides](docs/guides/).
-- Wanting to contribute? [docs/contributing/](docs/contributing/) is
+- New to snora? Start with [Getting started](docs/src/getting-started/).
+- Looking up something specific? [Reference](docs/src/reference/) and
+  [Guides](docs/src/guides/).
+- Wanting to contribute? [docs/src/contributing/](docs/src/contributing/) is
   for you — and we'd be glad to have you.
 
 Per-release notes live in [CHANGELOG.md](CHANGELOG.md); the

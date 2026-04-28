@@ -21,7 +21,7 @@ resolver = "2"
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.7.0"
+version = "0.8.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/nabbisen/snora"
@@ -54,4 +54,4 @@ lucide-icons = { version = "1", features = ["iced"] }
 # Including a `version` field (alongside `path`) is required by
 # `cargo publish`, even though examples themselves are
 # `publish = false`.  Cargo validates the workspace as a whole.
-snora = { path = "crates/snora", version = "0.7" }
+snora = { path = "crates/snora", version = "0.8" }
