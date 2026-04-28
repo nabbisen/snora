@@ -8,35 +8,36 @@ shorter and stops at the public surface.
 
 ```text
 crates/
-├── snora-core/                  # vocabulary
+├── snora-core/                  # vocabulary (no iced dep)
 │   src/
 │     lib.rs                     # re-exports only
 │     direction.rs               # LayoutDirection, Edge
 │     icon.rs                    # Icon enum + From conversions
 │     layout.rs                  # AppLayout struct + builder
 │     menu.rs                    # Menu / MenuItem / MenuAction
-│     overlay.rs                 # Dialog / BottomSheet / SheetHeight
+│     overlay.rs                 # Dialog / Sheet / SheetEdge / SheetSize
 │     sidebar.rs                 # SideBar / SideBarItem
 │     toast.rs                   # Toast / ToastIntent / ToastLifetime
 │                                # / ToastPosition
+├── snora-widgets/               # optional prefab widgets
+│   src/
+│     lib.rs                     # re-exports
+│     direction.rs               # row_dir / row_dir_three
+│     style.rs                   # shared style functions
+│     footer.rs                  # app_footer
+│     header.rs                  # app_header
+│     icon.rs                    # icon_element / icon_element_sized
+│     menu.rs                    # render_menu
+│     sidebar.rs                 # app_side_bar
 └── snora/                       # iced engine
     src/
-      lib.rs                     # re-exports + module wiring
-      direction.rs               # row_dir / row_dir_three
+      lib.rs                     # vocabulary re-exports + widget bridge
       render.rs                  # the only entry point: render(layout)
-      style.rs                   # shared style functions
       toast.rs                   # toast layer + lifecycle helpers
       overlay.rs                 # module declaration
       overlay/
-        bottom_sheet.rs
-        dialog.rs
-      widget.rs                  # module declaration
-      widget/
-        footer.rs
-        header.rs
-        sidebar.rs
-        menu.rs
-        icon.rs
+        sheet.rs                 # render_sheet (all 4 edges)
+        dialog.rs                # render_dialog
 ```
 
 No `mod.rs` files; we use the `my_module.rs + my_module/` layout

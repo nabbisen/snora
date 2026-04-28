@@ -39,7 +39,7 @@
 
 use crate::{
     direction::LayoutDirection,
-    overlay::{BottomSheet, Dialog},
+    overlay::{Dialog, Sheet},
     toast::{Toast, ToastPosition},
 };
 
@@ -93,8 +93,9 @@ where
     // -----------------------------------------------------------------
     /// A centered modal card.
     pub dialog: Option<Dialog<Node, Message>>,
-    /// A modal drawer anchored to the bottom of the window.
-    pub bottom_sheet: Option<BottomSheet<Node, Message>>,
+    /// A modal panel anchored to one of the four window edges. The
+    /// specific edge is configured on the [`Sheet`] itself.
+    pub sheet: Option<Sheet<Node, Message>>,
 
     // -----------------------------------------------------------------
     // Toasts.
@@ -153,7 +154,7 @@ where
             header_menu: None,
             context_menu: None,
             dialog: None,
-            bottom_sheet: None,
+            sheet: None,
             toasts: Vec::new(),
             toast_position: ToastPosition::default(),
             direction: LayoutDirection::default(),
@@ -213,11 +214,20 @@ where
         self
     }
 
-    /// Show a modal bottom sheet.
+    /// Show a modal sheet anchored to one of the window edges.
+    /// Configure the anchor with `Sheet::at(...)` on the value passed in.
     #[must_use]
-    pub fn bottom_sheet(mut self, sheet: BottomSheet<Node, Message>) -> Self {
-        self.bottom_sheet = Some(sheet);
+    pub fn sheet(mut self, sheet: Sheet<Node, Message>) -> Self {
+        self.sheet = Some(sheet);
         self
+    }
+
+    /// Deprecated alias for [`Self::sheet`]. Kept for source compatibility
+    /// with snora 0.5.x. Will be removed in 0.7.0.
+    #[deprecated(since = "0.6.0", note = "use `AppLayout::sheet(...)` instead")]
+    #[must_use]
+    pub fn bottom_sheet(self, sheet: Sheet<Node, Message>) -> Self {
+        self.sheet(sheet)
     }
 
     /// Replace the toast queue. Each frame the application typically passes

@@ -1,11 +1,17 @@
 # Adding a new overlay kind
 
 Use this page when you want to add an overlay surface that does not
-fit `Dialog`, `BottomSheet`, or `context_menu`. Examples that have
-come up in discussion (none implemented yet): a **side drawer**
-sliding from the start edge, a **command palette** centered like a
-dialog but with `Escape` to close, an **anchored popover** attached
-to a specific widget.
+fit `Dialog`, `Sheet`, or `context_menu`. Examples that have come up
+in discussion (none implemented yet): a **command palette** centered
+like a dialog but with `Escape` to close, an **anchored popover**
+attached to a specific widget, an **inline banner** that drops in
+from the top of the body region rather than over the whole window.
+
+Note that side panels and edge-anchored drawers are *already*
+covered by [`Sheet`] — choose `SheetEdge::Start` / `End` rather
+than introducing a separate "drawer" type.
+
+[`Sheet`]: ../guides/overlays.md#sheet
 
 ## Decision tree first
 
@@ -16,35 +22,39 @@ Before writing code, ask:
    as a `Dialog` whose `content` is your search input + result list.
    You get the dim layer and the `on_close_modals` plumbing for
    free, and there is no new vocabulary.
-2. **Is it modal or transient?** Modal → a sibling of `Dialog` /
-   `BottomSheet`. Transient → a sibling of `header_menu` /
-   `context_menu`.
-3. **Does it have configuration that does not fit existing
-   vocabulary?** A side drawer would want a `DrawerEdge` (start /
-   end). A command palette would not.
+2. **Is this a `Sheet` at a non-default edge?** If so, just use
+   `Sheet::new(...).at(SheetEdge::Top)` (or `Start`/`End`). No new
+   overlay needed.
+3. **Is it modal or transient?** Modal → a sibling of `Dialog` /
+   `Sheet`. Transient → a sibling of `header_menu` / `context_menu`.
+4. **Does it have configuration that does not fit existing
+   vocabulary?** A command palette has search history, a popover
+   has an anchor element. New configuration is the strongest
+   reason to introduce a new type.
 
-If you can answer "use a `Dialog`" to (1), stop here.
+If you can answer "use a `Dialog`" or "use a `Sheet` at a different
+edge" to (1) or (2), stop here.
 
 ## Steps if you do need a new overlay
 
 ### 1. Add the data type to `snora-core`
 
-Place it in `src/overlay.rs` next to `Dialog` and `BottomSheet`. Keep
+Place it in `src/overlay.rs` next to `Dialog` and `Sheet`. Keep
 the same shape:
 
 ```rust
-pub struct SideDrawer<Node, Message> {
+pub struct CommandPalette<Node, Message> {
     pub content: Node,
-    pub edge: DrawerEdge,
+    pub recent_count: usize,
     _marker: PhantomData<Message>,
 }
 
-impl<Node, Message> SideDrawer<Node, Message> {
+impl<Node, Message> CommandPalette<Node, Message> {
     pub fn new(content: Node) -> Self { /* sane default */ }
 
     #[must_use]
-    pub fn at(mut self, edge: DrawerEdge) -> Self {
-        self.edge = edge;
+    pub fn with_recent_count(mut self, n: usize) -> Self {
+        self.recent_count = n;
         self
     }
 }
@@ -61,10 +71,10 @@ Notes:
 
 ### 2. Add any new vocabulary enums
 
-If your overlay has configuration (drawer edge, palette mode,
-anchor type), add a small enum next to the struct. Use *logical*
-terms (`Start` / `End`) for axis-aligned variants — never `Left` /
-`Right` directly.
+If your overlay has configuration that does not fit a primitive
+(palette mode, popover anchor type), add a small enum next to the
+struct. Use *logical* terms (`Start` / `End`) for axis-aligned
+variants — never `Left` / `Right` directly.
 
 ### 3. Add an `AppLayout` field + builder method
 
@@ -73,13 +83,16 @@ In `snora-core/src/layout.rs`:
 ```rust
 pub struct AppLayout<Node, Message> {
     // existing fields...
-    pub side_drawer: Option<SideDrawer<Node, Message>>,
+    pub command_palette: Option<CommandPalette<Node, Message>>,
 }
 
 impl<Node, Message: Clone> AppLayout<Node, Message> {
     #[must_use]
-    pub fn side_drawer(mut self, drawer: SideDrawer<Node, Message>) -> Self {
-        self.side_drawer = Some(drawer);
+    pub fn command_palette(
+        mut self,
+        palette: CommandPalette<Node, Message>,
+    ) -> Self {
+        self.command_palette = Some(palette);
         self
     }
 }
@@ -89,11 +102,11 @@ Update `AppLayout::new` to initialize it to `None`.
 
 ### 4. Add the renderer in `snora`
 
-Create `snora/src/overlay/side_drawer.rs`:
+Create `snora/src/overlay/command_palette.rs`:
 
 ```rust
-pub(crate) fn render_side_drawer<'a, Message>(
-    drawer: SideDrawer<Element<'a, Message>, Message>,
+pub(crate) fn render_command_palette<'a, Message>(
+    palette: CommandPalette<Element<'a, Message>, Message>,
     direction: LayoutDirection,
 ) -> Element<'a, Message>
 where Message: Clone + 'a,
@@ -105,7 +118,7 @@ where Message: Clone + 'a,
 
 Wire it into `render` in `snora/src/render.rs`. Decide which
 existing layer it joins (above the dim, with the modals; or below,
-with the menus) and put the `if let Some(drawer)` block in the right
+with the menus) and put the `if let Some(palette)` block in the right
 place. Update the doc comment listing the layer order.
 
 ### 5. Add tests in `snora-core`

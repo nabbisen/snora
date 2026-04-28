@@ -2,11 +2,11 @@
 //!
 //! These are small, opinionated defaults. Applications that need a
 //! distinct visual identity should not try to override these — they
-//! should instead skip the built-in widgets ([`crate::widget`]) and
-//! build their own elements for the relevant [`crate::AppLayout`] slots.
-//! The framework does **not** gate that path: AppLayout slots are raw
-//! `Element`s, so your own widgets compose into the skeleton without
-//! touching snora's style surface.
+//! should instead skip the built-in widgets in this crate and build
+//! their own elements for the relevant
+//! [`snora_core::AppLayout`] slots. The framework does **not** gate that
+//! path: AppLayout slots are raw `Element`s, so your own widgets compose
+//! into the skeleton without touching snora's style surface.
 
 use iced::{
     Border, Color, Shadow, Theme,

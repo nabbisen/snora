@@ -24,7 +24,7 @@ use snora_core::{LayoutDirection, Menu, MenuAction};
 
 use crate::direction::row_dir;
 use crate::style::chrome_container_style;
-use crate::widget::menu::render_menu;
+use crate::menu::render_menu;
 
 /// Build an application header.
 ///

@@ -2,8 +2,11 @@
 
 snora ships a small set of prefab `iced::Element` builders for the
 common chrome — header, sidebar, footer, menu, icon. They are all
-plain functions in `snora::widget` and entirely **optional**: any
-`iced::Element` works in an `AppLayout` slot.
+plain functions, available under `snora::widget` (re-exported from
+the [`snora-widgets`](https://docs.rs/snora-widgets) crate when
+the `widgets` feature is enabled, which is the default), and they
+are entirely **optional**: any `iced::Element` works in an
+`AppLayout` slot.
 
 ## When to use the prefabs
 
@@ -13,6 +16,16 @@ moment you want to customize beyond what the helper exposes — write
 your own iced row and put it in the slot. Snora's value is the
 skeleton + overlay machinery, not the styling of these specific
 widgets.
+
+If you want to skip the widget compilation entirely:
+
+```toml
+snora = { version = "0.6", default-features = false }
+```
+
+In that configuration `snora::widget`, `snora::direction`, and
+`snora::style` do not exist; you supply your own elements for
+every `AppLayout` slot.
 
 ## Inventory
 

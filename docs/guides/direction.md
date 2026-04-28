@@ -61,7 +61,8 @@ under `Rtl`, the order is mirrored. You write the row once.
 | `app_header` | Title group on `Start`, end-controls on `End` |
 | `app_side_bar` | Tooltip side; the sidebar position is determined by `AppLayout::direction` |
 | Toast layer | Anchor side, when `ToastPosition` is `*Start` or `*End` |
-| `BottomSheet`, `Dialog` | Unaffected — these are vertically anchored, not horizontally |
+| `Sheet` | Anchor side, when `SheetEdge` is `Start` or `End`. Inside-facing rounded corner also flips. `Top` / `Bottom` edges are unaffected. |
+| `Dialog` | Unaffected — centered, not edge-anchored |
 
 ## Live flip
 
@@ -70,7 +71,7 @@ Live LTR ↔ RTL flipping is a one-line accessibility setting. Keep
 action, and re-pass it on each `view`. Snora re-renders the whole
 skeleton mirrored — no per-widget reset needed.
 
-The [`examples/rtl`](https://github.com/your-org/snora/tree/main/examples/rtl)
+The [`examples/rtl`](https://github.com/nabbisen/snora/tree/main/examples/rtl)
 demo flips on a button press.
 
 ## Intentionally non-mirroring elements

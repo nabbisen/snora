@@ -39,7 +39,7 @@ for fuller fit guidance.
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.5"
+snora = "0.6"
 ```
 
 ```rust
@@ -81,12 +81,13 @@ three more chained calls — see
   intent → theme color, six anchor positions including RTL-aware ones.
 - **One close sink per channel.** `on_close_modals` for dialogs and
   sheets, `on_close_menus` for header / context menus. Wired once.
-- **Vocabulary instead of magic numbers.** `SheetHeight::Half`,
-  `ToastPosition::TopEnd`, `LayoutDirection::Rtl`, `Edge::Start`
-  — explicit choices, not hardcoded constants.
-- **Two crates, one direction.** `snora-core` is the iced-free
-  vocabulary, `snora` is the engine — an iced upgrade only touches
-  one crate.
+- **Vocabulary instead of magic numbers.** `SheetSize::Half`,
+  `SheetEdge::Start`, `ToastPosition::TopEnd`,
+  `LayoutDirection::Rtl`, `Edge::Start` — explicit choices, not
+  hardcoded constants.
+- **Three crates, one umbrella.** `snora-core` is the iced-free
+  vocabulary, `snora-widgets` is the optional prefab UI parts, and
+  `snora` is the engine — applications only depend on `snora`.
 
 ## Design notes
 

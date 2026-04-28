@@ -14,7 +14,7 @@ use iced::{
 use snora_core::{LayoutDirection, SideBar};
 
 use crate::style::sidebar_active_color;
-use crate::widget::icon::icon_element;
+use crate::icon::icon_element;
 
 /// Default rail width in pixels.
 const RAIL_WIDTH: f32 = 64.0;

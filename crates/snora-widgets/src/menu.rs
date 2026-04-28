@@ -16,7 +16,7 @@ use iced::{
 use snora_core::{Menu, MenuAction};
 
 use crate::style::menu_button_style;
-use crate::widget::icon::icon_element;
+use crate::icon::icon_element;
 
 /// Render a single menu (header button + dropdown when active).
 ///

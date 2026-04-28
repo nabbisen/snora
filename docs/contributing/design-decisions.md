@@ -40,12 +40,12 @@ fields on `AppLayout`. Reasoning:
 
 ## Why one close sink per channel, not per overlay
 
-`Dialog` and `BottomSheet` could each carry an `on_outside_click:
+`Dialog` and `Sheet` could each carry an `on_outside_click:
 Option<Message>`. We considered that and rejected it.
 
-- Two overlays can be present together (a bottom sheet under a
-  dialog). With per-overlay sinks, two outside-clicks are needed to
-  close both, which is unintuitive — usually the user wants the dim
+- Two overlays can be present together (a sheet under a dialog).
+  With per-overlay sinks, two outside-clicks are needed to close
+  both, which is unintuitive — usually the user wants the dim
   area to dismiss everything modal at once.
 - The 99% case is "one CloseModals message that resets all modal
   state". Moving that into `AppLayout::on_close_modals` puts the
@@ -56,6 +56,32 @@ Option<Message>`. We considered that and rejected it.
 The design loses flexibility (you cannot close the dialog and keep
 the sheet open via outside-click) but gains a one-place wiring rule
 that is hard to misuse. Net: positive.
+
+## Why one `Sheet` type, not `BottomSheet` / `TopSheet` / `SideSheet`
+
+In 0.6 we generalized the bottom-anchored drawer of 0.5 into a
+single `Sheet` with a `SheetEdge { Bottom, Top, Start, End }`.
+The alternative — keep `BottomSheet` and add separate `TopSheet` /
+`SideSheet` types — was rejected.
+
+- `AppLayout` would need three optional fields where one suffices.
+  The 99 % case is "show one sheet at a time", and the engine's
+  z-order rule does not need to distinguish between edges.
+- Three nearly-identical builder methods would force callers to
+  remember which type matches which edge. The general `Sheet` lets
+  the edge ride on the value (`Sheet::new(...).at(...)`), keeping
+  one builder symbol.
+- Snora's "vocabulary over flags" principle says the *enum* is the
+  vocabulary. Adding a `SheetEdge` enum is the canonical way to
+  express the choice; adding three types is the anti-pattern.
+- The size axis is naturally edge-relative (height for vertical
+  edges, width for horizontal). A single `SheetSize` reads cleanly
+  in both senses without a per-type rename.
+
+The 0.5 → 0.6 type rename (`BottomSheet` → `Sheet`,
+`SheetHeight` → `SheetSize`) is breaking on paper but cushioned
+with `#[deprecated]` aliases that ship in 0.6 and are removed in
+0.7.
 
 ## Why default `ToastPosition` is `TopEnd`
 
@@ -103,6 +129,37 @@ inspector, mock AppLayout). Decided against:
   release needs `snora`, `snora-core`, *and* `snora-test` bumped).
 
 If the pattern becomes painful in practice, we will revisit.
+
+## Why three crates instead of two
+
+In 0.4 and 0.5, snora was a two-crate workspace
+(`snora-core` + `snora`). In 0.6 we carved out the prefab widgets
+into a third crate, `snora-widgets`. The reasoning:
+
+- **Widget evolution should not gate engine evolution.** Adding a
+  new widget (a tab bar, a breadcrumb, a status bar) is a faster
+  cadence of change than adding a new overlay layer. Putting them
+  in the same crate as `render` made every widget addition a
+  release of the engine.
+- **Engine-only applications shouldn't pay for widgets.**
+  Applications that supply 100 % of their UI parts can opt out
+  with `default-features = false` on `snora` and the
+  `snora-widgets` compilation is skipped entirely.
+- **The widget set is properly downstream of `snora-core`, not of
+  `snora`.** Widgets consume the vocabulary types (`Icon`,
+  `LayoutDirection`, `MenuAction<...>`) but do not need the
+  engine. The dependency edge `snora-widgets → snora-core` is
+  direct; the previous structure forced widgets to be in `snora`
+  even though they had no logical relationship to `render`.
+
+The cost is one more `Cargo.toml` to maintain and one extra crate
+in publish order. In exchange we get clean dependency edges and a
+clear ownership boundary.
+
+The 3-crate split is invisible to applications that depend only
+on `snora` — `snora`'s lib re-exports `snora-widgets` under the
+familiar `snora::widget` path when the `widgets` feature is on
+(the default).
 
 ## Why `AppLayout` has both fields and a builder
 

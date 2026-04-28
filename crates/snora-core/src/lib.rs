@@ -8,9 +8,9 @@
 //!   engine implementation is expected to render.
 //! * Vocabulary enums that spell out the canonical *choices* an application
 //!   can make: [`LayoutDirection`], [`ToastIntent`], [`ToastLifetime`],
-//!   [`ToastPosition`], [`SheetHeight`], [`Icon`].
+//!   [`ToastPosition`], [`SheetEdge`], [`SheetSize`], [`Icon`].
 //! * Data contracts for secondary surfaces: [`Toast`], [`Dialog`],
-//!   [`BottomSheet`], [`Menu`], [`MenuItem`], [`SideBar`], [`SideBarItem`].
+//!   [`Sheet`], [`Menu`], [`MenuItem`], [`SideBar`], [`SideBarItem`].
 //!
 //! The `snora` sibling crate binds these contracts to iced and provides the
 //! actual render engine. Other engines (e.g. a test double, a WGPU frontend,
@@ -52,6 +52,11 @@ pub use direction::{Edge, LayoutDirection};
 pub use icon::Icon;
 pub use layout::AppLayout;
 pub use menu::{Menu, MenuAction, MenuItem};
-pub use overlay::{BottomSheet, Dialog, SheetHeight};
+pub use overlay::{Dialog, Sheet, SheetEdge, SheetSize};
+// Deprecated aliases re-exported for source compatibility with 0.5.x.
+// Allow the deprecated lint here so the re-export itself does not warn —
+// callers using the aliases will receive the deprecation hint.
+#[allow(deprecated)]
+pub use overlay::{BottomSheet, SheetHeight};
 pub use sidebar::{SideBar, SideBarItem};
 pub use toast::{Toast, ToastIntent, ToastLifetime, ToastPosition};

@@ -75,7 +75,7 @@ You can ship with snora, but the framework gives you less leverage:
 > If no → snora's structure helps but a simpler iced setup works fine too.
 >
 > Will more than one person work on this app over months?
-> If yes → snora's vocabulary (`AppLayout`, `Toast`, `Dialog`, `SheetHeight`)
+> If yes → snora's vocabulary (`AppLayout`, `Toast`, `Dialog`, `SheetSize`)
 > gives you shared shorthand. Worth it.
 >
 > Does the app need to flip LTR ↔ RTL or support multiple themes?

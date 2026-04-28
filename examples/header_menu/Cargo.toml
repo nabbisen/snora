@@ -12,5 +12,5 @@ name = "snora-example-header-menu"
 path = "src/main.rs"
 
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.5.0" }
+snora = { path = "../../crates/snora", version = "0.6.0" }
 iced = { workspace = true }

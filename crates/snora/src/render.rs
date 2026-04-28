@@ -14,7 +14,7 @@
 //! 3. context_menu      — floating menu at click point
 //! 4. modal backdrop    — 40%-dim mouse_area, dispatches on_close_modals
 //! 5. dialog            — centered card
-//! 6. bottom_sheet      — drawer from bottom, height per SheetHeight
+//! 6. sheet            — edge-anchored panel, size per SheetSize
 //! 7. toasts            — stacked at the bottom-end (RTL-aware)
 //! ```
 //!
@@ -37,7 +37,7 @@ use iced::{
 
 use snora_core::{AppLayout, LayoutDirection};
 
-use crate::overlay::{bottom_sheet::render_bottom_sheet, dialog::render_dialog};
+use crate::overlay::{dialog::render_dialog, sheet::render_sheet};
 use crate::toast::render_toasts;
 
 /// Compile an [`AppLayout`] into an iced [`Element`].
@@ -82,7 +82,7 @@ where
     // -----------------------------------------------------------------
     // Layers 4-6 — modals.
     // -----------------------------------------------------------------
-    let has_modal = layout.dialog.is_some() || layout.bottom_sheet.is_some();
+    let has_modal = layout.dialog.is_some() || layout.sheet.is_some();
 
     if has_modal {
         if let Some(on_close) = layout.on_close_modals {
@@ -96,8 +96,8 @@ where
         if let Some(dialog) = layout.dialog {
             layers = layers.push(render_dialog(dialog));
         }
-        if let Some(sheet) = layout.bottom_sheet {
-            layers = layers.push(render_bottom_sheet(sheet));
+        if let Some(sheet) = layout.sheet {
+            layers = layers.push(render_sheet(sheet, layout.direction));
         }
     }
 

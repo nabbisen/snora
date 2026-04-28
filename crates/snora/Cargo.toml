@@ -11,11 +11,30 @@ categories    = ["gui", "development-tools", "accessibility", "asynchronous"]
 keywords = ["gui", "iced", "ui", "framework", "rtl"]
 
 [features]
-default = []
-lucide-icons = ["snora-core/lucide-icons", "dep:lucide-icons"]
-svg-icons = ["snora-core/svg-icons", "iced/svg"]
+# `widgets` is on by default — most applications want the prefab
+# header / sidebar / footer / menu / icon helpers. Opt out with
+# `default-features = false` to ship an engine-only build.
+default = ["widgets"]
+
+# Pulls in the snora-widgets crate and re-exports it under the
+# `snora::widget` module path (preserving the 0.5.x import shape).
+widgets = ["dep:snora-widgets"]
+
+# Icon-source features. They configure both `snora-core` (vocabulary)
+# and `snora-widgets` (rendering) when the latter is enabled.
+lucide-icons = [
+    "snora-core/lucide-icons",
+    "snora-widgets?/lucide-icons",
+    "dep:lucide-icons",
+]
+svg-icons = [
+    "snora-core/svg-icons",
+    "snora-widgets?/svg-icons",
+    "iced/svg",
+]
 
 [dependencies]
-snora-core = { path = "../snora-core", version = "0.4.3" }
+snora-core = { path = "../snora-core", version = "0.6" }
+snora-widgets = { path = "../snora-widgets", version = "0.6", optional = true }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

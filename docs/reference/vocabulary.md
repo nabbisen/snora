@@ -46,10 +46,17 @@ pub enum ToastPosition {
 - `ToastLifetime::seconds(n)` / `ToastLifetime::millis(ms)`.
 - `ToastPosition::is_top()` / `is_bottom()` — partition helpers.
 
-## Bottom sheet
+## Sheets
 
 ```rust
-pub enum SheetHeight {
+pub enum SheetEdge {
+    Bottom,             // default
+    Top,
+    Start,              // logical (LTR=left, RTL=right)
+    End,                // logical (LTR=right, RTL=left)
+}
+
+pub enum SheetSize {
     OneThird,           // default
     Half,
     TwoThirds,
@@ -58,7 +65,13 @@ pub enum SheetHeight {
 }
 ```
 
-Helpers: `SheetHeight::DEFAULT`, `as_ratio()`, `as_pixels()`.
+`SheetSize` is interpreted along the axis perpendicular to the edge —
+height for top/bottom, width for start/end.
+
+Helpers:
+
+- `SheetSize::DEFAULT`, `as_ratio()`, `as_pixels()`.
+- `SheetEdge::is_vertical()` / `is_horizontal()` — partition helpers.
 
 ## Icons
 
@@ -88,5 +101,6 @@ over both.
 LayoutDirection::default()  → Ltr
 ToastPosition::default()    → TopEnd
 ToastLifetime::DEFAULT      → Transient(4 s)
-SheetHeight::DEFAULT        → OneThird
+SheetEdge::default()        → Bottom
+SheetSize::DEFAULT          → OneThird
 ```

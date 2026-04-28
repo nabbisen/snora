@@ -57,7 +57,7 @@ impl App {
 
         let mut layout = AppLayout::new(body.into())
             // Wire the outside-click sink once. Both `Dialog` and
-            // `BottomSheet` (if present) share this single channel.
+            // `Sheet` (if present) share this single channel.
             .on_close_modals(Message::CloseModals);
 
         if self.open {

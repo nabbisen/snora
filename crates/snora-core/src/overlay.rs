@@ -1,4 +1,4 @@
-//! Dialogs and bottom sheets — the modal overlay surfaces.
+//! Dialogs and edge-anchored sheets — the modal overlay surfaces.
 //!
 //! Both overlay types are **pure content carriers**. They do not own close
 //! handlers; outside-click dismissal is installed once at the
@@ -6,12 +6,23 @@
 //! there is exactly one place to wire the close message regardless of which
 //! modal is showing.
 //!
-//! # Sheet height
+//! # Sheets
 //!
-//! [`BottomSheet`] carries a [`SheetHeight`] enum rather than a raw number.
-//! The engine resolves the enum to a concrete height at render time. This
-//! keeps the vocabulary in snora-core (iced-free) and confines physical
-//! pixel decisions to the engine.
+//! A [`Sheet`] is a panel that slides in from one of the four window
+//! edges ([`SheetEdge`]) and occupies a configurable size ([`SheetSize`])
+//! along the perpendicular axis. The engine resolves the enums to concrete
+//! pixels at render time, so this module remains iced-free.
+//!
+//! [`SheetSize`] is interpreted *along the axis perpendicular to the
+//! anchor edge*:
+//!
+//! * For [`SheetEdge::Top`] / [`SheetEdge::Bottom`] the size is a height
+//!   (vertical).
+//! * For [`SheetEdge::Start`] / [`SheetEdge::End`] the size is a width
+//!   (horizontal).
+//!
+//! This is intentional: a single `SheetSize::Half` reads naturally as
+//! "half of the relevant axis" no matter which edge the sheet attaches to.
 
 use std::marker::PhantomData;
 
@@ -40,43 +51,81 @@ impl<Node, Message> Dialog<Node, Message> {
     }
 }
 
-/// The vertical size a bottom sheet should occupy, relative to the window.
+/// Which window edge a sheet attaches to.
 ///
-/// Use the named variants for canonical proportions; use [`SheetHeight::Ratio`]
-/// for arbitrary fractions (clamped to `0.0..=1.0`); use
-/// [`SheetHeight::Pixels`] for a fixed pixel height independent of window
-/// size (discouraged for responsive apps).
+/// `Start` / `End` are logical, mirroring under
+/// [`crate::LayoutDirection::Rtl`] just like every other axis-aligned
+/// vocabulary in snora. `Top` / `Bottom` are direction-independent.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum SheetEdge {
+    /// Slides up from the bottom of the window. The historical default;
+    /// matches the "drawer from below" idiom.
+    #[default]
+    Bottom,
+    /// Slides down from the top of the window.
+    Top,
+    /// Slides in from the logical start edge (LTR=left, RTL=right).
+    Start,
+    /// Slides in from the logical end edge (LTR=right, RTL=left).
+    End,
+}
+
+impl SheetEdge {
+    /// Whether this edge anchors along the **vertical** axis.
+    /// `true` for `Top` / `Bottom`; `false` for `Start` / `End`.
+    #[must_use]
+    pub fn is_vertical(self) -> bool {
+        matches!(self, SheetEdge::Top | SheetEdge::Bottom)
+    }
+
+    /// Whether this edge anchors along the **horizontal** axis.
+    /// `true` for `Start` / `End`; `false` for `Top` / `Bottom`.
+    #[must_use]
+    pub fn is_horizontal(self) -> bool {
+        !self.is_vertical()
+    }
+}
+
+/// The size a sheet should occupy along the axis perpendicular to its
+/// anchor edge.
+///
+/// * For a top- or bottom-anchored sheet, `SheetSize` is a height.
+/// * For a start- or end-anchored sheet, `SheetSize` is a width.
+///
+/// Use the named variants for canonical proportions; use [`SheetSize::Ratio`]
+/// for arbitrary fractions (clamped to `0.0..=1.0`); use [`SheetSize::Pixels`]
+/// for a fixed pixel size independent of window dimensions (discouraged for
+/// responsive apps).
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum SheetHeight {
-    /// 33 % of the window height — the default canonical "drawer" size.
+pub enum SheetSize {
+    /// 33 % of the window's relevant axis — the default "drawer" size.
     OneThird,
-    /// 50 % of the window height.
+    /// 50 % of the window's relevant axis.
     Half,
-    /// 67 % of the window height.
+    /// 67 % of the window's relevant axis.
     TwoThirds,
-    /// Arbitrary fraction of window height. Values outside `0.0..=1.0` are
-    /// clamped by the engine.
+    /// Arbitrary fraction of the window's relevant axis. Values outside
+    /// `0.0..=1.0` are clamped by the engine.
     Ratio(f32),
-    /// Fixed pixel height. Only use when the content has a natural size that
+    /// Fixed pixel size. Only use when the content has a natural size that
     /// does not scale with the window.
     Pixels(f32),
 }
 
-impl SheetHeight {
-    /// The default height — one-third of the window. Matches the canonical
-    /// "drawer from the bottom" feel without dominating the screen.
-    pub const DEFAULT: SheetHeight = SheetHeight::OneThird;
+impl SheetSize {
+    /// The default size — one-third of the window.
+    pub const DEFAULT: SheetSize = SheetSize::OneThird;
 
-    /// Resolve to a fraction of the window, if this variant expresses one.
-    /// Returns `None` for [`SheetHeight::Pixels`].
+    /// Resolve to a fraction of the relevant axis, if this variant
+    /// expresses one. Returns `None` for [`SheetSize::Pixels`].
     #[must_use]
     pub fn as_ratio(self) -> Option<f32> {
         match self {
-            SheetHeight::OneThird => Some(1.0 / 3.0),
-            SheetHeight::Half => Some(0.5),
-            SheetHeight::TwoThirds => Some(2.0 / 3.0),
-            SheetHeight::Ratio(r) => Some(r.clamp(0.0, 1.0)),
-            SheetHeight::Pixels(_) => None,
+            SheetSize::OneThird => Some(1.0 / 3.0),
+            SheetSize::Half => Some(0.5),
+            SheetSize::TwoThirds => Some(2.0 / 3.0),
+            SheetSize::Ratio(r) => Some(r.clamp(0.0, 1.0)),
+            SheetSize::Pixels(_) => None,
         }
     }
 
@@ -85,42 +134,87 @@ impl SheetHeight {
     #[must_use]
     pub fn as_pixels(self) -> Option<f32> {
         match self {
-            SheetHeight::Pixels(p) => Some(p),
+            SheetSize::Pixels(p) => Some(p),
             _ => None,
         }
     }
 }
 
-/// A sheet that slides up from the bottom of the window.
+/// A panel that slides in from one of the window edges.
 ///
 /// Like [`Dialog`], a sheet is content only. The dim backdrop and its
 /// outside-click-to-close behavior are owned by the parent [`crate::AppLayout`].
-pub struct BottomSheet<Node, Message> {
-    /// The drawer's body content. The engine sizes the surrounding surface
-    /// according to `height` and paints the dim backdrop above it.
+///
+/// # Builder usage
+///
+/// ```ignore
+/// use snora::{Sheet, SheetEdge, SheetSize};
+///
+/// let sheet = Sheet::new(my_content)
+///     .at(SheetEdge::Start)
+///     .with_size(SheetSize::Half);
+/// ```
+pub struct Sheet<Node, Message> {
+    /// The sheet's body content. The engine wraps this in a styled surface
+    /// sized according to `size` and anchored to `edge`.
     pub content: Node,
-    /// Vertical size of the sheet. Defaults to [`SheetHeight::DEFAULT`].
-    pub height: SheetHeight,
+    /// Where the sheet attaches. Defaults to [`SheetEdge::Bottom`].
+    pub edge: SheetEdge,
+    /// Size of the sheet along the axis perpendicular to `edge`.
+    /// Defaults to [`SheetSize::DEFAULT`].
+    pub size: SheetSize,
     _marker: PhantomData<Message>,
 }
 
-impl<Node, Message> BottomSheet<Node, Message> {
-    /// Build a sheet with [`SheetHeight::DEFAULT`].
+impl<Node, Message> Sheet<Node, Message> {
+    /// Build a sheet with default edge ([`SheetEdge::Bottom`]) and size
+    /// ([`SheetSize::DEFAULT`]).
     pub fn new(content: Node) -> Self {
         Self {
             content,
-            height: SheetHeight::DEFAULT,
+            edge: SheetEdge::default(),
+            size: SheetSize::DEFAULT,
             _marker: PhantomData,
         }
     }
 
-    /// Override the height.
+    /// Override the anchor edge.
     #[must_use]
-    pub fn with_height(mut self, height: SheetHeight) -> Self {
-        self.height = height;
+    pub fn at(mut self, edge: SheetEdge) -> Self {
+        self.edge = edge;
+        self
+    }
+
+    /// Override the size.
+    #[must_use]
+    pub fn with_size(mut self, size: SheetSize) -> Self {
+        self.size = size;
         self
     }
 }
+
+// ---------------------------------------------------------------------
+// Deprecated aliases — kept for source compatibility with 0.5.x.
+//
+// Drop in 0.7.x. The aliases preserve `BottomSheet::new(...)`,
+// `BottomSheet::with_height(...)`, and `SheetHeight` constants in
+// existing application code while encouraging migration to `Sheet`,
+// `Sheet::with_size`, and `SheetSize`.
+// ---------------------------------------------------------------------
+
+/// Deprecated alias for [`Sheet`]. Use `Sheet` directly in new code.
+///
+/// Kept for source compatibility with snora 0.5.x. Will be removed in
+/// 0.7.0. See `docs/guides/migration-0.5-to-0.6.md` for the migration path.
+#[deprecated(since = "0.6.0", note = "use `Sheet` instead")]
+pub type BottomSheet<Node, Message> = Sheet<Node, Message>;
+
+/// Deprecated alias for [`SheetSize`]. Use `SheetSize` directly in new code.
+///
+/// Kept for source compatibility with snora 0.5.x. Will be removed in
+/// 0.7.0. See `docs/guides/migration-0.5-to-0.6.md` for the migration path.
+#[deprecated(since = "0.6.0", note = "use `SheetSize` instead")]
+pub type SheetHeight = SheetSize;
 
 #[cfg(test)]
 mod tests {
@@ -128,16 +222,41 @@ mod tests {
 
     #[test]
     fn ratio_resolves_correctly() {
-        assert_eq!(SheetHeight::OneThird.as_ratio(), Some(1.0 / 3.0));
-        assert_eq!(SheetHeight::Half.as_ratio(), Some(0.5));
-        assert_eq!(SheetHeight::TwoThirds.as_ratio(), Some(2.0 / 3.0));
-        assert_eq!(SheetHeight::Ratio(0.25).as_ratio(), Some(0.25));
-        assert_eq!(SheetHeight::Pixels(240.0).as_ratio(), None);
+        assert_eq!(SheetSize::OneThird.as_ratio(), Some(1.0 / 3.0));
+        assert_eq!(SheetSize::Half.as_ratio(), Some(0.5));
+        assert_eq!(SheetSize::TwoThirds.as_ratio(), Some(2.0 / 3.0));
+        assert_eq!(SheetSize::Ratio(0.25).as_ratio(), Some(0.25));
+        assert_eq!(SheetSize::Pixels(240.0).as_ratio(), None);
     }
 
     #[test]
     fn ratio_is_clamped() {
-        assert_eq!(SheetHeight::Ratio(1.5).as_ratio(), Some(1.0));
-        assert_eq!(SheetHeight::Ratio(-0.1).as_ratio(), Some(0.0));
+        assert_eq!(SheetSize::Ratio(1.5).as_ratio(), Some(1.0));
+        assert_eq!(SheetSize::Ratio(-0.1).as_ratio(), Some(0.0));
+    }
+
+    #[test]
+    fn default_sheet_edge_is_bottom() {
+        assert_eq!(SheetEdge::default(), SheetEdge::Bottom);
+    }
+
+    #[test]
+    fn vertical_horizontal_partition() {
+        for edge in [SheetEdge::Top, SheetEdge::Bottom, SheetEdge::Start, SheetEdge::End] {
+            assert_ne!(edge.is_vertical(), edge.is_horizontal());
+        }
+        assert!(SheetEdge::Top.is_vertical());
+        assert!(SheetEdge::Bottom.is_vertical());
+        assert!(SheetEdge::Start.is_horizontal());
+        assert!(SheetEdge::End.is_horizontal());
+    }
+
+    #[test]
+    fn sheet_builder_overrides() {
+        let s: Sheet<(), ()> = Sheet::new(())
+            .at(SheetEdge::Start)
+            .with_size(SheetSize::Half);
+        assert_eq!(s.edge, SheetEdge::Start);
+        assert_eq!(s.size, SheetSize::Half);
     }
 }

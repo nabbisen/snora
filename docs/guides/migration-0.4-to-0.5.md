@@ -101,7 +101,7 @@ snora = "0.4"
 just bump it to
 
 ```toml
-snora = "0.5"
+snora = "0.6"
 ```
 
 If you depend on `snora-core` directly (rare), bump that too:

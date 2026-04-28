@@ -24,6 +24,7 @@ Pick the topic you need.
 - [Direction and ABDD](guides/direction.md)
 - [Icons — text, Lucide, SVG](guides/icons.md)
 - [Testing UI logic without a renderer](guides/testing.md)
+- [Migrating from 0.5 to 0.6](guides/migration-0.5-to-0.6.md)
 - [Migrating from 0.4 to 0.5](guides/migration-0.4-to-0.5.md)
 
 ## I want to look up a specific symbol or layout
