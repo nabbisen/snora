@@ -16,6 +16,6 @@ lucide-icons = ["snora-core/lucide-icons", "dep:lucide-icons"]
 svg-icons = ["snora-core/svg-icons", "iced/svg"]
 
 [dependencies]
-snora-core = { path = "../snora-core", version = "0.4" }
+snora-core = { path = "../snora-core", version = "0.4.3" }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

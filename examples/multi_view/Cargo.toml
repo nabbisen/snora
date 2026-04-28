@@ -3,8 +3,8 @@ name = "snora-example-multi-view"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-authors.workspace = true
 repository.workspace = true
+authors.workspace = true
 publish = false
 
 [[bin]]
@@ -12,5 +12,5 @@ name = "snora-example-multi-view"
 path = "src/main.rs"
 
 [dependencies]
-snora = { path = "../../crates/snora" }
+snora = { path = "../../crates/snora", version = "0.4.3" }
 iced = { workspace = true }
