@@ -222,14 +222,6 @@ where
         self
     }
 
-    /// Deprecated alias for [`Self::sheet`]. Kept for source compatibility
-    /// with snora 0.5.x. Will be removed in 0.7.0.
-    #[deprecated(since = "0.6.0", note = "use `AppLayout::sheet(...)` instead")]
-    #[must_use]
-    pub fn bottom_sheet(self, sheet: Sheet<Node, Message>) -> Self {
-        self.sheet(sheet)
-    }
-
     /// Replace the toast queue. Each frame the application typically passes
     /// `state.toasts.clone()` here; snora does not mutate the slice. See
     /// `snora::toast::subscription` and `snora::toast::sweep_expired` for

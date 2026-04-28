@@ -1,8 +1,8 @@
 [package]
 name = "snora-core"
+description = "Vocabulary and contract layer for the Snora iced GUI framework."
 version.workspace = true
 edition.workspace = true
-description = "Vocabulary and contract layer for the Snora iced GUI framework."
 license.workspace = true
 repository.workspace = true
 authors.workspace = true

@@ -5,6 +5,10 @@ tutorials, guides, architectural reference, and contributor notes. The
 generated API reference (per-function signatures and short doc comments)
 lives on [docs.rs](https://docs.rs/snora).
 
+Two top-level files complement these docs: [`../CHANGELOG.md`](../CHANGELOG.md)
+records what changed in each release, and [`../ROADMAP.md`](../ROADMAP.md)
+sketches what is expected next.
+
 ## I am new to snora
 
 Read these in order. Each is short and self-contained.
@@ -24,6 +28,7 @@ Pick the topic you need.
 - [Direction and ABDD](guides/direction.md)
 - [Icons — text, Lucide, SVG](guides/icons.md)
 - [Testing UI logic without a renderer](guides/testing.md)
+- [Migrating from 0.6 to 0.7](guides/migration-0.6-to-0.7.md)
 - [Migrating from 0.5 to 0.6](guides/migration-0.5-to-0.6.md)
 - [Migrating from 0.4 to 0.5](guides/migration-0.4-to-0.5.md)
 
@@ -41,4 +46,5 @@ Welcome — see the contributor docs:
 - [Internal architecture](contributing/architecture.md)
 - [Design decisions](contributing/design-decisions.md) — why the API looks the way it does
 - [Adding a new overlay kind](contributing/adding-an-overlay.md)
+- [Feature-gating criteria](contributing/feature-gating-criteria.md) — when to split the `widgets` feature
 - [Release process](contributing/release-process.md)

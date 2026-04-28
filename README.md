@@ -39,7 +39,7 @@ for fuller fit guidance.
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.6"
+snora = "0.7"
 ```
 
 ```rust
@@ -85,6 +85,9 @@ three more chained calls — see
   `SheetEdge::Start`, `ToastPosition::TopEnd`,
   `LayoutDirection::Rtl`, `Edge::Start` — explicit choices, not
   hardcoded constants.
+- **Navigation widgets out of the box.** `app_header`, `app_side_bar`,
+  `app_tab_bar`, `app_breadcrumb`, plus dropdown menus and context
+  menus — direction-aware, theme-aware, and entirely opt-in.
 - **Three crates, one umbrella.** `snora-core` is the iced-free
   vocabulary, `snora-widgets` is the optional prefab UI parts, and
   `snora` is the engine — applications only depend on `snora`.
@@ -111,3 +114,7 @@ For the full picture, head to **[docs/](docs/)**:
 - Wanting to contribute? [docs/contributing/](docs/contributing/) is
   for you — and we'd be glad to have you.
 
+Per-release notes live in [CHANGELOG.md](CHANGELOG.md); the
+direction of upcoming work is sketched in [ROADMAP.md](ROADMAP.md).
+
+Built with [iced](https://iced.rs).

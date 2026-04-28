@@ -1,14 +1,14 @@
 [package]
 name = "snora"
+description = "iced engine for the Snora GUI framework. Consumes snora-core vocabulary."
 version.workspace = true
 edition.workspace = true
-description = "iced engine for the Snora GUI framework. Consumes snora-core vocabulary."
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
 readme = "../../README.md"
-categories    = ["gui", "development-tools", "accessibility", "asynchronous"]
 keywords = ["gui", "iced", "ui", "framework", "rtl"]
+categories = ["gui", "development-tools", "accessibility", "asynchronous"]
 
 [features]
 # `widgets` is on by default — most applications want the prefab
@@ -34,7 +34,7 @@ svg-icons = [
 ]
 
 [dependencies]
-snora-core = { path = "../snora-core", version = "0.6" }
-snora-widgets = { path = "../snora-widgets", version = "0.6", optional = true }
+snora-core = { path = "../snora-core", version = "0.7" }
+snora-widgets = { path = "../snora-widgets", version = "0.7", optional = true }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

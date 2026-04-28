@@ -75,12 +75,10 @@
 // contract surface so that a single `use snora::*` (or targeted imports)
 // suffices.
 pub use snora_core::{
-    AppLayout, Dialog, Edge, Icon, LayoutDirection, Menu, MenuAction, MenuItem, Sheet, SheetEdge,
-    SheetSize, SideBar, SideBarItem, Toast, ToastIntent, ToastLifetime, ToastPosition,
+    AppLayout, BreadcrumbAction, Crumb, Dialog, Edge, Icon, LayoutDirection, Menu, MenuAction,
+    MenuItem, Sheet, SheetEdge, SheetSize, SideBar, SideBarItem, Tab, TabAction, TabBar, Toast,
+    ToastIntent, ToastLifetime, ToastPosition,
 };
-// Deprecated aliases for source compatibility with 0.5.x.
-#[allow(deprecated)]
-pub use snora_core::{BottomSheet, SheetHeight};
 
 // ---- Engine modules (always present) ----------------------------------
 mod overlay;
@@ -116,7 +114,8 @@ pub use snora_widgets::style;
 #[cfg(feature = "widgets")]
 pub mod widget {
     pub use snora_widgets::{
-        app_footer, app_header, app_side_bar, icon_element, icon_element_sized, render_menu,
+        app_breadcrumb, app_footer, app_header, app_side_bar, app_tab_bar, icon_element,
+        icon_element_sized, render_menu,
     };
 
     /// The `icon` submodule path (kept for source-compat with 0.5.x

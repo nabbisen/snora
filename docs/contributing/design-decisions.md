@@ -161,7 +161,62 @@ on `snora` — `snora`'s lib re-exports `snora-widgets` under the
 familiar `snora::widget` path when the `widgets` feature is on
 (the default).
 
+## Why `Tab` and `Crumb` are separate vocabulary, not one navigation type
+
+In 0.7 we added [`TabBar`] and [`Crumb`] as independent types
+rather than collapsing them into a single `Navigation` enum.
+
+- They communicate different shapes of UI affordance. Tabs imply
+  *peer-level switching* — three to seven views the user expects
+  to flip among. Breadcrumbs imply *ancestor-level navigation* —
+  a path showing depth, only the parents are interactable.
+  Conflating them in one type forces every consumer to handle
+  both shapes; keeping them separate lets each screen pick
+  exactly the affordance it wants.
+- The `id` types have different semantics. A `TabId` is a small
+  closed set (3–7 values, typically all variants of an enum) and
+  `active` is one of them. A `CrumbId` is a path-element id —
+  potentially open-ended in the wider application even if any
+  single trail is short. The semantic difference would have
+  required generics either way; collapsing types only saves a
+  module and gains nothing for the caller.
+- The `is_leaf` flag on `Crumb` would be meaningless on a tab.
+  Tabs do not have a leaf concept; one of them is "active", but
+  pressing any of them is symmetric.
+
+The cost of two types is two short modules. Each is around 60
+lines of vocabulary and 80 lines of widget code. We are not at
+risk of vocabulary explosion in this corner of the API.
+
+## Why widget feature gating is coarse, not per-widget
+
+Snora 0.7 ships **one** `widgets` feature on the `snora` crate.
+There is no `widget-tab-bar` / `widget-breadcrumb` / `widget-header`
+distinction. We deliberately stop at the coarse boundary.
+
+- The current widget set is small (seven prefab elements at 0.7).
+  Compile time savings from gating any one widget out are
+  negligible compared to the iced compile, which dominates
+  cold-cache time.
+- A wider feature matrix multiplies documentation surface — every
+  combination is something a user might trip over and a
+  maintainer must keep coherent.
+- Fine-grained gates are *additive*. We can add them later
+  without breaking anything; the inverse (removing them after
+  shipping) breaks downstream code. Default to the simpler shape.
+
+The criteria that would justify revisiting the decision are
+documented separately in
+[contributing/feature-gating-criteria.md](feature-gating-criteria.md).
+That document records the indicators (compile time threshold,
+binary size threshold, heavy optional deps, platform-specific
+deps, field requests) so future maintainers do not have to
+reconstruct the reasoning.
+
 ## Why `AppLayout` has both fields and a builder
+
+[`TabBar`]: ../reference/vocabulary.md
+[`Crumb`]: ../reference/vocabulary.md
 
 Both are public and both supported. Reasoning:
 

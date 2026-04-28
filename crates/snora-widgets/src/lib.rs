@@ -32,18 +32,22 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 pub mod direction;
+mod crumb;
 mod footer;
 mod header;
 mod icon;
 mod menu;
 mod sidebar;
 pub mod style;
+mod tab;
 
+pub use crumb::app_breadcrumb;
 pub use footer::app_footer;
 pub use header::app_header;
 pub use icon::{icon_element, icon_element_sized};
 pub use menu::render_menu;
 pub use sidebar::app_side_bar;
+pub use tab::app_tab_bar;
 
 /// Convenience re-export of the Lucide icon constants, available when
 /// the `lucide-icons` feature is enabled.

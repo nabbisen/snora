@@ -8,6 +8,8 @@ members = [
     "examples/toast",
     "examples/dialog",
     "examples/sheet",
+    "examples/tab",
+    "examples/breadcrumb",
     "examples/context_menu",
     "examples/header_menu",
     "examples/multi_view",
@@ -19,11 +21,11 @@ resolver = "2"
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.6.0"
+version = "0.7.0"
 edition = "2024"
 license = "Apache-2.0"
-repository    = "https://github.com/nabbisen/snora"
-authors       = ["nabbisen <nabbisen@scqr.net>"]
+repository = "https://github.com/nabbisen/snora"
+authors = ["nabbisen <nabbisen@scqr.net>"]
 
 [profile.release]
 opt-level = "z"
@@ -39,3 +41,17 @@ incremental = false
 [workspace.dependencies]
 iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
 lucide-icons = { version = "1", features = ["iced"] }
+
+# `snora` listed here so example crates pick up its version through
+# workspace inheritance. Each example only needs:
+#
+#     [dependencies]
+#     snora = { workspace = true }
+#
+# When the workspace version bumps, the entry below is the *only*
+# place that needs updating; examples follow automatically.
+#
+# Including a `version` field (alongside `path`) is required by
+# `cargo publish`, even though examples themselves are
+# `publish = false`.  Cargo validates the workspace as a whole.
+snora = { path = "crates/snora", version = "0.7" }

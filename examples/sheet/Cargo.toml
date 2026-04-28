@@ -12,5 +12,5 @@ name = "snora-example-sheet"
 path = "src/main.rs"
 
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.6.0" }
+snora = { workspace = true }
 iced = { workspace = true }

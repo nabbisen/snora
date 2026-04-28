@@ -12,11 +12,13 @@ crates/
 │   src/
 │     lib.rs                     # re-exports only
 │     direction.rs               # LayoutDirection, Edge
+│     crumb.rs                   # Crumb / BreadcrumbAction
 │     icon.rs                    # Icon enum + From conversions
 │     layout.rs                  # AppLayout struct + builder
 │     menu.rs                    # Menu / MenuItem / MenuAction
 │     overlay.rs                 # Dialog / Sheet / SheetEdge / SheetSize
 │     sidebar.rs                 # SideBar / SideBarItem
+│     tab.rs                     # Tab / TabBar / TabAction
 │     toast.rs                   # Toast / ToastIntent / ToastLifetime
 │                                # / ToastPosition
 ├── snora-widgets/               # optional prefab widgets
@@ -24,11 +26,13 @@ crates/
 │     lib.rs                     # re-exports
 │     direction.rs               # row_dir / row_dir_three
 │     style.rs                   # shared style functions
+│     crumb.rs                   # app_breadcrumb
 │     footer.rs                  # app_footer
 │     header.rs                  # app_header
 │     icon.rs                    # icon_element / icon_element_sized
 │     menu.rs                    # render_menu
 │     sidebar.rs                 # app_side_bar
+│     tab.rs                     # app_tab_bar
 └── snora/                       # iced engine
     src/
       lib.rs                     # vocabulary re-exports + widget bridge

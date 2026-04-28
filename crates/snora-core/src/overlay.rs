@@ -193,29 +193,6 @@ impl<Node, Message> Sheet<Node, Message> {
     }
 }
 
-// ---------------------------------------------------------------------
-// Deprecated aliases — kept for source compatibility with 0.5.x.
-//
-// Drop in 0.7.x. The aliases preserve `BottomSheet::new(...)`,
-// `BottomSheet::with_height(...)`, and `SheetHeight` constants in
-// existing application code while encouraging migration to `Sheet`,
-// `Sheet::with_size`, and `SheetSize`.
-// ---------------------------------------------------------------------
-
-/// Deprecated alias for [`Sheet`]. Use `Sheet` directly in new code.
-///
-/// Kept for source compatibility with snora 0.5.x. Will be removed in
-/// 0.7.0. See `docs/guides/migration-0.5-to-0.6.md` for the migration path.
-#[deprecated(since = "0.6.0", note = "use `Sheet` instead")]
-pub type BottomSheet<Node, Message> = Sheet<Node, Message>;
-
-/// Deprecated alias for [`SheetSize`]. Use `SheetSize` directly in new code.
-///
-/// Kept for source compatibility with snora 0.5.x. Will be removed in
-/// 0.7.0. See `docs/guides/migration-0.5-to-0.6.md` for the migration path.
-#[deprecated(since = "0.6.0", note = "use `SheetSize` instead")]
-pub type SheetHeight = SheetSize;
-
 #[cfg(test)]
 mod tests {
     use super::*;

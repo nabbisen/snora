@@ -93,6 +93,38 @@ pub fn icon_element_sized<'a, Message>(icon: &Icon, size: f32) -> Element<'a, Me
 Resolve an `Icon` to an iced element at the default (14 px) or a
 specified size. Honors all enabled icon backends.
 
+### `app_tab_bar`
+
+```rust
+pub fn app_tab_bar<'a, Message, TabId, F>(
+    bar: TabBar<TabId>,
+    on_action: &'a F,
+    direction: LayoutDirection,
+) -> Element<'a, Message>
+where
+    F: Fn(TabAction<TabId>) -> Message + 'a;
+```
+
+Horizontal tab strip for peer-level navigation. The active tab gets
+a colored underline; inactive tabs are flat text. Direction-aware:
+the entire tab order mirrors under `Rtl`.
+
+### `app_breadcrumb`
+
+```rust
+pub fn app_breadcrumb<'a, Message, CrumbId, F>(
+    crumbs: Vec<Crumb<CrumbId>>,
+    on_action: &'a F,
+    direction: LayoutDirection,
+) -> Element<'a, Message>
+where
+    F: Fn(BreadcrumbAction<CrumbId>) -> Message + 'a;
+```
+
+Hierarchical position indicator. Ancestors render as clickable
+text; the leaf (current page, marked with `Crumb::leaf(...)`) is
+plain text. The separator glyph flips with direction (`›` / `‹`).
+
 ## Direction helpers
 
 In `snora::direction`:

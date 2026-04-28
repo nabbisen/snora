@@ -1,14 +1,14 @@
 [package]
 name = "snora-widgets"
+description = "Optional prefab iced widgets for the Snora GUI framework — header, footer, sidebar, menu, icon."
 version.workspace = true
 edition.workspace = true
-description = "Optional prefab iced widgets for the Snora GUI framework — header, footer, sidebar, menu, icon."
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
 readme = "../../README.md"
-categories = ["gui"]
 keywords = ["gui", "iced", "ui", "framework"]
+categories = ["gui"]
 
 [features]
 # Pass-through to snora-core's icon-source features. Applications that
@@ -18,6 +18,6 @@ lucide-icons = ["snora-core/lucide-icons", "dep:lucide-icons"]
 svg-icons = ["snora-core/svg-icons", "iced/svg"]
 
 [dependencies]
-snora-core = { path = "../snora-core", version = "0.6" }
+snora-core = { path = "../snora-core", version = "0.7" }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

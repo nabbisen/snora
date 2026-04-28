@@ -47,16 +47,22 @@ patch releases are accepted. Bump it only on a minor.
 
 ```text
 [ ] Bump [workspace.package].version
-[ ] If minor: bump snora-core dep version in crates/snora/Cargo.toml
+[ ] If minor: bump snora-core / snora-widgets dep versions across crates
+[ ] Move the [Unreleased] section in CHANGELOG.md to the new version,
+    and reset [Unreleased] to "Nothing yet."
 [ ] Update docs/guides/migration-X.Y-to-X.Z.md (minor only)
+[ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
+    if priorities changed)
 [ ] Re-run cargo metadata; confirm every crate reports new version
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
 [ ] cargo test --workspace --all-features
-[ ] cargo package -p snora-core --no-verify     # check .crate contents
-[ ] cargo package -p snora      --no-verify     # check .crate contents
+[ ] cargo package -p snora-core    --no-verify    # check .crate contents
+[ ] cargo package -p snora-widgets --no-verify    # check .crate contents
+[ ] cargo package -p snora         --no-verify    # check .crate contents
 [ ] git commit, git tag vX.Y.Z, git push --tags
 [ ] cargo publish -p snora-core
+[ ] cargo publish -p snora-widgets
 [ ] cargo publish -p snora
 ```
 
@@ -70,10 +76,16 @@ that is order-aware).
 
 ### Publish order
 
-`snora-core` first, then `snora`. The `snora` crate's `Cargo.toml`
-has both `path = "../snora-core"` and `version = "..."` on its
-dependency, so cargo accepts the build locally and on crates.io
-finds the just-published `snora-core` of the matching version.
+Strictly bottom-up along the dependency graph:
+
+1. `snora-core` (no internal deps).
+2. `snora-widgets` (depends on `snora-core`).
+3. `snora` (depends on `snora-core`, optionally `snora-widgets`).
+
+Each crate's `Cargo.toml` uses both `path = "..."` and
+`version = "..."` for inter-crate references, so cargo's local
+build does not require crates.io, and crates.io's verification
+finds the just-published sibling at the matching version.
 
 ## Tarball releases (if used)
 

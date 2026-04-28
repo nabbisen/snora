@@ -27,7 +27,7 @@
 //!
 //! * **No user-extensible close hooks.** Closing an overlay is a single
 //!   concern with a single channel: [`AppLayout::on_close_menus`] and
-//!   [`AppLayout::on_close_modals`]. Individual `Dialog` / `BottomSheet`
+//!   [`AppLayout::on_close_modals`]. Individual `Dialog` / `Sheet`
 //!   values do *not* carry their own close messages.
 
 #![warn(missing_docs)]
@@ -41,22 +41,23 @@ pub mod icon;
 pub mod layout;
 /// Header / context menu vocabulary.
 pub mod menu;
-/// Modal overlay surfaces — [`Dialog`], [`BottomSheet`].
+/// Modal overlay surfaces — [`Dialog`], [`Sheet`].
 pub mod overlay;
 /// Vertical navigation rail.
 pub mod sidebar;
+/// Horizontal tab bar — [`TabBar`], [`Tab`], [`TabAction`].
+pub mod tab;
 /// Toast notifications and lifetime / position vocabulary.
 pub mod toast;
+/// Breadcrumb trail — [`Crumb`], [`BreadcrumbAction`].
+pub mod crumb;
 
+pub use crumb::{BreadcrumbAction, Crumb};
 pub use direction::{Edge, LayoutDirection};
 pub use icon::Icon;
 pub use layout::AppLayout;
 pub use menu::{Menu, MenuAction, MenuItem};
 pub use overlay::{Dialog, Sheet, SheetEdge, SheetSize};
-// Deprecated aliases re-exported for source compatibility with 0.5.x.
-// Allow the deprecated lint here so the re-export itself does not warn —
-// callers using the aliases will receive the deprecation hint.
-#[allow(deprecated)]
-pub use overlay::{BottomSheet, SheetHeight};
 pub use sidebar::{SideBar, SideBarItem};
+pub use tab::{Tab, TabAction, TabBar};
 pub use toast::{Toast, ToastIntent, ToastLifetime, ToastPosition};
