@@ -3,7 +3,6 @@ title = "Snora"
 description = "An iced GUI framework that gets out of the way of your application."
 authors = ["nabbisen <nabbisen@scqr.net>"]
 language = "en"
-multilingual = false
 src = "src"
 
 [output.html]
