@@ -25,6 +25,11 @@
 //! let icon: Icon = String::from("★").into();
 //! ```
 
+/// An icon, with feature-gated source variants.
+///
+/// See the crate-level documentation and the
+/// [Icons guide](https://github.com/your-org/snora/blob/main/docs/guides/icons.md)
+/// for the full discussion of when to use each variant.
 #[derive(Debug, Clone)]
 pub enum Icon {
     /// Renders the given string as text. The engine may choose its font

@@ -4,11 +4,15 @@ version.workspace = true
 edition.workspace = true
 description = "Vocabulary and contract layer for the Snora iced GUI framework."
 license.workspace = true
-authors.workspace = true
 repository.workspace = true
+authors.workspace = true
 readme = "../../README.md"
 keywords = ["gui", "iced", "ui", "framework"]
 categories = ["gui"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
 # When enabled, the `Icon::Lucide` variant is compiled in.

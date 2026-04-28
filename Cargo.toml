@@ -18,7 +18,7 @@ resolver = "2"
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.4.3"
+version = "0.5.0"
 edition = "2024"
 license = "Apache-2.0"
 authors       = ["nabbisen <nabbisen@scqr.net>"]

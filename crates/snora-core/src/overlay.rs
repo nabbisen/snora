@@ -24,6 +24,8 @@ use std::marker::PhantomData;
 /// The `Message` type parameter is preserved for future extension (e.g.
 /// per-dialog animations or lifecycle hooks) without breaking API shape.
 pub struct Dialog<Node, Message> {
+    /// The dialog body content. The engine centers this in the window and
+    /// paints the dim backdrop around it.
     pub content: Node,
     _marker: PhantomData<Message>,
 }
@@ -46,8 +48,11 @@ impl<Node, Message> Dialog<Node, Message> {
 /// size (discouraged for responsive apps).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SheetHeight {
+    /// 33 % of the window height — the default canonical "drawer" size.
     OneThird,
+    /// 50 % of the window height.
     Half,
+    /// 67 % of the window height.
     TwoThirds,
     /// Arbitrary fraction of window height. Values outside `0.0..=1.0` are
     /// clamped by the engine.
@@ -91,7 +96,10 @@ impl SheetHeight {
 /// Like [`Dialog`], a sheet is content only. The dim backdrop and its
 /// outside-click-to-close behavior are owned by the parent [`crate::AppLayout`].
 pub struct BottomSheet<Node, Message> {
+    /// The drawer's body content. The engine sizes the surrounding surface
+    /// according to `height` and paints the dim backdrop above it.
     pub content: Node,
+    /// Vertical size of the sheet. Defaults to [`SheetHeight::DEFAULT`].
     pub height: SheetHeight,
     _marker: PhantomData<Message>,
 }

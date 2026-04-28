@@ -8,7 +8,7 @@
 //!   engine implementation is expected to render.
 //! * Vocabulary enums that spell out the canonical *choices* an application
 //!   can make: [`LayoutDirection`], [`ToastIntent`], [`ToastLifetime`],
-//!   [`SheetHeight`], [`Icon`].
+//!   [`ToastPosition`], [`SheetHeight`], [`Icon`].
 //! * Data contracts for secondary surfaces: [`Toast`], [`Dialog`],
 //!   [`BottomSheet`], [`Menu`], [`MenuItem`], [`SideBar`], [`SideBarItem`].
 //!
@@ -30,12 +30,22 @@
 //!   [`AppLayout::on_close_modals`]. Individual `Dialog` / `BottomSheet`
 //!   values do *not* carry their own close messages.
 
+#![warn(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
+/// Reading direction and logical edges (`Start`, `End`).
 pub mod direction;
+/// Icon enum and its source variants (text, Lucide, SVG).
 pub mod icon;
+/// The application skeleton ([`AppLayout`]).
 pub mod layout;
+/// Header / context menu vocabulary.
 pub mod menu;
+/// Modal overlay surfaces — [`Dialog`], [`BottomSheet`].
 pub mod overlay;
+/// Vertical navigation rail.
 pub mod sidebar;
+/// Toast notifications and lifetime / position vocabulary.
 pub mod toast;
 
 pub use direction::{Edge, LayoutDirection};
@@ -44,4 +54,4 @@ pub use layout::AppLayout;
 pub use menu::{Menu, MenuAction, MenuItem};
 pub use overlay::{BottomSheet, Dialog, SheetHeight};
 pub use sidebar::{SideBar, SideBarItem};
-pub use toast::{Toast, ToastIntent, ToastLifetime};
+pub use toast::{Toast, ToastIntent, ToastLifetime, ToastPosition};

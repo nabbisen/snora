@@ -21,9 +21,15 @@ where
     Message: Clone,
     ViewId: Clone + PartialEq,
 {
+    /// The view this item points to. Compared against [`SideBar::active`]
+    /// to decide whether to apply the highlight.
     pub view_id: ViewId,
+    /// Visual icon for the rail button.
     pub icon: Icon,
+    /// Tooltip shown on hover. Required for accessibility — keyboard and
+    /// screen-reader users rely on it.
     pub tooltip: String,
+    /// Message emitted when the user activates this item.
     pub on_press: Message,
 }
 
@@ -34,6 +40,7 @@ where
     Message: Clone,
     ViewId: Clone + PartialEq,
 {
+    /// The list of rail entries, in display order.
     pub items: Vec<SideBarItem<Message, ViewId>>,
     /// The id of the view that is currently displayed in the body slot.
     /// The engine uses this to apply an "active" visual treatment.

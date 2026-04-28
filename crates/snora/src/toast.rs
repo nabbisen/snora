@@ -23,7 +23,7 @@ use iced::{
     widget::{button, column, container, row, text},
 };
 
-use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime};
+use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime, ToastPosition};
 
 /// Fixed toast width so stacked toast edges align cleanly regardless of
 /// content length. The value is chosen to comfortably hold two lines of
@@ -40,12 +40,17 @@ const SWEEP_INTERVAL: Duration = Duration::from_millis(500);
 
 /// Build the toast layer, or `None` if the queue is empty.
 ///
-/// The layer is positioned at the bottom-*end* of the window:
+/// The layer is positioned at the requested [`ToastPosition`], with
+/// horizontal anchoring resolved against `direction` for `Start` / `End`
+/// variants. Stack growth direction is derived from the position:
 ///
-/// * `Ltr` → bottom-right
-/// * `Rtl` → bottom-left
+/// * Top anchors grow *downward* — newest toast is closest to the top
+///   edge.
+/// * Bottom anchors grow *upward* — newest toast is closest to the bottom
+///   edge.
 pub(crate) fn render_toasts<'a, Message>(
     toasts: Vec<Toast<Message>>,
+    position: ToastPosition,
     direction: LayoutDirection,
 ) -> Option<Element<'a, Message>>
 where
@@ -55,14 +60,26 @@ where
         return None;
     }
 
+    // For bottom anchors we want the newest toast (last in the application
+    // queue) to sit closest to the bottom edge. We achieve that by reversing
+    // the list when we render bottom-anchored, so the most recent gets
+    // pushed last into a top-down column whose bottom edge faces the screen.
     let mut stack_col = column![].spacing(8);
-    for toast in toasts {
-        stack_col = stack_col.push(render_single_toast(toast));
+    if position.is_bottom() {
+        for toast in toasts.into_iter().rev() {
+            stack_col = stack_col.push(render_single_toast(toast));
+        }
+    } else {
+        for toast in toasts {
+            stack_col = stack_col.push(render_single_toast(toast));
+        }
     }
 
-    let horizontal_anchor = match direction {
-        LayoutDirection::Ltr => Horizontal::Right,
-        LayoutDirection::Rtl => Horizontal::Left,
+    let horizontal_anchor = horizontal_align(position, direction);
+    let vertical_anchor = if position.is_top() {
+        Vertical::Top
+    } else {
+        Vertical::Bottom
     };
 
     Some(
@@ -71,9 +88,26 @@ where
             .height(Length::Fill)
             .padding(24)
             .align_x(horizontal_anchor)
-            .align_y(Vertical::Bottom)
+            .align_y(vertical_anchor)
             .into(),
     )
+}
+
+/// Resolve the horizontal anchor of a toast position under a given
+/// direction. `Start` / `End` mirror under RTL; `Center` is unaffected.
+fn horizontal_align(position: ToastPosition, direction: LayoutDirection) -> Horizontal {
+    use ToastPosition::*;
+    match position {
+        TopCenter | BottomCenter => Horizontal::Center,
+        TopStart | BottomStart => match direction {
+            LayoutDirection::Ltr => Horizontal::Left,
+            LayoutDirection::Rtl => Horizontal::Right,
+        },
+        TopEnd | BottomEnd => match direction {
+            LayoutDirection::Ltr => Horizontal::Right,
+            LayoutDirection::Rtl => Horizontal::Left,
+        },
+    }
 }
 
 fn render_single_toast<'a, Message>(toast: Toast<Message>) -> Element<'a, Message>

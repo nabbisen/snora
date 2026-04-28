@@ -49,7 +49,11 @@ impl LayoutDirection {
 /// In LTR this maps to (Left, Right); in RTL it maps to (Right, Left).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Edge {
+    /// The side a reader's eye begins at — physically left under
+    /// [`LayoutDirection::Ltr`], right under [`LayoutDirection::Rtl`].
     Start,
+    /// The side a reader's eye finishes at — physically right under
+    /// [`LayoutDirection::Ltr`], left under [`LayoutDirection::Rtl`].
     End,
 }
 

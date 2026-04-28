@@ -104,7 +104,9 @@ where
     // -----------------------------------------------------------------
     // Layer 7 — toasts.
     // -----------------------------------------------------------------
-    if let Some(toast_layer) = render_toasts(layout.toasts, layout.direction) {
+    if let Some(toast_layer) =
+        render_toasts(layout.toasts, layout.toast_position, layout.direction)
+    {
         layers = layers.push(toast_layer);
     }
 

@@ -12,5 +12,5 @@ name = "snora-example-toast"
 path = "src/main.rs"
 
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.4.3" }
+snora = { path = "../../crates/snora", version = "0.5.0" }
 iced = { workspace = true }

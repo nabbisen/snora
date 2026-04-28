@@ -32,7 +32,9 @@ pub enum MenuAction<MenuId, MenuItemId> {
 
     /// An item within a menu was chosen.
     MenuItemPressed {
+        /// Id of the parent menu.
         menu_id: MenuId,
+        /// Id of the chosen item.
         menu_item_id: MenuItemId,
     },
 }
@@ -44,9 +46,13 @@ where
     MenuId: Clone + Debug + PartialEq,
     MenuItemId: Clone + Debug,
 {
+    /// Application-defined identity of this menu.
     pub id: MenuId,
+    /// Visible label (e.g. "File", "View").
     pub label: String,
+    /// Optional icon shown next to the label.
     pub icon: Option<Icon>,
+    /// Items shown in the dropdown when this menu is active.
     pub items: Vec<MenuItem<MenuId, MenuItemId>>,
 }
 
@@ -60,7 +66,10 @@ where
     /// The id of the parent menu. Stored on each item so that
     /// [`MenuAction::MenuItemPressed`] can carry it without a second lookup.
     pub menu_id: MenuId,
+    /// Application-defined identity of this item.
     pub id: MenuItemId,
+    /// Visible label.
     pub label: String,
+    /// Optional icon shown before the label.
     pub icon: Option<Icon>,
 }
