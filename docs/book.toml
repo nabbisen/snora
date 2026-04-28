@@ -9,7 +9,6 @@ src = "src"
 default-theme = "rust"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/nabbisen/snora"
-git-repository-icon = "fa-github"
 edit-url-template = "https://github.com/nabbisen/snora/edit/main/docs/{path}"
 site-url = "/snora/"
 
