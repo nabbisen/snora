@@ -1,7 +1,7 @@
 [book]
 title = "Snora"
 description = "An iced GUI framework that gets out of the way of your application."
-authors = ["nabbisen <nabbisen@scqr.net>"]
+authors = ["nabbisen"]
 language = "en"
 src = "src"
 

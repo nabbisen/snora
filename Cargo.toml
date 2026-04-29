@@ -25,7 +25,7 @@ version = "0.8.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/nabbisen/snora"
-authors = ["nabbisen <nabbisen@scqr.net>"]
+authors = ["nabbisen"]
 
 [profile.release]
 opt-level = "z"
