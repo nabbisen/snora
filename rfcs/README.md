@@ -48,6 +48,9 @@ Numbers are stable forever and never reused.
 | 017-C | [Documentation test policy enforcement](./done/017-c-documentation-test-policy-enforcement.md) | v0.17.0 |
 | 017-D | [First build-cost data point](./done/017-d-first-build-cost-data-point.md) | v0.17.0 |
 | 017-E | [API freeze review update](./done/017-e-api-freeze-review-update.md) | v0.17.0 |
+| 018-A | [Version number maintenance](./done/018-a-version-number-maintenance.md) | v0.18.0 |
+| 018-B | [Gate 7 close-out](./done/018-b-gate-7-close-out.md) | v0.18.0 |
+| 018-C | [Contributing index and cross-links](./done/018-c-contributing-index-and-cross-links.md) | v0.18.0 |
 
 ## Proposed
 

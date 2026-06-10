@@ -37,7 +37,7 @@ Six of ten 1.0 gates are now satisfied. The remaining path:
 
 1. One iced major upgrade completed. ⬜
 3. At least one third-party or production-grade app. ⬜
-7. Public API freeze review completed. ⬜ in progress
+7. Public API freeze review completed. ✅ v0.18
 9. Binary-size and compile-time trends (≥2 data points). ⬜ first point v0.17
 
 Work on these proceeds alongside any v0.18+ feature work. There is no
@@ -45,6 +45,7 @@ scheduled date for 1.0.
 
 ## Recently shipped
 
+- **0.18** — Documentation maturity: contributing index; version snippets updated to 0.17; Gate 7 ✅ (API freeze review complete, 7/10 gates satisfied).
 - **0.17** — 1.0 gate advancement: `Icon` gains `PartialEq`; two RTL
   render-semantics integration tests (10 total); keyboard.rs doc fence fix;
   first build-cost data points in all three CSVs; api-freeze-review.md
@@ -83,7 +84,7 @@ The full readiness checklist is in
 4. AppLayout construction policy decided. ✅ v0.11
 5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.17
 6. Feature-matrix CI stable. ✅ v0.11
-7. Public API freeze review completed. ⬜ in progress
+7. Public API freeze review completed. ✅ v0.18
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
 9. Binary-size and compile-time trends monitored (≥2 data points). ⬜ first point v0.17
 10. No hidden feature-combination failures. ✅ (CI gate)

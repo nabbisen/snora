@@ -35,6 +35,7 @@
 
 # Contributing
 
+- [Contributing overview](contributing/README.md)
 - [Internal architecture](contributing/architecture.md)
 - [Design decisions](contributing/design-decisions.md)
 - [ABDD compliance checklist](contributing/abdd-checklist.md)

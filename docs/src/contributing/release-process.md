@@ -72,6 +72,8 @@ them in sync is a release-process invariant.
 [ ] Answer the four versioning-policy questions for any public API change
     (see docs/src/contributing/versioning-policy.md)
 [ ] Confirm migration guide exists if any public API broke or renamed
+[ ] Update user-facing version snippets in install.md and icons.md to the
+    new version (snora = "X.Y" — iced version stays unchanged)
 [ ] Re-run cargo metadata; confirm every crate reports new version
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings

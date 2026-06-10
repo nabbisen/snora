@@ -17,6 +17,29 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.18.0] — 2026-06-10
+
+### Added
+
+- **Contributing overview** (`docs/src/contributing/README.md`). Grouped
+  index of all 13 contributing pages with reading paths for new contributors,
+  designers, and maintainers. First item in the Contributing SUMMARY section.
+  (RFC-018-C)
+
+### Changed
+
+- **User-facing version snippets** in `docs/src/getting-started/01-install.md`
+  and `docs/src/guides/icons.md` updated from `"0.14"` (and two `"0.5"` in
+  `icons.md`) to `"0.17"`. The release checklist now includes a version-snippet
+  update step. (RFC-018-A)
+
+- **`api-freeze-review.md`** Gate 7 marked ✅ v0.18: all checklist sections
+  green, API declared ready for 1.0 pending gates 1, 3, and 9. Seven of ten
+  1.0 gates now satisfied. (RFC-018-B)
+
+- **ROADMAP** Gate 7 updated to ✅ v0.18. Post-0.18 section lists the three
+  remaining 1.0 blockers. (RFC-018-B)
+
 ## [0.17.0] — 2026-06-10
 
 ### Added

@@ -3,9 +3,10 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.17.0):** Six of ten gates satisfied. Gate 2
-(vocabulary stability) and Gate 5 (RTL integration tests) advanced this
-release. Gate 9 (build-cost data) has its first data point.
+**Current status (v0.18.0):** Seven of ten gates satisfied. Gate 7
+(public API freeze review) completed this release — all checklist
+sections green, maintainer declares API ready for 1.0 pending gates
+1, 3, and 9.
 
 ## Crate-level surface
 
@@ -71,7 +72,7 @@ Type-names audit: **complete as of v0.17.0.**
 |---|---|
 | README one-liner is accurate | ✅ |
 | Getting started path is current | ✅ v0.15 — version updated to 0.14 |
-| Reference vocabulary matches source | ✅ vocabulary.md audited alongside type-names pass |
+| Reference vocabulary matches source | ✅ audited v0.18 — all 22 core types present, all 13 widget functions covered, all 4 defaults correct |
 | Migration guides cover breaking pre-1.0 changes | ✅ 0.10→0.11 guide + template |
 | Docs distinguish ABDD from full i18n/accessibility | ✅ Laws 7–8, overlays.md, direction guide |
 | docs.rs feature annotations | ✅ RFC-015-B — `snora` has `[package.metadata.docs.rs]` |
@@ -93,20 +94,20 @@ Type-names audit: **complete as of v0.17.0.**
 | Gate | Status |
 |---|---|
 | 1. One iced major upgrade completed and lived on ≥1 minor | ⬜ |
-| 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 (4 minors, zero vocab change) |
+| 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
 | 3. At least one third-party or production-grade app | ⬜ |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
 | 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests including 2 RTL |
 | 6. Feature-matrix CI stable | ✅ v0.11 |
-| 7. Public API freeze review completed | ⬜ in progress (type-names audit done v0.17) |
+| 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
 | 9. Binary-size and compile-time trends monitored (≥2 data points) | ⬜ first point recorded v0.17; need second |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-**Gates satisfied: 4, 5, 6, 8, 10, 2 = six of ten.**
+**Gates satisfied: 2, 4, 5, 6, 7, 8, 10 = seven of ten.**
 
 Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
-freeze review completion (gate 7), second build-cost data point (gate 9).
+second build-cost data point (gate 9).
 
 ## How to use this document
 
