@@ -71,9 +71,12 @@ fn main() -> iced::Result {
 That's the whole program. Adding a header, sidebar, and footer is
 three more chained calls — see
 [docs/getting-started](docs/src/getting-started/) for the step-by-step
-walk-through, or jump straight to the runnable
-[examples directory](https://github.com/nabbisen/snora/tree/main/examples)
-for one-shot demos of every overlay and widget.
+walk-through, or jump straight to the
+[**workbench example**](https://github.com/nabbisen/snora/tree/main/examples/workbench)
+to see every surface working together (header, sidebar, menus, dialog,
+sheet, toasts, tabs, breadcrumb, and live LTR↔RTL toggle). Single-surface
+demos are in the
+[examples directory](https://github.com/nabbisen/snora/tree/main/examples).
 
 ## Features
 

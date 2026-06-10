@@ -1,6 +1,81 @@
 # RFC-012-A — ABDD Compliance Checklist
 
-Status: Proposed  
+**Status.** Implemented (v0.12.0)
+**Tracks.** Accessibility discipline / Contribution process.
+**Touches.** `docs/src/contributing/abdd-checklist.md` (new),
+`docs/src/SUMMARY.md`, `docs/src/guides/direction.md`,
+`docs/src/contributing/adding-an-overlay.md`,
+`.github/pull_request_template.md` (new).
+
+> Project-adopted version. No design decisions were left open in the
+> planning draft; this version pins the exact file paths and adds the
+> PR template, which the planning draft left optional.
+
+## 1. Summary
+
+Add an ABDD compliance checklist to Snora's contribution process. Every
+direction-sensitive change must demonstrate logical-edge correctness
+before merge.
+
+## 2. Goals
+
+- Make direction correctness a repeatable review gate.
+- Clarify that Snora owns layout direction, not full i18n.
+- Keep the checklist short enough that contributors actually use it.
+
+## 3. Non-Goals
+
+Translation catalogs, locale formatting, vertical writing modes, full
+a11y audit. ABDD is a layout discipline.
+
+## 4. [Decision] PR template is added
+
+The planning draft called this "optional". For a project where every
+direction-sensitive addition must pass the checklist, making it visible
+in every PR is worth the minimal overhead. A two-checkbox prompt is
+not bureaucracy.
+
+## 5. External design
+
+### 5.1 New page: `docs/src/contributing/abdd-checklist.md`
+
+Full checklist content is the planning draft's §6, verbatim.
+
+### 5.2 PR template: `.github/pull_request_template.md`
+
+```markdown
+## ABDD
+
+- [ ] This change is not direction-sensitive (no position, alignment, mirroring, or anchoring affected).
+- [ ] This change is direction-sensitive and the [ABDD checklist](docs/src/contributing/abdd-checklist.md) has been completed.
+```
+
+### 5.3 Cross-links added to
+
+- `SUMMARY.md` under Contributing
+- `docs/src/guides/direction.md` — new closing paragraph
+- `docs/src/contributing/adding-an-overlay.md` — note at step 2 (vocabulary enums)
+
+## 6. Source-comment convention (normative)
+
+When a direction-sensitive helper resolves logical edges to physical
+sides, the comment must say so explicitly:
+
+```rust
+// Resolve logical Start/End to the physical side required by iced layout.
+```
+
+Comments that say "left sidebar" or "right column" without qualification
+are ABDD violations unless the side is intentionally physical and
+documented as such.
+
+## 7. Acceptance criteria
+
+- `abdd-checklist.md` exists and is linked from SUMMARY, direction guide,
+  and adding-an-overlay guide.
+- PR template exists with two ABDD checkboxes.
+- Source-comment convention is stated in the checklist page.
+
 Target release: v0.12  
 Priority: Medium-high  
 Type: Accessibility discipline / Contribution process

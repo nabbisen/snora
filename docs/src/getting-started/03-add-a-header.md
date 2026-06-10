@@ -6,7 +6,7 @@ or use the prefab helpers in `snora::widget`.
 
 ## Adding slots one at a time
 
-```rust
+```rust,ignore
 use snora::{
     AppLayout, LayoutDirection, SideBar, SideBarItem,
     render,
@@ -68,7 +68,7 @@ for the full picture.
 You are not required to use the prefab widgets. Anything that yields an
 `Element<'_, Message>` slots in:
 
-```rust
+```rust,ignore
 let custom_header = iced::widget::container(my_header_row())
     .width(iced::Length::Fill)
     .padding(12)

@@ -33,7 +33,7 @@ the top-end. We followed the in-app convention.
 
 ### To keep the 0.4 behavior
 
-```rust
+```rust,ignore
 use snora::{AppLayout, ToastPosition};
 
 let layout = AppLayout::new(body)
@@ -48,7 +48,7 @@ positioning exactly.
 
 `ToastPosition` has six variants:
 
-```rust
+```rust,ignore
 pub enum ToastPosition {
     TopEnd,        // default (LTR=top-right, RTL=top-left)
     TopStart,
@@ -69,7 +69,7 @@ If your application has a settings panel and you want to let users
 choose, the position is suitable for runtime configuration. Store the
 choice on your state and re-pass it on every render:
 
-```rust
+```rust,ignore
 struct App { /* ... */ toast_position: ToastPosition }
 
 fn view(&self) -> iced::Element<'_, Message> {

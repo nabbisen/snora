@@ -3,7 +3,7 @@
 `Icon` is a single enum with feature-gated variants. Choose your icon
 source per call; nothing is global.
 
-```rust
+```rust,ignore
 pub enum Icon {
     Text(String),                      // always available
     #[cfg(feature = "lucide-icons")]
@@ -18,7 +18,7 @@ runtime "unknown icon kind" branch is reachable.
 
 ## `Icon::Text` — the always-available path
 
-```rust
+```rust,ignore
 let i: Icon = "★".into();                // From<&str>
 let i: Icon = String::from("★").into();  // From<String>
 let i = Icon::Text("✓".into());           // explicit
@@ -38,7 +38,7 @@ every platform that iced supports.
 snora = { version = "0.5", features = ["lucide-icons"] }
 ```
 
-```rust
+```rust,ignore
 use snora::Icon;
 use snora::lucide;                     // re-exported variants
 
@@ -56,7 +56,7 @@ does not pull `lucide::Settings` into the binary.
 snora = { version = "0.5", features = ["svg-icons"] }
 ```
 
-```rust
+```rust,ignore
 let i = Icon::Svg(std::path::PathBuf::from("assets/logo.svg"));
 ```
 
@@ -67,7 +67,7 @@ Pixel size is the same default as the other variants.
 
 The default size is 14 px to match the default body text. To override:
 
-```rust
+```rust,ignore
 use snora::widget::icon::icon_element_sized;
 
 let big_logo = icon_element_sized(&Icon::Text("✓".into()), 24.0);

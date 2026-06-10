@@ -15,7 +15,7 @@ Both share the `Menu` / `MenuItem` / `MenuAction` vocabulary from
 
 You define two enums for menu identities:
 
-```rust
+```rust,ignore
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum MyMenuId {
     File,
@@ -38,7 +38,7 @@ or numeric tagging — your enum is the source of truth.
 
 ## Building menus
 
-```rust
+```rust,ignore
 use snora::{Menu, MenuItem};
 
 let menus = vec![
@@ -62,7 +62,7 @@ lookup.
 
 ## Wiring into a header
 
-```rust
+```rust,ignore
 use snora::{
     AppLayout, LayoutDirection, MenuAction,
     render, widget::app_header,
@@ -103,7 +103,7 @@ fn view(state: &State) -> iced::Element<'_, Message> {
 
 `MenuAction` has two variants:
 
-```rust
+```rust,ignore
 match action {
     MenuAction::MenuPressed(id) => {
         // Toggle: same id closes; different id switches.

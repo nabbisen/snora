@@ -22,19 +22,14 @@ Numbers are stable forever and never reused.
 | 011-A | [Main Rust CI quality gate](./done/011-a-main-rust-ci-quality-gate.md) | v0.11.0 |
 | 011-B | [Toast ordering semantics fix](./done/011-b-toast-ordering-semantics-fix.md) | v0.11.0 |
 | 011-C | [AppLayout construction stability](./done/011-c-app-layout-construction-stability.md) | v0.11.0 |
-| 011-D | [Render-semantics test harness](./done/011-d-render-semantics-test-harness.md) | v0.11.0 (initial; full matrix in v0.12) |
+| 011-D | [Render-semantics test harness](./done/011-d-render-semantics-test-harness.md) | v0.11.0 initial; v0.12.0 full acceptance |
 | 011-E | [Overlay interaction semantics](./done/011-e-overlay-interaction-semantics.md) | v0.11.0 |
+| 012-A | [ABDD compliance checklist](./done/012-a-abdd-compliance-checklist.md) | v0.12.0 |
+| 012-B | [Showcase / workbench example](./done/012-b-showcase-workbench-example.md) | v0.12.0 |
+| 012-C | [Compile-time tracking](./done/012-c-compile-time-tracking.md) | v0.12.0 |
+| 012-D | [Documentation and doctest policy](./done/012-d-documentation-and-doctest-policy.md) | v0.12.0 |
 
 ## Proposed
-
-### v0.12 — Semantic testing & ABDD maturity
-
-| ID | Title |
-|----|-------|
-| 012-A | [ABDD compliance checklist](./proposed/012-a-abdd-compliance-checklist.md) |
-| 012-B | [Showcase / workbench example](./proposed/012-b-showcase-workbench-example.md) |
-| 012-C | [Compile-time tracking](./proposed/012-c-compile-time-tracking.md) |
-| 012-D | [Documentation and doctest policy](./proposed/012-d-documentation-and-doctest-policy.md) |
 
 ### v0.13 — Gated expansion (design-first)
 

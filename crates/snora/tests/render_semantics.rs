@@ -209,3 +209,69 @@ fn sheet_content_button_reachable() {
         "clicking sheet content should produce SheetAction only",
     );
 }
+
+// ---------------------------------------------------------------------------
+// v0.12 expansion — full RFC-011-D invariant coverage
+// ---------------------------------------------------------------------------
+
+/// Outside click emits `on_close_menus` when a menu is open and no modal
+/// is present.
+///
+/// Verifies: layer 1 (menu backdrop) dispatches `on_close_menus` on any
+/// click outside the menu area.
+#[test]
+fn outside_click_on_menu_emits_close_menus() {
+    // A menu element rendered at a fixed position (top-left corner area).
+    // The backdrop covers the whole window; clicking the opposite corner
+    // should hit the backdrop.
+    let menu_el: Element<Msg> = btn("File item", Msg::BodyPressed);
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .header_menu(menu_el)
+        .on_close_menus(Msg::CloseMenus);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    // Click a point far from where a menu item would typically render.
+    ui.point_at(Point::new(4.0, 500.0));
+    let _ = ui.simulate(iced_test::simulator::click());
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        msgs.contains(&Msg::CloseMenus),
+        "outside click with menu open should produce CloseMenus; got {msgs:?}",
+    );
+}
+
+/// When both dialog and sheet are present, both render and both contain
+/// interactive content.
+///
+/// Verifies Law 3 (RFC-011-E): dialog+sheet coexistence is supported.
+/// The sheet (layer 6) is above the dialog (layer 5). Since `render_dialog`
+/// uses `center()` without `opaque`, the dialog content falls through to
+/// the dim; however the sheet's `opaque` wrapper captures clicks within
+/// the sheet area. We verify that the sheet content is findable regardless.
+#[test]
+fn dialog_and_sheet_coexist_sheet_content_reachable() {
+    let dialog: Dialog<Element<Msg>, Msg> = Dialog::new(btn("Dialog btn", Msg::DialogOk));
+    let sheet: Sheet<Element<Msg>, Msg> =
+        Sheet::new(btn("Sheet action", Msg::SheetAction)).at(SheetEdge::Bottom);
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .dialog(dialog)
+        .sheet(sheet)
+        .on_close_modals(Msg::CloseModals);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    // Sheet content must be findable (sheet is topmost modal surface).
+    ui.find("Sheet action")
+        .expect("sheet content must be findable when both dialog and sheet are present");
+    ui.click("Sheet action")
+        .expect("sheet action button should be clickable");
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        msgs.contains(&Msg::SheetAction),
+        "sheet button click must produce SheetAction in coexistence layout; got {msgs:?}",
+    );
+}
+

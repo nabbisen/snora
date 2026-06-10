@@ -1,6 +1,74 @@
 # RFC-012-C — Compile-Time Tracking
 
-Status: Proposed  
+**Status.** Implemented (v0.12.0)
+**Tracks.** Operational metrics / CI.
+**Touches.** `scripts/measure-compile-time.sh` (new),
+`.github/workflows/build-cost.yaml` (new),
+`docs/src/reference/build-cost-budget.md` (new),
+`docs/src/reference/build-cost-budget/compile-time.csv` (new, header-only),
+`docs/src/SUMMARY.md`,
+`docs/src/contributing/feature-gating-criteria.md`,
+`docs/src/contributing/release-process.md`.
+
+> Project-adopted version. The planning draft's script and workflow
+> are adopted with one clarification: `cargo clean` is scoped to
+> the measured package (not the whole workspace) to save CI time
+> while still ensuring a cold build of the target under test.
+
+## 1. Script: `scripts/measure-compile-time.sh`
+
+The planning-pack pseudo-implementation is adopted verbatim except:
+- `cargo clean -p <package>` instead of `cargo clean` (workspace
+  clean is prohibitively expensive on CI for a trend signal).
+- Output line is written to stdout; caller may redirect.
+- Script is `chmod +x`.
+
+## 2. Workflow: `.github/workflows/build-cost.yaml`
+
+Triggers: push to `main`, release tags `v*.*.*`, `workflow_dispatch`.
+Not on PRs (cold compile is expensive and noisy per-PR).
+Commit-back on tags only, mirroring `binary-size.yaml`.
+
+```yaml
+name: Build cost
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+concurrency:
+  group: build-cost-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+```
+
+## 3. CSV header (normative)
+
+```csv
+version,check_workspace_ms,build_widgets_ms,build_engine_only_ms,example_hello_ms,rustc,runner_os,date
+```
+
+Shipping header-only, same policy as `binary-size.csv`.
+
+## 4. Threshold policy
+
+No CI failures initially. Watch points:
+- `build_widgets_ms` cold > 30 000 ms → discuss per feature-gating criteria indicator 1.
+- `build_engine_only_ms` growing toward `build_widgets_ms` → investigate.
+
+## 5. Acceptance criteria
+
+- Script exists, is executable, emits a valid CSV row.
+- Workflow exists, triggers on tags.
+- `build-cost-budget.md` explains the limitation (runner variance,
+  cold-build scope, no strict gate).
+- Release checklist updated.
+- feature-gating-criteria.md points to the new CSV for indicator 1.
+
 Target release: v0.12  
 Priority: Medium  
 Type: Operational metrics / CI

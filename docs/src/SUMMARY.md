@@ -9,6 +9,7 @@
 - [Add a header, sidebar, footer](getting-started/03-add-a-header.md)
 - [Toasts](getting-started/04-toasts.md)
 - [When to use snora](getting-started/05-when-to-use.md)
+- [The workbench example](getting-started/06-workbench.md)
 
 # Guides
 
@@ -27,11 +28,14 @@
 - [Built-in widgets](reference/widgets.md)
 - [Overlay interaction semantics](reference/overlay-interaction-semantics.md)
 - [Binary size budget](reference/binary-size-budget.md)
+- [Build cost budget](reference/build-cost-budget.md)
 
 # Contributing
 
 - [Internal architecture](contributing/architecture.md)
 - [Design decisions](contributing/design-decisions.md)
+- [ABDD compliance checklist](contributing/abdd-checklist.md)
+- [Documentation test policy](contributing/documentation-test-policy.md)
 - [Adding a new overlay kind](contributing/adding-an-overlay.md)
 - [Feature-gating criteria](contributing/feature-gating-criteria.md)
 - [Release process](contributing/release-process.md)

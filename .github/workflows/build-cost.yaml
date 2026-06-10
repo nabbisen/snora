@@ -1,0 +1,100 @@
+name: Build cost
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+# Avoid recursion: same [skip ci] + path-filter defence as binary-size.yaml.
+concurrency:
+  group: build-cost-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # required for commit-back on release tags
+
+jobs:
+  measure:
+    name: Measure compile time
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache build
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: build-cost
+
+      - name: Determine version label
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION=$(grep -oP '^version\s*=\s*"\K[0-9]+\.[0-9]+\.[0-9]+' Cargo.toml | head -n1)
+            VERSION="${VERSION}-dev-${GITHUB_SHA::7}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Measuring as: $VERSION"
+
+      - name: Measure
+        id: measure
+        run: |
+          ROW=$(scripts/measure-compile-time.sh "${{ steps.version.outputs.version }}")
+          echo "row=$ROW" >> "$GITHUB_OUTPUT"
+          echo "Measurement: $ROW"
+
+      - name: Write job summary
+        run: |
+          ROW="${{ steps.measure.outputs.row }}"
+          IFS=',' read -r v ws_ms wid_ms eng_ms hel_ms rustc os date <<<"$ROW"
+          {
+            echo "## Build cost — \`$v\`"
+            echo
+            echo "| Configuration | ms |"
+            echo "|---|---:|"
+            echo "| check workspace (all-features) | $ws_ms |"
+            echo "| build snora-widgets (release) | $wid_ms |"
+            echo "| build engine-only (release) | $eng_ms |"
+            echo "| build example-hello (release-baseline) | $hel_ms |"
+            echo
+            echo "Rustc: \`$rustc\` · OS: $os · Date: $date"
+            echo
+            echo "Watch point: widgets cold build > 30 000 ms → review feature-gating-criteria.md indicator 1."
+            if (( wid_ms > 30000 )); then
+              echo
+              echo ":warning: **Widgets build exceeds 30 s watch point.** Investigate before publishing."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload measurement artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-cost-${{ steps.version.outputs.version }}
+          path: /tmp/snora-build-cost-*.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      # Tag-only: append row to CSV and commit back with [skip ci].
+      - name: Append row to compile-time CSV
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "${{ steps.measure.outputs.row }}" >> \
+            docs/src/reference/build-cost-budget/compile-time.csv
+
+      - name: Commit and push to main
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: |
+            docs: append build cost for ${{ github.ref_name }} [skip ci]
+          file_pattern: docs/src/reference/build-cost-budget/compile-time.csv
+          branch: main
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com

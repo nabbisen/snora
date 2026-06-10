@@ -3,7 +3,7 @@
 The smallest possible snora application — a single body element,
 nothing else.
 
-```rust
+```rust,ignore
 use iced::{Element, widget::text};
 use snora::{AppLayout, render};
 

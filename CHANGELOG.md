@@ -17,6 +17,71 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.12.0] — 2026-06-10
+
+### Added
+
+- **Render-semantics test expansion** (RFC-011-D full acceptance).
+  Three new integration tests in `crates/snora/tests/render_semantics.rs`:
+  menu backdrop dismissal (`outside_click_on_menu_emits_close_menus`),
+  dialog+sheet coexistence (`dialog_and_sheet_coexist_sheet_content_reachable`),
+  and sheet opaque-wrapper interaction. Engine test suite is now 8 integration
+  tests covering all invariants from the RFC-011-D full-acceptance table.
+  Five new `toast.rs` unit tests cover RTL `horizontal_align` for all
+  Start/End/Center positions — full ABDD regression coverage at the unit level.
+
+- **ABDD compliance checklist** (`docs/src/contributing/abdd-checklist.md`).
+  Normative review gate for direction-sensitive changes. Covers scope
+  determination, logical-edge API, public naming, example/doc requirements,
+  test requirements, and accessibility wording. Linked from SUMMARY,
+  direction guide, and adding-an-overlay guide. (RFC-012-A)
+
+- **PR template** (`.github/pull_request_template.md`). Two-checkbox ABDD
+  prompt plus a docs fence classification reminder, visible on every PR.
+  (RFC-012-A)
+
+- **Workbench example** (`examples/workbench/`). A single application
+  exercising all major Snora surfaces together: header with File menu and
+  RTL toggle, sidebar, breadcrumb, tab bar, four tab-body panels
+  (Overview, Overlay Lab, Toast Lab, Direction Lab), all five toast intents,
+  all six toast positions, dialog, sheet (End-anchored, mirrors under RTL),
+  context menu, and footer status bar. Workspace member; compiles in CI.
+  (RFC-012-B)
+
+- **Workbench getting-started page** (`docs/src/getting-started/06-workbench.md`).
+  Surface-by-surface reference table and manual QA checklist.
+
+- **Compile-time tracking** (`scripts/measure-compile-time.sh`,
+  `.github/workflows/build-cost.yaml`, `docs/src/reference/build-cost-budget.md`,
+  `docs/src/reference/build-cost-budget/compile-time.csv`).
+  Complements the existing binary-size budget. Measures four cold-build
+  configurations per release and appends a row to the CSV on every tag,
+  mirroring the `binary-size.yaml` commit-back pattern. No CI failure gate
+  initially — trend signal only. (RFC-012-C)
+
+- **Documentation test policy** (`docs/src/contributing/documentation-test-policy.md`).
+  Defines code fence classifications and the no-bare-`rust`-fence rule.
+  `mdbook test docs` added to the CI docs job as enforcement. (RFC-012-D)
+
+### Changed
+
+- **All 54 bare `rust` fences in `docs/src` classified** (RFC-012-D).
+  Type-declaration excerpts → `rust,no_run` (15 fences in `vocabulary.md`
+  and `widgets.md`). App-shaped partials → `rust,ignore` (41 fences across
+  the remaining 15 files). Zero bare `rust` fences remain; `mdbook test`
+  now passes on the docs tree.
+
+- **CI docs job extended** with `mdbook test docs` step. (RFC-012-D)
+
+- **Feature-gating-criteria indicator 1** updated to point at the new
+  `compile-time.csv` and `build-cost-budget.md` instead of the previous
+  ad-hoc measurement instruction. (RFC-012-C)
+
+- **Release checklist** updated with the `build-cost` workflow post-tag
+  verification step. (RFC-012-C)
+
+- **README** updated with workbench reference and link. (RFC-012-B)
+
 ## [0.11.0] — 2026-06-10
 
 ### Added

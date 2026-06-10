@@ -1,6 +1,113 @@
 # RFC-012-B — Showcase / Workbench Example
 
-Status: Proposed  
+**Status.** Implemented (v0.12.0)
+**Tracks.** Example / Dogfood / Manual QA.
+**Touches.** `examples/workbench/` (new crate),
+`Cargo.toml` (workspace member),
+`docs/src/getting-started/06-workbench.md` (new),
+`docs/src/SUMMARY.md`, `README.md`.
+
+> Project-adopted version. Decisions made against the real tree:
+> (1) workbench is a workspace-member package, matching all other
+> examples; (2) `src/main.rs` stays under 300 ELOC by keeping tab
+> bodies short; (3) context menu triggered by a button (no
+> right-click handling needed — keeps the example clean); (4) the
+> ABDD requirement from RFC-012-A is satisfied by the LTR/RTL toggle.
+
+## 1. Summary
+
+Add `examples/workbench` — a single app exercising all major Snora
+surfaces together. Manual QA reference, dogfood target, docs
+showcase, and composition proof.
+
+## 2. File structure
+
+```
+examples/workbench/
+  Cargo.toml    (name = "snora-example-workbench", publish = false)
+  src/main.rs   (≤ 300 ELOC; single file per project convention)
+```
+
+Added to workspace `Cargo.toml` members list.
+
+## 3. State and message model (final)
+
+The planning draft's models are adopted verbatim with one addition:
+`context_menu_pos: Option<iced::Point>` is dropped in favour of a
+button-triggered context menu (no mouse-position tracking needed).
+
+```rust
+struct Workbench {
+    direction:      LayoutDirection,
+    active_tab:     Tab,
+    open_menu:      Option<OpenMenu>,
+    show_dialog:    bool,
+    show_sheet:     bool,
+    toasts:         Vec<Toast<Message>>,
+    next_toast_id:  u64,
+    toast_position: ToastPosition,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Tab { Overview, OverlayLab, ToastLab, DirectionLab }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum OpenMenu { File, Context }
+
+#[derive(Debug, Clone)]
+enum Message {
+    SelectTab(Tab),
+    ToggleDirection,
+    OpenFileMenu,
+    OpenContextMenu,
+    CloseMenus,
+    OpenDialog,
+    CloseModals,
+    OpenSheet,
+    AddToast(ToastIntent),
+    DismissToast(u64),
+    SetToastPosition(ToastPosition),
+    ToastTick,
+}
+```
+
+## 4. Update invariants
+
+- `OpenDialog` / `OpenSheet`: close menus first (Law 2, RFC-011-E).
+- `CloseMenus` → clear `open_menu`.
+- `CloseModals` → clear both `show_dialog` and `show_sheet`.
+- `ToastTick` → `snora::toast::sweep_expired`.
+- `AddToast(intent)` → push + increment `next_toast_id`.
+
+## 5. ABDD compliance (RFC-012-A)
+
+This example is direction-sensitive (sidebar side, sheet edge, toast
+anchor all mirror). Compliance:
+
+- LTR/RTL toggle button in the header. Pressing it calls
+  `ToggleDirection`, which calls `direction.flipped()`.
+- `Sheet` opens at `SheetEdge::End` — mirrors under RTL automatically.
+- `AppLayout` wired with `self.direction` — sidebar mirrors.
+- `ToastPosition::TopEnd` mirrors under RTL — demonstrated by
+  toggling direction while toasts are present.
+
+## 6. Documentation
+
+- `docs/src/getting-started/06-workbench.md`: short intro (what each
+  tab demonstrates, how to run, manual QA checklist).
+- SUMMARY.md: link under Getting started.
+- README.md: mention workbench in examples list.
+
+## 7. Acceptance criteria
+
+- `examples/workbench` compiles in CI (workspace member).
+- Demonstrates: header, sidebar, footer, file menu, context menu,
+  dialog, sheet, all five toast intents, six toast positions,
+  LTR/RTL toggle, tab bar, breadcrumb.
+- Single `src/main.rs` ≤ 300 ELOC.
+- `ToggleDirection` button present and functional.
+- Toast subscription wired.
+
 Target release: v0.12  
 Priority: Medium-high  
 Type: Example / Dogfood / Manual QA

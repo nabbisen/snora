@@ -22,7 +22,7 @@ Keep your `update` function pure (mutates state, returns `Task`) and
 have `view` be the only function that touches iced widgets. Tests
 exercise `update`; the renderer is never invoked.
 
-```rust
+```rust,ignore
 // src/app.rs
 
 #[derive(Default)]
@@ -59,7 +59,7 @@ impl App {
 
 ## Pattern: assert against the queue
 
-```rust
+```rust,ignore
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -7,7 +7,7 @@ one-liners.
 
 ## Three pieces
 
-```rust
+```rust,ignore
 use std::time::Instant;
 use iced::{Subscription, Task};
 use snora::{Toast, ToastIntent, ToastLifetime};
@@ -27,7 +27,7 @@ enum Message {
 
 ### 1. Push a toast
 
-```rust
+```rust,ignore
 fn update(&mut self, msg: Message) -> Task<Message> {
     if let Message::ShowSaved = msg {
         let id = self.next_id;
@@ -52,7 +52,7 @@ fn update(&mut self, msg: Message) -> Task<Message> {
 
 ### 2. Subscribe to TTL ticks
 
-```rust
+```rust,ignore
 fn subscription(&self) -> Subscription<Message> {
     snora::toast::subscription(&self.toasts, || Message::ToastTick)
 }
@@ -64,7 +64,7 @@ an idle screen.
 
 ### 3. Pass the queue to the layout
 
-```rust
+```rust,ignore
 fn view(&self) -> iced::Element<'_, Message> {
     let body: iced::Element<'_, Message> = /* … */;
     let layout = snora::AppLayout::new(body)

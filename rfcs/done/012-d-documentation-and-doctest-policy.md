@@ -1,6 +1,74 @@
 # RFC-012-D — Documentation and Doctest Policy
 
-Status: Proposed  
+**Status.** Implemented (v0.12.0)
+**Tracks.** Documentation quality / Test policy.
+**Touches.** All `docs/src/**/*.md` files with `rust` fences (17 files,
+54 fences), `docs/src/contributing/documentation-test-policy.md` (new),
+`docs/src/SUMMARY.md`, `.github/workflows/ci.yaml` (docs job extended).
+
+> Project-adopted version. The planning draft said "audit first."
+> The audit has been run against v0.12 tree. Findings and decisions
+> are recorded here.
+
+## 1. Audit findings
+
+| Fence type | Count | Classification |
+|---|---:|---|
+| `rust` (no suffix) | 54 | See §2 |
+| `rust,ignore` | 2 | Already correct (new in v0.11) |
+| `toml` | 17 | Correct |
+| `text` | 12 | Correct |
+| `bash` | 1 | Correct |
+
+All 54 bare `rust` fences fall into one of two categories:
+
+**A. Full-app-shaped partials** (require `iced::Application` context,
+partial `impl` blocks, or `fn main`). Examples: `02-hello-world.md`,
+`03-add-a-header.md`, guide/overlay snippets. → Mark `rust,ignore`.
+
+**B. Type-declaration excerpts** (`enum`/`struct` definitions shown
+for documentation, not meant to compile standalone). Examples:
+`vocabulary.md`, `design-decisions.md`. → Mark `rust,no_run`
+(renders highlighted, signals intent, skipped by `mdbook test`).
+
+No fence is self-contained enough to compile without crate context.
+`mdbook test docs` would fail all 54 without this classification.
+
+## 2. [Decision] Classification applied in v0.12
+
+- Category A fences → `rust,ignore` (illustrative partial code).
+- Category B fences → `rust,no_run` (type-declaration excerpts).
+- New fences added in v0.12 (workbench doc, checklist) → classified
+  at write time.
+
+After this classification, `mdbook test docs` is added to the CI docs
+job. Rationale: the step is cheap once fences are classified and
+catches future fence regressions automatically.
+
+## 3. Policy page: `docs/src/contributing/documentation-test-policy.md`
+
+Content covers:
+- the four fence classifications and when to use each;
+- the "widget builder samples compile somewhere" rule;
+- how to run `mdbook test docs` locally;
+- relationship to `cargo test -p snora-core` doctests.
+
+## 4. CI extension
+
+After fence classification, add to the `docs` job in `ci.yaml`:
+
+```yaml
+- name: Test docs (mdbook test)
+  run: mdbook test docs
+```
+
+## 5. Acceptance criteria
+
+- All 54 bare `rust` fences classified (`ignore` or `no_run`).
+- `documentation-test-policy.md` exists and is linked from SUMMARY.
+- `mdbook test docs` passes in CI.
+- `cargo test -p snora-core` doctests unchanged (still 17).
+
 Target release: v0.12  
 Priority: Medium  
 Type: Documentation quality / Test policy

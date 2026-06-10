@@ -59,10 +59,12 @@ If `cargo check` of the widget set on its own approaches the cost
 of recompiling iced, the per-widget gate becomes worth its
 documentation cost.
 
-How to measure: run `cargo clean -p snora-widgets && time cargo
-build -p snora-widgets --release`. Use `--release` so we are
-measuring optimization workload, not debug-info layout. Repeat the
-measurement at each release; track the trend.
+How to measure: `scripts/measure-compile-time.sh <version>` (see
+[`reference/build-cost-budget.md`](../reference/build-cost-budget.md)).
+Per-release values are tracked in
+[`reference/build-cost-budget/compile-time.csv`](../reference/build-cost-budget/compile-time.csv),
+appended on every release tag by the `build-cost` GitHub Actions workflow.
+The `build_widgets_ms` column is the indicator 1 proxy.
 
 ### 2. Binary size measurably increases for engine-only consumers
 

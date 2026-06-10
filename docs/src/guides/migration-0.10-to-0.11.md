@@ -39,7 +39,7 @@ This change only affects you if you constructed `AppLayout` using a struct
 literal *outside* `snora-core`. Every example and the recommended usage
 pattern already use the builder, so most users need no change.
 
-```rust
+```rust,ignore
 // Before (struct literal — no longer compiles from outside snora-core):
 let layout = AppLayout {
     body,

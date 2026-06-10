@@ -12,7 +12,7 @@ and how the user dismisses them.
 
 ## One close sink, two channels
 
-```rust
+```rust,ignore
 let layout = AppLayout::new(body)
     .on_close_modals(Message::CloseModals)   // dialog / sheet
     .on_close_menus(Message::CloseMenus);    // context / header menus
@@ -32,7 +32,7 @@ overlay content. snora never silently drops a populated overlay.
 A centered modal card. Snora paints the dim backdrop and centers your
 content; everything else is your decision.
 
-```rust
+```rust,ignore
 use snora::{AppLayout, Dialog};
 
 let layout = AppLayout::new(body)
@@ -49,7 +49,7 @@ form. snora is a positioner, not a styler.
 A modal panel anchored to one of the four window edges, occupying a
 configurable size along the perpendicular axis.
 
-```rust
+```rust,ignore
 use snora::{AppLayout, Sheet, SheetEdge, SheetSize};
 
 let sheet = Sheet::new(my_drawer_content())
@@ -101,7 +101,7 @@ A floating menu (right-click style). It uses `on_close_menus`, not
 `on_close_modals`, so it can coexist with an open dialog without one
 dismissing the other.
 
-```rust
+```rust,ignore
 let layout = AppLayout::new(body)
     .context_menu(my_floating_menu(point))
     .on_close_menus(Message::CloseMenus);

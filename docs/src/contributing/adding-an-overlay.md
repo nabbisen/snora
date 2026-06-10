@@ -42,7 +42,7 @@ edge" to (1) or (2), stop here.
 Place it in `src/overlay.rs` next to `Dialog` and `Sheet`. Keep
 the same shape:
 
-```rust
+```rust,ignore
 pub struct CommandPalette<Node, Message> {
     pub content: Node,
     pub recent_count: usize,
@@ -76,11 +76,16 @@ If your overlay has configuration that does not fit a primitive
 struct. Use *logical* terms (`Start` / `End`) for axis-aligned
 variants — never `Left` / `Right` directly.
 
+If the new overlay is direction-sensitive, complete the
+[ABDD compliance checklist](abdd-checklist.md) before opening
+a PR. Every direction-sensitive addition must demonstrate logical-edge
+correctness under both LTR and RTL.
+
 ### 3. Add an `AppLayout` field + builder method
 
 In `snora-core/src/layout.rs`:
 
-```rust
+```rust,ignore
 pub struct AppLayout<Node, Message> {
     // existing fields...
     pub command_palette: Option<CommandPalette<Node, Message>>,
@@ -104,7 +109,7 @@ Update `AppLayout::new` to initialize it to `None`.
 
 Create `snora/src/overlay/command_palette.rs`:
 
-```rust
+```rust,ignore
 pub(crate) fn render_command_palette<'a, Message>(
     palette: CommandPalette<Element<'a, Message>, Message>,
     direction: LayoutDirection,

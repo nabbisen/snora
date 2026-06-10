@@ -26,7 +26,7 @@ If your 0.6 build was clean of `#[deprecated]` warnings, no edit is
 needed. If you suppressed the warnings or skipped 0.6, do the
 renames now:
 
-```rust
+```rust,ignore
 // Before (0.5 / 0.6 with deprecation warnings)
 use snora::{BottomSheet, SheetHeight};
 let sheet = BottomSheet::new(content).with_height(SheetHeight::Half);
@@ -47,7 +47,7 @@ non-bottom anchors) is documented in
 For peer-level navigation — three to seven sibling views — use
 [`TabBar`] and [`app_tab_bar`].
 
-```rust
+```rust,ignore
 use snora::{
     AppLayout, Tab, TabAction, TabBar, render,
     widget::app_tab_bar,
@@ -99,7 +99,7 @@ beasts; the guide spans both).
 For ancestor-level navigation — "where am I in the hierarchy" —
 use [`Crumb`] and [`app_breadcrumb`].
 
-```rust
+```rust,ignore
 use snora::{
     BreadcrumbAction, Crumb, render,
     widget::app_breadcrumb,

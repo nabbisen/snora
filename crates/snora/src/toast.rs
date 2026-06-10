@@ -310,7 +310,60 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // render_order_for — toast anchor-edge invariant
+    // horizontal_align — RTL Start/End mirroring (RFC-011-D / RFC-012-A ABDD)
+    //
+    // The ABDD contract: Start/End positions mirror under RTL so the newest
+    // toast always lands on the correct logical side regardless of reading
+    // direction. Center positions are unaffected by direction.
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn top_end_ltr_resolves_right() {
+        assert_eq!(
+            horizontal_align(ToastPosition::TopEnd, LayoutDirection::Ltr),
+            iced::alignment::Horizontal::Right,
+        );
+    }
+
+    #[test]
+    fn top_end_rtl_mirrors_to_left() {
+        assert_eq!(
+            horizontal_align(ToastPosition::TopEnd, LayoutDirection::Rtl),
+            iced::alignment::Horizontal::Left,
+        );
+    }
+
+    #[test]
+    fn top_start_ltr_resolves_left() {
+        assert_eq!(
+            horizontal_align(ToastPosition::TopStart, LayoutDirection::Ltr),
+            iced::alignment::Horizontal::Left,
+        );
+    }
+
+    #[test]
+    fn top_start_rtl_mirrors_to_right() {
+        assert_eq!(
+            horizontal_align(ToastPosition::TopStart, LayoutDirection::Rtl),
+            iced::alignment::Horizontal::Right,
+        );
+    }
+
+    #[test]
+    fn center_positions_unaffected_by_direction() {
+        for dir in [LayoutDirection::Ltr, LayoutDirection::Rtl] {
+            assert_eq!(
+                horizontal_align(ToastPosition::TopCenter, dir),
+                iced::alignment::Horizontal::Center,
+                "TopCenter must be unaffected by direction ({dir:?})",
+            );
+            assert_eq!(
+                horizontal_align(ToastPosition::BottomCenter, dir),
+                iced::alignment::Horizontal::Center,
+                "BottomCenter must be unaffected by direction ({dir:?})",
+            );
+        }
+    }
     //
     // The contract: applications push toasts in chronological order (oldest
     // at index 0, newest at the back). The newest must appear closest to the

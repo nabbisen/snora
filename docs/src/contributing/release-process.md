@@ -81,14 +81,16 @@ them in sync is a release-process invariant.
 [ ] cargo package -p snora         --no-verify    # check .crate contents
 [ ] git commit, git tag vX.Y.Z, git push --tags
 [ ] Confirm CI workflow green on the tag commit (all three jobs)
-[ ] cargo publish -p snora-core
-[ ] cargo publish -p snora-widgets
-[ ] cargo publish -p snora
 [ ] After tag push: confirm the `binary-size` workflow run succeeded
     on the tag and appended a row to
     docs/src/reference/binary-size-budget/binary-size.csv on main.
     If the diff column exceeds 150 KB, follow up per
     feature-gating-criteria.md indicator 2.
+[ ] After tag push: confirm the `build-cost` workflow run succeeded
+    on the tag and appended a row to
+    docs/src/reference/build-cost-budget/compile-time.csv on main.
+    If build_widgets_ms exceeds 30 000, follow up per
+    feature-gating-criteria.md indicator 1.
 ```
 
 ### Why `--no-verify`

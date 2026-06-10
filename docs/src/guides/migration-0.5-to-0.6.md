@@ -31,7 +31,7 @@ the size axis perpendicular to the chosen edge.
 
 ### Minimal rename
 
-```rust
+```rust,ignore
 // 0.5
 use snora::{BottomSheet, SheetHeight};
 let sheet = BottomSheet::new(content).with_height(SheetHeight::Half);
@@ -56,7 +56,7 @@ silence warnings entirely.
 
 ### New: anchoring at other edges
 
-```rust
+```rust,ignore
 use snora::{Sheet, SheetEdge, SheetSize};
 
 // Sheet from the start edge (LTR=left, RTL=right)
@@ -104,7 +104,7 @@ full dependency picture.
 lib re-exports `snora-widgets` under the same paths used in 0.5.
 Your imports keep working:
 
-```rust
+```rust,ignore
 // Both 0.5 and 0.6 — same import paths
 use snora::widget::{app_header, app_side_bar, app_footer};
 use snora::widget::icon::icon_element;

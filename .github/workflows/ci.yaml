@@ -65,3 +65,5 @@ jobs:
         run: cargo install mdbook --no-default-features --features search --vers "^0.5" --locked
       - name: Build docs
         run: mdbook build docs
+      - name: Test docs (classify fences)
+        run: mdbook test docs

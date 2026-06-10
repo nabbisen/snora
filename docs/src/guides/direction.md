@@ -7,7 +7,7 @@ Arabic / Hebrew / Persian readers without a per-screen rewrite.
 
 ## Two switches
 
-```rust
+```rust,ignore
 use snora::{LayoutDirection, ToastPosition};
 
 let layout = AppLayout::new(body)
@@ -23,7 +23,7 @@ mirror their own internal `start` / `end` arrangements.
 
 `Edge` is the central vocabulary type:
 
-```rust
+```rust,ignore
 pub enum Edge { Start, End }
 ```
 
@@ -40,7 +40,7 @@ a physical side.
 For your own widgets, `snora::direction::row_dir` (and `row_dir_three`)
 build a `row!` whose order is decided by direction:
 
-```rust
+```rust,ignore
 use snora::direction::row_dir;
 
 let bar = row_dir(
@@ -97,3 +97,10 @@ internal contents, only the surrounding layout.
 
 ABDD is a layout discipline, not a complete i18n stack. snora gets the
 skeleton right; you bring the rest of the i18n story.
+
+## Contributing direction-sensitive changes
+
+When adding or modifying any direction-sensitive surface, follow the
+[ABDD compliance checklist](../contributing/abdd-checklist.md). The
+checklist covers logical-edge API, RTL examples, tests, and wording
+conventions.

@@ -1,6 +1,6 @@
 # RFC-011-D — Render-Semantics Test Harness
 
-**Status.** Implemented (v0.11.0)
+**Status.** Implemented (v0.11.0 initial; v0.12.0 full acceptance)
 Initial implementation in v0.11.0; full matrix in v0.12.
 **Tracks.** Testing / semantic hardening. Protects the engine's runtime
 contract (z-stack, dismissal, toast order, RTL) that `snora-core` doctests

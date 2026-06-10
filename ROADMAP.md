@@ -31,43 +31,42 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.12 (next release)
+## Near-term: 0.13 (next release)
 
-These items have clear scope and build directly on v0.11 foundations.
+Primary goal: design expansion — evaluate the only likely missing
+overlay class (anchored popovers) while keeping the vocabulary stable.
 
 ### Likely
 
-- **Render-semantics test expansion** (RFC-011-D full acceptance).
-  Extend `crates/snora/tests/render_semantics.rs` to cover menu
-  dismissal, dialog+sheet coexistence, and interaction-level RTL
-  placement — the v0.11 harness covers the first five invariants.
-- **ABDD compliance checklist** (RFC-012-A). Add
-  `docs/src/contributing/abdd-checklist.md` and link it from direction,
-  overlay, and adding-an-overlay guides.
-- **Showcase / workbench example** (RFC-012-B). A single
-  `examples/workbench` app that exercises all major surfaces together —
-  header, sidebar, menus, dialog, sheet, toasts, tab bar, breadcrumb,
-  and LTR/RTL toggle. Serves as manual QA reference and dogfood target.
+- **Tooltip vocabulary trigger** (RFC-013-C). `SideBarItem.tooltip:
+  String` is currently the only typed tooltip. A second consumer
+  (e.g. tab bar item tooltip, icon button) would justify promoting to
+  shared vocabulary (`Tooltip { text: String, side: Edge }`). Watch
+  for the second consumer.
 
-### Maybe
+### Design-first (no implementation without a real use case)
 
-- **Documentation and doctest policy** (RFC-012-D). Audit mdBook code
-  blocks, classify them (testable / `ignore` / non-Rust), and define
-  the policy for `snora-widgets` builder examples.
-- **Compile-time tracking** (RFC-012-C). Add
-  `scripts/measure-compile-time.sh` and a companion reference page,
-  mirroring the binary-size workflow.
+- **Anchored popover design study** (RFC-013-A). Design whether Snora
+  should add a popover overlay anchored to a widget/point/rect.
+  Fills the gap between menus, centered dialogs, and edge sheets.
+  Implementation requires a concrete consuming app.
+
+- **Public API freeze readiness** (RFC-013-B). Define the freeze review
+  process before 1.0. Checklist covers exported types, feature flags,
+  builder completeness, semantic contracts, docs, and release hygiene.
+  Should be written before further vocabulary additions.
 
 ## Recently shipped
 
+- **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance
+  (8 render-semantics integration tests, 5 RTL unit tests); ABDD compliance
+  checklist and PR template; workbench example exercising all surfaces;
+  compile-time tracking script + workflow + docs; documentation test policy
+  (54 fences classified, `mdbook test` in CI).
 - **0.11** — Foundation hardening: main Rust CI quality gate (three-job
-  workflow covering check/clippy/tests/feature-matrix/docs); toast
-  ordering bugfix (newest now correctly closest to anchor edge); `AppLayout`
-  construction stability (`#[non_exhaustive]`, builder path canonical);
-  overlay interaction semantics reference page (eight normative laws);
-  render-semantics test harness (`iced_test` headless, 6 integration
-  tests); RFC directory adopted (RFC-000 lifecycle, 24 forward RFCs filed).
-- **0.10** — Binary size budget: a CI-managed CSV
+  workflow covering check/clippy/tests/feature-matrix/docs); toast ordering
+  bugfix; `AppLayout` is `#[non_exhaustive]`; overlay interaction semantics
+  reference page; render-semantics test harness; RFC directory adopted.
   (`reference/binary-size-budget/binary-size.csv`) appended on each
   release tag, a `release-baseline` Cargo profile for fast
   measurement, the `binary-size` GitHub Actions workflow, and the

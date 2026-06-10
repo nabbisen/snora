@@ -9,7 +9,7 @@ trade-offs are still valid.
 
 Early drafts (≤ 0.3) defined a trait that page-like objects implemented:
 
-```rust
+```rust,ignore
 trait PageContract {
     type Node;
     type Message;
