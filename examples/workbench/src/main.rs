@@ -69,6 +69,8 @@ enum Message {
     DismissToast(u64),
     SetToastPosition(ToastPosition),
     ToastTick,
+    KeyPressed(iced::keyboard::Key),
+    NoOp,
 }
 
 // ---------------------------------------------------------------------------
@@ -161,16 +163,39 @@ impl Workbench {
                 ));
             }
             Message::DismissToast(id) => self.toasts.retain(|t| t.id != id),
+            Message::NoOp => {}
             Message::SetToastPosition(pos) => self.toast_position = pos,
             Message::ToastTick => {
                 snora::toast::sweep_expired(&mut self.toasts, Instant::now());
+            }
+            // Escape key: dismiss modals first, then menus — via the helper.
+            Message::KeyPressed(key) => {
+                let has_menu = self.file_menu_open || self.context_menu_open;
+                if let Some(msg) = snora::keyboard::dismiss_on_escape(
+                    self.show_dialog || self.show_sheet,
+                    has_menu,
+                    Some(Message::CloseModals),
+                    Some(Message::CloseMenus),
+                    key,
+                ) {
+                    return self.update(msg);
+                }
             }
         }
         Task::none()
     }
 
     fn subscription(&self) -> Subscription<Message> {
-        snora::toast::subscription(&self.toasts, || Message::ToastTick)
+        let toast_sub = snora::toast::subscription(&self.toasts, || Message::ToastTick);
+        // Listen to all keyboard events; filter to key-press in update.
+        let key_sub = iced::keyboard::listen().map(|event| {
+            if let iced::keyboard::Event::KeyPressed { key, .. } = event {
+                Message::KeyPressed(key)
+            } else {
+                Message::NoOp
+            }
+        });
+        Subscription::batch([toast_sub, key_sub])
     }
 }
 

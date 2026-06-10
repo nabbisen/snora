@@ -154,6 +154,52 @@ match msg {
 }
 ```
 
+## Keyboard dismissal
+
+Snora does not own application shortcut routing (Law 7). The recommended
+pattern for `Escape` is to use `snora::keyboard::dismiss_on_escape`:
+
+```rust,ignore
+fn subscription(&self) -> iced::Subscription<Message> {
+    let key_sub = iced::keyboard::listen().map(|event| {
+        if let iced::keyboard::Event::KeyPressed { key, .. } = event {
+            Message::KeyPressed(key)
+        } else {
+            Message::NoOp
+        }
+    });
+    Subscription::batch([snora::toast::subscription(&self.toasts, || Message::ToastTick), key_sub])
+}
+
+fn update(&mut self, msg: Message) -> Task<Message> {
+    match msg {
+        Message::KeyPressed(key) => {
+            if let Some(msg) = snora::keyboard::dismiss_on_escape(
+                self.show_dialog || self.show_sheet,
+                self.menu_open,
+                Some(Message::CloseModals),
+                Some(Message::CloseMenus),
+                key,
+            ) {
+                return self.update(msg);
+            }
+        }
+        // ...
+    }
+    Task::none()
+}
+```
+
+| State | `Escape` behavior |
+|---|---|
+| Modal open | emit `on_close_modals` |
+| Menu open, no modal | emit `on_close_menus` |
+| Both open | modal takes priority |
+| No overlay | no-op |
+| Sink is `None` | no-op |
+
+The workbench example demonstrates this pattern end-to-end.
+
 ## What Snora does not do
 
 - **Escape handling** — Snora does not capture keyboard events. Wire

@@ -76,6 +76,9 @@ them in sync is a release-process invariant.
 [ ] cargo test -p snora
 [ ] cargo check -p snora --no-default-features
 [ ] mdbook build docs               # validates the book renders
+[ ] All examples in examples/README.md acceptance matrix compile
+    (covered by workspace check above; verify no example was removed)
+[ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
 [ ] cargo package -p snora-core    --no-verify    # check .crate contents
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents

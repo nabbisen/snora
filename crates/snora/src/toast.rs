@@ -35,6 +35,16 @@ const TOAST_WIDTH: f32 = 340.0;
 /// and keeps idle wakeups low.
 const SWEEP_INTERVAL: Duration = Duration::from_millis(500);
 
+/// Fallback color for [`ToastIntent::Warning`].
+///
+/// iced's extended palette has no `warning` semantic pair (unlike `primary`,
+/// `success`, and `danger`). This stable amber/orange is chosen to remain
+/// readable against both light and dark iced themes. It is a Snora
+/// implementation detail — applications cannot configure it through the
+/// theme API, and it may change when iced eventually adds a warning
+/// semantic. See RFC-014-C.
+const WARNING_COLOR: Color = Color::from_rgb(0.851, 0.467, 0.024);
+
 // =========================================================================
 // Render-order policy
 // =========================================================================
@@ -191,9 +201,9 @@ fn toast_style(theme: &iced::Theme, intent: ToastIntent) -> iced::widget::contai
         ToastIntent::Debug => (ep.background.strong.color, ep.background.strong.text),
         ToastIntent::Info => (ep.primary.base.color, ep.primary.base.text),
         ToastIntent::Success => (ep.success.base.color, ep.success.base.text),
-        // iced's extended palette has no `warning`; use a stable orange
-        // that remains readable against both light and dark themes.
-        ToastIntent::Warning => (Color::from_rgb8(0xD9, 0x77, 0x06), Color::WHITE),
+        // iced's extended palette has no `warning` semantic pair; use the
+        // private fallback constant. See RFC-014-C and WARNING_COLOR above.
+        ToastIntent::Warning => (WARNING_COLOR, Color::WHITE),
         ToastIntent::Error => (ep.danger.base.color, ep.danger.base.text),
     };
 

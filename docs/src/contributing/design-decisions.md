@@ -279,3 +279,34 @@ named constructor would be justified when two separate examples or apps
 repeat this exact pattern. As of v0.12 no example calls `.persistent()`.
 The trigger is documented in RFC-013-C. If/when met, `persistent_ack` is
 a small additive constructor with a doctest — no migration needed.
+
+## Why Snora is theme-aware but not theme-owning (v0.14)
+
+Snora reads iced's active `Theme` (extended palette) in prefab widgets
+and toast rendering. It does not define a parallel theming layer. This
+is intentional and permanent: adding a `SnoraTheme` struct would
+duplicate iced's system, force applications to configure theming twice,
+and create a maintenance surface with no commensurate value.
+
+The `ToastIntent::Warning` color uses a private fallback
+(`WARNING_COLOR` in `crates/snora/src/toast.rs`) because iced's
+extended palette has no `warning` semantic pair. This is a narrow
+exception, not a token system. When iced adds a warning pair the
+fallback will be removed.
+
+Style review checklist for future changes: (1) Does the change add a
+public color/token type? If so, reject or escalate. (2) Does it derive
+from iced `Theme` where possible? (3) Does it add a dependency? Evaluate
+feature-gating. (4) Does it affect binary size? Measure.
+
+## Why focus trapping is deferred (v0.14)
+
+Snora's modal dim provides visual modality and pointer blocking. It does
+not trap keyboard focus (Law 8, RFC-011-E). iced 0.14's `operate`
+machinery and `widget::Id` make programmatic focus queries possible, but
+a reliable cross-platform focus trap at the framework level is unproven.
+
+Reconsideration trigger: a concrete downstream app demonstrates the need
+and iced provides a stable, cross-platform focus API. Any focus
+implementation must be additive — a new optional `Dialog`/`Sheet` field
+per RFC-011-C rules.

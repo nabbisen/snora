@@ -87,6 +87,8 @@ pub mod render;
 /// Toast rendering and lifecycle helpers
 /// ([`subscription`](toast::subscription), [`sweep_expired`](toast::sweep_expired)).
 pub mod toast;
+/// Keyboard dismissal helper: [`keyboard::dismiss_on_escape`].
+pub mod keyboard;
 
 pub use render::render;
 

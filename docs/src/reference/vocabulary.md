@@ -52,6 +52,12 @@ in chronological order; the engine honors the invariant automatically.
 Top anchors render newest at the top; bottom anchors render newest at
 the bottom.
 
+`ToastIntent::Warning` note: iced's extended palette has no warning
+semantic pair. Snora uses a private fallback color (stable amber/orange)
+for this intent. The fallback is an implementation detail and may
+change when iced adds a warning semantic — it is not a public design
+token and cannot be overridden through the theme API.
+
 ## Sheets
 
 ```rust,no_run

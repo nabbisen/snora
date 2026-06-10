@@ -84,3 +84,41 @@ your custom widgets.
 In the same spirit, the toast renderer encodes intent via *both* the
 background color and the surrounding text, so red is never the sole
 signal of an error.
+
+## Why icons are feature-gated
+
+`Icon::Text` has no extra dependencies and is always available. The
+richer icon sources are optional because:
+
+- The `lucide-icons` crate ships ~1500 constants and contributes non-trivial
+  compile time. Projects that only need emoji or text glyphs should not pay
+  that cost.
+- `Icon::Svg` requires iced's `svg` feature and a file path. Not all
+  applications need SVG rendering.
+
+Keeping both optional means engine-only builds (`--no-default-features`)
+stay small and the CI feature matrix can verify each combination
+independently.
+
+## Supported feature combinations
+
+```toml
+# Default (includes widgets + text icons):
+snora = { version = "0.14" }
+
+# Engine only — no widget re-exports, no icon packs:
+snora = { version = "0.14", default-features = false }
+
+# Widgets + Lucide icon constants:
+snora = { version = "0.14", features = ["widgets", "lucide-icons"] }
+
+# Widgets + SVG icon support:
+snora = { version = "0.14", features = ["widgets", "svg-icons"] }
+
+# Widgets + both icon sources:
+snora = { version = "0.14", features = ["widgets", "lucide-icons", "svg-icons"] }
+```
+
+`lucide-icons` and `svg-icons` are **subordinate** to `widgets`: they
+gate widget-side rendering and are not meaningful without it. The CI
+feature matrix tests all of these combinations on every PR.

@@ -165,3 +165,15 @@ Re-evaluate at each release. Update this table as part of the
 release process if anything changed (e.g. when indicator 2 starts
 crossing the threshold, this row should move from "Tracked" to a
 specific assessment).
+
+## Icon and asset feature policy
+
+The icon feature policy is intentionally separate from the widget-splitting
+criteria above. It is documented in `docs/src/guides/icons.md` (the
+"Why icons are feature-gated" section). Key rules:
+
+- `Icon::Text` is always available (no feature flag).
+- `lucide-icons` and `svg-icons` are optional and subordinate to `widgets`.
+- Adding a new icon ecosystem (a third icon pack) requires an RFC and
+  evidence of repeated demand.
+- Raster asset helpers are application responsibility.

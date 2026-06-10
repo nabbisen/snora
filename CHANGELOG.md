@@ -17,6 +17,53 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.14.0] — 2026-06-10
+
+### Added
+
+- **`snora::keyboard::dismiss_on_escape`** — public helper implementing
+  the Snora overlay dismissal priority for the `Escape` key: modal before
+  menu, `None` when no overlay is open or when the relevant close sink is
+  absent. Seven unit tests cover all six cases plus non-Escape keys. The
+  workbench example now wires this helper via `iced::keyboard::listen()`.
+  (RFC-014-A)
+
+- **`examples/README.md`** — acceptance matrix listing all twelve example
+  crates with their purpose, demonstrated surfaces, and the icons-gap note.
+  Includes instructions for adding new examples and the workbench manual QA
+  reference. (RFC-014-E)
+
+### Changed
+
+- **`crates/snora/src/toast.rs`** — the warning fallback color is now a
+  named private const `WARNING_COLOR` with a doc comment explaining why it
+  exists and that it is not a public design token. (RFC-014-C)
+
+- **`docs/src/reference/overlay-interaction-semantics.md`** — new
+  "Keyboard dismissal" section with the `dismiss_on_escape` usage table
+  and a complete code snippet. (RFC-014-A)
+
+- **`docs/src/guides/overlays.md`** — new "Accessibility responsibilities"
+  section with the application modal checklist and the ABDD-is-layout
+  boundary statement. (RFC-014-B)
+
+- **`docs/src/guides/icons.md`** — new "Why icons are feature-gated" and
+  "Supported feature combinations" sections. (RFC-014-D)
+
+- **`docs/src/contributing/feature-gating-criteria.md`** — icon and asset
+  feature policy cross-reference section added. (RFC-014-D)
+
+- **`docs/src/contributing/design-decisions.md`** — three new entries:
+  theme-aware-not-owning + style review checklist (RFC-014-C); focus-trap
+  deferred decision (RFC-014-B). (RFC-014-B, RFC-014-C)
+
+- **Release checklist** updated with examples matrix and workbench QA
+  steps. (RFC-014-E)
+
+- **`examples/workbench`** updated: `Escape` key wires overlay dismissal
+  via `snora::keyboard::dismiss_on_escape`; `NoOp` message variant handles
+  non-key-press keyboard events cleanly. (RFC-014-A)
+
 ## [0.13.0] — 2026-06-10
 
 ### Added

@@ -136,3 +136,26 @@ From bottom of the stack to top:
 
 Toasts are deliberately on top of modals — a long-running export
 finishing while a dialog is open should not be invisible.
+
+## Accessibility responsibilities
+
+Snora provides visual modality and pointer blocking. It does not manage
+keyboard focus or screen-reader semantics. Before shipping a dialog or
+sheet, check:
+
+```text
+[ ] A visible close/cancel button exists inside the overlay content.
+[ ] `on_close_modals` is set when outside-click dismissal is intended.
+[ ] Escape is wired via snora::keyboard::dismiss_on_escape if desired.
+    (See keyboard section of overlay-interaction-semantics.md.)
+[ ] Destructive actions have explicit labels; they are not triggered
+    by backdrop click alone.
+[ ] If initial keyboard focus inside the dialog matters, wire it via
+    iced's widget::Id and the operate mechanism — Snora does not
+    trap focus automatically.
+```
+
+ABDD is a layout discipline, not a complete accessibility or localization
+stack. Snora's contribution is deterministic overlay layering and logical
+edge placement. Full accessibility is a shared responsibility with iced
+and your application.

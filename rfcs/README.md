@@ -31,18 +31,13 @@ Numbers are stable forever and never reused.
 | 013-A | [Anchored popover design study](./done/013-a-anchored-popover-design-study.md) | v0.13.0 (design study; implementation deferred) |
 | 013-B | [Public API freeze readiness](./done/013-b-public-api-freeze-readiness.md) | v0.13.0 |
 | 013-C | [Tooltip vocabulary & persistent-toast helper](./done/013-c-tooltip-vocabulary-and-persistent-toast-helper.md) | v0.13.0 (both candidates deferred; triggers unmet) |
+| 014-A | [Keyboard navigation & dismissal policy](./done/014-a-keyboard-navigation-and-dismissal-policy.md) | v0.14.0 |
+| 014-B | [Focus & modal accessibility boundary](./done/014-b-focus-and-modal-accessibility-boundary.md) | v0.14.0 |
+| 014-C | [Theme boundary & warning palette policy](./done/014-c-theme-boundary-and-warning-palette-policy.md) | v0.14.0 |
+| 014-D | [Icon, asset & feature-gating policy v2](./done/014-d-icon-asset-and-feature-gating-policy-v2.md) | v0.14.0 |
+| 014-E | [Examples acceptance matrix](./done/014-e-examples-acceptance-matrix.md) | v0.14.0 |
 
 ## Proposed
-
-### v0.14 — Interaction & boundary clarity
-
-| ID | Title | v0.11 propagation |
-|----|-------|-------------------|
-| 014-A | [Keyboard navigation & dismissal policy](./proposed/014-a-keyboard-navigation-and-dismissal-policy.md) | extends RFC-011-E Law 7 |
-| 014-B | [Focus & modal accessibility boundary](./proposed/014-b-focus-and-modal-accessibility-boundary.md) | RFC-011-C satisfied; extends RFC-011-E Law 8 |
-| 014-C | [Theme boundary & warning palette policy](./proposed/014-c-theme-boundary-and-warning-palette-policy.md) | documents the existing toast warning fallback |
-| 014-D | [Icon, asset & feature-gating policy v2](./proposed/014-d-icon-asset-and-feature-gating-policy-v2.md) | builds on RFC-011-A feature matrix |
-| 014-E | [Examples acceptance matrix](./proposed/014-e-examples-acceptance-matrix.md) | — |
 
 ### v0.15 — Public surface & adoption maturity
 

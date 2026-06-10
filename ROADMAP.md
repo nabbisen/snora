@@ -53,28 +53,31 @@ These constrain what *can* be on the roadmap:
   size); 3-crate workspace split (`snora-core` / `snora-widgets` /
   `snora`).
 
-## Near-term: 0.14 (next release)
+## Near-term: 0.15 (next release)
 
-Primary goal: interaction and boundary clarity — keyboard behavior,
-accessibility, theme documentation, icon policy, and examples acceptance.
+Primary goal: public surface and adoption maturity — versioning policy,
+re-export and docs.rs cleanup, starter template, design-decision register.
 
-See RFC-014-A through RFC-014-E in `rfcs/proposed/` for details.
+See RFC-015-A through RFC-015-D in `rfcs/proposed/` for details.
 
 ## Recently shipped
 
-- **0.13** — Design expansion: anchored popover design study (eight
-  internal questions answered, decision to defer recorded); public API
-  freeze review doc (`api-freeze-review.md`) with current gate status;
-  tooltip/persistent-toast evidence check (both deferred — triggers unmet).
-- **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance
-  (8 render-semantics integration tests, 5 RTL unit tests); ABDD compliance
-  checklist and PR template; workbench example exercising all surfaces;
-  compile-time tracking script + workflow + docs; documentation test policy
-  (54 fences classified, `mdbook test` in CI).
-- **0.11** — Foundation hardening: main Rust CI quality gate (three-job
-  workflow covering check/clippy/tests/feature-matrix/docs); toast ordering
-  bugfix; `AppLayout` is `#[non_exhaustive]`; overlay interaction semantics
-  reference page; render-semantics test harness; RFC directory adopted.
+- **0.14** — Interaction & boundary clarity: `snora::keyboard::dismiss_on_escape`
+  helper (7 unit tests) with workbench Escape wiring; warning color extracted
+  as named private const; overlay accessibility boundary section; icons.md
+  feature-gating policy; examples acceptance matrix (`examples/README.md`);
+  ABDD boundary, focus-trap deferred decision, and theme-boundary recorded in
+  design-decisions.md.
+- **0.13** — Design expansion: anchored popover design study (8 questions
+  answered, defer decided); API freeze review tracker
+  (`api-freeze-review.md`); tooltip/persistent-toast evidence check (both
+  deferred).
+- **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance;
+  ABDD checklist + PR template; workbench example; compile-time tracking;
+  documentation test policy (54 fences classified, `mdbook test` in CI).
+- **0.11** — Foundation hardening: main Rust CI; toast ordering bugfix;
+  `AppLayout` `#[non_exhaustive]`; overlay semantics reference page;
+  render-semantics test harness; RFC directory adopted.
 
 ## Middle-term: 0.15
 
