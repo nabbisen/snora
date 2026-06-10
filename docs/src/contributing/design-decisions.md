@@ -5,7 +5,33 @@ shape that closes off other shapes. This page records the reasoning
 so that future contributors don't relitigate decisions whose
 trade-offs are still valid.
 
-## Why no `PageContract` trait
+**Status key:** *Firm boundary* — requires an RFC with a concrete scenario
+to reopen. *Accepted* — current approach; open to revision with evidence.
+*Deferred* — planned when trigger condition is met.
+
+## Decision index
+
+| Decision | Status | Reconsideration trigger |
+|---|---|---|
+| No `PageContract` trait | Firm boundary | A trait that an engine actually consumes |
+| One close sink per channel | Firm boundary | A concrete app needing per-overlay close |
+| One `Sheet` type, not `BottomSheet`/`TopSheet` | Firm boundary | — (settled; axis-relative design is correct) |
+| Default `ToastPosition` is `TopEnd` | Accepted | User research showing another default is more ergonomic |
+| Application owns toast `Vec` | Firm boundary | Framework-owned queue that apps cannot control |
+| No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve |
+| Three crates, not two | Accepted | iced-free core becomes unnecessary |
+| `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly |
+| Coarse `widgets` feature gate | Accepted | Two of the five feature-gating indicators are met |
+| `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) |
+| `AppLayout` is `#[non_exhaustive]` | Firm boundary | 1.0 freeze; no new overlays needed |
+| No `mod.rs` | Firm boundary | Rust edition change |
+| English-only comments | Firm boundary | Multi-language team adopts the project |
+| Tooltip vocabulary deferred | Deferred | Second consumer type in the codebase |
+| Persistent-toast helper deferred | Deferred | Two separate apps repeat `.persistent()` |
+| Theme-aware, not theme-owning | Firm boundary | iced adds an insufficient theming layer |
+| Focus trapping deferred | Deferred | Concrete app + stable iced focus API |
+
+
 
 Early drafts (≤ 0.3) defined a trait that page-like objects implemented:
 

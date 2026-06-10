@@ -6,13 +6,24 @@ Add snora and iced to your `Cargo.toml`. snora targets **iced 0.14** and
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.10"
+snora = "0.14"
 ```
 
 You normally do **not** depend on `snora-core` directly. The `snora` crate
 re-exports the entire vocabulary (`AppLayout`, `Toast`, `ToastPosition`,
 `Dialog`, `Sheet`, `LayoutDirection`, …), so a single `use snora::…`
 suffices.
+
+## Which crate should I depend on?
+
+| Use case | Depend on |
+|---|---|
+| Building a typical application | `snora` only |
+| Testing `update` state logic (no renderer needed) | `snora` only — `pub` fields on vocabulary types are directly assertable |
+| Building an alternate engine or test double | `snora-core` directly (no iced) |
+| Extending widget visuals | `snora-widgets` directly (rare; `snora` re-exports everything) |
+
+Advanced users who want to depend on `snora-core` without iced can do so — the crate's only dependency is the optional `lucide-icons`. The `snora` umbrella crate is still the recommended path for applications.
 
 ## Optional features
 
@@ -25,7 +36,7 @@ suffices.
 Enable them on the `snora` line:
 
 ```toml
-snora = { version = "0.10", features = ["lucide-icons"] }
+snora = { version = "0.14", features = ["lucide-icons"] }
 ```
 
 When a feature is disabled the corresponding `Icon` variant does not
@@ -38,7 +49,7 @@ footer, menu) and do not want the prefab widgets compiled in can opt
 out:
 
 ```toml
-snora = { version = "0.10", default-features = false }
+snora = { version = "0.14", default-features = false }
 ```
 
 In this configuration the `snora-widgets` crate is not pulled in,

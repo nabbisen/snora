@@ -45,3 +45,12 @@ until 1.0:
 
 The full pre-1.0 versioning policy is summarized at the top of
 [CHANGELOG.md](https://github.com/nabbisen/snora/blob/main/CHANGELOG.md).
+
+## Writing a migration guide
+
+Copy [`migration-template.md`](migration-template.md) to
+`migration-X.Y-to-X.Z.md`, fill in the seven sections, and add a link
+to the "Per-version guides" list above.
+
+The [versioning policy](../contributing/versioning-policy.md) defines
+when a migration guide is required and what changelog label to use.

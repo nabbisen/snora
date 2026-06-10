@@ -17,6 +17,50 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.15.0] — 2026-06-10
+
+### Added
+
+- **Starter application example** (`examples/starter/`, `snora-example-starter`).
+  177 ELOC covering the minimal-but-complete Snora patterns: header menu with
+  close sink, dialog with Escape close via `snora::keyboard::dismiss_on_escape`,
+  transient toast, LTR/RTL toggle, tab bar, and sidebar. Workspace member;
+  compiles in CI. Companion getting-started page added
+  (`docs/src/getting-started/07-starter-application.md`). (RFC-015-C)
+
+- **Versioning policy** (`docs/src/contributing/versioning-policy.md`).
+  Documents the change-type table, the "Fixed vs Changed" rule (behavior fixes
+  that restore documented invariants are **Fixed**), the "at least two minor
+  releases" deprecation bridge rule, and the four questions any PR touching
+  public API must answer. (RFC-015-A)
+
+- **Migration guide template** (`docs/src/guides/migration-template.md`).
+  Seven-section template (`Who is affected`, `What changed`, `Why it changed`,
+  `Mechanical migration`, `Behavioral migration`, `Deprecated aliases and
+  removal schedule`, `Examples before/after`). (RFC-015-A)
+
+- **Decision index** at the top of `docs/src/contributing/design-decisions.md`.
+  Status table covering all 17 current decisions with status labels (*Firm
+  boundary*, *Accepted*, *Deferred*) and concrete reconsideration triggers.
+  (RFC-015-D)
+
+### Changed
+
+- **`crates/snora/Cargo.toml`** now has `[package.metadata.docs.rs]` with
+  `all-features = true` and `rustdoc-args = ["--cfg", "docsrs"]`. docs.rs will
+  now build `snora` with all features, making feature-gated items (widgets,
+  Lucide constants, keyboard module) visible in the rendered docs. (RFC-015-B)
+
+- **`docs/src/getting-started/01-install.md`** updated: version references
+  corrected from `"0.10"` to `"0.14"`; new "Which crate should I depend on?"
+  section added. (RFC-015-B)
+
+- **`docs/src/guides/migrations.md`** extended with a link to the migration
+  template and the versioning policy. (RFC-015-A)
+
+- **Release checklist** updated: versioning-policy questions and migration
+  guide check added. (RFC-015-A)
+
 ## [0.14.0] — 2026-06-10
 
 ### Added

@@ -36,17 +36,12 @@ Numbers are stable forever and never reused.
 | 014-C | [Theme boundary & warning palette policy](./done/014-c-theme-boundary-and-warning-palette-policy.md) | v0.14.0 |
 | 014-D | [Icon, asset & feature-gating policy v2](./done/014-d-icon-asset-and-feature-gating-policy-v2.md) | v0.14.0 |
 | 014-E | [Examples acceptance matrix](./done/014-e-examples-acceptance-matrix.md) | v0.14.0 |
+| 015-A | [Versioning, migration & deprecation bridges](./done/015-a-versioning-migration-and-deprecation-bridges.md) | v0.15.0 |
+| 015-B | [Crate re-export & docs.rs policy](./done/015-b-crate-reexport-and-docsrs-policy.md) | v0.15.0 |
+| 015-C | [Starter application template](./done/015-c-starter-application-template.md) | v0.15.0 |
+| 015-D | [Design decision register maturity](./done/015-d-design-decision-register-maturity.md) | v0.15.0 |
 
 ## Proposed
-
-### v0.15 — Public surface & adoption maturity
-
-| ID | Title | v0.11 propagation |
-|----|-------|-------------------|
-| 015-A | [Versioning, migration & deprecation bridges](./proposed/015-a-versioning-migration-and-deprecation-bridges.md) | toast-fix → "Fixed" precedent set |
-| 015-B | [Crate re-export & docs.rs policy](./proposed/015-b-crate-reexport-and-docsrs-policy.md) | RFC-011-C satisfied |
-| 015-C | [Starter application template](./proposed/015-c-starter-application-template.md) | — |
-| 015-D | [Design decision register maturity](./proposed/015-d-design-decision-register-maturity.md) | — |
 
 ### v0.16+ — Strategic evidence & long-term options
 

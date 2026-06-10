@@ -69,6 +69,9 @@ them in sync is a release-process invariant.
     if priorities changed)
 [ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their
     Status fields and the rfcs/README.md index
+[ ] Answer the four versioning-policy questions for any public API change
+    (see docs/src/contributing/versioning-policy.md)
+[ ] Confirm migration guide exists if any public API broke or renamed
 [ ] Re-run cargo metadata; confirm every crate reports new version
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings

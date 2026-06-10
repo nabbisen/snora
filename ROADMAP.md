@@ -31,59 +31,32 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.14 (next release)
-  (`reference/binary-size-budget/binary-size.csv`) appended on each
-  release tag, a `release-baseline` Cargo profile for fast
-  measurement, the `binary-size` GitHub Actions workflow, and the
-  `binary-size-budget.md` reference page wiring it to
-  feature-gating-criteria indicator (2).
-- **0.9** — Doctest coverage for `snora-core` vocabulary (17 new
-  doctests across `Tab`, `TabBar`, `TabAction`, `Crumb`,
-  `BreadcrumbAction`, `Sheet`, `SheetEdge`, `SheetSize`, `Toast`,
-  `ToastPosition`, `LayoutDirection`); migration guides collapsed
-  to a single index entry in the SUMMARY.
-- **0.8** — mdBook documentation, GitHub Pages deployment, Docs CI
-  workflow, project-level GitHub conventions
-  (`.github/CONTRIBUTING.md`, security policy, code of conduct,
-  issue templates).
-- **0.7** — `Tab` + `Crumb` vocabulary and widgets; removal of
-  the deprecated 0.6 sheet aliases; documented feature-gating
-  criteria.
-- **0.6** — `Sheet` overlay generalization (4 edges, axis-relative
-  size); 3-crate workspace split (`snora-core` / `snora-widgets` /
-  `snora`).
+## Near-term: 0.16+ (next phase)
 
-## Near-term: 0.15 (next release)
+Primary goal: strategic evidence — alternate engine boundary assessment,
+performance envelope, and downstream adoption feedback.
 
-Primary goal: public surface and adoption maturity — versioning policy,
-re-export and docs.rs cleanup, starter template, design-decision register.
-
-See RFC-015-A through RFC-015-D in `rfcs/proposed/` for details.
+See RFC-016-A through RFC-016-C in `rfcs/proposed/` for details.
 
 ## Recently shipped
 
-- **0.14** — Interaction & boundary clarity: `snora::keyboard::dismiss_on_escape`
-  helper (7 unit tests) with workbench Escape wiring; warning color extracted
-  as named private const; overlay accessibility boundary section; icons.md
-  feature-gating policy; examples acceptance matrix (`examples/README.md`);
-  ABDD boundary, focus-trap deferred decision, and theme-boundary recorded in
-  design-decisions.md.
-- **0.13** — Design expansion: anchored popover design study (8 questions
-  answered, defer decided); API freeze review tracker
-  (`api-freeze-review.md`); tooltip/persistent-toast evidence check (both
-  deferred).
+- **0.15** — Public surface and adoption maturity: `snora` docs.rs metadata
+  (`all-features`); install.md version fix + "which crate?" section;
+  versioning policy doc + migration template; decision index with
+  status/trigger labels; starter application example (177 ELOC, workspace
+  member).
+- **0.14** — Interaction and boundary clarity: `snora::keyboard::dismiss_on_escape`
+  helper + workbench Escape wiring; warning color named const; overlay
+  accessibility boundary; icons.md feature-gating policy; examples acceptance
+  matrix.
+- **0.13** — Design expansion: anchored popover design study; API freeze review
+  tracker; tooltip/persistent-toast evidence check.
 - **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance;
   ABDD checklist + PR template; workbench example; compile-time tracking;
-  documentation test policy (54 fences classified, `mdbook test` in CI).
+  documentation test policy.
 - **0.11** — Foundation hardening: main Rust CI; toast ordering bugfix;
   `AppLayout` `#[non_exhaustive]`; overlay semantics reference page;
-  render-semantics test harness; RFC directory adopted.
-
-## Middle-term: 0.15
-
-Public surface and adoption maturity — versioning policy, re-export and
-docs.rs cleanup, starter template, design-decision register maintenance.
-See RFC-015-A through RFC-015-D.
+  render-semantics test harness; RFC directory.
 
 ## Longer-term: 1.0
 

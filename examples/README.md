@@ -15,6 +15,7 @@ before a release is tagged.
 | Crate | Purpose | Surface demonstrated |
 |---|---|---|
 | `snora-example-hello` | Minimal app | `AppLayout::new(body)` + `render` — smallest working Snora app |
+| **`snora-example-starter`** | **Recommended starting point** | Header menu, dialog, toast, LTR/RTL toggle, Escape wiring — minimal but complete |
 | `snora-example-skeleton` | Full skeleton | Prefab `app_header`, `app_side_bar`, `app_footer`; slot injection |
 | `snora-example-header-menu` | Header menus | `Menu` + `header_menu` slot; click-outside close sink |
 | `snora-example-context-menu` | Context menus | `context_menu` slot; transparent backdrop |
