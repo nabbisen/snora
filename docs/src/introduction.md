@@ -38,6 +38,7 @@ Pick the topic you need.
 - [Architecture overview](reference/architecture.md) — what `snora-core` and `snora` each contribute
 - [Vocabulary cheatsheet](reference/vocabulary.md) — every public enum at a glance
 - [Built-in widgets](reference/widgets.md) — the prefab `app_header` / `app_side_bar` / etc.
+- [Binary size budget](reference/binary-size-budget.md) — how snora's contribution to executable size is tracked across releases.
 
 ## I want to contribute
 

@@ -129,15 +129,17 @@ grows but the cause is a transitive iced bump that affects all
 crates equally, splitting widget features will not help; the right
 fix is elsewhere. Indicators trigger a discussion, not a refactor.
 
-## Current status (snora 0.7.0)
+## Current status (snora 0.10.0)
 
 | Indicator | Status |
 |---|---|
 | 1. Compile time | Within budget — `snora-widgets` builds in seconds when iced is cached. |
-| 2. Binary size | Untested as of 0.7.0; no baseline. Establish in 0.8 if convenient. |
+| 2. Binary size | **Tracked.** Per-release values live in [`reference/binary-size-budget.md`](../reference/binary-size-budget.md), appended on every release tag by the `binary-size` GitHub Actions workflow. The 150 KB threshold is checked against the `diff_bytes` column of that CSV. |
 | 3. Heavy optional dep | None — all widgets share `iced` and `snora-core` only. |
 | 4. Platform-specific dep | None. |
 | 5. Field requests | None. |
 
 Re-evaluate at each release. Update this table as part of the
-release process if anything changed.
+release process if anything changed (e.g. when indicator 2 starts
+crossing the threshold, this row should move from "Tracked" to a
+specific assessment).

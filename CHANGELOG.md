@@ -17,6 +17,46 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.10.0] — 2026-06-10
+
+### Added
+
+- **Binary size budget.** snora now tracks the size of its canonical
+  example binary (`examples/hello`) at every release, with and
+  without the optional `widgets` feature, to catch unintended size
+  regressions early.
+  - New reference page
+    [`docs/src/reference/binary-size-budget.md`](docs/src/reference/binary-size-budget.md)
+    explains the why/how and links to the data.
+  - The data itself lives in a CI-managed CSV at
+    `docs/src/reference/binary-size-budget/binary-size.csv`
+    (header-only until the first tagged release writes a row).
+  - New `binary-size` GitHub Actions workflow measures on every
+    push and pull request (job summary + 30-day artifact, no file
+    changes), and on every release tag appends one row to the CSV
+    and commits it back to `main` with `[skip ci]`.
+  - New `[profile.release-baseline]` Cargo profile (inherits
+    `release`, `lto = false`, `codegen-units = 16`) gives the
+    workflow a fast, consistent measurement profile.
+  - New scripts `scripts/measure-binary-size.sh` and
+    `scripts/append-binary-size-row.sh`, documented in
+    `scripts/README.md`.
+- `feature-gating-criteria.md` indicator (2) is now wired to the
+  budget: its "Current status" row points at the CSV and the
+  150 KB `diff_bytes` threshold.
+
+### Changed
+
+- `docs/src/contributing/release-process.md` gained a post-tag-push
+  checklist item confirming the budget row was appended and the
+  threshold respected.
+
+### Notes
+
+- The first CSV row is produced by CI on the first `v0.10.0` tag
+  push; the shipped tree carries only the CSV header. This follows
+  the page's own rule that humans never hand-edit the data file.
+
 ## [0.9.0] — 2026-04-29
 
 ### Added
@@ -100,9 +140,7 @@ Nothing yet.
 
 - 17 unit tests in `snora-core` (unchanged from 0.7.0).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.8.0...HEAD
-[0.8.0]: https://github.com/nabbisen/snora/releases/tag/v0.8.0
-[0.7.0]: https://github.com/nabbisen/snora/releases/tag/v0.7.0
+## [0.7.0] — 2026-04-29
 
 ### Removed
 
@@ -155,7 +193,8 @@ Nothing yet.
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/nabbisen/snora/releases/tag/v0.10.0
 [0.9.0]: https://github.com/nabbisen/snora/releases/tag/v0.9.0
 [0.8.0]: https://github.com/nabbisen/snora/releases/tag/v0.8.0
 [0.7.0]: https://github.com/nabbisen/snora/releases/tag/v0.7.0

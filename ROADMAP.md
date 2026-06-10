@@ -31,25 +31,24 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.10 (next release)
+## Near-term: 0.11 (next release)
 
 These items have either concrete demand or a small enough scope
 that they fit a single release.
 
 ### Likely
 
-- **Establish a binary-size baseline.** Carried over from 0.9 — the
-  measurement could not be captured in the 0.9 sandbox due to
-  release-mode iced+LTO compile time. Per
-  [feature-gating-criteria.md](src/contributing/feature-gating-criteria.md),
-  indicator (2) needs a baseline measurement (`snora-example-hello`
-  with and without `--no-default-features`) recorded so future
-  releases can detect drift.
 - **Tooltip vocabulary.** Currently `SideBarItem.tooltip: String` is
   the only typed tooltip in snora. If a second widget grows a
   tooltip slot, it warrants pulling tooltips out into shared
   vocabulary (`Tooltip { text: String, side: Edge }` or similar).
   Watch for the second consumer.
+- **First binary-size budget rows.** The budget infrastructure
+  shipped in 0.10 but the CSV is header-only until the first
+  `v*.*.*` tag runs through the `binary-size` workflow. The 0.11
+  release tag will produce the first committed row; confirm the
+  workflow's commit-back path works end to end on a real tag and
+  that the value looks sane.
 
 ### Maybe
 
@@ -66,9 +65,20 @@ that they fit a single release.
   `app_side_bar`, `app_tab_bar`, `app_breadcrumb`, `render_menu`)
   need iced for executable examples; whether to gate them on a dev
   feature or keep them as `ignore`-tagged samples is open.
+- **Binary-size CI enhancements (Level 3+).** The current workflow
+  records per-release values. If PR volume grows, add base-vs-PR
+  size comparison as a PR comment; if long-term trends matter,
+  add a chart generated from the budget CSV. Both build on the
+  existing CSV without changing how data flows.
 
 ## Recently shipped
 
+- **0.10** — Binary size budget: a CI-managed CSV
+  (`reference/binary-size-budget/binary-size.csv`) appended on each
+  release tag, a `release-baseline` Cargo profile for fast
+  measurement, the `binary-size` GitHub Actions workflow, and the
+  `binary-size-budget.md` reference page wiring it to
+  feature-gating-criteria indicator (2).
 - **0.9** — Doctest coverage for `snora-core` vocabulary (17 new
   doctests across `Tab`, `TabBar`, `TabAction`, `Crumb`,
   `BreadcrumbAction`, `Sheet`, `SheetEdge`, `SheetSize`, `Toast`,
@@ -85,7 +95,7 @@ that they fit a single release.
   size); 3-crate workspace split (`snora-core` / `snora-widgets` /
   `snora`).
 
-## Middle-term: 0.11 — 0.12
+## Middle-term: 0.12 — 0.13
 
 Things we expect to want but that need design work or signal from
 real applications first.
@@ -116,9 +126,11 @@ real applications first.
   ([feature-gating-criteria.md](docs/src/contributing/feature-gating-criteria.md))
   is the current decision. Re-evaluate at each release; split when
   the documented thresholds are met.
-- **Snapshot of compile time and binary size in CI.** Once the
-  baseline from 0.10 exists, automate the measurement so the
-  feature-gating thresholds are checked without human effort.
+- **Compile-time tracking in CI.** Binary size is now measured per
+  release (0.10). The complementary metric — `snora-widgets` cold
+  compile time, indicator (1) — is not yet automated. If it
+  becomes a concern, fold a timed build into the existing
+  `binary-size` workflow and record it alongside the size data.
 
 ## Longer-term: 1.0
 

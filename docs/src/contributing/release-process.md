@@ -65,6 +65,11 @@ patch releases are accepted. Bump it only on a minor.
 [ ] cargo publish -p snora-core
 [ ] cargo publish -p snora-widgets
 [ ] cargo publish -p snora
+[ ] After tag push: confirm the `binary-size` workflow run succeeded
+    on the tag and appended a row to
+    docs/src/reference/binary-size-budget/binary-size.csv on main.
+    If the diff column exceeds 150 KB, follow up per
+    feature-gating-criteria.md indicator 2.
 ```
 
 ### Why `--no-verify`

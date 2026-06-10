@@ -24,6 +24,7 @@
 - [Architecture overview](reference/architecture.md)
 - [Vocabulary cheatsheet](reference/vocabulary.md)
 - [Built-in widgets](reference/widgets.md)
+- [Binary size budget](reference/binary-size-budget.md)
 
 # Contributing
 

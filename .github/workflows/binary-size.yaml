@@ -1,0 +1,125 @@
+name: Binary size
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+
+# Avoid recursion: when this workflow commits back to main on a
+# release tag, the resulting push should not retrigger another run.
+# We achieve that two ways at once (defense in depth):
+#   1. The commit message includes `[skip ci]`, which GitHub Actions
+#      honors by skipping the run.
+#   2. The commit only touches the budget CSV; if a future
+#      maintainer ever wires a path filter, that file is the one to
+#      exclude.
+# Either guard alone is enough; both together are robust against
+# accidental edits to either layer.
+
+concurrency:
+  group: binary-size-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # required for commit-back on tag pushes
+
+jobs:
+  measure:
+    name: Measure release binary size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # We need rustc + cargo, plus the strip binary (already in the
+      # ubuntu-latest image as part of binutils).
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache build
+        uses: Swatinem/rust-cache@v2
+        with:
+          # Distinct cache key from the main build cache so the
+          # release-baseline profile doesn't fight the dev profile
+          # cache for slot space.
+          key: binary-size
+
+      - name: Determine version label
+        id: version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            # Pull the workspace version directly from Cargo.toml so
+            # PR / main-push job summaries label rows usefully even
+            # when no tag is involved.
+            VERSION=$(grep -oP '^version\s*=\s*"\K[0-9]+\.[0-9]+\.[0-9]+' Cargo.toml | head -n1)
+            VERSION="${VERSION}-dev-${GITHUB_SHA::7}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Measuring as: $VERSION"
+
+      - name: Measure
+        id: measure
+        run: |
+          ROW=$(scripts/measure-binary-size.sh "${{ steps.version.outputs.version }}")
+          echo "row=$ROW" >> "$GITHUB_OUTPUT"
+          echo "Measurement: $ROW"
+
+      - name: Write job summary
+        run: |
+          ROW="${{ steps.measure.outputs.row }}"
+          IFS=',' read -r v on off diff lto date <<<"$ROW"
+          {
+            echo "## Binary size — \`$v\`"
+            echo
+            echo "| Configuration | Stripped bytes | Approx KB |"
+            echo "|---|---:|---:|"
+            echo "| widgets ON  | $on | $(( on / 1024 )) |"
+            echo "| widgets OFF | $off | $(( off / 1024 )) |"
+            echo "| **diff**    | $diff | $(( diff / 1024 )) |"
+            echo
+            echo "Profile: \`release-baseline\` (LTO **${lto}**)."
+            echo "Date: $date."
+            echo
+            echo "150 KB threshold per feature-gating-criteria.md indicator 2."
+            if (( diff > 153600 )); then
+              echo
+              echo ":warning: **diff exceeds the 150 KB threshold.** Investigate before publishing."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload measurement artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-size-${{ steps.version.outputs.version }}
+          path: |
+            target/release-baseline/snora-example-hello.stripped.on
+            target/release-baseline/snora-example-hello.stripped.off
+          if-no-files-found: error
+          retention-days: 30
+
+      # ──────────────────────────────────────────────────────────
+      # Tag-only steps below: append the row to the budget CSV and
+      # commit it back to main with [skip ci].
+      # ──────────────────────────────────────────────────────────
+
+      - name: Append row to budget CSV
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: scripts/append-binary-size-row.sh "${{ steps.measure.outputs.row }}"
+
+      - name: Commit and push to main
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          # `[skip ci]` is the primary recursion guard.
+          commit_message: |
+            docs: append binary size for ${{ github.ref_name }} [skip ci]
+          file_pattern: docs/src/reference/binary-size-budget/binary-size.csv
+          # Tag pushes are detached; explicitly target main so the
+          # commit lands on the tracked branch rather than nowhere.
+          branch: main
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com

@@ -21,7 +21,7 @@ resolver = "2"
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.9.0"
+version = "0.10.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/nabbisen/snora"
@@ -37,6 +37,24 @@ codegen-units = 1
 opt-level = 1
 lto = false
 incremental = false
+
+# `release-baseline` is the profile used by the binary-size budget
+# CI workflow.  It mirrors `release` for size-affecting flags
+# (`opt-level = "z"`, `strip = true`) but drops LTO and bumps
+# codegen-units so the build completes in a few minutes rather
+# than tens.
+#
+# The trade-off: stripped binaries built under this profile are
+# typically 20-40% larger than what a user shipping with
+# `[profile.release]` would see.  That is acceptable because the
+# budget tracks **drift between releases**, not absolute sizes --
+# as long as every measurement uses the same profile, the
+# release-to-release diff stays meaningful.  See
+# docs/src/reference/binary-size-budget.md for the full rationale.
+[profile.release-baseline]
+inherits = "release"
+lto = false
+codegen-units = 16
 
 [workspace.dependencies]
 iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
@@ -54,4 +72,4 @@ lucide-icons = { version = "1", features = ["iced"] }
 # Including a `version` field (alongside `path`) is required by
 # `cargo publish`, even though examples themselves are
 # `publish = false`.  Cargo validates the workspace as a whole.
-snora = { path = "crates/snora", version = "0.9" }
+snora = { path = "crates/snora", version = "0.10" }
