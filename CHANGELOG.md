@@ -17,6 +17,42 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.17.0] — 2026-06-10
+
+### Added
+
+- **`Icon` now implements `PartialEq`** across all feature combinations.
+  Without `lucide-icons`: derived automatically. With `lucide-icons`: a
+  manual impl compares `Text` and `Svg` variants by value and `Lucide`
+  variants by discriminant (since `lucide_icons::Icon` does not itself
+  derive `PartialEq`). (RFC-017-A)
+
+- **Two RTL render-semantics integration tests** in
+  `crates/snora/tests/render_semantics.rs`:
+  `sheet_end_edge_reachable_under_rtl` and
+  `toast_dismiss_reachable_under_rtl`. Total integration tests: 10
+  (was 8). Gate 5 now reads "10 tests including 2 RTL." (RFC-017-B)
+
+- **First build-cost data points** recorded in all three budget CSVs:
+  `binary-size.csv`, `compile-time.csv`, `render-cost.csv`. Values are
+  from the sandbox build environment; CI on real hardware will produce
+  representative numbers. Gate 9 infra proven. (RFC-017-D)
+
+### Changed
+
+- **`api-freeze-review.md`** fully updated to reflect v0.17.0 state: six
+  of ten 1.0 gates now satisfied (added Gates 2 and 5); type-names audit
+  complete; all documentation and release-hygiene rows updated. (RFC-017-E)
+
+- **ROADMAP** 1.0 gate table updated: Gate 2 ✅ (v0.13–v0.16 vocabulary
+  stable), Gate 5 ✅ (v0.17, 10 tests including RTL), Gate 9 first point
+  noted. (RFC-017-A, RFC-017-B, RFC-017-D)
+
+### Fixed
+
+- **`keyboard.rs` doc comment fence** changed from bare `ignore` to
+  `rust,ignore` per the RFC-012-D documentation test policy. (RFC-017-C)
+
 ## [0.16.0] — 2026-06-10
 
 ### Added

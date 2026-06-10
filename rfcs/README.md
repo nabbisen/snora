@@ -43,10 +43,15 @@ Numbers are stable forever and never reused.
 | 016-A | [Alternate engine boundary assessment](./done/016-a-alternate-engine-boundary-assessment.md) | v0.16.0 |
 | 016-B | [Performance envelope & render-cost budget](./done/016-b-performance-envelope-and-render-cost-budget.md) | v0.16.0 |
 | 016-C | [Downstream adoption & feedback program](./done/016-c-downstream-adoption-and-feedback-program.md) | v0.16.0 |
+| 017-A | [1.0 gate advancement](./done/017-a-1-0-gate-advancement.md) | v0.17.0 |
+| 017-B | [RTL render-semantics tests](./done/017-b-rtl-render-semantics-tests.md) | v0.17.0 |
+| 017-C | [Documentation test policy enforcement](./done/017-c-documentation-test-policy-enforcement.md) | v0.17.0 |
+| 017-D | [First build-cost data point](./done/017-d-first-build-cost-data-point.md) | v0.17.0 |
+| 017-E | [API freeze review update](./done/017-e-api-freeze-review-update.md) | v0.17.0 |
 
 ## Proposed
 
-_(All planned RFCs through v0.16 are now in `done/`. New RFCs open here when the next phase begins.)_
+_(No RFCs currently in review. Open a new issue or PR to propose one.)_
 
 ## Archive
 

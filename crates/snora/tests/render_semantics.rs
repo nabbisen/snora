@@ -211,8 +211,74 @@ fn sheet_content_button_reachable() {
 }
 
 // ---------------------------------------------------------------------------
-// v0.12 expansion — full RFC-011-D invariant coverage
+// v0.17 expansion — RTL / LayoutDirection integration coverage
 // ---------------------------------------------------------------------------
+
+/// Sheet content is reachable when `LayoutDirection::Rtl` is active.
+///
+/// Under RTL the `End` edge resolves to the left physical side. The
+/// engine must still render the sheet content and make it interactive.
+/// This test verifies that direction mirroring does not break the
+/// interactive surface of a sheet overlay.
+///
+/// Verifies: ABDD render path — `SheetEdge::End` under RTL.
+#[test]
+fn sheet_end_edge_reachable_under_rtl() {
+    use snora::LayoutDirection;
+    let sheet: Sheet<Element<Msg>, Msg> =
+        Sheet::new(btn("RTL Sheet", Msg::SheetAction)).at(SheetEdge::End);
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .sheet(sheet)
+        .direction(LayoutDirection::Rtl)
+        .on_close_modals(Msg::CloseModals);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.find("RTL Sheet")
+        .expect("sheet content must be findable under RTL direction");
+    ui.click("RTL Sheet")
+        .expect("sheet action button should be clickable under RTL");
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        msgs.contains(&Msg::SheetAction),
+        "sheet button must fire SheetAction under RTL layout; got {msgs:?}",
+    );
+}
+
+/// Toast dismiss button is reachable when `LayoutDirection::Rtl` is active.
+///
+/// Under RTL `ToastPosition::TopEnd` anchors toasts to the top-left corner.
+/// The horizontal mirroring must not interfere with the dismiss button's
+/// interactivity.
+///
+/// Verifies: ABDD render path — toast dismiss under RTL.
+#[test]
+fn toast_dismiss_reachable_under_rtl() {
+    use snora::{LayoutDirection, ToastPosition};
+    let toast = Toast::new(
+        42,
+        ToastIntent::Success,
+        "Done",
+        "Task complete.",
+        Msg::DismissToast(42),
+    );
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .toasts(vec![toast])
+        .toast_position(ToastPosition::TopEnd)
+        .direction(LayoutDirection::Rtl);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.click("×").expect("toast close button (×) should be findable under RTL");
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        msgs.contains(&Msg::DismissToast(42)),
+        "toast dismiss must fire under RTL direction; got {msgs:?}",
+    );
+}
+
 
 /// Outside click emits `on_close_menus` when a menu is open and no modal
 /// is present.

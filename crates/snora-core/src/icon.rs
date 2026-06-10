@@ -30,7 +30,14 @@
 /// See the crate-level documentation and the
 /// [Icons guide](https://github.com/nabbisen/snora/blob/main/docs/guides/icons.md)
 /// for the full discussion of when to use each variant.
+///
+/// Implements [`PartialEq`] when all active features support it.
+/// `Icon::Text` and `Icon::Svg` are always comparable; `Icon::Lucide`
+/// requires `lucide-icons` to expose `PartialEq` on the inner type.
+/// If `lucide-icons` is enabled, a manual impl is used that compares the
+/// enum discriminant only for the `Lucide` variant.
 #[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "lucide-icons"), derive(PartialEq))]
 pub enum Icon {
     /// Renders the given string as text. The engine may choose its font
     /// and size; a single-glyph string acts as a tiny glyph icon.
@@ -45,6 +52,23 @@ pub enum Icon {
     /// the file.
     #[cfg(feature = "svg-icons")]
     Svg(std::path::PathBuf),
+}
+
+/// Manual `PartialEq` when `lucide-icons` is active, since
+/// `lucide_icons::Icon` does not derive `PartialEq` itself.
+/// Two `Lucide` variants are considered equal only when they hold the
+/// same discriminant value (compared via `as usize`).
+#[cfg(feature = "lucide-icons")]
+impl PartialEq for Icon {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Icon::Text(a), Icon::Text(b)) => a == b,
+            (Icon::Lucide(a), Icon::Lucide(b)) => (*a as usize) == (*b as usize),
+            #[cfg(feature = "svg-icons")]
+            (Icon::Svg(a), Icon::Svg(b)) => a == b,
+            _ => false,
+        }
+    }
 }
 
 impl From<&str> for Icon {

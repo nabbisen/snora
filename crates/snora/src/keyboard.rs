@@ -23,7 +23,7 @@ use iced::keyboard::{Key, key::Named};
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```rust,ignore
 /// // In your subscription:
 /// fn subscription(&self) -> Subscription<Message> {
 ///     iced::keyboard::on_key_press(|key, _mods| {

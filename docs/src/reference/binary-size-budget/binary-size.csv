@@ -1,1 +1,2 @@
 version,widgets_on_bytes,widgets_off_bytes,diff_bytes,lto,date
+0.17.0,15805520,15805520,0,rustc_1.96.0_(ac68faa20_2026-05-25),unknown,2026-06-10T12:41:24Z

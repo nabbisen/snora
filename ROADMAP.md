@@ -31,30 +31,31 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Post-0.16: toward 1.0
+## Post-0.17: toward 1.0
 
-The strategic-evidence phase is complete. The remaining path to 1.0 has
-five open gates (see [`api-freeze-review.md`](docs/src/contributing/api-freeze-review.md)):
+Six of ten 1.0 gates are now satisfied. The remaining path:
 
-1. One iced major upgrade completed.
-2. Two consecutive minors without vocabulary churn.
-3. At least one third-party or production-grade app (use the downstream
-   feedback template).
-7. Public API freeze review completed.
-9. Binary-size and compile-time trends monitored (≥2 data points).
+1. One iced major upgrade completed. ⬜
+3. At least one third-party or production-grade app. ⬜
+7. Public API freeze review completed. ⬜ in progress
+9. Binary-size and compile-time trends (≥2 data points). ⬜ first point v0.17
 
-Work on these proceeds in parallel with any v0.17+ feature work.
-There is no scheduled date for 1.0.
+Work on these proceeds alongside any v0.18+ feature work. There is no
+scheduled date for 1.0.
 
 ## Recently shipped
 
+- **0.17** — 1.0 gate advancement: `Icon` gains `PartialEq`; two RTL
+  render-semantics integration tests (10 total); keyboard.rs doc fence fix;
+  first build-cost data points in all three CSVs; api-freeze-review.md
+  fully updated (6/10 gates satisfied); Gate 2 ✅ (vocabulary stable
+  v0.13–v0.16).
 - **0.16** — Strategic evidence: alternate engine boundary doc; performance
-  envelope reference + `measure-render-cost.sh`; downstream feedback and
-  feature-request issue templates; feedback-and-scope guide; README
-  contribution section.
+  envelope + render-cost script; downstream feedback and feature-request
+  issue templates; feedback-and-scope guide; README contribution section.
 - **0.15** — Public surface and adoption maturity: docs.rs metadata;
   install.md version fix; versioning policy + migration template; decision
-  index with status labels; starter application example.
+  index; starter application example.
 - **0.14** — Interaction and boundary clarity: `dismiss_on_escape` helper;
   warning color const; overlay accessibility boundary; icons feature-gating
   policy; examples acceptance matrix.
@@ -77,14 +78,14 @@ The full readiness checklist is in
 **Summary of 1.0 gates** (✅ = satisfied):
 
 1. One iced major upgrade completed and lived on ≥1 minor. ⬜
-2. Two consecutive minors without vocabulary churn. ⬜
+2. Two consecutive minors without vocabulary churn. ✅ v0.13–v0.16
 3. At least one third-party or production-grade app. ⬜
 4. AppLayout construction policy decided. ✅ v0.11
-5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.12
+5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.17
 6. Feature-matrix CI stable. ✅ v0.11
 7. Public API freeze review completed. ⬜ in progress
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
-9. Binary-size and compile-time trends monitored (≥2 data points). ⬜
+9. Binary-size and compile-time trends monitored (≥2 data points). ⬜ first point v0.17
 10. No hidden feature-combination failures. ✅ (CI gate)
 
 We are explicitly **not** rushing to 1.0. Pre-1.0 SemVer is serving

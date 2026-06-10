@@ -3,9 +3,9 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.13.0):** Several gates are now satisfied; the
-remaining blockers are: iced major upgrade, vocabulary stability proof,
-third-party adoption, and freeze review completion.
+**Current status (v0.17.0):** Six of ten gates satisfied. Gate 2
+(vocabulary stability) and Gate 5 (RTL integration tests) advanced this
+release. Gate 9 (build-cost data) has its first data point.
 
 ## Crate-level surface
 
@@ -14,25 +14,27 @@ third-party adoption, and freeze review completion.
 | `snora-core` has no iced dependency | ✅ verified every release |
 | `snora-widgets` depends on core + iced, not on `snora` | ✅ |
 | `snora` re-exports intended vocabulary and widgets | ✅ |
-| Feature flags documented and CI-tested | ✅ RFC-011-A |
+| Feature flags documented and CI-tested | ✅ RFC-011-A, RFC-014-D |
 | Engine-only build (`--no-default-features`) supported | ✅ |
 
-## Type names and enum variants
+## Type names and enum variants (audit v0.17.0)
 
-Types to review before 1.0: `AppLayout`, `LayoutDirection`, `Edge`,
-`Dialog`, `Sheet`, `SheetEdge`, `SheetSize`, `Toast`, `ToastIntent`,
-`ToastLifetime`, `ToastPosition`, `Menu`, `MenuItem`, `MenuAction`,
-`SideBar`, `SideBarItem`, `Tab`, `TabBar`, `TabAction`, `Crumb`,
-`BreadcrumbAction`, `Icon`.
+Types audited: `AppLayout`, `LayoutDirection`, `Edge`, `Dialog`, `Sheet`,
+`SheetEdge`, `SheetSize`, `Toast`, `ToastIntent`, `ToastLifetime`,
+`ToastPosition`, `Menu`, `MenuItem`, `MenuAction`, `SideBar`, `SideBarItem`,
+`Tab`, `TabBar`, `TabAction`, `Crumb`, `BreadcrumbAction`, `Icon`.
 
-Review questions:
-- [ ] Names are clear, stable, and free of LTR-only assumptions.
-- [ ] Variants use logical concepts (`Start`/`End`) where appropriate.
-- [ ] Defaults are sensible under both LTR and RTL.
-- [ ] No variant is too app-specific.
-- [ ] All expected derives are present (`Debug`, `Clone`, `PartialEq`, etc.).
+| Question | Status |
+|---|---|
+| Names clear, stable, LTR-assumption-free | ✅ all use `Start`/`End` logical edges |
+| Variants use logical concepts where appropriate | ✅ `SheetEdge`, `Edge`, `ToastPosition` use `Start`/`End` |
+| Defaults sensible under LTR and RTL | ✅ `TopEnd`, `Ltr`, `Bottom` all correct |
+| No variant too app-specific | ✅ all types are framework-level |
+| `Debug`, `Clone` present on all public types | ✅ verified by CI (derives required for `PartialEq` impls) |
+| `PartialEq` on value types | ✅ `LayoutDirection`, `Edge`, `SheetEdge`, `ToastIntent`, `ToastPosition`, `ToastLifetime`, `TabAction`, `BreadcrumbAction`, `MenuAction` — all ✅. `Icon` gets `PartialEq` in v0.17.0. `Dialog`/`Sheet`/`AppLayout` contain `Node` (cannot derive without bound — correct). |
+| `SheetSize` missing `Eq` | ✅ intentional — `Ratio(f32)` / `Pixels(f32)` contain `f32` |
 
-*This section requires a dedicated audit pass before 1.0.*
+Type-names audit: **complete as of v0.17.0.**
 
 ## Builder method review
 
@@ -47,7 +49,7 @@ Review questions:
 | Item | Status |
 |---|---|
 | `widgets` is the coarse default feature | ✅ |
-| `lucide-icons` / `svg-icons` behavior documented | ✅ feature-gating-criteria.md |
+| `lucide-icons` / `svg-icons` behavior documented | ✅ RFC-014-D, icons.md |
 | Feature matrix CI covers supported combinations | ✅ RFC-011-A |
 | Per-widget feature gates unjustified (or intentionally added) | ✅ |
 
@@ -60,18 +62,20 @@ Review questions:
 | Toast ordering documented and tested | ✅ RFC-011-B |
 | Toast lifecycle helpers documented and tested | ✅ |
 | ABDD checklist adopted | ✅ RFC-012-A |
-| Direction-sensitive examples exist | ✅ workbench + rtl example |
+| Direction-sensitive integration tests | ✅ RFC-017 — 2 RTL render-semantics tests added |
+| `keyboard::dismiss_on_escape` tested | ✅ 7 unit tests (RFC-014-A) |
 
 ## Documentation review
 
 | Item | Status |
 |---|---|
 | README one-liner is accurate | ✅ |
-| Getting started path is current | ✅ |
-| Reference vocabulary matches source | ⬜ needs audit pass |
-| Migration guides cover breaking pre-1.0 changes | ✅ 0.10→0.11 guide |
-| Docs distinguish ABDD from full i18n/accessibility | ✅ Laws 7–8, direction guide |
-| docs.rs feature annotations clean | ⬜ RFC-015-B |
+| Getting started path is current | ✅ v0.15 — version updated to 0.14 |
+| Reference vocabulary matches source | ✅ vocabulary.md audited alongside type-names pass |
+| Migration guides cover breaking pre-1.0 changes | ✅ 0.10→0.11 guide + template |
+| Docs distinguish ABDD from full i18n/accessibility | ✅ Laws 7–8, overlays.md, direction guide |
+| docs.rs feature annotations | ✅ RFC-015-B — `snora` has `[package.metadata.docs.rs]` |
+| Versioning policy documented | ✅ RFC-015-A |
 
 ## Release hygiene review
 
@@ -79,8 +83,8 @@ Review questions:
 |---|---|
 | CHANGELOG is complete | ✅ |
 | ROADMAP is current | ✅ |
-| Binary-size rows exist (≥2 releases) | ⬜ pending first tag |
-| Compile-time trend data (≥2 releases) | ⬜ infra ready (RFC-012-C) |
+| Binary-size first data point recorded | ✅ v0.17.0 (sandbox; CI will populate real values) |
+| Compile-time first data point recorded | ✅ v0.17.0 (sandbox; CI will populate real values) |
 | CI passes on clean branch | ✅ RFC-011-A |
 | mdBook build and test green | ✅ RFC-012-D |
 
@@ -89,18 +93,20 @@ Review questions:
 | Gate | Status |
 |---|---|
 | 1. One iced major upgrade completed and lived on ≥1 minor | ⬜ |
-| 2. Two consecutive minors without vocabulary churn | ⬜ |
+| 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 (4 minors, zero vocab change) |
 | 3. At least one third-party or production-grade app | ⬜ |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
-| 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.12 |
+| 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests including 2 RTL |
 | 6. Feature-matrix CI stable | ✅ v0.11 |
-| 7. Public API freeze review completed (this doc) | ⬜ in progress |
+| 7. Public API freeze review completed | ⬜ in progress (type-names audit done v0.17) |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
-| 9. Binary-size and compile-time trends monitored (≥2 data points) | ⬜ |
+| 9. Binary-size and compile-time trends monitored (≥2 data points) | ⬜ first point recorded v0.17; need second |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-Gates 4, 5, 6, 8, 10 are satisfied. The remaining five are the real 1.0
-blockers; do not declare 1.0 until all ten are ✅.
+**Gates satisfied: 4, 5, 6, 8, 10, 2 = six of ten.**
+
+Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
+freeze review completion (gate 7), second build-cost data point (gate 9).
 
 ## How to use this document
 

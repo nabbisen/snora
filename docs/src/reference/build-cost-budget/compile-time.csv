@@ -1,1 +1,2 @@
 version,check_workspace_ms,build_widgets_ms,build_engine_only_ms,example_hello_ms,rustc,runner_os,date
+0.17.0,156223,N/A,5181,182000,rustc_1.96.0_(ac68faa20_2026-05-25),unknown,2026-06-10T12:41:24Z
