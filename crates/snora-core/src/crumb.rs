@@ -21,6 +21,26 @@
 /// when the user navigates back. The leaf step (the current page)
 /// typically has `is_leaf: true` and the engine renders it as plain
 /// text — non-clickable, visually muted differently from ancestors.
+///
+/// # Example
+///
+/// ```
+/// use snora_core::Crumb;
+///
+/// #[derive(Clone, Debug, PartialEq, Eq)]
+/// enum CrumbId { Home, Library, Books }
+///
+/// // Build a trail: Home › Library › Books, where Books is the
+/// // current page.
+/// let trail = vec![
+///     Crumb::ancestor(CrumbId::Home,    "Home"),
+///     Crumb::ancestor(CrumbId::Library, "Library"),
+///     Crumb::leaf(CrumbId::Books,       "Books"),
+/// ];
+/// assert!(!trail[0].is_leaf);
+/// assert!(trail[2].is_leaf);
+/// assert_eq!(trail[2].label, "Books");
+/// ```
 #[derive(Debug, Clone)]
 pub struct Crumb<CrumbId: Clone> {
     /// Application-defined identifier for this step. Returned in
@@ -36,6 +56,18 @@ pub struct Crumb<CrumbId: Clone> {
 
 impl<CrumbId: Clone> Crumb<CrumbId> {
     /// Build an ancestor crumb (clickable).
+    ///
+    /// Pairs with [`Crumb::leaf`] for the trail's last entry.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::Crumb;
+    ///
+    /// let home: Crumb<u32> = Crumb::ancestor(0, "Home");
+    /// assert_eq!(home.label, "Home");
+    /// assert!(!home.is_leaf);
+    /// ```
     pub fn ancestor(id: CrumbId, label: impl Into<String>) -> Self {
         Self {
             id,
@@ -45,6 +77,15 @@ impl<CrumbId: Clone> Crumb<CrumbId> {
     }
 
     /// Build a leaf crumb — the current page. Non-clickable.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::Crumb;
+    ///
+    /// let here: Crumb<u32> = Crumb::leaf(7, "Profile");
+    /// assert!(here.is_leaf);
+    /// ```
     pub fn leaf(id: CrumbId, label: impl Into<String>) -> Self {
         Self {
             id,
@@ -55,6 +96,21 @@ impl<CrumbId: Clone> Crumb<CrumbId> {
 }
 
 /// What happens when the user interacts with the breadcrumb trail.
+///
+/// # Example
+///
+/// ```
+/// use snora_core::BreadcrumbAction;
+///
+/// #[derive(Clone, Debug, PartialEq, Eq)]
+/// enum CrumbId { Home, Library }
+///
+/// let action: BreadcrumbAction<CrumbId> =
+///     BreadcrumbAction::Pressed(CrumbId::Library);
+/// match action {
+///     BreadcrumbAction::Pressed(id) => assert_eq!(id, CrumbId::Library),
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BreadcrumbAction<CrumbId> {
     /// The user pressed an ancestor crumb. The application typically

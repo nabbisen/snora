@@ -24,6 +24,17 @@ pub enum LayoutDirection {
 impl LayoutDirection {
     /// Flip the direction. Useful for a user-facing "Flip LTR / RTL" toggle
     /// during development or accessibility preference changes.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::LayoutDirection;
+    ///
+    /// assert_eq!(LayoutDirection::Ltr.flipped(), LayoutDirection::Rtl);
+    /// assert_eq!(LayoutDirection::Rtl.flipped(), LayoutDirection::Ltr);
+    /// // Flipping is its own inverse.
+    /// assert_eq!(LayoutDirection::Ltr.flipped().flipped(), LayoutDirection::Ltr);
+    /// ```
     #[must_use]
     pub fn flipped(self) -> Self {
         match self {

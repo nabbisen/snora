@@ -17,6 +17,47 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.9.0] — 2026-04-29
+
+### Added
+
+- **Doctest coverage for `snora-core` vocabulary.** Public types now
+  ship with executable `///` examples that `cargo test --doc` runs
+  alongside the unit suite. The additions cover the 0.7-era
+  newcomers (`Tab`, `TabBar`, `TabAction`, `Crumb` +
+  `Crumb::ancestor` / `Crumb::leaf`, `BreadcrumbAction`) and key
+  pre-existing types (`Sheet`, `SheetEdge::is_vertical`,
+  `SheetSize::as_ratio` / `as_pixels`, `Toast::new`,
+  `Toast::persistent`, `ToastPosition::is_top`,
+  `LayoutDirection::flipped`). Total: 17 new doctests, all passing
+  alongside the 17 unit tests.
+- **A single Migration index page**
+  ([`docs/src/guides/migrations.md`](docs/src/guides/migrations.md))
+  collects the per-version migration guides and groups them under
+  one entry in `SUMMARY.md` and `docs/README.md`. The individual
+  `migration-X.Y-to-X.Z.md` files are unchanged; the index simply
+  trims the navigation tree.
+
+### Changed
+
+- `docs/src/SUMMARY.md` no longer carries a top-level "Migration"
+  part with one bullet per version. Migrations are now a single
+  entry in the Guides part. Per-version detail lives one click
+  away on the index page.
+
+### Deferred
+
+- **Binary-size baseline.** Originally planned for 0.9, deferred to
+  0.10 — the release-mode iced compile (with workspace LTO) was
+  too slow to run reliably in this release's environment. The
+  measurement methodology is unchanged; see
+  [`docs/src/contributing/feature-gating-criteria.md`](docs/src/contributing/feature-gating-criteria.md)
+  indicator (2).
+
+### Tests
+
+- 34 tests in `snora-core`: 17 unit + 17 doctests (was 17 unit).
+
 ## [0.8.0] — 2026-04-29
 
 ### Added
@@ -113,3 +154,8 @@ Nothing yet.
 ### Tests
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
+
+[Unreleased]: https://github.com/nabbisen/snora/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/nabbisen/snora/releases/tag/v0.9.0
+[0.8.0]: https://github.com/nabbisen/snora/releases/tag/v0.8.0
+[0.7.0]: https://github.com/nabbisen/snora/releases/tag/v0.7.0

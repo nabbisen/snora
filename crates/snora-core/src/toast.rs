@@ -120,6 +120,16 @@ impl ToastPosition {
     /// Whether this position anchors to the *top* edge of the window.
     /// Engines use this to decide stack growth direction (top anchors grow
     /// downward; bottom anchors grow upward).
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::ToastPosition;
+    ///
+    /// assert!(ToastPosition::TopEnd.is_top());
+    /// assert!(ToastPosition::TopCenter.is_top());
+    /// assert!(!ToastPosition::BottomEnd.is_top());
+    /// ```
     #[must_use]
     pub fn is_top(self) -> bool {
         matches!(
@@ -129,6 +139,8 @@ impl ToastPosition {
     }
 
     /// Whether this position anchors to the *bottom* edge of the window.
+    ///
+    /// Always the inverse of [`Self::is_top`].
     #[must_use]
     pub fn is_bottom(self) -> bool {
         !self.is_top()
@@ -198,6 +210,26 @@ impl<Message: Clone> Toast<Message> {
     /// This constructor takes the mandatory fields positionally and uses
     /// [`ToastLifetime::DEFAULT`] for the lifetime. Use builder-style
     /// methods below to customize further.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::{Toast, ToastIntent};
+    ///
+    /// #[derive(Clone, Debug)]
+    /// enum Msg { DismissToast(u64) }
+    ///
+    /// let toast = Toast::new(
+    ///     /* id */       1,
+    ///     /* intent */   ToastIntent::Success,
+    ///     /* title */    "Saved",
+    ///     /* message */  "Your changes are stored.",
+    ///     /* on_dismiss */ Msg::DismissToast(1),
+    /// );
+    /// assert_eq!(toast.id, 1);
+    /// assert_eq!(toast.title, "Saved");
+    /// assert_eq!(toast.intent, ToastIntent::Success);
+    /// ```
     pub fn new(
         id: u64,
         intent: ToastIntent,
@@ -224,6 +256,25 @@ impl<Message: Clone> Toast<Message> {
     }
 
     /// Make this toast persistent (never auto-dismiss).
+    ///
+    /// Use for notifications the user must explicitly acknowledge —
+    /// "Export complete", "Disk almost full", confirmations of long
+    /// operations.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::{Toast, ToastIntent, ToastLifetime};
+    ///
+    /// #[derive(Clone, Debug)]
+    /// enum Msg { DismissToast(u64) }
+    ///
+    /// let toast = Toast::new(
+    ///     1, ToastIntent::Info, "Exported", "Done.", Msg::DismissToast(1),
+    /// )
+    /// .persistent();
+    /// assert_eq!(toast.lifetime, ToastLifetime::Persistent);
+    /// ```
     #[must_use]
     pub fn persistent(mut self) -> Self {
         self.lifetime = ToastLifetime::Persistent;

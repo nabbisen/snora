@@ -23,6 +23,23 @@ use crate::Icon;
 
 /// One tab in a [`TabBar`]. Carries an application-defined `TabId` so
 /// that the application is the source of truth for which tab is which.
+///
+/// # Example
+///
+/// ```
+/// use snora_core::Tab;
+///
+/// #[derive(Clone, PartialEq, Eq, Debug)]
+/// enum WorkspaceTab { Library, Editor, Settings }
+///
+/// let editor = Tab {
+///     id: WorkspaceTab::Editor,
+///     label: "Editor".into(),
+///     icon: None,
+/// };
+/// assert_eq!(editor.label, "Editor");
+/// assert_eq!(editor.id, WorkspaceTab::Editor);
+/// ```
 #[derive(Debug, Clone)]
 pub struct Tab<TabId: Clone + PartialEq> {
     /// Application-defined identifier. Compared against [`TabBar::active`]
@@ -38,6 +55,25 @@ pub struct Tab<TabId: Clone + PartialEq> {
 ///
 /// `TabBar` is generic over `TabId` so that applications can use any
 /// `Clone + PartialEq` type — typically a small enum.
+///
+/// # Example
+///
+/// ```
+/// use snora_core::{Tab, TabBar};
+///
+/// #[derive(Clone, PartialEq, Eq, Debug)]
+/// enum WorkspaceTab { Library, Editor }
+///
+/// let bar = TabBar {
+///     tabs: vec![
+///         Tab { id: WorkspaceTab::Library, label: "Library".into(), icon: None },
+///         Tab { id: WorkspaceTab::Editor,  label: "Editor".into(),  icon: None },
+///     ],
+///     active: WorkspaceTab::Library,
+/// };
+/// assert_eq!(bar.tabs.len(), 2);
+/// assert_eq!(bar.active, WorkspaceTab::Library);
+/// ```
 #[derive(Debug, Clone)]
 pub struct TabBar<TabId: Clone + PartialEq> {
     /// Tabs in display order. The widget engine respects this order;
@@ -56,6 +92,22 @@ pub struct TabBar<TabId: Clone + PartialEq> {
 /// still wrap it in an enum (rather than a bare `TabId`) so that
 /// future extensions (close button on a tab, drag-to-reorder) can be
 /// added without breaking the existing handler shape.
+///
+/// # Example
+///
+/// ```
+/// use snora_core::TabAction;
+///
+/// #[derive(Clone, Debug, PartialEq, Eq)]
+/// enum WorkspaceTab { Library, Editor }
+///
+/// // Application code typically maps `TabAction` into its own message
+/// // enum; here we just match on it directly.
+/// let received: TabAction<WorkspaceTab> = TabAction::Pressed(WorkspaceTab::Editor);
+/// match received {
+///     TabAction::Pressed(id) => assert_eq!(id, WorkspaceTab::Editor),
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TabAction<TabId> {
     /// The user pressed a tab. The application typically responds by

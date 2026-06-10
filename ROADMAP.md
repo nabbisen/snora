@@ -31,21 +31,20 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.9 (next release)
+## Near-term: 0.10 (next release)
 
 These items have either concrete demand or a small enough scope
 that they fit a single release.
 
 ### Likely
 
-- **Establish a binary-size baseline.** Per
+- **Establish a binary-size baseline.** Carried over from 0.9 — the
+  measurement could not be captured in the 0.9 sandbox due to
+  release-mode iced+LTO compile time. Per
   [feature-gating-criteria.md](src/contributing/feature-gating-criteria.md),
   indicator (2) needs a baseline measurement (`snora-example-hello`
   with and without `--no-default-features`) recorded so future
   releases can detect drift.
-- **Doctest coverage for the widget vocab introduced in 0.7.**
-  `Tab`, `TabBar`, `Crumb` should grow small `cargo test --doc`
-  examples to lock the surface against accidental signature change.
 - **Tooltip vocabulary.** Currently `SideBarItem.tooltip: String` is
   the only typed tooltip in snora. If a second widget grows a
   tooltip slot, it warrants pulling tooltips out into shared
@@ -58,13 +57,23 @@ that they fit a single release.
   pattern (used in apps for "Export complete" style notifications)
   recurs enough that a small ergonomic helper might be worth
   shipping. Not a vocabulary change — pure ergonomics.
-- **`mdbook test docs` integration.** Once the doctest pattern is
+- **`mdbook test docs` integration.** Now that doctests are
   established for the Rust source, run mdBook's own doctest
-  facility on the Markdown so code blocks stay valid alongside
-  vocabulary changes.
+  facility on the Markdown so code blocks in the prose stay valid
+  alongside vocabulary changes.
+- **Doctests for `snora-widgets` builders.** snora-core is now
+  doctest-covered. The widget-side builders (`app_header`,
+  `app_side_bar`, `app_tab_bar`, `app_breadcrumb`, `render_menu`)
+  need iced for executable examples; whether to gate them on a dev
+  feature or keep them as `ignore`-tagged samples is open.
 
 ## Recently shipped
 
+- **0.9** — Doctest coverage for `snora-core` vocabulary (17 new
+  doctests across `Tab`, `TabBar`, `TabAction`, `Crumb`,
+  `BreadcrumbAction`, `Sheet`, `SheetEdge`, `SheetSize`, `Toast`,
+  `ToastPosition`, `LayoutDirection`); migration guides collapsed
+  to a single index entry in the SUMMARY.
 - **0.8** — mdBook documentation, GitHub Pages deployment, Docs CI
   workflow, project-level GitHub conventions
   (`.github/CONTRIBUTING.md`, security policy, code of conduct,
@@ -76,7 +85,7 @@ that they fit a single release.
   size); 3-crate workspace split (`snora-core` / `snora-widgets` /
   `snora`).
 
-## Middle-term: 0.10 — 0.11
+## Middle-term: 0.11 — 0.12
 
 Things we expect to want but that need design work or signal from
 real applications first.
@@ -108,7 +117,7 @@ real applications first.
   is the current decision. Re-evaluate at each release; split when
   the documented thresholds are met.
 - **Snapshot of compile time and binary size in CI.** Once the
-  baseline from 0.9 exists, automate the measurement so the
+  baseline from 0.10 exists, automate the measurement so the
   feature-gating thresholds are checked without human effort.
 
 ## Longer-term: 1.0

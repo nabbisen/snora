@@ -73,6 +73,16 @@ pub enum SheetEdge {
 impl SheetEdge {
     /// Whether this edge anchors along the **vertical** axis.
     /// `true` for `Top` / `Bottom`; `false` for `Start` / `End`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::SheetEdge;
+    ///
+    /// assert!(SheetEdge::Top.is_vertical());
+    /// assert!(SheetEdge::Bottom.is_vertical());
+    /// assert!(!SheetEdge::Start.is_vertical());
+    /// ```
     #[must_use]
     pub fn is_vertical(self) -> bool {
         matches!(self, SheetEdge::Top | SheetEdge::Bottom)
@@ -80,6 +90,8 @@ impl SheetEdge {
 
     /// Whether this edge anchors along the **horizontal** axis.
     /// `true` for `Start` / `End`; `false` for `Top` / `Bottom`.
+    ///
+    /// Always the inverse of [`Self::is_vertical`].
     #[must_use]
     pub fn is_horizontal(self) -> bool {
         !self.is_vertical()
@@ -118,6 +130,16 @@ impl SheetSize {
 
     /// Resolve to a fraction of the relevant axis, if this variant
     /// expresses one. Returns `None` for [`SheetSize::Pixels`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::SheetSize;
+    ///
+    /// assert_eq!(SheetSize::Half.as_ratio(), Some(0.5));
+    /// assert_eq!(SheetSize::Ratio(1.5).as_ratio(), Some(1.0)); // clamped
+    /// assert_eq!(SheetSize::Pixels(240.0).as_ratio(), None);
+    /// ```
     #[must_use]
     pub fn as_ratio(self) -> Option<f32> {
         match self {
@@ -131,6 +153,15 @@ impl SheetSize {
 
     /// Resolve to a pixel value, if this variant expresses one.
     /// Returns `None` for the ratio-based variants.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use snora_core::SheetSize;
+    ///
+    /// assert_eq!(SheetSize::Pixels(280.0).as_pixels(), Some(280.0));
+    /// assert_eq!(SheetSize::Half.as_pixels(), None);
+    /// ```
     #[must_use]
     pub fn as_pixels(self) -> Option<f32> {
         match self {
@@ -147,12 +178,18 @@ impl SheetSize {
 ///
 /// # Builder usage
 ///
-/// ```ignore
-/// use snora::{Sheet, SheetEdge, SheetSize};
+/// ```
+/// use snora_core::{Sheet, SheetEdge, SheetSize};
 ///
-/// let sheet = Sheet::new(my_content)
+/// // Use `()` for the content/message parameters when illustrating the
+/// // shape only. In application code these are `iced::Element<'_, M>` and
+/// // your `Message` type.
+/// let sheet: Sheet<(), ()> = Sheet::new(())
 ///     .at(SheetEdge::Start)
 ///     .with_size(SheetSize::Half);
+///
+/// assert_eq!(sheet.edge, SheetEdge::Start);
+/// assert_eq!(sheet.size, SheetSize::Half);
 /// ```
 pub struct Sheet<Node, Message> {
     /// The sheet's body content. The engine wraps this in a styled surface

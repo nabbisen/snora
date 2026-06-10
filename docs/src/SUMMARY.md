@@ -17,12 +17,7 @@
 - [Direction and ABDD](guides/direction.md)
 - [Icons](guides/icons.md)
 - [Testing UI logic](guides/testing.md)
-
-# Migration
-
-- [0.6 → 0.7](guides/migration-0.6-to-0.7.md)
-- [0.5 → 0.6](guides/migration-0.5-to-0.6.md)
-- [0.4 → 0.5](guides/migration-0.4-to-0.5.md)
+- [Migrating between versions](guides/migrations.md)
 
 # Reference
 
