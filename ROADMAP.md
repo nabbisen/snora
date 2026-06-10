@@ -31,42 +31,7 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.13 (next release)
-
-Primary goal: design expansion — evaluate the only likely missing
-overlay class (anchored popovers) while keeping the vocabulary stable.
-
-### Likely
-
-- **Tooltip vocabulary trigger** (RFC-013-C). `SideBarItem.tooltip:
-  String` is currently the only typed tooltip. A second consumer
-  (e.g. tab bar item tooltip, icon button) would justify promoting to
-  shared vocabulary (`Tooltip { text: String, side: Edge }`). Watch
-  for the second consumer.
-
-### Design-first (no implementation without a real use case)
-
-- **Anchored popover design study** (RFC-013-A). Design whether Snora
-  should add a popover overlay anchored to a widget/point/rect.
-  Fills the gap between menus, centered dialogs, and edge sheets.
-  Implementation requires a concrete consuming app.
-
-- **Public API freeze readiness** (RFC-013-B). Define the freeze review
-  process before 1.0. Checklist covers exported types, feature flags,
-  builder completeness, semantic contracts, docs, and release hygiene.
-  Should be written before further vocabulary additions.
-
-## Recently shipped
-
-- **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance
-  (8 render-semantics integration tests, 5 RTL unit tests); ABDD compliance
-  checklist and PR template; workbench example exercising all surfaces;
-  compile-time tracking script + workflow + docs; documentation test policy
-  (54 fences classified, `mdbook test` in CI).
-- **0.11** — Foundation hardening: main Rust CI quality gate (three-job
-  workflow covering check/clippy/tests/feature-matrix/docs); toast ordering
-  bugfix; `AppLayout` is `#[non_exhaustive]`; overlay interaction semantics
-  reference page; render-semantics test harness; RFC directory adopted.
+## Near-term: 0.14 (next release)
   (`reference/binary-size-budget/binary-size.csv`) appended on each
   release tag, a `release-baseline` Cargo profile for fast
   measurement, the `binary-size` GitHub Actions workflow, and the
@@ -88,66 +53,59 @@ overlay class (anchored popovers) while keeping the vocabulary stable.
   size); 3-crate workspace split (`snora-core` / `snora-widgets` /
   `snora`).
 
-## Middle-term: 0.12 — 0.13
+## Near-term: 0.14 (next release)
 
-Things we expect to want but that need design work or signal from
-real applications first.
+Primary goal: interaction and boundary clarity — keyboard behavior,
+accessibility, theme documentation, icon policy, and examples acceptance.
 
-### Watch list
+See RFC-014-A through RFC-014-E in `rfcs/proposed/` for details.
 
-- **Status bar widget.** Considered for 0.7 and deferred — current
-  position is "the existing `app_footer` + `row_dir_three` covers
-  this well enough that a dedicated `app_status_bar` would be a
-  thin wrapper without earning its keep". A concrete app whose
-  needs do not fit `app_footer` would change that.
-- **Anchored popover overlay.** `Dialog` is centered; `Sheet` is
-  edge-anchored. Neither covers "popover anchored to the widget
-  the user clicked" (combobox dropdowns, hover cards). Designing
-  this requires deciding how the anchor point is communicated to
-  the engine — an iced `Point` or a layout reference. Out of scope
-  until a concrete need arrives.
-- **Command palette overlay.** Discussed in
-  [adding-an-overlay.md](docs/src/contributing/adding-an-overlay.md) as
-  a hypothetical example. If multiple applications request it, it
-  becomes a real candidate.
-- **`#[doc(cfg(feature = ...))]` polish.** Make sure every feature-
-  gated item is correctly tagged so docs.rs renders the toggles.
+## Recently shipped
 
-### Investigation
+- **0.13** — Design expansion: anchored popover design study (eight
+  internal questions answered, decision to defer recorded); public API
+  freeze review doc (`api-freeze-review.md`) with current gate status;
+  tooltip/persistent-toast evidence check (both deferred — triggers unmet).
+- **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance
+  (8 render-semantics integration tests, 5 RTL unit tests); ABDD compliance
+  checklist and PR template; workbench example exercising all surfaces;
+  compile-time tracking script + workflow + docs; documentation test policy
+  (54 fences classified, `mdbook test` in CI).
+- **0.11** — Foundation hardening: main Rust CI quality gate (three-job
+  workflow covering check/clippy/tests/feature-matrix/docs); toast ordering
+  bugfix; `AppLayout` is `#[non_exhaustive]`; overlay interaction semantics
+  reference page; render-semantics test harness; RFC directory adopted.
 
-- **Per-widget feature gates.** Coarse gating
-  ([feature-gating-criteria.md](docs/src/contributing/feature-gating-criteria.md))
-  is the current decision. Re-evaluate at each release; split when
-  the documented thresholds are met.
-- **Compile-time tracking in CI.** Binary size is now measured per
-  release (0.10). The complementary metric — `snora-widgets` cold
-  compile time, indicator (1) — is not yet automated. If it
-  becomes a concern, fold a timed build into the existing
-  `binary-size` workflow and record it alongside the size data.
+## Middle-term: 0.15
+
+Public surface and adoption maturity — versioning policy, re-export and
+docs.rs cleanup, starter template, design-decision register maintenance.
+See RFC-015-A through RFC-015-D.
 
 ## Longer-term: 1.0
 
 Snora hits 1.0 when the API surface has been stable across a few
 releases and we are confident it will not need a wholesale redesign.
 
-Concrete prerequisites:
+The full readiness checklist is in
+[`docs/src/contributing/api-freeze-review.md`](docs/src/contributing/api-freeze-review.md).
 
-1. **iced 0.15 (or whatever the next major iced is) integration is
-   done.** The next iced bump is the most likely source of breaking
-   changes; we want at least one minor cycle on the new iced before
-   committing to 1.0.
-2. **The vocabulary set has stopped growing rapidly.** If two
-   consecutive minor releases ship without a new vocabulary type
-   being added (or worse, with one being renamed), the surface is
-   stable enough to commit to.
-3. **At least one third-party application in production.** "It is
-   used by something other than its examples and the maintainer's
-   own projects."
+**Summary of 1.0 gates** (✅ = satisfied):
 
-We are explicitly **not** rushing to 1.0. Pre-1.0 SemVer is
-serving snora well — minor versions can carry small breaking
-changes when justified, with deprecation aliases bridging two
-releases (the pattern used at 0.5 → 0.6 and 0.6 → 0.7).
+1. One iced major upgrade completed and lived on ≥1 minor. ⬜
+2. Two consecutive minors without vocabulary churn. ⬜
+3. At least one third-party or production-grade app. ⬜
+4. AppLayout construction policy decided. ✅ v0.11
+5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.12
+6. Feature-matrix CI stable. ✅ v0.11
+7. Public API freeze review completed. ⬜ in progress
+8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
+9. Binary-size and compile-time trends monitored (≥2 data points). ⬜
+10. No hidden feature-combination failures. ✅ (CI gate)
+
+We are explicitly **not** rushing to 1.0. Pre-1.0 SemVer is serving
+snora well; minor versions can carry small breaking changes when
+justified, with deprecation bridges across two releases.
 
 ## Off the roadmap (deliberately not pursued)
 

@@ -17,6 +17,44 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.13.0] — 2026-06-10
+
+### Added
+
+- **Anchored popover design page**
+  (`docs/src/contributing/anchored-popover-design.md`). Records the
+  complete design study: eight internal questions answered (iced `operate`
+  geometry API, application-provided-only geometry, new `on_close_popovers`
+  sink needed, non-modal, single popover, no collision detection, additive
+  `AppLayout` field, layer between context_menu and modal dim). Decision:
+  defer implementation until a concrete consuming app exists. (RFC-013-A)
+
+- **Public API freeze review**
+  (`docs/src/contributing/api-freeze-review.md`). Living readiness
+  tracker for 1.0. Four of ten gates are now satisfied (AppLayout
+  stability, render-semantics tests, feature-matrix CI, workbench
+  example); six remain (iced major upgrade, vocabulary stability,
+  third-party adoption, freeze review completion, build-cost data,
+  docs.rs polish). (RFC-013-B)
+
+### Changed
+
+- **ROADMAP 1.0 gates** expanded to ten items with current satisfaction
+  status. Gates 4, 5, 6, 8, 10 marked ✅; remaining five are real
+  blockers. Pointer added to `api-freeze-review.md`. (RFC-013-B)
+
+- **`design-decisions.md`** extended with two deferred-feature records:
+  tooltip vocabulary (trigger: second consumer type) and persistent-toast
+  helper (trigger: two apps repeat the pattern). (RFC-013-C)
+
+### Notes
+
+- Tooltip vocabulary (`RFC-013-C` Candidate A): trigger not met as of
+  v0.13. `SideBarItem.tooltip: String` remains the only consumer. Watch
+  for a second consumer type.
+- Persistent-toast helper (`RFC-013-C` Candidate B): trigger not met.
+  No example calls `.persistent()` yet.
+
 ## [0.12.0] — 2026-06-10
 
 ### Added

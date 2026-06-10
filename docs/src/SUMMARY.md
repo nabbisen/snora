@@ -36,6 +36,8 @@
 - [Design decisions](contributing/design-decisions.md)
 - [ABDD compliance checklist](contributing/abdd-checklist.md)
 - [Documentation test policy](contributing/documentation-test-policy.md)
+- [Anchored popover design](contributing/anchored-popover-design.md)
+- [Public API freeze review](contributing/api-freeze-review.md)
 - [Adding a new overlay kind](contributing/adding-an-overlay.md)
 - [Feature-gating criteria](contributing/feature-gating-criteria.md)
 - [Release process](contributing/release-process.md)

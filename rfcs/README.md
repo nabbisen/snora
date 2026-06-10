@@ -28,16 +28,11 @@ Numbers are stable forever and never reused.
 | 012-B | [Showcase / workbench example](./done/012-b-showcase-workbench-example.md) | v0.12.0 |
 | 012-C | [Compile-time tracking](./done/012-c-compile-time-tracking.md) | v0.12.0 |
 | 012-D | [Documentation and doctest policy](./done/012-d-documentation-and-doctest-policy.md) | v0.12.0 |
+| 013-A | [Anchored popover design study](./done/013-a-anchored-popover-design-study.md) | v0.13.0 (design study; implementation deferred) |
+| 013-B | [Public API freeze readiness](./done/013-b-public-api-freeze-readiness.md) | v0.13.0 |
+| 013-C | [Tooltip vocabulary & persistent-toast helper](./done/013-c-tooltip-vocabulary-and-persistent-toast-helper.md) | v0.13.0 (both candidates deferred; triggers unmet) |
 
 ## Proposed
-
-### v0.13 — Gated expansion (design-first)
-
-| ID | Title | v0.11 propagation |
-|----|-------|-------------------|
-| 013-A | [Anchored popover design study](./proposed/013-a-anchored-popover-design-study.md) | RFC-011-C satisfied → popover field would be additive |
-| 013-B | [Public API freeze readiness](./proposed/013-b-public-api-freeze-readiness.md) | — |
-| 013-C | [Tooltip vocabulary & persistent-toast helper](./proposed/013-c-tooltip-vocabulary-and-persistent-toast-helper.md) | — |
 
 ### v0.14 — Interaction & boundary clarity
 

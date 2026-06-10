@@ -261,3 +261,21 @@ All comments are in English so that snora is reviewable by
 contributors regardless of language. Documentation prose in `docs/`
 follows the same rule. Translations of `docs/` into other languages
 are welcome as a separate effort.
+
+## Why tooltip vocabulary is deferred (v0.13)
+
+`SideBarItem.tooltip: String` is the only typed tooltip-like field in
+the current API. A shared `Tooltip { text: String, side: Edge }` type
+would be justified when a second consumer appears. As of v0.12 no second
+consumer exists. The trigger and the proposed type are documented in
+RFC-013-C. When the trigger is met, `SideBarItem.tooltip` changes from
+`String` to `Tooltip` — a minor-release breaking change with a migration
+guide.
+
+## Why the persistent-toast helper is deferred (v0.13)
+
+`Toast::new(…).persistent()` is the current idiom. A `persistent_ack`
+named constructor would be justified when two separate examples or apps
+repeat this exact pattern. As of v0.12 no example calls `.persistent()`.
+The trigger is documented in RFC-013-C. If/when met, `persistent_ack` is
+a small additive constructor with a doctest — no migration needed.
