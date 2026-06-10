@@ -40,16 +40,13 @@ Numbers are stable forever and never reused.
 | 015-B | [Crate re-export & docs.rs policy](./done/015-b-crate-reexport-and-docsrs-policy.md) | v0.15.0 |
 | 015-C | [Starter application template](./done/015-c-starter-application-template.md) | v0.15.0 |
 | 015-D | [Design decision register maturity](./done/015-d-design-decision-register-maturity.md) | v0.15.0 |
+| 016-A | [Alternate engine boundary assessment](./done/016-a-alternate-engine-boundary-assessment.md) | v0.16.0 |
+| 016-B | [Performance envelope & render-cost budget](./done/016-b-performance-envelope-and-render-cost-budget.md) | v0.16.0 |
+| 016-C | [Downstream adoption & feedback program](./done/016-c-downstream-adoption-and-feedback-program.md) | v0.16.0 |
 
 ## Proposed
 
-### v0.16+ — Strategic evidence & long-term options
-
-| ID | Title |
-|----|-------|
-| 016-A | [Alternate engine boundary assessment](./proposed/016-a-alternate-engine-boundary-assessment.md) |
-| 016-B | [Performance envelope & render-cost budget](./proposed/016-b-performance-envelope-and-render-cost-budget.md) |
-| 016-C | [Downstream adoption & feedback program](./proposed/016-c-downstream-adoption-and-feedback-program.md) |
+_(All planned RFCs through v0.16 are now in `done/`. New RFCs open here when the next phase begins.)_
 
 ## Archive
 

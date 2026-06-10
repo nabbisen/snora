@@ -1,0 +1,87 @@
+name: Downstream feedback
+description: Share your experience building a real application with Snora. This feedback directly informs 1.0 readiness.
+labels: ["downstream-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for sharing your experience. This template is for developers who have used Snora in a real application. Your feedback shapes the framework's direction. Details can be anonymized.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: App category
+      description: What kind of application are you building?
+      options:
+        - Desktop / local-first tool
+        - Internal productivity tool
+        - Developer tool / editor
+        - Media / content app
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: surfaces
+    attributes:
+      label: Snora surfaces used
+      description: Which surfaces did your app use?
+      options:
+        - label: Header (`app_header`)
+        - label: Sidebar (`app_side_bar`)
+        - label: Footer (`app_footer`)
+        - label: Header menu / context menu
+        - label: Dialog
+        - label: Sheet
+        - label: Toasts
+        - label: Tab bar
+        - label: Breadcrumb
+        - label: RTL / direction toggle
+        - label: Engine-only build (no widgets)
+
+  - type: checkboxes
+    id: features
+    attributes:
+      label: Feature flags used
+      options:
+        - label: default (`widgets`)
+        - label: lucide-icons
+        - label: svg-icons
+        - label: no-default-features (engine only)
+
+  - type: textarea
+    id: worked_well
+    attributes:
+      label: What worked well
+      placeholder: "e.g. AppLayout assembly was clear; toast lifecycle was easy to wire..."
+
+  - type: textarea
+    id: awkward
+    attributes:
+      label: What was awkward or friction-causing
+      placeholder: "e.g. I couldn't easily do X; the API for Y felt verbose..."
+
+  - type: textarea
+    id: missing
+    attributes:
+      label: Missing framework-level concepts
+      description: Things that belong in the framework layer (skeleton/overlay/direction), not in your app code.
+      placeholder: "Leave blank if nothing is missing at the framework level."
+
+  - type: textarea
+    id: app_specific
+    attributes:
+      label: App-specific needs that should stay outside Snora
+      description: Things you needed but that are clearly your application's responsibility.
+
+  - type: textarea
+    id: build_concerns
+    attributes:
+      label: Binary size or compile-time concerns
+      placeholder: "e.g. binary was larger than expected; first compile was slow..."
+
+  - type: textarea
+    id: iced_concerns
+    attributes:
+      label: iced upgrade concerns
+      placeholder: "e.g. breaking change in iced 0.x caused problems; API mismatch..."

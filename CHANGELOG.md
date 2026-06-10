@@ -17,6 +17,54 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.16.0] — 2026-06-10
+
+### Added
+
+- **Alternate engine boundary doc**
+  (`docs/src/contributing/alternate-engine-boundary.md`). Explains why
+  `snora-core` is iced-free (vocabulary stability, testability, and
+  architectural clarity), what a hypothetical alternate engine would require
+  (capability table), what is iced-specific and not portable, and the
+  conservative public wording: Snora does not currently promise alternate
+  renderer support. (RFC-016-A)
+
+- **Performance envelope reference**
+  (`docs/src/reference/performance-envelope.md`). Documents Snora's
+  algorithmic performance commitments (all O(n) or O(1)), six reference
+  scenarios, and the render-cost CSV at
+  `docs/src/reference/performance-envelope/render-cost.csv` (header-only
+  until first tag run). (RFC-016-B)
+
+- **`scripts/measure-render-cost.sh`**. Times the release-baseline builds
+  of `examples/hello` and `examples/workbench` as a proxy for layout
+  composition cost. Mirrors `measure-compile-time.sh` output conventions.
+  (RFC-016-B)
+
+- **Downstream feedback issue template**
+  (`.github/ISSUE_TEMPLATE/downstream-feedback.yml`). Structured form for
+  developers using Snora in real applications. Directly feeds the 1.0
+  "third-party adoption" gate. (RFC-016-C)
+
+- **Feature request issue template**
+  (`.github/ISSUE_TEMPLATE/feature-request.yml`). Includes scope-triage
+  question and pre-submission checklist against the off-the-roadmap
+  non-goals. (RFC-016-C)
+
+- **Feedback and scope guide**
+  (`docs/src/contributing/feedback-and-scope.md`). Defines the
+  framework layer, feature-request triage table, what counts as a
+  third-party production app for the 1.0 gate, and the "Snora does not
+  grow into a widget library" commitment. (RFC-016-C)
+
+### Changed
+
+- **README** — new "Contributing and feedback" section with links to
+  both issue templates and the feedback guide. (RFC-016-C)
+
+- **`docs/src/reference/build-cost-budget.md`** — cross-link to the new
+  performance-envelope page. (RFC-016-B)
+
 ## [0.15.0] — 2026-06-10
 
 ### Added

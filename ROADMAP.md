@@ -31,32 +31,40 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.16+ (next phase)
+## Post-0.16: toward 1.0
 
-Primary goal: strategic evidence — alternate engine boundary assessment,
-performance envelope, and downstream adoption feedback.
+The strategic-evidence phase is complete. The remaining path to 1.0 has
+five open gates (see [`api-freeze-review.md`](docs/src/contributing/api-freeze-review.md)):
 
-See RFC-016-A through RFC-016-C in `rfcs/proposed/` for details.
+1. One iced major upgrade completed.
+2. Two consecutive minors without vocabulary churn.
+3. At least one third-party or production-grade app (use the downstream
+   feedback template).
+7. Public API freeze review completed.
+9. Binary-size and compile-time trends monitored (≥2 data points).
+
+Work on these proceeds in parallel with any v0.17+ feature work.
+There is no scheduled date for 1.0.
 
 ## Recently shipped
 
-- **0.15** — Public surface and adoption maturity: `snora` docs.rs metadata
-  (`all-features`); install.md version fix + "which crate?" section;
-  versioning policy doc + migration template; decision index with
-  status/trigger labels; starter application example (177 ELOC, workspace
-  member).
-- **0.14** — Interaction and boundary clarity: `snora::keyboard::dismiss_on_escape`
-  helper + workbench Escape wiring; warning color named const; overlay
-  accessibility boundary; icons.md feature-gating policy; examples acceptance
-  matrix.
-- **0.13** — Design expansion: anchored popover design study; API freeze review
+- **0.16** — Strategic evidence: alternate engine boundary doc; performance
+  envelope reference + `measure-render-cost.sh`; downstream feedback and
+  feature-request issue templates; feedback-and-scope guide; README
+  contribution section.
+- **0.15** — Public surface and adoption maturity: docs.rs metadata;
+  install.md version fix; versioning policy + migration template; decision
+  index with status labels; starter application example.
+- **0.14** — Interaction and boundary clarity: `dismiss_on_escape` helper;
+  warning color const; overlay accessibility boundary; icons feature-gating
+  policy; examples acceptance matrix.
+- **0.13** — Design expansion: anchored popover study; API freeze review
   tracker; tooltip/persistent-toast evidence check.
 - **0.12** — Semantic testing and ABDD maturity: RFC-011-D full acceptance;
-  ABDD checklist + PR template; workbench example; compile-time tracking;
-  documentation test policy.
+  ABDD checklist; workbench example; compile-time tracking; doc test policy.
 - **0.11** — Foundation hardening: main Rust CI; toast ordering bugfix;
-  `AppLayout` `#[non_exhaustive]`; overlay semantics reference page;
-  render-semantics test harness; RFC directory.
+  `AppLayout` `#[non_exhaustive]`; overlay semantics; render-semantics
+  test harness; RFC directory.
 
 ## Longer-term: 1.0
 

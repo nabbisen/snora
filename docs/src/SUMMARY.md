@@ -31,6 +31,7 @@
 - [Overlay interaction semantics](reference/overlay-interaction-semantics.md)
 - [Binary size budget](reference/binary-size-budget.md)
 - [Build cost budget](reference/build-cost-budget.md)
+- [Performance envelope](reference/performance-envelope.md)
 
 # Contributing
 
@@ -41,6 +42,8 @@
 - [Anchored popover design](contributing/anchored-popover-design.md)
 - [Public API freeze review](contributing/api-freeze-review.md)
 - [Versioning policy](contributing/versioning-policy.md)
+- [Alternate engine boundary](contributing/alternate-engine-boundary.md)
 - [Adding a new overlay kind](contributing/adding-an-overlay.md)
 - [Feature-gating criteria](contributing/feature-gating-criteria.md)
+- [Feedback and scope](contributing/feedback-and-scope.md)
 - [Release process](contributing/release-process.md)

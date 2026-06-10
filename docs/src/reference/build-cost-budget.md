@@ -66,3 +66,8 @@ Do not hand-edit the CSV; let the script and the CI workflow manage it.
 
 See [`binary-size-budget.md`](binary-size-budget.md) for the binary-size
 tracking policy and the 150 KB `diff_bytes` threshold.
+
+## Related: render-cost budget
+
+For runtime/layout-composition cost (build-time proxies for Snora's own
+example compilation), see [performance-envelope.md](performance-envelope.md).

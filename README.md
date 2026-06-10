@@ -124,4 +124,16 @@ For the full picture, head to **[docs/](docs/)**:
 Per-release notes live in [CHANGELOG.md](CHANGELOG.md); the
 direction of upcoming work is sketched in [ROADMAP.md](ROADMAP.md).
 
+## Contributing and feedback
+
+- **Bug reports and questions** — open an issue.
+- **Feature requests** — use the
+  [feature request template](https://github.com/nabbisen/snora/issues/new?template=feature-request.yml).
+  Please read the scope guide first; Snora is intentionally narrow.
+- **Using Snora in a real app?** Share your experience via the
+  [downstream feedback template](https://github.com/nabbisen/snora/issues/new?template=downstream-feedback.yml).
+  Real app stories are the strongest signal for 1.0 readiness.
+- **PRs** — the most legible form of argument. See
+  [docs/src/contributing/](docs/src/contributing/).
+
 Built with [iced](https://iced.rs).

@@ -1,0 +1,58 @@
+name: Feature request
+description: Propose an addition or change to Snora.
+labels: ["feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Snora is intentionally narrow: it positions and stacks layout surfaces; you supply content and styling. Before filing, please check the [scope guide](https://github.com/nabbisen/snora/blob/main/docs/src/contributing/feedback-and-scope.md) and the [off-the-roadmap section](https://github.com/nabbisen/snora/blob/main/ROADMAP.md#off-the-roadmap-deliberately-not-pursued) in the ROADMAP.
+
+  - type: dropdown
+    id: scope_triage
+    attributes:
+      label: Does this belong in Snora's framework layer?
+      description: "Snora's framework layer covers: skeleton layout, overlay stacking, close behavior, layout direction (ABDD), and operational quality of those concerns."
+      options:
+        - "Yes — it is a skeleton/overlay/direction/operational issue"
+        - "Unsure — it might be framework-level"
+        - "No — it belongs in application code or a separate crate"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the concrete scenario. Code is the most legible argument.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed solution
+      description: What would you like Snora to do or provide?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you have considered
+      description: Can this be solved today with `context_menu`, `Dialog`, `Sheet`, or application code?
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence of repeated need
+      description: |
+        Snora accepts new surface types only when multiple real apps demonstrate the need.
+        How many projects or developers need this? Have you seen the same pattern in the workbench or examples?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have read the ROADMAP "Off the roadmap" section and this request is not listed there.
+          required: true
+        - label: I have checked that this is not a form widget, data-display widget, decorative widget, or theming layer request.
+          required: true
