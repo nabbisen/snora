@@ -97,6 +97,17 @@ LTR, top-left under RTL). Override with
 position can be changed at runtime — re-rendering with a different
 position re-anchors the entire stack on the next frame.
 
+### Stack ordering
+
+The **newest toast is always closest to the anchor edge**. The engine
+handles this automatically; your application only needs to push new
+toasts to the back of the queue in chronological order.
+
+| Anchor | Column order (top → bottom) | Newest sits at |
+|---|---|---|
+| `TopStart` / `TopCenter` / `TopEnd` | newest → oldest | top edge |
+| `BottomStart` / `BottomCenter` / `BottomEnd` | oldest → newest | bottom edge |
+
 ## Why not store TTL outside the toast?
 
 `Toast` carries `created_at` and `lifetime` so that any single toast

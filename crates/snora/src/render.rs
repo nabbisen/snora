@@ -14,11 +14,16 @@
 //! 3. context_menu      — floating menu at click point
 //! 4. modal backdrop    — 40%-dim mouse_area, dispatches on_close_modals
 //! 5. dialog            — centered card
-//! 6. sheet            — edge-anchored panel, size per SheetSize
-//! 7. toasts            — stacked at the bottom-end (RTL-aware)
+//! 6. sheet             — edge-anchored panel, size per SheetSize
+//! 7. toasts            — stacked at the configured ToastPosition (RTL-aware),
+//!                        newest toast closest to the anchor edge
 //! ```
 //!
-//! Layers 1-6 are conditional on the corresponding `AppLayout` fields
+//! This order is part of the framework contract. See the
+//! [overlay interaction semantics](https://docs.snora.dev/reference/overlay-interaction-semantics.html)
+//! reference page for the normative behavioral rules.
+//!
+//! Layers 1–6 are conditional on the corresponding `AppLayout` fields
 //! being populated. Layer 7 is always evaluated but emits nothing when
 //! the toast queue is empty.
 //!

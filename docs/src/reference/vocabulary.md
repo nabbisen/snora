@@ -46,6 +46,12 @@ pub enum ToastPosition {
 - `ToastLifetime::seconds(n)` / `ToastLifetime::millis(ms)`.
 - `ToastPosition::is_top()` / `is_bottom()` — partition helpers.
 
+`ToastPosition` invariant: the **newest toast is always closest to the
+anchor edge**. Applications push new toasts to the back of their queue
+in chronological order; the engine honors the invariant automatically.
+Top anchors render newest at the top; bottom anchors render newest at
+the bottom.
+
 ## Sheets
 
 ```rust

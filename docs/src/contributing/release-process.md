@@ -43,6 +43,20 @@ snora-core = { path = "../snora-core", version = "0.5" }
 The trailing `"0.5"` is a caret range (`^0.5`), so all `0.5.*`
 patch releases are accepted. Bump it only on a minor.
 
+## GitHub Actions workflows
+
+Three workflows run automatically; they have distinct responsibilities:
+
+| Workflow | File | Trigger | Responsibility |
+|---|---|---|---|
+| **CI** | `ci.yaml` | PR, push to `main` | Rust quality gate (check, clippy, tests, engine-only, feature matrix, docs build). **No release merges while this is red.** |
+| **Docs** | `docs.yaml` | Push to `main` | Build and deploy mdBook to GitHub Pages. |
+| **Binary size** | `binary-size.yaml` | PR, push, tags | Measure stripped binary size; append a row to the CSV on release tags. |
+
+Do not confuse the **CI docs job** (PR gate) with the **Docs workflow**
+(deployment). They run mdBook with the same `^0.5` locked version; keeping
+them in sync is a release-process invariant.
+
 ## Release checklist
 
 ```text
@@ -53,15 +67,20 @@ patch releases are accepted. Bump it only on a minor.
 [ ] Update docs/guides/migration-X.Y-to-X.Z.md (minor only)
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)
+[ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their
+    Status fields and the rfcs/README.md index
 [ ] Re-run cargo metadata; confirm every crate reports new version
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
-[ ] cargo test --workspace --all-features
+[ ] cargo test -p snora-core
+[ ] cargo test -p snora
+[ ] cargo check -p snora --no-default-features
 [ ] mdbook build docs               # validates the book renders
 [ ] cargo package -p snora-core    --no-verify    # check .crate contents
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents
 [ ] git commit, git tag vX.Y.Z, git push --tags
+[ ] Confirm CI workflow green on the tag commit (all three jobs)
 [ ] cargo publish -p snora-core
 [ ] cargo publish -p snora-widgets
 [ ] cargo publish -p snora

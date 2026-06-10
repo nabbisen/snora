@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust-quality:
+    name: Rust quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check workspace
+        run: cargo check --workspace --all-features
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Test core
+        run: cargo test -p snora-core
+      - name: Test engine (render semantics)
+        run: cargo test -p snora
+      - name: Check engine-only build
+        run: cargo check -p snora --no-default-features
+
+  feature-matrix:
+    name: Feature matrix (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: default
+            args: ""
+          - name: no-default-features
+            args: "--no-default-features"
+          - name: widgets
+            args: "--no-default-features --features widgets"
+          - name: widgets-lucide-icons
+            args: "--no-default-features --features widgets,lucide-icons"
+          - name: widgets-svg-icons
+            args: "--no-default-features --features widgets,svg-icons"
+          - name: all-public-features
+            args: "--all-features"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Check feature combination
+        run: cargo check -p snora ${{ matrix.args }}
+
+  docs:
+    name: Docs build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install mdBook
+        run: cargo install mdbook --no-default-features --features search --vers "^0.5" --locked
+      - name: Build docs
+        run: mdbook build docs

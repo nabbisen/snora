@@ -218,19 +218,35 @@ reconstruct the reasoning.
 [`TabBar`]: ../reference/vocabulary.md
 [`Crumb`]: ../reference/vocabulary.md
 
-Both are public and both supported. Reasoning:
+Both are supported; the builder is the stable, documented canonical path.
+Reasoning:
 
 - The builder (`AppLayout::new(body).header(h).footer(f)`) is the
   recommended path because each setter has a clear name and you read
   the building site top-to-bottom.
-- Direct struct-literal construction (`AppLayout { body, header,
-  side_bar, ... }`) is available as an escape hatch when generating
-  layouts programmatically (e.g. in tests where you want explicit
-  field-by-field overrides).
+- Direct struct-literal construction from *outside* `snora-core` is
+  no longer permitted (see below). Fields remain `pub` for in-crate
+  access and for reading by the engine.
 
 We are *not* going to add a `Default` impl that requires `body:
 Option<Node>` — `body` is mandatory by construction; `AppLayout::new`
 exists precisely to enforce that.
+
+## Why `AppLayout` is `#[non_exhaustive]` (v0.11)
+
+Added in v0.11.0. Three later planned features (anchored popover,
+optional focus policy, and possible new overlay surfaces) may each
+add a top-level field to `AppLayout`. Without `#[non_exhaustive]`,
+every such addition would break downstream code that constructs the
+struct with a literal.
+
+The decision was made concrete by an in-tree audit: **no downstream
+code constructs `AppLayout` by literal** — every example already uses
+`AppLayout::new(body)` plus builders. The change broke nothing in
+practice and unblocks future additive extensions.
+
+Rule: any future PR adding a field to `AppLayout` must add a matching
+`#[must_use]` builder method in the same PR (see RFC-011-C).
 
 ## Why no `mod.rs`
 

@@ -18,12 +18,14 @@
 - [Icons](guides/icons.md)
 - [Testing UI logic](guides/testing.md)
 - [Migrating between versions](guides/migrations.md)
+  - [0.10 → 0.11](guides/migration-0.10-to-0.11.md)
 
 # Reference
 
 - [Architecture overview](reference/architecture.md)
 - [Vocabulary cheatsheet](reference/vocabulary.md)
 - [Built-in widgets](reference/widgets.md)
+- [Overlay interaction semantics](reference/overlay-interaction-semantics.md)
 - [Binary size budget](reference/binary-size-budget.md)
 
 # Contributing

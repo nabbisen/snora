@@ -9,6 +9,10 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.10 → 0.11](migration-0.10-to-0.11.md) — `AppLayout` is now
+  `#[non_exhaustive]` (builder path is the stable construction contract);
+  toast ordering fix (newest toast now correctly closest to the anchor
+  edge).
 - [0.6 → 0.7](migration-0.6-to-0.7.md) — removal of the deprecated 0.6
   sheet aliases (`BottomSheet`, `SheetHeight`,
   `AppLayout::bottom_sheet`); two new navigation widgets (`Tab`,

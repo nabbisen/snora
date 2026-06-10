@@ -1,13 +1,13 @@
 //! The application skeleton — [`AppLayout`].
 //!
 //! `AppLayout` is the **only** shape an engine consumes. It is a plain
-//! data structure with public fields plus a builder-style API. Every slot
+//! data structure with `pub` fields plus a builder-style API. Every slot
 //! is a `Node` of the same generic type — when rendered with snora, that
 //! binds to `iced::Element<'a, Message>`, so all four layout slots accept
 //! any iced element regardless of how the application organized its view
 //! code.
 //!
-//! # Filling slots
+//! # Canonical construction
 //!
 //! `AppLayout::new(body)` is the minimum — just a body element. Every
 //! other slot has a sensible default and is set via a chainable method:
@@ -21,6 +21,10 @@
 //!     .on_close_menus(Message::CloseMenus)
 //!     .on_close_modals(Message::CloseModals);
 //! ```
+//!
+//! The struct is `#[non_exhaustive]` so future top-level surfaces can be
+//! added without breaking downstream callers. Fields remain `pub` for
+//! readability; builder methods are the stable construction contract.
 //!
 //! # Why no `PageContract`?
 //!
@@ -50,9 +54,25 @@ use crate::{
 ///   engine, this is `iced::Element<'a, Message>`.
 /// * `Message` — your application's top-level message type.
 ///
-/// Fields are intentionally `pub` so that direct struct literal syntax is
-/// available for advanced callers. The `new` + chainable setters are the
-/// *canonical* path; direct construction is a power-user escape hatch.
+/// # Canonical construction
+///
+/// Use [`AppLayout::new`] plus chainable builder methods. This is the
+/// stable, long-term construction path:
+///
+/// ```ignore
+/// let layout = AppLayout::new(body)
+///     .header(header)
+///     .side_bar(sidebar)
+///     .on_close_menus(Message::CloseMenus)
+///     .on_close_modals(Message::CloseModals);
+/// ```
+///
+/// Fields are `pub` for readability and in-crate access. Direct struct
+/// literal construction from *outside* `snora-core` is not supported
+/// (the struct is `#[non_exhaustive]`) so that future top-level surfaces
+/// can be added as additive changes. Any new field ships with a
+/// corresponding `#[must_use]` builder method.
+#[non_exhaustive]
 pub struct AppLayout<Node, Message>
 where
     Message: Clone,

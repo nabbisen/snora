@@ -17,6 +17,84 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.11.0] — 2026-06-10
+
+### Added
+
+- **Main Rust CI workflow** (`.github/workflows/ci.yaml`). Enforces the
+  documented local-verification commands on every pull request and push
+  to `main`: workspace check, clippy with `-D warnings`, `snora-core`
+  tests, `snora` engine tests (including render-semantics), engine-only
+  build, a six-combination feature matrix, and a mdBook docs build. The
+  new workflow is the quality gate; `docs.yaml` and `binary-size.yaml`
+  retain their existing deployment and measurement responsibilities.
+  See `docs/src/contributing/release-process.md` for the relationship
+  between the three workflows. (RFC-011-A)
+
+- **Render-semantics test harness** (`crates/snora/tests/render_semantics.rs`).
+  Six headless integration tests using `iced_test` verify the engine's
+  runtime behavioral contract: skeleton reachability, outside-click
+  dismissal, dialog and sheet interactive content, missing-close-sink
+  graceful degradation, toast visibility above a modal, and sheet opaque
+  wrapper behavior. `iced_test` is a `[dev-dependencies]` entry only —
+  no impact on public API or binary size. (RFC-011-D)
+
+- **RFC directory** (`rfcs/`). Adopts the RFC lifecycle policy (RFC-000)
+  with `done/`, `proposed/`, and `archive/` folders and a `README.md`
+  index. All 24 forward RFCs (011-A … 016-C) are filed in `proposed/`;
+  RFC-000 and the five v0.11 RFCs move to `done/` with this release.
+
+- **Overlay interaction semantics reference page**
+  (`docs/src/reference/overlay-interaction-semantics.md`). Normative
+  documentation for overlay coexistence, the z-stack order, the two
+  close sinks, modal dim behavior, Law 5 (missing close sink), Law 6
+  (toasts above modals), Law 7 (keyboard app-owned), and Law 8 (focus
+  out of scope). Linked from `SUMMARY.md`. `render.rs` doc comments
+  updated to match. (RFC-011-E)
+
+- **Migration guide 0.10 → 0.11**
+  (`docs/src/guides/migration-0.10-to-0.11.md`) covering the
+  `#[non_exhaustive]` change and the toast ordering fix.
+
+### Changed
+
+- **`AppLayout` is now `#[non_exhaustive]`**. Struct literal
+  construction from outside `snora-core` is no longer permitted.
+  The canonical construction path — `AppLayout::new(body)` plus
+  chainable builder methods — is unchanged and is the stable contract.
+  Field reads remain unrestricted. This allows future overlay surfaces
+  (e.g. popover, focus policy) to be added as non-breaking minor
+  releases. An in-tree audit confirmed no examples or in-tree code used
+  struct literals; all already used the builder. See the migration
+  guide. (RFC-011-C)
+
+- **Feature-gating criteria doc** updated with the supported
+  feature-combination matrix and the subordinate-feature note for
+  `lucide-icons` / `svg-icons`. (RFC-011-A)
+
+- **Testing guide** updated with "What Snora tests internally" section
+  describing the render-semantics test harness and the `snora-test`
+  non-goal. (RFC-011-D)
+
+- **`render.rs` doc comments** corrected: layer 7 description now says
+  "configured `ToastPosition`, newest toast closest to the anchor edge"
+  instead of the stale "bottom-end". (RFC-011-B / RFC-011-E)
+
+- **`toast.rs` module doc** corrected: removes the stale "bottom-end
+  only" description; accurately describes the six-position support and
+  the newest-closest-to-anchor invariant. (RFC-011-B)
+
+### Fixed
+
+- **Toast ordering**. The newest toast now correctly appears closest to
+  the configured anchor edge, matching the documented `ToastPosition`
+  invariant. Previously the iteration predicate was inverted (`is_bottom()`
+  instead of `is_top()`), causing both top and bottom anchor families to
+  display in the wrong order. Applications that pushed toasts in
+  chronological order (newest at the back) will now see the correct
+  visual result. Applications that relied on the inverted order should
+  update. (RFC-011-B)
+
 ## [0.10.0] — 2026-06-10
 
 ### Added

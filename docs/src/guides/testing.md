@@ -131,14 +131,36 @@ Three things to notice:
 - **Layout measurements.** Whether two columns fit, whether a sheet
   reaches the top of the screen, etc. These are renderer-side concerns.
 
-For the first class of test we recommend a small integration test
-that boots iced in a hidden window — that is rare in practice and
-out of scope here.
+## What Snora tests internally
 
-## A note on a future `snora-test`
+Snora uses [`iced_test`](https://crates.io/crates/iced_test) — a
+CPU-only headless renderer — to verify the engine's own behavioral
+contract. These tests live in `crates/snora/tests/render_semantics.rs`
+and cover:
+
+- skeleton body is reachable (layer 0 renders and handles clicks);
+- outside-click on a modal emits `on_close_modals` (layer 4 backdrop);
+- dialog interactive content is reachable above the dim (layer 5);
+- missing `on_close_modals` sink omits the backdrop but still renders
+  content (Law 5);
+- toast dismiss button fires above a modal (layer 7 above layers 4–6);
+- sheet content is reachable via its `opaque` wrapper (layer 6);
+- toast ordering policy (unit tests in `crates/snora/src/toast.rs`).
+
+`iced_test` is a `[dev-dependencies]` entry only — it does not affect
+the public API, feature flags, or binary size.
+
+**Applications should not depend on these internals.** The contract you
+can rely on is the public API: `AppLayout`, `render`, `Dialog`, `Sheet`,
+and `Toast` behave as documented. Snora does not ship a public
+`snora-test` crate; the current "pub fields + pure update" approach
+covers the common application-testing cases, as shown in this guide.
+
+## A note on `snora-test`
 
 We considered shipping a dedicated test-helper crate. The conclusion
-was that doing so would freeze internal data shapes (the `lifetime`
-field, etc.) into the public API and create a second surface to
-maintain. The current "pub fields + pure update" pattern covers the
-common cases, and the API stays small.
+was that doing so would freeze internal data shapes into the public API
+and create a second surface to maintain. The current approach — `pub`
+fields on vocabulary types, pure `update` functions, and internal
+render-semantics tests using `iced_test` — covers both application and
+framework needs without that cost.

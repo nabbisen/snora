@@ -3,8 +3,9 @@
 //! This module exposes three concerns:
 //!
 //! 1. [`render_toasts`] — internal renderer used by [`crate::render::render`].
-//!    Produces a stack-layer that anchors toasts at the bottom-*end*
-//!    (bottom-right under LTR, bottom-left under RTL).
+//!    Produces a toast stack at the requested [`ToastPosition`], with logical
+//!    Start/End anchoring resolved by [`LayoutDirection`], and the newest
+//!    toast rendered closest to the anchor edge.
 //! 2. [`subscription`] — a public helper that emits ticks for TTL sweep.
 //!    Applications wire this into their `iced::Application::subscription`.
 //! 3. [`sweep_expired`] — a public helper that drops expired transient
@@ -35,6 +36,42 @@ const TOAST_WIDTH: f32 = 340.0;
 const SWEEP_INTERVAL: Duration = Duration::from_millis(500);
 
 // =========================================================================
+// Render-order policy
+// =========================================================================
+
+/// The iteration order used when pushing individual toasts into the column.
+///
+/// This type exists so that the ordering decision can be unit-tested
+/// independently of the iced widget tree.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ToastRenderOrder {
+    /// Push oldest first, newest last. Used for bottom anchors so the newest
+    /// toast ends up at the bottom of the column (closest to the anchor edge).
+    Chronological,
+    /// Push newest first, oldest last. Used for top anchors so the newest
+    /// toast ends up at the top of the column (closest to the anchor edge).
+    ReverseChronological,
+}
+
+/// Returns the push order required to place the newest toast closest to the
+/// anchor edge, given `position`.
+///
+/// The rule: in a top-down iced `column!`, the first child pushed is
+/// visually highest and the last child pushed is visually lowest. Therefore:
+///
+/// * Top anchors (column is top-aligned): push newest **first** →
+///   newest appears at the top.
+/// * Bottom anchors (column is bottom-aligned): push newest **last** →
+///   newest appears at the bottom.
+fn render_order_for(position: ToastPosition) -> ToastRenderOrder {
+    if position.is_top() {
+        ToastRenderOrder::ReverseChronological
+    } else {
+        ToastRenderOrder::Chronological
+    }
+}
+
+// =========================================================================
 // Rendering
 // =========================================================================
 
@@ -44,10 +81,12 @@ const SWEEP_INTERVAL: Duration = Duration::from_millis(500);
 /// horizontal anchoring resolved against `direction` for `Start` / `End`
 /// variants. Stack growth direction is derived from the position:
 ///
-/// * Top anchors grow *downward* — newest toast is closest to the top
-///   edge.
-/// * Bottom anchors grow *upward* — newest toast is closest to the bottom
-///   edge.
+/// * Top anchors grow *downward* — newest toast is closest to the top edge.
+/// * Bottom anchors grow *upward* — newest toast is closest to the bottom edge.
+///
+/// Applications push new toasts to the *back* of their queue in chronological
+/// order (oldest at index 0, newest at the back). This function is responsible
+/// for honoring the anchor-edge invariant regardless of that convention.
 pub(crate) fn render_toasts<'a, Message>(
     toasts: Vec<Toast<Message>>,
     position: ToastPosition,
@@ -60,18 +99,21 @@ where
         return None;
     }
 
-    // For bottom anchors we want the newest toast (last in the application
-    // queue) to sit closest to the bottom edge. We achieve that by reversing
-    // the list when we render bottom-anchored, so the most recent gets
-    // pushed last into a top-down column whose bottom edge faces the screen.
     let mut stack_col = column![].spacing(8);
-    if position.is_bottom() {
-        for toast in toasts.into_iter().rev() {
-            stack_col = stack_col.push(render_single_toast(toast));
+    match render_order_for(position) {
+        // Top anchors: newest must be at the top of the column (first child),
+        // so iterate in reverse — newest (back of queue) is pushed first.
+        ToastRenderOrder::ReverseChronological => {
+            for toast in toasts.into_iter().rev() {
+                stack_col = stack_col.push(render_single_toast(toast));
+            }
         }
-    } else {
-        for toast in toasts {
-            stack_col = stack_col.push(render_single_toast(toast));
+        // Bottom anchors: newest must be at the bottom of the column (last child),
+        // so iterate in chronological order — newest (back of queue) is pushed last.
+        ToastRenderOrder::Chronological => {
+            for toast in toasts {
+                stack_col = stack_col.push(render_single_toast(toast));
+            }
         }
     }
 
@@ -265,5 +307,39 @@ mod tests {
 
         let remaining_ids: Vec<u64> = v.iter().map(|t| t.id).collect();
         assert_eq!(remaining_ids, vec![1, 3]);
+    }
+
+    // -----------------------------------------------------------------------
+    // render_order_for — toast anchor-edge invariant
+    //
+    // The contract: applications push toasts in chronological order (oldest
+    // at index 0, newest at the back). The newest must appear closest to the
+    // anchor edge. In a top-down iced column:
+    //   - top anchor → newest must be the first child → reverse iteration;
+    //   - bottom anchor → newest must be the last child → chronological order.
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn top_positions_render_reverse_chronological() {
+        use ToastPosition::*;
+        for pos in [TopEnd, TopStart, TopCenter] {
+            assert_eq!(
+                render_order_for(pos),
+                ToastRenderOrder::ReverseChronological,
+                "{pos:?} should use reverse-chronological order",
+            );
+        }
+    }
+
+    #[test]
+    fn bottom_positions_render_chronological() {
+        use ToastPosition::*;
+        for pos in [BottomEnd, BottomStart, BottomCenter] {
+            assert_eq!(
+                render_order_for(pos),
+                ToastRenderOrder::Chronological,
+                "{pos:?} should use chronological order",
+            );
+        }
     }
 }

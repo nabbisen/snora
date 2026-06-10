@@ -1,4 +1,24 @@
-# When to introduce per-widget feature gates
+## Supported feature combinations (CI matrix)
+
+The following combinations of `snora` features are explicitly supported and
+verified by CI on every PR and push to `main`:
+
+| Combination | What it builds |
+|---|---|
+| default (no flags) | Engine + `widgets`. |
+| `--no-default-features` | Engine only. No widget re-exports. |
+| `--no-default-features --features widgets` | Engine + `widgets`. |
+| `--no-default-features --features widgets,lucide-icons` | Engine + widgets + Lucide icon constants. |
+| `--no-default-features --features widgets,svg-icons` | Engine + widgets + SVG icon support. |
+| `--all-features` | All public optional features. |
+
+`lucide-icons` and `svg-icons` are **subordinate** to `widgets`: they gate
+widget-side rendering that requires `snora-widgets` and have no meaningful
+effect without it. The CI matrix therefore does not test `lucide-icons` or
+`svg-icons` in isolation. This policy is recorded here so it is visible when
+the matrix is read (see RFC-014-D for the planned v2 icon-gating policy).
+
+## When to introduce per-widget feature gates
 
 Snora's current widget feature gating is **coarse**: a single
 `widgets` feature on the `snora` crate switches the entire

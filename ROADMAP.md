@@ -31,48 +31,42 @@ These constrain what *can* be on the roadmap:
   engine renders it; a missing close sink only suppresses the
   click-outside backdrop, never the content.
 
-## Near-term: 0.11 (next release)
+## Near-term: 0.12 (next release)
 
-These items have either concrete demand or a small enough scope
-that they fit a single release.
+These items have clear scope and build directly on v0.11 foundations.
 
 ### Likely
 
-- **Tooltip vocabulary.** Currently `SideBarItem.tooltip: String` is
-  the only typed tooltip in snora. If a second widget grows a
-  tooltip slot, it warrants pulling tooltips out into shared
-  vocabulary (`Tooltip { text: String, side: Edge }` or similar).
-  Watch for the second consumer.
-- **First binary-size budget rows.** The budget infrastructure
-  shipped in 0.10 but the CSV is header-only until the first
-  `v*.*.*` tag runs through the `binary-size` workflow. The 0.11
-  release tag will produce the first committed row; confirm the
-  workflow's commit-back path works end to end on a real tag and
-  that the value looks sane.
+- **Render-semantics test expansion** (RFC-011-D full acceptance).
+  Extend `crates/snora/tests/render_semantics.rs` to cover menu
+  dismissal, dialog+sheet coexistence, and interaction-level RTL
+  placement — the v0.11 harness covers the first five invariants.
+- **ABDD compliance checklist** (RFC-012-A). Add
+  `docs/src/contributing/abdd-checklist.md` and link it from direction,
+  overlay, and adding-an-overlay guides.
+- **Showcase / workbench example** (RFC-012-B). A single
+  `examples/workbench` app that exercises all major surfaces together —
+  header, sidebar, menus, dialog, sheet, toasts, tab bar, breadcrumb,
+  and LTR/RTL toggle. Serves as manual QA reference and dogfood target.
 
 ### Maybe
 
-- **Persistent-toast acknowledgement helper.** The persistent-toast
-  pattern (used in apps for "Export complete" style notifications)
-  recurs enough that a small ergonomic helper might be worth
-  shipping. Not a vocabulary change — pure ergonomics.
-- **`mdbook test docs` integration.** Now that doctests are
-  established for the Rust source, run mdBook's own doctest
-  facility on the Markdown so code blocks in the prose stay valid
-  alongside vocabulary changes.
-- **Doctests for `snora-widgets` builders.** snora-core is now
-  doctest-covered. The widget-side builders (`app_header`,
-  `app_side_bar`, `app_tab_bar`, `app_breadcrumb`, `render_menu`)
-  need iced for executable examples; whether to gate them on a dev
-  feature or keep them as `ignore`-tagged samples is open.
-- **Binary-size CI enhancements (Level 3+).** The current workflow
-  records per-release values. If PR volume grows, add base-vs-PR
-  size comparison as a PR comment; if long-term trends matter,
-  add a chart generated from the budget CSV. Both build on the
-  existing CSV without changing how data flows.
+- **Documentation and doctest policy** (RFC-012-D). Audit mdBook code
+  blocks, classify them (testable / `ignore` / non-Rust), and define
+  the policy for `snora-widgets` builder examples.
+- **Compile-time tracking** (RFC-012-C). Add
+  `scripts/measure-compile-time.sh` and a companion reference page,
+  mirroring the binary-size workflow.
 
 ## Recently shipped
 
+- **0.11** — Foundation hardening: main Rust CI quality gate (three-job
+  workflow covering check/clippy/tests/feature-matrix/docs); toast
+  ordering bugfix (newest now correctly closest to anchor edge); `AppLayout`
+  construction stability (`#[non_exhaustive]`, builder path canonical);
+  overlay interaction semantics reference page (eight normative laws);
+  render-semantics test harness (`iced_test` headless, 6 integration
+  tests); RFC directory adopted (RFC-000 lifecycle, 24 forward RFCs filed).
 - **0.10** — Binary size budget: a CI-managed CSV
   (`reference/binary-size-budget/binary-size.csv`) appended on each
   release tag, a `release-baseline` Cargo profile for fast
