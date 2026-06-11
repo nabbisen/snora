@@ -51,6 +51,7 @@ Numbers are stable forever and never reused.
 | 018-A | [Version number maintenance](./done/018-a-version-number-maintenance.md) | v0.18.0 |
 | 018-B | [Gate 7 close-out](./done/018-b-gate-7-close-out.md) | v0.18.0 |
 | 018-C | [Contributing index and cross-links](./done/018-c-contributing-index-and-cross-links.md) | v0.18.0 |
+| 019-A | [Lucide icons type-parameter fix](./done/019-a-lucide-icons-type-parameter-fix.md) | v0.18.1 |
 
 ## Proposed
 

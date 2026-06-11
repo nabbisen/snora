@@ -95,7 +95,7 @@ Type-names audit: **complete as of v0.17.0.**
 |---|---|
 | 1. One iced major upgrade completed and lived on ≥1 minor | ⬜ |
 | 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
-| 3. At least one third-party or production-grade app | ⬜ |
+| 3. At least one third-party or production-grade app | ⬜ first downstream user identified (v0.18.1 build failure report from nabbisen/logolig) |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
 | 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests including 2 RTL |
 | 6. Feature-matrix CI stable | ✅ v0.11 |

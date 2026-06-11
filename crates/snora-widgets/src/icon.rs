@@ -24,7 +24,22 @@ where
         Icon::Text(s) => text(s.to_owned()).size(size).into(),
 
         #[cfg(feature = "lucide-icons")]
-        Icon::Lucide(lucide_const) => lucide_const.widget().size(size).into(),
+        Icon::Lucide(lucide_const) => {
+            // Do NOT call lucide_const.widget() — that method returns
+            // iced::widget::Text parameterised against lucide-icons' own
+            // iced_core version, which may differ from snora-widgets' iced
+            // dependency when the downstream app has multiple iced_core
+            // versions in the graph. Instead, extract the unicode codepoint
+            // via the stable `From<Icon> for char` impl (which has no iced
+            // dependency) and build the Text widget using our own iced::text.
+            // This replicates what lucide-icons does internally without the
+            // type-parameter mismatch. See the v0.18.1 bug fix.
+            let glyph = char::from(*lucide_const).to_string();
+            text(glyph)
+                .font(iced::Font::with_name("lucide"))
+                .size(size)
+                .into()
+        }
 
         #[cfg(feature = "svg-icons")]
         Icon::Svg(path) => iced::widget::svg(iced::widget::svg::Handle::from_path(path.clone()))

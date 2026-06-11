@@ -17,6 +17,24 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.18.1] — 2026-06-10
+
+### Fixed
+
+- **`Icon::Lucide` rendering failed to compile** when a downstream app had
+  `lucide-icons` enabled and iced's dependency graph contained multiple
+  `iced_core` versions. The previous code called `lucide_const.widget()`
+  which returns `iced::widget::Text` parameterised against lucide-icons'
+  own internal iced_core, causing an unsatisfied `From` trait bound when
+  converting `.into()` the snora-widgets element type.
+
+  **Fix:** extract the unicode codepoint via the stable `From<Icon> for char`
+  conversion (which has no iced dependency) and construct the `Text` widget
+  using snora-widgets' own `iced::widget::text()` call with
+  `iced::Font::with_name("lucide")`. This matches the visual output of
+  the previous code exactly while using only the snora-widgets iced
+  dependency. (RFC-019-A; reported by downstream user nabbisen)
+
 ## [0.18.0] — 2026-06-10
 
 ### Added
