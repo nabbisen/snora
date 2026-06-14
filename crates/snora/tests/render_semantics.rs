@@ -38,7 +38,6 @@ use snora::{AppLayout, Dialog, Sheet, SheetEdge, Toast, ToastIntent, render};
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)] // some variants are reserved for v0.12 expansion
 enum Msg {
     BodyPressed,
     CloseMenus,
@@ -279,6 +278,33 @@ fn toast_dismiss_reachable_under_rtl() {
     );
 }
 
+
+/// Context menu content (layer 3) is findable and interactive.
+///
+/// Verifies: the `context_menu` field uses a separate code path from
+/// `header_menu` in render.rs (both are pushed after the menu backdrop
+/// but as distinct stack entries). This test confirms layer 3 renders
+/// correctly and does not regress if the push order changes.
+#[test]
+fn context_menu_content_reachable() {
+    let context_el: Element<Msg> = btn("Context action", Msg::DialogOk);
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .context_menu(context_el)
+        .on_close_menus(Msg::CloseMenus);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.find("Context action")
+        .expect("context_menu content must be findable (layer 3)");
+    ui.click("Context action")
+        .expect("context_menu content must be clickable");
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        msgs.contains(&Msg::DialogOk),
+        "context_menu action must fire; got {msgs:?}",
+    );
+}
 
 /// Outside click emits `on_close_menus` when a menu is open and no modal
 /// is present.

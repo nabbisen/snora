@@ -12,7 +12,7 @@
 //! `AppLayout::new(body)` is the minimum — just a body element. Every
 //! other slot has a sensible default and is set via a chainable method:
 //!
-//! ```ignore
+//! ```rust,ignore
 //! let layout = AppLayout::new(my_body())
 //!     .header(my_header())
 //!     .side_bar(my_sidebar())
@@ -59,7 +59,7 @@ use crate::{
 /// Use [`AppLayout::new`] plus chainable builder methods. This is the
 /// stable, long-term construction path:
 ///
-/// ```ignore
+/// ```rust,ignore
 /// let layout = AppLayout::new(body)
 ///     .header(header)
 ///     .side_bar(sidebar)

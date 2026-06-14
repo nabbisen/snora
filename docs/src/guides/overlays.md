@@ -125,13 +125,14 @@ the dedicated [Menus](menus.md) guide.
 From bottom of the stack to top:
 
 ```text
-0. skeleton           header / body / sidebar / footer
-1. menu backdrop      transparent click sink for header/context menus
-2. header_menu / context_menu
-3. modal dim          40 % black click sink for dialog/sheet
-4. dialog
-5. sheet
-6. toasts             always on top so they survive over modals
+0. skeleton           header / body+sidebar / footer
+1. menu backdrop      transparent click sink (if any menu is open)
+2. header_menu        header-attached dropdown
+3. context_menu       floating context menu
+4. modal dim          40 % black click sink (if a modal is present)
+5. dialog             centered card
+6. sheet              edge-anchored panel
+7. toasts             always on top so they survive over modals
 ```
 
 Toasts are deliberately on top of modals — a long-running export

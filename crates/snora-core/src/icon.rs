@@ -89,3 +89,45 @@ impl From<lucide_icons::Icon> for Icon {
         Icon::Lucide(i)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn text_icons_equal_when_same_string() {
+        let a: Icon = "★".into();
+        let b: Icon = "★".into();
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn text_icons_not_equal_when_different_string() {
+        let a: Icon = "★".into();
+        let b: Icon = "☆".into();
+        assert_ne!(a, b);
+    }
+
+    #[test]
+    fn text_icon_from_string_vs_str() {
+        let a: Icon = "hello".into();
+        let b: Icon = String::from("hello").into();
+        assert_eq!(a, b);
+    }
+
+    #[cfg(feature = "svg-icons")]
+    #[test]
+    fn svg_icons_equal_when_same_path() {
+        let a = Icon::Svg(std::path::PathBuf::from("icons/foo.svg"));
+        let b = Icon::Svg(std::path::PathBuf::from("icons/foo.svg"));
+        assert_eq!(a, b);
+    }
+
+    #[cfg(feature = "svg-icons")]
+    #[test]
+    fn svg_icons_not_equal_when_different_path() {
+        let a = Icon::Svg(std::path::PathBuf::from("icons/foo.svg"));
+        let b = Icon::Svg(std::path::PathBuf::from("icons/bar.svg"));
+        assert_ne!(a, b);
+    }
+}

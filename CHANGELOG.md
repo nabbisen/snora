@@ -17,6 +17,43 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.18.2] — 2026-06-10
+
+### Fixed
+
+- **`keyboard.rs` doc example used `iced::keyboard::on_key_press`**, which
+  does not exist in iced 0.14. Example updated to the correct
+  `iced::keyboard::listen().map(...)` pattern matching the workbench and
+  starter examples.
+
+- **`snora/src/lib.rs` engine-only doc snippet** showed version `"0.6"`.
+  Updated to `"0.18"`.
+
+- **`layout.rs` doc fences** used bare `ignore` instead of `rust,ignore`,
+  violating the RFC-012-D documentation test policy. Both fences corrected.
+
+- **`guides/overlays.md` z-stack** collapsed layers 2 and 3 into one
+  entry, misrepresenting the 8-layer stack. Expanded to match `render.rs`
+  and `overlay-interaction-semantics.md` exactly.
+
+- **User-facing version snippets** in `install.md` and `icons.md` still
+  showed `"0.17"` after the v0.18.1 patch. Updated to `"0.18"`.
+
+- **`render_semantics.rs`** `#[allow(dead_code)]` comment was stale
+  ("reserved for v0.12 expansion"); removed since all `Msg` variants are
+  actively used.
+
+### Added
+
+- **`context_menu` integration test** (`context_menu_content_reachable`).
+  Layer 3 of the z-stack was the only layer without render-semantics
+  coverage. The new test verifies `context_menu` content is findable and
+  interactive. Integration test total: **11**.
+
+- **`Icon::PartialEq` unit tests** (3 unconditional + 2 under
+  `svg-icons` feature). `Icon::PartialEq` was added in v0.17.0 without
+  corresponding tests. `snora-core` unit test total: **20**.
+
 ## [0.18.1] — 2026-06-10
 
 ### Fixed

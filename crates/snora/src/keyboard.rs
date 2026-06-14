@@ -26,9 +26,17 @@ use iced::keyboard::{Key, key::Named};
 /// ```rust,ignore
 /// // In your subscription:
 /// fn subscription(&self) -> Subscription<Message> {
-///     iced::keyboard::on_key_press(|key, _mods| {
-///         Some(Message::KeyPressed(key))
-///     })
+///     let key_sub = iced::keyboard::listen().map(|event| {
+///         if let iced::keyboard::Event::KeyPressed { key, .. } = event {
+///             Message::KeyPressed(key)
+///         } else {
+///             Message::NoOp
+///         }
+///     });
+///     Subscription::batch([
+///         snora::toast::subscription(&self.toasts, || Message::ToastTick),
+///         key_sub,
+///     ])
 /// }
 ///
 /// // In your update:
