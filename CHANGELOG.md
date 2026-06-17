@@ -17,6 +17,10 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.18.3] — 2026-06-17
+
+- Re-export `lucide_icons::LUCIDE_FONT_BYTES`.
+
 ## [0.18.2] — 2026-06-10
 
 ### Fixed

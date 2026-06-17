@@ -31,8 +31,8 @@
 #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-pub mod direction;
 mod crumb;
+pub mod direction;
 mod footer;
 mod header;
 mod icon;
@@ -53,5 +53,5 @@ pub use tab::app_tab_bar;
 /// the `lucide-icons` feature is enabled.
 #[cfg(feature = "lucide-icons")]
 pub mod lucide {
-    pub use lucide_icons::Icon::*;
+    pub use lucide_icons::{Icon::*, LUCIDE_FONT_BYTES};
 }
