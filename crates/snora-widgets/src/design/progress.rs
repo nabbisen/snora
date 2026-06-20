@@ -101,3 +101,6 @@ pub fn card<'a, Message: 'a>(
 ) -> Element<'a, Message> {
     card::surface(tokens, progress_content(tokens, label, value, tone))
 }
+
+#[cfg(test)]
+mod tests;

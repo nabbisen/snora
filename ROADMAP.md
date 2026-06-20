@@ -68,6 +68,7 @@ Remaining design-track sequence:
 
 ## Recently shipped
 
+- **0.22.0** — Code quality and doc audit: chip dedup, new tests (chip/notice/progress), three new design doc pages (notices/chips/progress), stale version refs cleaned.
 - **0.21.0** — Notice, chip, and progress primitives (RFC-032); design workbench updated.
 - **0.20.0** — Snora Design activation: `snora-design` published; RFC-031 release gate satisfied; `design` opt-in confirmed; migration guide 0.19→0.20.
 - **0.19.1** — CI fixes: `measure-compile-time.sh` missing-space bug fixed;

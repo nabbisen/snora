@@ -26,30 +26,38 @@
 //! chip::removable(&tokens, "Tag: Rust", true, Message::ToggleTag, Message::RemoveTag)
 //! ```
 
-use iced::{Border, Element, widget::{button, row, text}};
+use iced::{Border, Color, Element, widget::{button, row, text}};
 use snora_design::Tokens;
 
 use super::style;
 
 // ---------------------------------------------------------------------------
-// Shared style helpers
+// Private helpers
 // ---------------------------------------------------------------------------
 
+/// Blends a color toward black by `amount`. Used for hover/press states.
+fn darken(color: Color, amount: f32) -> Color {
+    Color {
+        r: (color.r - amount).max(0.0),
+        g: (color.g - amount).max(0.0),
+        b: (color.b - amount).max(0.0),
+        a: color.a,
+    }
+}
+
 fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
-    // Selected: tinted accent background
-    let t = tokens;
-    let accent = style::color::to_iced_color(t.palette.accent);
+    let accent = style::color::to_iced_color(tokens.palette.accent);
     let bg = match status {
-        button::Status::Active   => iced::Color { a: 0.15, ..accent },
-        button::Status::Hovered  => iced::Color { a: 0.22, ..accent },
-        button::Status::Pressed  => iced::Color { a: 0.30, ..accent },
-        button::Status::Disabled => iced::Color { a: 0.06, ..accent },
+        button::Status::Active   => Color { a: 0.15, ..accent },
+        button::Status::Hovered  => Color { a: 0.22, ..accent },
+        button::Status::Pressed  => Color { a: 0.30, ..accent },
+        button::Status::Disabled => Color { a: 0.06, ..accent },
     };
     button::Style {
         background: Some(bg.into()),
-        text_color: style::color::to_iced_color(t.palette.accent),
+        text_color: accent,
         border: Border::default()
-            .rounded(t.radius.pill)
+            .rounded(tokens.radius.pill)
             .color(accent)
             .width(1.0),
         shadow: iced::Shadow::default(),
@@ -58,22 +66,20 @@ fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style
 }
 
 fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> button::Style {
-    // Unselected: surface background, border-colored outline
-    let t = tokens;
-    let border_col = style::color::to_iced_color(t.palette.border);
-    let text_col   = style::color::to_iced_color(t.palette.text_secondary);
-    let surface    = style::color::to_iced_color(t.palette.surface);
+    let border_col = style::color::to_iced_color(tokens.palette.border);
+    let text_col   = style::color::to_iced_color(tokens.palette.text_secondary);
+    let surface    = style::color::to_iced_color(tokens.palette.surface);
     let bg = match status {
         button::Status::Active   => surface,
-        button::Status::Hovered  => { let mut c = surface; c.r = (c.r - 0.04).max(0.0); c.g = (c.g - 0.04).max(0.0); c.b = (c.b - 0.04).max(0.0); c }
-        button::Status::Pressed  => { let mut c = surface; c.r = (c.r - 0.08).max(0.0); c.g = (c.g - 0.08).max(0.0); c.b = (c.b - 0.08).max(0.0); c }
-        button::Status::Disabled => { let mut c = surface; c.a = 0.5; c }
+        button::Status::Hovered  => darken(surface, 0.04),
+        button::Status::Pressed  => darken(surface, 0.08),
+        button::Status::Disabled => Color { a: 0.5, ..surface },
     };
     button::Style {
         background: Some(bg.into()),
         text_color: text_col,
         border: Border::default()
-            .rounded(t.radius.pill)
+            .rounded(tokens.radius.pill)
             .color(border_col)
             .width(1.0),
         shadow: iced::Shadow::default(),
@@ -97,17 +103,12 @@ pub fn filter<'a, Message: Clone + 'a>(
     on_toggle: impl Into<Option<Message>>,
 ) -> Element<'a, Message> {
     let t = tokens.clone();
-    let label_text = label.into();
     let style_fn = if selected { chip_style_selected } else { chip_style_unselected };
-
-    button(
-        text(label_text)
-            .size(style::text::label_size(tokens)),
-    )
-    .on_press_maybe(on_toggle.into())
-    .padding([tokens.spacing.xs, tokens.spacing.sm])
-    .style(move |_theme, status| style_fn(&t, status))
-    .into()
+    button(text(label.into()).size(style::text::label_size(tokens)))
+        .on_press_maybe(on_toggle.into())
+        .padding([tokens.spacing.xs, tokens.spacing.sm])
+        .style(move |_theme, status| style_fn(&t, status))
+        .into()
 }
 
 /// A chip with a separate remove (×) button.
@@ -124,12 +125,10 @@ pub fn removable<'a, Message: Clone + 'a>(
 ) -> Element<'a, Message> {
     let t_label  = tokens.clone();
     let t_remove = tokens.clone();
-    let label_text = label.into();
     let style_fn = if selected { chip_style_selected } else { chip_style_unselected };
-    let style_fn_rm = if selected { chip_style_selected } else { chip_style_unselected };
 
     let label_btn: Element<'a, Message> = button(
-        text(label_text).size(style::text::label_size(tokens)),
+        text(label.into()).size(style::text::label_size(tokens)),
     )
     .on_press_maybe(on_toggle.into())
     .padding([tokens.spacing.xs, tokens.spacing.sm])
@@ -141,10 +140,11 @@ pub fn removable<'a, Message: Clone + 'a>(
     )
     .on_press_maybe(on_remove.into())
     .padding([tokens.spacing.xs, tokens.spacing.xs])
-    .style(move |_theme, status| style_fn_rm(&t_remove, status))
+    .style(move |_theme, status| style_fn(&t_remove, status))
     .into();
 
-    row![label_btn, remove_btn]
-        .spacing(0)
-        .into()
+    row![label_btn, remove_btn].spacing(0).into()
 }
+
+#[cfg(test)]
+mod tests;

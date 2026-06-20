@@ -1,132 +1,90 @@
 # v0.21 Primitives — Notice, Chip, Progress
 
-This page documents the **notice**, **filter chip**, and **progress**
-primitives shipped in v0.21.
+These three primitives shipped in v0.21. They are available when the
+`design` feature is enabled (`features = ["widgets", "design"]`).
 
-**Preconditions met:** the v0.20 style bridge and button/card helpers are
-implemented; the RFC-027 semantic construction policy applies to each
-primitive below.
+See the dedicated pages for usage details:
+
+- [Notices](notices.md)
+- [Chips](chips.md)
+- [Progress](progress.md)
 
 ---
 
 ## Notice
 
-A themed row or card that communicates status to the user. Has an optional
-title, a body message, an optional action button, and an optional dismiss
-button. App owns visibility state.
-
-### Proposed API
+A toned banner that communicates status. Action and dismiss controls are
+`iced::widget::button` — keyboard-reachable. App owns visibility state.
 
 ```rust,ignore
-Notice::new(Tone::Info, "Background sync is running.")
-    .title("Syncing")
-    .action("View details", Message::OpenSyncDetails)
+use snora::design::{Tokens, Tone, notice::Notice};
+
+Notice::new(&tokens, Tone::Warning, "Disk space low.")
+    .title("Storage warning")
+    .action("Free space", Message::FreeSpace)
     .dismiss(Message::DismissNotice)
-    .render(&tokens)
+    .render()
 ```
 
-### Internal model
+### Accessibility (RFC-027)
 
-```rust,ignore
-pub struct NoticeSpec<Message> {
-    pub tone: Tone,           // Info / Success / Warning / Danger
-    pub title: Option<String>,
-    pub body: String,
-    pub action: Option<(String, Message)>,
-    pub dismiss: Option<Message>,
-}
-```
-
-### Events
-
-- Action button emits the app-provided message.
-- Dismiss button emits the app-provided message.
-- The app is solely responsible for showing and hiding the notice.
-
-### Accessibility requirements (RFC-027)
-
-- Action and dismiss controls must be `iced::widget::button`, not
-  `mouse_area` over a container.
-- Tone color pairs (`success_text on success`, etc.) are already verified
-  by the contrast tests for all four presets.
-- Text remains readable when `Notice` is displayed at high contrast.
+1. **Native primitive:** `iced::widget::button` for action and dismiss.
+2. **Keyboard reachable:** yes, inherited from iced.
+3. **Focus visible:** no custom focus ring (iced 0.14 limitation).
+4. **Semantic limitation:** no ARIA role exposed; visual tone only.
+5. **Example:** design workbench notice section.
 
 ---
 
 ## Filter chip
 
-A compact toggle control for filtering or categorizing. App owns the filter
-state. Interactive chips must use `iced::widget::button` semantics.
-
-### Proposed API
+A toggle chip backed by `iced::widget::button`.
 
 ```rust,ignore
+use snora::design::chip;
+
 chip::filter(&tokens, "Draft", self.show_drafts, Message::ToggleDrafts)
-chip::removable(&tokens, "Draft", self.show_drafts, Message::Toggle, Message::Remove)
+chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove)
 ```
 
-### Internal model
+### Accessibility (RFC-027)
 
-```rust,ignore
-pub struct ChipSpec<Message> {
-    pub label: String,
-    pub selected: bool,
-    pub on_toggle: Option<Message>,
-    pub on_remove: Option<Message>,
-}
-```
-
-### Accessibility requirements (RFC-027)
-
-- Use `iced::widget::button` for the chip body.
-- Do not use a container with `mouse_area` only.
-- Selected state communicated via visual styling (background, border);
-  document color-alone limitation.
+1. **Native primitive:** `iced::widget::button`.
+2. **Keyboard reachable:** yes.
+3. **Focus visible:** no custom focus ring (iced 0.14 limitation).
+4. **Semantic limitation:** selected state communicated via color — document
+   if color-alone would be a barrier in the application context.
+5. **Example:** design workbench chip section.
 
 ---
 
 ## Progress
 
-A progress indicator that accepts a determinate ratio (`0.0..=1.0`) or
-an indeterminate signal. App owns the task, the progress value, and any
-cancellation semantics.
-
-### Proposed API
+Backed by `iced::widget::progress_bar`. Display-only; emits no events.
+Pass `None` for indeterminate state — iced 0.14 has no native indeterminate
+animation; renders as 0% with a "…" suffix.
 
 ```rust,ignore
-progress::row(&tokens, "Indexing files", Some(0.6))
-progress::indeterminate(&tokens, "Loading…")
-progress::card(&tokens, "Indexing files", Some(0.6))
+use snora::design::{Tone, progress};
+
+progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent)
+progress::card(&tokens, "Syncing", None, Tone::Info)
 ```
 
-### Value model
+Note: the `Tone` parameter was added beyond the RFC-032 sketch (which
+omitted it) to allow toned progress bars consistent with notices and chips.
+It is `Tone::Accent` for neutral progress.
 
-```rust,ignore
-pub enum ProgressValue {
-    Determinate(f32),   // 0.0..=1.0
-    Indeterminate,
-}
-```
+### Accessibility (RFC-027)
 
-### Accessibility requirements (RFC-027)
+1. **Native primitive:** `iced::widget::progress_bar`.
+2. **Keyboard reachable:** N/A (display only).
+3. **Focus visible:** N/A.
+4. **Semantic limitation:** no ARIA progressbar role in iced 0.14.
+5. **Example:** design workbench progress section.
 
-- Use `iced::widget::progress_bar` where available and appropriate.
-- Indeterminate state must still be visually meaningful (animated or
-  labeled, not a frozen bar at 0%).
-- Progress percentage must be readable as text alongside the bar.
+### Visual fit checklist
 
----
-
-## Visual-fit checklist for v0.21
-
-When adding these to the design workbench, inspect:
-
-- Notice: tone color at all four presets; action/dismiss button alignment;
-  text wrapping in narrow containers.
-- Chip: selected vs unselected visual difference at high contrast;
-  tap target size (`>= 24px` height).
-- Progress: bar fill at 0%, 50%, and 100%; indeterminate animation
-  visibility; text label legibility.
-
-See [Accessibility checklist](../contributing/accessibility-checklist.md)
-for the full gate.
+- Bar fill at 0%, 60%, and 100%.
+- Indeterminate ("…") label visible.
+- Tone colors at high contrast.

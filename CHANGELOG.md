@@ -17,6 +17,43 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.22.0] — 2026-06-20
+
+### Changed
+
+- **`chip::removable` — removed duplicate `style_fn_rm` variable.** The
+  second closure reference to the style function was an unnecessary copy of
+  the first. Both now share the same `style_fn` function pointer. No
+  behaviour change.
+
+- **`chip` — hover/pressed states use `darken` helper.** The inline
+  per-channel arithmetic (`c.r = (c.r - 0.04).max(0.0)`) has been replaced
+  with a private `darken(color, amount)` helper consistent with the pattern
+  in `style/button.rs`. No behaviour change.
+
+- **Stale version reference removed.** `snora::design::card` doc comment
+  said "Cards in v0.20 are non-interactive"; the version qualifier removed.
+
+- **`v021-primitives.md` updated** from a planning document ("Proposed API")
+  to a shipped-primitives reference page linking out to the new dedicated
+  pages.
+
+### Added
+
+- **Test coverage for `chip` style functions.** 4 new unit tests in
+  `design::chip::tests`: all `button::Status` variants across all four
+  token presets for both selected and unselected styles; `darken` clamping.
+
+- **Compile-time tests for `notice` and `progress`.** `notice::tests` covers
+  all `Tone` variants, all preset tokens, and all builder combinations.
+  `progress::tests` covers all variants and includes a `value_clamps_within_range`
+  runtime assertion.
+
+- **Three new design doc pages** in `docs/src/design/`:
+  `notices.md`, `chips.md`, `progress.md` — each covering usage, accessibility
+  (RFC-027 five questions), and visual fit. `v021-primitives.md` renamed to
+  serve as a cross-reference overview.
+
 ## [0.21.0] — 2026-06-20
 
 ### Added

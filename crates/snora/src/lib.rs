@@ -186,7 +186,7 @@ pub mod design {
     /// Pilot card helpers (RFC-029).
     ///
     /// Each function wraps `iced::widget::container` with Snora Design token
-    /// styling. Cards in v0.20 are non-interactive visual grouping surfaces;
+    /// styling. Cards are non-interactive visual grouping surfaces;
     /// application behaviour lives outside the card.
     pub mod card {
         pub use snora_widgets::design::card::{raised, selected, surface};

@@ -24,6 +24,7 @@
   - [0.18 → 0.19](guides/migration-0.18-to-0.19.md)
   - [0.19 → 0.20](guides/migration-0.19-to-0.20.md)
   - [0.20 → 0.21](guides/migration-0.20-to-0.21.md)
+  - [0.21 → 0.22](guides/migration-0.21-to-0.22.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design
@@ -34,8 +35,11 @@
 - [High contrast](design/high-contrast.md)
 - [Buttons](design/buttons.md)
 - [Cards](design/cards.md)
+- [Notices](design/notices.md)
+- [Chips](design/chips.md)
+- [Progress](design/progress.md)
 - [iced style bridge](design/iced-style-bridge.md)
-- [v0.21 Primitives — Notice, Chip, Progress](design/v021-primitives.md)
+- [v0.21 Primitives](design/v021-primitives.md)
 
 # Reference
 

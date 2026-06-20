@@ -208,3 +208,6 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             .into()
     }
 }
+
+#[cfg(test)]
+mod tests;
