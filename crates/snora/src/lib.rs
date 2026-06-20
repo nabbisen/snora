@@ -167,6 +167,7 @@ pub mod design {
         pub use snora_widgets::design::style::button;
         pub use snora_widgets::design::style::color;
         pub use snora_widgets::design::style::container;
+        pub use snora_widgets::design::style::progress;
         pub use snora_widgets::design::style::text;
     }
 
@@ -189,5 +190,22 @@ pub mod design {
     /// application behaviour lives outside the card.
     pub mod card {
         pub use snora_widgets::design::card::{raised, selected, surface};
+    }
+
+    /// Notice banner primitive (RFC-032).
+    ///
+    /// Builder: `Notice::new(tokens, tone, body).title(…).action(…).dismiss(…).render()`.
+    pub mod notice {
+        pub use snora_widgets::design::notice::Notice;
+    }
+
+    /// Filter and removable chip primitives (RFC-032).
+    pub mod chip {
+        pub use snora_widgets::design::chip::{filter, removable};
+    }
+
+    /// Progress row and card primitives (RFC-032).
+    pub mod progress {
+        pub use snora_widgets::design::progress::{card, row};
     }
 }

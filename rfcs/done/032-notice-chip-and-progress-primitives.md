@@ -1,6 +1,6 @@
 # RFC 032 — Notice, Chip, and Progress Primitives
 
-**Status.** Proposed
+**Status.** Implemented (v0.21.0)
 **Tracks.** Snora Design System migration; v0.21+.
 **Touches.** `snora-widgets::design` future primitives.
 

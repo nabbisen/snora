@@ -11,3 +11,6 @@ pub mod container;
 
 /// Text style helpers.
 pub mod text;
+
+/// Progress bar style functions.
+pub mod progress;

@@ -55,5 +55,25 @@ pub mod button;
 /// See [`card::surface`], [`card::raised`], [`card::selected`].
 pub mod card;
 
+/// Notice banner primitive (RFC-032).
+///
+/// Builder-style wrapper: tone, optional title, body, optional action
+/// button, optional dismiss button. All interactive controls are native
+/// iced buttons.
+pub mod notice;
+
+/// Filter and removable chip primitives (RFC-032).
+///
+/// See [`chip::filter`] and [`chip::removable`]. Both use
+/// `iced::widget::button` and are keyboard-reachable.
+pub mod chip;
+
+/// Progress row and card primitives (RFC-032).
+///
+/// See [`progress::row`] and [`progress::card`]. Backed by
+/// `iced::widget::progress_bar`. Indeterminate state is rendered as
+/// 0% with a "…" suffix (iced 0.14 limitation).
+pub mod progress;
+
 /// iced style functions for Snora Design tokens.
 pub mod style;

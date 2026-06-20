@@ -1,14 +1,11 @@
 # v0.21 Primitives — Notice, Chip, Progress
 
-This page documents the planned v0.21 shallow primitives: **notice**,
-**filter chip**, and **progress**. None of these ship in v0.20; they are
-listed here so the design is visible and reviewable before implementation.
+This page documents the **notice**, **filter chip**, and **progress**
+primitives shipped in v0.21.
 
-**Precondition:** These must not be started until:
-
-1. The v0.20 style bridge and button/card helpers have been lightly dogfooded.
-2. The RFC-027 semantic construction policy is applied to each primitive.
-3. `api-governance.md` promotion criteria are understood by the implementer.
+**Preconditions met:** the v0.20 style bridge and button/card helpers are
+implemented; the RFC-027 semantic construction policy applies to each
+primitive below.
 
 ---
 

@@ -33,7 +33,7 @@ These constrain what *can* be on the roadmap:
 
 ## Post-0.17: toward 1.0
 
-Six of ten 1.0 gates are now satisfied. The remaining path:
+Eight of ten 1.0 gates are now satisfied. The remaining path:
 
 1. One iced major upgrade completed. ⬜
 3. At least one third-party or production-grade app. ⬜
@@ -62,14 +62,14 @@ layer (`design` feature; `snora-design` published as of v0.19.0):
 
 Remaining design-track sequence:
 
-- **v0.20** — activate and publish `snora-design`; measure binary-size /
-  build-cost; implement RFC-031 release acceptance gate.
-- **v0.21+** — notice/chip/progress primitives (RFC-032).
-- **v0.22+** — recipes and dogfooding (RFC-033).
+- **v0.21** — notice, chip, and progress primitives (RFC-032). ✅ Shipped.
+- **v0.22** *(current)* — recipes and dogfooding (RFC-033).
 - **v0.23+** — promotion / stabilization and API governance (RFC-034).
 
 ## Recently shipped
 
+- **0.21.0** — Notice, chip, and progress primitives (RFC-032); design workbench updated.
+- **0.20.0** — Snora Design activation: `snora-design` published; RFC-031 release gate satisfied; `design` opt-in confirmed; migration guide 0.19→0.20.
 - **0.19.1** — CI fixes: `measure-compile-time.sh` missing-space bug fixed;
   `binary-size.csv` schema corrected (7-field rows); Gate 9 ✅ (binary-size
   and build-cost both have ≥2 real CI data points). Remaining 1.0 blockers:

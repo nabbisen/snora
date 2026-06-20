@@ -26,7 +26,7 @@ use iced::{
     widget::{column, container, row, scrollable, text},
 };
 use snora::{AppLayout, LayoutDirection, MenuAction, render, widget::app_header};
-use snora::design::{Color, Tokens, button, card, style};
+use snora::design::{Color, Tone, Tokens, button, card, chip, notice::Notice, progress, style};
 
 // ---------------------------------------------------------------------------
 // Preset selector
@@ -64,11 +64,12 @@ impl Preset {
 struct App {
     preset: Preset,
     tokens: Tokens,
+    notice_dismissed: bool,
 }
 
 impl Default for App {
     fn default() -> Self {
-        Self { preset: Preset::Light, tokens: Preset::Light.tokens() }
+        Self { preset: Preset::Light, tokens: Preset::Light.tokens(), notice_dismissed: false }
     }
 }
 
@@ -76,13 +77,19 @@ impl Default for App {
 enum Msg {
     SetPreset(Preset),
     Noop,
+    DismissNotice,
 }
 
 impl App {
     fn update(&mut self, msg: Msg) -> Task<Msg> {
-        if let Msg::SetPreset(p) = msg {
-            self.preset = p;
-            self.tokens = p.tokens();
+        match msg {
+            Msg::SetPreset(p) => {
+                self.preset = p;
+                self.tokens = p.tokens();
+                self.notice_dismissed = false;
+            }
+            Msg::DismissNotice => self.notice_dismissed = true,
+            Msg::Noop => {}
         }
         Task::none()
     }
@@ -211,6 +218,67 @@ fn typography_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
     ).spacing(t.spacing.sm))
 }
 
+fn notices_section<'a>(t: &'a Tokens, dismissed: bool) -> Element<'a, Msg> {
+    let mut notices: Vec<Element<'a, Msg>> = Vec::new();
+    for tone in [Tone::Info, Tone::Success, Tone::Warning, Tone::Danger] {
+        let label = match tone {
+            Tone::Info    => "Info notice — background sync running.",
+            Tone::Success => "Success notice — export complete.",
+            Tone::Warning => "Warning notice — disk space low.",
+            Tone::Danger  => "Danger notice — action cannot be undone.",
+            _             => "",
+        };
+        notices.push(
+            Notice::new(t, tone, label)
+                .action("View", Msg::Noop)
+                .render(),
+        );
+    }
+    // One dismissible notice
+    if !dismissed {
+        notices.push(
+            Notice::new(t, Tone::Accent, "This notice can be dismissed.")
+                .title("Dismissible")
+                .action("Learn more", Msg::Noop)
+                .dismiss(Msg::DismissNotice)
+                .render(),
+        );
+    }
+    card::surface(t, iced::widget::column![
+        heading(t, "Notices"),
+        note(t, "Inspect: tone colors, border clarity at HC, action/dismiss button focus."),
+        iced::widget::column(notices).spacing(t.spacing.sm),
+    ].spacing(t.spacing.md))
+}
+
+fn chips_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
+    card::surface(t, iced::widget::column![
+        heading(t, "Chips"),
+        note(t, "Inspect: selected vs unselected tint at HC, tap target size."),
+        iced::widget::row![
+            chip::filter(t, "All",     true,  Msg::Noop),
+            chip::filter(t, "Draft",   false, Msg::Noop),
+            chip::filter(t, "Active",  false, Msg::Noop),
+            chip::filter(t, "Done",    false, Msg::Noop),
+        ].spacing(t.spacing.sm),
+        iced::widget::row![
+            chip::removable(t, "Rust",   true,  Msg::Noop, Msg::Noop),
+            chip::removable(t, "Design", false, Msg::Noop, Msg::Noop),
+        ].spacing(t.spacing.sm),
+    ].spacing(t.spacing.md))
+}
+
+fn progress_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
+    card::surface(t, iced::widget::column![
+        heading(t, "Progress"),
+        note(t, "Inspect: bar fill at 0%/60%/100%, indeterminate (…), tone colors."),
+        progress::row(t, "Indexing files",    Some(0.6),  Tone::Accent),
+        progress::row(t, "Upload complete",   Some(1.0),  Tone::Success),
+        progress::row(t, "Sync in progress",  None,       Tone::Info),
+        progress::row(t, "Low disk — backup", Some(0.85), Tone::Warning),
+    ].spacing(t.spacing.md))
+}
+
 fn palette_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
     let p = &t.palette;
     let pairs: &[(Color, &str)] = &[
@@ -280,6 +348,9 @@ impl App {
                         .color(style::color::to_iced_color(t.palette.text_primary)),
                     buttons_section(t),
                     cards_section(t),
+                    notices_section(t, self.notice_dismissed),
+                    chips_section(t),
+                    progress_section(t),
                     typography_section(t),
                     palette_section(t),
                 ]

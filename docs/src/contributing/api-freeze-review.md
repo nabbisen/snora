@@ -104,7 +104,7 @@ Type-names audit: **complete as of v0.17.0.**
 | 9. Binary-size and compile-time trends monitored (≥2 data points) | ✅ binary-size: v0.17.0, v0.19.0, v0.19.1 on ubuntu-latest. build-cost: v0.17.0 (sandbox), v0.19.1 on ubuntu-latest. |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-**Gates satisfied: 2, 4, 5, 6, 7, 8, 10 = seven of ten.**
+**Gates satisfied: 2, 4, 5, 6, 7, 8, 9, 10 = eight of ten.**
 
 Remaining blockers: iced upgrade (gate 1), third-party app (gate 3).
 Gate 9 fully satisfied: binary-size has three CI data points (v0.17.0,

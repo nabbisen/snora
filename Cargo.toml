@@ -25,7 +25,7 @@ resolver = "2"
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.20.0"
+version = "0.21.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/nabbisen/snora"
@@ -73,14 +73,14 @@ codegen-units = 16
 # Including a `version` field (alongside `path`) is required by
 # `cargo publish`, even though examples themselves are
 # `publish = false`.  Cargo validates the workspace as a whole.
-snora = { version = "0.20", path = "crates/snora" }
-snora-core = { version = "0.20", path = "crates/snora-core" }
-snora-widgets = { version = "0.20", path = "crates/snora-widgets" }
+snora = { version = "0.21", path = "crates/snora" }
+snora-core = { version = "0.21", path = "crates/snora-core" }
+snora-widgets = { version = "0.21", path = "crates/snora-widgets" }
 # Iced-free design tokens (Snora Design). Listed here so the `snora` /
 # `snora-widgets` crates can pick it up via workspace inheritance once the
 # `design` feature wiring lands (RFC-021 / RFC-025). It is a workspace member
 # in its own right and has no iced dependency.
-snora-design = { version = "0.20", path = "crates/snora-design" }
+snora-design = { version = "0.21", path = "crates/snora-design" }
 
 iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
 lucide-icons = { version = "1", features = ["iced"] }

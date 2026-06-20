@@ -17,6 +17,36 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.21.0] — 2026-06-20
+
+### Added
+
+- **Notice primitive (`snora::design::notice::Notice`, RFC-032).** Builder-style
+  notice banner: tone (`Tone::Info/Success/Warning/Danger/Accent`), optional
+  title, body, optional action button, optional dismiss button. Action and
+  dismiss controls are `iced::widget::button` — keyboard-reachable. Tone
+  colors use palette status roles verified by the automated contrast tests.
+
+- **Chip primitives (`snora::design::chip`, RFC-032).** Two functions:
+  `filter` (toggle chip, tinted accent background when selected) and
+  `removable` (chip label + separate × button). Both backed by
+  `iced::widget::button`.
+
+- **Progress primitives (`snora::design::progress`, RFC-032).** Two layout
+  variants: `row` (compact inline) and `card` (wrapped in `card::surface`).
+  Backed by `iced::widget::progress_bar`. `None` value = indeterminate,
+  rendered as 0% with "…" suffix (iced 0.14 has no native indeterminate
+  animation — documented limitation, not a regression). `Tone` parameter
+  colors the bar via `style::progress::toned`.
+
+- **`style::progress::toned` style function.** Maps `Tone` to a
+  `progress_bar::Style` using token palette roles.
+
+- **Design workbench updated.** Notice, chip, and progress sections added,
+  exercising all tone variants and indeterminate state.
+
+- **RFC-032 closed** — moved to `rfcs/done/` (Status: Implemented v0.21.0).
+
 ## [0.20.0] — 2026-06-20
 
 ### Added
