@@ -84,18 +84,16 @@ One of:
 
 ## Candidate recipes
 
-The following recipes are planned for v0.22. None are written yet; they are
-listed to signal intent and invite early feedback.
+The following recipes were published in v0.23. See the
+[recipe index](../design/recipes/README.md) for the full catalog with
+promotion status.
 
 | Recipe | Status |
 |---|---|
-| Result card | Recipe |
-| Recent search card | Recipe |
-| Setup wizard step card | Recipe |
-| Onboarding card | Recipe |
-| Empty state | Recipe |
-| Background task card | Recipe |
-| Friendly error recovery notice | Recipe |
+| [Empty state](../design/recipes/empty-state.md) | Recipe |
+| [Background task card](../design/recipes/background-task.md) | Recipe |
+| [Friendly error recovery notice](../design/recipes/error-recovery.md) | Recipe |
+| [Result card](../design/recipes/result-card.md) | Recipe |
 
 Adding a recipe does not require an RFC. Open a PR with the doc page and
 the nine sections filled in. The PR reviewer checks:
@@ -152,12 +150,11 @@ Should any recipe become a primitive? If so, which one and why:
 
 ```text
 docs/src/design/recipes/
-  README.md          ← index of all recipes
-  result-card.md
-  recent-search.md
+  README.md          ← index of all recipes with promotion status
   empty-state.md
   background-task.md
   error-recovery.md
+  result-card.md
   …
 ```
 

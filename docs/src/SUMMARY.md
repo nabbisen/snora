@@ -25,6 +25,7 @@
   - [0.19 → 0.20](guides/migration-0.19-to-0.20.md)
   - [0.20 → 0.21](guides/migration-0.20-to-0.21.md)
   - [0.21 → 0.22](guides/migration-0.21-to-0.22.md)
+  - [0.22 → 0.23](guides/migration-0.22-to-0.23.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design
@@ -60,6 +61,14 @@
 - [Accessibility checklist](contributing/accessibility-checklist.md)
 - [Semantic accessibility policy](contributing/semantic-accessibility.md)
 - [Recipes and dogfood process](contributing/recipes.md)
+
+## Recipes
+
+- [Recipe index](design/recipes/README.md)
+- [Empty state](design/recipes/empty-state.md)
+- [Background task card](design/recipes/background-task.md)
+- [Friendly error recovery notice](design/recipes/error-recovery.md)
+- [Result card](design/recipes/result-card.md)
 - [API governance — Snora Design](contributing/api-governance.md)
 - [Documentation test policy](contributing/documentation-test-policy.md)
 - [Anchored popover design](contributing/anchored-popover-design.md)

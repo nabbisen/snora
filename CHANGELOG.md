@@ -17,6 +17,48 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.23.0] — 2026-06-20
+
+### Added
+
+- **Four initial recipes in `docs/src/design/recipes/` (RFC-033).** Each
+  follows the nine-section format (Purpose, When to use, When not to use,
+  Data the app owns, Snora primitives used, Accessibility notes, Code
+  example, Customization points, Promotion status):
+  - **Empty state** — placeholder card with optional CTA. Uses
+    `card::surface`, `button::primary`, text size helpers.
+  - **Background task card** — progress bar + optional cancel/pause.
+    Uses `card::surface`, `progress::row`, `button::ghost`.
+  - **Friendly error recovery notice** — inline error with recovery action.
+    Uses `notice::Notice` with `Tone::Danger` or `Tone::Warning`.
+  - **Result card** — selectable list-item card with metadata chips.
+    Uses `card::surface`/`selected`, `chip::filter`. Documents the
+    outer-`button`-wrapping-a-card pattern for keyboard reachability.
+
+- **Recipe index** at `docs/src/design/recipes/README.md` with promotion
+  status table. All four recipes are status **Recipe**.
+
+- **`contributing/recipes.md` updated** — candidate table replaced with
+  links to published recipes; directory listing updated to match.
+
+- **RFC-033 and RFC-034 closed** — both moved to `rfcs/done/` (Status:
+  Implemented v0.23.0). RFC-034 (API governance) was already fully
+  implemented in `docs/src/contributing/api-governance.md`; this release
+  formally records its completion.
+
+### Design API changes
+
+```
+New APIs:        none
+Experimental:    none
+Promoted:        none
+Deprecated:      none
+Removed:         none
+Recipes added:   empty-state, background-task, error-recovery, result-card
+Recipes promoted: none
+Scope concerns:  none
+```
+
 ## [0.22.0] — 2026-06-20
 
 ### Changed

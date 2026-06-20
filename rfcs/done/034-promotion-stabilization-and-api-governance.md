@@ -1,6 +1,6 @@
 # RFC 034 — Promotion, Stabilization, and API Governance
 
-**Status.** Proposed
+**Status.** Implemented (v0.23.0)
 **Tracks.** Snora Design System migration; v0.23+.
 **Touches.** release governance, API lifecycle docs.
 

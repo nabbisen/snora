@@ -63,11 +63,15 @@ layer (`design` feature; `snora-design` published as of v0.19.0):
 Remaining design-track sequence:
 
 - **v0.21** — notice, chip, and progress primitives (RFC-032). ✅ Shipped.
-- **v0.22** *(current)* — recipes and dogfooding (RFC-033).
-- **v0.23+** — promotion / stabilization and API governance (RFC-034).
+- **v0.22** — recipes and dogfooding (RFC-033). ✅ Shipped as v0.23.
+- **v0.23** — promotion / stabilization and API governance (RFC-034). ✅ Shipped.
+
+All design-track RFCs (RFC-020 through RFC-034) are now in `rfcs/done/`.
+Future design work is governed by `api-governance.md` and the D-gates.
 
 ## Recently shipped
 
+- **0.23.0** — Recipes and dogfood process (RFC-033): four initial recipes (empty-state, background-task, error-recovery, result-card); RFC-034 governance formally closed. All 35 design-track RFCs complete.
 - **0.22.0** — Code quality and doc audit: chip dedup, new tests (chip/notice/progress), three new design doc pages (notices/chips/progress), stale version refs cleaned.
 - **0.21.0** — Notice, chip, and progress primitives (RFC-032); design workbench updated.
 - **0.20.0** — Snora Design activation: `snora-design` published; RFC-031 release gate satisfied; `design` opt-in confirmed; migration guide 0.19→0.20.

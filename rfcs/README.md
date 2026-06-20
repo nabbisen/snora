@@ -73,6 +73,9 @@ Numbers remain stable forever and are never reused.
 
 | 032 | [Notice, Chip, and Progress Primitives](./done/032-notice-chip-and-progress-primitives.md) | v0.21.0 |
 
+| 033 | [Recipes and Dogfood Process](./done/033-recipes-and-dogfood-process.md) | v0.23.0 |
+| 034 | [Promotion, Stabilization, and API Governance](./done/034-promotion-stabilization-and-api-governance.md) | v0.23.0 |
+
 ## Proposed
 
 The following design-system RFCs remain in review (target v0.20+):
@@ -80,8 +83,6 @@ The following design-system RFCs remain in review (target v0.20+):
 | ID | Title |
 |----|-------|
 | 031 | [v0.20 Release Acceptance Criteria](./done/031-v020-release-acceptance.md) | v0.20.0 |
-| 033 | [Recipes and Dogfood Process](./proposed/033-recipes-and-dogfood-process.md) |
-| 034 | [Promotion, Stabilization, and API Governance](./proposed/034-promotion-stabilization-and-api-governance.md) |
 
 ## Archive
 

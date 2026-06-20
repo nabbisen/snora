@@ -1,6 +1,6 @@
 # RFC 033 — Recipes and Dogfood Process
 
-**Status.** Proposed
+**Status.** Implemented (v0.23.0)
 **Tracks.** Snora Design System migration; v0.22+.
 **Touches.** recipe docs, dogfood feedback process.
 
