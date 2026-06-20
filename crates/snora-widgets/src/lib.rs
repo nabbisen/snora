@@ -41,6 +41,14 @@ mod sidebar;
 pub mod style;
 mod tab;
 
+/// iced style bridge for Snora Design tokens.
+///
+/// Available when the `design` feature is enabled. Provides color conversion,
+/// semantic button styles, and card/container styles derived from a
+/// [`snora_design::Tokens`] bundle.
+#[cfg(feature = "design")]
+pub mod design;
+
 pub use crumb::app_breadcrumb;
 pub use footer::app_footer;
 pub use header::app_header;

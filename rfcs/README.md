@@ -14,6 +14,11 @@ Numbering uses the planning-pack scheme `0NN-x` (the `NNN` groups by the
 target minor; the `x` letter distinguishes RFCs within that group).
 Numbers are stable forever and never reused.
 
+From **RFC-020 onward**, numbering is **flat sequential** (RFC-020, RFC-021,
+…) rather than the `0NN-x` grouping; the leading number no longer encodes a
+target minor. Existing `0NN-x` RFCs keep their IDs and are not renumbered.
+Numbers remain stable forever and are never reused.
+
 ## Done
 
 | ID | Title | Shipped in |
@@ -53,9 +58,28 @@ Numbers are stable forever and never reused.
 | 018-C | [Contributing index and cross-links](./done/018-c-contributing-index-and-cross-links.md) | v0.18.0 |
 | 019-A | [Lucide icons type-parameter fix](./done/019-a-lucide-icons-type-parameter-fix.md) | v0.18.1 |
 
+| 020 | [Design System Boundary and Philosophy Amendment](./done/020-design-system-boundary-and-philosophy.md) | v0.19.0 |
+| 021 | [Crate and Feature Architecture](./done/021-crate-and-feature-architecture.md) | v0.19.0 |
+| 022 | [Snora Design Token Data Model](./done/022-token-data-model.md) | v0.19.0 |
+| 023 | [Palettes, High Contrast, and Automated Contrast Tests](./done/023-palettes-high-contrast-and-contrast-tests.md) | v0.19.0 |
+| 024 | [Typography, Leading, Spacing, Radius, Focus, and Density](./done/024-typography-leading-spacing-radius-focus-density.md) | v0.19.0 |
+| 025 | [iced Style Bridge](./done/025-iced-style-bridge.md) | v0.19.0 |
+| 026 | [Feature Matrix CI and Quality Gates](./done/026-feature-matrix-ci-and-quality-gates.md) | v0.19.0 |
+| 027 | [Accessibility and Semantic Construction Policy](./done/027-accessibility-and-semantic-construction.md) | v0.19.0 |
+| 028 | [v0.20 Pilot Button Helper](./done/028-pilot-button-helper.md) | v0.19.0 |
+| 029 | [v0.20 Pilot Card Helper](./done/029-pilot-card-helper.md) | v0.19.0 |
+| 030 | [Documentation, Examples, and Design Workbench](./done/030-docs-examples-and-design-workbench.md) | v0.19.0 |
+
 ## Proposed
 
-_(No RFCs currently in review. Open a new issue or PR to propose one.)_
+The following design-system RFCs remain in review (target v0.20+):
+
+| ID | Title |
+|----|-------|
+| 031 | [v0.20 Release Acceptance Criteria](./proposed/031-v020-release-acceptance.md) |
+| 032 | [Notice, Chip, and Progress Primitives](./proposed/032-notice-chip-and-progress-primitives.md) |
+| 033 | [Recipes and Dogfood Process](./proposed/033-recipes-and-dogfood-process.md) |
+| 034 | [Promotion, Stabilization, and API Governance](./proposed/034-promotion-stabilization-and-api-governance.md) |
 
 ## Archive
 

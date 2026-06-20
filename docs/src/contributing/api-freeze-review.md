@@ -117,3 +117,23 @@ second build-cost data point (gate 9).
 - If you are completing a gate, add the version number.
 - This document is **not** a process checklist run once at 1.0 — it is
   a living readiness tracker maintained from now until 1.0.
+
+## Snora Design gate set (separate from core 1.0)
+
+The design-system track has its own stability gates, tracked here for
+visibility alongside the core gates. These are the RFC-034 design 1.0
+gates; they do not block snora core's 1.0 release.
+
+| Gate | Status |
+|---|---|
+| D-1. One iced major upgrade survived with design feature enabled | ⬜ |
+| D-2. Minimal path clean after iced upgrade | ⬜ |
+| D-3. Token model stable for ≥2 consecutive minors | ⬜ (v0.20 is the first design minor) |
+| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ (v0.20 is the first design minor) |
+| D-5. ≥1 real app in serious production use of design tokens | ⬜ |
+| D-6. Promotion process used at least once with evidence | ⬜ |
+| D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor) |
+| D-8. `snora-design` published (`publish = false` flipped) | ⬜ (v0.20 activation pending) |
+
+See `docs/src/contributing/api-governance.md` for the full promotion,
+deprecation, and release-review governance process.

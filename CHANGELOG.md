@@ -17,6 +17,125 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.19.0] — 2026-06-20
+
+### Added
+
+- **v0.21 primitives design doc (RFC-032).** New
+  `docs/src/design/v021-primitives.md` documents the planned notice, filter
+  chip, and progress primitives — proposed API, internal model, events, and
+  per-primitive accessibility requirements. These primitives are **not
+  implemented** in v0.19; they are listed to make the design visible before
+  the v0.21 implementation cycle.
+
+- **Recipes and dogfood process (RFC-033).** New
+  `docs/src/contributing/recipes.md` defines the nine-section recipe format,
+  the candidate recipe catalog (result card, empty state, error recovery
+  notice, etc.), the dogfood validation requirement that guards promotion, and
+  the feedback template for downstream applications.
+
+- **API governance (RFC-034).** New
+  `docs/src/contributing/api-governance.md` defines the five API states
+  (recipe, experimental, stable, deprecated, removed), the six-condition
+  promotion criteria, the twelve-item stable-API review checklist, the
+  deprecation policy, the per-release review template, and the eight
+  Snora Design 1.0 gates (D-1 through D-8). Gates D-1 through D-8 appended
+  to `docs/src/contributing/api-freeze-review.md` alongside the core gates.
+
+- **Design workbench example (RFC-030).** New `snora-example-design-workbench`
+  crate exercises all four token presets (light / dark / HC light / HC dark),
+  all button variants (enabled + disabled), all card variants, the full
+  typography scale, and palette swatches. Preset is stored in app state to
+  avoid lifetime friction. Serves as the visual-fit QA surface for RFC-027's
+  accessibility checklist.
+
+- **Snora Design documentation section (RFC-030).** Seven new pages under
+  `docs/src/design/`: overview, feature flags, tokens, high contrast, buttons,
+  cards, and the iced style bridge. Covers minimal / default / design usage
+  paths and documents the iced 0.14 focus-ring limitation prominently.
+
+- **Pilot button helpers (RFC-028)** in `snora_widgets::design::button` (and
+  `snora::design::button` at the facade). Eight functions: `primary`,
+  `secondary`, `ghost`, `danger` (take `on_press: Message`) and their
+  `*_maybe` variants (take `Option<Message>`, disabled when `None`). All four
+  wrap `iced::widget::button`; tokens are cloned once into the style closure
+  so callers are lifetime-free. Focus rings absent in iced 0.14 —
+  documented limitation.
+
+- **Pilot card helpers (RFC-029)** in `snora_widgets::design::card` (and
+  `snora::design::card` at the facade). Three functions: `surface`, `raised`,
+  `selected`. All wrap `iced::widget::container` with token-derived padding,
+  radius, border, and background. Cards are non-interactive visual grouping
+  surfaces in v0.20; application behaviour lives outside the card.
+
+- **New `snora-design` crate (iced-free) — Snora Design token foundation
+  (RFC-022 / RFC-023 / RFC-024).** Defines `Color`, a semantic `Palette`
+  (18 roles including paired status-text foregrounds `success_text` /
+  `warning_text` / `danger_text` / `info_text`), `Spacing`, `Typography` /
+  `TextRole`, `Radius`, `FocusTokens`, and the `Tone` / `Emphasis` / `Size` /
+  `Density` variant vocabulary, bundled into a `Tokens` struct with four
+  built-in presets (`light`, `dark`, `high_contrast_light`,
+  `high_contrast_dark`). `Tokens` and `Palette` are `#[non_exhaustive]`. Ships
+  a pure-Rust `contrast` module and an automated contrast test suite covering
+  all mandatory WCAG AA pairs (including `danger_text on danger`). The crate
+  has **no iced dependency** (CI gate Q3; enforced by the new
+  `design-isolation` CI job). Groundwork only: not yet wired into the `snora`
+  facade; `publish = false`; activation targets v0.20.
+
+- **`snora-widgets` `design` feature — iced style bridge (RFC-025).** Adds an
+  opt-in `design` feature to `snora-widgets` and the root `snora` crate.
+  When enabled, exposes `snora_widgets::design::style` with:
+  `color::to_iced_color` (explicit boundary function); four semantic button
+  styles (`primary`, `secondary`, `ghost`, `danger`) covering iced 0.14's
+  `Active / Hovered / Pressed / Disabled` statuses; three card/container styles
+  (`card_surface`, `card_raised`, `card_selected`); six typography-size helpers.
+  Root `snora::design` re-exports the full token vocabulary and the style
+  sub-modules (enumerated, not glob). 12 style-bridge unit tests; all feature
+  isolation checks pass. **iced 0.14 note:** `button::Status` has no
+  `Focused` variant; custom focus rings on standard buttons/cards are not
+  deliverable in v0.20 — documented limitation, not a regression.
+
+- **CI quality gates for the design feature (RFC-026).** Extended `ci.yaml`:
+  three new design feature-matrix entries (`widgets,design`;
+  `widgets,design,lucide-icons`; `widgets,design,svg-icons`) in the existing
+  `feature-matrix` job; new `design-isolation` job enforcing Q2-B (widgets
+  compiles without design) and Q3 (no iced in `snora-design`); `rust-quality`
+  job now runs `cargo test -p snora-design` on every PR (Q4 token sanity +
+  Q5 mandatory contrast).
+
+- **Accessibility checklist and semantic construction policy (RFC-027).**
+  Two new contributing docs: `accessibility-checklist.md` (required review
+  gate for every Snora Design primitive, covering contrast, high-contrast, focus
+  visibility, keyboard reachability, semantic construction, pointer target size,
+  typography, directionality, reduced motion, disabled states, loading/error
+  states, and plain-language wording); `semantic-accessibility.md` (core
+  "prefer native iced controls" rule, primitive construction table, the five
+  required RFC/PR questions, the iced 0.14 focus-state limitation stated
+  formally, and the keyboard ownership table). Both pages are indexed in
+  `SUMMARY.md` and `contributing/README.md`.
+
+- **Snora Design System RFCs (RFC-020 … RFC-034)** under `rfcs/proposed/`,
+  with per-RFC and global implementation-handoff material in
+  `design-system-handoff/`.
+
+### Changed
+
+- Opened the **0.19.0** development line (`0.18.3` was published; workspace
+  version and inter-crate pins bumped `0.18` → `0.19`).
+- `rfcs/README.md`: documented flat sequential RFC numbering from RFC-020
+  onward; indexed RFC-020 … RFC-034 in the Proposed section.
+- `docs/src/contributing/release-process.md`: updated publish order to
+  `snora-core → snora-design → snora-widgets → snora` (RFC-031); added
+  `snora-design` to the `cargo package` checklist with a note to flip
+  `publish = false` at v0.20.
+- `docs/src/SUMMARY.md`: added Snora Design section with seven doc pages.
+- `docs/book.toml`: removed deprecated `multilingual = false` key and the
+  `git-repository-icon` that referenced a non-existent font.
+- `docs/src/reference/vocabulary.md`, `reference/widgets.md`,
+  `contributing/anchored-popover-design.md`: converted `rust,no_run` type-
+  signature fences to `rust,ignore` per RFC-012-D policy; `mdbook test docs`
+  now passes cleanly.
+
 ## [0.18.3] — 2026-06-17
 
 - Re-export `lucide_icons::LUCIDE_FONT_BYTES`.

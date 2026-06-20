@@ -1,0 +1,16 @@
+[package]
+name = "snora-example-design-workbench"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "snora-example-design-workbench"
+path = "src/main.rs"
+
+[dependencies]
+snora = { workspace = true, features = ["widgets", "design"] }
+iced = { workspace = true }

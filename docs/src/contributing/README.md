@@ -17,6 +17,10 @@ you are here.
 | Page | What it covers |
 |---|---|
 | [ABDD compliance checklist](abdd-checklist.md) | Direction-sensitivity review gate for any PR touching layout |
+| [Accessibility checklist](accessibility-checklist.md) | Required checklist for every Snora Design primitive (contrast, focus, keyboard, semantics) |
+| [Semantic accessibility policy](semantic-accessibility.md) | Primitive construction rules; iced 0.14 focus-state limitation documented |
+| [Recipes and dogfood process](recipes.md) | Recipe format, contribution guide, dogfood validation requirement, feedback template |
+| [API governance — Snora Design](api-governance.md) | API states, promotion criteria, deprecation policy, release review template, design 1.0 gates |
 | [Adding a new overlay kind](adding-an-overlay.md) | Step-by-step guide for adding a new layer to the z-stack |
 | [Anchored popover design](anchored-popover-design.md) | Design study for a future popover overlay; eight questions answered |
 | [Feature-gating criteria](feature-gating-criteria.md) | Five indicators that justify splitting a feature behind a Cargo flag |

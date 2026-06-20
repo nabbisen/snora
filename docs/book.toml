@@ -3,14 +3,12 @@ title = "Snora"
 description = "An iced GUI framework that gets out of the way of your application — long-form documentation."
 authors = ["nabbisen <nabbisen@scqr.net>"]
 language = "en"
-multilingual = false
 src = "src"
 
 [output.html]
 default-theme = "rust"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/nabbisen/snora"
-git-repository-icon = "fa-github"
 edit-url-template = "https://github.com/nabbisen/snora/edit/main/docs/{path}"
 site-url = "/snora/"
 

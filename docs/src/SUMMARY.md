@@ -21,7 +21,19 @@
 - [Testing UI logic](guides/testing.md)
 - [Migrating between versions](guides/migrations.md)
   - [0.10 → 0.11](guides/migration-0.10-to-0.11.md)
+  - [0.18 → 0.19](guides/migration-0.18-to-0.19.md)
 - [Migration guide template](guides/migration-template.md)
+
+# Snora Design
+
+- [Overview](design/overview.md)
+- [Feature flags](design/feature-flags.md)
+- [Design tokens](design/tokens.md)
+- [High contrast](design/high-contrast.md)
+- [Buttons](design/buttons.md)
+- [Cards](design/cards.md)
+- [iced style bridge](design/iced-style-bridge.md)
+- [v0.21 Primitives — Notice, Chip, Progress](design/v021-primitives.md)
 
 # Reference
 
@@ -39,6 +51,10 @@
 - [Internal architecture](contributing/architecture.md)
 - [Design decisions](contributing/design-decisions.md)
 - [ABDD compliance checklist](contributing/abdd-checklist.md)
+- [Accessibility checklist](contributing/accessibility-checklist.md)
+- [Semantic accessibility policy](contributing/semantic-accessibility.md)
+- [Recipes and dogfood process](contributing/recipes.md)
+- [API governance — Snora Design](contributing/api-governance.md)
 - [Documentation test policy](contributing/documentation-test-policy.md)
 - [Anchored popover design](contributing/anchored-popover-design.md)
 - [Public API freeze review](contributing/api-freeze-review.md)

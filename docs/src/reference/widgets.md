@@ -31,7 +31,7 @@ every `AppLayout` slot.
 
 ### `app_header`
 
-```rust,no_run
+```rust,ignore
 pub fn app_header<'a, Message, MenuId, MenuItemId, F>(
     title: &'a str,
     menus: Vec<Menu<MenuId, MenuItemId>>,
@@ -47,7 +47,7 @@ controls anchored to the end edge. Direction-aware.
 
 ### `app_side_bar`
 
-```rust,no_run
+```rust,ignore
 pub fn app_side_bar<'a, Message, ViewId>(
     side_bar: SideBar<Message, ViewId>,
     direction: LayoutDirection,
@@ -59,7 +59,7 @@ background highlight. Tooltip side flips with direction.
 
 ### `app_footer`
 
-```rust,no_run
+```rust,ignore
 pub fn app_footer<'a, Message>(
     content: Element<'a, Message>,
 ) -> Element<'a, Message>
@@ -71,7 +71,7 @@ layout inside.
 
 ### `render_menu`
 
-```rust,no_run
+```rust,ignore
 pub fn render_menu<'a, Message, MenuId, MenuItemId, F>(
     menu: Menu<MenuId, MenuItemId>,
     on_action: &'a F,
@@ -85,7 +85,7 @@ them. Direct calls are for non-header menus.
 
 ### `icon_element` / `icon_element_sized`
 
-```rust,no_run
+```rust,ignore
 pub fn icon_element<'a, Message>(icon: &Icon) -> Element<'a, Message>;
 pub fn icon_element_sized<'a, Message>(icon: &Icon, size: f32) -> Element<'a, Message>;
 ```
@@ -95,7 +95,7 @@ specified size. Honors all enabled icon backends.
 
 ### `app_tab_bar`
 
-```rust,no_run
+```rust,ignore
 pub fn app_tab_bar<'a, Message, TabId, F>(
     bar: TabBar<TabId>,
     on_action: &'a F,
@@ -111,7 +111,7 @@ the entire tab order mirrors under `Rtl`.
 
 ### `app_breadcrumb`
 
-```rust,no_run
+```rust,ignore
 pub fn app_breadcrumb<'a, Message, CrumbId, F>(
     crumbs: Vec<Crumb<CrumbId>>,
     on_action: &'a F,
@@ -129,7 +129,7 @@ plain text. The separator glyph flips with direction (`›` / `‹`).
 
 In `snora::direction`:
 
-```rust,no_run
+```rust,ignore
 pub fn row_dir<'a, M>(direction, start, end) -> iced::widget::Row<'a, M>;
 pub fn row_dir_three<'a, M>(direction, start, center, end) -> iced::widget::Row<'a, M>;
 ```

@@ -15,7 +15,7 @@ jobs:
     name: Rust quality gate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Check workspace
@@ -24,9 +24,14 @@ jobs:
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
       - name: Test core
         run: cargo test -p snora-core
+      - name: Test design tokens (Q4 + Q5 — token sanity and contrast)
+        # snora-design is iced-free and fast. Runs on every PR.
+        # Failing here means a palette color violates a mandatory WCAG contrast
+        # pair or a token value is out of range. See RFC-026 gates Q4 and Q5.
+        run: cargo test -p snora-design
       - name: Test engine (render semantics)
         run: cargo test -p snora
-      - name: Check engine-only build
+      - name: Check engine-only build (Q1 — minimal path)
         run: cargo check -p snora --no-default-features
 
   feature-matrix:
@@ -36,6 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # ---- Baseline (unchanged) ----
           - name: default
             args: ""
           - name: no-default-features
@@ -48,18 +54,54 @@ jobs:
             args: "--no-default-features --features widgets,svg-icons"
           - name: all-public-features
             args: "--all-features"
+          # ---- Design feature combinations (RFC-026 Q2 / Q2-B) ----
+          # widgets,design: the primary design activation path.
+          - name: widgets-design
+            args: "--no-default-features --features widgets,design"
+          # widgets,design,lucide-icons: icon features stay independent of design.
+          - name: widgets-design-lucide-icons
+            args: "--no-default-features --features widgets,design,lucide-icons"
+          # widgets,design,svg-icons: same for svg-icons.
+          - name: widgets-design-svg-icons
+            args: "--no-default-features --features widgets,design,svg-icons"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Check feature combination
         run: cargo check -p snora ${{ matrix.args }}
 
+  design-isolation:
+    # Q2-B and Q3: verify that widgets-without-design compiles cleanly and
+    # that snora-design itself has no iced dependency.
+    name: Design feature isolation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: widgets compiles without design (Q2-B)
+        run: cargo check -p snora-widgets --no-default-features
+      - name: snora-design has no iced dependency (Q3)
+        # Verify the iced-free guarantee: snora-design's dependency tree must
+        # not include iced. `cargo tree` is the authoritative tool; a clean
+        # exit with no iced lines means the gate holds.
+        run: |
+          TREE=$(cargo tree -p snora-design --prefix none)
+          if echo "$TREE" | grep -q "^iced "; then
+            echo "ERROR: snora-design depends on iced — Q3 gate violated"
+            echo "$TREE"
+            exit 1
+          fi
+          echo "Q3 pass: no iced in snora-design dependency tree"
+      - name: snora-design token tests (contract check)
+        run: cargo test -p snora-design
+
   docs:
     name: Docs build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - name: Install mdBook
         run: cargo install mdbook --no-default-features --features search --vers "^0.5" --locked
@@ -67,3 +109,4 @@ jobs:
         run: mdbook build docs
       - name: Test docs (classify fences)
         run: mdbook test docs
+

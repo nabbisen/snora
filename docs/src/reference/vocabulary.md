@@ -5,7 +5,7 @@ a quick scan when you forget a variant name.
 
 ## Direction and edges
 
-```rust,no_run
+```rust,ignore
 pub enum LayoutDirection { Ltr, Rtl }
 pub enum Edge            { Start, End }
 ```
@@ -16,7 +16,7 @@ left/right via `Edge::is_left_under(direction)`.
 
 ## Toasts
 
-```rust,no_run
+```rust,ignore
 pub enum ToastIntent {
     Debug,
     Info,
@@ -60,7 +60,7 @@ token and cannot be overridden through the theme API.
 
 ## Sheets
 
-```rust,no_run
+```rust,ignore
 pub enum SheetEdge {
     Bottom,             // default
     Top,
@@ -87,7 +87,7 @@ Helpers:
 
 ## Icons
 
-```rust,no_run
+```rust,ignore
 pub enum Icon {
     Text(String),
     #[cfg(feature = "lucide-icons")] Lucide(lucide_icons::Icon),
@@ -97,7 +97,7 @@ pub enum Icon {
 
 ## Menu actions
 
-```rust,no_run
+```rust,ignore
 pub enum MenuAction<MenuId, MenuItemId> {
     MenuPressed(MenuId),
     MenuItemPressed { menu_id: MenuId, menu_item_id: MenuItemId },
@@ -109,7 +109,7 @@ over both.
 
 ## Tabs
 
-```rust,no_run
+```rust,ignore
 pub struct Tab<TabId: Clone + PartialEq> {
     pub id: TabId,
     pub label: String,
@@ -131,7 +131,7 @@ widget renders the entry whose `id == active` with an underline.
 
 ## Breadcrumbs
 
-```rust,no_run
+```rust,ignore
 pub struct Crumb<CrumbId: Clone> {
     pub id: CrumbId,
     pub label: String,

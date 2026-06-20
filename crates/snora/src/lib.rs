@@ -131,3 +131,63 @@ pub mod widget {
 /// `widgets` and `lucide-icons` features are enabled.
 #[cfg(all(feature = "widgets", feature = "lucide-icons"))]
 pub use snora_widgets::lucide;
+
+// ---- Design re-exports (feature-gated) --------------------------------
+//
+// When `design` is enabled (opt-in, requires `widgets`), expose the Snora
+// Design token types and iced style bridge under `snora::design`.
+
+/// Snora Design token types and iced style bridge.
+///
+/// Available when the `design` feature is enabled. Exposes:
+///
+/// * Token vocabulary from [`snora_design`]: [`design::Tokens`],
+///   [`design::Palette`], [`design::Color`], and the full variant /
+///   sub-token set.
+/// * The iced style bridge under [`design::style`]: color conversion,
+///   semantic button styles, and card/container styles.
+///
+/// # iced 0.14 focus limitation
+///
+/// Standard `button` / `container` styles in iced 0.14 do not expose
+/// keyboard-focus state. The style bridge maps every status iced does expose
+/// (hover, pressed, disabled); custom focus rings on standard controls are
+/// not deliverable in v0.20 through this path. See RFC-025 and
+/// `docs/src/contributing/semantic-accessibility.md` for detail.
+#[cfg(feature = "design")]
+pub mod design {
+    // Token types (enumerated, not glob).
+    pub use snora_design::{
+        Color, Density, Emphasis, FocusTokens, Palette, Radius, Size, Spacing, TextRole, Tokens,
+        Tone, Typography,
+    };
+
+    /// iced style functions derived from Snora Design tokens.
+    pub mod style {
+        pub use snora_widgets::design::style::button;
+        pub use snora_widgets::design::style::color;
+        pub use snora_widgets::design::style::container;
+        pub use snora_widgets::design::style::text;
+    }
+
+    /// Pilot button helpers (RFC-028).
+    ///
+    /// Each function wraps `iced::widget::button` with Snora Design token
+    /// styling. Token ownership is handled internally via `Clone`; callers
+    /// do not need to annotate lifetimes.
+    pub mod button {
+        pub use snora_widgets::design::button::{
+            danger, danger_maybe, ghost, ghost_maybe, primary, primary_maybe, secondary,
+            secondary_maybe,
+        };
+    }
+
+    /// Pilot card helpers (RFC-029).
+    ///
+    /// Each function wraps `iced::widget::container` with Snora Design token
+    /// styling. Cards in v0.20 are non-interactive visual grouping surfaces;
+    /// application behaviour lives outside the card.
+    pub mod card {
+        pub use snora_widgets::design::card::{raised, selected, surface};
+    }
+}

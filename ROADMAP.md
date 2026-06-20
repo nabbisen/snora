@@ -43,8 +43,38 @@ Six of ten 1.0 gates are now satisfied. The remaining path:
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
 
+## Snora Design System (v0.19 foundation shipped — RFC-020 … RFC-030)
+
+The Snora Design System foundation has landed in v0.19 as an **opt-in**
+layer (`design` feature; `snora-design` is `publish = false` until v0.20):
+
+- Iced-free `snora-design` crate with `Tokens`, `Palette`, `Color`,
+  `Spacing`, `Typography`, `Radius`, `FocusTokens`, `Tone`/`Emphasis`/
+  `Size`/`Density`; four presets with automated WCAG AA contrast tests.
+- iced style bridge (`snora::design::style`): button + card + text helpers.
+- Pilot button helpers: `primary`, `secondary`, `ghost`, `danger` + `*_maybe`.
+- Pilot card helpers: `surface`, `raised`, `selected`.
+- CI quality gates: `design-isolation` job (Q3 iced-free), feature matrix.
+- Accessibility checklist, semantic construction policy, API governance docs.
+- Design workbench example.
+- RFC-031 (v0.20 release gate), RFC-032/033/034 (future-phase) remain
+  in `rfcs/proposed/`.
+
+Remaining design-track sequence:
+
+- **v0.20** — activate and publish `snora-design`; measure binary-size /
+  build-cost; implement RFC-031 release acceptance gate.
+- **v0.21+** — notice/chip/progress primitives (RFC-032).
+- **v0.22+** — recipes and dogfooding (RFC-033).
+- **v0.23+** — promotion / stabilization and API governance (RFC-034).
+
 ## Recently shipped
 
+- **0.19** — Snora Design System foundation (RFC-020–030, opt-in `design`
+  feature): `snora-design` crate, style bridge, pilot button/card helpers,
+  CI quality gates, accessibility docs, API governance, design workbench.
+  `publish = false` until v0.20 activation. Docs gate fixed (book.toml,
+  fence-tag policy). Migration guide: 0.18 → 0.19.
 - **0.18** — Documentation maturity: contributing index; version snippets updated to 0.17; Gate 7 ✅ (API freeze review complete, 7/10 gates satisfied).
 - **0.17** — 1.0 gate advancement: `Icon` gains `PartialEq`; two RTL
   render-semantics integration tests (10 total); keyboard.rs doc fence fix;

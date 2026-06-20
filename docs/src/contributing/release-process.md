@@ -85,6 +85,7 @@ them in sync is a release-process invariant.
     (covered by workspace check above; verify no example was removed)
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
 [ ] cargo package -p snora-core    --no-verify    # check .crate contents
+[ ] cargo package -p snora-design  --no-verify    # (flip publish=false first at v0.20)
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents
 [ ] git commit, git tag vX.Y.Z, git push --tags
@@ -114,8 +115,11 @@ that is order-aware).
 Strictly bottom-up along the dependency graph:
 
 1. `snora-core` (no internal deps).
-2. `snora-widgets` (depends on `snora-core`).
-3. `snora` (depends on `snora-core`, optionally `snora-widgets`).
+2. `snora-design` (no internal deps; no iced dependency; `publish = false`
+   until v0.20 activates the design feature — flip at release time).
+3. `snora-widgets` (depends on `snora-core`; optionally on `snora-design`).
+4. `snora` (depends on `snora-core`; optionally on `snora-widgets` and
+   `snora-design`).
 
 Each crate's `Cargo.toml` uses both `path = "..."` and
 `version = "..."` for inter-crate references, so cargo's local

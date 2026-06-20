@@ -11,6 +11,10 @@ keywords = ["gui", "iced", "ui", "framework"]
 categories = ["gui"]
 
 [features]
+# When enabled, exposes the Snora Design style bridge (`snora_widgets::design`).
+# Pulls in the iced-free `snora-design` token crate. This feature is opt-in
+# and does NOT activate by default; it targets the v0.20 release surface.
+design = ["dep:snora-design"]
 # Pass-through to snora-core's icon-source features. Applications that
 # enable `snora/lucide-icons` automatically light up the matching path
 # in this crate.
@@ -18,6 +22,7 @@ lucide-icons = ["snora-core/lucide-icons", "dep:lucide-icons"]
 svg-icons = ["snora-core/svg-icons", "iced/svg"]
 
 [dependencies]
-snora-core = { path = "../snora-core", version = "0.18" }
+snora-core = { workspace = true }
+snora-design = { workspace = true, optional = true }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

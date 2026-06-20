@@ -101,7 +101,7 @@ Modal state (layers 6–8) still dominates popover state.
 
 ## Proposed vocabulary (for reference, not adopted)
 
-```rust,no_run
+```rust,ignore
 pub struct Popover<Node, Message>
 where
     Message: Clone,

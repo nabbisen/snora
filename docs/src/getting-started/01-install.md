@@ -6,7 +6,7 @@ Add snora and iced to your `Cargo.toml`. snora targets **iced 0.14** and
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.18"
+snora = "0.19"
 ```
 
 You normally do **not** depend on `snora-core` directly. The `snora` crate
@@ -36,7 +36,7 @@ Advanced users who want to depend on `snora-core` without iced can do so — the
 Enable them on the `snora` line:
 
 ```toml
-snora = { version = "0.18", features = ["lucide-icons"] }
+snora = { version = "0.19", features = ["lucide-icons"] }
 ```
 
 When a feature is disabled the corresponding `Icon` variant does not
@@ -49,7 +49,7 @@ footer, menu) and do not want the prefab widgets compiled in can opt
 out:
 
 ```toml
-snora = { version = "0.18", default-features = false }
+snora = { version = "0.19", default-features = false }
 ```
 
 In this configuration the `snora-widgets` crate is not pulled in,

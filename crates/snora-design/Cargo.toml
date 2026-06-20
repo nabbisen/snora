@@ -1,0 +1,20 @@
+[package]
+name = "snora-design"
+description = "Iced-free design tokens and vocabulary for the Snora GUI framework's optional design system."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "../../README.md"
+keywords = ["gui", "design-system", "tokens", "accessibility", "iced"]
+categories = ["gui"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+# This crate has NO iced dependency, by design (RFC-021/022). Adding one is a
+# CI gate failure (Q3). Tokens are plain data; iced-facing style helpers live
+# in `snora-widgets`.
+[dependencies]
