@@ -17,6 +17,28 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.25.1] — 2026-06-20
+
+### Added
+
+- **`snora::design::contrast` re-export (facade completeness fix).**
+  `snora::design::contrast::{relative_luminance, contrast_ratio,
+  composite_over}` now resolves when the `design` feature is enabled.
+  Previously the `contrast` module was the only public `snora-design` module
+  not reachable through the `snora::design` facade, forcing downstream apps
+  that wanted contrast utilities to add a direct `snora-design` dependency.
+  No new capability is introduced — the functions are already public in
+  `snora-design`; this only adds the intended facade path.
+
+- **Smoke test `design_facade_tests::contrast_ratio_black_white_via_facade`.**
+  Verifies the facade path resolves and that `contrast_ratio(black, white)`
+  returns the WCAG 2.1 value of ~21.0. Guards the re-export against
+  accidental future removal.
+
+- **`snora::design` module doc updated** to list `contrast` alongside
+  `style`, `button`, `card`, `notice`, `chip`, and `progress` in the
+  "Exposes:" section.
+
 ## [0.25.0] — 2026-06-20
 
 ### Fixed
@@ -1061,7 +1083,8 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.25.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/v0.25.1...HEAD
+[0.25.1]: https://github.com/nabbisen/snora/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/nabbisen/snora/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/nabbisen/snora/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/nabbisen/snora/compare/v0.22.0...v0.23.0

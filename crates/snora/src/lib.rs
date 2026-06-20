@@ -58,7 +58,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! snora = { version = "0.24", default-features = false }
+//! snora = { version = "0.25", default-features = false }
 //! ```
 //!
 //! In this configuration `snora-widgets` is not pulled in and the
@@ -70,10 +70,6 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 // ---- Re-export the vocabulary from snora-core --------------------------
-//
-// Users should only need to import from `snora`. We forward the whole
-// contract surface so that a single `use snora::*` (or targeted imports)
-// suffices.
 pub use snora_core::{
     AppLayout, BreadcrumbAction, Crumb, Dialog, Edge, Icon, LayoutDirection, Menu, MenuAction,
     MenuItem, Sheet, SheetEdge, SheetSize, SideBar, SideBarItem, Tab, TabAction, TabBar, Toast,
@@ -93,11 +89,6 @@ pub mod keyboard;
 pub use render::render;
 
 // ---- Widget re-exports (feature-gated) --------------------------------
-//
-// When `widgets` is enabled (the default), expose the prefab widget set
-// from `snora-widgets` under `snora::widget` and `snora::direction` /
-// `snora::style`. These import paths preserve the 0.5.x shape so most
-// applications need no change.
 
 /// Direction-aware row helpers. Re-exported from `snora-widgets`.
 #[cfg(feature = "widgets")]
@@ -114,18 +105,7 @@ pub use snora_widgets::style;
 /// This module is only available when the `widgets` feature is enabled
 /// (which is the default).
 #[cfg(feature = "widgets")]
-pub mod widget {
-    pub use snora_widgets::{
-        app_breadcrumb, app_footer, app_header, app_side_bar, app_tab_bar, icon_element,
-        icon_element_sized, render_menu,
-    };
-
-    /// The `icon` submodule path (kept for source-compat with 0.5.x
-    /// callers using `snora::widget::icon::icon_element`).
-    pub mod icon {
-        pub use snora_widgets::{icon_element, icon_element_sized};
-    }
-}
+pub mod widget;
 
 /// Convenience re-export of Lucide icon constants. Available when both
 /// `widgets` and `lucide-icons` features are enabled.
@@ -133,11 +113,8 @@ pub mod widget {
 pub use snora_widgets::lucide;
 
 // ---- Design re-exports (feature-gated) --------------------------------
-//
-// When `design` is enabled (opt-in, requires `widgets`), expose the Snora
-// Design token types and iced style bridge under `snora::design`.
 
-/// Snora Design token types and iced style bridge.
+/// Snora Design token types, iced style bridge, and contrast utilities.
 ///
 /// Available when the `design` feature is enabled. Exposes:
 ///
@@ -146,6 +123,12 @@ pub use snora_widgets::lucide;
 ///   sub-token set.
 /// * The iced style bridge under [`design::style`]: color conversion,
 ///   semantic button styles, and card/container styles.
+/// * Shallow UI primitives: [`design::button`], [`design::card`],
+///   [`design::notice`], [`design::chip`], [`design::progress`].
+/// * Pure-Rust WCAG contrast utilities under [`design::contrast`]:
+///   [`design::contrast::relative_luminance`],
+///   [`design::contrast::contrast_ratio`],
+///   [`design::contrast::composite_over`].
 ///
 /// # iced 0.14 focus limitation
 ///
@@ -155,57 +138,4 @@ pub use snora_widgets::lucide;
 /// not deliverable in v0.20 through this path. See RFC-025 and
 /// `docs/src/contributing/semantic-accessibility.md` for detail.
 #[cfg(feature = "design")]
-pub mod design {
-    // Token types (enumerated, not glob).
-    pub use snora_design::{
-        Color, Density, Emphasis, FocusTokens, Palette, Radius, Size, Spacing, TextRole, Tokens,
-        Tone, Typography,
-    };
-
-    /// iced style functions derived from Snora Design tokens.
-    pub mod style {
-        pub use snora_widgets::design::style::button;
-        pub use snora_widgets::design::style::color;
-        pub use snora_widgets::design::style::container;
-        pub use snora_widgets::design::style::progress;
-        pub use snora_widgets::design::style::text;
-    }
-
-    /// Pilot button helpers (RFC-028).
-    ///
-    /// Each function wraps `iced::widget::button` with Snora Design token
-    /// styling. Token ownership is handled internally via `Clone`; callers
-    /// do not need to annotate lifetimes.
-    pub mod button {
-        pub use snora_widgets::design::button::{
-            danger, danger_maybe, ghost, ghost_maybe, primary, primary_maybe, secondary,
-            secondary_maybe,
-        };
-    }
-
-    /// Pilot card helpers (RFC-029).
-    ///
-    /// Each function wraps `iced::widget::container` with Snora Design token
-    /// styling. Cards are non-interactive visual grouping surfaces;
-    /// application behaviour lives outside the card.
-    pub mod card {
-        pub use snora_widgets::design::card::{raised, selected, surface};
-    }
-
-    /// Notice banner primitive (RFC-032).
-    ///
-    /// Builder: `Notice::new(tokens, tone, body).title(…).action(…).dismiss(…).render()`.
-    pub mod notice {
-        pub use snora_widgets::design::notice::Notice;
-    }
-
-    /// Filter and removable chip primitives (RFC-032).
-    pub mod chip {
-        pub use snora_widgets::design::chip::{filter, removable};
-    }
-
-    /// Progress row and card primitives (RFC-032).
-    pub mod progress {
-        pub use snora_widgets::design::progress::{card, row};
-    }
-}
+pub mod design;
