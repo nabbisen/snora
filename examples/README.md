@@ -35,7 +35,7 @@ The design workbench is the primary manual regression target for Snora Design.
 Run with:
 
 ```bash
-cargo run -p snora-example-design-workbench --features design
+cargo run -p snora-example-design-workbench
 ```
 
 QA checklist (inspect visually for all four preset tokens):

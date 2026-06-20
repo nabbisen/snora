@@ -30,7 +30,7 @@ measure_ms() {
     local name="$1"
     shift
     # Clean only the package(s) being measured for a cold build of those crates.
-    cargo clean -p snora-core -p snora-widgets -p snora 2>/dev/null || true
+    cargo clean -p snora-core -p snora-design -p snora-widgets -p snora 2>/dev/null || true
     local start end
     start=$(date +%s%3N)
     "$@" > "/tmp/snora-build-cost-${name}.log" 2>&1
@@ -43,6 +43,8 @@ build_widgets_ms=$(measure_ms    "build_widgets"      cargo build -p snora-widge
 build_engine_only_ms=$(measure_ms "build_engine_only"  cargo build -p snora --no-default-features --release)
 example_hello_ms=$(measure_ms    "example_hello"      cargo build --profile release-baseline -p snora-example-hello)
 build_widgets_design_ms=$(measure_ms "build_widgets_design" cargo build -p snora-widgets --features design --release)
+# Also clean the workbench binary itself (measure_ms does not include it in the package clean).
+cargo clean -p snora-example-design-workbench 2>/dev/null || true
 example_workbench_ms=$(measure_ms "example_workbench"  cargo build --profile release-baseline -p snora-example-design-workbench)
 
 echo "${VERSION},${check_workspace_ms},${build_widgets_ms},${build_engine_only_ms},${example_hello_ms},${build_widgets_design_ms},${example_workbench_ms},${RUSTC},${RUNNER_OS},${DATE}"

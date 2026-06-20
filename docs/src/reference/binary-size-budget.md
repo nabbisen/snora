@@ -15,12 +15,12 @@ real consequences for distribution — installers, app stores,
 auto-updaters, end-user disk space. Adding a feature to the
 framework should never quietly cost users megabytes of bloat.
 
-This page tracks the size of the canonical example binary
-(`examples/hello`, the smallest possible snora app) at every
-release tag, with and without the optional `widgets` feature. The
-diff between the two values is the floor of "what snora widgets
-cost you" — anything further you do (sidebar, header, sheet, tabs)
-builds on that floor.
+This page tracks the stripped binary size of three identical probe
+apps (`examples/size_probe_engine`, `size_probe_widgets`,
+`size_probe_design`) at every release tag. All three probes contain
+the same trivial application code; only their `snora` feature set
+differs. The size difference between two consecutive probes is the
+**marginal cost** of adding that feature to an application.
 
 Tracking the number across releases gives us **drift detection**:
 if 0.10 → 0.11 grows the binary by 200 KB without a corresponding
@@ -67,15 +67,19 @@ Each CSV row records:
 
 | Column | Meaning |
 |---|---|
-| `version` | snora version this row is for, e.g. `0.24.0`. |
-| `widgets_on_bytes` | Stripped size of `snora-example-hello` built with default features (widgets ON). |
-| `widgets_off_bytes` | Same example built with `--no-default-features`. |
-| `diff_bytes` | `widgets_on_bytes − widgets_off_bytes`. Marginal cost of opting into `snora-widgets`. |
-| `design_on_bytes` | Stripped size of `snora-example-design-workbench` with `features = ["widgets", "design"]`. `N/A` for releases before v0.24. |
-| `design_diff_bytes` | `design_on_bytes − widgets_on_bytes`. Marginal cost of opting into `snora-design`. `N/A` for releases before v0.24. |
-| `rustc` | Rust toolchain version used, e.g. `rustc_1.96.0_(ac68faa20_2026-05-25)`. |
+| `version` | snora version this row is for, e.g. `0.25.0`. |
+| `engine_bytes` | Stripped size of `snora-size-probe-engine` (`--no-default-features`). |
+| `widgets_bytes` | Stripped size of `snora-size-probe-widgets` (default features). |
+| `widgets_diff_bytes` | `widgets_bytes − engine_bytes`. Marginal binary cost of `snora-widgets`. |
+| `design_bytes` | Stripped size of `snora-size-probe-design` (`features = ["widgets", "design"]`). |
+| `design_diff_bytes` | `design_bytes − widgets_bytes`. Marginal binary cost of `snora-design`. |
+| `rustc` | Rust toolchain version, e.g. `rustc_1.96.0_(ac68faa20_2026-05-25)`. |
 | `runner_os` | CI runner OS, e.g. `ubuntu-latest`. |
 | `date` | UTC date of the measurement (`YYYY-MM-DD`). |
+
+All three probes contain identical application code (see `examples/size_probe_*/src/main.rs`),
+so diffs measure the cost of the feature alone. Rows before v0.25 carry `N/A`
+because the probe crates did not exist and earlier measurements used different methodology.
 
 The 150 KB threshold from
 [`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md)

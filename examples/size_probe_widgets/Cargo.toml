@@ -1,0 +1,17 @@
+[package]
+name = "snora-size-probe-widgets"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "snora-size-probe-widgets"
+path = "src/main.rs"
+
+# Default features (widgets ON, design OFF).
+[dependencies]
+snora = { workspace = true }
+iced  = { workspace = true }

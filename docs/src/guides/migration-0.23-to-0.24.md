@@ -1,7 +1,7 @@
 # Migrating from 0.23 to 0.24
 
 v0.24 is an **architect-review cleanup release** addressing findings from the
-v0.23 architect review. One breaking change to an internal-only method.
+v0.23 architect review. One breaking change to a public but intended-for-validation helper.
 
 ## What changed
 

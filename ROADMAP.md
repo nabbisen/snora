@@ -43,34 +43,35 @@ Eight of ten 1.0 gates are now satisfied. The remaining path:
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
 
-## Snora Design System (v0.19 foundation shipped — RFC-020 … RFC-030)
+## Snora Design System (complete — RFC-020 … RFC-034)
 
-The Snora Design System foundation has landed in v0.19 as an **opt-in**
-layer (`design` feature; `snora-design` published as of v0.19.0):
+The Snora Design System shipped across five minor releases:
 
-- Iced-free `snora-design` crate with `Tokens`, `Palette`, `Color`,
-  `Spacing`, `Typography`, `Radius`, `FocusTokens`, `Tone`/`Emphasis`/
-  `Size`/`Density`; four presets with automated WCAG AA contrast tests.
-- iced style bridge (`snora::design::style`): button + card + text helpers.
-- Pilot button helpers: `primary`, `secondary`, `ghost`, `danger` + `*_maybe`.
-- Pilot card helpers: `surface`, `raised`, `selected`.
-- CI quality gates: `design-isolation` job (Q3 iced-free), feature matrix.
-- Accessibility checklist, semantic construction policy, API governance docs.
-- Design workbench example.
-- RFC-031 (v0.20 release gate), RFC-032/033/034 (future-phase) remain
-  in `rfcs/proposed/`.
+- **v0.19** — Foundation groundwork (RFC-020–030): iced-free `snora-design`
+  crate, token model, WCAG AA contrast tests, iced style bridge, pilot
+  button/card helpers, CI quality gates, accessibility and governance docs.
+  `snora-design` was `publish = false` in v0.19.
+- **v0.20** — Activation (RFC-031): `snora-design` published; release gate
+  satisfied; `design` confirmed opt-in.
+- **v0.21** — Primitives (RFC-032): notice, chip, and progress.
+- **v0.23** — Recipes and governance (RFC-033, RFC-034): four initial recipes,
+  API governance process.
+- **v0.24** — Architect-review cleanup: chip contrast fix, measurement
+  methodology improvements, documentation corrections.
 
-Remaining design-track sequence:
+All RFC-020 through RFC-034 are in `rfcs/done/`. Future design work is
+governed by `docs/src/contributing/api-governance.md` and the D-gates.
 
-- **v0.21** — notice, chip, and progress primitives (RFC-032). ✅ Shipped.
-- **v0.22** — recipes and dogfooding (RFC-033). ✅ Shipped as v0.23.
-- **v0.23** — promotion / stabilization and API governance (RFC-034). ✅ Shipped.
+The `design` feature remains **opt-in** (`default = ["widgets"]`). Making it
+default-on requires an explicit size/build-cost review and a future RFC or
+release decision — measurement alone does not automatically flip the default.
 
 All design-track RFCs (RFC-020 through RFC-034) are now in `rfcs/done/`.
 Future design work is governed by `api-governance.md` and the D-gates.
 
 ## Recently shipped
 
+- **0.25.0** — Measurement methodology fix (size-probe crates replacing hello/workbench diff); build-cost cold-clean fix; RFC-031 index fix; docs corrections.
 - **0.24.0** — Architect-review cleanup: M-4 chip contrast fix, M-1/M-2/M-3/M-5/M-6/M-7 must-fixes, S-series should-fixes, all from v0.23 review.
 - **0.23.0** — Recipes and dogfood process (RFC-033): four initial recipes (empty-state, background-task, error-recovery, result-card); RFC-034 governance formally closed. All 15 design-track RFCs complete.
 - **0.22.0** — Code quality and doc audit: chip dedup, new tests (chip/notice/progress), three new design doc pages (notices/chips/progress), stale version refs cleaned.

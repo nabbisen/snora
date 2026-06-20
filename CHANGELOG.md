@@ -17,6 +17,72 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.25.0] — 2026-06-20
+
+### Fixed
+
+- **RFC-031 missing from `rfcs/README.md` Done table (M-1).** The row for
+  RFC-031 was absent despite the file existing in `rfcs/done/`. Added between
+  RFC-030 and RFC-032.
+
+- **Binary-size measurement methodology (M-2).** Replaced the previous
+  approach (comparing `snora-example-hello` against
+  `snora-example-design-workbench`) with three identical size-probe crates:
+  `snora-size-probe-engine`, `snora-size-probe-widgets`,
+  `snora-size-probe-design`. All probes contain identical application code;
+  diffs now measure the marginal cost of each feature in isolation.
+  `binary-size.csv` schema updated; pre-v0.25 rows carry `N/A`.
+
+- **Build-cost measurement not cold for design (M-3).** `snora-design`
+  is now included in the `cargo clean` list in `measure-compile-time.sh`.
+  `snora-example-design-workbench` is also cleaned before its measurement.
+
+- **Measurement docs inconsistent with implementation (M-4).** Updated
+  `binary-size-budget.md` (column table, methodology description),
+  `build-cost-budget.md` (six columns documented), `scripts/README.md`
+  (all three scripts described with new probe approach), and
+  `append-binary-size-row.sh` (comments and example row corrected).
+
+- **`examples/README.md` invalid workbench command (M-5).** Removed
+  the invalid `--features design` flag from the design-workbench run
+  command. The example's `Cargo.toml` already includes the `design`
+  feature; passing it at the CLI is a no-op at best, an error at worst.
+
+- **ROADMAP stale design-track section (M-6).** Rewrote the Snora Design
+  System section with accurate per-version history. Removed stale
+  "remain in `rfcs/proposed/`" sentence.
+
+### Changed
+
+- **`snora/Cargo.toml` `design` feature comment.** Updated from
+  "Opt-in until binary-size/build-cost are measured (roadmap Option B: v0.20)"
+  to accurately describe the policy: opt-in by deliberate decision;
+  default-on requires an explicit review and RFC.
+
+- **CHANGELOG reference links** updated from `v0.10.0...HEAD` through
+  the full release history to v0.24.0.
+
+- **`docs/src/design/chips.md`** updated to describe the solid accent
+  background + `accent_text` foreground selected state (was "tinted accent
+  background").
+
+- **Design workbench banner** text updated from "Visual-fit QA for Snora
+  Design v0.20" to "Visual-fit QA for Snora Design".
+
+- **`feature-gating-criteria.md`** current status updated to v0.25.
+
+- **`api-freeze-review.md`** D-3/D-4 rationale clarified: vocabulary and
+  style bridge stable across five consecutive minors (v0.20–v0.24); gates
+  close after a dedicated design-freeze review at or after v0.25.
+
+### Added
+
+- **Three size-probe example crates** in `examples/size_probe_engine/`,
+  `examples/size_probe_widgets/`, `examples/size_probe_design/`. All contain
+  identical minimal app code; only the `snora` feature set differs.
+  Used by `scripts/measure-binary-size.sh` to produce valid marginal-cost
+  measurements.
+
 ## [0.24.0] — 2026-06-20
 
 ### Breaking changes
@@ -995,7 +1061,17 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/v0.25.0...HEAD
+[0.25.0]: https://github.com/nabbisen/snora/compare/v0.24.0...v0.25.0
+[0.24.0]: https://github.com/nabbisen/snora/compare/v0.23.0...v0.24.0
+[0.23.0]: https://github.com/nabbisen/snora/compare/v0.22.0...v0.23.0
+[0.22.0]: https://github.com/nabbisen/snora/compare/v0.21.0...v0.22.0
+[0.21.0]: https://github.com/nabbisen/snora/compare/v0.20.0...v0.21.0
+[0.20.0]: https://github.com/nabbisen/snora/compare/v0.19.1...v0.20.0
+[0.19.1]: https://github.com/nabbisen/snora/compare/v0.19.0...v0.19.1
+[0.19.0]: https://github.com/nabbisen/snora/compare/v0.18.3...v0.19.0
+[0.18.3]: https://github.com/nabbisen/snora/compare/v0.18.2...v0.18.3
+[0.18.2]: https://github.com/nabbisen/snora/compare/v0.10.0...v0.18.2
 [0.10.0]: https://github.com/nabbisen/snora/releases/tag/v0.10.0
 [0.9.0]: https://github.com/nabbisen/snora/releases/tag/v0.9.0
 [0.8.0]: https://github.com/nabbisen/snora/releases/tag/v0.8.0

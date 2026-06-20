@@ -1,0 +1,20 @@
+[package]
+name = "snora-size-probe-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "snora-size-probe-engine"
+path = "src/main.rs"
+
+# Engine-only: no widgets, no design.
+# Uses an explicit path dep (not workspace inheritance) so that
+# default-features = false can be set independently of the workspace
+# snora entry, which carries default-features for regular examples.
+[dependencies]
+snora = { path = "../../crates/snora", version = "0.25", default-features = false }
+iced  = { workspace = true }

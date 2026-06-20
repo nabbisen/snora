@@ -341,7 +341,7 @@ impl App {
         let body: Element<'_, Msg> = scrollable(
             container(
                 column![
-                    text("Visual-fit QA for Snora Design v0.20. \
+                    text("Visual-fit QA for Snora Design. \
                           Use the header buttons to switch presets. \
                           Tab through controls to test native focus handling.")
                         .size(style::text::body_size(t))

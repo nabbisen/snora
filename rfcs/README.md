@@ -69,8 +69,7 @@ Numbers remain stable forever and are never reused.
 | 028 | [v0.20 Pilot Button Helper](./done/028-pilot-button-helper.md) | v0.19.0 |
 | 029 | [v0.20 Pilot Card Helper](./done/029-pilot-card-helper.md) | v0.19.0 |
 | 030 | [Documentation, Examples, and Design Workbench](./done/030-docs-examples-and-design-workbench.md) | v0.19.0 |
-
-
+| 031 | [v0.20 Release Acceptance Criteria](./done/031-v020-release-acceptance.md) | v0.20.0 |
 | 032 | [Notice, Chip, and Progress Primitives](./done/032-notice-chip-and-progress-primitives.md) | v0.21.0 |
 
 | 033 | [Recipes and Dogfood Process](./done/033-recipes-and-dogfood-process.md) | v0.23.0 |

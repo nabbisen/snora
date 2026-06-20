@@ -27,7 +27,9 @@ widgets = ["dep:snora-widgets"]
 # Enables the Snora Design style bridge. Activates the `design` feature on
 # `snora-widgets` (which pulls in the iced-free `snora-design` token crate)
 # and re-exports the style bridge and token types under `snora::design`.
-# Opt-in until binary-size/build-cost are measured (roadmap Option B: v0.20).
+# Opt-in by policy; default-on requires an explicit size/build-cost review
+# and a future RFC or release decision. Measurement data tracked in
+# docs/src/reference/binary-size-budget.md and build-cost-budget.md.
 # Requires the `widgets` feature; enabling `design` without `widgets` is a
 # no-op except for the snora-design token types.
 design = ["widgets", "dep:snora-design", "snora-widgets?/design"]

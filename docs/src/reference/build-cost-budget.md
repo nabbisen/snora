@@ -12,7 +12,7 @@ unintended growth before it becomes invisible.
 
 ## Compile-time measurements
 
-`scripts/measure-compile-time.sh` records four cold-build durations:
+`scripts/measure-compile-time.sh` records six cold-build durations:
 
 | Column | What it measures |
 |---|---|
@@ -20,10 +20,13 @@ unintended growth before it becomes invisible.
 | `build_widgets_ms` | `cargo build -p snora-widgets --release` |
 | `build_engine_only_ms` | `cargo build -p snora --no-default-features --release` |
 | `example_hello_ms` | `cargo build --profile release-baseline -p snora-example-hello` |
+| `build_widgets_design_ms` | `cargo build -p snora-widgets --features design --release` |
+| `example_workbench_ms` | `cargo build --profile release-baseline -p snora-example-design-workbench` |
 
-"Cold" means the three Snora crates (`snora-core`, `snora-widgets`,
-`snora`) are cleaned before each measurement. iced's transitive closure
-remains cached so the measurement reflects Snora's contribution, not iced's.
+"Cold" means `snora-core`, `snora-design`, `snora-widgets`, and `snora`
+are cleaned before each measurement. iced's transitive closure remains
+cached so the measurement reflects Snora's contribution, not iced's.
+The workbench binary itself is also cleaned before `example_workbench_ms`.
 
 ### Limitations
 

@@ -11,7 +11,7 @@
 # Where <csv-row> is exactly the line produced by
 # scripts/measure-binary-size.sh, e.g.
 #
-#     0.10.0,11500000,11200000,300000,off,2026-04-29
+#     0.25.0,14000000,15800000,1800000,15900000,100000,rustc_1.96.0_(...),ubuntu-latest,2026-06-20
 #
 # This script is intentionally minimal: it does not parse, sort,
 # de-duplicate, or rewrite the file.  Append-only is the entire
@@ -31,9 +31,10 @@ if [[ ! -f "$CSV_PATH" ]]; then
     exit 1
 fi
 
-# Sanity-check: the row must have exactly seven comma-separated fields,
-# matching the CSV header.  Reject obvious mistakes (empty input,
-# wrong column count) before they pollute the file.
+# Sanity-check: the row must have exactly nine comma-separated fields,
+# matching the CSV header:
+#   version,engine_bytes,widgets_bytes,widgets_diff_bytes,design_bytes,design_diff_bytes,rustc,runner_os,date
+# Reject obvious mistakes (empty input, wrong column count) before they pollute the file.
 field_count=$(awk -F, '{print NF}' <<<"$ROW")
 if [[ "$field_count" -ne 9 ]]; then
     echo "row has $field_count fields, expected 9: '$ROW'" >&2

@@ -7,7 +7,7 @@ The application owns selection state.
 
 ### `chip::filter`
 
-A simple toggle chip. Shows a tinted accent background when selected.
+A simple toggle chip. Shows a solid accent background with `accent_text` foreground when selected (WCAG AA ≥4.5:1 across all presets).
 
 ```rust,ignore
 use snora::design::chip;
@@ -49,7 +49,7 @@ for tag in &self.active_tags {
 ## Accessibility
 
 - Both variants use `iced::widget::button`.
-- Selected state is communicated via color (tinted background + accent text).
+- Selected state is communicated via solid accent background + contrast-tested `accent_text` foreground (WCAG AA ≥4.5:1 across all presets, verified by automated tests).
   If color-alone would be a barrier in your application context, add a
   checkmark glyph to the label.
 - Custom focus ring not rendered in iced 0.14 — documented limitation.

@@ -128,8 +128,8 @@ gates; they do not block snora core's 1.0 release.
 |---|---|
 | D-1. One iced major upgrade survived with design feature enabled | ⬜ (coupled to core Gate 1) |
 | D-2. Minimal path clean after iced upgrade | ⬜ (coupled to core Gate 1) |
-| D-3. Token model stable for ≥2 consecutive minors | ⬜ (first design minor v0.20; need v0.20–v0.21+ with no vocabulary churn — vocabulary unchanged v0.20–v0.24) |
-| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ (bridge unchanged v0.20–v0.24; satisfy after one more clean minor) |
+| D-3. Token model stable for ≥2 consecutive minors | ⬜ (vocabulary unchanged v0.20–v0.24 — five clean minors; close after a dedicated design-freeze review at or after v0.25) |
+| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ (bridge unchanged v0.20–v0.24 — five clean minors; close alongside D-3 after the freeze review) |
 | D-5. ≥1 real app in serious production use of design tokens | ⬜ (coupled to core Gate 3) |
 | D-6. Promotion process used at least once with evidence | ⬜ (recipes published v0.23; no promotion yet) |
 | D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor — clean through v0.24) |
