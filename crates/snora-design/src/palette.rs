@@ -64,9 +64,13 @@ pub struct Palette {
 }
 
 impl Palette {
-    /// Returns every role color in a stable order, for validation and tests.
+    /// Returns every role color in a stable order, for crate-internal
+    /// validation and tests. Crate-private: the fixed-size return type would
+    /// become a breaking change if new roles are added to `#[non_exhaustive]`
+    /// `Palette`. External code should access fields directly.
+    #[cfg(test)]
     #[must_use]
-    pub fn roles(&self) -> [Color; 18] {
+    pub(crate) fn roles(&self) -> [Color; 18] {
         [
             self.background,
             self.surface,

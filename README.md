@@ -40,7 +40,7 @@ for fuller fit guidance.
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.10"
+snora = "0.24"
 ```
 
 ```rust
@@ -107,9 +107,12 @@ demos are in the
 - *No silent drops.* If you populate an overlay but leave its close
   sink `None`, the overlay still renders — snora omits only the
   click-outside backdrop, never the content.
-- *Skeleton, not styling.* Snora positions and stacks. The look of
-  your dialog card, the typography of your header — those are your
-  decisions, not ours.
+- *Skeleton first, optional design defaults.* Snora positions and stacks.
+  The look of your dialog card, the typography of your header — those are
+  your decisions by default. When you want contrast-tested tokens and
+  shallow style helpers, opt in to **Snora Design** (`features =
+  ["widgets", "design"]`) — an iced-free token vocabulary with four
+  built-in presets and WCAG AA–tested palettes.
 
 ## Read more
 

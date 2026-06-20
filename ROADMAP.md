@@ -71,7 +71,8 @@ Future design work is governed by `api-governance.md` and the D-gates.
 
 ## Recently shipped
 
-- **0.23.0** — Recipes and dogfood process (RFC-033): four initial recipes (empty-state, background-task, error-recovery, result-card); RFC-034 governance formally closed. All 35 design-track RFCs complete.
+- **0.24.0** — Architect-review cleanup: M-4 chip contrast fix, M-1/M-2/M-3/M-5/M-6/M-7 must-fixes, S-series should-fixes, all from v0.23 review.
+- **0.23.0** — Recipes and dogfood process (RFC-033): four initial recipes (empty-state, background-task, error-recovery, result-card); RFC-034 governance formally closed. All 15 design-track RFCs complete.
 - **0.22.0** — Code quality and doc audit: chip dedup, new tests (chip/notice/progress), three new design doc pages (notices/chips/progress), stale version refs cleaned.
 - **0.21.0** — Notice, chip, and progress primitives (RFC-032); design workbench updated.
 - **0.20.0** — Snora Design activation: `snora-design` published; RFC-031 release gate satisfied; `design` opt-in confirmed; migration guide 0.19→0.20.

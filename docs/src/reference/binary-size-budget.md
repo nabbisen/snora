@@ -67,11 +67,13 @@ Each CSV row records:
 
 | Column | Meaning |
 |---|---|
-| `version` | snora version this row is for, e.g. `0.19.0`. |
-| `widgets_on_bytes` | Stripped size of `examples/hello` built with default features. |
+| `version` | snora version this row is for, e.g. `0.24.0`. |
+| `widgets_on_bytes` | Stripped size of `snora-example-hello` built with default features (widgets ON). |
 | `widgets_off_bytes` | Same example built with `--no-default-features`. |
-| `diff_bytes` | `widgets_on_bytes − widgets_off_bytes`. The marginal cost of opting into `snora-widgets`. |
-| `rustc` | Rust toolchain version used for the measurement, e.g. `rustc_1.96.0_(ac68faa20_2026-05-25)`. |
+| `diff_bytes` | `widgets_on_bytes − widgets_off_bytes`. Marginal cost of opting into `snora-widgets`. |
+| `design_on_bytes` | Stripped size of `snora-example-design-workbench` with `features = ["widgets", "design"]`. `N/A` for releases before v0.24. |
+| `design_diff_bytes` | `design_on_bytes − widgets_on_bytes`. Marginal cost of opting into `snora-design`. `N/A` for releases before v0.24. |
+| `rustc` | Rust toolchain version used, e.g. `rustc_1.96.0_(ac68faa20_2026-05-25)`. |
 | `runner_os` | CI runner OS, e.g. `ubuntu-latest`. |
 | `date` | UTC date of the measurement (`YYYY-MM-DD`). |
 

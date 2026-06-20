@@ -20,7 +20,7 @@ Each recipe follows the nine-section format defined in
 ### All design-track RFCs complete
 
 RFC-033 (Recipes and Dogfood Process) and RFC-034 (Promotion, Stabilization,
-and API Governance) are both closed. All 35 design-track RFCs (RFC-020
+and API Governance) are both closed. All 15 design-track RFCs (RFC-020
 through RFC-034) are now in `rfcs/done/`. Future design work is governed
 by `docs/src/contributing/api-governance.md`.
 

@@ -1,31 +1,33 @@
 #!/usr/bin/env bash
 #
 # measure-binary-size.sh — produce a single CSV row describing the
-# release-build binary size of `examples/hello`, both with and
-# without the optional `widgets` feature.
+# release-build binary size of representative Snora binaries.
 #
 # Usage:
 #
-#     scripts/measure-binary-size.sh <version> [<lto-mode>]
+#     scripts/measure-binary-size.sh <version>
 #
 # Arguments:
 #
 #   <version>   — the snora version this measurement refers to,
-#                 written verbatim into the CSV.  E.g. "0.10.0".
-#
-#   <lto-mode>  — optional, defaults to "off".  Written verbatim
-#                 into the CSV's lto column.  This script always
-#                 builds with the workspace's release-baseline
-#                 profile, which has lto = false; the argument
-#                 exists so callers can record a different value
-#                 if they switch profiles.
+#                 written verbatim into the CSV.  E.g. "0.24.0".
 #
 # Output (stdout):
 #
 #   One CSV row matching the schema in
 #   docs/src/reference/binary-size-budget/binary-size.csv :
 #
-#     version,widgets_on_bytes,widgets_off_bytes,diff_bytes,lto,date
+#     version,widgets_on_bytes,widgets_off_bytes,diff_bytes,design_on_bytes,design_diff_bytes,rustc,runner_os,date
+#
+#   Columns:
+#     widgets_on_bytes   — snora-example-hello with default features (widgets ON)
+#     widgets_off_bytes  — snora-example-hello with --no-default-features
+#     diff_bytes         — widgets_on - widgets_off (marginal cost of widgets)
+#     design_on_bytes    — snora-example-design-workbench (widgets + design)
+#     design_diff_bytes  — design_on - widgets_on (marginal cost of design)
+#     rustc              — toolchain version
+#     runner_os          — CI runner OS
+#     date               — UTC date of measurement
 #
 # Exit code:
 #
@@ -48,45 +50,51 @@ WORKSPACE_DIR="$(cd -- "$SCRIPT_DIR/.." &>/dev/null && pwd)"
 cd "$WORKSPACE_DIR"
 
 PROFILE="release-baseline"
-BIN_NAME="snora-example-hello"
-BIN_PATH="target/$PROFILE/$BIN_NAME"
+HELLO_BIN="snora-example-hello"
+WORKBENCH_BIN="snora-example-design-workbench"
+HELLO_PATH="target/$PROFILE/$HELLO_BIN"
+WORKBENCH_PATH="target/$PROFILE/$WORKBENCH_BIN"
 
 build_and_measure() {
     local label="$1"
-    shift  # remaining args go to cargo
+    local bin_name="$2"
+    local bin_path="$3"
+    shift 3  # remaining args go to cargo
 
     # Clean only the binary's own artifacts so iced's heavy deps
-    # stay cached between the two builds.  Without this the second
-    # build re-uses the first build's binary and reports a stale
-    # size.
-    cargo clean -p "$BIN_NAME" --profile "$PROFILE" >&2
+    # stay cached between builds.
+    cargo clean -p "$bin_name" --profile "$PROFILE" >&2
 
-    cargo build --profile "$PROFILE" -p "$BIN_NAME" "$@" >&2
+    cargo build --profile "$PROFILE" -p "$bin_name" "$@" >&2
 
-    if [[ ! -f "$BIN_PATH" ]]; then
-        echo "build did not produce $BIN_PATH (label=$label)" >&2
+    if [[ ! -f "$bin_path" ]]; then
+        echo "build did not produce $bin_path (label=$label)" >&2
         exit 1
     fi
 
     # Strip a copy so the original binary is left intact for any
     # subsequent step that wants it.
-    local stripped="$BIN_PATH.stripped.$label"
-    cp "$BIN_PATH" "$stripped"
+    local stripped="$bin_path.stripped.$label"
+    cp "$bin_path" "$stripped"
     strip --strip-all "$stripped"
 
     stat -c '%s' "$stripped"
 }
 
-echo "Measuring widgets ON ..." >&2
-WIDGETS_ON=$(build_and_measure "on")
+echo "Measuring widgets ON (snora-example-hello, default features) ..." >&2
+WIDGETS_ON=$(build_and_measure "on" "$HELLO_BIN" "$HELLO_PATH")
 
-echo "Measuring widgets OFF ..." >&2
-WIDGETS_OFF=$(build_and_measure "off" --no-default-features)
+echo "Measuring widgets OFF (snora-example-hello, --no-default-features) ..." >&2
+WIDGETS_OFF=$(build_and_measure "off" "$HELLO_BIN" "$HELLO_PATH" --no-default-features)
+
+echo "Measuring design ON (snora-example-design-workbench, widgets+design) ..." >&2
+DESIGN_ON=$(build_and_measure "design" "$WORKBENCH_BIN" "$WORKBENCH_PATH")
 
 DIFF=$(( WIDGETS_ON - WIDGETS_OFF ))
+DESIGN_DIFF=$(( DESIGN_ON - WIDGETS_ON ))
 DATE=$(date -u +%Y-%m-%d)
 RUSTC=$(rustc --version | tr ' ' '_')
 RUNNER_OS="${RUNNER_OS:-unknown}"
 
 # CSV row, matching the budget CSV header.
-echo "${VERSION},${WIDGETS_ON},${WIDGETS_OFF},${DIFF},${RUSTC},${RUNNER_OS},${DATE}"
+echo "${VERSION},${WIDGETS_ON},${WIDGETS_OFF},${DIFF},${DESIGN_ON},${DESIGN_DIFF},${RUSTC},${RUNNER_OS},${DATE}"

@@ -12,6 +12,10 @@
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
 //! - Focus rings follow the iced 0.14 limitation (no `Focused` status on
 //!   `button::Status`); documented, not a regression.
+//! - The dismiss button uses `"×"` as its visible label. iced 0.14 does not
+//!   expose a separate accessible label for buttons. If a more descriptive
+//!   label is needed for assistive technology, this is a future customization
+//!   point (e.g. `.dismiss_label(msg, label)`).
 //!
 //! # Usage
 //!

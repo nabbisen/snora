@@ -3,10 +3,9 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.18.0):** Seven of ten gates satisfied. Gate 7
-(public API freeze review) completed this release — all checklist
-sections green, maintainer declares API ready for 1.0 pending gates
-1, 3, and 9.
+**Current status (v0.24.0):** Eight of ten core gates satisfied. Remaining
+blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
+production app). Design-track D-gates tracking in progress; see table below.
 
 ## Crate-level surface
 
@@ -127,14 +126,14 @@ gates; they do not block snora core's 1.0 release.
 
 | Gate | Status |
 |---|---|
-| D-1. One iced major upgrade survived with design feature enabled | ⬜ |
-| D-2. Minimal path clean after iced upgrade | ⬜ |
-| D-3. Token model stable for ≥2 consecutive minors | ⬜ (v0.20 is the first design minor) |
-| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ (v0.20 is the first design minor) |
-| D-5. ≥1 real app in serious production use of design tokens | ⬜ |
-| D-6. Promotion process used at least once with evidence | ⬜ |
-| D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor) |
-| D-8. `snora-design` published (`publish = false` flipped) | ⬜ (v0.20 activation pending) |
+| D-1. One iced major upgrade survived with design feature enabled | ⬜ (coupled to core Gate 1) |
+| D-2. Minimal path clean after iced upgrade | ⬜ (coupled to core Gate 1) |
+| D-3. Token model stable for ≥2 consecutive minors | ⬜ (first design minor v0.20; need v0.20–v0.21+ with no vocabulary churn — vocabulary unchanged v0.20–v0.24) |
+| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ (bridge unchanged v0.20–v0.24; satisfy after one more clean minor) |
+| D-5. ≥1 real app in serious production use of design tokens | ⬜ (coupled to core Gate 3) |
+| D-6. Promotion process used at least once with evidence | ⬜ (recipes published v0.23; no promotion yet) |
+| D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor — clean through v0.24) |
+| D-8. `snora-design` published (`publish = false` flipped) | ✅ v0.20.0 |
 
 See `docs/src/contributing/api-governance.md` for the full promotion,
 deprecation, and release-review governance process.

@@ -42,5 +42,7 @@ check_workspace_ms=$(measure_ms  "check_workspace"    cargo check --workspace --
 build_widgets_ms=$(measure_ms    "build_widgets"      cargo build -p snora-widgets --release)
 build_engine_only_ms=$(measure_ms "build_engine_only"  cargo build -p snora --no-default-features --release)
 example_hello_ms=$(measure_ms    "example_hello"      cargo build --profile release-baseline -p snora-example-hello)
+build_widgets_design_ms=$(measure_ms "build_widgets_design" cargo build -p snora-widgets --features design --release)
+example_workbench_ms=$(measure_ms "example_workbench"  cargo build --profile release-baseline -p snora-example-design-workbench)
 
-echo "${VERSION},${check_workspace_ms},${build_widgets_ms},${build_engine_only_ms},${example_hello_ms},${RUSTC},${RUNNER_OS},${DATE}"
+echo "${VERSION},${check_workspace_ms},${build_widgets_ms},${build_engine_only_ms},${example_hello_ms},${build_widgets_design_ms},${example_workbench_ms},${RUSTC},${RUNNER_OS},${DATE}"

@@ -115,8 +115,7 @@ that is order-aware).
 Strictly bottom-up along the dependency graph:
 
 1. `snora-core` (no internal deps).
-2. `snora-design` (no internal deps; no iced dependency; `publish = false`
-   until v0.20 activates the design feature — flip at release time).
+2. `snora-design` (no internal deps; no iced dependency; published from v0.20 onward).
 3. `snora-widgets` (depends on `snora-core`; optionally on `snora-design`).
 4. `snora` (depends on `snora-core`; optionally on `snora-widgets` and
    `snora-design`).

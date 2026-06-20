@@ -53,7 +53,7 @@ jobs:
       - name: Write job summary
         run: |
           ROW="${{ steps.measure.outputs.row }}"
-          IFS=',' read -r v ws_ms wid_ms eng_ms hel_ms rustc os date <<<"$ROW"
+          IFS=',' read -r v ws_ms wid_ms eng_ms hel_ms wid_design_ms wb_ms rustc os date <<<"$ROW"
           {
             echo "## Build cost — \`$v\`"
             echo
@@ -63,6 +63,8 @@ jobs:
             echo "| build snora-widgets (release) | $wid_ms |"
             echo "| build engine-only (release) | $eng_ms |"
             echo "| build example-hello (release-baseline) | $hel_ms |"
+            echo "| build snora-widgets + design (release) | $wid_design_ms |"
+            echo "| build design workbench (release-baseline) | $wb_ms |"
             echo
             echo "Rustc: \`$rustc\` · OS: $os · Date: $date"
             echo

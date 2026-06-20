@@ -25,9 +25,9 @@ change.
 
 Three new pages in `docs/src/design/`:
 
-- [Notices](design/notices.md) — usage, tone table, visibility pattern, accessibility.
-- [Chips](design/chips.md) — filter and removable variants, selection state, accessibility.
-- [Progress](design/progress.md) — value, tone, layout variants, indeterminate limitation.
+- [Notices](../design/notices.md) — usage, tone table, visibility pattern, accessibility.
+- [Chips](../design/chips.md) — filter and removable variants, selection state, accessibility.
+- [Progress](../design/progress.md) — value, tone, layout variants, indeterminate limitation.
 
 `v021-primitives.md` updated from planning document to implementation reference.
 

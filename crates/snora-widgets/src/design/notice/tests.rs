@@ -9,6 +9,7 @@ use super::*;
 use snora_design::{Tokens, Tone};
 
 // If this compiles, the builder chain and all Tone variants are accepted.
+#[allow(dead_code)] // compile-only: verifies builder accepts all Tone × preset combinations
 fn _notice_compiles_for_all_tones_and_presets() {
     for tokens in [
         Tokens::light(), Tokens::dark(),

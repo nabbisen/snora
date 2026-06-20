@@ -78,11 +78,7 @@ Numbers remain stable forever and are never reused.
 
 ## Proposed
 
-The following design-system RFCs remain in review (target v0.20+):
-
-| ID | Title |
-|----|-------|
-| 031 | [v0.20 Release Acceptance Criteria](./done/031-v020-release-acceptance.md) | v0.20.0 |
+_(none)_
 
 ## Archive
 

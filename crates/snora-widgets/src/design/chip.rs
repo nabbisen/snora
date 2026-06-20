@@ -2,17 +2,36 @@
 //!
 //! Two variants:
 //!
-//! * [`filter`] — a toggle chip for filtering or categorizing. Tinted when
-//!   selected, neutral at rest.
+//! * [`filter`] — a toggle chip for filtering or categorizing. Solid accent
+//!   background + `accent_text` foreground when selected; neutral border at
+//!   rest.
 //! * [`removable`] — a chip with a separate remove (×) button.
 //!
 //! Both are backed by `iced::widget::button` and are keyboard-reachable.
 //! The application owns selection/filter state.
 //!
+//! # Contrast design (M-4 fix)
+//!
+//! Prior to v0.24, the selected chip used a semi-transparent accent tint
+//! (alpha 0.15–0.30) as the background with the full accent color as text.
+//! After compositing over the surface, hovered/pressed states failed
+//! WCAG AA (4.5:1). Replaced with a solid `accent` background +
+//! `accent_text` foreground, which yields ≥6.7:1 across all four presets.
+//! The contrast test `chip_selected_text_over_accent_background` verifies
+//! this.
+//!
 //! # iced 0.14 focus limitation
 //!
 //! No custom focus ring — `button::Status` has no `Focused` variant.
 //! Documented limitation, not a regression (RFC-025, RFC-027).
+//!
+//! # iced 0.14 accessible label limitation
+//!
+//! The dismiss/remove button uses the "×" glyph as its visible label. iced
+//! 0.14 does not expose a separate accessible label for buttons. If the
+//! application requires a more descriptive label for assistive technology,
+//! pass a string such as `"Dismiss"` or `"Remove <tag>"` as a `text`
+//! element instead of `"×"` — this is a future customization point.
 //!
 //! # Usage
 //!
@@ -45,17 +64,24 @@ fn darken(color: Color, amount: f32) -> Color {
     }
 }
 
+/// Selected chip style: solid accent background + accent_text foreground.
+///
+/// This replaces the previous semi-transparent tint approach, which failed
+/// WCAG AA (4.5:1) at hovered (α=0.22) and pressed (α=0.30) states after
+/// compositing over the surface. Solid background + paired foreground role
+/// yields ≥6.7:1 across all four built-in presets.
 fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
-    let accent = style::color::to_iced_color(tokens.palette.accent);
+    let accent      = style::color::to_iced_color(tokens.palette.accent);
+    let accent_text = style::color::to_iced_color(tokens.palette.accent_text);
     let bg = match status {
-        button::Status::Active   => Color { a: 0.15, ..accent },
-        button::Status::Hovered  => Color { a: 0.22, ..accent },
-        button::Status::Pressed  => Color { a: 0.30, ..accent },
-        button::Status::Disabled => Color { a: 0.06, ..accent },
+        button::Status::Active   => accent,
+        button::Status::Hovered  => darken(accent, 0.06),
+        button::Status::Pressed  => darken(accent, 0.12),
+        button::Status::Disabled => Color { a: 0.5, ..accent },
     };
     button::Style {
         background: Some(bg.into()),
-        text_color: accent,
+        text_color: accent_text,
         border: Border::default()
             .rounded(tokens.radius.pill)
             .color(accent)
@@ -93,8 +119,9 @@ fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> button::Sty
 
 /// A toggle chip for filtering or categorizing content.
 ///
-/// Shows a tinted accent background and accent text when `selected`.
-/// Emits `on_toggle` when pressed. Pass `None` to disable.
+/// Shows a solid accent background and `accent_text` foreground when
+/// `selected` (WCAG AA ≥6.7:1 across all built-in presets). Emits
+/// `on_toggle` when pressed. Pass `None` to disable.
 #[must_use]
 pub fn filter<'a, Message: Clone + 'a>(
     tokens: &Tokens,

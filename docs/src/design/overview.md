@@ -34,19 +34,19 @@ Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 **Minimal** — no design feature; iced's default theme only:
 
 ```toml
-snora = { version = "0.19", default-features = false }
+snora = { version = "0.24", default-features = false }
 ```
 
 **Default** — snora's existing layout + prefab widgets, no design tokens:
 
 ```toml
-snora = { version = "0.19" }   # default = ["widgets"]
+snora = { version = "0.24" }   # default = ["widgets"]
 ```
 
 **Design** — layout + widgets + Snora Design tokens and helpers:
 
 ```toml
-snora = { version = "0.19", features = ["widgets", "design"] }
+snora = { version = "0.24", features = ["widgets", "design"] }
 ```
 
 For the full feature flag reference see [Feature flags](feature-flags.md).

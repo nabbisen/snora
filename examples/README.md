@@ -27,6 +27,30 @@ before a release is tagged.
 | `snora-example-breadcrumb` | Breadcrumb | `Crumb::ancestor`/`leaf`; `BreadcrumbAction`; RTL separator flip |
 | `snora-example-multi-view` | Sidebar navigation | `SideBar`, `SideBarItem`; active-view highlighting |
 | `snora-example-workbench` | **All surfaces together** | Header, sidebar, menus, dialog, sheet, toasts (all intents/positions), tab bar, breadcrumb, Escape wiring, LTR/RTL toggle |
+| `snora-example-design-workbench` | **Snora Design visual QA** | Token presets, high contrast, buttons (all variants/states), cards, notices (all tones), chips (filter/removable), progress (tones, indeterminate), typography |
+
+## Manual QA: design workbench
+
+The design workbench is the primary manual regression target for Snora Design.
+Run with:
+
+```bash
+cargo run -p snora-example-design-workbench --features design
+```
+
+QA checklist (inspect visually for all four preset tokens):
+
+- Switch presets (Light / Dark / High-contrast Light / High-contrast Dark).
+- Verify all button variants render: primary, secondary, ghost, danger, disabled.
+- Verify card variants: surface, raised, selected.
+- Verify all notice tones (Info, Success, Warning, Danger, Accent) render
+  with legible text; verify dismiss and action buttons are reachable.
+- Verify filter chips: selected (solid accent bg) vs unselected state.
+- Verify removable chips: label and × button both reachable.
+- Verify progress: determinate at various values; indeterminate ("…") suffix
+  visible; all six tone variants.
+- Inspect typography scale for visible line-height rendering.
+- Confirm high-contrast presets show strong border and text contrast.
 
 ## Manual QA: workbench
 

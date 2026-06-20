@@ -17,6 +17,87 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.24.0] — 2026-06-20
+
+### Breaking changes
+
+- **`Palette::roles()` is now `#[cfg(test)] pub(crate)`** (was `pub`).
+  The method returned `[Color; 18]`, which locks the role count into the
+  public API, conflicting with `Palette` being `#[non_exhaustive]`. The
+  method is now test-only and crate-internal. Access palette roles directly
+  via fields (`palette.text_primary`, `palette.accent`, etc.).
+
+### Fixed
+
+- **Chip selected contrast (M-4, accessibility bug).** `chip::filter` and
+  `chip::removable` selected-state hover/pressed colors failed WCAG AA
+  (4.5:1) in light and dark presets. Replaced the semi-transparent accent
+  tint (α=0.15–0.30) with a solid `accent` background + `accent_text`
+  foreground. Measured contrast ≥6.7:1 across all four built-in presets.
+  New tests: `chip_selected_text_over_accent_background_meets_aa_all_presets`
+  and `chip_selected_text_hover_pressed_meets_aa_all_presets`.
+
+- **RFC README lifecycle inconsistency (M-1).** `rfcs/README.md` `##
+  Proposed` section listed RFC-031 (already in `rfcs/done/`). Section now
+  correctly reads `_(none)_`.
+
+- **Stale version snippets (M-3).** `README.md` quick-start (`0.10` →
+  `0.24`); `crates/snora/src/lib.rs` engine-only doc (`0.18` → `0.24`);
+  `docs/src/design/overview.md` and `feature-flags.md` (`0.19` → `0.24`).
+
+- **`composite_over` debug assertion (N-2).** Added
+  `debug_assert!(bg.is_opaque())` with an explanatory message.
+
+- **`release-process.md` stale note (S-5).** Removed "flip `publish =
+  false` at release time" note; `snora-design` has been published since v0.20.
+
+- **Script comments (S-6).** `measure-binary-size.sh` and
+  `append-binary-size-row.sh` comments updated to document the 9-field
+  schema (`version,widgets_on,widgets_off,diff,design_on,design_diff,rustc,runner_os,date`).
+
+- **Relative links (S-2).** `.github/pull_request_template.md` links
+  corrected to `../docs/src/...`; `migration-0.21-to-0.22.md` design doc
+  links corrected to `../design/...`.
+
+- **"35 design-track RFCs" → "15" (S-3).** Fixed in ROADMAP and
+  `migration-0.22-to-0.23.md`.
+
+### Added
+
+- **Binary-size and build-cost measurement for `design` feature (M-2).**
+  `measure-binary-size.sh` now measures three configurations: widgets ON,
+  widgets OFF, and `widgets+design` via `snora-example-design-workbench`.
+  New columns: `design_on_bytes`, `design_diff_bytes` in `binary-size.csv`;
+  `build_widgets_design_ms`, `example_workbench_ms` in `compile-time.csv`.
+  Existing rows backfilled with `N/A`. CI job summaries updated. First real
+  design measurements will appear after the next CI tag.
+
+- **Design workbench in examples acceptance matrix (M-6).** Added
+  `snora-example-design-workbench` to `examples/README.md` with a dedicated
+  manual QA checklist.
+
+### Changed
+
+- **SUMMARY.md navigation (S-1).** Recipes moved under `# Snora Design`
+  section (were under a separate `## Recipes` heading after Contributing).
+  API governance remains under Contributing.
+
+- **`api-freeze-review.md` updated (M-7).** Header reflects v0.24.0 status
+  (eight of ten core gates). D-8 (`snora-design` published) marked ✅ v0.20.
+  D-3/D-4 rationale updated: vocabulary and style bridge have been stable
+  v0.20–v0.24.
+
+- **README Snora Design mention (S-4).** "Skeleton, not styling" updated to
+  describe the opt-in Snora Design layer.
+
+- **`notice.rs` and `chip.rs` (S-7).** Module comments now explicitly
+  document the `"×"` accessible-label limitation and note it as a future
+  customization point.
+
+- **Compile-only test helpers annotated (S-8).** `_notice_compiles_...`
+  and `_progress_compiles_...` now carry `#[allow(dead_code)]` with
+  explanatory comments.
+
 ## [0.23.0] — 2026-06-20
 
 ### Added
@@ -136,9 +217,10 @@ Scope concerns:  none
   iced-free `snora-design`, high-contrast presets, automated contrast tests,
   iced style bridge, pilot button/card helpers, accessibility checklist,
   semantic construction policy, and boundary docs. `design` remains opt-in
-  (`default = ["widgets"]`); binary-size/build-cost measurements with and
-  without `design` are tracked in the budget CSVs before any decision to
-  make it default-on.
+  (`default = ["widgets"]`); binary-size/build-cost measurement with and
+  without `design` is still pending — the current scripts and CSVs measure
+  `widgets_on/off` only, not `design_on/off`. Measurement columns for the
+  design feature will be added before any decision to make `design` default-on.
 
 - **RFC-031 closed** — moved to `rfcs/done/` (Status: Implemented v0.20.0).
 

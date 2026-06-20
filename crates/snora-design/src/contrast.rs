@@ -55,8 +55,20 @@ pub fn contrast_ratio(a: Color, b: Color) -> f32 {
 ///
 /// Use this before computing contrast when a foreground role legitimately
 /// uses alpha (e.g. a translucent border or focus ring).
+///
+/// # Panics (debug only)
+///
+/// Panics in debug builds if `bg` is not fully opaque (`bg.a != 1.0`).
+/// Compositing over a translucent background requires recursive compositing
+/// against the layer beneath it, which this function does not perform.
 #[must_use]
 pub fn composite_over(fg: Color, bg: Color) -> Color {
+    debug_assert!(
+        bg.is_opaque(),
+        "composite_over: bg must be opaque (a=1.0), got a={}. \
+         Composite the background first before calling this function.",
+        bg.a
+    );
     let a = fg.a;
     Color::rgb(
         fg.r * a + bg.r * (1.0 - a),

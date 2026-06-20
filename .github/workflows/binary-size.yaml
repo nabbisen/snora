@@ -71,7 +71,7 @@ jobs:
       - name: Write job summary
         run: |
           ROW="${{ steps.measure.outputs.row }}"
-          IFS=',' read -r v on off diff rustc os date <<<"$ROW"
+          IFS=',' read -r v on off diff design_on design_diff rustc os date <<<"$ROW"
           {
             echo "## Binary size — \`$v\`"
             echo
@@ -79,14 +79,20 @@ jobs:
             echo "|---|---:|---:|"
             echo "| widgets ON  | $on | $(( on / 1024 )) |"
             echo "| widgets OFF | $off | $(( off / 1024 )) |"
-            echo "| **diff**    | $diff | $(( diff / 1024 )) |"
+            echo "| **widgets diff** | $diff | $(( diff / 1024 )) |"
+            echo "| design ON (workbench) | $design_on | $(( design_on / 1024 )) |"
+            echo "| **design diff** | $design_diff | $(( design_diff / 1024 )) |"
             echo
             echo "Rustc: \`$rustc\` · OS: $os · Date: $date."
             echo
             echo "150 KB threshold per feature-gating-criteria.md indicator 2."
             if (( diff > 153600 )); then
               echo
-              echo ":warning: **diff exceeds the 150 KB threshold.** Investigate before publishing."
+              echo ":warning: **widgets diff exceeds the 150 KB threshold.** Investigate before publishing."
+            fi
+            if (( design_diff > 153600 )); then
+              echo
+              echo ":warning: **design diff exceeds the 150 KB threshold.** Investigate before publishing."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -97,6 +103,7 @@ jobs:
           path: |
             target/release-baseline/snora-example-hello.stripped.on
             target/release-baseline/snora-example-hello.stripped.off
+            target/release-baseline/snora-example-design-workbench.stripped.design
           if-no-files-found: error
           retention-days: 30
 

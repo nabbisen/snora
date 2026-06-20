@@ -26,6 +26,7 @@
   - [0.20 → 0.21](guides/migration-0.20-to-0.21.md)
   - [0.21 → 0.22](guides/migration-0.21-to-0.22.md)
   - [0.22 → 0.23](guides/migration-0.22-to-0.23.md)
+  - [0.23 → 0.24](guides/migration-0.23-to-0.24.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design
@@ -41,6 +42,11 @@
 - [Progress](design/progress.md)
 - [iced style bridge](design/iced-style-bridge.md)
 - [v0.21 Primitives](design/v021-primitives.md)
+- [Recipes](design/recipes/README.md)
+  - [Empty state](design/recipes/empty-state.md)
+  - [Background task card](design/recipes/background-task.md)
+  - [Friendly error recovery notice](design/recipes/error-recovery.md)
+  - [Result card](design/recipes/result-card.md)
 
 # Reference
 
@@ -61,14 +67,6 @@
 - [Accessibility checklist](contributing/accessibility-checklist.md)
 - [Semantic accessibility policy](contributing/semantic-accessibility.md)
 - [Recipes and dogfood process](contributing/recipes.md)
-
-## Recipes
-
-- [Recipe index](design/recipes/README.md)
-- [Empty state](design/recipes/empty-state.md)
-- [Background task card](design/recipes/background-task.md)
-- [Friendly error recovery notice](design/recipes/error-recovery.md)
-- [Result card](design/recipes/result-card.md)
 - [API governance — Snora Design](contributing/api-governance.md)
 - [Documentation test policy](contributing/documentation-test-policy.md)
 - [Anchored popover design](contributing/anchored-popover-design.md)

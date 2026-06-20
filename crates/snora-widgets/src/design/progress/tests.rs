@@ -4,6 +4,7 @@
 use super::*;
 use snora_design::{Tokens, Tone};
 
+#[allow(dead_code)] // compile-only: verifies row/card accept all Tone × preset combinations
 fn _progress_compiles_for_all_variants() {
     for tokens in [
         Tokens::light(), Tokens::dark(),

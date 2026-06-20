@@ -31,12 +31,12 @@ if [[ ! -f "$CSV_PATH" ]]; then
     exit 1
 fi
 
-# Sanity-check: the row must have exactly six comma-separated fields,
+# Sanity-check: the row must have exactly seven comma-separated fields,
 # matching the CSV header.  Reject obvious mistakes (empty input,
 # wrong column count) before they pollute the file.
 field_count=$(awk -F, '{print NF}' <<<"$ROW")
-if [[ "$field_count" -ne 7 ]]; then
-    echo "row has $field_count fields, expected 7: '$ROW'" >&2
+if [[ "$field_count" -ne 9 ]]; then
+    echo "row has $field_count fields, expected 9: '$ROW'" >&2
     exit 1
 fi
 
