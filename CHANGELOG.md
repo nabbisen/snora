@@ -17,6 +17,35 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.19.1] — 2026-06-20
+
+### Fixed
+
+- **`scripts/measure-compile-time.sh` — missing space caused CI failure.**
+  Line 43 read `measure_ms"build_engine_only"` (no space), which the shell
+  parsed as a call to the non-existent command `measure_msbuild_engine_only`,
+  causing `build-cost.yaml` to fail with exit code 127. Single character fix:
+  added the space before the argument.
+
+- **`binary-size.csv` schema corrected.** The header declared 6 columns
+  (`lto` as the fifth), but the v0.17.0 row had always been 7 columns
+  (`rustc` and `runner_os` in positions 5–6). Fixed header, updated
+  `measure-binary-size.sh` to emit 7 fields (replacing the unused `lto`
+  argument with `rustc` and `runner_os`), updated
+  `append-binary-size-row.sh` field-count validation from 6 to 7, and
+  updated `binary-size.yaml` job summary parsing accordingly.
+  `binary-size-budget.md` column table updated to match.
+
+### Added
+
+- **Binary-size Gate 9 data point (v0.19.0).** Appended the CI measurement
+  from the v0.19.0 run to `binary-size.csv`: both `widgets_on` and
+  `widgets_off` measure 15,813,584 bytes stripped on `ubuntu-latest`
+  (diff = 0; `snora-design` is opt-in and absent from `snora-example-hello`).
+  Gate 9 is now satisfied for binary-size (two real CI data points: v0.17.0,
+  v0.19.0). Build-cost Gate 9 pending the next successful `build-cost.yaml`
+  run.
+
 ## [0.19.0] — 2026-06-20
 
 ### Added

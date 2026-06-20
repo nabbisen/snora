@@ -40,7 +40,6 @@
 set -euo pipefail
 
 VERSION="${1:?missing version argument}"
-LTO_MODE="${2:-off}"
 
 # Always run from the workspace root, even when invoked from
 # elsewhere.
@@ -86,6 +85,8 @@ WIDGETS_OFF=$(build_and_measure "off" --no-default-features)
 
 DIFF=$(( WIDGETS_ON - WIDGETS_OFF ))
 DATE=$(date -u +%Y-%m-%d)
+RUSTC=$(rustc --version | tr ' ' '_')
+RUNNER_OS="${RUNNER_OS:-unknown}"
 
 # CSV row, matching the budget CSV header.
-echo "${VERSION},${WIDGETS_ON},${WIDGETS_OFF},${DIFF},${LTO_MODE},${DATE}"
+echo "${VERSION},${WIDGETS_ON},${WIDGETS_OFF},${DIFF},${RUSTC},${RUNNER_OS},${DATE}"

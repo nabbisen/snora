@@ -67,11 +67,12 @@ Each CSV row records:
 
 | Column | Meaning |
 |---|---|
-| `version` | snora version this row is for, e.g. `0.10.0`. |
+| `version` | snora version this row is for, e.g. `0.19.0`. |
 | `widgets_on_bytes` | Stripped size of `examples/hello` built with default features. |
 | `widgets_off_bytes` | Same example built with `--no-default-features`. |
 | `diff_bytes` | `widgets_on_bytes − widgets_off_bytes`. The marginal cost of opting into `snora-widgets`. |
-| `lto` | Whether link-time optimization was enabled for the build. Currently `off` for all rows; see below. |
+| `rustc` | Rust toolchain version used for the measurement, e.g. `rustc_1.96.0_(ac68faa20_2026-05-25)`. |
+| `runner_os` | CI runner OS, e.g. `ubuntu-latest`. |
 | `date` | UTC date of the measurement (`YYYY-MM-DD`). |
 
 The 150 KB threshold from
@@ -81,38 +82,19 @@ threshold, the criteria document specifies what to do (it does
 not unilaterally trigger a per-widget feature split — see the
 document for the full rule).
 
-### Why LTO is off
+### Build profile
 
-These measurements are taken under a dedicated
-`[profile.release-baseline]` Cargo profile, which inherits from
-`[profile.release]` but with `lto = false` and
-`codegen-units = 16`. The reason is throughput: a full LTO build
-of an iced-based application takes 10–20 minutes per
-configuration; the baseline profile finishes in 2–4 minutes,
-allowing CI to run on every push without queuing.
+Measurements use the `[profile.release-baseline]` Cargo profile, which
+inherits from `[profile.release]` but with `lto = false` and
+`codegen-units = 16`. This keeps CI build time to 2–4 minutes per
+configuration rather than 10–20 minutes for a full LTO build.
 
-The cost is that `release-baseline` binaries are **20–40% larger
-than what a user actually ships** with the workspace's default
-`[profile.release]`. That is acceptable for the budget's purpose:
-
-- **Drift detection still works.** As long as every row is
-  measured under the same profile, the diff between consecutive
-  rows accurately reflects the change in the framework's
-  contribution. Absolute size is irrelevant to the question "did
-  0.11 quietly grow vs 0.10?".
-
-- **Users who care about absolute size already build with their
-  own profile.** The `[profile.release]` numbers a downstream user
-  sees depend on their `Cargo.toml`'s settings, not snora's. A
-  framework-published "absolute size" would be misleading — what
-  matters is how snora *contributes* to whatever profile the user
-  picks.
-
-If the budget eventually needs an LTO-on row alongside the
-`off` rows (for example to corroborate a worrying drift), the
-`lto` column already accommodates that — measurements with
-different LTO settings live as separate rows; consumers filter on
-the column when comparing.
+The cost is that `release-baseline` binaries are **20–40% larger than what
+a user actually ships** with the default `[profile.release]`. That is
+acceptable for the budget's purpose: every row is measured under the same
+profile, so the diff between consecutive rows accurately reflects the change
+in the framework's contribution. The `rustc` and `runner_os` columns allow
+filtering out measurements taken under different toolchains or platforms.
 
 ## Frequently checked questions
 

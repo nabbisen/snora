@@ -46,7 +46,7 @@ scheduled date for 1.0.
 ## Snora Design System (v0.19 foundation shipped — RFC-020 … RFC-030)
 
 The Snora Design System foundation has landed in v0.19 as an **opt-in**
-layer (`design` feature; `snora-design` is `publish = false` until v0.20):
+layer (`design` feature; `snora-design` published as of v0.19.0):
 
 - Iced-free `snora-design` crate with `Tokens`, `Palette`, `Color`,
   `Spacing`, `Typography`, `Radius`, `FocusTokens`, `Tone`/`Emphasis`/
