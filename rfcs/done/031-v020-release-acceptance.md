@@ -1,6 +1,6 @@
 # RFC 031 — v0.20 Release Acceptance Criteria
 
-**Status.** Proposed
+**Status.** Implemented (v0.20.0)
 **Tracks.** Snora Design System migration; v0.20 release gate.
 **Touches.** release checklist, changelog, migration notes.
 

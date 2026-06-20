@@ -85,7 +85,7 @@ them in sync is a release-process invariant.
     (covered by workspace check above; verify no example was removed)
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
 [ ] cargo package -p snora-core    --no-verify    # check .crate contents
-[ ] cargo package -p snora-design  --no-verify    # (flip publish=false first at v0.20)
+[ ] cargo package -p snora-design  --no-verify    # check .crate contents
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents
 [ ] git commit, git tag vX.Y.Z, git push --tags

@@ -17,6 +17,27 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.20.0] — 2026-06-20
+
+### Added
+
+- **`snora-design` published to crates.io (RFC-031).** The iced-free design
+  token crate introduced as groundwork in v0.19 is now a first-class published
+  dependency. The v0.20 release satisfies all RFC-031 non-deferrable criteria:
+  iced-free `snora-design`, high-contrast presets, automated contrast tests,
+  iced style bridge, pilot button/card helpers, accessibility checklist,
+  semantic construction policy, and boundary docs. `design` remains opt-in
+  (`default = ["widgets"]`); binary-size/build-cost measurements with and
+  without `design` are tracked in the budget CSVs before any decision to
+  make it default-on.
+
+- **RFC-031 closed** — moved to `rfcs/done/` (Status: Implemented v0.20.0).
+
+### Changed
+
+- `docs/src/contributing/release-process.md`: removed stale "flip
+  publish=false first" note for `snora-design` (already done in v0.19.1).
+
 ## [0.19.1] — 2026-06-20
 
 ### Fixed
@@ -38,13 +59,17 @@ Nothing yet.
 
 ### Added
 
-- **Binary-size Gate 9 data point (v0.19.0).** Appended the CI measurement
-  from the v0.19.0 run to `binary-size.csv`: both `widgets_on` and
-  `widgets_off` measure 15,813,584 bytes stripped on `ubuntu-latest`
-  (diff = 0; `snora-design` is opt-in and absent from `snora-example-hello`).
-  Gate 9 is now satisfied for binary-size (two real CI data points: v0.17.0,
-  v0.19.0). Build-cost Gate 9 pending the next successful `build-cost.yaml`
-  run.
+- **Gate 9 fully satisfied — build-cost data point (v0.19.1).** Appended
+  the CI measurement from the v0.19.1 run to `compile-time.csv`
+  (check_workspace 56,150 ms; build_widgets 96,000 ms; build_engine_only
+  330 ms; example_hello 153,000 ms; ubuntu-latest). Combined with the
+  v0.17.0 sandbox row, Gate 9 now has ≥2 data points in both budget CSVs.
+  Remaining 1.0 blockers: gate 1 (iced major upgrade) and gate 3
+  (confirmed third-party production app).
+
+- **Binary-size Gate 9 data point (v0.19.1).** Appended a second real CI
+  row to `binary-size.csv`: 15,813,712 bytes stripped, diff = 0
+  (ubuntu-latest).
 
 ## [0.19.0] — 2026-06-20
 

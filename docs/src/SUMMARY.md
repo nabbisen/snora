@@ -22,6 +22,7 @@
 - [Migrating between versions](guides/migrations.md)
   - [0.10 → 0.11](guides/migration-0.10-to-0.11.md)
   - [0.18 → 0.19](guides/migration-0.18-to-0.19.md)
+  - [0.19 → 0.20](guides/migration-0.19-to-0.20.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design

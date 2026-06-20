@@ -70,13 +70,14 @@ Numbers remain stable forever and are never reused.
 | 029 | [v0.20 Pilot Card Helper](./done/029-pilot-card-helper.md) | v0.19.0 |
 | 030 | [Documentation, Examples, and Design Workbench](./done/030-docs-examples-and-design-workbench.md) | v0.19.0 |
 
+
 ## Proposed
 
 The following design-system RFCs remain in review (target v0.20+):
 
 | ID | Title |
 |----|-------|
-| 031 | [v0.20 Release Acceptance Criteria](./proposed/031-v020-release-acceptance.md) |
+| 031 | [v0.20 Release Acceptance Criteria](./done/031-v020-release-acceptance.md) | v0.20.0 |
 | 032 | [Notice, Chip, and Progress Primitives](./proposed/032-notice-chip-and-progress-primitives.md) |
 | 033 | [Recipes and Dogfood Process](./proposed/033-recipes-and-dogfood-process.md) |
 | 034 | [Promotion, Stabilization, and API Governance](./proposed/034-promotion-stabilization-and-api-governance.md) |

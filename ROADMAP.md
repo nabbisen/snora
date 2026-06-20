@@ -38,7 +38,7 @@ Six of ten 1.0 gates are now satisfied. The remaining path:
 1. One iced major upgrade completed. ⬜
 3. At least one third-party or production-grade app. ⬜
 7. Public API freeze review completed. ✅ v0.18
-9. Binary-size and compile-time trends (≥2 data points). ⬜ first point v0.17
+9. Binary-size and compile-time trends (≥2 data points). ✅ v0.19.1
 
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
@@ -70,7 +70,11 @@ Remaining design-track sequence:
 
 ## Recently shipped
 
-- **0.19** — Snora Design System foundation (RFC-020–030, opt-in `design`
+- **0.19.1** — CI fixes: `measure-compile-time.sh` missing-space bug fixed;
+  `binary-size.csv` schema corrected (7-field rows); Gate 9 ✅ (binary-size
+  and build-cost both have ≥2 real CI data points). Remaining 1.0 blockers:
+  gate 1 (iced upgrade) and gate 3 (third-party app).
+- **0.19.0** — Snora Design System foundation (RFC-020–030, opt-in `design`
   feature): `snora-design` crate, style bridge, pilot button/card helpers,
   CI quality gates, accessibility docs, API governance, design workbench.
   `publish = false` until v0.20 activation. Docs gate fixed (book.toml,
@@ -116,7 +120,7 @@ The full readiness checklist is in
 6. Feature-matrix CI stable. ✅ v0.11
 7. Public API freeze review completed. ✅ v0.18
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
-9. Binary-size and compile-time trends monitored (≥2 data points). ⬜ first point v0.17
+9. Binary-size and compile-time trends monitored (≥2 data points). ✅ v0.19.1
 10. No hidden feature-combination failures. ✅ (CI gate)
 
 We are explicitly **not** rushing to 1.0. Pre-1.0 SemVer is serving

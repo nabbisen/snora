@@ -101,15 +101,14 @@ Type-names audit: **complete as of v0.17.0.**
 | 6. Feature-matrix CI stable | ✅ v0.11 |
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
-| 9. Binary-size and compile-time trends monitored (≥2 data points) | ✅ binary-size: v0.17.0 + v0.19.0 on ubuntu-latest CI. build-cost: script bug fixed (v0.20); second run pending. |
+| 9. Binary-size and compile-time trends monitored (≥2 data points) | ✅ binary-size: v0.17.0, v0.19.0, v0.19.1 on ubuntu-latest. build-cost: v0.17.0 (sandbox), v0.19.1 on ubuntu-latest. |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
 **Gates satisfied: 2, 4, 5, 6, 7, 8, 10 = seven of ten.**
 
 Remaining blockers: iced upgrade (gate 1), third-party app (gate 3).
-Gate 9 satisfied for binary-size (two CI data points: v0.17.0, v0.19.0).
-Build-cost Gate 9 pending: script bug fixed in v0.20 (`measure-compile-time.sh`
-line 43 missing space), second run needed on next tag.
+Gate 9 fully satisfied: binary-size has three CI data points (v0.17.0,
+v0.19.0, v0.19.1); build-cost has two (v0.17.0 sandbox, v0.19.1 ubuntu-latest).
 
 ## How to use this document
 

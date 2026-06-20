@@ -1,3 +1,4 @@
 version,widgets_on_bytes,widgets_off_bytes,diff_bytes,rustc,runner_os,date
 0.17.0,15805520,15805520,0,rustc_1.96.0_(ac68faa20_2026-05-25),unknown,2026-06-10T12:41:24Z
 0.19.0,15813584,15813584,0,rustc_1.96.0_(ac68faa20_2026-05-25),ubuntu-latest,2026-06-20
+0.19.1,15813712,15813712,0,rustc_1.96.0_(ac68faa20_2026-05-25),ubuntu-latest,2026-06-20
