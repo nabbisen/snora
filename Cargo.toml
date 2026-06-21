@@ -1,38 +1,44 @@
 [workspace]
+resolver = "3"
 members = [
-    "crates/snora-core",
-    "crates/snora-design",
-    "crates/snora-widgets",
-    "crates/snora",
-    "examples/hello",
-    "examples/skeleton",
-    "examples/toast",
-    "examples/dialog",
-    "examples/sheet",
-    "examples/tab",
-    "examples/breadcrumb",
-    "examples/context_menu",
-    "examples/header_menu",
-    "examples/multi_view",
-    "examples/rtl",
-    "examples/workbench",
-    "examples/starter",
-    "examples/design_workbench",
-    "examples/size_probe_engine",
-    "examples/size_probe_widgets",
-    "examples/size_probe_design",
+    "crates/*",
+    "examples/*",
 ]
-resolver = "2"
 
 # Shared package metadata. Member crates pull these in via
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.25.1"
+version = "0.25.2"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/nabbisen/snora"
 authors = ["nabbisen"]
+
+[workspace.dependencies]
+# `snora` listed here so example crates pick up its version through
+# workspace inheritance. Each example only needs:
+#
+#     [dependencies]
+#     snora = { workspace = true }
+#
+# When the workspace version bumps, the entry below is the *only*
+# place that needs updating; examples follow automatically.
+#
+# Including a `version` field (alongside `path`) is required by
+# `cargo publish`, even though examples themselves are
+# `publish = false`.  Cargo validates the workspace as a whole.
+snora = { version = "0.25", path = "crates/snora" }
+snora-core = { version = "0.25", path = "crates/snora-core" }
+snora-widgets = { version = "0.25", path = "crates/snora-widgets" }
+# Iced-free design tokens (Snora Design). Listed here so the `snora` /
+# `snora-widgets` crates can pick it up via workspace inheritance once the
+# `design` feature wiring lands (RFC-021 / RFC-025). It is a workspace member
+# in its own right and has no iced dependency.
+snora-design = { version = "0.25", path = "crates/snora-design" }
+
+iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
+lucide-icons = { version = "1", features = ["iced"] }
 
 [profile.release]
 opt-level = "z"
@@ -62,28 +68,3 @@ incremental = false
 inherits = "release"
 lto = false
 codegen-units = 16
-
-[workspace.dependencies]
-# `snora` listed here so example crates pick up its version through
-# workspace inheritance. Each example only needs:
-#
-#     [dependencies]
-#     snora = { workspace = true }
-#
-# When the workspace version bumps, the entry below is the *only*
-# place that needs updating; examples follow automatically.
-#
-# Including a `version` field (alongside `path`) is required by
-# `cargo publish`, even though examples themselves are
-# `publish = false`.  Cargo validates the workspace as a whole.
-snora = { version = "0.25", path = "crates/snora" }
-snora-core = { version = "0.25", path = "crates/snora-core" }
-snora-widgets = { version = "0.25", path = "crates/snora-widgets" }
-# Iced-free design tokens (Snora Design). Listed here so the `snora` /
-# `snora-widgets` crates can pick it up via workspace inheritance once the
-# `design` feature wiring lands (RFC-021 / RFC-025). It is a workspace member
-# in its own right and has no iced dependency.
-snora-design = { version = "0.25", path = "crates/snora-design" }
-
-iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
-lucide-icons = { version = "1", features = ["iced"] }
