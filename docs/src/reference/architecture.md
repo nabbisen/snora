@@ -1,23 +1,31 @@
 # Architecture overview
 
-Snora is three crates with a strict dependency direction.
+Snora is four crates with a strict dependency direction. `snora-core`
+and `snora-design` are independent, iced-free leaves; `snora-widgets`
+depends on both; `snora` depends on `snora-core` always and on the
+other two behind its `widgets` / `design` features.
 
 ```text
 your application
        │
        ▼
-   snora                 (engine — depends on iced)
+   snora                    (engine — depends on iced)
        │
-       ├──► snora-widgets  (optional, prefab UI parts — depends on iced)
-       │        │
-       ▼        ▼
-   snora-core            (vocabulary — no iced dependency)
+       ├──► snora-core      (vocabulary — no iced dependency)
+       │
+       ├──► snora-design    (design tokens — no iced dependency; opt-in)
+       │
+       └──► snora-widgets   (optional, prefab UI parts — depends on iced)
+                │
+                ├──► snora-core
+                └──► snora-design
 ```
 
 Applications normally depend on a single crate, `snora`, which
-re-exports the vocabulary from `snora-core` and (when its `widgets`
+re-exports the vocabulary from `snora-core`, (when its `widgets`
 feature is enabled, the default) the prefab widgets from
-`snora-widgets`.
+`snora-widgets`, and (when its `design` feature is enabled, opt-in)
+the design tokens from `snora-design`.
 
 ## `snora-core` — vocabulary
 
@@ -51,6 +59,25 @@ that consumes `snora-core`.
 Applications normally do not depend on `snora-widgets` directly.
 They are pulled in transparently by `snora`'s default `widgets`
 feature, which re-exports them under `snora::widget`.
+
+## `snora-design` — design tokens
+
+This crate owns the **opt-in token vocabulary** for applications that
+want contrast-tested, theme-aware styling without snora imposing a
+theme. It contains:
+
+- `Tokens` — the top-level token bundle, with four built-in presets
+  (light, dark, high-contrast light, high-contrast dark).
+- `Palette` — 18 semantic color roles.
+- WCAG 2.1 AA contrast utilities (`relative_luminance`,
+  `contrast_ratio`, `composite_over`).
+- Typography, spacing, radius, and focus sub-token sets.
+
+`snora-design` has zero dependency on iced, matching `snora-core`'s
+guarantee. It is reached through the `design` feature (opt-in;
+requires `widgets`), which activates the iced style bridge and
+shallow primitives in `snora-widgets` and re-exports the token types
+under `snora::design`.
 
 ## `snora` — engine
 

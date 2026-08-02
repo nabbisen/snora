@@ -45,13 +45,14 @@ patch releases are accepted. Bump it only on a minor.
 
 ## GitHub Actions workflows
 
-Three workflows run automatically; they have distinct responsibilities:
+Four workflows run automatically; they have distinct responsibilities:
 
 | Workflow | File | Trigger | Responsibility |
 |---|---|---|---|
-| **CI** | `ci.yaml` | PR, push to `main` | Rust quality gate (check, clippy, tests, engine-only, feature matrix, docs build). **No release merges while this is red.** |
+| **CI** | `ci.yaml` | PR, push to `main` | Rust quality gate: `rust-quality`, `feature-matrix`, `design-isolation`, `docs` jobs. **No release merges while this is red.** |
 | **Docs** | `docs.yaml` | Push to `main` | Build and deploy mdBook to GitHub Pages. |
 | **Binary size** | `binary-size.yaml` | PR, push, tags | Measure stripped binary size; append a row to the CSV on release tags. |
+| **Build cost** | `build-cost.yaml` | Push to `main`, tags | Measure compile time; append a row to the CSV on release tags. |
 
 Do not confuse the **CI docs job** (PR gate) with the **Docs workflow**
 (deployment). They run mdBook with the same `^0.5` locked version; keeping
@@ -75,12 +76,17 @@ them in sync is a release-process invariant.
 [ ] Update user-facing version snippets in install.md and icons.md to the
     new version (snora = "X.Y" — iced version stays unchanged)
 [ ] Re-run cargo metadata; confirm every crate reports new version
+[ ] cargo fmt --check
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
 [ ] cargo test -p snora-core
-[ ] cargo test -p snora
+[ ] cargo test -p snora-design
+[ ] cargo test -p snora-widgets --features design
+[ ] cargo test -p snora --lib --all-features
+[ ] cargo test -p snora --test render_semantics   # CI hardware; may OOM locally
 [ ] cargo check -p snora --no-default-features
 [ ] mdbook build docs               # validates the book renders
+[ ] mdbook test docs                # validates the doc-fence policy
 [ ] All examples in examples/README.md acceptance matrix compile
     (covered by workspace check above; verify no example was removed)
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
@@ -88,8 +94,10 @@ them in sync is a release-process invariant.
 [ ] cargo package -p snora-design  --no-verify    # check .crate contents
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents
-[ ] git commit, git tag vX.Y.Z, git push --tags
-[ ] Confirm CI workflow green on the tag commit (all three jobs)
+[ ] git commit, git tag X.Y.Z, git push --tags
+    # tags carry no `v` prefix, matching Rust crate convention
+[ ] Confirm CI workflow green on the tag commit (all four jobs:
+    rust-quality, feature-matrix, design-isolation, docs)
 [ ] After tag push: confirm the `binary-size` workflow run succeeded
     on the tag and appended a row to
     docs/src/reference/binary-size-budget/binary-size.csv on main.

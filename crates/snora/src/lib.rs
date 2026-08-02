@@ -16,6 +16,9 @@
 //!  snora::render(AppLayout<Element, Message>) -> Element
 //!         │
 //!         ├─► snora-widgets   (optional, prefab UI parts)
+//!         │         │
+//!         │         ▼
+//!         │   snora-design   (optional, design tokens — no iced dependency)
 //!         ▼
 //!  snora-core   (vocabulary: Toast, Dialog, Sheet, SheetSize, …)
 //! ```
@@ -25,11 +28,14 @@
 //!
 //! * `snora-core` has zero iced dependency. It owns the vocabulary
 //!   (what choices exist).
-//! * `snora-widgets` depends on `snora-core` and `iced`. It owns the
-//!   prefab widget visuals.
-//! * `snora` depends on `snora-core` and (optionally) `snora-widgets`.
-//!   It owns the engine — `render`, the layer composition, and the
-//!   toast lifecycle helpers.
+//! * `snora-design` has zero iced dependency. It owns the opt-in design
+//!   token vocabulary (`Tokens`, `Palette`, contrast utilities).
+//! * `snora-widgets` depends on `snora-core`, `iced`, and (behind the
+//!   `design` feature) `snora-design`. It owns the prefab widget visuals
+//!   and the iced style bridge that turns tokens into `iced::*::Style`.
+//! * `snora` depends on `snora-core` and (optionally) `snora-widgets`
+//!   and `snora-design`. It owns the engine — `render`, the layer
+//!   composition, and the toast lifecycle helpers.
 //!
 //! Applications normally only depend on `snora` and use it as the single
 //! umbrella crate; the workspace split exists so each layer can evolve

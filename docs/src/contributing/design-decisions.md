@@ -19,7 +19,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | Default `ToastPosition` is `TopEnd` | Accepted | User research showing another default is more ergonomic |
 | Application owns toast `Vec` | Firm boundary | Framework-owned queue that apps cannot control |
 | No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve |
-| Three crates, not two | Accepted | iced-free core becomes unnecessary |
+| Four crates (`-core`, `-design`, `-widgets`, engine) | Accepted | iced-free core becomes unnecessary |
 | `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly |
 | Coarse `widgets` feature gate | Accepted | Two of the five feature-gating indicators are met |
 | `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) |
@@ -31,7 +31,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | Theme-aware, not theme-owning | Firm boundary | iced adds an insufficient theming layer |
 | Focus trapping deferred | Deferred | Concrete app + stable iced focus API |
 
-
+## Why no `PageContract` trait
 
 Early drafts (≤ 0.3) defined a trait that page-like objects implemented:
 
@@ -156,7 +156,7 @@ inspector, mock AppLayout). Decided against:
 
 If the pattern becomes painful in practice, we will revisit.
 
-## Why three crates instead of two
+## Why four crates
 
 In 0.4 and 0.5, snora was a two-crate workspace
 (`snora-core` + `snora`). In 0.6 we carved out the prefab widgets
@@ -186,6 +186,27 @@ The 3-crate split is invisible to applications that depend only
 on `snora` — `snora`'s lib re-exports `snora-widgets` under the
 familiar `snora::widget` path when the `widgets` feature is on
 (the default).
+
+### A fourth crate: `snora-design`
+
+In 0.19 we carved a fourth crate, `snora-design`, out of what would
+otherwise have been `snora-widgets` code. The reasoning is the same
+argument that separated `snora-core` from `snora` in the first place:
+`snora-design`'s token vocabulary (`Tokens`, `Palette`, contrast
+utilities) has no iced type in its signature and gains nothing from
+sitting in an iced-dependent crate. Putting it in `snora-widgets`
+would mean an iced upgrade could, in principle, touch pure-data token
+code that has no reason to change. Keeping it separate preserves the
+same iced-free guarantee (NF-1) that motivates `snora-core`, applied
+one layer up. `snora-widgets` depends on `snora-design` (behind the
+`design` feature) to bridge tokens into `iced::*::Style`; `snora-core`
+does not depend on `snora-design`. See RFC-020 and RFC-021 for the
+full design-system boundary and crate/feature architecture.
+
+The four-crate split remains invisible to applications that depend
+only on `snora` — the `design` feature (opt-in) re-exports
+`snora-design`'s types and `snora-widgets`' style bridge under
+`snora::design`.
 
 ## Why `Tab` and `Crumb` are separate vocabulary, not one navigation type
 
@@ -240,9 +261,6 @@ deps, field requests) so future maintainers do not have to
 reconstruct the reasoning.
 
 ## Why `AppLayout` has both fields and a builder
-
-[`TabBar`]: ../reference/vocabulary.md
-[`Crumb`]: ../reference/vocabulary.md
 
 Both are supported; the builder is the stable, documented canonical path.
 Reasoning:
@@ -315,10 +333,18 @@ duplicate iced's system, force applications to configure theming twice,
 and create a maintenance surface with no commensurate value.
 
 The `ToastIntent::Warning` color uses a private fallback
-(`WARNING_COLOR` in `crates/snora/src/toast.rs`) because iced's
-extended palette has no `warning` semantic pair. This is a narrow
-exception, not a token system. When iced adds a warning pair the
-fallback will be removed.
+(`WARNING_COLOR` in `crates/snora/src/toast.rs`) that predates a
+verification of iced's palette. **iced 0.14 does provide a `warning`
+semantic pair**: `iced_core::theme::Palette::warning` (base color) and
+`iced_core::theme::palette::Extended::warning` (generated three-shade
+set), confirmed against the pinned dependency source at
+`iced_core-0.14.0/src/theme/palette.rs:18` and `:297`. `WARNING_COLOR`
+is therefore a removal candidate — but toasts render on the
+design-inactive path, so removing it would change the appearance of
+existing applications that do not opt into the `design` feature. Its
+disposition (keep as a documented intentional fallback, or migrate to
+`Extended::warning`) is deferred to RFC-038 Q-2; the constant is not
+changed by this correction.
 
 Style review checklist for future changes: (1) Does the change add a
 public color/token type? If so, reject or escalate. (2) Does it derive
@@ -336,3 +362,6 @@ Reconsideration trigger: a concrete downstream app demonstrates the need
 and iced provides a stable, cross-platform focus API. Any focus
 implementation must be additive — a new optional `Dialog`/`Sheet` field
 per RFC-011-C rules.
+
+[`TabBar`]: ../reference/vocabulary.md
+[`Crumb`]: ../reference/vocabulary.md

@@ -95,9 +95,10 @@ demos are in the
 - **Navigation widgets out of the box.** `app_header`, `app_side_bar`,
   `app_tab_bar`, `app_breadcrumb`, plus dropdown menus and context
   menus — direction-aware, theme-aware, and entirely opt-in.
-- **Three crates, one umbrella.** `snora-core` is the iced-free
-  vocabulary, `snora-widgets` is the optional prefab UI parts, and
-  `snora` is the engine — applications only depend on `snora`.
+- **Four crates, one umbrella.** `snora-core` is the iced-free
+  vocabulary, `snora-design` is the iced-free (opt-in) token system,
+  `snora-widgets` is the optional prefab UI parts, and `snora` is the
+  engine — applications only depend on `snora`.
 
 ## Design notes
 

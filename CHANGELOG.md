@@ -15,7 +15,48 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **Documentation consistency and source-of-truth audit (RFC-035).**
+  Corrected in-tree documentation that still described a three-crate
+  architecture five releases after `snora-design` shipped: both
+  architecture pages, the README feature list, the `snora` crate module
+  doc, and the design-decision register now name all four crates
+  (`snora-core`, `snora-design`, `snora-widgets`, `snora`) and the
+  correct dependency direction. Fixed a contributor procedure that
+  pointed at the wrong crate for new prefab widgets and added a
+  matching procedure for design primitives. Brought the release
+  checklist's workflow table, CI job names, and gate list in line with
+  what CI actually runs. Fixed a structurally broken decision register
+  (orphaned section heading, misplaced link definitions) and corrected
+  a stale claim that iced's palette has no `warning` pair (it does, as
+  of iced 0.14 — see `design-decisions.md`). Updated the API freeze
+  review header and D-gate spans to the current version. Fixed the RFC
+  index table rendering and added a note-on-first-use for `archive/`.
+  No public API, feature flag, or runtime behavior changed.
+  **F-6 (`Cargo.lock` policy) was not actioned**: RFC-035's premise that
+  `Cargo.lock` is tracked does not hold against the current repository
+  state (see review request for detail); resolving it needs an owner
+  decision on the corrected facts.
+
+## [0.25.2] — 2026-06-21
+
+### Changed
+
+- **Workspace feature resolver moved from `"2"` to `"3"`.** Switches the
+  workspace to Cargo's MSRV-aware feature resolver.
+- **`[workspace].members` changed from an explicit 21-entry list to the
+  globs `crates/*` and `examples/*`.** New crates and example directories
+  now join the workspace automatically instead of requiring a manual
+  `Cargo.toml` edit.
+- User-facing version snippets updated to `0.25` in `README.md`,
+  `docs/src/design/feature-flags.md`, and `docs/src/design/overview.md`.
+
+**No file under `crates/*/src/` changed in this release** (verified via
+`git diff 0.25.1 0.25.2 -- crates/`, which is empty). The published crates
+are functionally identical to 0.25.1 for downstream consumers; the
+`resolver` key affects only this workspace's own builds, not consumers'
+dependency resolution.
 
 ## [0.25.1] — 2026-06-20
 
