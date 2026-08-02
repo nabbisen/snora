@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-041 measurement integrity and gate 9
 
-**Governing RFC.** [RFC-041](../../proposed/041-measurement-integrity-and-gate-9.md)
-**Status.** Inherited from RFC-041 (Proposed; all open questions answered by the owner).
+**Governing RFC.** [RFC-041](../../done/041-measurement-integrity-and-gate-9.md)
+**Status.** Inherited from RFC-041 — Implemented (v0.25.3).
 **Release target.** 0.25.3 (patch), alongside RFC-035 and RFC-036.
 **Implementation units.** One, in four steps. CI, manifest metadata, and docs.
 
@@ -44,7 +44,7 @@ six tags — while 1.0 gate 9 is marked satisfied on that data.
 
 ## 3. Background
 
-Read `rfcs/proposed/041-measurement-integrity-and-gate-9.md` in full,
+Read `rfcs/done/041-measurement-integrity-and-gate-9.md` in full,
 especially §Evidence (E-1 … E-5). This handoff executes it.
 
 The owner has answered all three open questions; **there are no open

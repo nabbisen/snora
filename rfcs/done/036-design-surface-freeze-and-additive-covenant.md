@@ -1,6 +1,6 @@
 # RFC 036 — Design surface freeze review and additive-only covenant
 
-**Status.** Proposed
+**Status.** Implemented (v0.25.3)
 **Tracks.** Snora Design stability governance; closes design gates D-3 and
 D-4 (RFC-034). Prerequisite for the v0.26 appearance work
 (RFC-037 … RFC-040).

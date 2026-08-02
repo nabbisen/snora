@@ -1,6 +1,6 @@
 # RFC 042 — Commit `Cargo.lock`
 
-**Status.** Proposed
+**Status.** Implemented (v0.25.3)
 **Tracks.** Build reproducibility and measurement integrity. Reverses a
 prior deliberate decision (`b7af344`), so it requires explicit owner
 approval.

@@ -1,6 +1,6 @@
 # RFC 041 — Measurement integrity and gate 9 re-assessment
 
-**Status.** Proposed
+**Status.** Implemented (v0.25.3)
 **Tracks.** Measurement and release automation integrity. Re-assesses 1.0
 gate 9. Independent of the v0.26 appearance milestone.
 **Touches.** `.github/workflows/binary-size.yaml`,

@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-036 design surface freeze and additive-only covenant
 
-**Governing RFC.** [RFC-036](../../proposed/036-design-surface-freeze-and-additive-covenant.md)
-**Status.** Inherited from RFC-036 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-036](../../done/036-design-surface-freeze-and-additive-covenant.md)
+**Status.** Inherited from RFC-036 — Implemented (v0.25.3).
 **Release target.** 0.25.3 (patch), alongside RFC-035 and RFC-041.
 **Implementation units.** One. Documentation and governance only.
 
@@ -29,7 +29,7 @@ reasoning.
 
 Read before starting:
 
-- `rfcs/proposed/036-design-surface-freeze-and-additive-covenant.md`
+- `rfcs/done/036-design-surface-freeze-and-additive-covenant.md`
 - `docs/src/contributing/api-governance.md` (where the covenant lands)
 - `docs/src/contributing/api-freeze-review.md` (where the gates live)
 

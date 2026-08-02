@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.25.3] — 2026-08-03
+
 ### Fixed
 
 - **Documentation consistency and source-of-truth audit (RFC-035).**
@@ -34,10 +38,14 @@ are recorded in the per-version migration guides under
   review header and D-gate spans to the current version. Fixed the RFC
   index table rendering and added a note-on-first-use for `archive/`.
   No public API, feature flag, or runtime behavior changed.
-  **F-6 (`Cargo.lock` policy) was not actioned**: RFC-035's premise that
-  `Cargo.lock` is tracked does not hold against the current repository
-  state (see review request for detail); resolving it needs an owner
-  decision on the corrected facts.
+  **F-6 (`Cargo.lock` policy) was withdrawn**, not fixed: the finding
+  asserted the lockfile was tracked while `.gitignore` and the
+  architecture page denied it. Verification showed it was *not* tracked
+  (deliberately removed in `b7af344`), so both of those were already
+  correct and needed no change. The underlying question was taken up
+  separately and resolved in this same release — see RFC-042 under
+  **Changed**, which now tracks the lockfile for measurement and MSRV
+  reasons.
 
 - **Measurement workflow tag-pattern mismatch fixed; 1.0 gate 9 reopened
   (RFC-041).** Both `binary-size.yaml` and `build-cost.yaml` triggered and

@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-042 commit `Cargo.lock`
 
-**Governing RFC.** [RFC-042](../../proposed/042-commit-cargo-lock.md)
-**Status.** Inherited from RFC-042 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-042](../../done/042-commit-cargo-lock.md)
+**Status.** Inherited from RFC-042 — Implemented (v0.25.3).
 **Release target.** 0.25.3 (patch), alongside RFC-035, RFC-036, RFC-041.
 **Implementation units.** One. Small.
 
@@ -22,7 +22,7 @@ moved unobserved once (documented 1.85, actual 1.88).
 
 ## 3. Background
 
-Read `rfcs/proposed/042-commit-cargo-lock.md` in full. It reverses
+Read `rfcs/done/042-commit-cargo-lock.md` in full. It reverses
 `b7af344` ("remove Cargo.lock from vcs"), which RFC-035 F-6 confirmed was
 deliberate — so this is a governed reversal, not a correction of a mistake.
 
