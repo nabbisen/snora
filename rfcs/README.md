@@ -73,16 +73,16 @@ Numbers remain stable forever and are never reused.
 | 032 | [Notice, Chip, and Progress Primitives](./done/032-notice-chip-and-progress-primitives.md) | v0.21.0 |
 | 033 | [Recipes and Dogfood Process](./done/033-recipes-and-dogfood-process.md) | v0.23.0 |
 | 034 | [Promotion, Stabilization, and API Governance](./done/034-promotion-stabilization-and-api-governance.md) | v0.23.0 |
+| 035 | [Documentation consistency and source-of-truth audit](./done/035-documentation-consistency-audit.md) | v0.25.3 (handoff: [`handoffs/035-…`](./handoffs/035-documentation-consistency-audit/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Priority |
 |----|-------|----------|
-| 035 | [Documentation consistency and source-of-truth audit](./proposed/035-documentation-consistency-audit.md) | High — two authoritative pages state a three-crate architecture; handoff at [`handoffs/035-documentation-consistency-audit/`](./handoffs/035-documentation-consistency-audit/implementation-handoff.md) |
-| 036 | [Design surface freeze review and additive-only covenant](./proposed/036-design-surface-freeze-and-additive-covenant.md) | High — closes D-3/D-4 on six minors of evidence; the covenant gates RFC-038…040 |
+| 036 | [Design surface freeze review and additive-only covenant](./proposed/036-design-surface-freeze-and-additive-covenant.md) | High — 0.25.3; closes D-3/D-4; covenant gates RFC-038…040; handoff ready |
 | 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26 positioning; extends RFC-020 to snora's own surfaces, permits theme emission under `design` |
 | 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26; prerequisite for RFC-039/040 |
-| 041 | [Measurement integrity and gate 9 re-assessment](./proposed/041-measurement-integrity-and-gate-9.md) | High — measurement workflows have never run on a release tag; gate 9 is unbacked |
+| 041 | [Measurement integrity and gate 9 re-assessment](./proposed/041-measurement-integrity-and-gate-9.md) | High — 0.25.3; workflows have never run on a release tag; gate 9 reopens 8/10 → 7/10; handoff ready |
 
 ## Archive
 

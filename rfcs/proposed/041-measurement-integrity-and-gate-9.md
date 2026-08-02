@@ -228,15 +228,22 @@ to work rather than assumed.
 
 ## Open questions
 
-- **Q-1 (owner).** Adopt C-4(a) and declare `rust-version = "1.85"`? And
-  is raising MSRV a minor or a patch? (Recommend: declare; raising is a
-  minor.)
-- **Q-2 (owner).** Reopen gate 9 as recommended in C-3, or record it as
-  satisfied-in-intent with a caveat? (Recommend: reopen — a gate backed by
-  `N/A` rows cannot be evidence.)
-- **Q-3.** Should the pre-0.25.2 rows be retained, annotated as
-  non-comparable, or moved to a clearly-labelled historical section?
-  (Recommend: retain and annotate; never delete measurement history.)
+All three are **answered**. Recorded here so the Developer Handoff carries
+no open decisions.
+
+- **Q-1 — ANSWERED.** Adopt C-4(a): declare `rust-version = "1.85"` in
+  `[workspace.package]`. **Raising the MSRV in future is a minor**, per
+  pre-1.0 SemVer; declaring it now is additive and ships as part of the
+  0.25.3 patch, since it documents support the project already claims
+  rather than changing it.
+- **Q-2 — ANSWERED.** Reopen gate 9 per C-3. The 1.0 gate count becomes
+  **7 of 10**. Re-satisfy only once ≥2 real post-fix data points exist on
+  the same runner and methodology.
+- **Q-3 — ANSWERED.** Retain the pre-0.25.2 rows and annotate them as
+  non-comparable. Measurement history is never deleted or back-filled
+  (N-1).
+
+**Release target: 0.25.3** (patch), alongside RFC-035 and RFC-036.
 
 ## Acceptance criteria
 

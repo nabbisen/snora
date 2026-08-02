@@ -1,6 +1,6 @@
 # RFC 035 — Documentation consistency and source-of-truth audit
 
-**Status.** Proposed
+**Status.** Implemented (v0.25.3)
 **Tracks.** Cross-cutting documentation and release-governance hygiene.
 Not tied to a feature; corrects drift between in-tree documentation and
 the shipped four-crate reality.

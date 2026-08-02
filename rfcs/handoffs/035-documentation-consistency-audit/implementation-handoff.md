@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-035 documentation consistency audit
 
-**Governing RFC.** [RFC-035](../../proposed/035-documentation-consistency-audit.md)
-**Status.** Inherited from RFC-035 (Proposed).
+**Governing RFC.** [RFC-035](../../done/035-documentation-consistency-audit.md)
+**Status.** Inherited from RFC-035 — Implemented (v0.25.3).
 **Implementation units.** One. This is a single reviewable change.
 
 ---
@@ -29,7 +29,7 @@ references; this handoff is the execution plan for them.
 
 Read before starting:
 
-- `rfcs/proposed/035-documentation-consistency-audit.md` (the governing RFC)
+- `rfcs/done/035-documentation-consistency-audit.md` (the governing RFC)
 - `docs/src/contributing/documentation-test-policy.md` (fence rules)
 - `docs/src/contributing/README.md` (contributing index)
 
@@ -45,7 +45,7 @@ to this handoff are inlined here so no external file is required:
 
 ## 4. Applicable requirements
 
-- **M-3** CHANGELOG and ROADMAP kept current (F-8, blocked)
+- **M-3** CHANGELOG and ROADMAP kept current (F-8)
 - **NF-1** `snora-core` / `snora-design` iced-free — must be *stated
   correctly*, not merely true in the manifests
 - **NF-7** all doc fences classified; `mdbook test` in CI
@@ -60,16 +60,16 @@ Exactly these files:
 |---|---|
 | `README.md` | F-1 |
 | `docs/src/reference/architecture.md` | F-1 |
-| `docs/src/contributing/architecture.md` | F-1, F-2, F-6 |
+| `docs/src/contributing/architecture.md` | F-1, F-2 |
 | `docs/src/contributing/alternate-engine-boundary.md` | F-1 (cross-ref text only) |
 | `docs/src/contributing/design-decisions.md` | F-4 |
 | `docs/src/contributing/release-process.md` | F-3 |
 | `docs/src/contributing/api-freeze-review.md` | F-5 |
 | `crates/snora/src/lib.rs` | F-1 — **module doc comment only** |
 | `rfcs/README.md` | F-7 |
-| `.gitignore` | F-6 — unblocked; owner confirmed the lockfile stays committed |
-| `CHANGELOG.md` | F-8 — unblocked; owner confirmed 0.25.2 was published |
-| `docs/src/reference/binary-size-budget.md` | F-8 follow-on note (Step 9) |
+| ~~`.gitignore`~~ | F-6 **withdrawn** — not touched |
+| `CHANGELOG.md` | F-8 — retroactive `[0.25.2]` entry |
+| ~~`docs/src/reference/binary-size-budget.md`~~ | Step 9 **withdrawn** — moved to RFC-041 |
 
 ## 6. Explicit non-change scope
 
@@ -230,19 +230,18 @@ In `rfcs/README.md`: remove the blank lines inside the Done table so it
 renders as one table; add a Proposed row for RFC-035; annotate the
 `archive/` bullet as "created on first use".
 
-### Step 7 — F-6, `Cargo.lock` policy (**unblocked**)
+### Step 7 — F-6, `Cargo.lock` policy — **WITHDRAWN, no action**
 
-Owner decision: the lockfile is intentionally committed, revisitable with
-good reason.
+An earlier revision of this step instructed removing `.gitignore:5` and
+rewriting the architecture section to say the lockfile is committed. **That
+instruction was wrong and was withdrawn during review.**
 
-1. Remove line 5 (`Cargo.lock`) from `.gitignore`. Do not remove the file
-   from the index — it stays tracked.
-2. In `docs/src/contributing/architecture.md`, retitle the section from
-   "Why no `Cargo.lock` in version control" to "Why `Cargo.lock` **is** in
-   version control" and replace its body with the rationale quoted in
-   RFC-035 F-6 (measurement attributability for the binary-size and
-   build-cost budgets, given 17 example/probe binaries in the workspace).
-   Note that the decision is revisitable.
+`Cargo.lock` is **not** tracked — it was deliberately removed in `b7af344`.
+Therefore `.gitignore` is correct and the "Why no `Cargo.lock` in version
+control" section is correct. **Both are left exactly as they are.** Any
+edit to either is a defect.
+
+See RFC-035 F-6 for the withdrawal and its root cause.
 
 ### Step 8 — F-8, retroactive `[0.25.2]` CHANGELOG entry (**unblocked**)
 
@@ -271,13 +270,13 @@ Verify the facts yourself before writing the entry — `git diff 0.25.1
 0.25.2` and `git diff 0.25.1 0.25.2 -- crates/` — and report both in the
 review request. Do not copy the summary above on trust.
 
-### Step 9 — budget-series note
+### Step 9 — budget-series note — **WITHDRAWN, no action**
 
-In `docs/src/reference/binary-size-budget.md`, add a short note that the
-trend series spans the 0.25.2 resolver change, that committed-lockfile
-resolution means existing data points remain comparable, and that the next
-lockfile regeneration is where comparability could break. One short
-paragraph; do not restructure the page.
+This step rested on the same false premise as Step 7 (a committed
+lockfile). The underlying concern — whether budget data points are
+comparable across the 0.25.2 resolver change — is real and was moved to
+**RFC-041**. `docs/src/reference/binary-size-budget.md` is **not** touched
+by this handoff.
 
 ## 8. Required tests
 
