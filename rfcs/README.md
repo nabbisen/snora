@@ -8,7 +8,8 @@ Status field is kept consistent with its folder.
 - `proposed/` — open for review; implementer should not assume the design
   is final.
 - `done/` — implemented; historical record of the design.
-- `archive/` — withdrawn or superseded.
+- `archive/` — withdrawn or superseded. Created on first use; no RFC
+  has been withdrawn or superseded yet.
 
 Numbering uses the planning-pack scheme `0NN-x` (the `NNN` groups by the
 target minor; the `x` letter distinguishes RFCs within that group).
@@ -57,7 +58,6 @@ Numbers remain stable forever and are never reused.
 | 018-B | [Gate 7 close-out](./done/018-b-gate-7-close-out.md) | v0.18.0 |
 | 018-C | [Contributing index and cross-links](./done/018-c-contributing-index-and-cross-links.md) | v0.18.0 |
 | 019-A | [Lucide icons type-parameter fix](./done/019-a-lucide-icons-type-parameter-fix.md) | v0.18.1 |
-
 | 020 | [Design System Boundary and Philosophy Amendment](./done/020-design-system-boundary-and-philosophy.md) | v0.19.0 |
 | 021 | [Crate and Feature Architecture](./done/021-crate-and-feature-architecture.md) | v0.19.0 |
 | 022 | [Snora Design Token Data Model](./done/022-token-data-model.md) | v0.19.0 |
@@ -71,7 +71,6 @@ Numbers remain stable forever and are never reused.
 | 030 | [Documentation, Examples, and Design Workbench](./done/030-docs-examples-and-design-workbench.md) | v0.19.0 |
 | 031 | [v0.20 Release Acceptance Criteria](./done/031-v020-release-acceptance.md) | v0.20.0 |
 | 032 | [Notice, Chip, and Progress Primitives](./done/032-notice-chip-and-progress-primitives.md) | v0.21.0 |
-
 | 033 | [Recipes and Dogfood Process](./done/033-recipes-and-dogfood-process.md) | v0.23.0 |
 | 034 | [Promotion, Stabilization, and API Governance](./done/034-promotion-stabilization-and-api-governance.md) | v0.23.0 |
 
@@ -83,6 +82,7 @@ Numbers remain stable forever and are never reused.
 | 036 | [Design surface freeze review and additive-only covenant](./proposed/036-design-surface-freeze-and-additive-covenant.md) | High — closes D-3/D-4 on six minors of evidence; the covenant gates RFC-038…040 |
 | 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26 positioning; extends RFC-020 to snora's own surfaces, permits theme emission under `design` |
 | 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26; prerequisite for RFC-039/040 |
+| 041 | [Measurement integrity and gate 9 re-assessment](./proposed/041-measurement-integrity-and-gate-9.md) | High — measurement workflows have never run on a release tag; gate 9 is unbacked |
 
 ## Archive
 

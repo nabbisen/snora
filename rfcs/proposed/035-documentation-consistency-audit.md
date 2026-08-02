@@ -174,32 +174,49 @@ version; D-gate rows reflect the current minor span. Gate *status* values
 are not changed — closing D-3/D-4 requires a design-freeze review, which
 is out of scope here.
 
-### F-6 (S) — `Cargo.lock` policy stated three ways
+### F-6 — **WITHDRAWN. The finding's premise was false.**
 
-- `Cargo.lock` is **tracked** (`git ls-files Cargo.lock` returns a hit).
-- `.gitignore:5` lists `Cargo.lock`.
-- `docs/src/contributing/architecture.md:99-104` has a section titled
-  "Why no `Cargo.lock` in version control".
+**This finding was wrong and is retained as a record of the error, not as
+work to be done. No change is required for F-6.**
 
-The v0.25.1 handoff records "Lockfile committed", and a workspace
-containing example binaries has a defensible reason to commit it.
+The finding originally asserted that `Cargo.lock` is tracked while
+`.gitignore:5` ignores it and
+`docs/src/contributing/architecture.md:99-104` denies it — a three-way
+contradiction.
 
-**Owner decision (received).** The lockfile is intentionally committed.
+**Verified false.** `Cargo.lock` is **not** tracked:
 
-**Expected corrected state.** The `.gitignore:5` entry is removed, since
-it contradicts the tracked state and would mislead anyone regenerating the
-file. The architecture section is retitled and rewritten to state why the
-lockfile **is** committed. The recorded reason:
+```
+$ git ls-files --error-unmatch Cargo.lock
+error: pathspec 'Cargo.lock' did not match any file(s) known to git
+$ git log --oneline -1 -- Cargo.lock
+b7af344 remove Cargo.lock from vcs
+```
 
-> The workspace contains 17 example and size-probe binaries, and the
-> binary-size and build-cost budgets (1.0 gate 9) track drift *between
-> releases*. A committed lockfile keeps those measurements attributable to
-> snora's own changes rather than to upstream dependency drift. This is a
-> deliberate departure from Cargo's library convention, taken because the
-> workspace is also a measurement harness.
+The lockfile was deliberately removed from version control in `b7af344`
+and has remained untracked since. Therefore `.gitignore:5` is **correct**,
+and the "Why no `Cargo.lock` in version control" section is **correct**.
 
-The section must also record that the decision is revisitable: the owner
-has stated it may be removed with good reason.
+**Root cause of the error.** The author (architect) ran
+`git ls-files Cargo.lock; echo "exit=$?"`, observed `exit=0`, and read it
+as a match. `git ls-files` exits 0 whether or not it matches; the command
+printed no filename. That misreading appeared to confirm "Lockfile
+committed" inherited from the v0.25.1 handoff bundle — which this RFC
+itself prohibits relying on ("re-derive every claim from source"). The
+implementer caught it on re-verification, reverted edits already made
+rather than shipping a new falsehood, and escalated instead of guessing.
+That is the correct handling and is recorded here as such.
+
+**Owner decision (received).** The untracked state stands. F-6 closes as
+*no change needed*.
+
+**Consequence — a live question opened elsewhere.** The rationale
+originally drafted for F-6 (that a committed lockfile keeps budget
+measurements attributable to snora's own changes) does not describe
+reality. With no committed lockfile, CI resolves dependencies fresh on
+every run, so the `resolver = "2"` → `"3"` switch in 0.25.2 could affect
+comparability of binary-size and build-cost data points. **This is
+followed up in RFC-041 and is explicitly out of scope here.**
 
 ### F-7 (S) — RFC index promises paths that do not resolve
 
@@ -314,9 +331,9 @@ No new tests are required: this RFC asserts nothing testable at runtime.
 
 - **Q-1 (owner) — ANSWERED.** `0.25.2` was published to crates.io. F-8 is
   unblocked and becomes a retroactive `[0.25.2]` CHANGELOG section.
-- **Q-2 (owner) — ANSWERED.** `Cargo.lock` is intentionally committed,
-  revisitable with good reason. F-6 is unblocked: remove the contradictory
-  `.gitignore` entry and document why it is committed.
+- **Q-2 (owner) — ANSWERED, on corrected facts.** The question was posed
+  on a false premise (see F-6). `Cargo.lock` is untracked and stays
+  untracked. F-6 closes as *no change needed*.
 - **Q-3 (follow-up).** Should a lightweight docs-consistency CI check be
   added (crate count, dead relative links, RFC index integrity)? Deferred
   to a separate RFC; RFC-000 §"Optional CI invariants" sketches the shape.
@@ -344,8 +361,9 @@ No new tests are required: this RFC asserts nothing testable at runtime.
    No gate status value changed.
 7. `rfcs/README.md` Done table renders as one table; Proposed lists
    RFC-035.
-8. F-6 is resolved: `.gitignore:5` no longer lists `Cargo.lock`, and the
-   architecture page states why the lockfile is committed.
+8. F-6 requires no change: `.gitignore` and the "Why no `Cargo.lock` in
+   version control" section are both left exactly as they were. Any edit
+   to either is a defect.
 9. F-8 is resolved: `CHANGELOG.md` carries a `[0.25.2]` section naming the
    resolver switch and member globbing, and stating that no source file
    changed.
