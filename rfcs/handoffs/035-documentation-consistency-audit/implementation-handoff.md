@@ -31,8 +31,17 @@ Read before starting:
 
 - `rfcs/proposed/035-documentation-consistency-audit.md` (the governing RFC)
 - `docs/src/contributing/documentation-test-policy.md` (fence rules)
-- `.git-exclude/rules/project-instructions-rust-gui.md` (English-only,
-  file-splitting, `cargo fmt` ordering)
+- `docs/src/contributing/README.md` (contributing index)
+
+The project also has an owner-held conventions document that is **not in
+the repository** (`.git-exclude/` is gitignored). The conventions relevant
+to this handoff are inlined here so no external file is required:
+
+- **English only** for all documentation prose and code comments.
+- **`cargo fmt` ordering:** complete all edits first, run `cargo fmt`
+  **once**, do not review the reformatted output, then run the gates.
+- **Rust 2018+ module style**, no `mod.rs` — relevant only to the paths
+  named in Step 2's procedures, not to any edit you make.
 
 ## 4. Applicable requirements
 
