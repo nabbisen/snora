@@ -3,7 +3,7 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.25.2):** Seven of ten core gates satisfied. Remaining
+**Current status (v0.25.3):** Seven of ten core gates satisfied. Remaining
 blockers: gate 1 (iced major upgrade), gate 3 (confirmed third-party
 production app), and gate 9 (measurement automation never fired on a
 release tag — reopened by RFC-041; see below). Design-track D-gates

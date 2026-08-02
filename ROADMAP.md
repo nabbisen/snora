@@ -33,12 +33,16 @@ These constrain what *can* be on the roadmap:
 
 ## Post-0.17: toward 1.0
 
-Eight of ten 1.0 gates are now satisfied. The remaining path:
+**Seven** of ten 1.0 gates are satisfied. The remaining path:
 
 1. One iced major upgrade completed. ⬜
 3. At least one third-party or production-grade app. ⬜
 7. Public API freeze review completed. ✅ v0.18
-9. Binary-size and compile-time trends (≥2 data points). ✅ v0.19.1
+9. Binary-size and compile-time trends (≥2 data points). ⬜ **reopened
+   v0.25.3** — the measurement workflows had never fired on a release tag
+   (RFC-041), and the methodology itself measures ~0 marginal cost
+   (RFC-043). Previously recorded as satisfied at v0.19.1; that was not
+   supported by the data.
 
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
@@ -71,6 +75,18 @@ Future design work is governed by `api-governance.md` and the D-gates.
 
 ## Recently shipped
 
+- **0.25.3** — Documentation accuracy, measurement integrity, build
+  reproducibility. Corrected in-tree docs that still described a
+  three-crate workspace five releases after `snora-design` shipped
+  (RFC-035); design-surface freeze review closing D-3/D-4 with an
+  additive-only covenant (RFC-036); fixed measurement workflows that had
+  **never** run on a release tag and reopened gate 9 (RFC-041); declared
+  `rust-version = "1.88"` — the documented 1.85 was false; committed
+  `Cargo.lock` with a weekly unpinned-build job (RFC-042). No public API,
+  feature-flag, or runtime behavior change.
+- **0.25.2** — Workspace resolver `"2"` → `"3"`; member globbing; version
+  snippets. No source change.
+- **0.25.1** — `snora::design::contrast` facade re-export.
 - **0.25.0** — Measurement methodology fix (size-probe crates replacing hello/workbench diff); build-cost cold-clean fix; RFC-031 index fix; docs corrections.
 - **0.24.0** — Architect-review cleanup: M-4 chip contrast fix, M-1/M-2/M-3/M-5/M-6/M-7 must-fixes, S-series should-fixes, all from v0.23 review.
 - **0.23.0** — Recipes and dogfood process (RFC-033): four initial recipes (empty-state, background-task, error-recovery, result-card); RFC-034 governance formally closed. All 15 design-track RFCs complete.
@@ -127,7 +143,8 @@ The full readiness checklist is in
 6. Feature-matrix CI stable. ✅ v0.11
 7. Public API freeze review completed. ✅ v0.18
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
-9. Binary-size and compile-time trends monitored (≥2 data points). ✅ v0.19.1
+9. Binary-size and compile-time trends monitored (≥2 data points). ⬜
+   (reopened v0.25.3 — see above and RFC-041 / RFC-043)
 10. No hidden feature-combination failures. ✅ (CI gate)
 
 We are explicitly **not** rushing to 1.0. Pre-1.0 SemVer is serving
