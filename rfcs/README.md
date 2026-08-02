@@ -80,6 +80,9 @@ Numbers remain stable forever and are never reused.
 | ID | Title | Priority |
 |----|-------|----------|
 | 035 | [Documentation consistency and source-of-truth audit](./proposed/035-documentation-consistency-audit.md) | High — two authoritative pages state a three-crate architecture; handoff at [`handoffs/035-documentation-consistency-audit/`](./handoffs/035-documentation-consistency-audit/implementation-handoff.md) |
+| 036 | [Design surface freeze review and additive-only covenant](./proposed/036-design-surface-freeze-and-additive-covenant.md) | High — closes D-3/D-4 on six minors of evidence; the covenant gates RFC-038…040 |
+| 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26 positioning; extends RFC-020 to snora's own surfaces, permits theme emission under `design` |
+| 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26; prerequisite for RFC-039/040 |
 
 ## Archive
 
