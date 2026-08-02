@@ -97,13 +97,20 @@ across findings in a way that makes review harder.
 
 The canonical statement to use, adapted per page's register:
 
-> Snora is four crates with a strict dependency direction:
-> `snora-core ← snora-design ← snora-widgets ← snora`.
-> `snora-core` (vocabulary) and `snora-design` (design tokens) have no
-> iced dependency. `snora-widgets` (prefab visuals and the design style
-> bridge) and `snora` (engine and facade) depend on iced. Applications
-> depend only on `snora`. `snora-design` is reached through the opt-in
-> `design` feature.
+> Snora is four crates with a strict dependency direction.
+> `snora-core` (vocabulary) and `snora-design` (design tokens) are
+> independent, iced-free leaves — **neither depends on the other**.
+> `snora-widgets` (prefab visuals and the design style bridge) depends on
+> `snora-core`, on `snora-design` behind the `design` feature, and on
+> iced. `snora` (engine and facade) depends on `snora-core` always and on
+> `snora-widgets` / `snora-design` optionally. Applications depend only on
+> `snora`. `snora-design` is reached through the opt-in `design` feature.
+
+**Do not** describe this as the linear chain
+`snora-core ← snora-design ← snora-widgets ← snora`. An earlier revision
+of this handoff did; it is false. `crates/snora-design/Cargo.toml` has an
+empty `[dependencies]` section. Verify with `cargo tree -p snora-design`
+before writing any dependency-direction prose.
 
 - `docs/src/reference/architecture.md` — update the opening sentence, the
   ASCII diagram, and add a `## snora-design — design tokens` section

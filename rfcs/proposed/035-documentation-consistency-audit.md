@@ -58,8 +58,8 @@ landed and survived five releases.
 ## Goals
 
 - G-1. Every architecture description in the repository states four
-  crates with the correct dependency direction
-  `snora-core ← snora-design ← snora-widgets ← snora`.
+  crates with the correct dependency **graph** (see F-1 for its shape —
+  it is a DAG, not a linear chain).
 - G-2. Contributor procedures name the crate and path where the code
   actually belongs.
 - G-3. The release checklist matches the gate suite CI actually runs and
@@ -103,9 +103,28 @@ inconsistent but not misdirecting).
 `grep -c snora-design` returns **0** for both architecture pages.
 
 **Expected corrected state.** All five locations describe four crates and
-the strict direction `snora-core ← snora-design ← snora-widgets ← snora`,
-noting that `snora-design` is iced-free and reached behind the opt-in
-`design` feature.
+the correct dependency graph, noting that `snora-design` is iced-free and
+reached behind the opt-in `design` feature.
+
+**Correction (round 2).** An earlier revision of this RFC specified the
+direction as the linear chain
+`snora-core ← snora-design ← snora-widgets ← snora`. **That is false.**
+`crates/snora-design/Cargo.toml` has an **empty `[dependencies]` section**
+— `snora-design` does not depend on `snora-core`, and `cargo tree -p
+snora-design` returns the crate alone. The two iced-free crates are
+independent siblings, not a chain. The actual graph:
+
+```text
+snora            → snora-core (always), snora-widgets (opt), snora-design (opt)
+snora-widgets    → snora-core, snora-design (behind `design`), iced
+snora-core       → (nothing)
+snora-design     → (nothing)
+```
+
+Any wording implying `snora-design` depends on `snora-core` is a defect.
+This error was inherited from the v0.25.1 handoff bundle's
+`external-design.md` and propagated by the RFC author; see the round-2
+review result for the root cause.
 
 ### F-2 (M) — Contributor procedure names the wrong crate
 
