@@ -87,11 +87,17 @@ schedule (weekly is sufficient) and on `workflow_dispatch`:
 cargo update
 cargo check --workspace --all-features
 cargo test -p snora-core -p snora-design
+# and verify the declared MSRV still holds against the fresh resolution:
+cargo +<declared MSRV> check --workspace --all-features
 ```
 
 It must **not** commit the updated lockfile — it exists to fail loudly and
 tell a human that upstream moved. A failure means "investigate", not
 "auto-merge".
+
+The MSRV line is what makes an **inherited** floor rise visible weekly
+instead of at release time, which is what the RFC-041 bump policy
+(inherited rise → patch) needs in order to be actionable.
 
 This converts an unpinned tree's implicit, continuous early warning into
 an explicit, scheduled one — which is strictly better, because today that
@@ -146,10 +152,29 @@ not proposed here.
 
 ## Open questions
 
-- **Q-1 (owner).** Adopt, and if so, in **0.25.3** (before the first
-  rebuilt budget data point — recommended) or 0.26.0?
-- **Q-2.** Scheduled-job cadence: weekly is proposed. Daily is noise at
-  this project's rate of change.
+Both answered; the Developer Handoff carries no open decisions.
+
+- **Q-1 — ANSWERED.** Adopted, targeting **0.25.3**, so the first rebuilt
+  budget data point (RFC-041) is measured against pinned dependencies.
+- **Q-2 — ANSWERED.** Weekly cadence for the scheduled unpinned-build job.
+
+## Sequencing with RFC-041
+
+These two land in the same release and interact. **The lockfile must be
+committed before the MSRV declaration is finalised**, because the declared
+floor is only meaningful relative to a specific resolution: if `Cargo.lock`
+were committed after the fact, an intervening `cargo update` could move the
+floor and re-invalidate the declaration — the exact failure RFC-041 exists
+to fix.
+
+Required final state, whatever the order of the intermediate steps:
+`Cargo.lock` is tracked, and `cargo +1.88 check --workspace --all-features`
+passes **against that exact lockfile**.
+
+The scheduled job (C-3) must therefore also verify the MSRV, so an
+*inherited* rise is caught weekly rather than at release time. This is what
+operationalises the inherited-rise-is-a-patch policy adopted in RFC-041:
+the job tells us the floor moved, and a patch follows.
 
 ## Acceptance criteria
 
