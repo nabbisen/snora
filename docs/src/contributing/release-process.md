@@ -76,6 +76,15 @@ them in sync is a release-process invariant.
 [ ] Update user-facing version snippets in install.md and icons.md to the
     new version (snora = "X.Y" — iced version stays unchanged)
 [ ] Re-run cargo metadata; confirm every crate reports new version
+[ ] Confirm Cargo.lock is current and its diff (if any) is intentional —
+    `git status --porcelain Cargo.lock`; if it shows a diff, review what
+    moved and why before committing. A lockfile that drifts unreviewed is
+    worse than none: it carries the implied assertion that someone looked.
+[ ] cargo +<declared MSRV> check --workspace --all-features
+    # must pass against the committed Cargo.lock; an MSRV not re-checked
+    # at release time is a claim, not a fact
+[ ] Confirm no resolved dependency declares a higher rust-version than the
+    declared MSRV: cargo metadata --format-version 1 --all-features
 [ ] cargo fmt --check
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
@@ -94,19 +103,36 @@ them in sync is a release-process invariant.
 [ ] cargo package -p snora-design  --no-verify    # check .crate contents
 [ ] cargo package -p snora-widgets --no-verify    # check .crate contents
 [ ] cargo package -p snora         --no-verify    # check .crate contents
+[ ] Merge to main, then dispatch the `unpinned-build` workflow on main and
+    confirm a green run BEFORE tagging.
+    # `workflow_dispatch` only works for workflows already on the default
+    # branch, so this cannot be verified from a feature branch. A workflow
+    # that has never executed is exactly the failure RFC-041 was raised to
+    # fix — do not skip this.
 [ ] git commit, git tag X.Y.Z, git push --tags
     # tags carry no `v` prefix, matching Rust crate convention
 [ ] Confirm CI workflow green on the tag commit (all four jobs:
     rust-quality, feature-matrix, design-isolation, docs)
-[ ] After tag push: confirm the `binary-size` workflow run succeeded
-    on the tag and appended a row to
-    docs/src/reference/binary-size-budget/binary-size.csv on main.
-    If the diff column exceeds 150 KB, follow up per
-    feature-gating-criteria.md indicator 2.
-[ ] After tag push: confirm the `build-cost` workflow run succeeded
-    on the tag and appended a row to
-    docs/src/reference/build-cost-budget/compile-time.csv on main.
-    If build_widgets_ms exceeds 30 000, follow up per
+[ ] After tag push: confirm a NEW ROW EXISTS for this version in
+    docs/src/reference/binary-size-budget/binary-size.csv on main —
+    `git show main:docs/src/reference/binary-size-budget/binary-size.csv | tail -1`
+    and check its `version` column equals the tag just pushed. This is the
+    falsifiable check; "the workflow run is green" is not, because a
+    workflow that never triggers reports nothing rather than failing (the
+    exact failure mode RFC-041 exists to fix — the tag-pattern mismatch
+    that caused it went unnoticed for six releases specifically because
+    only the run's status, not the row's existence, was ever checked). If
+    no new row exists, treat it as a release blocker: check the Actions
+    tab for whether the `binary-size` workflow triggered at all on the
+    tag, not just whether a triggered run went green. If the diff column
+    exceeds 150 KB, follow up per feature-gating-criteria.md indicator 2.
+[ ] After tag push: confirm a NEW ROW EXISTS for this version in
+    docs/src/reference/build-cost-budget/compile-time.csv on main —
+    `git show main:docs/src/reference/build-cost-budget/compile-time.csv | tail -1`
+    and check its `version` column equals the tag just pushed. Same
+    failure-mode note as above: verify the row, not just workflow status.
+    If no new row exists, treat it as a release blocker. If
+    build_widgets_ms exceeds 30 000, follow up per
     feature-gating-criteria.md indicator 1.
 ```
 

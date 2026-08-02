@@ -176,6 +176,26 @@ The scheduled job (C-3) must therefore also verify the MSRV, so an
 operationalises the inherited-rise-is-a-patch policy adopted in RFC-041:
 the job tells us the floor moved, and a patch follows.
 
+## AC-3 disposition (recorded at review)
+
+AC-3 — "the scheduled workflow has been proven to run via
+`workflow_dispatch`" — **could not be satisfied during implementation**.
+GitHub only exposes `workflow_dispatch` for workflows already present on
+the **default branch**, even when `--ref` points elsewhere, so a workflow
+introduced on a feature branch cannot be dispatched from it.
+
+**Owner decision.** AC-3 is **deferred into a blocking pre-tag gate**
+rather than waived. It now appears in the release checklist
+(`release-process.md`): after merging to `main` and **before tagging
+0.25.3**, dispatch `unpinned-build` on `main` and confirm a green run. At
+that point `main` carries both the workflow and the `rust-version`
+declaration, so the run exercises the full path including the MSRV check.
+
+An isolated PR containing only the workflow (`nabbisen/snora#1`) was opened
+during implementation to work around the constraint, and **closed unmerged**
+by owner decision: the workflow reaches `main` via this RFC's own branch, and
+two independent routes to `main` for one file is a divergence risk.
+
 ## Acceptance criteria
 
 1. `Cargo.lock` is tracked; `.gitignore` no longer lists it.

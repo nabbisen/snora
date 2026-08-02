@@ -4,7 +4,11 @@ on:
   push:
     branches: [main]
     tags:
-      - 'v*.*.*'
+      # Accept both the project's actual tag shape (no `v` prefix, e.g.
+      # `0.25.3`) and a `v`-prefixed shape, so a future convention change
+      # cannot silently disable measurement again (RFC-041).
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
 
 # Avoid recursion: same [skip ci] + path-filter defence as binary-size.yaml.
@@ -34,8 +38,12 @@ jobs:
       - name: Determine version label
         id: version
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            # Prefix-agnostic: strip refs/tags/, then an optional leading
+            # `v`, so VERSION is always e.g. "0.25.3", never "v0.25.3" —
+            # matching the CSV `version` column in every existing row.
+            VERSION="${GITHUB_REF#refs/tags/}"
+            VERSION="${VERSION#v}"
           else
             VERSION=$(grep -oP '^version\s*=\s*"\K[0-9]+\.[0-9]+\.[0-9]+' Cargo.toml | head -n1)
             VERSION="${VERSION}-dev-${GITHUB_SHA::7}"
@@ -85,13 +93,13 @@ jobs:
 
       # Tag-only: append row to CSV and commit back with [skip ci].
       - name: Append row to compile-time CSV
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           echo "${{ steps.measure.outputs.row }}" >> \
             docs/src/reference/build-cost-budget/compile-time.csv
 
       - name: Commit and push to main
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: |

@@ -5,7 +5,11 @@ on:
   push:
     branches: [main]
     tags:
-      - 'v*.*.*'
+      # Accept both the project's actual tag shape (no `v` prefix, e.g.
+      # `0.25.3`) and a `v`-prefixed shape, so a future convention change
+      # cannot silently disable measurement again (RFC-041).
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 # Avoid recursion: when this workflow commits back to main on a
 # release tag, the resulting push should not retrigger another run.
@@ -49,8 +53,12 @@ jobs:
       - name: Determine version label
         id: version
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            # Prefix-agnostic: strip refs/tags/, then an optional leading
+            # `v`, so VERSION is always e.g. "0.25.3", never "v0.25.3" —
+            # matching the CSV `version` column in every existing row.
+            VERSION="${GITHUB_REF#refs/tags/}"
+            VERSION="${VERSION#v}"
           else
             # Pull the workspace version directly from Cargo.toml so
             # PR / main-push job summaries label rows usefully even
@@ -113,11 +121,11 @@ jobs:
       # ──────────────────────────────────────────────────────────
 
       - name: Append row to budget CSV
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/')
         run: scripts/append-binary-size-row.sh "${{ steps.measure.outputs.row }}"
 
       - name: Commit and push to main
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/')
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           # `[skip ci]` is the primary recursion guard.

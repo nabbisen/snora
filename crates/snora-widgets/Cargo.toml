@@ -3,6 +3,7 @@ name = "snora-widgets"
 description = "Optional prefab iced widgets for the Snora GUI framework — header, footer, sidebar, menu, icon."
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true

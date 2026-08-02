@@ -1,7 +1,9 @@
 # 1 — Install
 
 Add snora and iced to your `Cargo.toml`. snora targets **iced 0.14** and
-**Rust edition 2024** (rustc ≥ 1.85).
+**Rust edition 2024**. The declared minimum supported Rust version is
+**rustc ≥ 1.88** — snora's own code needs only the edition-2024 minimum of
+1.85, but the floor is inherited from `iced`/`wgpu`, which require 1.88.
 
 ```toml
 [dependencies]

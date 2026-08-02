@@ -41,10 +41,10 @@ The flow is split between automation and human discipline:
   gives developers visibility into accidental size regressions
   without polluting the repository history.
 
-- **CI appends one row to the budget CSV on every release tag
-  (`v*.*.*`)**, then commits the change back to `main` with
-  `[skip ci]`. This is the only path by which the CSV grows. One
-  release, one row.
+- **CI appends one row to the budget CSV on every release tag**
+  (the project's tags carry no `v` prefix, e.g. `0.25.3`), then commits
+  the change back to `main` with `[skip ci]`. This is the only path by
+  which the CSV grows. One release, one row.
 
 - **Humans never edit the CSV directly.** Manual edits would
   shadow the bot's commits and could be lost on the next release;
@@ -81,6 +81,21 @@ All three probes contain identical application code (see `examples/size_probe_*/
 so diffs measure the cost of the feature alone. Rows before v0.25 carry `N/A`
 because the probe crates did not exist and earlier measurements used different methodology.
 
+### Data integrity note (RFC-041)
+
+Every row through 0.25.2 carries `N/A` in all measurement columns. The
+workflow's release-tag trigger matched `v*.*.*`, but the project's tags
+carry no `v` prefix, so the append-on-tag step never fired on any of the
+project's 38 release tags — not because of the `N/A` schema migration
+described above, but because no CI run ever executed the append at all.
+This was fixed in 0.25.3 (RFC-041). Rows before 0.25.3 therefore predate
+the fix and were not produced by the tag automation. Additionally, the
+series spans the 0.25.2 `resolver = "2"` → `"3"` workspace change, and
+because `Cargo.lock` is not committed, dependency resolution is not
+pinned between CI runs — so pre-0.25.3 and post-0.25.3 rows are **not
+comparable** even where both are non-`N/A`. Treat 0.25.3 as the start of
+a new, real baseline.
+
 The 150 KB threshold from
 [`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md)
 indicator (2) applies to `diff_bytes`. If a release crosses that
@@ -115,10 +130,12 @@ a `gh-pages` chart, an external dashboard) without changing how
 the data flows. Keeping the data store separable from the
 visualization is exactly why the CSV lives in its own subfolder.
 
-**Why is the CSV empty / missing my release?** The first row is
-written by CI the first time a `v*.*.*` tag is pushed after this
-budget was introduced (0.10.0). Until that first tagged release
-runs through the workflow, the CSV holds only its header. If a
-release shipped and no row appeared, the `binary-size` workflow
-failed on that tag — check the workflow run; the failure mode is
-almost always a build issue rather than a measurement bug.
+**Why is the CSV empty / missing my release?** The first *real* row is
+expected starting with the 0.25.3 tag (RFC-041 fixed the tag-pattern
+mismatch that silently prevented every prior release from appending one —
+see the data integrity note above). If a release at or after 0.25.3 ships
+and no row appears, don't assume the workflow was green — a workflow that
+never triggers reports nothing rather than failing. Confirm the row exists
+in the CSV directly (`git show main:docs/src/reference/binary-size-budget/binary-size.csv | tail -1`)
+before treating the release as clean; if it's missing, check the Actions
+tab for whether `binary-size` triggered on the tag at all.

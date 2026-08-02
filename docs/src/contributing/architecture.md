@@ -140,9 +140,49 @@ escalate when needed; do not start at `pub`.
 5. Confirm it against `docs/src/contributing/api-governance.md` before
    promoting it out of experimental status.
 
-## Why no `Cargo.lock` in version control
+## Why `Cargo.lock` **is** in version control
 
-Snora ships as libraries; Cargo's convention for libraries is to leave
-`Cargo.lock` out of git so consumers' lockfiles win. Examples are
-internal binaries but they share the workspace lockfile, which still
-follows the library convention.
+Snora ships as libraries, and Cargo's convention for libraries is to leave
+`Cargo.lock` out of git so consumers' lockfiles win — this was snora's own
+policy from `b7af344` ("remove Cargo.lock from vcs") until RFC-042. The
+workspace is also a measurement harness, and that second role is what
+changed the calculus:
+
+- **Measurement attributability.** The workspace carries 17 example and
+  size-probe binaries feeding the binary-size and build-cost budgets,
+  which exist to track drift *between releases*. With no lockfile, CI
+  resolves dependencies fresh on every run, so a measured delta mixes
+  snora's own change with whatever upstream published in the interim — the
+  budgets end up measuring partly noise. A committed lockfile fixes
+  resolution so a delta is attributable to snora's own change.
+- **MSRV floor visibility.** The workspace's declared `rust-version` is
+  only meaningful relative to a specific dependency resolution: `iced`
+  and `wgpu` set the actual floor (see `versioning-policy.md`), and
+  because `iced = "0.14"` is a caret range, an unpinned resolution lets a
+  future patch release of `iced` silently raise that floor with no change
+  on snora's side. A lockfile turns that into a reviewable diff instead of
+  a surprise — this is exactly how the floor moved from the documented
+  1.85 to the actual 1.88 unnoticed (RFC-041).
+- **Reproducible workspace builds.** `cargo run -p
+  snora-example-workbench` producing different dependency versions on two
+  machines is a debugging cost with no compensating benefit.
+
+**The cost accepted.** Committing a lockfile means CI stops noticing, on
+its own, that a fresh dependency resolution would have broken — the
+continuous early warning an unpinned tree provides is lost. RFC-042
+accepts that cost deliberately and replaces it with a scheduled
+`unpinned-build` workflow (weekly, plus manual dispatch) that runs `cargo
+update` in a throwaway checkout, checks the workspace still builds and the
+declared MSRV still holds, and fails loudly without ever committing the
+updated lockfile. A failure means "upstream moved — investigate," not
+"auto-merge."
+
+**No effect on downstream consumers.** A library's committed `Cargo.lock`
+is ignored by Cargo when the library is used as a dependency — downstream
+applications resolve against their own lockfile regardless of what snora
+commits. This is purely about this repository's own builds and
+measurements.
+
+This decision is revisitable, same as its predecessor: if the
+measurement-harness rationale stops applying, the lockfile can be
+untracked again with good reason, recorded the same way this reversal was.

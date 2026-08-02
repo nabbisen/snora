@@ -3,9 +3,11 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.25.2):** Eight of ten core gates satisfied. Remaining
-blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
-production app). Design-track D-gates tracking in progress; see table below.
+**Current status (v0.25.2):** Seven of ten core gates satisfied. Remaining
+blockers: gate 1 (iced major upgrade), gate 3 (confirmed third-party
+production app), and gate 9 (measurement automation never fired on a
+release tag — reopened by RFC-041; see below). Design-track D-gates
+tracking in progress; see table below.
 
 ## Crate-level surface
 
@@ -83,8 +85,8 @@ Type-names audit: **complete as of v0.17.0.**
 |---|---|
 | CHANGELOG is complete | ✅ |
 | ROADMAP is current | ✅ |
-| Binary-size first data point recorded | ✅ v0.17.0 (sandbox; CI will populate real values) |
-| Compile-time first data point recorded | ✅ v0.17.0 (sandbox; CI will populate real values) |
+| Binary-size first data point recorded | ⬜ every row through 0.25.2 is `N/A` or a non-CI sandbox run; the tag-automation bug (RFC-041) meant CI never populated real values as this row assumed |
+| Compile-time first data point recorded | ⬜ same as above; see RFC-041 |
 | CI passes on clean branch | ✅ RFC-011-A |
 | mdBook build and test green | ✅ RFC-012-D |
 
@@ -100,14 +102,18 @@ Type-names audit: **complete as of v0.17.0.**
 | 6. Feature-matrix CI stable | ✅ v0.11 |
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
-| 9. Binary-size and compile-time trends monitored (≥2 data points) | ✅ binary-size: v0.17.0, v0.19.0, v0.19.1 on ubuntu-latest. build-cost: v0.17.0 (sandbox), v0.19.1 on ubuntu-latest. |
+| 9. Binary-size and compile-time trends monitored (≥2 data points) | ⬜ **reopened (RFC-041).** Both measurement workflows triggered on `refs/tags/v*`, but all 38 project tags carry no `v` prefix, so the append-on-tag step never fired on any release tag. `binary-size.csv` holds three rows in which every measurement column is `N/A`; `compile-time.csv` has two rows, one on `runner_os = unknown` (a sandbox, not CI). Zero usable CI data points exist. Fixed in 0.25.3; re-satisfy once ≥2 real post-fix data points exist on the same runner and methodology. |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-**Gates satisfied: 2, 4, 5, 6, 7, 8, 9, 10 = eight of ten.**
+**Gates satisfied: 2, 4, 5, 6, 7, 8, 10 = seven of ten.**
 
-Remaining blockers: iced upgrade (gate 1), third-party app (gate 3).
-Gate 9 fully satisfied: binary-size has three CI data points (v0.17.0,
-v0.19.0, v0.19.1); build-cost has two (v0.17.0 sandbox, v0.19.1 ubuntu-latest).
+Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
+measurement trend data (gate 9, reopened by RFC-041). The previous
+"Gate 9 fully satisfied: binary-size has three CI data points" claim was
+wrong on two counts: `v0.17.0`'s `runner_os` is `unknown` (not CI), and all
+three rows are `N/A` — so the honest count was never eight of ten. See
+`docs/src/reference/binary-size-budget.md` and `build-cost-budget.md` for
+the full data-integrity record.
 
 ## How to use this document
 
@@ -128,12 +134,28 @@ gates; they do not block snora core's 1.0 release.
 |---|---|
 | D-1. One iced major upgrade survived with design feature enabled | ⬜ (coupled to core Gate 1) |
 | D-2. Minimal path clean after iced upgrade | ⬜ (coupled to core Gate 1) |
-| D-3. Token model stable for ≥2 consecutive minors | ⬜ (vocabulary unchanged v0.20–v0.25; close after a dedicated design-freeze review) |
-| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ (bridge unchanged v0.20–v0.25; close alongside D-3 after the freeze review) |
+| D-3. Token model stable for ≥2 consecutive minors | ✅ v0.20–v0.25 (token model unchanged across six consecutive minors; freeze review RFC-036) |
+| D-4. Style bridge stable for ≥2 consecutive minors | ✅ v0.20–v0.25 (style bridge additive-only across six consecutive minors; freeze review RFC-036) |
 | D-5. ≥1 real app in serious production use of design tokens | ⬜ (coupled to core Gate 3) |
 | D-6. Promotion process used at least once with evidence | ⬜ (recipes published v0.23; no promotion yet) |
 | D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor — clean through v0.24) |
 | D-8. `snora-design` published (`publish = false` flipped) | ✅ v0.20.0 |
+
+The D-3/D-4 closure is **qualified**, not an unbroken surface: across
+v0.20.0 → v0.25.2, `crates/snora-design/src/palette.rs` narrowed
+`Palette::roles()` from `pub` to `#[cfg(test)] pub(crate)` (DEC-12 — a
+removal from the public API, deliberate SemVer hardening against a future
+breaking change on role addition to `#[non_exhaustive] Palette`), and
+`crates/snora-design/src/contrast.rs`'s `composite_over` gained a
+debug-only precondition (`debug_assert!(bg.is_opaque())`) with no signature
+change. Both changes were deliberate hardening, and neither altered the
+token *model* (all 18 `Palette` role fields, `Tokens`, and every preset are
+byte-for-byte unchanged) or the style bridge (which changed by addition
+only — `style::progress::toned`, v0.21). D-3 and D-4 ask whether the token
+model and style bridge are stable, not whether the surface is frozen solid;
+they are. See RFC-036 §Evidence for the full `git diff` record and the
+additive-only covenant (`api-governance.md`) that now governs what may
+change next.
 
 See `docs/src/contributing/api-governance.md` for the full promotion,
 deprecation, and release-review governance process.

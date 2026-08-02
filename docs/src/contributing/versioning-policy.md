@@ -16,6 +16,23 @@ how public API changes are versioned, communicated, and bridged.
 | Behavior semantics change (changes doc invariant) | minor | Changelog note under **Changed** |
 | 1.0+ breaking change | major | Full migration guide |
 
+## MSRV bump policy
+
+Snora declares `rust-version` in `[workspace.package]` (adopted in RFC-041,
+after verification showed the documented floor was wrong by three point
+releases — see `contributing/architecture.md`'s `Cargo.lock` rationale for
+how that happened). Raising it is versioned by *why* it rises, not just
+that it does:
+
+| Case | Level | Reasoning |
+|---|---|---|
+| **Inherited** rise — a dependency (`iced`, `wgpu`, …) raises its own `rust-version`, forcing snora's floor up with it | **patch** | Snora controls neither the timing nor the value; it is reporting a floor already imposed on it, not making a design decision. With `rust-version` declared, cargo's MSRV-aware resolver (resolver `"3"`) keeps users on older toolchains at the last compatible snora version rather than breaking them outright. |
+| **Chosen** rise — snora adopts a newer language edition or toolchain feature by choice | **minor** | This is a decision snora makes, with alternatives (stay on the older feature set). It narrows who can currently build snora by snora's own choice, which is a minor-level compatibility decision like any other. |
+
+Either way, the release checklist requires re-verifying the declared value
+against the committed lockfile before tagging (see `release-process.md`) —
+an MSRV that isn't re-checked at release time is a claim, not a fact.
+
 ## "Fixed" vs "Changed" rule
 
 A fix that makes behavior match *already-published* documentation is

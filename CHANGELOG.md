@@ -39,6 +39,68 @@ are recorded in the per-version migration guides under
   state (see review request for detail); resolving it needs an owner
   decision on the corrected facts.
 
+- **Measurement workflow tag-pattern mismatch fixed; 1.0 gate 9 reopened
+  (RFC-041).** Both `binary-size.yaml` and `build-cost.yaml` triggered and
+  gated their append/commit-back steps on `refs/tags/v*`, while all 38 of
+  the project's release tags carry no `v` prefix — so the measurement
+  automation has never executed on a release tag in the project's history.
+  `binary-size.csv` held three rows in which every measurement column was
+  `N/A`; `compile-time.csv` held two, one on a non-CI sandbox runner. Fixed
+  both workflows' trigger filters and version-extraction/step-guard logic
+  to accept the project's real tag shape (and a `v`-prefixed shape, for
+  future-proofing). Replaced two unfalsifiable release-checklist items
+  ("confirm the workflow succeeded") with falsifiable ones (confirm a row
+  for the new version actually exists in the CSV on `main`). Corrected 1.0
+  gate 9 and the two related release-hygiene rows in `api-freeze-review.md`
+  from a false "satisfied" to reopened (⬜); the honest core-gate count is
+  **7 of 10**, not 8. Annotated both budget docs: pre-0.25.3 rows predate
+  the fix, are not comparable to post-0.25.3 rows (0.25.2's
+  `resolver = "2"` → `"3"` change plus no committed `Cargo.lock` means
+  dependency resolution isn't pinned across the boundary), and the
+  `compile-time.csv` `0.17.0` row is flagged suspect (duplicate value
+  across two different metrics). No CSV row deleted, edited, or
+  back-filled. **The MSRV portion of RFC-041 was corrected and completed
+  in round 2**: the RFC's original value (`rust-version = "1.85"`) was
+  verified false against the resolved dependency graph and escalated
+  rather than shipped; the owner-confirmed corrected value, `rust-version
+  = "1.88"` (`iced`/`wgpu` require it; `cargo +1.87 check` fails,
+  `cargo +1.88 check` passes), is now declared in `[workspace.package]`
+  and inherited by all four crates. `docs/src/getting-started/01-install.md`
+  corrected to state the real floor. The bump policy (inherited rise =
+  patch, chosen rise = minor) is recorded in `versioning-policy.md`. No
+  source, public API, or feature-flag change.
+
+### Changed
+
+- **Design surface freeze review; design gates D-3 and D-4 closed (RFC-036).**
+  Recorded a freeze review spanning six consecutive minors (v0.20 → v0.25)
+  showing the Snora Design token model and iced style bridge stable except
+  for two deliberate SemVer-hardening changes (`Palette::roles()` narrowed
+  to test-only; `composite_over` gained a debug-only precondition) that
+  altered neither the token model nor the style bridge. Closes D-3 and D-4
+  in `api-freeze-review.md`. Establishes the **additive-only covenant** in
+  `api-governance.md`, which itemizes the frozen design surface and
+  constrains what may change in it without reopening the gate — the
+  prerequisite for the v0.26 appearance milestone (RFC-037…040) to proceed
+  without hollowing out the gates it just closed. No source, public API,
+  or feature-flag change.
+
+- **`Cargo.lock` is now tracked (RFC-042).** Reverses `b7af344` ("remove
+  Cargo.lock from vcs"), a deliberate prior decision, because the
+  workspace is also a measurement harness: with no lockfile, CI resolved
+  dependencies fresh on every run, so binary-size/build-cost deltas mixed
+  snora's own changes with whatever upstream published in between, and the
+  MSRV floor could move unobserved (as it did — RFC-041 found the
+  documented 1.85 was actually 1.88). A committed lockfile fixes both.
+  **The cost accepted:** CI no longer notices on its own that a fresh
+  resolution would have broken; a new scheduled `unpinned-build` workflow
+  (weekly + manual dispatch) replaces that lost signal by re-resolving in
+  a throwaway checkout, checking the workspace and the declared MSRV still
+  hold, and failing loudly — it never commits or pushes the updated
+  lockfile. **Downstream consumers are unaffected in either direction**: a
+  library's committed lockfile is ignored by Cargo when the library is
+  used as a dependency. No dependency range in any `Cargo.toml` changed.
+
 ## [0.25.2] — 2026-06-21
 
 ### Changed

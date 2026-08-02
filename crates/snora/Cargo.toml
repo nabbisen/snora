@@ -3,6 +3,7 @@ name = "snora"
 description = "iced engine for the Snora GUI framework. Consumes snora-core vocabulary."
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true

@@ -136,6 +136,80 @@ covers the core snora 1.0 gates.
 
 ---
 
+## Additive-only covenant (design surface)
+
+D-3 and D-4 closed at v0.25 on a freeze review spanning six consecutive
+minors (v0.20 → v0.25; see RFC-036). Closing a stability gate immediately
+before a milestone that extends the surface it covers would hollow the gate
+out, so this covenant binds what may be done to the frozen surface *next*.
+It does not freeze the surface against all future change — it defines
+which changes remain permitted without reopening the gate.
+
+### The frozen surface
+
+Anything not listed below is outside the covenant and not constrained by
+it.
+
+**Token surface** — all public items of `snora-design`:
+
+- `Tokens` and its constructors: `light`, `dark`, `high_contrast_light`,
+  `high_contrast_dark`.
+- `Palette` and its 18 role fields.
+- `Color`.
+- `Spacing`.
+- `Typography` and `TextRole`.
+- `Radius`.
+- `FocusTokens`.
+- `Tone`, `Emphasis`, `Size`, `Density`.
+- The `contrast` module's three functions: `relative_luminance`,
+  `contrast_ratio`, `composite_over`.
+
+**Style-bridge surface** — all public functions of
+`snora_widgets::design::style`:
+
+- `color::to_iced_color`.
+- `button::{primary, secondary, ghost, danger}`.
+- `container::{card_surface, card_raised, card_selected}`.
+- `progress::toned`.
+- `text::{body_size, body_small_size, label_size, title_size,
+  heading_size, display_size}`.
+
+**Not frozen.** The design **primitives** — `button`, `card`, `notice`,
+`chip`, `progress` helper modules — are deliberately excluded from the
+frozen surface. They remain governed by the promotion lifecycle above
+(Recipe → Experimental helper → Stable primitive → Deprecated → Removed),
+which is a different and more permissive regime than this covenant.
+
+### Permitted without reopening the gate
+
+- Adding new items to `snora-design` (new token types, new fields on
+  `#[non_exhaustive]` types, new presets, new contrast helpers).
+- Adding new functions to the style bridge.
+- Adding new modules, entry points, and primitives elsewhere in the design
+  layer.
+- Changing values *inside* a preset **only** where a contrast test proves
+  the change fixes an accessibility defect, recorded as **Fixed** in the
+  CHANGELOG.
+
+### Forbidden without reopening the gate
+
+- Removing, renaming, or retyping any item in the frozen surface.
+- Changing the signature of any frozen style-bridge function.
+- Adding, removing, renaming, or retyping a `Palette` role.
+- Changing the *meaning* of an existing token (e.g. redefining what
+  `Spacing::md` denotes) even where the type itself is untouched.
+
+### Reopening obligation
+
+If work requires a forbidden change, the implementing RFC must say so
+explicitly and **reset D-3 and D-4 to open (⬜) in `api-freeze-review.md`
+in the same change**. It must not proceed and rationalise afterward. The
+gate's value is entirely in its being expensive to reverse — quietly
+absorbing a forbidden change without reopening the gate defeats the point
+of having recorded the freeze review at all.
+
+---
+
 ## Scope boundary
 
 Snora Design is **not** a generic UI component library. The scope boundary

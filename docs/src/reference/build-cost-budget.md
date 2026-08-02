@@ -38,6 +38,26 @@ The workbench binary itself is also cleaned before `example_workbench_ms`.
 - The `build_widgets_ms` measurement is the closest proxy for
   `feature-gating-criteria.md` indicator 1 (30-second threshold).
 
+### Data integrity note (RFC-041)
+
+`compile-time.csv` holds only two rows through 0.25.2 (0.17.0, 0.19.1), and
+no row has been appended by CI on a release tag: the workflow's trigger
+matched `v*.*.*`, but the project's tags carry no `v` prefix, so the
+append-on-tag step never fired on any of the 38 release tags. This was
+fixed in 0.25.3 (RFC-041). Rows before 0.25.3 predate the fix and were not
+produced by the tag automation. The series also spans the 0.25.2
+`resolver = "2"` → `"3"` workspace change; with no committed `Cargo.lock`,
+dependency resolution is not pinned between CI runs, so pre-0.25.3 and
+post-0.25.3 rows are **not comparable**. Treat 0.25.3 as the start of a
+new, real baseline.
+
+Additionally, row `0.17.0` was measured with `runner_os = unknown` (a
+sandbox run, not CI) and reports `example_hello_ms = 182000` — the same
+value `render-cost.csv` reports for `hello_ms` at `0.17.0`, a different
+metric. Two independent measurements landing on an identical value
+suggests a script or transcription fault at that data point; treat the
+`0.17.0` row as suspect rather than a real signal.
+
 ### Watch points
 
 No CI failures are triggered by compile time in the first iteration.
