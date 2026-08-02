@@ -7,6 +7,26 @@
 
 ---
 
+> ## ⚠ Round 2 — only Step 3 needs work
+>
+> Steps 1, 2, and 4 were **reviewed and approved** — see
+> `.git-exclude/reviewed/041-measurement-integrity-and-gate-9/review-result.md`.
+> **Do not redo them and do not re-evidence them.** Your existing edits to
+> the workflows, `release-process.md`, `api-freeze-review.md`, and the two
+> budget docs stand as they are.
+>
+> **Step 3 only**, with the corrected value: the MSRV is **1.88**, not
+> 1.85. Your escalation was right; the RFC was wrong.
+>
+> **Read `rfcs/handoffs/042-commit-cargo-lock/implementation-handoff.md`
+> §5 before starting.** RFC-042 (commit `Cargo.lock`) lands in the same
+> release and is order-dependent with this step: the lockfile must be
+> committed **first**, as currently resolved, and the MSRV then verified
+> against it. The two may be done as a single work item; they are separate
+> handoffs for reviewability, not because the work must be split.
+
+---
+
 ## 1. Task title
 
 Fix the measurement workflows so they run on the project's real tag
