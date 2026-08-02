@@ -77,7 +77,9 @@ Numbers remain stable forever and are never reused.
 
 ## Proposed
 
-_(none)_
+| ID | Title | Priority |
+|----|-------|----------|
+| 035 | [Documentation consistency and source-of-truth audit](./proposed/035-documentation-consistency-audit.md) | High — two authoritative pages state a three-crate architecture; handoff at [`handoffs/035-documentation-consistency-audit/`](./handoffs/035-documentation-consistency-audit/implementation-handoff.md) |
 
 ## Archive
 
