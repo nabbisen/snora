@@ -30,7 +30,7 @@ especially §Evidence (E-1 … E-5). This handoff executes it.
 The owner has answered all three open questions; **there are no open
 decisions in this work**:
 
-- Declare `rust-version = "1.85"`; raising the MSRV later is a **minor**.
+- Declare `rust-version`; **the verified value is 1.88** (an earlier revision said 1.85 — wrong, see Step 3). Inherited rises are patch, chosen rises are minor.
 - Reopen gate 9 — the 1.0 count becomes **7 of 10**.
 - Retain the pre-0.25.2 CSV rows and annotate them; never delete or
   back-fill measurement history.
@@ -118,29 +118,69 @@ If you can additionally make the workflow itself fail loudly when the
 append produces no new row, propose it in the review request — but do not
 implement speculative CI logic without review.
 
-### Step 3 — Declare the MSRV
+### Step 3 — Declare the MSRV (**corrected: 1.88, not 1.85**)
 
-In the root `Cargo.toml`, add to `[workspace.package]`:
+An earlier revision of this step specified `1.85`. **That value was wrong**
+— you verified it and escalated, and the owner has accepted the corrected
+value. The effective floor is **1.88**, forced by `iced 0.14.0` and
+`wgpu 27.0.1`; nothing in the resolved graph exceeds it.
 
-```toml
-rust-version = "1.85"
-```
+1. In the root `Cargo.toml`, add to `[workspace.package]`:
 
-Then verify it holds:
+   ```toml
+   rust-version = "1.88"
+   ```
 
-```bash
-cargo check --workspace --all-features
-```
+   and inherit it in all four crate manifests with
+   `rust-version.workspace = true`.
 
-and, if a 1.85 toolchain is available, `cargo +1.85 check --workspace
---all-features`. **If any dependency requires newer than 1.85, stop and
-escalate** — that is a real finding, not something to work around by
-raising the declared value.
+2. **Verify on a pinned toolchain. This check is mandatory, not
+   optional:**
 
-Document the bump policy where the versioning rules live
-(`docs/src/contributing/versioning-policy.md`): **raising the MSRV is a
-minor**, per pre-1.0 SemVer. Declaring it now is additive — it documents
-support the project already claims — hence patch-level here.
+   ```bash
+   cargo +1.88 check --workspace --all-features   # must pass
+   cargo +1.87 check --workspace --all-features   # must fail (proves the floor is real)
+   ```
+
+   `cargo check` on the ambient toolchain is **not** sufficient and proves
+   nothing: a newer active toolchain satisfies the graph regardless of the
+   declared value. That is exactly how the wrong value nearly shipped.
+
+   If `+1.88` fails, or `+1.87` unexpectedly passes, **stop and escalate**.
+   Do not adjust the declared value to make a check pass.
+
+3. Correct the false claim in `docs/src/getting-started/01-install.md:4`
+   — currently "**Rust edition 2024** (rustc ≥ 1.85)". This is the **only**
+   in-tree occurrence; the architect swept for it. State 1.88 and note the
+   floor comes from `iced`, while snora's own code needs only the
+   edition-2024 minimum of 1.85.
+
+4. Record the bump policy in
+   `docs/src/contributing/versioning-policy.md`:
+
+   | Case | Level |
+   |---|---|
+   | **Inherited** rise (a dependency raises its `rust-version`) | **patch** |
+   | **Chosen** rise (snora adopts a language/toolchain feature) | **minor** |
+
+   Rationale to include: snora controls neither the timing nor the value
+   of an inherited rise, and with `rust-version` declared, cargo's
+   MSRV-aware resolver keeps users on older toolchains at the last
+   compatible snora rather than breaking them.
+
+5. Add an MSRV verification step to the release checklist in
+   `docs/src/contributing/release-process.md`, so the floor cannot drift
+   silently again:
+
+   ```text
+   [ ] cargo +<declared MSRV> check --workspace --all-features
+   [ ] Confirm no resolved dependency declares a higher rust-version:
+       cargo metadata --format-version 1 --all-features
+   ```
+
+**Version level for this change: patch.** No working configuration breaks
+— 1.85 users already could not build snora — and it corrects a claim that
+was false.
 
 ### Step 4 — Reopen gate 9 and annotate the history
 
@@ -201,7 +241,7 @@ RFC-041 §Acceptance criteria 1–6. In particular:
 - Both workflows' trigger filters and all six guards match the project's
   real tag format.
 - `VERSION` extraction yields `0.25.3`, not `v0.25.3`.
-- `rust-version = "1.85"` is declared and the workspace checks clean.
+- `rust-version = "1.88"` is declared and `cargo +1.88 check --workspace --all-features` passes while `+1.87` fails.
 - Gate 9 is `⬜`, the count reads 7 of 10, and no D-gate row changed.
 - No CSV row is deleted, edited, or back-filled.
 
@@ -211,16 +251,16 @@ RFC-041 §Acceptance criteria 1–6. In particular:
   That would present today's numbers as historical data.
 - **Do not** mark gate 9 satisfied because the fix is in. It is satisfied
   when ≥2 real data points exist, which cannot be true before 0.25.3 ships.
-- **Do not** raise the declared MSRV above 1.85 to make a check pass —
-  escalate instead.
+- **Do not** adjust the declared MSRV to make a check pass — escalate
+  instead. (This already happened once and was handled correctly.)
 - **Do not** edit any D-gate row.
 
 ## 11. Compatibility and security
 
 **Compatibility.** CI and metadata only; no crate content changes.
-`rust-version` declares support the project already claims. If it surfaces
-a dependency needing newer than 1.85, that is a finding to escalate, not a
-compatibility break to absorb.
+`rust-version = "1.88"` declares the floor the dependency graph already
+enforces; it does not narrow support that anyone actually had. Users on
+1.85 could never build snora.
 
 **Security.** One item to flag rather than assume: the workflows push to
 `main` via `git-auto-commit-action` on tags. **That path has never
@@ -240,8 +280,9 @@ tag exists.
 - `git tag | head -40` output confirming no tag carries a `v` prefix.
 - The version-extraction logic, and how you tested it (a shell trace of
   the extraction against `refs/tags/0.25.3` is sufficient).
-- `cargo check --workspace --all-features` output after adding
-  `rust-version`.
+- `cargo +1.88 check` (pass) and `cargo +1.87 check` (fail) output.
+- `cargo metadata` confirmation that no resolved package declares a
+  rust-version above 1.88.
 - `mdbook build docs` / `mdbook test docs` output.
 - Explicit statement that no CSV row changed (`git diff --stat` over
   `docs/src/reference/**/*.csv` must be empty).

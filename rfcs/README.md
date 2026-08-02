@@ -83,6 +83,7 @@ Numbers remain stable forever and are never reused.
 | 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26 positioning; extends RFC-020 to snora's own surfaces, permits theme emission under `design` |
 | 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26; prerequisite for RFC-039/040 |
 | 041 | [Measurement integrity and gate 9 re-assessment](./proposed/041-measurement-integrity-and-gate-9.md) | High — 0.25.3; workflows have never run on a release tag; gate 9 reopens 8/10 → 7/10; handoff ready |
+| 042 | [Commit `Cargo.lock`](./proposed/042-commit-cargo-lock.md) | Medium — reverses `b7af344`; determinism for budget measurement and MSRV floor; awaiting owner decision |
 
 ## Archive
 

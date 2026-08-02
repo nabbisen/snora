@@ -189,7 +189,7 @@ MSRV-aware behavior has nothing to key on and the documented "stable ≥
 
 | Option | Effect |
 |---|---|
-| **(a) Declare `rust-version = "1.85"`** in `[workspace.package]` ⭐ | Makes resolver 3 meaningful; publishes the MSRV to crates.io/docs.rs; makes the documented policy machine-checked. Needs a stated bump policy (recommend: raising MSRV is a **minor**, per pre-1.0 SemVer). |
+| **(a) Declare `rust-version` in `[workspace.package]`** ⭐ | Makes resolver 3 meaningful; publishes the MSRV to crates.io/docs.rs; makes the floor machine-checked. **Value must be verified, not assumed** — see Q-1: it is 1.88, not the 1.85 this RFC originally stated. Needs a stated bump policy. |
 | (b) Leave undeclared | Resolver 3 stays inert; MSRV remains documentation-only; nothing prevents a dependency bump from silently raising it. |
 | (c) Declare and pin the lockfile | Maximum reproducibility; reverses `b7af344`, a deliberate prior decision. Only worth it if measurement stability proves insufficient after C-1. |
 
@@ -199,7 +199,7 @@ Recommended: **(a)**, with (c) held in reserve pending post-fix data.
 
 **Compatibility.** C-1/C-2 are CI-only. C-4(a) declares an MSRV that the
 project already claims to honour; if any dependency currently requires
->1.85 the declaration will surface it, which is the point. No public API
+more than the declared value, the declaration will surface it, which is the point. No public API
 changes.
 
 **Security.** No new data flow, dependency, or integration. One note: the
@@ -215,7 +215,7 @@ to work rather than assumed.
 | Trigger fires on a real tag | Dry-run via `workflow_dispatch`, then verify on the next release tag |
 | Row is appended with correct field count | `append-binary-size-row.sh` validates 9 fields; confirm against the current schema |
 | Commit-back does not recurse | Confirm `[skip ci]` suppresses a follow-on run |
-| MSRV holds | `cargo +1.85 check --workspace --all-features` if C-4(a) is adopted |
+| MSRV holds | `cargo +<declared> check --workspace --all-features` on a **pinned** toolchain. This check is **mandatory, not optional**: `cargo check` on a newer ambient toolchain passes regardless and proves nothing about the floor. |
 
 ## Risks
 
@@ -223,7 +223,7 @@ to work rather than assumed.
 |---|---|---|---|
 | First real commit-back misbehaves on `main` | Medium | Medium | Path never exercised; watch the first run, and consider a dry-run tag first |
 | Reopening gate 9 reads as a setback | Certain | Low | It is a correction of the record; the honest count was always 7/10 |
-| Declaring MSRV surfaces a dependency needing >1.85 | Low | Medium | Better surfaced than latent; would be a real finding |
+| Declaring MSRV surfaces a dependency needing more than the assumed value | **Occurred** | Medium | It did: the floor is 1.88, not 1.85. Surfaced by the pinned-toolchain check, which this RFC had wrongly made optional. Now mandatory. |
 | Re-measured baseline is mistaken for historical data | Medium | Medium | N-1 forbids back-filling; new rows must be visibly a new baseline |
 
 ## Open questions
@@ -231,11 +231,37 @@ to work rather than assumed.
 All three are **answered**. Recorded here so the Developer Handoff carries
 no open decisions.
 
-- **Q-1 — ANSWERED.** Adopt C-4(a): declare `rust-version = "1.85"` in
-  `[workspace.package]`. **Raising the MSRV in future is a minor**, per
-  pre-1.0 SemVer; declaring it now is additive and ships as part of the
-  0.25.3 patch, since it documents support the project already claims
-  rather than changing it.
+- **Q-1 — ANSWERED, on corrected facts.** The original answer specified
+  `rust-version = "1.85"` on the stated basis that this was "support the
+  project already claims." **That basis was false and the value is wrong.**
+
+  Verified: the effective floor is **1.88**, forced by `iced 0.14.0` and
+  `wgpu 27.0.1` (both declare `rust-version = "1.88"`); nothing in the
+  resolved graph exceeds it. `cargo +1.85` and `cargo +1.87` both fail;
+  `cargo +1.88` succeeds. The long-standing documented claim "Rust
+  toolchain | Stable ≥ 1.85" has been false for as long as iced 0.14 has
+  been pinned.
+
+  **Adopt C-4(a) with the value `1.88`**, and correct
+  `docs/src/getting-started/01-install.md:4` (the only in-tree occurrence
+  of the false claim).
+
+  **Version level: patch.** No working configuration breaks — 1.85 users
+  already cannot build snora — and the change converts a confusing failure
+  deep inside `iced` into a clear one at the top. Ships in 0.25.3.
+
+  **Bump policy.** Distinguish the two cases, because snora does not
+  choose this floor:
+
+  | Case | Level |
+  |---|---|
+  | **Inherited** rise (a dependency raises its `rust-version`) | **patch** — snora controls neither the timing nor the value; with `rust-version` declared, cargo's MSRV-aware resolver keeps older-toolchain users on the last compatible snora automatically |
+  | **Chosen** rise (snora adopts a language/toolchain feature) | **minor** — a deliberate product decision |
+
+  Note that `snora-core` and `snora-design` are iced-free; their own code
+  needs only 1.85 (the edition-2024 minimum). The 1.88 floor is inherited
+  entirely through `snora-widgets` / `snora` → `iced`. The workspace
+  declares one MSRV for simplicity; per-crate MSRVs are not proposed.
 - **Q-2 — ANSWERED.** Reopen gate 9 per C-3. The 1.0 gate count becomes
   **7 of 10**. Re-satisfy only once ≥2 real post-fix data points exist on
   the same runner and methodology.
