@@ -191,6 +191,23 @@ rather than waived. It now appears in the release checklist
 that point `main` carries both the workflow and the `rust-version`
 declaration, so the run exercises the full path including the MSRV check.
 
+### AC-3 — SATISFIED
+
+Closed on 2026-08-02. After the branch merged to `main` (`1c67468`), the
+workflow was dispatched and completed **green in 2m26s** —
+[run 30768189915](https://github.com/nabbisen/snora/actions/runs/30768189915).
+
+Every step passed, including the ones that matter:
+
+- `cargo update` re-resolved dependencies in a throwaway checkout;
+- the workspace still checks against that fresh resolution;
+- `snora-core` / `snora-design` tests still pass against it;
+- the declared MSRV was read from `Cargo.toml`, its toolchain installed,
+  and **1.88 verified still sufficient against the fresh resolution**.
+
+This is the first execution of this workflow, and it exercised the full
+path rather than a partial one. AC-3 needs no further action.
+
 An isolated PR containing only the workflow (`nabbisen/snora#1`) was opened
 during implementation to work around the constraint, and **closed unmerged**
 by owner decision: the workflow reaches `main` via this RFC's own branch, and
