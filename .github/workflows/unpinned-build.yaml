@@ -1,0 +1,67 @@
+name: Unpinned build
+
+on:
+  schedule:
+    # Weekly, Monday 03:00 UTC. Cadence per RFC-042 Q-2 — frequent enough
+    # to catch upstream movement inside a pre-1.0 release cycle, cheap
+    # enough not to matter.
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+# This job exists to preserve the early-warning value that committing
+# Cargo.lock (RFC-042) otherwise removes: with a lockfile tracked, CI no
+# longer notices on its own that a fresh dependency resolution would have
+# broken. This workflow re-resolves deliberately, in a throwaway checkout,
+# and fails loudly if the fresh resolution — or the declared MSRV against
+# it — no longer holds. A failure means "upstream moved, investigate," not
+# "auto-merge": it must never commit or push the updated lockfile.
+
+jobs:
+  unpinned-build:
+    name: Build against freshly-resolved dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache build
+        uses: Swatinem/rust-cache@v2
+        with:
+          # Distinct cache key: this job's whole point is to move away
+          # from the committed Cargo.lock, so it must not share a cache
+          # slot with jobs that build against the pinned resolution.
+          key: unpinned-build
+
+      # Deliberately re-resolves within this checkout only. Nothing here
+      # is ever committed or pushed back — the checkout is discarded when
+      # the job ends.
+      - name: Re-resolve dependencies (cargo update)
+        run: cargo update
+
+      - name: Check workspace against the fresh resolution
+        run: cargo check --workspace --all-features
+
+      - name: Test iced-free crates against the fresh resolution
+        run: cargo test -p snora-core -p snora-design
+
+      - name: Determine the declared MSRV
+        id: msrv
+        run: |
+          MSRV=$(grep -m1 -oP '^rust-version\s*=\s*"\K[0-9.]+' Cargo.toml)
+          if [[ -z "$MSRV" ]]; then
+            echo "::error::No rust-version declared in [workspace.package]; cannot verify the MSRV floor."
+            exit 1
+          fi
+          echo "msrv=$MSRV" >> "$GITHUB_OUTPUT"
+          echo "Declared MSRV: $MSRV"
+
+      - name: Install the declared-MSRV toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.msrv.outputs.msrv }}
+
+      - name: Verify the declared MSRV still holds against the fresh resolution
+        run: cargo "+${{ steps.msrv.outputs.msrv }}" check --workspace --all-features
