@@ -111,4 +111,19 @@ been measured under the corrected methodology.
 
 ## Minimum supported Rust version
 
-Unchanged from v0.25.3: **1.88**, inherited from `iced` and `wgpu`.
+**1.88**, inherited from `iced` and `wgpu`. Unchanged from v0.25.3.
+
+**If you are coming from v0.25.0, v0.25.1 or v0.25.2**, note that those
+releases declared **no** `rust-version` at all — the field was added in the
+v0.25.3 patch, and there is no separate migration guide for a patch. This
+is the one thing in the jump that can stop your build.
+
+To be precise about what changed: snora's *actual* floor has been 1.88 for
+as long as iced 0.14 has been pinned, because `iced` and `wgpu` both
+declare it. Declaring it does not narrow support — it means Cargo now
+refuses cleanly up front instead of failing somewhere inside `iced`, and
+its MSRV-aware resolver will hold you on an older snora rather than
+breaking you outright.
+
+If you are on a toolchain below 1.88, upgrade the toolchain. You could not
+have built snora 0.26 or later regardless.
