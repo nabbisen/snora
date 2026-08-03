@@ -144,7 +144,9 @@ The contrast obligation is the blocking requirement, not an afterthought.
 | Test | Assertion |
 |---|---|
 | Emitted-theme contrast, all four presets | Every `Pair` in the emitted `Extended` meets WCAG AA (≥ 4.5 for body text) using `snora_design::contrast::contrast_ratio` |
-| Fidelity | Every emitted color equals the corresponding token role exactly — proves iced's heuristic did not run |
+| Fidelity (**base** tiers) | Every emitted **base** color equals the corresponding token role exactly — proves iced's heuristic did not run |
+| Determinism (**derived** tiers) | `weak`, `strong`, and the `Background` sub-tiers are a deterministic function of a token role, and independently meet the contrast thresholds |
+| Tier distinctness | For every preset and every semantic set, `base`, `weak` and `strong` are pairwise **distinct** |
 | `is_dark` correctness | Matches the preset's intent for all four |
 | High-contrast strictness | HC presets meet AAA (≥ 7.0) where the tokens already do |
 | Feature isolation | `cargo check -p snora --no-default-features` and the `widgets`-without-`design` matrix entry still pass |
@@ -188,8 +190,22 @@ build, `mdbook build docs`, `mdbook test docs`.
 
 1. `snora::design::theme(&Tokens) -> iced::Theme` exists behind the
    `design` feature and is documented.
-2. The emitted `Extended` is constructed without `Pair::new`; fidelity
-   tests prove every emitted color equals its token role exactly.
+2. The emitted `Extended` is constructed without `Pair::new`. **Base**
+   tiers equal their token role exactly (fidelity). **Derived** tiers
+   (`weak`, `strong`, `Background` sub-tiers) are a deterministic
+   function of a token role, are pairwise distinct from `base`, and meet
+   the contrast thresholds independently.
+
+   > **Corrected after round 1.** The original criterion demanded exact
+   > equality for *every* emitted color. `snora-design` has no
+   > weak/strong variants, so that is only satisfiable by collapsing all
+   > three tiers to one value — which removes hover and pressed feedback
+   > from every stock iced widget, since `button::primary` reads
+   > `primary.base` for rest and `primary.strong` for hover
+   > (`iced_widget-0.14.2/src/button.rs:600,605`). Fidelity and tier
+   > distinctness were in direct tension and the original wording resolved
+   > it the wrong way. Deriving tiers in `snora-widgets` keeps RFC-036's
+   > covenant intact; adding variants to `Palette` would not.
 3. Contrast tests pass over the emitted theme for all four presets.
 4. The 18→6 mapping is documented, including the lossy-accessor note.
 5. `cargo check -p snora --no-default-features` and every feature-matrix
