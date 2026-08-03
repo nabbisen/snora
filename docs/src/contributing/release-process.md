@@ -99,10 +99,10 @@ them in sync is a release-process invariant.
 [ ] All examples in examples/README.md acceptance matrix compile
     (covered by workspace check above; verify no example was removed)
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
-[ ] cargo package -p snora-core    --no-verify    # check .crate contents
-[ ] cargo package -p snora-design  --no-verify    # check .crate contents
-[ ] cargo package -p snora-widgets --no-verify    # check .crate contents
-[ ] cargo package -p snora         --no-verify    # check .crate contents
+[ ] cargo package --workspace
+    # Inspects all four .crate archives. Examples are `publish = false`
+    # and are skipped automatically — no exclusion flag is needed.
+    # Do NOT package the four crates individually (see "Publishing").
 [ ] Merge to main, then dispatch the `unpinned-build` workflow on main and
     confirm a green run BEFORE tagging.
     # `workflow_dispatch` only works for workflows already on the default
@@ -157,50 +157,60 @@ them in sync is a release-process invariant.
     the "cold" build is warm — the exact defect RFC-043 fixed once
     already; treat it as a release blocker and check that
     `build-cost.yaml` still has no `Swatinem/rust-cache` step.
+[ ] cargo publish --workspace
+    # ONE command — cargo resolves member order itself. Do not publish the
+    # four crates individually; an interrupted per-crate sequence leaves a
+    # public tag with `snora` itself missing from crates.io, and anyone
+    # depending on the new minor gets a resolution failure until it is
+    # finished. See "Publishing" below.
+[ ] Confirm all four crates report the new version on crates.io
 ```
 
-### Why `--no-verify`
+### Publishing
 
-`cargo package --no-verify` skips the *build* verification step — it
-does **not** skip dependency resolution. We use it to inspect the
-`.crate` archive locally before the actual `cargo publish`.
-
-**On a minor bump, the dependent crates cannot be packaged until their
-siblings are published.** Once `[workspace.dependencies]` moves from
-`0.25` to `0.26`, `snora-widgets` requires `snora-core = "^0.26"`, which
-does not exist on crates.io until `snora-core` is published. So:
-
-```text
-error: failed to select a version for the requirement `snora-core = "^0.26"`
-  candidate versions found which didn't match: 0.25.3, 0.25.2, …
+```bash
+cargo publish --workspace
 ```
 
-That is expected, not a fault. On a minor:
+**One command. Do not publish the four crates individually.**
 
-- `cargo package` succeeds for `snora-core` and `snora-design` (no
-  internal dependencies);
-- it fails for `snora-widgets` and `snora` until the crates below them
-  are on crates.io;
-- publish in dependency order and each one unblocks the next.
+Cargo computes the dependency order from the manifests
+(`snora-core` and `snora-design` have no internal dependencies;
+`snora-widgets` depends on both; `snora` depends on all three) and waits
+for each to become available on crates.io before publishing the next. The
+order cannot drift from the manifests, because nothing restates it.
 
-On a **patch** bump the pin is unchanged (`0.25` still matches `0.25.3`),
-so all four package cleanly up front. Do not treat a minor's packaging
-failure as a release blocker — check the order instead.
+#### Why not one `cargo publish` per crate
 
-### Publish order
+That was this project's process until v0.27.0, and it predates
+`cargo publish --workspace`. It had two costs:
 
-Strictly bottom-up along the dependency graph:
+- **A hand-maintained order.** A restated dependency order is a second
+  source of truth that can disagree with the manifests.
+- **Packaging appeared broken on every minor bump.** Once
+  `[workspace.dependencies]` moves from `0.26` to `0.27`,
+  `cargo package -p snora-widgets` fails with
 
-1. `snora-core` (no internal deps).
-2. `snora-design` (no internal deps; no iced dependency; published from v0.20 onward).
-3. `snora-widgets` (depends on `snora-core`; optionally on `snora-design`).
-4. `snora` (depends on `snora-core`; optionally on `snora-widgets` and
-   `snora-design`).
+  ```text
+  error: failed to select a version for the requirement `snora-core = "^0.27"`
+  ```
 
-Each crate's `Cargo.toml` uses both `path = "..."` and
-`version = "..."` for inter-crate references, so cargo's local
-build does not require crates.io, and crates.io's verification
-finds the just-published sibling at the matching version.
+  because that version is not on crates.io yet. This is not a fault, and
+  earlier revisions of this page carried a long explanation of why it was
+  expected. `cargo publish --workspace` removes the condition rather than
+  explaining it.
+
+A half-published release is the failure this avoids: if the sequence is
+interrupted partway, the tag is public while `snora` itself is missing, and
+anyone depending on the new minor gets a resolution failure until it is
+finished.
+
+#### `--no-verify`
+
+`cargo package --no-verify` skips the *build* verification step; it does
+**not** skip dependency resolution. It is occasionally useful for
+inspecting a `.crate` archive's contents in isolation, but it is not part
+of the normal release path.
 
 ## Tarball releases (if used)
 
