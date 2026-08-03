@@ -9,6 +9,23 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.25 → 0.26](migration-0.25-to-0.26.md) — `snora::design::theme`
+  emits an `iced::Theme` from Snora Design tokens, so stock iced widgets
+  follow your palette; DEC-02 amended to permit theme *emission*.
+- [0.24 → 0.25](migration-0.24-to-0.25.md) — measurement methodology and
+  documentation cleanup (size-probe crates; build-cost clean fix).
+- [0.23 → 0.24](migration-0.23-to-0.24.md) — architect-review cleanup;
+  **one breaking change** (chip selected state).
+- [0.22 → 0.23](migration-0.22-to-0.23.md) — recipes and governance. No
+  code changes.
+- [0.21 → 0.22](migration-0.21-to-0.22.md) — code-quality and
+  documentation audit. No breaking changes.
+- [0.20 → 0.21](migration-0.20-to-0.21.md) — notice, chip and progress
+  primitives added to Snora Design.
+- [0.19 → 0.20](migration-0.19-to-0.20.md) — Snora Design activation;
+  `snora-design` published.
+- [0.18 → 0.19](migration-0.18-to-0.19.md) — Snora Design foundation
+  (opt-in `design` feature). Additive.
 - [0.10 → 0.11](migration-0.10-to-0.11.md) — `AppLayout` is now
   `#[non_exhaustive]` (builder path is the stable construction contract);
   toast ordering fix (newest toast now correctly closest to the anchor
