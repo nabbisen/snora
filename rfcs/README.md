@@ -83,8 +83,12 @@ Numbers remain stable forever and are never reused.
 
 ## Proposed
 
-_(none — RFC-039 and RFC-040, the v0.27 half of the appearance
-milestone, are agreed in principle but not yet drafted.)_
+| ID | Title | Priority |
+|----|-------|----------|
+| 044 | [`RUNNER_OS` cannot be overridden; RFC-043 AC-4 is unmet](./proposed/044-runner-os-override-cannot-work.md) | Medium — CSV `runner_os` still emits `Linux`; found only after the v0.26.0 rows landed |
+
+RFC-039 and RFC-040, the v0.27 half of the appearance milestone, are
+agreed in principle but not yet drafted.
 
 ## Archive
 
