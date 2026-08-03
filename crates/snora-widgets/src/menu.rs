@@ -15,8 +15,23 @@ use iced::{
 
 use snora_core::{Menu, MenuAction};
 
-use crate::style::menu_button_style;
 use crate::icon::icon_element;
+use crate::style::menu_button_style;
+
+/// Geometry parameter [`build_menu`] takes, letting [`render_menu`]
+/// (unstyled) and the `design`-gated styled variant (RFC-040) share one
+/// implementation.
+pub(crate) struct MenuGeometry {
+    /// Gap between a menu/item's icon and its label.
+    pub(crate) gap: f32,
+}
+
+impl MenuGeometry {
+    /// Today's literal, unmodified.
+    pub(crate) const fn unstyled() -> Self {
+        Self { gap: 6.0 }
+    }
+}
 
 /// Render a single menu (header button + dropdown when active).
 ///
@@ -35,8 +50,23 @@ where
     MenuItemId: Clone + Debug + 'a,
     F: Fn(MenuAction<MenuId, MenuItemId>) -> Message + 'a,
 {
+    build_menu(menu, on_action, is_active, MenuGeometry::unstyled())
+}
+
+pub(crate) fn build_menu<'a, Message, MenuId, MenuItemId, F>(
+    menu: Menu<MenuId, MenuItemId>,
+    on_action: &'a F,
+    is_active: bool,
+    geometry: MenuGeometry,
+) -> Element<'a, Message>
+where
+    Message: Clone + 'a,
+    MenuId: Clone + Debug + PartialEq + 'a,
+    MenuItemId: Clone + Debug + 'a,
+    F: Fn(MenuAction<MenuId, MenuItemId>) -> Message + 'a,
+{
     // Trigger button (always visible).
-    let mut header_content = row![].spacing(6).align_y(Center);
+    let mut header_content = row![].spacing(geometry.gap).align_y(Center);
     if let Some(ref ic) = menu.icon {
         header_content = header_content.push(icon_element(ic));
     }
@@ -57,7 +87,7 @@ where
 
     // Dropdown — only rendered when this menu is active.
     for item in menu.items {
-        let mut btn_content = row![].spacing(6).align_y(Center);
+        let mut btn_content = row![].spacing(geometry.gap).align_y(Center);
         if let Some(ref ic) = item.icon {
             btn_content = btn_content.push(icon_element(ic));
         }
@@ -68,11 +98,7 @@ where
             menu_item_id: item.id.clone(),
         });
 
-        stack = stack.push(
-            button(btn_content)
-                .style(menu_button_style)
-                .on_press(msg),
-        );
+        stack = stack.push(button(btn_content).style(menu_button_style).on_press(msg));
     }
 
     container(stack).into()

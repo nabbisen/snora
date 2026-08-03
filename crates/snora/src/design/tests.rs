@@ -19,7 +19,10 @@ fn contrast_ratio_black_white_via_facade() {
     // Confirm relative_luminance and composite_over also resolve via facade.
     let _ = relative_luminance(t.palette.text_primary);
     let _ = composite_over(
-        Color { a: 0.5, ..t.palette.accent },
+        Color {
+            a: 0.5,
+            ..t.palette.accent
+        },
         t.palette.surface,
     );
 }

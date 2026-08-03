@@ -26,7 +26,12 @@
 #     design_bytes        — snora-size-probe-design (widgets + design)
 #     design_diff_bytes   — design_bytes - widgets_bytes (marginal cost of design)
 #     rustc               — Rust toolchain version string
-#     runner_os           — CI runner OS
+#     runner_os           — CI runner OS, from $SNORA_RUNNER_OS if set,
+#                            else $RUNNER_OS, else "unknown" (RFC-044:
+#                            SNORA_RUNNER_OS exists because GitHub Actions
+#                            reserves the RUNNER_* namespace and silently
+#                            ignores any attempt to override RUNNER_OS
+#                            itself via a step's `env:` block)
 #     date                — UTC date of measurement (YYYY-MM-DD)
 #
 #   All three probes share a common baseline application and differ only by
@@ -88,6 +93,10 @@ WIDGETS_DIFF=$(( WIDGETS - ENGINE ))
 DESIGN_DIFF=$(( DESIGN - WIDGETS ))
 DATE=$(date -u +%Y-%m-%d)
 RUSTC=$(rustc --version | tr ' ' '_')
-RUNNER_OS="${RUNNER_OS:-unknown}"
+# SNORA_RUNNER_OS takes priority: GitHub Actions reserves RUNNER_OS
+# itself, so a workflow step cannot override it (RFC-044). Falling back
+# to $RUNNER_OS keeps this script's behavior sensible when run outside
+# CI's override, e.g. under GitHub's own ambient RUNNER_OS or by hand.
+RUNNER_OS="${SNORA_RUNNER_OS:-${RUNNER_OS:-unknown}}"
 
 echo "${VERSION},${ENGINE},${WIDGETS},${WIDGETS_DIFF},${DESIGN},${DESIGN_DIFF},${RUSTC},${RUNNER_OS},${DATE}"

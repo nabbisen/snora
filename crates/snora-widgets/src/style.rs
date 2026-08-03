@@ -32,13 +32,31 @@ pub fn menu_button_style(theme: &Theme, status: button::Status) -> button::Style
 }
 
 /// Thin-bordered chrome container used for the app header and footer.
+///
+/// Radius fixed at `0.0` — today's literal, unchanged. See
+/// [`chrome_container_style_with_radius`] for the `design`-gated styled
+/// chrome widgets' (RFC-040) token-derived radius.
 pub fn chrome_container_style(theme: &Theme) -> container::Style {
+    chrome_container_style_with_radius(theme, 0.0)
+}
+
+/// Geometry-parameterized variant of [`chrome_container_style`] (RFC-040):
+/// identical color logic, but the corner radius is a parameter instead of
+/// a hardcoded `0.0`. [`chrome_container_style`] is a thin wrapper over
+/// this with `radius = 0.0` — the one-body-two-geometry-sources shape
+/// applied to the shared style function itself, not only the widgets that
+/// call it.
+///
+/// Not part of the public style surface `chrome_container_style` is;
+/// `pub(crate)` since only the `design::widget` styled variants need the
+/// radius parameter.
+pub(crate) fn chrome_container_style_with_radius(theme: &Theme, radius: f32) -> container::Style {
     let ep = theme.extended_palette();
     container::Style {
         text_color: Some(ep.background.base.text),
         background: None,
         border: Border {
-            radius: 0.0.into(),
+            radius: radius.into(),
             width: 1.0,
             color: ep.background.weak.color,
         },

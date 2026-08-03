@@ -8,7 +8,12 @@
 #   scripts/measure-compile-time.sh 0.12.0
 #
 # Output (one line):
-#   version,check_workspace_ms,build_widgets_ms,build_engine_only_ms,example_hello_ms,rustc,runner_os,date
+#   version,check_workspace_ms,build_widgets_ms,build_engine_only_ms,example_hello_ms,build_widgets_design_ms,example_workbench_ms,rustc,runner_os,date
+#
+#   runner_os is read from $SNORA_RUNNER_OS if set, else $RUNNER_OS, else
+#   "unknown" (RFC-044: SNORA_RUNNER_OS exists because GitHub Actions
+#   reserves the RUNNER_* namespace and silently ignores any attempt to
+#   override RUNNER_OS itself via a step's `env:` block).
 #
 # Design notes:
 # - Uses `cargo clean -p <package>` for per-measurement cold builds so only
@@ -24,7 +29,11 @@ set -euo pipefail
 VERSION="${1:?Usage: measure-compile-time.sh <version>}"
 DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 RUSTC="$(rustc --version | tr ' ' '_')"
-RUNNER_OS="${RUNNER_OS:-unknown}"
+# SNORA_RUNNER_OS takes priority: GitHub Actions reserves RUNNER_OS
+# itself, so a workflow step cannot override it (RFC-044). Falling back
+# to $RUNNER_OS keeps this script's behavior sensible when run outside
+# CI's override, e.g. under GitHub's own ambient RUNNER_OS or by hand.
+RUNNER_OS="${SNORA_RUNNER_OS:-${RUNNER_OS:-unknown}}"
 
 measure_ms() {
     local name="$1"

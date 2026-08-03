@@ -25,7 +25,42 @@ use snora_core::{LayoutDirection, TabAction, TabBar};
 
 use crate::direction::row_dir;
 use crate::icon::icon_element;
-use crate::style::chrome_container_style;
+use crate::style::chrome_container_style_with_radius;
+
+/// Geometry parameters [`build_tab_bar`] takes, letting [`app_tab_bar`]
+/// (unstyled) and the `design`-gated styled variant (RFC-040) share one
+/// implementation.
+#[derive(Debug, PartialEq)]
+pub(crate) struct TabGeometry {
+    /// Gap between tabs.
+    pub(crate) bar_gap: f32,
+    /// Bar's own horizontal padding. Vertical padding is a structural
+    /// `0.0` in both paths — tabs supply their own vertical padding
+    /// (`tab_pad_y`), not part of this geometry.
+    pub(crate) bar_pad_x: f32,
+    /// Gap between a tab's icon and its label.
+    pub(crate) content_gap: f32,
+    /// Per-tab button horizontal padding.
+    pub(crate) tab_pad_x: f32,
+    /// Per-tab button vertical padding.
+    pub(crate) tab_pad_y: f32,
+    /// Bar's own corner radius.
+    pub(crate) bar_border_radius: f32,
+}
+
+impl TabGeometry {
+    /// Today's literals, unmodified.
+    pub(crate) const fn unstyled() -> Self {
+        Self {
+            bar_gap: 2.0,
+            bar_pad_x: 12.0,
+            content_gap: 6.0,
+            tab_pad_x: 12.0,
+            tab_pad_y: 8.0,
+            bar_border_radius: 0.0,
+        }
+    }
+}
 
 /// Build a horizontal tab bar.
 ///
@@ -48,12 +83,26 @@ where
     TabId: Clone + Debug + PartialEq + 'a,
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
+    build_tab_bar(bar, on_action, direction, TabGeometry::unstyled())
+}
+
+pub(crate) fn build_tab_bar<'a, Message, TabId, F>(
+    bar: TabBar<TabId>,
+    on_action: &'a F,
+    direction: LayoutDirection,
+    geometry: TabGeometry,
+) -> Element<'a, Message>
+where
+    Message: Clone + 'a,
+    TabId: Clone + Debug + PartialEq + 'a,
+    F: Fn(TabAction<TabId>) -> Message + 'a,
+{
     let active = bar.active.clone();
     let mut tab_row = match direction {
         LayoutDirection::Ltr => row![],
         LayoutDirection::Rtl => row![],
     }
-    .spacing(2)
+    .spacing(geometry.bar_gap)
     .align_y(Center);
 
     // We push tabs in declaration order under LTR and reverse order
@@ -68,17 +117,25 @@ where
 
     for tab in tabs {
         let is_active = tab.id == active;
-        tab_row = tab_row.push(render_tab(tab, is_active, on_action));
+        tab_row = tab_row.push(render_tab(
+            tab,
+            is_active,
+            on_action,
+            geometry.content_gap,
+            geometry.tab_pad_x,
+            geometry.tab_pad_y,
+        ));
     }
 
     // Leave the trailing edge fillable so the row hugs the start edge
     // without stretching tabs.
     let body = row_dir(direction, tab_row, space().width(Length::Fill));
 
+    let bar_border_radius = geometry.bar_border_radius;
     container(body)
-        .style(tab_bar_container_style)
+        .style(move |theme| tab_bar_container_style(theme, bar_border_radius))
         .width(Length::Fill)
-        .padding(Padding::from([0.0, 12.0]))
+        .padding(Padding::from([0.0, geometry.bar_pad_x]))
         .into()
 }
 
@@ -88,13 +145,16 @@ fn render_tab<'a, Message, TabId, F>(
     tab: snora_core::Tab<TabId>,
     is_active: bool,
     on_action: &'a F,
+    content_gap: f32,
+    tab_pad_x: f32,
+    tab_pad_y: f32,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
     TabId: Clone + Debug + PartialEq + 'a,
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
-    let mut content = row![].spacing(6).align_y(Center);
+    let mut content = row![].spacing(content_gap).align_y(Center);
     if let Some(icon) = &tab.icon {
         content = content.push(icon_element::<Message>(icon));
     }
@@ -103,7 +163,7 @@ where
     let id_for_msg = tab.id.clone();
     let pressable = button(content)
         .on_press_with(move || on_action(TabAction::Pressed(id_for_msg.clone())))
-        .padding(Padding::from([8.0, 12.0]))
+        .padding(Padding::from([tab_pad_y, tab_pad_x]))
         .style(move |theme: &Theme, status| tab_button_style(theme, status, is_active));
 
     pressable.into()
@@ -112,8 +172,8 @@ where
 /// Container style for the whole tab bar — provides the bottom border
 /// that sits under the inactive tabs and against which the active
 /// tab's underline reads.
-fn tab_bar_container_style(theme: &Theme) -> container::Style {
-    let chrome = chrome_container_style(theme);
+fn tab_bar_container_style(theme: &Theme, border_radius: f32) -> container::Style {
+    let chrome = chrome_container_style_with_radius(theme, border_radius);
     let palette = theme.extended_palette();
     container::Style {
         // Drop the top/left/right borders; keep only a thin bottom
@@ -121,7 +181,7 @@ fn tab_bar_container_style(theme: &Theme) -> container::Style {
         border: Border {
             color: palette.background.weak.color,
             width: 1.0,
-            radius: 0.0.into(),
+            radius: border_radius.into(),
         },
         ..chrome
     }
@@ -133,11 +193,7 @@ fn tab_button_style(theme: &Theme, status: button::Status, is_active: bool) -> b
     let palette = theme.extended_palette();
 
     let (background, text_color, border_color) = match (is_active, status) {
-        (true, _) => (
-            None,
-            palette.primary.base.color,
-            palette.primary.base.color,
-        ),
+        (true, _) => (None, palette.primary.base.color, palette.primary.base.color),
         (false, button::Status::Hovered) => (
             Some(Background::Color(palette.background.weak.color)),
             palette.background.base.text,

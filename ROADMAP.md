@@ -47,7 +47,7 @@ These constrain what *can* be on the roadmap:
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
 
-## Snora Design System (RFC-020 … RFC-034 complete; appearance milestone in progress)
+## Snora Design System (complete — RFC-020 … RFC-040)
 
 The Snora Design System shipped across five minor releases:
 
@@ -65,24 +65,41 @@ The Snora Design System shipped across five minor releases:
 
 All RFC-020 through RFC-034 are in `rfcs/done/`.
 
-**Appearance milestone (RFC-037 … RFC-040).** A second design phase,
-opened after real-world use showed that an application built on snora
-looked flat and unresponsive: snora's own chrome never participated in
-the token system. v0.26.0 delivers the colour half — an emitted
-`iced::Theme` that chrome follows transitively. The geometry half —
-dialog card, modal dim, spacing rhythm, elevation — is RFC-039/040,
-targeting v0.27.0. The `design` feature remains opt-in throughout; with
-it inactive, rendering is unchanged.
+**Appearance milestone (RFC-037 … RFC-040) — complete.** A second design
+phase, opened after real-world use showed that an application built on
+snora looked flat and unresponsive: snora's own chrome never participated
+in the token system. v0.26.0 delivered the colour half (an emitted
+`iced::Theme` that chrome follows transitively); v0.27.0 the surfaces and
+geometry (dialog card, derived modal dim, chrome spacing and radius).
 
-The `design` feature remains **opt-in** (`default = ["widgets"]`). Making it
-default-on requires an explicit size/build-cost review and a future RFC or
-release decision — measurement alone does not automatically flip the default.
+**Elevation was never delivered and is not planned.** `Tokens` carries no
+shadow or elevation scale, and adding one is a frozen-surface change under
+RFC-036's covenant that no RFC in this milestone chose to pay for. Early
+scoping listed it; that was an assumption about a vocabulary that does not
+exist.
+
+The `design` feature remains **opt-in** (`default = ["widgets"]`), and from
+v0.27.0 the new surfaces are opt-in *per call site* on top of that — with
+`design` inactive, rendering is unchanged. Making `design` default-on
+requires an explicit size/build-cost review and a future RFC or release
+decision — measurement alone does not automatically flip the default.
 
 Future design work is governed by
 [`api-governance.md`](docs/src/contributing/api-governance.md) and the
 D-gates.
 
 ## Recently shipped
+
+- **0.27.0** — Appearance milestone complete. `snora::design::render`
+  gives the dialog a real card and derives the modal dim from tokens —
+  fixing a latent defect where the hardcoded 40% black scrim was
+  *completely invisible* over `high_contrast_dark`'s pure-black background
+  (RFC-039). `snora::design::widget::*` derives chrome spacing and radius
+  from the token scales, replacing seven unrelated padding shapes and
+  square corners (RFC-040). Both are opt-in **per call site**, not per
+  feature flag: existing call sites keep their exact appearance.
+  Measurement `runner_os` fixed — GitHub reserves `RUNNER_*`, so v0.26's
+  override was silently ignored (RFC-044).
 
 - **0.26.0** — Appearance milestone, first half. `snora::design::theme`
   emits an `iced::Theme` from Snora Design tokens, so stock iced widgets

@@ -15,9 +15,16 @@ behavior, complex widgets, validation, data presentation, navigation, and
 final brand identity.
 
 Surface coverage arrives incrementally. As of v0.26.0, chrome colours
-follow the emitted theme because snora's prefab widgets already read
-iced's palette; overlay styling and layout geometry (dialog card, modal
-dim, spacing rhythm, elevation) are not yet token-derived.
+follow the emitted theme automatically — the prefab widgets already read
+iced's palette. As of v0.27.0, the dialog card, the modal dim
+(`snora::design::render`, RFC-039), and chrome spacing/radius
+(`snora::design::widget::*`, RFC-040) are also token-derived — but not
+automatically: each requires calling the corresponding `design`-gated
+entry point instead of its unstyled `snora::render` /
+`snora::widget::*` counterpart, per the compatibility promise below.
+Elevation remains out of scope: `Tokens` carries no shadow or elevation
+scale, and adding one is a frozen-surface change (RFC-036) no RFC in
+this milestone made.
 
 **Compatibility promise.** With `design` inactive, snora's rendered output
 is unchanged from v0.25 — this is a guarantee, not an aspiration. The
@@ -53,19 +60,19 @@ Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 **Minimal** — no design feature; iced's default theme only:
 
 ```toml
-snora = { version = "0.26", default-features = false }
+snora = { version = "0.27", default-features = false }
 ```
 
 **Default** — snora's existing layout + prefab widgets, no design tokens:
 
 ```toml
-snora = { version = "0.26" }   # default = ["widgets"]
+snora = { version = "0.27" }   # default = ["widgets"]
 ```
 
 **Design** — layout + widgets + Snora Design tokens and helpers:
 
 ```toml
-snora = { version = "0.26", features = ["widgets", "design"] }
+snora = { version = "0.27", features = ["widgets", "design"] }
 ```
 
 For the full feature flag reference see [Feature flags](feature-flags.md).

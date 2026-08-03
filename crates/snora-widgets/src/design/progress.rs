@@ -28,8 +28,11 @@
 //! progress::card(&tokens, "Syncing", None, Tone::Info)
 //! ```
 
-use iced::{Element, Length, widget::{column, container, progress_bar, text}};
-use snora_design::{Tone, Tokens};
+use iced::{
+    Element, Length,
+    widget::{column, container, progress_bar, text},
+};
+use snora_design::{Tokens, Tone};
 
 use super::{card, style};
 
@@ -45,11 +48,14 @@ fn progress_content<'a, Message: 'a>(
 ) -> Element<'a, Message> {
     let t = tokens;
     let (display_value, label_suffix) = match value {
-        Some(v) => (v.clamp(0.0, 1.0), format!("{:.0}%", v.clamp(0.0, 1.0) * 100.0)),
+        Some(v) => (
+            v.clamp(0.0, 1.0),
+            format!("{:.0}%", v.clamp(0.0, 1.0) * 100.0),
+        ),
         // Indeterminate: iced 0.14 has no native indeterminate animation.
         // Show 0% bar with "…" suffix to signal in-progress state.
         // See docs/src/design/v021-primitives.md for the documented limitation.
-        None    => (0.0_f32, "…".into()),
+        None => (0.0_f32, "…".into()),
     };
 
     let label_line = format!("{label}  {label_suffix}");

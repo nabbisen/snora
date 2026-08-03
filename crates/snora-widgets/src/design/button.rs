@@ -39,7 +39,10 @@
 //! let save = button::primary_maybe(&tokens, "Save", None::<Message>);
 //! ```
 
-use iced::{Element, widget::{button, text}};
+use iced::{
+    Element,
+    widget::{button, text},
+};
 use snora_design::Tokens;
 
 use super::style;

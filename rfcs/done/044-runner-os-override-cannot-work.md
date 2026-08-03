@@ -1,6 +1,6 @@
 # RFC 044 — `RUNNER_OS` cannot be overridden; RFC-043 AC-4 is unmet
 
-**Status.** Proposed
+**Status.** Implemented (v0.27.0)
 **Tracks.** Measurement integrity. Follow-on from RFC-043, whose
 acceptance criterion 4 did not take effect in CI.
 **Touches.** `.github/workflows/binary-size.yaml`,

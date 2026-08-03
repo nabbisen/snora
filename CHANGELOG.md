@@ -17,6 +17,110 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.27.0] — 2026-08-04
+
+### Added
+
+- **`snora::design::render(layout, &tokens) -> Element` — token-derived
+  engine surfaces (RFC-039).** The dialog and the modal dim are surfaces
+  the engine renders itself, not primitives an application builds; RFC-038
+  made chrome *colours* follow the emitted theme but deliberately left
+  these untouched. `snora::design::render` is a sibling to `snora::render`,
+  sharing one z-stack implementation (layer order, conditions, backdrop
+  wiring written exactly once) parameterized by style — with `design`
+  inactive, `snora::render`'s output is byte-for-byte unchanged, proven by
+  `render_semantics` passing without modification. The dialog gets a real
+  card: fill `surface_raised`, border `border`, radius `radius.lg`,
+  padding `spacing.lg` — reusing `snora::design::style::container::
+  card_raised` (RFC-029) directly, with its drop shadow zeroed out, since
+  a border-defined card (not a shadow-defined one) is what actually works
+  in the high-contrast presets. Two of the four built-in presets have
+  `surface_raised == background` by the token data's own design, so the
+  card is visible there *only* because of its border — tests assert the
+  border's contrast against `background`, not the fill's, since a
+  fill-vs-background assertion would be false by construction in half the
+  presets. The modal dim replaces the hardcoded `rgba(0, 0, 0, 0.4)` with
+  a color chosen from `background`'s own darkness (`iced::theme::palette::
+  is_dark`) rather than a fixed pole — black-on-black in a dark preset was
+  close to invisible before, the same class of defect RFC-038's
+  `shift_away_from` was built to prevent for derived theme tiers, here for
+  a fixed constant instead of a derived one. Neither derivation extends
+  `snora-design`'s frozen token surface (RFC-036); both work within it, per
+  the owner-confirmed recommendation over adding a scrim or elevation
+  role. Purely additive and feature-gated behind `design`; nothing calls
+  it automatically. No file under `crates/snora-core/` or
+  `crates/snora-design/` changed.
+
+- **`snora::design::widget::*` — token-derived chrome geometry
+  (RFC-040).** RFC-038 made chrome *colours* follow the emitted theme;
+  geometry could not, since an `iced::Theme` carries no spacing or
+  radius, so the prefab header/sidebar/footer/tab-bar/breadcrumb widgets
+  still hardcoded unrelated magic numbers, and `radius: 0.0` was a large
+  part of why stock snora chrome read as flat and dated. Styled variants
+  (`app_header`, `app_side_bar`, `app_footer`, `app_tab_bar`,
+  `app_breadcrumb`) take `&Tokens` first, then the same parameters as
+  their `snora::widget::*` counterparts, and map padding/gaps/radii to
+  the `Spacing`/`Radius` scales. Every widget's body is extracted into
+  exactly one `pub(crate)` builder parameterized by a small geometry
+  struct; the unstyled functions pass that struct's `::unstyled()`
+  constructor (today's literals, unchanged) and the styled functions
+  pass a token-derived one — drift between the two paths is structurally
+  impossible, since there is nowhere for a second copy of a widget body
+  to live. The mapping is deliberate, not reverse-engineered to match
+  today's numbers: each value maps to the `Spacing`/`Radius` token whose
+  own documented semantic fits it, several values landing on today's
+  exact literal because the original numbers already loosely followed
+  this scale (stated per value in `docs/src/design/chrome-geometry.md`,
+  not hidden behind it), others deliberately not reproducing today's
+  number where the semantic mapping calls for a different token (e.g.
+  the sidebar's icon-button gap moves from 16 to `Spacing::md`, 12).
+  Header, footer, and the tab bar's own border move from the hardcoded
+  `radius: 0.0` to a shared `Radius::sm` — the specific defect this RFC
+  names directly. Where a literal has no clean `Spacing`/`Radius`
+  equivalent (several border *widths*, and the tab bar's structural
+  zero vertical padding), it stays a literal, documented as such rather
+  than forcing an invented token match. `Density::Compact` has no
+  resolved `Spacing` scale in `snora-design` as of this release (only
+  `comfortable()` exists) — geometry is derived from `tokens.spacing`/
+  `tokens.radius` directly rather than branching on `tokens.density`,
+  so it is already density-correct in the sense that matters: whatever
+  a future compact scale resolves to flows through with no widget-level
+  branch to keep in sync, verified with hand-mutated `Tokens` in
+  `design/widget/tests.rs` since no built-in preset yet offers two
+  distinct `Spacing` values to compare. The design workbench gains a
+  chrome-geometry section rendering every widget unstyled next to
+  styled for direct visual comparison. Purely additive and
+  feature-gated behind `design`; the unstyled `snora::widget::*` set's
+  geometry is unchanged, proven by a regression test asserting every
+  unstyled builder still receives today's exact literal. No file under
+  `crates/snora-core/` or `crates/snora-design/` changed.
+
+### Fixed
+
+- **`runner_os` override corrected; release checklist now verifies row
+  contents (RFC-044).** RFC-043's `env: RUNNER_OS: ubuntu-latest` step
+  override never took effect: GitHub Actions reserves the entire
+  `RUNNER_*` variable namespace and silently ignores any attempt to
+  overwrite it. Both the 0.25.3 and 0.26.0 rows in `binary-size.csv` and
+  `compile-time.csv` read `Linux`, not `ubuntu-latest` — the workflow file
+  looked correct on inspection and two review passes confirmed it; only
+  the emitted row revealed the defect, and no post-fix row existed until
+  the 0.26.0 tag. Fixed by routing the value through `SNORA_RUNNER_OS`
+  (outside the reserved namespace) in both `binary-size.yaml` and
+  `build-cost.yaml`, consumed by both measurement scripts as
+  `${SNORA_RUNNER_OS:-${RUNNER_OS:-unknown}}`. Neither historical `Linux`
+  row is edited or back-filled; both budget docs now record the
+  discontinuity. Separately, the release checklist previously verified
+  only that a new CSV row *exists* after a tag — exactly the gap that let
+  this defect, and RFC-043's original `widgets_diff_bytes = 0` defect,
+  both ship unnoticed. It now also checks row *contents*: `runner_os`
+  must read `ubuntu-latest`, `widgets_diff_bytes` must be non-zero, and
+  `check_workspace_ms` must be plausibly cold (≥ 10,000 ms). This
+  criterion is not closed by this change alone — it closes only when the
+  next tagged release's row is confirmed to read `ubuntu-latest`. No
+  crate source, public API, or feature flag changed; no CSV row edited,
+  deleted, or back-filled.
+
 ## [0.26.0] — 2026-08-03
 
 ### Added

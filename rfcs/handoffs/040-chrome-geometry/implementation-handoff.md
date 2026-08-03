@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-040 chrome geometry
 
-**Governing RFC.** [RFC-040](../../proposed/040-chrome-geometry.md)
-**Status.** Inherited from RFC-040 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-040](../../done/040-chrome-geometry.md)
+**Status.** Inherited from RFC-040 — Implemented (v0.27.0).
 **Release target.** v0.27.0, alongside RFC-039.
 **Implementation units.** One. Independent of RFC-039 — parallel is fine.
 
@@ -22,7 +22,7 @@ large part of why stock snora chrome reads as flat and dated.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/040-chrome-geometry.md` in full.
+- `rfcs/done/040-chrome-geometry.md` in full.
 - `rfcs/done/037-coherent-defaults-positioning.md` — the gating invariant.
 - `rfcs/done/036-design-surface-freeze-and-additive-covenant.md` — this
   work *consumes* the frozen surface and must not modify it.

@@ -80,15 +80,14 @@ Numbers remain stable forever and are never reused.
 | 037 | [Coherent defaults for snora-rendered surfaces](./done/037-coherent-defaults-positioning.md) | v0.26.0 (handoff: [`handoffs/037-…`](./handoffs/037-coherent-defaults-positioning/implementation-handoff.md)) |
 | 038 | [Token-derived `iced::Theme` emission](./done/038-token-derived-theme-emission.md) | v0.26.0 (handoff: [`handoffs/038-…`](./handoffs/038-token-derived-theme-emission/implementation-handoff.md)) |
 | 043 | [The budget measurements do not measure what they claim](./done/043-measurement-methodology-measures-nothing.md) | v0.26.0 (handoff: [`handoffs/043-…`](./handoffs/043-measurement-methodology-measures-nothing/implementation-handoff.md)) |
+| 039 | [Engine surfaces: the dialog card and the modal dim](./done/039-engine-surface-styling.md) | v0.27.0 (handoff: [`handoffs/039-…`](./handoffs/039-engine-surface-styling/implementation-handoff.md)) |
+| 040 | [Chrome geometry: token-derived spacing and radius](./done/040-chrome-geometry.md) | v0.27.0 (handoff: [`handoffs/040-…`](./handoffs/040-chrome-geometry/implementation-handoff.md)) |
+| 044 | [`RUNNER_OS` cannot be overridden](./done/044-runner-os-override-cannot-work.md) | v0.27.0 (handoff: [`handoffs/044-…`](./handoffs/044-runner-os-override-cannot-work/implementation-handoff.md)) |
 
 ## Proposed
 
-| ID | Title | Priority |
-|----|-------|----------|
-| 044 | [`RUNNER_OS` cannot be overridden; RFC-043 AC-4 is unmet](./proposed/044-runner-os-override-cannot-work.md) | Medium — CSV `runner_os` still emits `Linux`; found only after the v0.26.0 rows landed |
-| 039 | [Engine surfaces: the dialog card and the modal dim](./proposed/039-engine-surface-styling.md) | High — v0.27.0; the dialog currently has no card at all |
-| 040 | [Chrome geometry: token-derived spacing and radius](./proposed/040-chrome-geometry.md) | High — v0.27.0; chrome geometry is unrelated magic numbers, corners square |
-
+_(none — the appearance milestone is complete. Next themes are a
+planning matter for the owner and architect.)_
 
 ## Archive
 

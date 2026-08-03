@@ -36,7 +36,7 @@ use iced::{
     Border, Element, Length,
     widget::{button, column, container, row, text},
 };
-use snora_design::{Tone, Tokens};
+use snora_design::{Tokens, Tone};
 
 use super::style;
 
@@ -87,7 +87,10 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
     /// Adds a primary action button.
     #[must_use]
     pub fn action(mut self, label: impl Into<String>, on_press: Message) -> Self {
-        self.action = Some(NoticeAction { label: label.into(), on_press });
+        self.action = Some(NoticeAction {
+            label: label.into(),
+            on_press,
+        });
         self
     }
 
@@ -105,15 +108,15 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         let p = &t.palette;
 
         let accent_color = style::color::to_iced_color(match self.tone {
-            Tone::Accent  => p.accent,
+            Tone::Accent => p.accent,
             Tone::Success => p.success,
             Tone::Warning => p.warning,
-            Tone::Danger  => p.danger,
-            Tone::Info    => p.info,
+            Tone::Danger => p.danger,
+            Tone::Info => p.info,
             Tone::Neutral => p.border,
         });
         let text_color = style::color::to_iced_color(p.text_primary);
-        let surface    = style::color::to_iced_color(p.surface);
+        let surface = style::color::to_iced_color(p.surface);
 
         // Content: optional title + body
         let mut content_col: Vec<Element<'a, Message>> = Vec::new();
@@ -160,8 +163,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         }
 
         // Main row: colored left accent bar + content + controls
-        let content_area: Element<'a, Message> =
-            column(content_col).spacing(t.spacing.xs).into();
+        let content_area: Element<'a, Message> = column(content_col).spacing(t.spacing.xs).into();
 
         let mut main_row_children: Vec<Element<'a, Message>> = Vec::new();
 
@@ -189,7 +191,9 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         if !controls.is_empty() {
             main_row_children.push(
                 container(
-                    row(controls).spacing(t.spacing.xs).align_y(iced::Alignment::Center),
+                    row(controls)
+                        .spacing(t.spacing.xs)
+                        .align_y(iced::Alignment::Center),
                 )
                 .padding([t.spacing.sm, t.spacing.sm])
                 .align_y(iced::alignment::Vertical::Center)

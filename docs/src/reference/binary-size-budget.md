@@ -124,6 +124,23 @@ threshold, the criteria document specifies what to do (it does
 not unilaterally trigger a per-widget feature split — see the
 document for the full rule).
 
+### Data integrity note (RFC-044)
+
+`runner_os` reads `Linux` for both the 0.25.3 and 0.26.0 rows, not
+`ubuntu-latest` like every row before them. RFC-043 attempted to
+stabilize this column via `env: RUNNER_OS: ubuntu-latest` on the
+measuring step; that override is silently ignored, because GitHub
+Actions reserves the entire `RUNNER_*` variable namespace and does not
+permit overwriting it. The workflow file looked correct on inspection —
+present, well-commented — and two review passes confirmed it; only the
+emitted row revealed the defect, and no post-fix row existed until the
+0.26.0 tag. Fixed in RFC-044 by routing the value through
+`SNORA_RUNNER_OS`, a name GitHub does not reserve. The two `Linux` rows
+are not edited or back-filled — they stand as a recorded discontinuity,
+per the append-only policy (RFC-041 N-1). This criterion is not closed by
+the fix landing; it closes only when the next tagged release's row is
+confirmed to read `ubuntu-latest`.
+
 ### Build profile
 
 Measurements use the `[profile.release-baseline]` Cargo profile, which

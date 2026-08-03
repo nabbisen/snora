@@ -7,12 +7,18 @@ use snora_design::{Tokens, Tone};
 #[allow(dead_code)] // compile-only: verifies row/card accept all Tone × preset combinations
 fn _progress_compiles_for_all_variants() {
     for tokens in [
-        Tokens::light(), Tokens::dark(),
-        Tokens::high_contrast_light(), Tokens::high_contrast_dark(),
+        Tokens::light(),
+        Tokens::dark(),
+        Tokens::high_contrast_light(),
+        Tokens::high_contrast_dark(),
     ] {
         for tone in [
-            Tone::Neutral, Tone::Accent, Tone::Success,
-            Tone::Warning, Tone::Danger, Tone::Info,
+            Tone::Neutral,
+            Tone::Accent,
+            Tone::Success,
+            Tone::Warning,
+            Tone::Danger,
+            Tone::Info,
         ] {
             let _: iced::Element<'_, ()> = row(&tokens, "label", Some(0.5), tone);
             let _: iced::Element<'_, ()> = row(&tokens, "label", None, tone);

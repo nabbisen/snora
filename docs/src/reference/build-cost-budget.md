@@ -79,10 +79,27 @@ crates, not iced's transitive closure — the 56 s → 5.5 s drop between
 0.19.1 and 0.25.3 reflects that, not a real improvement. Fixed by
 removing the cache entirely from the release after 0.25.3 onward. The
 0.25.3 row's timings are **not comparable** to any row from the next
-release onward, which reflects a genuinely cold build. `runner_os` is
-also stabilized to `ubuntu-latest` (explicit `RUNNER_OS` override) from
-that release onward — GitHub's auto-populated value is `Linux`, which the
-0.25.3 row carries and every row before it does not.
+release onward, which reflects a genuinely cold build. RFC-043 also
+attempted to stabilize `runner_os` to `ubuntu-latest` via an explicit
+`RUNNER_OS` override on that release onward — see the RFC-044 note
+below for why that attempt did not take effect.
+
+### Data integrity note (RFC-044)
+
+RFC-043's `runner_os` override did not work: GitHub Actions reserves the
+`RUNNER_*` variable namespace and silently ignores any attempt to
+overwrite it via a step's `env:` block. Both the 0.25.3 and 0.26.0 rows
+read `Linux`, not `ubuntu-latest` — the workflow file looked correct
+on inspection (the override was present and well-commented, and two
+review passes confirmed it); only the emitted row revealed the defect,
+and no post-fix row existed until the 0.26.0 tag. Fixed in RFC-044 by
+routing the value through `SNORA_RUNNER_OS`, a name GitHub does not
+reserve, consumed by `measure-compile-time.sh` as
+`${SNORA_RUNNER_OS:-${RUNNER_OS:-unknown}}`. The two `Linux` rows are not
+edited or back-filled — they stand as a recorded discontinuity, per
+the append-only policy (RFC-041 N-1). This criterion is not closed by the
+fix landing; it closes only when the next tagged release's row is
+confirmed to read `ubuntu-latest`.
 
 ### Watch points
 

@@ -1,7 +1,7 @@
 // Token types (enumerated, not glob).
 pub use snora_design::{
-    Color, Density, Emphasis, FocusTokens, Palette, Radius, Size, Spacing, TextRole, Tokens,
-    Tone, Typography,
+    Color, Density, Emphasis, FocusTokens, Palette, Radius, Size, Spacing, TextRole, Tokens, Tone,
+    Typography,
 };
 
 /// Pure-Rust WCAG contrast utilities, re-exported from `snora-design`.
@@ -43,6 +43,30 @@ pub mod style {
 /// heuristically-corrected colors for the contrast-tested ones the preset
 /// guarantees. See [`theme`] for the full mapping and usage example.
 pub use snora_widgets::design::theme::theme;
+
+/// Token-derived engine surface styling: the dialog card and the modal
+/// dim (RFC-039).
+///
+/// [`render`] is a sibling to [`crate::render::render`] (`snora::render`),
+/// not a replacement — see [`render`]'s own documentation for the
+/// derivation and the gating-invariant guarantee.
+pub mod render;
+pub use render::render;
+
+/// Token-derived chrome geometry: styled variants of the header, sidebar,
+/// footer, tab bar, and breadcrumb (RFC-040).
+///
+/// Each function takes `&Tokens` first, then the same parameters as its
+/// unstyled `snora::widget::*` counterpart. Colors already follow the
+/// theme (RFC-038); these additionally map padding, gaps, and corner
+/// radii to `tokens.spacing`/`tokens.radius`. See
+/// `snora_widgets::design::widget`'s module documentation for the full
+/// mapping table and rationale.
+pub mod widget {
+    pub use snora_widgets::design::widget::{
+        app_breadcrumb, app_footer, app_header, app_side_bar, app_tab_bar,
+    };
+}
 
 /// Pilot button helpers (RFC-028).
 ///

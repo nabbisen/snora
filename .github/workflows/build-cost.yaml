@@ -61,13 +61,17 @@ jobs:
 
       - name: Measure
         id: measure
-        # RUNNER_OS is overridden explicitly (RFC-043): GitHub Actions'
-        # own auto-populated $RUNNER_OS is "Linux", but every historical
-        # CSV row uses "ubuntu-latest" (this job's runs-on value). Without
-        # the override the column silently drifts and breaks grouping —
-        # exactly what the 0.25.3 row did.
+        # SNORA_RUNNER_OS supplies the CSV runner_os column (RFC-044,
+        # correcting RFC-043): GitHub Actions' own auto-populated
+        # $RUNNER_OS is "Linux", but every historical CSV row other than
+        # the 0.25.3/0.26.0 discontinuity uses "ubuntu-latest" (this job's
+        # runs-on value). RFC-043 tried `env: RUNNER_OS: ubuntu-latest` —
+        # GitHub silently ignores that, because it reserves the entire
+        # `RUNNER_*` variable namespace and does not permit overwriting
+        # it. SNORA_RUNNER_OS is outside that namespace, so the value
+        # actually reaches the script.
         env:
-          RUNNER_OS: ubuntu-latest
+          SNORA_RUNNER_OS: ubuntu-latest
         run: |
           ROW=$(scripts/measure-compile-time.sh "${{ steps.version.outputs.version }}")
           echo "row=$ROW" >> "$GITHUB_OUTPUT"

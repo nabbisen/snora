@@ -4,12 +4,18 @@ use snora_design::{Tokens, Tone};
 #[test]
 fn all_tones_produce_valid_style_for_all_presets() {
     let tones = [
-        Tone::Neutral, Tone::Accent, Tone::Success,
-        Tone::Warning, Tone::Danger, Tone::Info,
+        Tone::Neutral,
+        Tone::Accent,
+        Tone::Success,
+        Tone::Warning,
+        Tone::Danger,
+        Tone::Info,
     ];
     for tokens in [
-        Tokens::light(), Tokens::dark(),
-        Tokens::high_contrast_light(), Tokens::high_contrast_dark(),
+        Tokens::light(),
+        Tokens::dark(),
+        Tokens::high_contrast_light(),
+        Tokens::high_contrast_dark(),
     ] {
         for tone in tones {
             let s = toned(&tokens, tone);

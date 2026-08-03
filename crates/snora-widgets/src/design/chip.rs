@@ -45,7 +45,10 @@
 //! chip::removable(&tokens, "Tag: Rust", true, Message::ToggleTag, Message::RemoveTag)
 //! ```
 
-use iced::{Border, Color, Element, widget::{button, row, text}};
+use iced::{
+    Border, Color, Element,
+    widget::{button, row, text},
+};
 use snora_design::Tokens;
 
 use super::style;
@@ -71,12 +74,12 @@ fn darken(color: Color, amount: f32) -> Color {
 /// compositing over the surface. Solid background + paired foreground role
 /// yields ≥6.7:1 across all four built-in presets.
 fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
-    let accent      = style::color::to_iced_color(tokens.palette.accent);
+    let accent = style::color::to_iced_color(tokens.palette.accent);
     let accent_text = style::color::to_iced_color(tokens.palette.accent_text);
     let bg = match status {
-        button::Status::Active   => accent,
-        button::Status::Hovered  => darken(accent, 0.06),
-        button::Status::Pressed  => darken(accent, 0.12),
+        button::Status::Active => accent,
+        button::Status::Hovered => darken(accent, 0.06),
+        button::Status::Pressed => darken(accent, 0.12),
         button::Status::Disabled => Color { a: 0.5, ..accent },
     };
     button::Style {
@@ -93,12 +96,12 @@ fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style
 
 fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> button::Style {
     let border_col = style::color::to_iced_color(tokens.palette.border);
-    let text_col   = style::color::to_iced_color(tokens.palette.text_secondary);
-    let surface    = style::color::to_iced_color(tokens.palette.surface);
+    let text_col = style::color::to_iced_color(tokens.palette.text_secondary);
+    let surface = style::color::to_iced_color(tokens.palette.surface);
     let bg = match status {
-        button::Status::Active   => surface,
-        button::Status::Hovered  => darken(surface, 0.04),
-        button::Status::Pressed  => darken(surface, 0.08),
+        button::Status::Active => surface,
+        button::Status::Hovered => darken(surface, 0.04),
+        button::Status::Pressed => darken(surface, 0.08),
         button::Status::Disabled => Color { a: 0.5, ..surface },
     };
     button::Style {
@@ -130,7 +133,11 @@ pub fn filter<'a, Message: Clone + 'a>(
     on_toggle: impl Into<Option<Message>>,
 ) -> Element<'a, Message> {
     let t = tokens.clone();
-    let style_fn = if selected { chip_style_selected } else { chip_style_unselected };
+    let style_fn = if selected {
+        chip_style_selected
+    } else {
+        chip_style_unselected
+    };
     button(text(label.into()).size(style::text::label_size(tokens)))
         .on_press_maybe(on_toggle.into())
         .padding([tokens.spacing.xs, tokens.spacing.sm])
@@ -150,25 +157,26 @@ pub fn removable<'a, Message: Clone + 'a>(
     on_toggle: impl Into<Option<Message>>,
     on_remove: impl Into<Option<Message>>,
 ) -> Element<'a, Message> {
-    let t_label  = tokens.clone();
+    let t_label = tokens.clone();
     let t_remove = tokens.clone();
-    let style_fn = if selected { chip_style_selected } else { chip_style_unselected };
+    let style_fn = if selected {
+        chip_style_selected
+    } else {
+        chip_style_unselected
+    };
 
-    let label_btn: Element<'a, Message> = button(
-        text(label.into()).size(style::text::label_size(tokens)),
-    )
-    .on_press_maybe(on_toggle.into())
-    .padding([tokens.spacing.xs, tokens.spacing.sm])
-    .style(move |_theme, status| style_fn(&t_label, status))
-    .into();
+    let label_btn: Element<'a, Message> =
+        button(text(label.into()).size(style::text::label_size(tokens)))
+            .on_press_maybe(on_toggle.into())
+            .padding([tokens.spacing.xs, tokens.spacing.sm])
+            .style(move |_theme, status| style_fn(&t_label, status))
+            .into();
 
-    let remove_btn: Element<'a, Message> = button(
-        text("×").size(style::text::label_size(tokens)),
-    )
-    .on_press_maybe(on_remove.into())
-    .padding([tokens.spacing.xs, tokens.spacing.xs])
-    .style(move |_theme, status| style_fn(&t_remove, status))
-    .into();
+    let remove_btn: Element<'a, Message> = button(text("×").size(style::text::label_size(tokens)))
+        .on_press_maybe(on_remove.into())
+        .padding([tokens.spacing.xs, tokens.spacing.xs])
+        .style(move |_theme, status| style_fn(&t_remove, status))
+        .into();
 
     row![label_btn, remove_btn].spacing(0).into()
 }

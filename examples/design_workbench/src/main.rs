@@ -25,32 +25,42 @@ use iced::{
     Alignment, Element, Length, Task,
     widget::{column, container, row, scrollable, text},
 };
-use snora::{AppLayout, LayoutDirection, MenuAction, render, widget::app_header};
-use snora::design::{Color, Tone, Tokens, button, card, chip, notice::Notice, progress, style};
+use snora::design::widget as styled;
+use snora::design::{Color, Tokens, Tone, button, card, chip, notice::Notice, progress, style};
+use snora::{
+    AppLayout, BreadcrumbAction, Crumb, Icon, LayoutDirection, MenuAction, SideBar, SideBarItem,
+    Tab, TabAction, TabBar, render,
+    widget::{app_breadcrumb, app_footer, app_header, app_side_bar, app_tab_bar},
+};
 
 // ---------------------------------------------------------------------------
 // Preset selector
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Preset { Light, Dark, HcLight, HcDark }
+enum Preset {
+    Light,
+    Dark,
+    HcLight,
+    HcDark,
+}
 
 impl Preset {
     fn label(self) -> &'static str {
         match self {
-            Self::Light   => "Light",
-            Self::Dark    => "Dark",
+            Self::Light => "Light",
+            Self::Dark => "Dark",
             Self::HcLight => "HC Light",
-            Self::HcDark  => "HC Dark",
+            Self::HcDark => "HC Dark",
         }
     }
 
     fn tokens(self) -> Tokens {
         match self {
-            Self::Light   => Tokens::light(),
-            Self::Dark    => Tokens::dark(),
+            Self::Light => Tokens::light(),
+            Self::Dark => Tokens::dark(),
             Self::HcLight => Tokens::high_contrast_light(),
-            Self::HcDark  => Tokens::high_contrast_dark(),
+            Self::HcDark => Tokens::high_contrast_dark(),
         }
     }
 }
@@ -69,7 +79,11 @@ struct App {
 
 impl Default for App {
     fn default() -> Self {
-        Self { preset: Preset::Light, tokens: Preset::Light.tokens(), notice_dismissed: false }
+        Self {
+            preset: Preset::Light,
+            tokens: Preset::Light.tokens(),
+            notice_dismissed: false,
+        }
     }
 }
 
@@ -115,7 +129,11 @@ fn note<'a>(t: &'a Tokens, s: &'a str) -> Element<'a, Msg> {
 
 fn swatch_text_color(c: Color) -> iced::Color {
     let b = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-    if b < 0.5 { iced::Color::WHITE } else { iced::Color::BLACK }
+    if b < 0.5 {
+        iced::Color::WHITE
+    } else {
+        iced::Color::BLACK
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -124,13 +142,16 @@ fn swatch_text_color(c: Color) -> iced::Color {
 
 fn preset_toolbar<'a>(t: &'a Tokens, active: Preset) -> Element<'a, Msg> {
     let presets = [Preset::Light, Preset::Dark, Preset::HcLight, Preset::HcDark];
-    let btns: Vec<Element<'a, Msg>> = presets.iter().map(|&p| {
-        if p == active {
-            button::primary(t, p.label(), Msg::SetPreset(p))
-        } else {
-            button::secondary(t, p.label(), Msg::SetPreset(p))
-        }
-    }).collect();
+    let btns: Vec<Element<'a, Msg>> = presets
+        .iter()
+        .map(|&p| {
+            if p == active {
+                button::primary(t, p.label(), Msg::SetPreset(p))
+            } else {
+                button::secondary(t, p.label(), Msg::SetPreset(p))
+            }
+        })
+        .collect();
     row(btns).spacing(t.spacing.sm).into()
 }
 
@@ -174,59 +195,81 @@ fn cards_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
             text(desc)
                 .size(style::text::body_small_size(t))
                 .color(style::color::to_iced_color(t.palette.text_secondary)),
-        ].spacing(t.spacing.xs).into()
+        ]
+        .spacing(t.spacing.xs)
+        .into()
     };
 
-    card::surface(t, column![
-        heading(t, "Cards"),
-        note(t, "Inspect: padding, border clarity at high contrast, shadow on Raised."),
-        row![
-            card::surface(t, mk("Surface", "Default card")),
-            card::raised(t, mk("Raised", "Elevated + shadow")),
-            card::selected(t, mk("Selected", "Accent border")),
-        ].spacing(t.spacing.md),
-    ].spacing(t.spacing.md))
+    card::surface(
+        t,
+        column![
+            heading(t, "Cards"),
+            note(
+                t,
+                "Inspect: padding, border clarity at high contrast, shadow on Raised."
+            ),
+            row![
+                card::surface(t, mk("Surface", "Default card")),
+                card::raised(t, mk("Raised", "Elevated + shadow")),
+                card::selected(t, mk("Selected", "Accent border")),
+            ]
+            .spacing(t.spacing.md),
+        ]
+        .spacing(t.spacing.md),
+    )
 }
 
 fn typography_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
     let pairs: &[(&str, iced::Pixels)] = &[
-        ("Display",    style::text::display_size(t)),
-        ("Heading",    style::text::heading_size(t)),
-        ("Title",      style::text::title_size(t)),
-        ("Body",       style::text::body_size(t)),
-        ("Label",      style::text::label_size(t)),
+        ("Display", style::text::display_size(t)),
+        ("Heading", style::text::heading_size(t)),
+        ("Title", style::text::title_size(t)),
+        ("Body", style::text::body_size(t)),
+        ("Label", style::text::label_size(t)),
         ("Body small", style::text::body_small_size(t)),
     ];
 
-    let rows: Vec<Element<'a, Msg>> = pairs.iter().map(|(name, size)| {
-        row![
-            text(format!("{name} — The quick brown fox"))
-                .size(*size)
-                .color(style::color::to_iced_color(t.palette.text_primary))
-                .width(Length::Fill),
-            text(format!("{:.0}px", size.0))
-                .size(style::text::body_small_size(t))
-                .color(style::color::to_iced_color(t.palette.text_secondary)),
-        ].align_y(Alignment::Center).into()
-    }).collect();
+    let rows: Vec<Element<'a, Msg>> = pairs
+        .iter()
+        .map(|(name, size)| {
+            row![
+                text(format!("{name} — The quick brown fox"))
+                    .size(*size)
+                    .color(style::color::to_iced_color(t.palette.text_primary))
+                    .width(Length::Fill),
+                text(format!("{:.0}px", size.0))
+                    .size(style::text::body_small_size(t))
+                    .color(style::color::to_iced_color(t.palette.text_secondary)),
+            ]
+            .align_y(Alignment::Center)
+            .into()
+        })
+        .collect();
 
-    card::surface(t, column(
-        std::iter::once(heading(t, "Typography"))
-            .chain(std::iter::once(note(t, "Inspect: no clipping, readable scale.")))
-            .chain(rows)
-            .collect::<Vec<_>>(),
-    ).spacing(t.spacing.sm))
+    card::surface(
+        t,
+        column(
+            std::iter::once(heading(t, "Typography"))
+                .chain(std::iter::once(note(
+                    t,
+                    "Inspect: no clipping, readable scale.",
+                )))
+                .chain(rows)
+                .collect::<Vec<_>>(),
+        )
+        .spacing(t.spacing.sm),
+    )
 }
 
 fn notices_section<'a>(t: &'a Tokens, dismissed: bool) -> Element<'a, Msg> {
     let mut notices: Vec<Element<'a, Msg>> = Vec::new();
     for tone in [Tone::Info, Tone::Success, Tone::Warning, Tone::Danger] {
         let label = match tone {
-            Tone::Info    => "Info notice — background sync running.",
+            Tone::Info => "Info notice — background sync running.",
             Tone::Success => "Success notice — export complete.",
             Tone::Warning => "Warning notice — disk space low.",
-            Tone::Danger  => "Danger notice — action cannot be undone.",
-            _             => "",
+            Tone::Danger => "Danger notice — action cannot be undone.",
+            _ => "",
         };
         notices.push(
             Notice::new(t, tone, label)
@@ -244,78 +287,288 @@ fn notices_section<'a>(t: &'a Tokens, dismissed: bool) -> Element<'a, Msg> {
                 .render(),
         );
     }
-    card::surface(t, iced::widget::column![
-        heading(t, "Notices"),
-        note(t, "Inspect: tone colors, border clarity at HC, action/dismiss button focus."),
-        iced::widget::column(notices).spacing(t.spacing.sm),
-    ].spacing(t.spacing.md))
+    card::surface(
+        t,
+        iced::widget::column![
+            heading(t, "Notices"),
+            note(
+                t,
+                "Inspect: tone colors, border clarity at HC, action/dismiss button focus."
+            ),
+            iced::widget::column(notices).spacing(t.spacing.sm),
+        ]
+        .spacing(t.spacing.md),
+    )
 }
 
 fn chips_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
-    card::surface(t, iced::widget::column![
-        heading(t, "Chips"),
-        note(t, "Inspect: selected vs unselected tint at HC, tap target size."),
-        iced::widget::row![
-            chip::filter(t, "All",     true,  Msg::Noop),
-            chip::filter(t, "Draft",   false, Msg::Noop),
-            chip::filter(t, "Active",  false, Msg::Noop),
-            chip::filter(t, "Done",    false, Msg::Noop),
-        ].spacing(t.spacing.sm),
-        iced::widget::row![
-            chip::removable(t, "Rust",   true,  Msg::Noop, Msg::Noop),
-            chip::removable(t, "Design", false, Msg::Noop, Msg::Noop),
-        ].spacing(t.spacing.sm),
-    ].spacing(t.spacing.md))
+    card::surface(
+        t,
+        iced::widget::column![
+            heading(t, "Chips"),
+            note(
+                t,
+                "Inspect: selected vs unselected tint at HC, tap target size."
+            ),
+            iced::widget::row![
+                chip::filter(t, "All", true, Msg::Noop),
+                chip::filter(t, "Draft", false, Msg::Noop),
+                chip::filter(t, "Active", false, Msg::Noop),
+                chip::filter(t, "Done", false, Msg::Noop),
+            ]
+            .spacing(t.spacing.sm),
+            iced::widget::row![
+                chip::removable(t, "Rust", true, Msg::Noop, Msg::Noop),
+                chip::removable(t, "Design", false, Msg::Noop, Msg::Noop),
+            ]
+            .spacing(t.spacing.sm),
+        ]
+        .spacing(t.spacing.md),
+    )
 }
 
 fn progress_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
-    card::surface(t, iced::widget::column![
-        heading(t, "Progress"),
-        note(t, "Inspect: bar fill at 0%/60%/100%, indeterminate (…), tone colors."),
-        progress::row(t, "Indexing files",    Some(0.6),  Tone::Accent),
-        progress::row(t, "Upload complete",   Some(1.0),  Tone::Success),
-        progress::row(t, "Sync in progress",  None,       Tone::Info),
-        progress::row(t, "Low disk — backup", Some(0.85), Tone::Warning),
-    ].spacing(t.spacing.md))
+    card::surface(
+        t,
+        iced::widget::column![
+            heading(t, "Progress"),
+            note(
+                t,
+                "Inspect: bar fill at 0%/60%/100%, indeterminate (…), tone colors."
+            ),
+            progress::row(t, "Indexing files", Some(0.6), Tone::Accent),
+            progress::row(t, "Upload complete", Some(1.0), Tone::Success),
+            progress::row(t, "Sync in progress", None, Tone::Info),
+            progress::row(t, "Low disk — backup", Some(0.85), Tone::Warning),
+        ]
+        .spacing(t.spacing.md),
+    )
 }
 
 fn palette_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
     let p = &t.palette;
     let pairs: &[(Color, &str)] = &[
-        (p.background,     "background"),
-        (p.surface,        "surface"),
+        (p.background, "background"),
+        (p.surface, "surface"),
         (p.surface_raised, "surface_raised"),
-        (p.accent,         "accent"),
-        (p.success,        "success"),
-        (p.warning,        "warning"),
-        (p.danger,         "danger"),
-        (p.info,           "info"),
-        (p.focus,          "focus"),
+        (p.accent, "accent"),
+        (p.success, "success"),
+        (p.warning, "warning"),
+        (p.danger, "danger"),
+        (p.info, "info"),
+        (p.focus, "focus"),
     ];
 
-    let swatches: Vec<Element<'a, Msg>> = pairs.iter().map(|(color, name)| {
-        let bg       = style::color::to_iced_color(*color);
-        let text_col = swatch_text_color(*color);
-        let r        = t.radius.sm;
-        let pad      = t.spacing.sm;
-        container(
-            text(*name).size(style::text::body_small_size(t)).color(text_col),
-        )
-        .padding(pad)
-        .width(100.0)
-        .height(56.0)
-        .style(move |_| iced::widget::container::Style {
-            background: Some(bg.into()),
-            border: iced::Border::default().rounded(r),
-            ..Default::default()
+    let swatches: Vec<Element<'a, Msg>> = pairs
+        .iter()
+        .map(|(color, name)| {
+            let bg = style::color::to_iced_color(*color);
+            let text_col = swatch_text_color(*color);
+            let r = t.radius.sm;
+            let pad = t.spacing.sm;
+            container(
+                text(*name)
+                    .size(style::text::body_small_size(t))
+                    .color(text_col),
+            )
+            .padding(pad)
+            .width(100.0)
+            .height(56.0)
+            .style(move |_| iced::widget::container::Style {
+                background: Some(bg.into()),
+                border: iced::Border::default().rounded(r),
+                ..Default::default()
+            })
+            .into()
         })
+        .collect();
+
+    card::surface(
+        t,
+        column![
+            heading(t, "Palette"),
+            note(
+                t,
+                "Inspect at HC presets: all swatches must be visually distinct."
+            ),
+            row(swatches).spacing(t.spacing.xs),
+        ]
+        .spacing(t.spacing.md),
+    )
+}
+
+// ---------------------------------------------------------------------------
+// Chrome geometry (RFC-040) — unstyled vs. styled, side by side
+// ---------------------------------------------------------------------------
+
+fn labeled<'a>(t: &'a Tokens, label: &'a str, content: Element<'a, Msg>) -> Element<'a, Msg> {
+    column![note(t, label), content]
+        .spacing(t.spacing.xs)
         .into()
-    }).collect();
+}
+
+fn demo_tab_bar<TabId: Clone + PartialEq>(active: TabId, ids: [TabId; 2]) -> TabBar<TabId> {
+    let [a, b] = ids;
+    TabBar {
+        tabs: vec![
+            Tab {
+                id: a,
+                label: "Overview".into(),
+                icon: None,
+            },
+            Tab {
+                id: b,
+                label: "Details".into(),
+                icon: None,
+            },
+        ],
+        active,
+    }
+}
+
+fn demo_crumbs() -> Vec<Crumb<u8>> {
+    vec![
+        Crumb::ancestor(0, "Home"),
+        Crumb::leaf(1, "Chrome geometry"),
+    ]
+}
+
+fn demo_side_bar() -> SideBar<Msg, u8> {
+    SideBar {
+        items: vec![
+            SideBarItem {
+                view_id: 0,
+                icon: Icon::Text("A".into()),
+                tooltip: "Alpha".into(),
+                on_press: Msg::Noop,
+            },
+            SideBarItem {
+                view_id: 1,
+                icon: Icon::Text("B".into()),
+                tooltip: "Beta".into(),
+                on_press: Msg::Noop,
+            },
+        ],
+        active: 0,
+    }
+}
+
+/// Every chrome widget rendered twice — unstyled (`snora::widget::*`) next
+/// to styled (`snora::design::widget::*`, RFC-040) — so the radius and
+/// spacing difference is visible directly, not inferred. `header`,
+/// `footer`, and `tab_bar` show the clearest change: their corner radius
+/// moves from the flat `0.0` literal to `Radius::sm`. `sidebar`'s button
+/// radius happens to already equal `Radius::md` in the built-in presets
+/// (documented in `snora_widgets::design::widget`'s mapping table) — shown
+/// anyway, so that coincidence is visible rather than silently omitted.
+fn chrome_geometry_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
+    let header_row = row![
+        labeled(
+            t,
+            "header — unstyled",
+            app_header(
+                "Header",
+                vec![],
+                &|_: MenuAction<(), ()>| Msg::Noop,
+                None::<&()>,
+                None,
+                LayoutDirection::Ltr
+            )
+        ),
+        labeled(
+            t,
+            "header — styled",
+            styled::app_header(
+                t,
+                "Header",
+                vec![],
+                &|_: MenuAction<(), ()>| Msg::Noop,
+                None::<&()>,
+                None,
+                LayoutDirection::Ltr
+            )
+        ),
+    ]
+    .spacing(t.spacing.md);
+
+    let footer_row = row![
+        labeled(t, "footer — unstyled", app_footer(note(t, "Ready"))),
+        labeled(
+            t,
+            "footer — styled",
+            styled::app_footer(t, note(t, "Ready"))
+        ),
+    ]
+    .spacing(t.spacing.md);
+
+    let tab_row = row![
+        labeled(
+            t,
+            "tab bar — unstyled",
+            app_tab_bar(
+                demo_tab_bar(0u8, [0, 1]),
+                &|_: TabAction<u8>| Msg::Noop,
+                LayoutDirection::Ltr
+            )
+        ),
+        labeled(
+            t,
+            "tab bar — styled",
+            styled::app_tab_bar(
+                t,
+                demo_tab_bar(0u8, [0, 1]),
+                &|_: TabAction<u8>| Msg::Noop,
+                LayoutDirection::Ltr
+            )
+        ),
+    ]
+    .spacing(t.spacing.md);
+
+    let crumb_row = row![
+        labeled(
+            t,
+            "breadcrumb — unstyled",
+            app_breadcrumb(
+                demo_crumbs(),
+                &|_: BreadcrumbAction<u8>| Msg::Noop,
+                LayoutDirection::Ltr
+            )
+        ),
+        labeled(
+            t,
+            "breadcrumb — styled",
+            styled::app_breadcrumb(
+                t,
+                demo_crumbs(),
+                &|_: BreadcrumbAction<u8>| Msg::Noop,
+                LayoutDirection::Ltr
+            )
+        ),
+    ]
+    .spacing(t.spacing.md);
+
+    let side_bar_row = row![
+        labeled(
+            t,
+            "sidebar — unstyled",
+            app_side_bar(demo_side_bar(), LayoutDirection::Ltr)
+        ),
+        labeled(
+            t,
+            "sidebar — styled",
+            styled::app_side_bar(t, demo_side_bar(), LayoutDirection::Ltr)
+        ),
+    ]
+    .spacing(t.spacing.md);
 
     card::surface(t, column![
-        heading(t, "Palette"),
-        note(t, "Inspect at HC presets: all swatches must be visually distinct."),
-        row(swatches).spacing(t.spacing.xs),
+        heading(t, "Chrome geometry (RFC-040)"),
+        note(t, "Inspect: corner radius (header/footer/tab bar go from square to Radius::sm), spacing rhythm."),
+        header_row,
+        footer_row,
+        tab_row,
+        crumb_row,
+        side_bar_row,
     ].spacing(t.spacing.md))
 }
 
@@ -329,7 +582,7 @@ impl App {
         let bg = style::color::to_iced_color(t.palette.background);
 
         let toolbar = preset_toolbar(t, self.preset);
-        let header  = app_header(
+        let header = app_header(
             "Snora Design Workbench",
             vec![],
             &|_: MenuAction<(), ()>| Msg::Noop,
@@ -341,11 +594,13 @@ impl App {
         let body: Element<'_, Msg> = scrollable(
             container(
                 column![
-                    text("Visual-fit QA for Snora Design. \
+                    text(
+                        "Visual-fit QA for Snora Design. \
                           Use the header buttons to switch presets. \
-                          Tab through controls to test native focus handling.")
-                        .size(style::text::body_size(t))
-                        .color(style::color::to_iced_color(t.palette.text_primary)),
+                          Tab through controls to test native focus handling."
+                    )
+                    .size(style::text::body_size(t))
+                    .color(style::color::to_iced_color(t.palette.text_primary)),
                     buttons_section(t),
                     cards_section(t),
                     notices_section(t, self.notice_dismissed),
@@ -353,6 +608,7 @@ impl App {
                     progress_section(t),
                     typography_section(t),
                     palette_section(t),
+                    chrome_geometry_section(t),
                 ]
                 .spacing(t.spacing.lg)
                 .padding(t.spacing.lg),
@@ -362,7 +618,8 @@ impl App {
                 background: Some(bg.into()),
                 ..Default::default()
             }),
-        ).into();
+        )
+        .into();
 
         render(AppLayout::new(body).header(header))
     }

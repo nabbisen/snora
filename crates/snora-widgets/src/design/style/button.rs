@@ -25,10 +25,7 @@
 //!     .style(move |_theme, status| button::primary(&tokens, status));
 //! ```
 
-use iced::{
-    Border, Color, Shadow,
-    widget::button,
-};
+use iced::{Border, Color, Shadow, widget::button};
 use snora_design::Tokens;
 
 use super::color::to_iced_color;
@@ -57,7 +54,10 @@ fn darken(color: Color, amount: f32) -> Color {
 
 /// Applies a standard disabled alpha reduction.
 fn disabled_alpha(color: Color) -> Color {
-    Color { a: color.a * 0.45, ..color }
+    Color {
+        a: color.a * 0.45,
+        ..color
+    }
 }
 
 fn border_radius(tokens: &Tokens) -> iced::border::Radius {
@@ -121,7 +121,10 @@ pub fn secondary(tokens: &Tokens, status: button::Status) -> button::Style {
     button::Style {
         background: Some(bg.into()),
         text_color,
-        border: Border::default().rounded(radius).color(border_color).width(1.0),
+        border: Border::default()
+            .rounded(radius)
+            .color(border_color)
+            .width(1.0),
         shadow: Shadow::default(),
         snap: true,
     }
@@ -198,7 +201,10 @@ mod tests {
         let t = Tokens::light();
         for s in all_statuses() {
             let style = primary(&t, s);
-            assert!(style.background.is_some(), "primary {s:?}: background must be set");
+            assert!(
+                style.background.is_some(),
+                "primary {s:?}: background must be set"
+            );
         }
     }
 
@@ -209,7 +215,8 @@ mod tests {
         // Secondary at rest is outline-only; background fully transparent.
         assert!(
             matches!(style.background, Some(iced::Background::Color(c)) if c.a < 0.01),
-            "secondary active should be transparent, got {:?}", style.background
+            "secondary active should be transparent, got {:?}",
+            style.background
         );
     }
 
@@ -228,7 +235,10 @@ mod tests {
         let t = Tokens::high_contrast_dark();
         for s in all_statuses() {
             let style = danger(&t, s);
-            assert!(style.background.is_some(), "danger {s:?}: background must be set");
+            assert!(
+                style.background.is_some(),
+                "danger {s:?}: background must be set"
+            );
         }
     }
 
@@ -241,7 +251,8 @@ mod tests {
         assert!(
             disabled.text_color.a < active.text_color.a,
             "disabled alpha {:.2} should be < active alpha {:.2}",
-            disabled.text_color.a, active.text_color.a
+            disabled.text_color.a,
+            active.text_color.a
         );
     }
 

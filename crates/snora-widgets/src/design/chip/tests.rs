@@ -5,8 +5,8 @@
 //! `Disabled` is exempt per WCAG 2.1 §1.4.3 exception.
 
 use super::*;
-use snora_design::{Tokens, contrast};
 use iced::widget::button::Status;
+use snora_design::{Tokens, contrast};
 
 // ---------------------------------------------------------------------------
 // Style function structural tests
@@ -17,7 +17,10 @@ fn chip_style_selected_all_statuses_all_presets() {
     for t in all_presets() {
         for s in all_statuses() {
             let style = chip_style_selected(&t, s);
-            assert!(style.background.is_some(), "selected {s:?}: background must be set");
+            assert!(
+                style.background.is_some(),
+                "selected {s:?}: background must be set"
+            );
         }
     }
 }
@@ -27,7 +30,10 @@ fn chip_style_unselected_all_statuses_all_presets() {
     for t in all_presets() {
         for s in all_statuses() {
             let style = chip_style_unselected(&t, s);
-            assert!(style.background.is_some(), "unselected {s:?}: background must be set");
+            assert!(
+                style.background.is_some(),
+                "unselected {s:?}: background must be set"
+            );
         }
     }
 }
@@ -77,7 +83,7 @@ fn chip_selected_text_over_accent_background_meets_aa_all_presets() {
 fn chip_selected_text_hover_pressed_meets_aa_all_presets() {
     const AA: f32 = 4.5;
     for (name, t) in named_presets() {
-        let accent      = t.palette.accent;
+        let accent = t.palette.accent;
         let accent_text = t.palette.accent_text;
 
         let hover_bg = snora_design::Color {
@@ -93,7 +99,7 @@ fn chip_selected_text_hover_pressed_meets_aa_all_presets() {
             a: accent.a,
         };
 
-        let hover_ratio   = contrast::contrast_ratio(accent_text, hover_bg);
+        let hover_ratio = contrast::contrast_ratio(accent_text, hover_bg);
         let pressed_ratio = contrast::contrast_ratio(accent_text, pressed_bg);
 
         assert!(
@@ -123,8 +129,10 @@ fn darken_clamps_to_zero() {
 
 fn all_presets() -> [Tokens; 4] {
     [
-        Tokens::light(), Tokens::dark(),
-        Tokens::high_contrast_light(), Tokens::high_contrast_dark(),
+        Tokens::light(),
+        Tokens::dark(),
+        Tokens::high_contrast_light(),
+        Tokens::high_contrast_dark(),
     ]
 }
 
@@ -138,5 +146,10 @@ fn named_presets() -> [(&'static str, Tokens); 4] {
 }
 
 fn all_statuses() -> [Status; 4] {
-    [Status::Active, Status::Hovered, Status::Pressed, Status::Disabled]
+    [
+        Status::Active,
+        Status::Hovered,
+        Status::Pressed,
+        Status::Disabled,
+    ]
 }

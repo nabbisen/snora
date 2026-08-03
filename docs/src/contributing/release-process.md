@@ -126,6 +126,18 @@ them in sync is a release-process invariant.
     tab for whether the `binary-size` workflow triggered at all on the
     tag, not just whether a triggered run went green. If the diff column
     exceeds 150 KB, follow up per feature-gating-criteria.md indicator 2.
+[ ] CONTENT-check that same binary-size row (RFC-044 — a row existing says
+    nothing about whether its fields are right; this is the check that
+    would have caught RFC-043's `widgets_diff_bytes = 0` at release time
+    instead of a release later):
+    `git show main:docs/src/reference/binary-size-budget/binary-size.csv | tail -1 | cut -d, -f8`
+    must print `ubuntu-latest` — field 8, `runner_os`. If it prints
+    `Linux`, the `SNORA_RUNNER_OS` override did not reach the script;
+    treat it as a release blocker and investigate before publishing, do
+    not just note it and move on.
+    `... | cut -d, -f4` (`widgets_diff_bytes`) must be **non-zero**. A `0`
+    means the probes are byte-identical again and are measuring nothing —
+    treat it as a release blocker.
 [ ] After tag push: confirm a NEW ROW EXISTS for this version in
     docs/src/reference/build-cost-budget/compile-time.csv on main —
     `git show main:docs/src/reference/build-cost-budget/compile-time.csv | tail -1`
@@ -134,6 +146,17 @@ them in sync is a release-process invariant.
     If no new row exists, treat it as a release blocker. If
     build_widgets_ms exceeds 30 000, follow up per
     feature-gating-criteria.md indicator 1.
+[ ] CONTENT-check that same compile-time row (RFC-044, same rationale as
+    the binary-size content-check above):
+    `git show main:docs/src/reference/build-cost-budget/compile-time.csv | tail -1 | cut -d, -f9`
+    must print `ubuntu-latest` — field 9, `runner_os`. If it prints
+    `Linux`, treat it as a release blocker, same as above.
+    `... | cut -d, -f2` (`check_workspace_ms`) must be **at least 10 000**
+    (plausibly cold — tens of seconds, not milliseconds). A value in the
+    hundreds or low thousands means a dependency cache was restored and
+    the "cold" build is warm — the exact defect RFC-043 fixed once
+    already; treat it as a release blocker and check that
+    `build-cost.yaml` still has no `Swatinem/rust-cache` step.
 ```
 
 ### Why `--no-verify`

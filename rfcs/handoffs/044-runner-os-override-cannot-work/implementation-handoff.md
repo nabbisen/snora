@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-044 `runner_os` override and content verification
 
-**Governing RFC.** [RFC-044](../../proposed/044-runner-os-override-cannot-work.md)
-**Status.** Inherited from RFC-044 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-044](../../done/044-runner-os-override-cannot-work.md)
+**Status.** Inherited from RFC-044 — Implemented (v0.27.0).
 **Release target.** Next release — fold in rather than cutting one for it.
 **Implementation units.** One. Small: CI, two scripts, docs.
 
@@ -25,7 +25,7 @@ release, and how this did too.
 
 ## 3. Background — read first
 
-`rfcs/proposed/044-runner-os-override-cannot-work.md` in full.
+`rfcs/done/044-runner-os-override-cannot-work.md` in full.
 
 The key fact, and the reason two review passes missed it: the workflow
 step and the script are *each* correct in isolation.

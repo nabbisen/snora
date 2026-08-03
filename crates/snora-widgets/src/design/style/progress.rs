@@ -14,12 +14,12 @@ use super::color::to_iced_color;
 pub fn toned(tokens: &Tokens, tone: Tone) -> progress_bar::Style {
     let p = &tokens.palette;
     let bar = to_iced_color(match tone {
-        Tone::Accent   => p.accent,
-        Tone::Success  => p.success,
-        Tone::Warning  => p.warning,
-        Tone::Danger   => p.danger,
-        Tone::Info     => p.info,
-        Tone::Neutral  => p.border,
+        Tone::Accent => p.accent,
+        Tone::Success => p.success,
+        Tone::Warning => p.warning,
+        Tone::Danger => p.danger,
+        Tone::Info => p.info,
+        Tone::Neutral => p.border,
     });
     progress_bar::Style {
         background: to_iced_color(p.surface).into(),

@@ -82,3 +82,9 @@ pub mod style;
 ///
 /// See [`theme::theme`].
 pub mod theme;
+
+/// Token-derived chrome geometry — styled variants of the prefab chrome
+/// widgets (RFC-040).
+///
+/// See the module documentation for the full spacing/radius mapping.
+pub mod widget;

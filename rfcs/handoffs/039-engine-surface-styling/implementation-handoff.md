@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-039 engine surfaces: dialog card and modal dim
 
-**Governing RFC.** [RFC-039](../../proposed/039-engine-surface-styling.md)
-**Status.** Inherited from RFC-039 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-039](../../done/039-engine-surface-styling.md)
+**Status.** Inherited from RFC-039 — Implemented (v0.27.0).
 **Release target.** v0.27.0, alongside RFC-040.
 **Implementation units.** One. Independent of RFC-040 — they can run in
 parallel.
@@ -30,7 +30,7 @@ to see."
 
 ## 3. Background — read first
 
-- `rfcs/proposed/039-engine-surface-styling.md` in full.
+- `rfcs/done/039-engine-surface-styling.md` in full.
 - `rfcs/done/037-coherent-defaults-positioning.md` — the **gating
   invariant** this must preserve.
 - `rfcs/done/036-design-surface-freeze-and-additive-covenant.md` — the

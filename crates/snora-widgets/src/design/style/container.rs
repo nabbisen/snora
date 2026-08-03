@@ -52,7 +52,10 @@ pub fn card_raised(tokens: &Tokens) -> container::Style {
             .color(to_iced_color(tokens.palette.border))
             .width(1.0),
         shadow: Shadow {
-            color: Color { a: 0.12, ..Color::BLACK },
+            color: Color {
+                a: 0.12,
+                ..Color::BLACK
+            },
             offset: iced::Vector { x: 0.0, y: 2.0 },
             blur_radius: 8.0,
         },
@@ -95,9 +98,18 @@ mod tests {
     #[test]
     fn all_card_styles_produce_background_for_all_presets() {
         for t in all_presets() {
-            assert!(card_surface(&t).background.is_some(), "card_surface no background");
-            assert!(card_raised(&t).background.is_some(), "card_raised no background");
-            assert!(card_selected(&t).background.is_some(), "card_selected no background");
+            assert!(
+                card_surface(&t).background.is_some(),
+                "card_surface no background"
+            );
+            assert!(
+                card_raised(&t).background.is_some(),
+                "card_raised no background"
+            );
+            assert!(
+                card_selected(&t).background.is_some(),
+                "card_selected no background"
+            );
         }
     }
 
@@ -114,6 +126,9 @@ mod tests {
     fn card_raised_has_shadow_offset() {
         let t = Tokens::dark();
         let s = card_raised(&t);
-        assert!(s.shadow.blur_radius > 0.0, "card_raised should have a shadow");
+        assert!(
+            s.shadow.blur_radius > 0.0,
+            "card_raised should have a shadow"
+        );
     }
 }

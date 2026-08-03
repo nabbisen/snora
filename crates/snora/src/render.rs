@@ -36,14 +36,39 @@
 //! their overlays.
 
 use iced::{
-    Element, Length,
+    Color, Element, Length,
     widget::{column, container, mouse_area, row, space, stack},
 };
 
 use snora_core::{AppLayout, LayoutDirection};
 
+use crate::overlay::dialog::DialogCardStyle;
 use crate::overlay::{dialog::render_dialog, sheet::render_sheet};
 use crate::toast::render_toasts;
+
+/// Style parameters [`render_with_style`] composes into the layer stack,
+/// letting [`render`] (unstyled) and [`crate::design::render::render`]
+/// (`design`-gated) share one implementation (RFC-039) instead of two
+/// that could drift.
+pub(crate) struct ChromeStyle {
+    /// Fill for the modal-backdrop layer (layer 4). Includes alpha.
+    pub(crate) dim_color: Color,
+    /// Card wrapper for the dialog layer (layer 5). `None` renders
+    /// `dialog.content` centered with no card at all.
+    pub(crate) dialog_card: Option<DialogCardStyle>,
+}
+
+impl ChromeStyle {
+    /// Today's literal, unmodified: opaque black at 40% alpha, no card.
+    /// This is [`render`]'s exact pre-RFC-039 behavior — the gating
+    /// invariant depends on this value never changing.
+    fn unstyled() -> Self {
+        Self {
+            dim_color: Color::from_rgba(0.0, 0.0, 0.0, 0.4),
+            dialog_card: None,
+        }
+    }
+}
 
 /// Compile an [`AppLayout`] into an iced [`Element`].
 ///
@@ -51,6 +76,21 @@ use crate::toast::render_toasts;
 /// (including inside toasts and overlay content) are preserved through
 /// the output element's lifetime `'a`.
 pub fn render<'a, Message>(layout: AppLayout<Element<'a, Message>, Message>) -> Element<'a, Message>
+where
+    Message: Clone + 'a,
+{
+    render_with_style(layout, &ChromeStyle::unstyled())
+}
+
+/// The shared implementation behind [`render`] and
+/// [`crate::design::render::render`]. `style` carries every value that
+/// differs between the unstyled and `design`-gated paths; the z-stack
+/// composition itself — layer order, conditions, and backdrop wiring —
+/// is written exactly once.
+pub(crate) fn render_with_style<'a, Message>(
+    layout: AppLayout<Element<'a, Message>, Message>,
+    style: &ChromeStyle,
+) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
@@ -91,15 +131,15 @@ where
 
     if has_modal {
         if let Some(on_close) = layout.on_close_modals {
-            layers = layers.push(dim_backdrop(on_close));
+            layers = layers.push(dim_backdrop(on_close, style.dim_color));
         } else {
             // No click-to-close requested — still paint the dim to signal
             // "this is modal", but don't capture clicks.
-            layers = layers.push(dim_without_capture());
+            layers = layers.push(dim_without_capture(style.dim_color));
         }
 
         if let Some(dialog) = layout.dialog {
-            layers = layers.push(render_dialog(dialog));
+            layers = layers.push(render_dialog(dialog, style.dialog_card.as_ref()));
         }
         if let Some(sheet) = layout.sheet {
             layers = layers.push(render_sheet(sheet, layout.direction));
@@ -109,8 +149,7 @@ where
     // -----------------------------------------------------------------
     // Layer 7 — toasts.
     // -----------------------------------------------------------------
-    if let Some(toast_layer) =
-        render_toasts(layout.toasts, layout.toast_position, layout.direction)
+    if let Some(toast_layer) = render_toasts(layout.toasts, layout.toast_position, layout.direction)
     {
         layers = layers.push(toast_layer);
     }
@@ -176,20 +215,21 @@ where
         .into()
 }
 
-/// A full-window, 40%-dim click target. Used above menus and below modals
-/// so that clicking outside a dialog / sheet dismisses it and signals
-/// "this is modal" by dimming the background content.
-fn dim_backdrop<'a, Message>(on_press: Message) -> Element<'a, Message>
+/// A full-window dim click target, filled with `dim_color`. Used above
+/// menus and below modals so that clicking outside a dialog / sheet
+/// dismisses it and signals "this is modal" by dimming the background
+/// content.
+fn dim_backdrop<'a, Message>(on_press: Message, dim_color: Color) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
-    use iced::{Background, Color, widget::container::Style};
+    use iced::{Background, widget::container::Style};
 
     let dim = container(space())
         .width(Length::Fill)
         .height(Length::Fill)
-        .style(|_theme| Style {
-            background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.4))),
+        .style(move |_theme| Style {
+            background: Some(Background::Color(dim_color)),
             ..Default::default()
         });
     mouse_area(dim).on_press(on_press).into()
@@ -197,17 +237,17 @@ where
 
 /// Same visual as [`dim_backdrop`] but without the click sink — used when
 /// the application chose not to provide `on_close_modals`.
-fn dim_without_capture<'a, Message>() -> Element<'a, Message>
+fn dim_without_capture<'a, Message>(dim_color: Color) -> Element<'a, Message>
 where
     Message: 'a,
 {
-    use iced::{Background, Color, widget::container::Style};
+    use iced::{Background, widget::container::Style};
 
     container(space())
         .width(Length::Fill)
         .height(Length::Fill)
-        .style(|_theme| Style {
-            background: Some(Background::Color(Color::from_rgba(0.0, 0.0, 0.0, 0.4))),
+        .style(move |_theme| Style {
+            background: Some(Background::Color(dim_color)),
             ..Default::default()
         })
         .into()

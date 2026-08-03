@@ -23,6 +23,39 @@ use iced::{
 
 use snora_core::{BreadcrumbAction, Crumb, LayoutDirection};
 
+/// Geometry parameters [`build_breadcrumb`] takes, letting
+/// [`app_breadcrumb`] (unstyled) and the `design`-gated styled variant
+/// (RFC-040) share one implementation.
+#[derive(Debug, PartialEq)]
+pub(crate) struct CrumbGeometry {
+    /// Gap between a crumb and its trailing separator.
+    pub(crate) gap: f32,
+    /// Trail container's horizontal padding.
+    pub(crate) row_pad_x: f32,
+    /// Trail container's vertical padding.
+    pub(crate) row_pad_y: f32,
+    /// Per-crumb button horizontal padding.
+    pub(crate) btn_pad_x: f32,
+    /// Per-crumb button vertical padding.
+    pub(crate) btn_pad_y: f32,
+    /// Per-crumb button corner radius.
+    pub(crate) btn_radius: f32,
+}
+
+impl CrumbGeometry {
+    /// Today's literals, unmodified.
+    pub(crate) const fn unstyled() -> Self {
+        Self {
+            gap: 6.0,
+            row_pad_x: 12.0,
+            row_pad_y: 4.0,
+            btn_pad_x: 4.0,
+            btn_pad_y: 2.0,
+            btn_radius: 3.0,
+        }
+    }
+}
+
 /// Build a breadcrumb trail.
 ///
 /// * `crumbs` — the ordered sequence from root to leaf. The application
@@ -45,6 +78,20 @@ where
     CrumbId: Clone + Debug + 'a,
     F: Fn(BreadcrumbAction<CrumbId>) -> Message + 'a,
 {
+    build_breadcrumb(crumbs, on_action, direction, CrumbGeometry::unstyled())
+}
+
+pub(crate) fn build_breadcrumb<'a, Message, CrumbId, F>(
+    crumbs: Vec<Crumb<CrumbId>>,
+    on_action: &'a F,
+    direction: LayoutDirection,
+    geometry: CrumbGeometry,
+) -> Element<'a, Message>
+where
+    Message: Clone + 'a,
+    CrumbId: Clone + Debug + 'a,
+    F: Fn(BreadcrumbAction<CrumbId>) -> Message + 'a,
+{
     let separator = match direction {
         LayoutDirection::Ltr => "›",
         LayoutDirection::Rtl => "‹",
@@ -55,31 +102,38 @@ where
         LayoutDirection::Rtl => crumbs.into_iter().rev().collect(),
     };
 
-    let mut trail = row![].spacing(6).align_y(Center);
+    let mut trail = row![].spacing(geometry.gap).align_y(Center);
 
     let last = crumbs.len().saturating_sub(1);
     for (i, crumb) in crumbs.into_iter().enumerate() {
-        trail = trail.push(render_crumb(crumb, on_action));
+        trail = trail.push(render_crumb(
+            crumb,
+            on_action,
+            geometry.btn_pad_x,
+            geometry.btn_pad_y,
+            geometry.btn_radius,
+        ));
         if i < last {
-            trail = trail.push(
-                text(separator)
-                    .size(13)
-                    .style(|theme: &Theme| iced::widget::text::Style {
-                        color: Some(separator_color(theme)),
-                    }),
-            );
+            trail = trail.push(text(separator).size(13).style(|theme: &Theme| {
+                iced::widget::text::Style {
+                    color: Some(separator_color(theme)),
+                }
+            }));
         }
     }
 
     container(trail)
         .width(Length::Fill)
-        .padding(Padding::from([4.0, 12.0]))
+        .padding(Padding::from([geometry.row_pad_y, geometry.row_pad_x]))
         .into()
 }
 
 fn render_crumb<'a, Message, CrumbId, F>(
     crumb: Crumb<CrumbId>,
     on_action: &'a F,
+    btn_pad_x: f32,
+    btn_pad_y: f32,
+    btn_radius: f32,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -93,15 +147,15 @@ where
         let id_for_msg = crumb.id.clone();
         button(text(crumb.label).size(13))
             .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
-            .padding(Padding::from([2.0, 4.0]))
-            .style(crumb_button_style)
+            .padding(Padding::from([btn_pad_y, btn_pad_x]))
+            .style(move |theme, status| crumb_button_style(theme, status, btn_radius))
             .into()
     }
 }
 
 /// Plain text-only style for ancestor crumbs. Hover gets a subtle
 /// background to signal interactivity.
-fn crumb_button_style(theme: &Theme, status: button::Status) -> button::Style {
+fn crumb_button_style(theme: &Theme, status: button::Status, radius: f32) -> button::Style {
     use iced::{Background, Border};
     let palette = theme.extended_palette();
     let (background, text_color) = match status {
@@ -117,7 +171,7 @@ fn crumb_button_style(theme: &Theme, status: button::Status) -> button::Style {
         border: Border {
             color: Color::TRANSPARENT,
             width: 0.0,
-            radius: 3.0.into(),
+            radius: radius.into(),
         },
         ..button::Style::default()
     }

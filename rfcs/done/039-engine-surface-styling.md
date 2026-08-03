@@ -1,6 +1,6 @@
 # RFC 039 — Engine surfaces: the dialog card and the modal dim
 
-**Status.** Proposed
+**Status.** Implemented (v0.27.0)
 **Tracks.** Appearance milestone, second half (v0.27.0). Authorized by
 RFC-037; constrained by RFC-036's additive-only covenant; depends on
 RFC-038.
