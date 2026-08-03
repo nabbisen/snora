@@ -82,9 +82,9 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Priority |
 |----|-------|----------|
-| 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26 positioning; extends RFC-020 to snora's own surfaces, permits theme emission under `design` |
-| 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26; accepted; handoff ready; prerequisite for RFC-039/040 |
-| 043 | [The budget measurements do not measure what they claim](./proposed/043-measurement-methodology-measures-nothing.md) | High — accepted; handoff ready; gate 9 cannot re-satisfy until this lands |
+| 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26.0; **must ship with RFC-038**, which it authorizes; handoff ready |
+| 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26.0; **approved**, awaiting release; prerequisite for RFC-039/040 |
+| 043 | [The budget measurements do not measure what they claim](./proposed/043-measurement-methodology-measures-nothing.md) | High — v0.26.0; **approved**, awaiting release; gate 9 re-satisfies after two rows under the corrected methodology |
 
 ## Archive
 
