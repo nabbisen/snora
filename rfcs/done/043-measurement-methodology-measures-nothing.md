@@ -1,6 +1,6 @@
 # RFC 043 — The budget measurements do not measure what they claim
 
-**Status.** Proposed
+**Status.** Implemented (v0.26.0)
 **Tracks.** Measurement integrity, follow-on from RFC-041. Bears on 1.0
 gate 9 and on DEC-11 (`design` opt-in).
 **Touches.** `examples/size_probe_*/src/main.rs`,

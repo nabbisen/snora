@@ -138,11 +138,31 @@ them in sync is a release-process invariant.
 
 ### Why `--no-verify`
 
-`cargo package --no-verify` skips the dependency-resolution check
-that would otherwise demand the sibling crate be on crates.io
-*already*. We use it to inspect the `.crate` archive locally before
-the actual `cargo publish` (which has its own verification step
-that is order-aware).
+`cargo package --no-verify` skips the *build* verification step — it
+does **not** skip dependency resolution. We use it to inspect the
+`.crate` archive locally before the actual `cargo publish`.
+
+**On a minor bump, the dependent crates cannot be packaged until their
+siblings are published.** Once `[workspace.dependencies]` moves from
+`0.25` to `0.26`, `snora-widgets` requires `snora-core = "^0.26"`, which
+does not exist on crates.io until `snora-core` is published. So:
+
+```text
+error: failed to select a version for the requirement `snora-core = "^0.26"`
+  candidate versions found which didn't match: 0.25.3, 0.25.2, …
+```
+
+That is expected, not a fault. On a minor:
+
+- `cargo package` succeeds for `snora-core` and `snora-design` (no
+  internal dependencies);
+- it fails for `snora-widgets` and `snora` until the crates below them
+  are on crates.io;
+- publish in dependency order and each one unblocks the next.
+
+On a **patch** bump the pin is unchanged (`0.25` still matches `0.25.3`),
+so all four package cleanly up front. Do not treat a minor's packaging
+failure as a release blocker — check the order instead.
 
 ### Publish order
 

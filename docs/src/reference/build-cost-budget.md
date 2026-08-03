@@ -24,8 +24,16 @@ unintended growth before it becomes invisible.
 | `example_workbench_ms` | `cargo build --profile release-baseline -p snora-example-design-workbench` |
 
 "Cold" means `snora-core`, `snora-design`, `snora-widgets`, and `snora`
-are cleaned before each measurement. iced's transitive closure remains
-cached so the measurement reflects Snora's contribution, not iced's.
+are cleaned before each measurement, **and**, from the release after
+0.25.3 onward (RFC-043), the CI job runs with no dependency cache at all,
+so iced's transitive closure is rebuilt from scratch too. Through 0.25.3,
+`build-cost.yaml` restored a
+`Swatinem/rust-cache` between runs; because the per-measurement clean only
+covered snora's own four crates, the cached iced build meant the "cold"
+numbers were actually warm — this is what produced the 56 s → 5.5 s
+"improvement" between 0.19.1 and 0.25.3, which was a caching artifact, not
+a real trend (see the RFC-043 data integrity note below). Expect run times
+in the minutes, not under a minute; that reflects a real cold build.
 The workbench binary itself is also cleaned before `example_workbench_ms`.
 
 ### Limitations
@@ -46,10 +54,12 @@ matched `v*.*.*`, but the project's tags carry no `v` prefix, so the
 append-on-tag step never fired on any of the 38 release tags. This was
 fixed in 0.25.3 (RFC-041). Rows before 0.25.3 predate the fix and were not
 produced by the tag automation. The series also spans the 0.25.2
-`resolver = "2"` → `"3"` workspace change; with no committed `Cargo.lock`,
-dependency resolution is not pinned between CI runs, so pre-0.25.3 and
-post-0.25.3 rows are **not comparable**. Treat 0.25.3 as the start of a
-new, real baseline.
+`resolver = "2"` → `"3"` workspace change; at the time of the 0.25.3
+measurement, `Cargo.lock` was not yet committed for any *prior* release,
+so dependency resolution was not pinned between the CI runs that produced
+pre-0.25.3 rows — pre-0.25.3 and post-0.25.3 rows are **not comparable**.
+`Cargo.lock` is committed as of 0.25.3 itself (RFC-042), so this caveat
+does not apply going forward.
 
 Additionally, row `0.17.0` was measured with `runner_os = unknown` (a
 sandbox run, not CI) and reports `example_hello_ms = 182000` — the same
@@ -57,6 +67,22 @@ value `render-cost.csv` reports for `hello_ms` at `0.17.0`, a different
 metric. Two independent measurements landing on an identical value
 suggests a script or transcription fault at that data point; treat the
 `0.17.0` row as suspect rather than a real signal.
+
+### Data integrity note (RFC-043)
+
+The 0.25.3 row is doubly transitional, the same as the binary-size
+series: it is the **first** row produced by the fixed tag-automation
+(RFC-041) and the **last** row produced by a warm-cache "cold" build.
+`build-cost.yaml` restored a dependency cache between runs through
+0.25.3, so the timed steps only ever rebuilt snora's own four small
+crates, not iced's transitive closure — the 56 s → 5.5 s drop between
+0.19.1 and 0.25.3 reflects that, not a real improvement. Fixed by
+removing the cache entirely from the release after 0.25.3 onward. The
+0.25.3 row's timings are **not comparable** to any row from the next
+release onward, which reflects a genuinely cold build. `runner_os` is
+also stabilized to `ubuntu-latest` (explicit `RUNNER_OS` override) from
+that release onward — GitHub's auto-populated value is `Linux`, which the
+0.25.3 row carries and every row before it does not.
 
 ### Watch points
 

@@ -28,6 +28,7 @@
   - [0.22 → 0.23](guides/migration-0.22-to-0.23.md)
   - [0.23 → 0.24](guides/migration-0.23-to-0.24.md)
   - [0.24 → 0.25](guides/migration-0.24-to-0.25.md)
+  - [0.25 → 0.26](guides/migration-0.25-to-0.26.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design
@@ -42,6 +43,7 @@
 - [Chips](design/chips.md)
 - [Progress](design/progress.md)
 - [iced style bridge](design/iced-style-bridge.md)
+- [Token-derived iced::Theme](design/theme.md)
 - [v0.21 Primitives](design/v021-primitives.md)
 - [Recipes](design/recipes/README.md)
   - [Empty state](design/recipes/empty-state.md)

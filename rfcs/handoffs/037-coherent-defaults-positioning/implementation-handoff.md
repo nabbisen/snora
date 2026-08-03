@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-037 coherent defaults positioning
 
-**Governing RFC.** [RFC-037](../../proposed/037-coherent-defaults-positioning.md)
-**Status.** Inherited from RFC-037 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-037](../../done/037-coherent-defaults-positioning.md)
+**Status.** Inherited from RFC-037 — Implemented (v0.26.0).
 **Release target.** v0.26.0, alongside RFC-038 and RFC-043.
 **Implementation units.** One. Documentation and governance only — no code.
 
@@ -29,7 +29,7 @@ parallel.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/037-coherent-defaults-positioning.md` in full.
+- `rfcs/done/037-coherent-defaults-positioning.md` in full.
 - `rfcs/done/020-design-system-boundary-and-philosophy.md` — the boundary
   this extends. Note RFC-020's acceptance criterion "Boundary statement is
   added to docs" was **never satisfied**; this work discharges it.

@@ -28,8 +28,9 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | English-only comments | Firm boundary | Multi-language team adopts the project |
 | Tooltip vocabulary deferred | Deferred | Second consumer type in the codebase |
 | Persistent-toast helper deferred | Deferred | Two separate apps repeat `.persistent()` |
-| Theme-aware, not theme-owning | Firm boundary | iced adds an insufficient theming layer |
+| Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. |
 | Focus trapping deferred | Deferred | Concrete app + stable iced focus API |
+| Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases |
 
 ## Why no `PageContract` trait
 
@@ -324,13 +325,26 @@ repeat this exact pattern. As of v0.12 no example calls `.persistent()`.
 The trigger is documented in RFC-013-C. If/when met, `persistent_ack` is
 a small additive constructor with a doctest — no migration needed.
 
-## Why Snora is theme-aware but not theme-owning (v0.14)
+## Why Snora is theme-producing, not theme-owning (v0.14; amended v0.26 by RFC-037)
 
-Snora reads iced's active `Theme` (extended palette) in prefab widgets
-and toast rendering. It does not define a parallel theming layer. This
-is intentional and permanent: adding a `SnoraTheme` struct would
-duplicate iced's system, force applications to configure theming twice,
-and create a maintenance surface with no commensurate value.
+Snora reads iced's active `Theme` (extended palette) in prefab widgets and
+toast rendering, and — as of RFC-038, under the `design` feature — can
+also *produce* one. The distinction that makes both true at once:
+
+- **Theme-owning** — snora defines a parallel theming abstraction, holds
+  theme state, and requires applications to configure appearance through
+  snora rather than through iced. **Still declined, permanently.** Adding
+  a `SnoraTheme` struct would duplicate iced's system, force applications
+  to configure theming twice, and create a maintenance surface with no
+  commensurate value.
+- **Theme-producing** — a pure function from tokens to an `iced::Theme`
+  (`snora::design::theme`, RFC-038). The application decides whether to
+  call it, owns the result, and hands it to iced through iced's own
+  `.theme()` hook. Snora holds no state and intercepts nothing.
+  **Permitted under `design`.** Emission does not duplicate iced's
+  system — it feeds it — and it *removes* a double configuration that
+  exists today, where an application must separately configure tokens and
+  an `iced::Theme` and keep them manually in agreement.
 
 The `ToastIntent::Warning` color uses a private fallback
 (`WARNING_COLOR` in `crates/snora/src/toast.rs`) that predates a
@@ -362,6 +376,41 @@ Reconsideration trigger: a concrete downstream app demonstrates the need
 and iced provides a stable, cross-platform focus API. Any focus
 implementation must be additive — a new optional `Dialog`/`Sheet` field
 per RFC-011-C rules.
+
+## Why binary size is measured via three feature-exercising probes
+
+Three probe crates (`size_probe_engine`, `size_probe_widgets`,
+`size_probe_design`) measure the marginal binary-size cost of the
+`widgets` and `design` features. `widgets_diff_bytes` and
+`design_diff_bytes` are computed from stripped binary sizes across the
+three (v0.25, replacing an earlier hello-vs-workbench diff).
+
+The first release under this methodology (v0.25.3, RFC-041) exposed a
+defect: all three probes were byte-identical — same application code,
+differing only in which `snora` features their `Cargo.toml` enabled —
+and `widgets_diff_bytes` measured **0**. The probes compiled the
+`widgets` feature in but never *called* any `snora::widget::*` function,
+so Rust's linker stripped the entire unused feature at link time. The
+diff was real, just measuring "cost of compiling but not using" rather
+than "cost of adopting" — the opposite of the intended signal.
+
+RFC-043 corrected this: each probe now shares a common baseline
+application (`size_probe_engine`'s code) and adds exactly one minimal,
+representative call to the feature it measures — `size_probe_widgets`
+wires `app_header` and `app_side_bar` into its `AppLayout`;
+`size_probe_design` additionally calls `design::button::primary` and
+`design::style::container::card_surface` against `Tokens::light()`. The
+probes are deliberately **not** identical anymore; "identical
+application code" was the trap, not the goal. The goal — isolating the
+marginal cost of one feature from unrelated application-logic
+differences — is preserved by keeping every probe's *baseline* shared
+and adding only the smallest representative use on top.
+
+Reconsideration trigger: if a future methodology change causes probe
+drift that makes the marginal-cost diff unreliable or non-reproducible
+across consecutive releases, revisit the representative-use approach
+(see RFC-043 §Risks for the accepted risk that a corrected probe can
+still report an honestly small number).
 
 [`TabBar`]: ../reference/vocabulary.md
 [`Crumb`]: ../reference/vocabulary.md

@@ -1,9 +1,28 @@
 # Snora Design — Overview
 
-Snora Design is an **optional layer** on top of the snora layout engine. It
-provides contrast-tested design tokens, a thin iced style bridge, and shallow
-helpers for standard button and card surfaces — without prescribing a complete
-design system or replacing iced's own theming.
+Snora is not becoming a general widget component framework. Snora remains
+a small layout and overlay framework for iced-based desktop applications.
+
+By default, snora positions and stacks: applications supply content and
+styling, and snora's own chrome carries only the minimum needed to be
+legible.
+
+When the optional `design` feature is active, Snora Design additionally
+supplies a coherent visual default for the surfaces snora itself renders
+— chrome, overlays, and notification surfaces — derived from tokens the
+application owns and may replace. Applications still own their domain
+behavior, complex widgets, validation, data presentation, navigation, and
+final brand identity.
+
+Surface coverage arrives incrementally. As of v0.26.0, chrome colours
+follow the emitted theme because snora's prefab widgets already read
+iced's palette; overlay styling and layout geometry (dialog card, modal
+dim, spacing rhythm, elevation) are not yet token-derived.
+
+**Compatibility promise.** With `design` inactive, snora's rendered output
+is unchanged from v0.25 — this is a guarantee, not an aspiration. The
+skeleton remains the default; the coherent appearance above is what
+activating the feature buys.
 
 Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 
@@ -34,19 +53,19 @@ Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 **Minimal** — no design feature; iced's default theme only:
 
 ```toml
-snora = { version = "0.25", default-features = false }
+snora = { version = "0.26", default-features = false }
 ```
 
 **Default** — snora's existing layout + prefab widgets, no design tokens:
 
 ```toml
-snora = { version = "0.25" }   # default = ["widgets"]
+snora = { version = "0.26" }   # default = ["widgets"]
 ```
 
 **Design** — layout + widgets + Snora Design tokens and helpers:
 
 ```toml
-snora = { version = "0.25", features = ["widgets", "design"] }
+snora = { version = "0.26", features = ["widgets", "design"] }
 ```
 
 For the full feature flag reference see [Feature flags](feature-flags.md).

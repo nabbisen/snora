@@ -1,6 +1,6 @@
 # RFC 037 — Coherent defaults for snora-rendered surfaces
 
-**Status.** Proposed
+**Status.** Implemented (v0.26.0)
 **Tracks.** Snora Design positioning. Extends RFC-020's boundary to
 snora's own rendered surfaces and narrowly amends the theme-owning non-goal.
 Authorizes RFC-038 … RFC-040.

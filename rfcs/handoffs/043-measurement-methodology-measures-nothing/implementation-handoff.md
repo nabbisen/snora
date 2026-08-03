@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-043 fix the budget measurement methodology
 
-**Governing RFC.** [RFC-043](../../proposed/043-measurement-methodology-measures-nothing.md)
-**Status.** Inherited from RFC-043 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-043](../../done/043-measurement-methodology-measures-nothing.md)
+**Status.** Inherited from RFC-043 — Implemented (v0.26.0).
 **Release target.** Next patch (0.25.4) or folded into v0.26 — owner's call
 at release time. Independent of the v0.26 appearance work.
 **Implementation units.** One, in five steps. Examples, scripts, CI, docs.
@@ -22,7 +22,7 @@ crate measured as costing nothing.
 
 ## 3. Background — read first
 
-`rfcs/proposed/043-measurement-methodology-measures-nothing.md` in full,
+`rfcs/done/043-measurement-methodology-measures-nothing.md` in full,
 especially §Evidence. The short version:
 
 - All three size probes are **byte-identical** and their whole snora

@@ -29,9 +29,11 @@
 #     runner_os           — CI runner OS
 #     date                — UTC date of measurement (YYYY-MM-DD)
 #
-#   All three probes use identical application code (see examples/size_probe_*/src/main.rs),
-#   so the diff values are purely the marginal cost of each feature, not of
-#   different application logic.
+#   All three probes share a common baseline application and differ only by
+#   a minimal, representative use of the feature under test (see
+#   examples/size_probe_*/src/main.rs) — so the diff values are the
+#   marginal cost of actually adopting each feature, not merely compiling
+#   it in (RFC-043). They are deliberately NOT byte-identical.
 #
 # Exit code:
 #

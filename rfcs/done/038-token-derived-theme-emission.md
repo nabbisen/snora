@@ -1,6 +1,6 @@
 # RFC 038 — Token-derived `iced::Theme` emission
 
-**Status.** Proposed
+**Status.** Implemented (v0.26.0)
 **Tracks.** v0.26 appearance milestone. Authorized by RFC-037; constrained
 by RFC-036's additive-only covenant. Prerequisite for RFC-039 and RFC-040.
 **Touches.** `crates/snora-widgets/src/design/theme.rs` (new),

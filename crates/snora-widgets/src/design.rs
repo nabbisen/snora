@@ -77,3 +77,8 @@ pub mod progress;
 
 /// iced style functions for Snora Design tokens.
 pub mod style;
+
+/// Token-derived `iced::Theme` emission (RFC-038).
+///
+/// See [`theme::theme`].
+pub mod theme;

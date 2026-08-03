@@ -35,6 +35,15 @@ pub mod style {
     pub use snora_widgets::design::style::text;
 }
 
+/// Token-derived `iced::Theme` emission (RFC-038).
+///
+/// [`theme`] derives a complete `iced::Theme` from a [`Tokens`] bundle so
+/// stock iced widgets and the window background follow the same palette as
+/// snora's design primitives — without letting iced substitute its own
+/// heuristically-corrected colors for the contrast-tested ones the preset
+/// guarantees. See [`theme`] for the full mapping and usage example.
+pub use snora_widgets::design::theme::theme;
+
 /// Pilot button helpers (RFC-028).
 ///
 /// Each function wraps `iced::widget::button` with Snora Design token

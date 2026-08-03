@@ -29,7 +29,8 @@ Snora's value is in these areas:
 | Form widgets / validation | Out of scope — use iced primitives |
 | Table / chart / data-display | Out of scope — UI library territory |
 | Decorative widgets (avatar, badge, chip) | Out of scope — trivial inline |
-| Snora-owned theming layer | Firm non-goal — use iced theming |
+| Snora-owned theming layer (state, cascade, registry) | Firm non-goal — use iced theming |
+| Token-derived `iced::Theme` emission | Available under `design` — see `snora::design::theme` (RFC-038) |
 | Translation / locale formatting beyond direction | Out of scope |
 | `snora-test` public crate | Firm non-goal — `pub` fields + `iced_test` cover it |
 | Game-loop / real-time rendering | Out of scope |

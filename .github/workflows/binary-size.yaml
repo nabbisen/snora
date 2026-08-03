@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # We need rustc + cargo, plus the strip binary (already in the
       # ubuntu-latest image as part of binutils).
@@ -71,6 +71,13 @@ jobs:
 
       - name: Measure
         id: measure
+        # RUNNER_OS is overridden explicitly (RFC-043): GitHub Actions'
+        # own auto-populated $RUNNER_OS is "Linux", but every historical
+        # CSV row uses "ubuntu-latest" (this job's runs-on value). Without
+        # the override the column silently drifts and breaks grouping —
+        # exactly what the 0.25.3 row did.
+        env:
+          RUNNER_OS: ubuntu-latest
         run: |
           ROW=$(scripts/measure-binary-size.sh "${{ steps.version.outputs.version }}")
           echo "row=$ROW" >> "$GITHUB_OUTPUT"

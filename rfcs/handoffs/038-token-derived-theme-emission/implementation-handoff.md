@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-038 token-derived `iced::Theme` emission
 
-**Governing RFC.** [RFC-038](../../proposed/038-token-derived-theme-emission.md)
-**Status.** Inherited from RFC-038 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-038](../../done/038-token-derived-theme-emission.md)
+**Status.** Inherited from RFC-038 — Implemented (v0.26.0).
 **Release target.** v0.26 (minor — first additive public API of the milestone).
 **Implementation units.** One.
 
@@ -22,7 +22,7 @@ configured `iced::Theme`. This function removes that double configuration.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/038-token-derived-theme-emission.md` in full, especially
+- `rfcs/done/038-token-derived-theme-emission.md` in full, especially
   §"Verified iced 0.14 facts" and §"The finding that shapes the design".
 - `rfcs/done/037-coherent-defaults-positioning.md` — the positioning
   amendment that authorises this, and its **gating invariant**.

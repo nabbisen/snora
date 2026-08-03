@@ -17,6 +17,110 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.26.0] — 2026-08-03
+
+### Added
+
+- **`snora::design::theme(&Tokens) -> iced::Theme` (RFC-038).** Derives a
+  complete iced theme from a Snora Design token bundle, so stock iced
+  widgets (`text_input`, `pick_list`, `scrollable`, …) and the window
+  background follow the same palette as snora's design primitives instead
+  of needing a second, separately maintained `iced::Theme`. Built with a
+  custom `Theme::custom_with_fn` generator that constructs every `Pair` as
+  a struct literal from a verified token role — never via iced's
+  `Pair::new`, which would silently replace contrast-tested colors with a
+  heuristic approximation. Every set's `base` tier equals its source token
+  role exactly; the `weak`/`strong` tiers and `Background`'s seven
+  non-base tiers are derived by deterministic, contrast-verified
+  transforms rather than collapsed onto `base` — an earlier revision made
+  every tier identical, which silently removed hover/pressed feedback from
+  every stock iced button, since `button::primary` reads `primary.base` at
+  rest and `primary.strong` on hover. `secondary` derives from
+  `surface`/`text_primary` (iced's own neutral-chrome shape for that set),
+  not from `info`/`info_text` as originally proposed — iced derives
+  `Secondary` from background+text as a neutral set, not a semantic
+  accent, so the `info` mapping would have rendered every stock secondary
+  control in an unintended hue. `Background.strong` — the one tier iced's
+  stock widgets read as a border/separator color, not a text background —
+  is derived by growing its shift amount until it clears a `1.5:1`
+  contrast floor against `Background.base` itself, rather than a fixed
+  amount: an earlier revision used a fixed amount keyed off the paired
+  text's darkness, which produced borders darker than an already
+  near-black background in the `dark` preset (invisible), and would have
+  stayed invisible for any preset whose background sits at a luminance
+  extreme even with a fixed amount keyed the other way, since the same
+  OKLCH-lightness delta yields a far smaller WCAG contrast gain near a
+  luminance extreme than anywhere else on the scale. Fidelity tests assert
+  every `base` color equals its source token role exactly, for all four
+  presets; determinism tests independently recompute every derived tier;
+  contrast tests assert every emitted pair (base and derived) meets WCAG
+  AA against its own paired text (AAA where the underlying tokens already
+  do); an adjacent-surface test asserts `Background.strong` clears its
+  contrast floor against `Background.base`; distinctness tests assert
+  `base`/`weak`/`strong` are pairwise distinct within every semantic set.
+  Purely additive and feature-gated behind `design`; nothing calls it
+  automatically, so applications that don't opt in see no change. The full
+  mapping is documented in `docs/src/design/theme.md`. No file under
+  `crates/snora-core/` or `crates/snora-design/` changed; RFC-036's
+  additive-only covenant is unaffected.
+
+### Changed
+
+- **Design-system boundary extended to snora's own rendered surfaces, and
+  DEC-02 amended to permit theme emission (RFC-037).** RFC-020's boundary
+  ("Snora positions and stacks; Snora Design styles what applications
+  build") covered only primitives applications construct themselves — it
+  never contemplated snora styling its *own* chrome, overlays, and
+  notification surfaces, which is the larger part of what users actually
+  see. `docs/src/design/overview.md` now carries the amended boundary
+  statement, discharging RFC-020's own acceptance criterion ("boundary
+  statement is added to docs") that was never satisfied at the time.
+  Separately, DEC-02 ("theme-aware, not theme-owning") is split:
+  **theme-owning** — a parallel theming abstraction, snora holding theme
+  state, applications configuring appearance through snora instead of
+  iced — **remains permanently declined**; **theme-producing** — a pure
+  `Tokens -> iced::Theme` function the application calls, owns, and hands
+  to iced itself, with snora holding no state — is now **Accepted**,
+  which is what RFC-038's `snora::design::theme` (above) relies on.
+  `docs/src/contributing/feedback-and-scope.md` and `README.md` are
+  updated to match. Documentation and governance only: no source file
+  changed, and the gating invariant — with `design` inactive, snora's
+  rendered output is unchanged from v0.25 — is stated explicitly as a
+  compatibility promise. Surface coverage remains incremental: as of
+  v0.26.0 only chrome colors follow the emitted theme; overlay styling
+  and layout geometry are not yet token-derived (tracked by RFC-039/040).
+
+### Fixed
+
+- **Binary-size and build-cost measurement methodology corrected
+  (RFC-043).** The 0.25.3 first-real-data-point (RFC-041) exposed that the
+  instrument itself was never calibrated: `widgets_diff_bytes` measured
+  `0` because all three size-probe crates were byte-identical and never
+  *called* `snora::widget::*`/`snora::design::*` — Rust's linker strips
+  compiled-but-unused code, so the diff measured the marginal cost of
+  compiling a feature in, not of adopting it. `size_probe_widgets` now
+  wires `app_header`/`app_side_bar` into its layout; `size_probe_design`
+  additionally calls `design::button::primary` and
+  `design::style::container::card_surface`. Local remeasurement:
+  `widgets_diff_bytes` 0 → 43,520; `design_diff_bytes` 128 → 2,560 — both
+  now non-trivial. Separately, `build-cost.yaml` measured "cold" compile
+  time with a restored dependency cache in place, so only snora's own four
+  crates were ever actually rebuilt — the 56 s → 5.5 s change between
+  0.19.1 and 0.25.3 was this caching artifact, not a real trend; the cache
+  step is now removed from that workflow, and CI compile-time runs will
+  take minutes rather than under a minute going forward, correctly.
+  `runner_os` is stabilized to `ubuntu-latest` in both workflows (explicit
+  `RUNNER_OS` override; GitHub's auto-populated value is `Linux`, which
+  the 0.25.3 rows alone carry). Both budget docs annotate 0.25.3 as
+  simultaneously the first row from the fixed tag-automation and the last
+  row from the broken methodology — not comparable to what follows. No
+  CSV row deleted, edited, or back-filled; **gate 9 remains ⬜** and
+  re-satisfies only once ≥2 real rows exist under this corrected
+  methodology. `actions/checkout` bumped `v4` → `v6` in
+  `binary-size.yaml`, `build-cost.yaml`, and `unpinned-build.yaml`,
+  matching `ci.yaml`/`docs.yaml`. No crate source, public API, or feature
+  flag change.
+
 ## [0.25.3] — 2026-08-03
 
 ### Fixed

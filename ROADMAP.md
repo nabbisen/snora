@@ -47,7 +47,7 @@ These constrain what *can* be on the roadmap:
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
 
-## Snora Design System (complete — RFC-020 … RFC-034)
+## Snora Design System (RFC-020 … RFC-034 complete; appearance milestone in progress)
 
 The Snora Design System shipped across five minor releases:
 
@@ -63,17 +63,36 @@ The Snora Design System shipped across five minor releases:
 - **v0.24** — Architect-review cleanup: chip contrast fix, measurement
   methodology improvements, documentation corrections.
 
-All RFC-020 through RFC-034 are in `rfcs/done/`. Future design work is
-governed by `docs/src/contributing/api-governance.md` and the D-gates.
+All RFC-020 through RFC-034 are in `rfcs/done/`.
+
+**Appearance milestone (RFC-037 … RFC-040).** A second design phase,
+opened after real-world use showed that an application built on snora
+looked flat and unresponsive: snora's own chrome never participated in
+the token system. v0.26.0 delivers the colour half — an emitted
+`iced::Theme` that chrome follows transitively. The geometry half —
+dialog card, modal dim, spacing rhythm, elevation — is RFC-039/040,
+targeting v0.27.0. The `design` feature remains opt-in throughout; with
+it inactive, rendering is unchanged.
 
 The `design` feature remains **opt-in** (`default = ["widgets"]`). Making it
 default-on requires an explicit size/build-cost review and a future RFC or
 release decision — measurement alone does not automatically flip the default.
 
-All design-track RFCs (RFC-020 through RFC-034) are now in `rfcs/done/`.
-Future design work is governed by `api-governance.md` and the D-gates.
+Future design work is governed by
+[`api-governance.md`](docs/src/contributing/api-governance.md) and the
+D-gates.
 
 ## Recently shipped
+
+- **0.26.0** — Appearance milestone, first half. `snora::design::theme`
+  emits an `iced::Theme` from Snora Design tokens, so stock iced widgets
+  and the window background follow the same palette as snora's design
+  primitives (RFC-038); DEC-02 amended to split theme-*producing*
+  (permitted under `design`) from theme-*owning* (still declined), and
+  RFC-020's long-unsatisfied "boundary statement in docs" criterion
+  discharged (RFC-037); budget measurement methodology corrected — the
+  size probes never called the features they measured, so
+  `widgets_diff_bytes` had been reporting 0 (RFC-043).
 
 - **0.25.3** — Documentation accuracy, measurement integrity, build
   reproducibility. Corrected in-tree docs that still described a

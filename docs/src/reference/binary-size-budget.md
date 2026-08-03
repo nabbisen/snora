@@ -15,12 +15,15 @@ real consequences for distribution — installers, app stores,
 auto-updaters, end-user disk space. Adding a feature to the
 framework should never quietly cost users megabytes of bloat.
 
-This page tracks the stripped binary size of three identical probe
-apps (`examples/size_probe_engine`, `size_probe_widgets`,
-`size_probe_design`) at every release tag. All three probes contain
-the same trivial application code; only their `snora` feature set
-differs. The size difference between two consecutive probes is the
-**marginal cost** of adding that feature to an application.
+This page tracks the stripped binary size of three probe apps
+(`examples/size_probe_engine`, `size_probe_widgets`, `size_probe_design`)
+at every release tag. All three share a common baseline application, and
+each adds a minimal, representative *use* of the feature it measures —
+`size_probe_widgets` calls `app_header`/`app_side_bar`,
+`size_probe_design` additionally calls a `design::button` and a
+`design::style::container` helper (see RFC-043). The size difference
+between two consecutive probes is the **marginal cost** of actually
+*adopting* that feature, not merely compiling it in.
 
 Tracking the number across releases gives us **drift detection**:
 if 0.10 → 0.11 grows the binary by 200 KB without a corresponding
@@ -77,9 +80,13 @@ Each CSV row records:
 | `runner_os` | CI runner OS, e.g. `ubuntu-latest`. |
 | `date` | UTC date of the measurement (`YYYY-MM-DD`). |
 
-All three probes contain identical application code (see `examples/size_probe_*/src/main.rs`),
-so diffs measure the cost of the feature alone. Rows before v0.25 carry `N/A`
-because the probe crates did not exist and earlier measurements used different methodology.
+All three probes share a common baseline application and differ **only**
+by a minimal, representative use of the feature under test (see
+`examples/size_probe_*/src/main.rs`) — through 0.25.3 the probes were
+byte-identical instead, which measured the cost of compiling a feature in
+but never calling it; RFC-043 corrected this (see the discontinuity note
+below). Rows before v0.25 carry `N/A` because the probe crates did not
+exist and earlier measurements used different methodology.
 
 ### Data integrity note (RFC-041)
 
@@ -90,11 +97,25 @@ project's 38 release tags — not because of the `N/A` schema migration
 described above, but because no CI run ever executed the append at all.
 This was fixed in 0.25.3 (RFC-041). Rows before 0.25.3 therefore predate
 the fix and were not produced by the tag automation. Additionally, the
-series spans the 0.25.2 `resolver = "2"` → `"3"` workspace change, and
-because `Cargo.lock` is not committed, dependency resolution is not
-pinned between CI runs — so pre-0.25.3 and post-0.25.3 rows are **not
-comparable** even where both are non-`N/A`. Treat 0.25.3 as the start of
-a new, real baseline.
+series spans the 0.25.2 `resolver = "2"` → `"3"` workspace change; at the
+time of the 0.25.3 measurement, `Cargo.lock` was not yet committed for
+any *prior* release, so dependency resolution was not pinned between the
+CI runs that produced pre-0.25.3 rows — pre-0.25.3 and post-0.25.3 rows
+are **not comparable** even where both are non-`N/A`. `Cargo.lock` is
+committed as of 0.25.3 itself (RFC-042), so resolution *is* pinned for
+0.25.3 and every release after it — this caveat does not apply going
+forward.
+
+### Data integrity note (RFC-043)
+
+The 0.25.3 row is doubly transitional: it is simultaneously the **first**
+row produced by the fixed tag-automation (RFC-041) and the **last** row
+produced by the broken probe methodology (byte-identical probes that
+never called the feature they measured, described above). Its
+`widgets_diff_bytes` (`0`) and `design_diff_bytes` (`128`) reflect that
+defect, not a real marginal cost, and are **not comparable** to any row
+from 0.25.4 onward, which uses the corrected feature-exercising probes.
+Do not treat the 0.25.3 diffs as a baseline for drift detection.
 
 The 150 KB threshold from
 [`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md)

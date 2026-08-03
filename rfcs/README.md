@@ -77,14 +77,14 @@ Numbers remain stable forever and are never reused.
 | 036 | [Design surface freeze review and additive-only covenant](./done/036-design-surface-freeze-and-additive-covenant.md) | v0.25.3 (handoff: [`handoffs/036-…`](./handoffs/036-design-surface-freeze-and-additive-covenant/implementation-handoff.md)) |
 | 041 | [Measurement integrity and gate 9 re-assessment](./done/041-measurement-integrity-and-gate-9.md) | v0.25.3 (handoff: [`handoffs/041-…`](./handoffs/041-measurement-integrity-and-gate-9/implementation-handoff.md)) |
 | 042 | [Commit `Cargo.lock`](./done/042-commit-cargo-lock.md) | v0.25.3 (handoff: [`handoffs/042-…`](./handoffs/042-commit-cargo-lock/implementation-handoff.md)) |
+| 037 | [Coherent defaults for snora-rendered surfaces](./done/037-coherent-defaults-positioning.md) | v0.26.0 (handoff: [`handoffs/037-…`](./handoffs/037-coherent-defaults-positioning/implementation-handoff.md)) |
+| 038 | [Token-derived `iced::Theme` emission](./done/038-token-derived-theme-emission.md) | v0.26.0 (handoff: [`handoffs/038-…`](./handoffs/038-token-derived-theme-emission/implementation-handoff.md)) |
+| 043 | [The budget measurements do not measure what they claim](./done/043-measurement-methodology-measures-nothing.md) | v0.26.0 (handoff: [`handoffs/043-…`](./handoffs/043-measurement-methodology-measures-nothing/implementation-handoff.md)) |
 
 ## Proposed
 
-| ID | Title | Priority |
-|----|-------|----------|
-| 037 | [Coherent defaults for snora-rendered surfaces](./proposed/037-coherent-defaults-positioning.md) | High — v0.26.0; **must ship with RFC-038**, which it authorizes; handoff ready |
-| 038 | [Token-derived `iced::Theme` emission](./proposed/038-token-derived-theme-emission.md) | High — v0.26.0; **approved**, awaiting release; prerequisite for RFC-039/040 |
-| 043 | [The budget measurements do not measure what they claim](./proposed/043-measurement-methodology-measures-nothing.md) | High — v0.26.0; **approved**, awaiting release; gate 9 re-satisfies after two rows under the corrected methodology |
+_(none — RFC-039 and RFC-040, the v0.27 half of the appearance
+milestone, are agreed in principle but not yet drafted.)_
 
 ## Archive
 
