@@ -109,7 +109,18 @@ them in sync is a release-process invariant.
     # branch, so this cannot be verified from a feature branch. A workflow
     # that has never executed is exactly the failure RFC-041 was raised to
     # fix — do not skip this.
-[ ] git commit, git tag X.Y.Z, git push --tags
+[ ] git commit, THEN pull --rebase, THEN tag — in that order
+    # Tagging before rebasing leaves the tag on a commit the rebase
+    # orphans: `git merge-base --is-ancestor X.Y.Z^{commit} main` fails,
+    # and the release tag is not in main's history. The measurement bots
+    # append to main between your commit and your push, so a rebase is
+    # NORMAL on this repo, not an exception.
+[ ] Verify the tag is on main BEFORE pushing it:
+    git merge-base --is-ancestor X.Y.Z^{commit} main && echo on-main
+    # If it is not, delete the local tag and re-tag. If you already pushed
+    # it, cancel any tag-triggered measurement runs first — otherwise
+    # re-pushing the tag appends a SECOND row for the same version.
+[ ] git push origin main && git push origin X.Y.Z
     # tags carry no `v` prefix, matching Rust crate convention
 [ ] Confirm CI workflow green on the tag commit (all four jobs:
     rust-quality, feature-matrix, design-isolation, docs)
