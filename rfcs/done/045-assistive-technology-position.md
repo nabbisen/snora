@@ -1,6 +1,6 @@
 # RFC 045 — Assistive technology: stated position, and bounding the ABDD claim
 
-**Status.** Proposed
+**Status.** Implemented (v0.27.1)
 **Tracks.** Accessibility governance. Answers a downstream question raised
 by the apimokka team (2026-08-04) and corrects a claim snora makes about
 itself.

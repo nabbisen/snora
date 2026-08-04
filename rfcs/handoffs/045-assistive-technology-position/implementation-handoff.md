@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-045 assistive technology position
 
-**Governing RFC.** [RFC-045](../../proposed/045-assistive-technology-position.md)
-**Status.** Inherited from RFC-045 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-045](../../done/045-assistive-technology-position.md)
+**Status.** Inherited from RFC-045 — Implemented (v0.27.1).
 **Release target.** 0.27.1 (patch). Ships alone and first.
 **Implementation units.** One. Documentation and governance only — no code.
 
@@ -27,7 +27,7 @@ reading than its implementation supports.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/045-assistive-technology-position.md` in full.
+- `rfcs/done/045-assistive-technology-position.md` in full.
 - `docs/src/contributing/semantic-accessibility.md` — the existing document,
   which is **good** and is not being replaced.
 - `.git-exclude/tmp/apimokka-to-snora-feedback-2026-08-04.md` — the field

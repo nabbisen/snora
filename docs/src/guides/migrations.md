@@ -9,6 +9,9 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.27 → 0.28](migration-0.27-to-0.28.md) — layout width exposure
+  (`responsive_render`) and stable identifiers on snora-rendered surfaces.
+  Both additive; identifier names become a compatibility surface.
 - [0.26 → 0.27](migration-0.26-to-0.27.md) — appearance milestone
   completed: dialog card, derived modal dim, token-derived chrome
   geometry. Opt-in **per call site**, not per feature flag.

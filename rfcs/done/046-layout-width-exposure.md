@@ -1,6 +1,6 @@
 # RFC 046 — Layout width exposure
 
-**Status.** Proposed
+**Status.** Implemented (v0.28.0)
 **Tracks.** Engine capability. First half of the responsive theme raised by
 the apimokka team (2026-08-04); breakpoint *behaviour* is deliberately not
 in scope.

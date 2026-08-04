@@ -16,6 +16,25 @@ how public API changes are versioned, communicated, and bridged.
 | Behavior semantics change (changes doc invariant) | minor | Changelog note under **Changed** |
 | 1.0+ breaking change | major | Full migration guide |
 
+## Rendered surface identifiers
+
+The `iced::widget::Id`s snora attaches to the surfaces it renders itself
+(RFC-047; see the [reference page](../reference/rendered-surface-identifiers.md)
+for the full list) are a compatibility surface, effective from the
+release that ships them, even though they are not `pub` Rust API in the
+usual sense — nothing about them appears in a type signature or shows up
+in `cargo doc`.
+
+**Renaming or removing a rendered-surface identifier is a minor bump,
+not a patch.** The reasoning is the same as any other public API rename:
+once a downstream test asserts on `snora-modal-dim`, changing that string
+breaks the assertion — the difference is that the break is **silent at
+runtime** rather than caught at compile time the way a Rust API rename
+would be, which if anything argues for treating it *more* carefully, not
+less. Adding a new identifier is additive (patch-or-minor, per the table
+above); renaming or removing an existing one requires the same migration-
+guide discipline as renaming a public type.
+
 ## MSRV bump policy
 
 Snora declares `rust-version` in `[workspace.package]` (adopted in RFC-041,

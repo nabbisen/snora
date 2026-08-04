@@ -28,6 +28,7 @@ before a release is tagged.
 | `snora-example-multi-view` | Sidebar navigation | `SideBar`, `SideBarItem`; active-view highlighting |
 | `snora-example-workbench` | **All surfaces together** | Header, sidebar, menus, dialog, sheet, toasts (all intents/positions), tab bar, breadcrumb, Escape wiring, LTR/RTL toggle |
 | `snora-example-design-workbench` | **Snora Design visual QA** | Token presets, high contrast, buttons (all variants/states), cards, notices (all tones), chips (filter/removable), progress (tones, indeterminate), typography |
+| `snora-example-responsive` | Width-aware layout | `responsive_render`; application-chosen threshold dropping the sidebar below 600px |
 
 ## Manual QA: design workbench
 

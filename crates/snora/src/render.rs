@@ -42,6 +42,7 @@ use iced::{
 
 use snora_core::{AppLayout, LayoutDirection};
 
+use crate::identifiers;
 use crate::overlay::dialog::DialogCardStyle;
 use crate::overlay::{dialog::render_dialog, sheet::render_sheet};
 use crate::toast::render_toasts;
@@ -174,15 +175,28 @@ where
     let mut main_col = column![];
 
     if let Some(header) = header {
-        main_col = main_col.push(header);
+        main_col = main_col.push(
+            container(header)
+                .width(Length::Fill)
+                .id(identifiers::HEADER_REGION),
+        );
     }
 
     // Body row: sidebar on the logical start side.
-    let body_container = container(body).width(Length::Fill).height(Length::Fill);
+    let body_container = container(body)
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .id(identifiers::BODY_REGION);
+
+    let sidebar_region = |sb: Element<'a, Message>| {
+        container(sb)
+            .height(Length::Fill)
+            .id(identifiers::SIDEBAR_REGION)
+    };
 
     let body_row = match (direction, side_bar) {
-        (LayoutDirection::Ltr, Some(sb)) => row![sb, body_container],
-        (LayoutDirection::Rtl, Some(sb)) => row![body_container, sb],
+        (LayoutDirection::Ltr, Some(sb)) => row![sidebar_region(sb), body_container],
+        (LayoutDirection::Rtl, Some(sb)) => row![body_container, sidebar_region(sb)],
         (_, None) => row![body_container],
     }
     .width(Length::Fill)
@@ -191,7 +205,11 @@ where
     main_col = main_col.push(body_row);
 
     if let Some(footer) = footer {
-        main_col = main_col.push(footer);
+        main_col = main_col.push(
+            container(footer)
+                .width(Length::Fill)
+                .id(identifiers::FOOTER_REGION),
+        );
     }
 
     container(main_col)
@@ -210,9 +228,11 @@ fn transparent_backdrop<'a, Message>(on_press: Message) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
-    mouse_area(container(space()).width(Length::Fill).height(Length::Fill))
-        .on_press(on_press)
-        .into()
+    let surface = container(space())
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .id(identifiers::MENU_BACKDROP);
+    mouse_area(surface).on_press(on_press).into()
 }
 
 /// A full-window dim click target, filled with `dim_color`. Used above
@@ -228,6 +248,7 @@ where
     let dim = container(space())
         .width(Length::Fill)
         .height(Length::Fill)
+        .id(identifiers::MODAL_DIM)
         .style(move |_theme| Style {
             background: Some(Background::Color(dim_color)),
             ..Default::default()
@@ -246,6 +267,7 @@ where
     container(space())
         .width(Length::Fill)
         .height(Length::Fill)
+        .id(identifiers::MODAL_DIM)
         .style(move |_theme| Style {
             background: Some(Background::Color(dim_color)),
             ..Default::default()

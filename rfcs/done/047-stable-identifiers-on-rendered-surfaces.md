@@ -1,6 +1,6 @@
 # RFC 047 — Stable identifiers on snora-rendered surfaces
 
-**Status.** Proposed
+**Status.** Implemented (v0.28.0)
 **Tracks.** Testability and observability. Raised by the apimokka team
 (2026-08-04) alongside the assistive-technology question.
 **Touches.** `crates/snora/src/render.rs`, `overlay/dialog.rs`,

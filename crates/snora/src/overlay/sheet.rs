@@ -43,7 +43,8 @@ where
     let body_surface = container(sheet.content)
         .style(move |theme: &iced::Theme| sheet_surface_style(theme, edge, direction))
         .width(Length::Fill)
-        .height(Length::Fill);
+        .height(Length::Fill)
+        .id(crate::identifiers::SHEET_PANEL);
     let body = opaque(body_surface);
 
     if edge.is_vertical() {
@@ -66,10 +67,18 @@ where
         // Pixel-sized sheets: fixed sheet height, spacer fills the rest.
         (SheetEdge::Bottom, SheetSize::Pixels(px)) => (
             Element::from(space().height(Length::Fill)),
-            Element::from(container(body).width(Length::Fill).height(Length::Fixed(px))),
+            Element::from(
+                container(body)
+                    .width(Length::Fill)
+                    .height(Length::Fixed(px)),
+            ),
         ),
         (SheetEdge::Top, SheetSize::Pixels(px)) => (
-            Element::from(container(body).width(Length::Fill).height(Length::Fixed(px))),
+            Element::from(
+                container(body)
+                    .width(Length::Fill)
+                    .height(Length::Fixed(px)),
+            ),
             Element::from(space().height(Length::Fill)),
         ),
         // Ratio-sized sheets: portions split the available height.
@@ -87,13 +96,10 @@ where
         }
         (SheetEdge::Top, _) => {
             let ratio = size.as_ratio().unwrap_or(1.0 / 3.0);
-            let (sheet_pct, spacer_pct) = (
-                (ratio * 100.0).round().clamp(1.0, 100.0) as u16,
-                {
-                    let s = (ratio * 100.0).round().clamp(0.0, 100.0) as u16;
-                    100u16.saturating_sub(s).max(1)
-                },
-            );
+            let (sheet_pct, spacer_pct) = ((ratio * 100.0).round().clamp(1.0, 100.0) as u16, {
+                let s = (ratio * 100.0).round().clamp(0.0, 100.0) as u16;
+                100u16.saturating_sub(s).max(1)
+            });
             (
                 Element::from(
                     container(body)
@@ -135,18 +141,14 @@ where
 
     let (left_cell, right_cell) = match size {
         SheetSize::Pixels(px) => {
-            let sheet_cell = container(body).width(Length::Fixed(px)).height(Length::Fill);
+            let sheet_cell = container(body)
+                .width(Length::Fixed(px))
+                .height(Length::Fill);
             let spacer_cell = space().width(Length::Fill);
             if on_left {
-                (
-                    Element::from(sheet_cell),
-                    Element::from(spacer_cell),
-                )
+                (Element::from(sheet_cell), Element::from(spacer_cell))
             } else {
-                (
-                    Element::from(spacer_cell),
-                    Element::from(sheet_cell),
-                )
+                (Element::from(spacer_cell), Element::from(sheet_cell))
             }
         }
         _ => {

@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-046 layout width exposure
 
-**Governing RFC.** [RFC-046](../../proposed/046-layout-width-exposure.md)
-**Status.** Inherited from RFC-046 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-046](../../done/046-layout-width-exposure.md)
+**Status.** Inherited from RFC-046 — Implemented (v0.28.0).
 **Release target.** 0.28.0, alongside RFC-047.
 **Implementation units.** One. **Read §5 before starting — this and
 RFC-047 both touch `render.rs`.**
@@ -23,7 +23,7 @@ nor snora observed size anywhere.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/046-layout-width-exposure.md` in full, especially
+- `rfcs/done/046-layout-width-exposure.md` in full, especially
   §"Why exposure and not behaviour".
 - `rfcs/done/039-engine-surface-styling.md` — establishes the sibling
   entry-point pattern this follows, and the `render_semantics`-unmodified

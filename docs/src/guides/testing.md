@@ -156,6 +156,23 @@ and `Toast` behave as documented. Snora does not ship a public
 `snora-test` crate; the current "pub fields + pure update" approach
 covers the common application-testing cases, as shown in this guide.
 
+## Widget identifiers for external observation (RFC-047)
+
+snora attaches a stable `iced::widget::Id` to every surface it renders
+itself — backdrops, the dialog card, the sheet panel, the toast stack,
+the skeleton regions. See the [rendered surface identifiers
+reference](../reference/rendered-surface-identifiers.md) for the full
+list and naming convention.
+
+**This is not a test harness.** It provides labels on snora-rendered
+output — nothing more. It does not give you a state-query API, a
+scripted-interaction driver, or accessibility semantics; an `Id` is not
+a role. If you are building scripted GUI verification against a snora
+application and need to locate a snora-rendered surface (the modal dim,
+the dialog card, a specific toast) rather than application content you
+already control, these identifiers are what to assert against instead
+of window titles or coordinate guessing.
+
 ## A note on `snora-test`
 
 We considered shipping a dedicated test-helper crate. The conclusion

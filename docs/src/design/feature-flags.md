@@ -36,16 +36,16 @@ snora
 
 ```toml
 # Minimal (engine only)
-snora = { version = "0.27", default-features = false }
+snora = { version = "0.28", default-features = false }
 
 # Default (layout + prefab widgets)
-snora = { version = "0.27" }
+snora = { version = "0.28" }
 
 # Design tokens + helpers
-snora = { version = "0.27", features = ["widgets", "design"] }
+snora = { version = "0.28", features = ["widgets", "design"] }
 
 # Design + Lucide icons
-snora = { version = "0.27", features = ["widgets", "design", "lucide-icons"] }
+snora = { version = "0.28", features = ["widgets", "design", "lucide-icons"] }
 ```
 
 ## Token-only use (no iced dependency in your crate)

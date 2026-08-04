@@ -83,18 +83,14 @@ Numbers remain stable forever and are never reused.
 | 039 | [Engine surfaces: the dialog card and the modal dim](./done/039-engine-surface-styling.md) | v0.27.0 (handoff: [`handoffs/039-…`](./handoffs/039-engine-surface-styling/implementation-handoff.md)) |
 | 040 | [Chrome geometry: token-derived spacing and radius](./done/040-chrome-geometry.md) | v0.27.0 (handoff: [`handoffs/040-…`](./handoffs/040-chrome-geometry/implementation-handoff.md)) |
 | 044 | [`RUNNER_OS` cannot be overridden](./done/044-runner-os-override-cannot-work.md) | v0.27.0 (handoff: [`handoffs/044-…`](./handoffs/044-runner-os-override-cannot-work/implementation-handoff.md)) |
+| 045 | [Assistive technology: stated position, and bounding the ABDD claim](./done/045-assistive-technology-position.md) | v0.27.1 (handoff: [`handoffs/045-…`](./handoffs/045-assistive-technology-position/implementation-handoff.md)) |
+| 046 | [Layout width exposure](./done/046-layout-width-exposure.md) | v0.28.0 (handoff: [`handoffs/046-…`](./handoffs/046-layout-width-exposure/implementation-handoff.md)) |
+| 047 | [Stable identifiers on snora-rendered surfaces](./done/047-stable-identifiers-on-rendered-surfaces.md) | v0.28.0 (handoff: [`handoffs/047-…`](./handoffs/047-stable-identifiers-on-rendered-surfaces/implementation-handoff.md)) |
 
 ## Proposed
 
-| ID | Title | Priority |
-|----|-------|----------|
-| 045 | [Assistive technology: stated position, and bounding the ABDD claim](./proposed/045-assistive-technology-position.md) | High — 0.27.1; docs/governance only; handoff ready; ships alone and first |
-| 046 | [Layout width exposure](./proposed/046-layout-width-exposure.md) | High — 0.28.0; handoff ready; **shares `render.rs` with RFC-047 — do not run in parallel** |
-| 047 | [Stable identifiers on snora-rendered surfaces](./proposed/047-stable-identifiers-on-rendered-surfaces.md) | Medium — 0.28.0; handoff ready; **land before RFC-046** (smaller edit to the shared file) |
-
-Opened from the first substantive downstream field report (apimokka,
-2026-08-04), taken at the planning checkpoint after the appearance
-milestone closed.
+_(none — RFC-045/046/047 shipped. Next themes await the post-adoption
+report from apimokka and a planning discussion.)_
 
 ## Archive
 

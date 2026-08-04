@@ -18,6 +18,7 @@
 - [Header and context menus](guides/menus.md)
 - [Direction and ABDD](guides/direction.md)
 - [Accessibility](guides/accessibility.md)
+- [Responsive layout width](guides/responsive.md)
 - [Icons](guides/icons.md)
 - [Testing UI logic](guides/testing.md)
 - [Migrating between versions](guides/migrations.md)
@@ -31,6 +32,7 @@
   - [0.24 → 0.25](guides/migration-0.24-to-0.25.md)
   - [0.25 → 0.26](guides/migration-0.25-to-0.26.md)
   - [0.26 → 0.27](guides/migration-0.26-to-0.27.md)
+  - [0.27 → 0.28](guides/migration-0.27-to-0.28.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design
@@ -61,6 +63,7 @@
 - [Vocabulary cheatsheet](reference/vocabulary.md)
 - [Built-in widgets](reference/widgets.md)
 - [Overlay interaction semantics](reference/overlay-interaction-semantics.md)
+- [Rendered surface identifiers](reference/rendered-surface-identifiers.md)
 - [Binary size budget](reference/binary-size-budget.md)
 - [Build cost budget](reference/build-cost-budget.md)
 - [Performance envelope](reference/performance-envelope.md)

@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-047 stable identifiers on rendered surfaces
 
-**Governing RFC.** [RFC-047](../../proposed/047-stable-identifiers-on-rendered-surfaces.md)
-**Status.** Inherited from RFC-047 (Proposed; accepted by the owner).
+**Governing RFC.** [RFC-047](../../done/047-stable-identifiers-on-rendered-surfaces.md)
+**Status.** Inherited from RFC-047 — Implemented (v0.28.0).
 **Release target.** 0.28.0, alongside RFC-046.
 **Implementation units.** One. **Read §4 before starting — this and
 RFC-046 both touch `render.rs`.**
@@ -26,7 +26,7 @@ wrapping its dialog content. The gap is exactly snora-shaped.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/047-stable-identifiers-on-rendered-surfaces.md` in full,
+- `rfcs/done/047-stable-identifiers-on-rendered-surfaces.md` in full,
   especially §"The real cost is not the code".
 - `docs/src/contributing/versioning-policy.md` — you will be adding to it.
 

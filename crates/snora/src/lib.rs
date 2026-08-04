@@ -83,16 +83,23 @@ pub use snora_core::{
 };
 
 // ---- Engine modules (always present) ----------------------------------
+/// Stable identifiers snora attaches to the surfaces it renders itself
+/// (RFC-047). Private module; the identifier reference page under
+/// `docs/src/reference/` is the public-facing form of this contract.
+mod identifiers;
+/// Keyboard dismissal helper: [`keyboard::dismiss_on_escape`].
+pub mod keyboard;
 mod overlay;
 /// The single rendering entry point: [`render`].
 pub mod render;
+/// Width-aware rendering: [`responsive::responsive_render`] (RFC-046).
+pub mod responsive;
 /// Toast rendering and lifecycle helpers
 /// ([`subscription`](toast::subscription), [`sweep_expired`](toast::sweep_expired)).
 pub mod toast;
-/// Keyboard dismissal helper: [`keyboard::dismiss_on_escape`].
-pub mod keyboard;
 
 pub use render::render;
+pub use responsive::responsive_render;
 
 // ---- Widget re-exports (feature-gated) --------------------------------
 

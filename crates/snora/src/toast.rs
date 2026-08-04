@@ -141,6 +141,7 @@ where
             .padding(24)
             .align_x(horizontal_anchor)
             .align_y(vertical_anchor)
+            .id(crate::identifiers::TOAST_STACK)
             .into(),
     )
 }
@@ -168,11 +169,7 @@ where
 {
     let intent = toast.intent;
 
-    let text_col = column![
-        text(toast.title).size(16),
-        text(toast.message).size(14),
-    ]
-    .spacing(4);
+    let text_col = column![text(toast.title).size(16), text(toast.message).size(14),].spacing(4);
 
     let close_btn = button(text("×").size(18))
         .on_press(toast.on_dismiss)
@@ -187,6 +184,7 @@ where
         .width(Length::Fixed(TOAST_WIDTH))
         .padding(12)
         .style(move |theme| toast_style(theme, intent))
+        .id(crate::identifiers::toast_id(toast.id))
         .into()
 }
 
@@ -268,10 +266,7 @@ fn close_button_style(status: button::Status) -> button::Style {
 /// The `tick_message` closure must be `Clone` because iced clones it for
 /// each wake-up. The simplest form is a zero-capture closure like
 /// `|| Message::ToastTick`.
-pub fn subscription<Message, F>(
-    toasts: &[Toast<Message>],
-    tick_message: F,
-) -> Subscription<Message>
+pub fn subscription<Message, F>(toasts: &[Toast<Message>], tick_message: F) -> Subscription<Message>
 where
     Message: Clone + Send + 'static,
     F: Fn() -> Message + Send + Sync + Clone + 'static,

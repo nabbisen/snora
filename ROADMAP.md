@@ -90,6 +90,24 @@ D-gates.
 
 ## Recently shipped
 
+- **0.28.0** — From the first substantive downstream field report.
+  `snora::responsive_render` exposes the layout's available width — snora
+  observed window size nowhere before, so every consumer wanting
+  breakpoints wrote that plumbing themselves (RFC-046). Stable identifiers
+  on every surface snora renders itself — the modal dim, backdrops, dialog
+  card, sheet panel, toasts, skeleton regions — which are exactly the
+  surfaces an application cannot label, because it never sees them
+  (RFC-047). Identifier names are now a compatibility surface.
+  **snora deliberately prescribes no breakpoint thresholds**; that is
+  deferred until there is evidence about what real applications converge
+  on, which this release makes gatherable.
+- **0.27.1** — snora's assistive-technology position stated: it will
+  integrate an accessibility tree when iced exposes one, and will not build
+  a parallel abstraction meanwhile. The ABDD claim is bounded where it
+  overclaimed — "accessibility correct from day one" now reads
+  "layout-direction and visual accessibility … not assistive-technology
+  support" (RFC-045). Documentation only.
+
 - **0.27.0** — Appearance milestone complete. `snora::design::render`
   gives the dialog a real card and derives the modal dim from tokens —
   fixing a latent defect where the hardcoded 40% black scrim was
