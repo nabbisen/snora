@@ -86,8 +86,15 @@ Numbers remain stable forever and are never reused.
 
 ## Proposed
 
-_(none — the appearance milestone is complete. Next themes are a
-planning matter for the owner and architect.)_
+| ID | Title | Priority |
+|----|-------|----------|
+| 045 | [Assistive technology: stated position, and bounding the ABDD claim](./proposed/045-assistive-technology-position.md) | High — 0.27.1; docs/governance only; downstream needs it for acceptance evidence |
+| 046 | [Layout width exposure](./proposed/046-layout-width-exposure.md) | High — 0.28.0; snora observes window size nowhere today |
+| 047 | [Stable identifiers on snora-rendered surfaces](./proposed/047-stable-identifiers-on-rendered-surfaces.md) | Medium — 0.28.0; a snora app is externally unobservable |
+
+Opened from the first substantive downstream field report (apimokka,
+2026-08-04), taken at the planning checkpoint after the appearance
+milestone closed.
 
 ## Archive
 
