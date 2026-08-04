@@ -157,7 +157,11 @@ them in sync is a release-process invariant.
     the "cold" build is warm — the exact defect RFC-043 fixed once
     already; treat it as a release blocker and check that
     `build-cost.yaml` still has no `Swatinem/rust-cache` step.
-[ ] cargo publish --workspace
+[ ] cargo publish --workspace   — FROM A CLEAN TREE AT THE TAG
+    # cargo packages the WORKING DIRECTORY, not the tagged commit. If other
+    # work is in flight, publish from a throwaway worktree:
+    #   git worktree add --detach /tmp/pub X.Y.Z && cd /tmp/pub && cargo publish --workspace
+    # Cargo refuses a dirty tree by default. NEVER pass --allow-dirty.
     # ONE command — cargo resolves member order itself. Do not publish the
     # four crates individually; an interrupted per-crate sequence leaves a
     # public tag with `snora` itself missing from crates.io, and anyone
@@ -173,6 +177,24 @@ cargo publish --workspace
 ```
 
 **One command. Do not publish the four crates individually.**
+
+**Publish from a clean tree at the tag** — not from a working directory
+with other work in flight. `cargo publish` packages the **working
+directory**, not the tagged commit, so uncommitted work from a later
+milestone would be uploaded inside the release. Cargo refuses a dirty tree
+by default, which is the guard; **never pass `--allow-dirty` to get past
+it.**
+
+If other work is in flight, publish from a throwaway worktree at the tag:
+
+```bash
+git worktree add --detach /tmp/publish-X.Y.Z X.Y.Z
+cd /tmp/publish-X.Y.Z && cargo publish --workspace
+```
+
+This is not hypothetical: 0.27.1 was cut while the 0.28.0 work sat
+uncommitted, and cargo's dirty-tree refusal is what stopped a docs-only
+patch from shipping two unreleased features' source.
 
 Cargo computes the dependency order from the manifests
 (`snora-core` and `snora-design` have no internal dependencies;
