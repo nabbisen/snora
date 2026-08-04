@@ -10,6 +10,27 @@ and from the CI acceptance criteria.
 
 ---
 
+## Position on assistive technology (RFC-045)
+
+> **snora will integrate an accessibility tree when iced exposes one.**
+> Until then, ABDD means layout-direction correctness and visual
+> accessibility — contrast, logical edges, non-colour status encoding — and
+> snora states that boundary plainly rather than implying more.
+>
+> snora will **not** build a parallel accessibility abstraction of its own
+> in the interim.
+
+This is snora's stated position, citable directly rather than inferred from
+silence. The gap is real: there is no accessibility tree, no AccessKit
+integration, and no semantic identifiers anywhere in the crates, and a screen
+reader sees nothing an application does not supply itself. That gap is not a
+snora oversight — an accessibility tree requires the widget toolkit to expose
+one, and iced 0.14 does not. It is recorded as a decision, with a
+reconsideration trigger, in
+[design decisions](design-decisions.md#why-snora-has-no-interim-accessibility-tree-v027).
+
+---
+
 ## Core rule
 
 > **Prefer native iced interactive widgets** for interactive primitives.

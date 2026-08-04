@@ -17,6 +17,7 @@
 - [Overlays — dialogs and sheets](guides/overlays.md)
 - [Header and context menus](guides/menus.md)
 - [Direction and ABDD](guides/direction.md)
+- [Accessibility](guides/accessibility.md)
 - [Icons](guides/icons.md)
 - [Testing UI logic](guides/testing.md)
 - [Migrating between versions](guides/migrations.md)

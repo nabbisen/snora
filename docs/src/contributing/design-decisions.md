@@ -31,6 +31,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. |
 | Focus trapping deferred | Deferred | Concrete app + stable iced focus API |
 | Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases |
+| No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API |
 
 ## Why no `PageContract` trait
 
@@ -411,6 +412,52 @@ drift that makes the marginal-cost diff unreliable or non-reproducible
 across consecutive releases, revisit the representative-use approach
 (see RFC-043 §Risks for the accepted risk that a corrected probe can
 still report an honestly small number).
+
+## Why snora has no interim accessibility tree (v0.27)
+
+A downstream team preparing UX acceptance sessions asked directly
+whether snora has a position on AccessKit, which iced has discussed
+integrating, or considers assistive technology out of scope in favour of
+visual accessibility. Verified before answering:
+`grep -rniE "accesskit|accessibility_tree|widget::Id|semantic_id"
+crates/*/src/` returned nothing. There is no accessibility tree, no
+AccessKit integration, and no semantic identifiers anywhere in the
+crates — a screen reader sees nothing an application does not supply
+itself.
+
+The gap is defensible: an accessibility tree is not something a layout
+framework can supply on its own, and iced 0.14 does not expose one. What
+was not defensible is that snora's own framing — "Accessible By Default
+and by Design" — invites a reading its implementation does not support.
+A reader meets the name before the fine print, and the name was doing
+the claiming.
+
+The position, stated in
+[`semantic-accessibility.md`](semantic-accessibility.md#position-on-assistive-technology-rfc-045)
+and reproduced here for the register:
+
+> snora will integrate an accessibility tree when iced exposes one.
+> Until then, ABDD means layout-direction correctness and visual
+> accessibility — contrast, logical edges, non-colour status encoding —
+> and snora states that boundary plainly rather than implying more.
+> snora will not build a parallel accessibility abstraction of its own
+> in the interim.
+
+The last clause is deliberate: a snora-owned interim accessibility layer
+would repeat DEC-02's original mistake — a parallel abstraction
+duplicating what the toolkit will eventually provide — in a domain where
+getting it wrong is worse than in theming. When iced exposes an API,
+snora integrates it, the same relationship snora already has to iced's
+`Theme`.
+
+This bounds a *claim*; it does not retreat from a *capability*. The
+contrast-tested presets, the four built-in tokens, and the ABDD layout
+discipline are unchanged and are genuinely strong for a framework this
+size — the correction is to stop implying they cover assistive
+technology too.
+
+Reconsideration trigger: iced exposes an accessibility API. Until then
+this stands, revisited deliberately rather than left to expire quietly.
 
 [`TabBar`]: ../reference/vocabulary.md
 [`Crumb`]: ../reference/vocabulary.md

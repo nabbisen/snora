@@ -25,8 +25,9 @@ snora is a good fit when you are building:
 
 - a **local-first desktop app** that runs heavy work alongside an
   interactive UI (AI inference, dataset converters, file processors);
-- an app that needs **accessibility correct from day one** — RTL
-  layout, theme-aware colors, logical edges baked into the API;
+- an app that needs **layout-direction and visual accessibility correct
+  from day one** — RTL layout, theme-aware colors, logical edges baked
+  into the API, not assistive-technology support;
 - a **standard desktop chrome** (header / sidebar / body / footer)
   with a few overlays.
 

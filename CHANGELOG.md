@@ -15,7 +15,90 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`snora::responsive_render` — expose the layout's available width
+  (RFC-046).** snora had no window-size awareness of any kind; every
+  consumer wanting breakpoint-style behavior had to write window
+  observation from scratch. `responsive_render(build)` wraps
+  `iced::widget::Responsive` (reachable through `iced::widget::*`'s glob
+  re-export — not separately documented by `iced`, confirmed by
+  compiling against it rather than by reading its source) and calls
+  `build` with the available width in logical pixels, in the same way
+  `snora::render` and `snora::design::render` already work: the
+  application supplies a closure, snora renders the result through the
+  **same** shared z-stack `render` uses — no second copy of the layer
+  composition. Exposes width only, not the full `Size` iced's own
+  `Responsive` provides: width is what motivated this, and is the
+  narrower, more conservative contract. Deliberately adds **no**
+  `Breakpoint` type, threshold, or auto-collapse behavior — the
+  application decides its own thresholds and what changes at them,
+  matching every other "snora positions and stacks, the application
+  decides" boundary in the project (no theming layer, no form widgets).
+  A new guide (`docs/src/guides/responsive.md`) and runnable example
+  (`examples/responsive`) demonstrate a threshold the example itself
+  chooses. Not `design`-gated — this is engine capability, in the
+  default surface alongside `render`. `render_semantics` passes
+  unmodified; no new dependency, no `AppLayout` field.
+
+- **Stable identifiers on every surface snora renders itself
+  (RFC-047).** A downstream team building scripted GUI verification found
+  no widget identifiers, no semantic names, and no state query — the
+  window title was the only readable signal, used as a de facto
+  accessibility API because nothing else existed. snora now attaches a
+  documented `iced::widget::Id` to every surface it composes: the menu
+  backdrop, the modal dim (both the click-capturing and non-capturing
+  variants — deliberately the same identifier, since it names the
+  surface, not its interactive behavior), the dialog's centered
+  container, the sheet panel, the toast stack and each individual toast
+  (`snora-toast-{id}`, derived deterministically from `Toast::id`), and
+  the four skeleton regions (header/sidebar/body/footer — labeling the
+  *slot* snora composed, never the application's own content inside it).
+  Naming convention: `snora-` prefix, kebab-case, so snora's identifiers
+  never collide with an application's own in a tree the application also
+  populates. Always-on, not feature-gated — an `Id` has no rendering
+  effect, and gating it would make tests pass or fail depending on
+  feature selection. Every identifier is documented in a new reference
+  page, `docs/src/reference/rendered-surface-identifiers.md`, verified
+  against the actual emitted set by a dedicated drift test rather than
+  hand-maintained — the failure mode this guards against is a stale
+  reference asserting on a name that no longer exists. **From this
+  release, these identifiers are a compatibility surface**: renaming or
+  removing one is a minor version bump, not a patch, recorded in
+  `docs/src/contributing/versioning-policy.md`. This provides labels on
+  snora-rendered output only — not a test harness, not a state-query API,
+  and not accessibility semantics (an `Id` is not a role; see RFC-045 for
+  snora's separate, iced-blocked position on an actual accessibility
+  tree). `render_semantics` passes unmodified, proving no appearance or
+  behavior changed.
+
+## [0.27.1] — 2026-08-04
+
+### Changed
+
+- **snora's assistive-technology position stated; the ABDD claim bounded
+  (RFC-045).** A downstream team preparing UX acceptance evidence asked
+  whether snora has a position on AccessKit or considers assistive
+  technology out of scope — verified there is no accessibility tree, no
+  AccessKit integration, and no semantic identifiers anywhere in the
+  crates. The gap is defensible (iced 0.14 exposes no accessibility API
+  for a layout framework to consume); snora's own framing was not — the
+  name "Accessible By Default and by Design" invited a broader reading
+  than the implementation supports. `docs/src/contributing/
+  semantic-accessibility.md` now states the position: snora integrates an
+  accessibility tree when iced exposes one, and will not build an interim
+  abstraction of its own — recorded in `design-decisions.md` with a
+  reconsideration trigger (iced exposes an accessibility API). `README.md`
+  and `docs/src/getting-started/05-when-to-use.md` bound the "accessible"
+  claim at its two overclaiming sites to layout-direction and visual
+  accessibility specifically. A new consumer-facing
+  `docs/src/guides/accessibility.md` page — linked from the Guides
+  section, not buried under `contributing/` — states what snora provides
+  and does not, for a reader who does not already know the existing
+  `contributing/` documents exist. This bounds a claim; it does not
+  retreat from a capability — the contrast-tested presets, four built-in
+  token sets, and ABDD layout discipline are unchanged. Documentation
+  only: no code, API, or gate-row change.
 
 ## [0.27.0] — 2026-08-04
 

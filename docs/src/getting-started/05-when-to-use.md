@@ -8,8 +8,9 @@ than discovering misfit later.
 ## A good fit
 
 snora is built for **desktop applications that combine an interactive
-UI with non-trivial background work** and want accessibility correct
-from day one:
+UI with non-trivial background work** and want layout-direction and
+visual accessibility correct from day one — not assistive-technology
+support; see [snora's position](../contributing/semantic-accessibility.md#position-on-assistive-technology-rfc-045):
 
 - **Local-first tools.** Apps that run heavy computation on the user's
   machine — local AI inference, search indexers, file processors,
