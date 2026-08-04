@@ -4,10 +4,16 @@
 **Tracks.** Accessibility governance. Answers a downstream question raised
 by the apimokka team (2026-08-04) and corrects a claim snora makes about
 itself.
-**Touches.** `README.md`, `docs/src/introduction.md`,
+**Touches.** `README.md`,
 `docs/src/getting-started/05-when-to-use.md`,
 `docs/src/contributing/semantic-accessibility.md`, `docs/src/SUMMARY.md`,
-`docs/src/contributing/design-decisions.md`. **No code.**
+`docs/src/contributing/design-decisions.md`, plus a new consumer-facing
+accessibility page. **No code.**
+
+*Correction (post-acceptance):* an earlier revision listed
+`docs/src/introduction.md`. It carries **no accessibility claim** — its
+only match is a navigation link to the direction guide. Verified; removed
+so the implementer does not hunt for a claim that is not there.
 
 ## Summary
 
