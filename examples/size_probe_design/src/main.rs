@@ -18,11 +18,15 @@
 //! code that compiles but is never called. See RFC-043 for the full
 //! finding.
 
-use iced::{Element, Length, widget::{column, container, text}};
+use iced::{
+    Element, Length,
+    widget::{column, container, text},
+};
 use snora::{
-    AppLayout, LayoutDirection, SideBar, SideBarItem, render,
-    widget::{app_header, app_side_bar},
+    AppLayout, LayoutDirection, SideBar, SideBarItem,
     design::{Tokens, button, style::container as design_container},
+    render,
+    widget::{app_header, app_side_bar},
 };
 
 #[derive(Debug, Clone)]
@@ -69,12 +73,10 @@ impl App {
         );
 
         let tokens = Tokens::light();
-        let card: Element<'_, Message> = container(
-            column![
-                text("size probe").size(14),
-                button::primary(&tokens, "Go", Message::Noop),
-            ],
-        )
+        let card: Element<'_, Message> = container(column![
+            text("size probe").size(14),
+            button::primary(&tokens, "Go", Message::Noop),
+        ])
         .style(move |_theme| design_container::card_surface(&tokens))
         .width(Length::Fill)
         .height(Length::Fill)

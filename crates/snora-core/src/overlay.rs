@@ -256,7 +256,12 @@ mod tests {
 
     #[test]
     fn vertical_horizontal_partition() {
-        for edge in [SheetEdge::Top, SheetEdge::Bottom, SheetEdge::Start, SheetEdge::End] {
+        for edge in [
+            SheetEdge::Top,
+            SheetEdge::Bottom,
+            SheetEdge::Start,
+            SheetEdge::End,
+        ] {
             assert_ne!(edge.is_vertical(), edge.is_horizontal());
         }
         assert!(SheetEdge::Top.is_vertical());

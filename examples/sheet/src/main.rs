@@ -102,8 +102,11 @@ impl App {
             .on_close_modals(Message::CloseModals);
 
         if let Some((edge, size)) = self.open {
-            layout =
-                layout.sheet(Sheet::new(sheet_content(edge, size)).at(edge).with_size(size));
+            layout = layout.sheet(
+                Sheet::new(sheet_content(edge, size))
+                    .at(edge)
+                    .with_size(size),
+            );
         }
 
         render(layout)
@@ -119,7 +122,9 @@ fn edge_button(label: &str, edge: SheetEdge, size: SheetSize) -> Element<'static
 }
 
 fn labeled_button(label: &str, msg: Message) -> Element<'static, Message> {
-    button(text(label.to_string()).size(13)).on_press(msg).into()
+    button(text(label.to_string()).size(13))
+        .on_press(msg)
+        .into()
 }
 
 fn sheet_content(edge: SheetEdge, size: SheetSize) -> Element<'static, Message> {

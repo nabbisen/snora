@@ -24,8 +24,7 @@ use iced::{
     widget::{column, container, row, space, text},
 };
 use snora::{
-    AppLayout, LayoutDirection, SideBar, SideBarItem,
-    render,
+    AppLayout, LayoutDirection, SideBar, SideBarItem, render,
     widget::{app_footer, app_header, app_side_bar},
 };
 
@@ -55,7 +54,9 @@ struct App {
 
 impl Default for App {
     fn default() -> Self {
-        Self { active: ViewId::Home }
+        Self {
+            active: ViewId::Home,
+        }
     }
 }
 
@@ -114,17 +115,11 @@ impl App {
                 ViewId::Profile => ("Profile", "Imagine user settings here."),
                 ViewId::Settings => ("Settings", "Imagine app configuration here."),
             };
-            container(
-                column![
-                    text(title).size(28),
-                    text(blurb).size(14),
-                ]
-                .spacing(8),
-            )
-            .padding(32)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .into()
+            container(column![text(title).size(28), text(blurb).size(14),].spacing(8))
+                .padding(32)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .into()
         };
 
         // Footer — a simple status bar.

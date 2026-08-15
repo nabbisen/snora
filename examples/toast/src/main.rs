@@ -59,15 +59,13 @@ impl App {
         match msg {
             Message::ShowDefault(intent) => {
                 let id = self.issue_id();
-                self.toasts.push(
-                    Toast::new(
-                        id,
-                        intent,
-                        format!("{intent}"),
-                        "Default lifetime — auto-dismisses in 4 seconds.",
-                        Message::Dismiss(id),
-                    ),
-                );
+                self.toasts.push(Toast::new(
+                    id,
+                    intent,
+                    format!("{intent}"),
+                    "Default lifetime — auto-dismisses in 4 seconds.",
+                    Message::Dismiss(id),
+                ));
             }
             Message::ShowWithDuration(intent, millis) => {
                 let id = self.issue_id();
@@ -133,7 +131,10 @@ impl App {
                 space().height(Length::Fixed(12.0)),
                 section_label("Custom lifetime"),
                 row![
-                    labeled_button("1 s Info", Message::ShowWithDuration(ToastIntent::Info, 1_000)),
+                    labeled_button(
+                        "1 s Info",
+                        Message::ShowWithDuration(ToastIntent::Info, 1_000)
+                    ),
                     labeled_button(
                         "10 s Success",
                         Message::ShowWithDuration(ToastIntent::Success, 10_000),
@@ -143,10 +144,7 @@ impl App {
                 space().height(Length::Fixed(12.0)),
                 section_label("Persistent (manual dismiss)"),
                 row![
-                    labeled_button(
-                        "Warning",
-                        Message::ShowPersistent(ToastIntent::Warning),
-                    ),
+                    labeled_button("Warning", Message::ShowPersistent(ToastIntent::Warning),),
                     labeled_button("Error", Message::ShowPersistent(ToastIntent::Error)),
                 ]
                 .spacing(8),
@@ -154,11 +152,7 @@ impl App {
                 section_label(format!("Position (current: {:?})", self.position)),
                 position_row(),
                 space().height(Length::Fixed(16.0)),
-                text(format!(
-                    "Currently queued: {} toast(s)",
-                    self.toasts.len()
-                ))
-                .size(12),
+                text(format!("Currently queued: {} toast(s)", self.toasts.len())).size(12),
             ]
             .spacing(8),
         )
@@ -204,7 +198,10 @@ where
 fn position_row() -> Element<'static, Message> {
     row![
         labeled_button("TopStart", Message::ChangePosition(ToastPosition::TopStart)),
-        labeled_button("TopCenter", Message::ChangePosition(ToastPosition::TopCenter)),
+        labeled_button(
+            "TopCenter",
+            Message::ChangePosition(ToastPosition::TopCenter)
+        ),
         labeled_button("TopEnd", Message::ChangePosition(ToastPosition::TopEnd)),
         labeled_button(
             "BottomStart",
@@ -225,7 +222,9 @@ fn position_row() -> Element<'static, Message> {
 }
 
 fn labeled_button(label: &str, msg: Message) -> Element<'static, Message> {
-    button(text(label.to_string()).size(13)).on_press(msg).into()
+    button(text(label.to_string()).size(13))
+        .on_press(msg)
+        .into()
 }
 
 fn main() -> iced::Result {

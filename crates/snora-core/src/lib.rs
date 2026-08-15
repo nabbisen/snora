@@ -33,6 +33,8 @@
 #![warn(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+/// Breadcrumb trail — [`Crumb`], [`BreadcrumbAction`].
+pub mod crumb;
 /// Reading direction and logical edges (`Start`, `End`).
 pub mod direction;
 /// Icon enum and its source variants (text, Lucide, SVG).
@@ -49,8 +51,6 @@ pub mod sidebar;
 pub mod tab;
 /// Toast notifications and lifetime / position vocabulary.
 pub mod toast;
-/// Breadcrumb trail — [`Crumb`], [`BreadcrumbAction`].
-pub mod crumb;
 
 pub use crumb::{BreadcrumbAction, Crumb};
 pub use direction::{Edge, LayoutDirection};

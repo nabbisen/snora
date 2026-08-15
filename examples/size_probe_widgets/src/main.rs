@@ -17,7 +17,10 @@
 //! code that compiles but is never called. See RFC-043 for the full
 //! finding.
 
-use iced::{Element, Length, widget::{column, container, text}};
+use iced::{
+    Element, Length,
+    widget::{column, container, text},
+};
 use snora::{
     AppLayout, LayoutDirection, SideBar, SideBarItem, render,
     widget::{app_header, app_side_bar},
@@ -64,14 +67,10 @@ impl App {
             },
             LayoutDirection::Ltr,
         );
-        let body: Element<'_, Message> = container(
-            column![
-                text("size probe").size(14),
-            ],
-        )
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .into();
+        let body: Element<'_, Message> = container(column![text("size probe").size(14),])
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into();
         render(AppLayout::new(body).header(header).side_bar(sidebar))
     }
 }

@@ -17,7 +17,10 @@
 //! never call the feature they're named for all measure ~0 regardless of
 //! feature, which is not a marginal cost, just dead-code elimination.
 
-use iced::{Element, Length, widget::{column, container, text}};
+use iced::{
+    Element, Length,
+    widget::{column, container, text},
+};
 use snora::{AppLayout, render};
 
 #[derive(Debug, Clone)]
@@ -29,14 +32,10 @@ struct App;
 impl App {
     fn update(&mut self, _msg: Message) {}
     fn view(&self) -> Element<'_, Message> {
-        let body: Element<'_, Message> = container(
-            column![
-                text("size probe").size(14),
-            ],
-        )
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .into();
+        let body: Element<'_, Message> = container(column![text("size probe").size(14),])
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into();
         render(AppLayout::new(body))
     }
 }

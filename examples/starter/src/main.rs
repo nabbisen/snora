@@ -22,11 +22,14 @@
 
 use std::time::Instant;
 
-use iced::{Alignment::Center, Element, Length, Subscription, Task, widget::{button, column, container, row, space, text}};
+use iced::{
+    Alignment::Center,
+    Element, Length, Subscription, Task,
+    widget::{button, column, container, row, space, text},
+};
 use snora::{
-    AppLayout, Dialog, LayoutDirection, Menu, MenuAction, SideBar, SideBarItem,
-    Tab, TabAction, TabBar, Toast, ToastIntent, ToastPosition,
-    render,
+    AppLayout, Dialog, LayoutDirection, Menu, MenuAction, SideBar, SideBarItem, Tab, TabAction,
+    TabBar, Toast, ToastIntent, ToastPosition, render,
     widget::{app_footer, app_header, app_side_bar, app_tab_bar},
 };
 
@@ -35,10 +38,15 @@ use snora::{
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum View { Home, Settings }
+enum View {
+    Home,
+    Settings,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum MenuId { File }
+enum MenuId {
+    File,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(dead_code)]
@@ -46,26 +54,26 @@ enum MenuItemId {}
 
 struct App {
     // ---- Snora-managed state ----
-    direction:    LayoutDirection,   // Snora uses this to mirror the skeleton
+    direction: LayoutDirection, // Snora uses this to mirror the skeleton
     // ---- App-managed overlay state ----
-    menu_open:    bool,
-    show_dialog:  bool,
+    menu_open: bool,
+    show_dialog: bool,
     // ---- App-managed navigation ----
-    view:         View,
+    view: View,
     // ---- App-managed toasts ----
-    toasts:       Vec<Toast<Message>>,
-    next_id:      u64,
+    toasts: Vec<Toast<Message>>,
+    next_id: u64,
 }
 
 impl Default for App {
     fn default() -> Self {
         Self {
-            direction:   LayoutDirection::Ltr,
-            menu_open:   false,
+            direction: LayoutDirection::Ltr,
+            menu_open: false,
             show_dialog: false,
-            view:        View::Home,
-            toasts:      Vec::new(),
-            next_id:     1,
+            view: View::Home,
+            toasts: Vec::new(),
+            next_id: 1,
         }
     }
 }
@@ -103,27 +111,44 @@ impl App {
         match msg {
             // Open the File menu (app clears it before opening a modal).
             Message::HeaderAction(MenuAction::MenuPressed(MenuId::File)) => {
-                if !self.show_dialog { self.menu_open = !self.menu_open; }
+                if !self.show_dialog {
+                    self.menu_open = !self.menu_open;
+                }
             }
             Message::HeaderAction(_) => {}
-            Message::CloseMenus  => self.menu_open = false,
+            Message::CloseMenus => self.menu_open = false,
             // Law 2: clear menus before opening a modal.
-            Message::OpenDialog  => { self.menu_open = false; self.show_dialog = true; }
+            Message::OpenDialog => {
+                self.menu_open = false;
+                self.show_dialog = true;
+            }
             Message::CloseModals => self.show_dialog = false,
             Message::SelectTab(TabAction::Pressed(v)) => self.view = v,
             Message::ToggleDirection => self.direction = self.direction.flipped(),
             Message::AddToast => {
-                let id = self.next_id; self.next_id += 1;
-                self.toasts.push(Toast::new(id, ToastIntent::Info, "Hello", "Toast from the starter.", Message::DismissToast(id)));
+                let id = self.next_id;
+                self.next_id += 1;
+                self.toasts.push(Toast::new(
+                    id,
+                    ToastIntent::Info,
+                    "Hello",
+                    "Toast from the starter.",
+                    Message::DismissToast(id),
+                ));
             }
             Message::DismissToast(id) => self.toasts.retain(|t| t.id != id),
             Message::ToastTick => snora::toast::sweep_expired(&mut self.toasts, Instant::now()),
             // Escape: dismiss modal first, then menu (modal priority).
             Message::KeyPressed(key) => {
                 if let Some(m) = snora::keyboard::dismiss_on_escape(
-                    self.show_dialog, self.menu_open,
-                    Some(Message::CloseModals), Some(Message::CloseMenus), key,
-                ) { return self.update(m); }
+                    self.show_dialog,
+                    self.menu_open,
+                    Some(Message::CloseModals),
+                    Some(Message::CloseMenus),
+                    key,
+                ) {
+                    return self.update(m);
+                }
             }
             Message::NoOp => {}
         }
@@ -136,7 +161,9 @@ impl App {
             iced::keyboard::listen().map(|ev| {
                 if let iced::keyboard::Event::KeyPressed { key, .. } = ev {
                     Message::KeyPressed(key)
-                } else { Message::NoOp }
+                } else {
+                    Message::NoOp
+                }
             }),
         ])
     }
@@ -151,14 +178,33 @@ impl App {
         // Snora prefab header. Owns the File menu open/close interaction.
         let header = app_header(
             "My App",
-            vec![Menu { id: MenuId::File, label: "File".into(), icon: None, items: vec![] }],
+            vec![Menu {
+                id: MenuId::File,
+                label: "File".into(),
+                icon: None,
+                items: vec![],
+            }],
             &Message::HeaderAction,
-            if self.menu_open { Some(&MenuId::File) } else { None },
-            Some(row![
-                button(text("Toggle RTL").size(13)).on_press(Message::ToggleDirection).padding([4,10]),
-                button(text("Open dialog").size(13)).on_press(Message::OpenDialog).padding([4,10]),
-                button(text("Add toast").size(13)).on_press(Message::AddToast).padding([4,10]),
-            ].spacing(6).into()),
+            if self.menu_open {
+                Some(&MenuId::File)
+            } else {
+                None
+            },
+            Some(
+                row![
+                    button(text("Toggle RTL").size(13))
+                        .on_press(Message::ToggleDirection)
+                        .padding([4, 10]),
+                    button(text("Open dialog").size(13))
+                        .on_press(Message::OpenDialog)
+                        .padding([4, 10]),
+                    button(text("Add toast").size(13))
+                        .on_press(Message::AddToast)
+                        .padding([4, 10]),
+                ]
+                .spacing(6)
+                .into(),
+            ),
             self.direction,
         );
 
@@ -166,8 +212,18 @@ impl App {
         let sidebar = app_side_bar(
             SideBar {
                 items: vec![
-                    SideBarItem { view_id: View::Home,     icon: "🏠".into(), tooltip: "Home".into(),     on_press: Message::SelectTab(TabAction::Pressed(View::Home)) },
-                    SideBarItem { view_id: View::Settings, icon: "⚙".into(),  tooltip: "Settings".into(), on_press: Message::SelectTab(TabAction::Pressed(View::Settings)) },
+                    SideBarItem {
+                        view_id: View::Home,
+                        icon: "🏠".into(),
+                        tooltip: "Home".into(),
+                        on_press: Message::SelectTab(TabAction::Pressed(View::Home)),
+                    },
+                    SideBarItem {
+                        view_id: View::Settings,
+                        icon: "⚙".into(),
+                        tooltip: "Settings".into(),
+                        on_press: Message::SelectTab(TabAction::Pressed(View::Settings)),
+                    },
                 ],
                 active: self.view,
             },
@@ -178,8 +234,16 @@ impl App {
         let tabs = app_tab_bar(
             TabBar {
                 tabs: vec![
-                    Tab { id: View::Home,     label: "Home".into(),     icon: None },
-                    Tab { id: View::Settings, label: "Settings".into(), icon: None },
+                    Tab {
+                        id: View::Home,
+                        label: "Home".into(),
+                        icon: None,
+                    },
+                    Tab {
+                        id: View::Settings,
+                        label: "Settings".into(),
+                        icon: None,
+                    },
                 ],
                 active: self.view,
             },
@@ -188,42 +252,82 @@ impl App {
         );
 
         let body_content: Element<'_, Message> = match self.view {
-            View::Home =>
-                column![text("Home view").size(20), text("Use the header to open menus, dialog, and toasts."), text("Press Escape to close overlays.")]
-                    .spacing(8).into(),
-            View::Settings =>
-                column![text("Settings view").size(20), text("Your app settings would live here.")]
-                    .spacing(8).into(),
+            View::Home => column![
+                text("Home view").size(20),
+                text("Use the header to open menus, dialog, and toasts."),
+                text("Press Escape to close overlays.")
+            ]
+            .spacing(8)
+            .into(),
+            View::Settings => column![
+                text("Settings view").size(20),
+                text("Your app settings would live here.")
+            ]
+            .spacing(8)
+            .into(),
         };
 
         let body = container(column![tabs, body_content].spacing(12).padding(16))
-            .width(Length::Fill).height(Length::Fill).into();
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into();
 
         // Snora prefab footer.
-        let dir = match self.direction { LayoutDirection::Ltr => "LTR", LayoutDirection::Rtl => "RTL" };
+        let dir = match self.direction {
+            LayoutDirection::Ltr => "LTR",
+            LayoutDirection::Rtl => "RTL",
+        };
         let footer = app_footer(
-            row![text(format!("Dir: {dir}  |  Toasts: {}", self.toasts.len())).size(13),
-                 container(space()).width(Length::Fill)]
-            .align_y(Center).into(),
+            row![
+                text(format!("Dir: {dir}  |  Toasts: {}", self.toasts.len())).size(13),
+                container(space()).width(Length::Fill)
+            ]
+            .align_y(Center)
+            .into(),
         );
 
         // Dialog content (app-owned: close button is required).
-        let dialog_el: Element<'_, Message> = container(column![
-            text("Dialog").size(18),
-            text("Close with the button below or press Escape."),
-            row![space().width(Length::Fill), button(text("Close").size(13)).on_press(Message::CloseModals).padding([4,10])],
-        ].spacing(12).padding(24)).width(380).into();
+        let dialog_el: Element<'_, Message> = container(
+            column![
+                text("Dialog").size(18),
+                text("Close with the button below or press Escape."),
+                row![
+                    space().width(Length::Fill),
+                    button(text("Close").size(13))
+                        .on_press(Message::CloseModals)
+                        .padding([4, 10])
+                ],
+            ]
+            .spacing(12)
+            .padding(24),
+        )
+        .width(380)
+        .into();
 
         // File menu overlay (app-owned element).
-        let menu_el: Element<'_, Message> = container(column![
-            button(text("New").size(13)).on_press(Message::CloseMenus).padding([4,8]).width(Length::Fill),
-            button(text("Close menu").size(13)).on_press(Message::CloseMenus).padding([4,8]).width(Length::Fill),
-        ].spacing(2).padding(4))
+        let menu_el: Element<'_, Message> = container(
+            column![
+                button(text("New").size(13))
+                    .on_press(Message::CloseMenus)
+                    .padding([4, 8])
+                    .width(Length::Fill),
+                button(text("Close menu").size(13))
+                    .on_press(Message::CloseMenus)
+                    .padding([4, 8])
+                    .width(Length::Fill),
+            ]
+            .spacing(2)
+            .padding(4),
+        )
         .style(|t: &iced::Theme| {
             let p = t.extended_palette();
             iced::widget::container::Style {
                 background: Some(iced::Background::Color(p.background.base.color)),
-                border: iced::Border { width: 1.0, color: p.background.weak.color, radius: 4.0.into() },
+                border: iced::Border {
+                    width: 1.0,
+                    color: p.background.weak.color,
+                    radius: 4.0.into(),
+                },
                 ..Default::default()
             }
         })
@@ -236,14 +340,18 @@ impl App {
             .footer(footer)
             .toasts(self.toasts.clone())
             .toast_position(ToastPosition::TopEnd)
-            .direction(self.direction)           // ← drives all mirroring
+            .direction(self.direction) // ← drives all mirroring
             .on_close_menus(Message::CloseMenus) // ← outside-click close sink
             .on_close_modals(Message::CloseModals);
 
-        if self.menu_open    { layout = layout.header_menu(menu_el); }
-        if self.show_dialog  { layout = layout.dialog(Dialog::new(dialog_el)); }
+        if self.menu_open {
+            layout = layout.header_menu(menu_el);
+        }
+        if self.show_dialog {
+            layout = layout.dialog(Dialog::new(dialog_el));
+        }
 
-        render(layout)  // ← the single Snora entry point
+        render(layout) // ← the single Snora entry point
     }
 }
 

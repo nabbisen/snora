@@ -25,10 +25,9 @@ use iced::{
     widget::{button, column, container, row, space, text},
 };
 use snora::{
-    AppLayout, BreadcrumbAction, Crumb, Dialog, LayoutDirection,
-    Menu, MenuAction, Sheet, SheetEdge, SheetSize,
-    SideBar, SideBarItem, Tab, TabAction, TabBar, Toast, ToastIntent, ToastPosition,
-    render,
+    AppLayout, BreadcrumbAction, Crumb, Dialog, LayoutDirection, Menu, MenuAction, Sheet,
+    SheetEdge, SheetSize, SideBar, SideBarItem, Tab, TabAction, TabBar, Toast, ToastIntent,
+    ToastPosition, render,
     widget::{app_breadcrumb, app_footer, app_header, app_side_bar, app_tab_bar},
 };
 
@@ -37,17 +36,32 @@ use snora::{
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ActiveTab { Overview, OverlayLab, ToastLab, DirectionLab }
+enum ActiveTab {
+    Overview,
+    OverlayLab,
+    ToastLab,
+    DirectionLab,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum SideView { Home, Layout, Toasts, Direction }
+enum SideView {
+    Home,
+    Layout,
+    Toasts,
+    Direction,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum MenuId { File }
+enum MenuId {
+    File,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(dead_code)] // variants reserved for menu item expansion
-enum MenuItemId { New, Close }
+enum MenuItemId {
+    New,
+    Close,
+}
 
 // ---------------------------------------------------------------------------
 // Message
@@ -78,31 +92,31 @@ enum Message {
 // ---------------------------------------------------------------------------
 
 struct Workbench {
-    direction:        LayoutDirection,
-    active_tab:       ActiveTab,
-    side_view:        SideView,
-    file_menu_open:   bool,
-    context_menu_open:bool,
-    show_dialog:      bool,
-    show_sheet:       bool,
-    toasts:           Vec<Toast<Message>>,
-    next_toast_id:    u64,
-    toast_position:   ToastPosition,
+    direction: LayoutDirection,
+    active_tab: ActiveTab,
+    side_view: SideView,
+    file_menu_open: bool,
+    context_menu_open: bool,
+    show_dialog: bool,
+    show_sheet: bool,
+    toasts: Vec<Toast<Message>>,
+    next_toast_id: u64,
+    toast_position: ToastPosition,
 }
 
 impl Default for Workbench {
     fn default() -> Self {
         Self {
-            direction:         LayoutDirection::Ltr,
-            active_tab:        ActiveTab::Overview,
-            side_view:         SideView::Home,
-            file_menu_open:    false,
+            direction: LayoutDirection::Ltr,
+            active_tab: ActiveTab::Overview,
+            side_view: SideView::Home,
+            file_menu_open: false,
             context_menu_open: false,
-            show_dialog:       false,
-            show_sheet:        false,
-            toasts:            Vec::new(),
-            next_toast_id:     1,
-            toast_position:    ToastPosition::TopEnd,
+            show_dialog: false,
+            show_sheet: false,
+            toasts: Vec::new(),
+            next_toast_id: 1,
+            toast_position: ToastPosition::TopEnd,
         }
     }
 }
@@ -156,7 +170,8 @@ impl Workbench {
                 let id = self.next_toast_id;
                 self.next_toast_id += 1;
                 self.toasts.push(Toast::new(
-                    id, intent,
+                    id,
+                    intent,
                     format!("{intent} toast"),
                     "Added from workbench.",
                     Message::DismissToast(id),
@@ -212,25 +227,58 @@ impl Workbench {
 
         let header = app_header(
             "Snora Workbench",
-            vec![Menu { id: MenuId::File, label: "File".into(), icon: None, items: vec![] }],
+            vec![Menu {
+                id: MenuId::File,
+                label: "File".into(),
+                icon: None,
+                items: vec![],
+            }],
             &Message::HeaderAction,
-            if self.file_menu_open { Some(&MenuId::File) } else { None },
-            Some(row![
-                btn(dir_label, Message::ToggleDirection),
-                btn("Dialog", Message::OpenDialog),
-                btn("Sheet", Message::OpenSheet),
-                btn("Context menu", Message::OpenContextMenu),
-            ].spacing(6).into()),
+            if self.file_menu_open {
+                Some(&MenuId::File)
+            } else {
+                None
+            },
+            Some(
+                row![
+                    btn(dir_label, Message::ToggleDirection),
+                    btn("Dialog", Message::OpenDialog),
+                    btn("Sheet", Message::OpenSheet),
+                    btn("Context menu", Message::OpenContextMenu),
+                ]
+                .spacing(6)
+                .into(),
+            ),
             self.direction,
         );
 
         let sidebar = app_side_bar(
             SideBar {
                 items: vec![
-                    SideBarItem { view_id: SideView::Home,      icon: "🏠".into(), tooltip: "Home".into(),      on_press: Message::SidebarPressed(SideView::Home) },
-                    SideBarItem { view_id: SideView::Layout,    icon: "⬜".into(), tooltip: "Layout".into(),    on_press: Message::SidebarPressed(SideView::Layout) },
-                    SideBarItem { view_id: SideView::Toasts,    icon: "🔔".into(), tooltip: "Toasts".into(),    on_press: Message::SidebarPressed(SideView::Toasts) },
-                    SideBarItem { view_id: SideView::Direction, icon: "↔".into(),  tooltip: "Direction".into(), on_press: Message::SidebarPressed(SideView::Direction) },
+                    SideBarItem {
+                        view_id: SideView::Home,
+                        icon: "🏠".into(),
+                        tooltip: "Home".into(),
+                        on_press: Message::SidebarPressed(SideView::Home),
+                    },
+                    SideBarItem {
+                        view_id: SideView::Layout,
+                        icon: "⬜".into(),
+                        tooltip: "Layout".into(),
+                        on_press: Message::SidebarPressed(SideView::Layout),
+                    },
+                    SideBarItem {
+                        view_id: SideView::Toasts,
+                        icon: "🔔".into(),
+                        tooltip: "Toasts".into(),
+                        on_press: Message::SidebarPressed(SideView::Toasts),
+                    },
+                    SideBarItem {
+                        view_id: SideView::Direction,
+                        icon: "↔".into(),
+                        tooltip: "Direction".into(),
+                        on_press: Message::SidebarPressed(SideView::Direction),
+                    },
                 ],
                 active: self.side_view,
             },
@@ -249,10 +297,26 @@ impl Workbench {
         let tabs = app_tab_bar(
             TabBar {
                 tabs: vec![
-                    Tab { id: ActiveTab::Overview,     label: "Overview".into(),     icon: None },
-                    Tab { id: ActiveTab::OverlayLab,   label: "Overlay Lab".into(),  icon: None },
-                    Tab { id: ActiveTab::ToastLab,     label: "Toast Lab".into(),    icon: None },
-                    Tab { id: ActiveTab::DirectionLab, label: "Direction Lab".into(),icon: None },
+                    Tab {
+                        id: ActiveTab::Overview,
+                        label: "Overview".into(),
+                        icon: None,
+                    },
+                    Tab {
+                        id: ActiveTab::OverlayLab,
+                        label: "Overlay Lab".into(),
+                        icon: None,
+                    },
+                    Tab {
+                        id: ActiveTab::ToastLab,
+                        label: "Toast Lab".into(),
+                        icon: None,
+                    },
+                    Tab {
+                        id: ActiveTab::DirectionLab,
+                        label: "Direction Lab".into(),
+                        icon: None,
+                    },
                 ],
                 active: self.active_tab,
             },
@@ -261,29 +325,34 @@ impl Workbench {
         );
 
         let tab_body: Element<'_, Message> = match self.active_tab {
-            ActiveTab::Overview     => self.tab_overview(),
-            ActiveTab::OverlayLab   => self.tab_overlay_lab(),
-            ActiveTab::ToastLab     => self.tab_toast_lab(),
+            ActiveTab::Overview => self.tab_overview(),
+            ActiveTab::OverlayLab => self.tab_overlay_lab(),
+            ActiveTab::ToastLab => self.tab_toast_lab(),
             ActiveTab::DirectionLab => self.tab_direction_lab(),
         };
 
-        let body = container(
-            column![breadcrumb, tabs, tab_body].spacing(8).padding(16),
-        )
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .into();
+        let body = container(column![breadcrumb, tabs, tab_body].spacing(8).padding(16))
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into();
 
-        let dir_str = match self.direction { LayoutDirection::Ltr => "LTR", LayoutDirection::Rtl => "RTL" };
+        let dir_str = match self.direction {
+            LayoutDirection::Ltr => "LTR",
+            LayoutDirection::Rtl => "RTL",
+        };
         let overlay_str = match (self.show_dialog, self.show_sheet) {
-            (true, true)   => "dialog+sheet",
-            (true, false)  => "dialog",
-            (false, true)  => "sheet",
+            (true, true) => "dialog+sheet",
+            (true, false) => "dialog",
+            (false, true) => "sheet",
             (false, false) => "none",
         };
         let footer = app_footer(
             row![
-                text(format!("Dir: {dir_str}  |  Overlays: {overlay_str}  |  Toasts: {}", self.toasts.len())).size(13),
+                text(format!(
+                    "Dir: {dir_str}  |  Overlays: {overlay_str}  |  Toasts: {}",
+                    self.toasts.len()
+                ))
+                .size(13),
                 container(space()).width(Length::Fill),
                 text("Snora Workbench").size(13),
             ]
@@ -316,7 +385,7 @@ impl Workbench {
         if self.show_sheet {
             layout = layout.sheet(
                 Sheet::new(self.build_sheet())
-                    .at(SheetEdge::End)   // logical End — mirrors under RTL (ABDD)
+                    .at(SheetEdge::End) // logical End — mirrors under RTL (ABDD)
                     .with_size(SheetSize::OneThird),
             );
         }
@@ -324,32 +393,47 @@ impl Workbench {
     }
 
     fn build_file_menu_overlay(&self) -> Element<'_, Message> {
-        container(column![
-            btn("New",        Message::CloseMenus),
-            btn("Open",       Message::CloseMenus),
-            btn("Close menu", Message::CloseMenus),
-        ].spacing(4).padding(8))
+        container(
+            column![
+                btn("New", Message::CloseMenus),
+                btn("Open", Message::CloseMenus),
+                btn("Close menu", Message::CloseMenus),
+            ]
+            .spacing(4)
+            .padding(8),
+        )
         .style(menu_style)
         .into()
     }
 
     fn build_context_menu_overlay(&self) -> Element<'_, Message> {
-        container(column![
-            btn("Action A",   Message::CloseMenus),
-            btn("Action B",   Message::CloseMenus),
-            btn("Close menu", Message::CloseMenus),
-        ].spacing(4).padding(8))
+        container(
+            column![
+                btn("Action A", Message::CloseMenus),
+                btn("Action B", Message::CloseMenus),
+                btn("Close menu", Message::CloseMenus),
+            ]
+            .spacing(4)
+            .padding(8),
+        )
         .style(menu_style)
         .into()
     }
 
     fn build_dialog(&self) -> Element<'_, Message> {
-        container(column![
-            text("About Snora Workbench").size(18),
-            text("Demonstrates the centered modal surface (layer 5)."),
-            text("The dim layer (layer 4) blocks menu access while this is open."),
-            row![space().width(Length::Fill), btn("Close", Message::CloseModals)],
-        ].spacing(12).padding(24))
+        container(
+            column![
+                text("About Snora Workbench").size(18),
+                text("Demonstrates the centered modal surface (layer 5)."),
+                text("The dim layer (layer 4) blocks menu access while this is open."),
+                row![
+                    space().width(Length::Fill),
+                    btn("Close", Message::CloseModals)
+                ],
+            ]
+            .spacing(12)
+            .padding(24),
+        )
         .width(400)
         .into()
     }
@@ -375,7 +459,9 @@ impl Workbench {
             text("All major Snora surfaces are wired in this example."),
             text("Use the header buttons to open overlays."),
             text("Toggle RTL in the header to verify all surfaces mirror."),
-        ].spacing(8).into()
+        ]
+        .spacing(8)
+        .into()
     }
 
     fn tab_overlay_lab(&self) -> Element<'_, Message> {
@@ -387,28 +473,33 @@ impl Workbench {
             text("  • Toast dismiss is reachable even while a modal is open."),
             row![
                 btn("Open dialog", Message::OpenDialog),
-                btn("Open sheet",  Message::OpenSheet),
-            ].spacing(6),
-        ].spacing(8).into()
+                btn("Open sheet", Message::OpenSheet),
+            ]
+            .spacing(6),
+        ]
+        .spacing(8)
+        .into()
     }
 
     fn tab_toast_lab(&self) -> Element<'_, Message> {
         let intent_btns = row![
-            btn("Debug",   Message::AddToast(ToastIntent::Debug)),
-            btn("Info",    Message::AddToast(ToastIntent::Info)),
+            btn("Debug", Message::AddToast(ToastIntent::Debug)),
+            btn("Info", Message::AddToast(ToastIntent::Info)),
             btn("Success", Message::AddToast(ToastIntent::Success)),
             btn("Warning", Message::AddToast(ToastIntent::Warning)),
-            btn("Error",   Message::AddToast(ToastIntent::Error)),
-        ].spacing(4);
+            btn("Error", Message::AddToast(ToastIntent::Error)),
+        ]
+        .spacing(4);
 
         let pos_btns = row![
-            btn("↖",  Message::SetToastPosition(ToastPosition::TopStart)),
-            btn("↑",  Message::SetToastPosition(ToastPosition::TopCenter)),
-            btn("↗",  Message::SetToastPosition(ToastPosition::TopEnd)),
-            btn("↙",  Message::SetToastPosition(ToastPosition::BottomStart)),
-            btn("↓",  Message::SetToastPosition(ToastPosition::BottomCenter)),
-            btn("↘",  Message::SetToastPosition(ToastPosition::BottomEnd)),
-        ].spacing(4);
+            btn("↖", Message::SetToastPosition(ToastPosition::TopStart)),
+            btn("↑", Message::SetToastPosition(ToastPosition::TopCenter)),
+            btn("↗", Message::SetToastPosition(ToastPosition::TopEnd)),
+            btn("↙", Message::SetToastPosition(ToastPosition::BottomStart)),
+            btn("↓", Message::SetToastPosition(ToastPosition::BottomCenter)),
+            btn("↘", Message::SetToastPosition(ToastPosition::BottomEnd)),
+        ]
+        .spacing(4);
 
         column![
             text("Toast Lab").size(16),
@@ -418,7 +509,9 @@ impl Workbench {
             text("Change anchor:"),
             pos_btns,
             text("Newest toast is always closest to the anchor edge."),
-        ].spacing(8).into()
+        ]
+        .spacing(8)
+        .into()
     }
 
     fn tab_direction_lab(&self) -> Element<'_, Message> {
@@ -436,7 +529,9 @@ impl Workbench {
             text("  • Toast Start/End anchor mirrors."),
             text("  • Header start/end controls swap."),
             text("ABDD — Accessible By Default and by Design."),
-        ].spacing(8).into()
+        ]
+        .spacing(8)
+        .into()
     }
 }
 
@@ -448,13 +543,20 @@ fn menu_style(theme: &iced::Theme) -> iced::widget::container::Style {
     let p = theme.extended_palette();
     iced::widget::container::Style {
         background: Some(iced::Background::Color(p.background.base.color)),
-        border: iced::Border { width: 1.0, color: p.background.weak.color, radius: 4.0.into() },
+        border: iced::Border {
+            width: 1.0,
+            color: p.background.weak.color,
+            radius: 4.0.into(),
+        },
         ..Default::default()
     }
 }
 
 fn btn<'a>(label: &'static str, msg: Message) -> Element<'a, Message> {
-    button(text(label).size(13)).on_press(msg).padding([4, 10]).into()
+    button(text(label).size(13))
+        .on_press(msg)
+        .padding([4, 10])
+        .into()
 }
 
 // ---------------------------------------------------------------------------

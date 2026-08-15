@@ -23,9 +23,7 @@ use iced::{
     Element, Length,
     widget::{button, column, container, row, text},
 };
-use snora::{
-    AppLayout, LayoutDirection, Tab, TabAction, TabBar, render, widget::app_tab_bar,
-};
+use snora::{AppLayout, LayoutDirection, Tab, TabAction, TabBar, render, widget::app_tab_bar};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum WorkspaceTab {

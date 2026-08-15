@@ -129,8 +129,7 @@ fn dialog_content_button_reachable() {
 #[test]
 fn no_close_sink_means_no_dismiss_but_content_renders() {
     let dialog: Dialog<Element<Msg>, Msg> = Dialog::new(btn("OK", Msg::DialogOk));
-    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
-        .dialog(dialog);
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed)).dialog(dialog);
     // on_close_modals intentionally absent.
     let element = render(layout);
 
@@ -150,7 +149,8 @@ fn no_close_sink_means_no_dismiss_but_content_renders() {
     let layout2 = AppLayout::new(btn("body", Msg::BodyPressed)).dialog(rebuild);
     let element2 = render(layout2);
     let mut ui2 = simulator(element2);
-    ui2.find("OK").expect("dialog content should still be renderable with no close sink");
+    ui2.find("OK")
+        .expect("dialog content should still be renderable with no close sink");
 }
 
 /// Toast dismiss button fires its message even while a modal is open.
@@ -175,7 +175,8 @@ fn toast_dismiss_reachable_above_modal() {
 
     let mut ui = simulator(element);
     // The toast close button renders the glyph "×".
-    ui.click("×").expect("toast close button (×) should be findable above the modal");
+    ui.click("×")
+        .expect("toast close button (×) should be findable above the modal");
     let msgs: Vec<Msg> = ui.into_messages().collect();
 
     assert!(
@@ -199,7 +200,8 @@ fn sheet_content_button_reachable() {
     let element = render(layout);
 
     let mut ui = simulator(element);
-    ui.click("Sheet action").expect("sheet action button should be findable");
+    ui.click("Sheet action")
+        .expect("sheet action button should be findable");
     let msgs: Vec<Msg> = ui.into_messages().collect();
 
     assert_eq!(
@@ -269,7 +271,8 @@ fn toast_dismiss_reachable_under_rtl() {
     let element = render(layout);
 
     let mut ui = simulator(element);
-    ui.click("×").expect("toast close button (×) should be findable under RTL");
+    ui.click("×")
+        .expect("toast close button (×) should be findable under RTL");
     let msgs: Vec<Msg> = ui.into_messages().collect();
 
     assert!(
@@ -277,7 +280,6 @@ fn toast_dismiss_reachable_under_rtl() {
         "toast dismiss must fire under RTL direction; got {msgs:?}",
     );
 }
-
 
 /// Context menu content (layer 3) is findable and interactive.
 ///
@@ -366,4 +368,3 @@ fn dialog_and_sheet_coexist_sheet_content_reachable() {
         "sheet button click must produce SheetAction in coexistence layout; got {msgs:?}",
     );
 }
-

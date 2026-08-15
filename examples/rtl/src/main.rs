@@ -109,14 +109,12 @@ impl App {
         // right side of the body row automatically.
         let sidebar = app_side_bar(
             SideBar {
-                items: vec![
-                    SideBarItem {
-                        view_id: (),
-                        icon: "✦".into(),
-                        tooltip: "Demo".into(),
-                        on_press: Message::ShowToast,
-                    },
-                ],
+                items: vec![SideBarItem {
+                    view_id: (),
+                    icon: "✦".into(),
+                    tooltip: "Demo".into(),
+                    on_press: Message::ShowToast,
+                }],
                 active: (),
             },
             self.direction,

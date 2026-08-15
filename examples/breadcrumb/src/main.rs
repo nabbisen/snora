@@ -24,9 +24,7 @@ use iced::{
     Element, Length,
     widget::{button, column, container, row, text},
 };
-use snora::{
-    AppLayout, BreadcrumbAction, Crumb, LayoutDirection, render, widget::app_breadcrumb,
-};
+use snora::{AppLayout, BreadcrumbAction, Crumb, LayoutDirection, render, widget::app_breadcrumb};
 
 /// A small enum modeling a hierarchy: Home → Library → Books → a
 /// particular book. Each level can be the user's current page (the
@@ -63,8 +61,9 @@ impl Default for App {
 impl App {
     fn update(&mut self, msg: Message) {
         match msg {
-            Message::Breadcrumb(BreadcrumbAction::Pressed(id))
-            | Message::NavigateTo(id) => self.location = id,
+            Message::Breadcrumb(BreadcrumbAction::Pressed(id)) | Message::NavigateTo(id) => {
+                self.location = id
+            }
             Message::SetDirection(d) => self.direction = d,
         }
     }

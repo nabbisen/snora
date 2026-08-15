@@ -20,10 +20,7 @@ use iced::{
     Element, Length, Padding,
     widget::{button, column, container, row, space, text, text_input},
 };
-use snora::{
-    AppLayout, LayoutDirection, SideBar, SideBarItem,
-    render, widget::app_side_bar,
-};
+use snora::{AppLayout, LayoutDirection, SideBar, SideBarItem, render, widget::app_side_bar};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum ViewId {

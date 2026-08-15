@@ -19,10 +19,7 @@ use iced::{
     Element, Length,
     widget::{container, space, text},
 };
-use snora::{
-    AppLayout, LayoutDirection, Menu, MenuAction, MenuItem,
-    render, widget::app_header,
-};
+use snora::{AppLayout, LayoutDirection, Menu, MenuAction, MenuItem, render, widget::app_header};
 
 // ---------------------------------------------------------------------
 // Application-defined menu identities.
@@ -142,11 +139,14 @@ impl App {
             )
             .size(13),
             space().height(Length::Fixed(12.0)),
-            text(format!("Last action: {}", if self.last_action.is_empty() {
-                "(none)"
-            } else {
-                self.last_action.as_str()
-            }))
+            text(format!(
+                "Last action: {}",
+                if self.last_action.is_empty() {
+                    "(none)"
+                } else {
+                    self.last_action.as_str()
+                }
+            ))
             .size(13),
             if self.show_status {
                 text("Status line is ON.").size(12).into()
