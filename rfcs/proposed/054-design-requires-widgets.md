@@ -119,8 +119,16 @@ design path implies the widget crate, why, and what it costs. Cheapest, and
 honest — but it leaves `examples/responsive_body` unreachable for its intended
 reader and leaves apimokka shipping 46 KB they do not use.
 
-**No option is recommended here.** The measurement and the RFC-039 constraint
-are the inputs; the decision is the owner's.
+**No option was recommended here.** The measurement and the RFC-039 constraint
+were the inputs; the decision was the owner's.
+
+**Decided 2026-08-15: option B′** — extract the style layer into a peer crate.
+Tracked as [RFC-055](./055-extract-the-style-bridge.md). The deciding criteria
+were **future technical debt** and **documentation cleanliness**, not size:
+this RFC's size framing was wrong, and the investigation it commissioned
+answered a question that decides nothing. Option B was found to be
+structurally unavailable — `snora` depends on `snora-widgets` and not the
+reverse, so relocating the bridge into `snora` would be a dependency cycle.
 
 ## Why this may be declined
 
