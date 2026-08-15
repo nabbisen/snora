@@ -91,7 +91,10 @@ Numbers remain stable forever and are never reused.
 
 ## Proposed
 
-_(none — RFC-048 shipped in v0.28.1 and RFC-049 in v0.29.0.)_
+| ID | Title | Target |
+|----|-------|--------|
+| 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | v0.30.0 (closes gate 9b) |
+| 051 | [The responsive example excludes the consumer who asked for it](./proposed/051-responsive-example-excludes-its-own-requester.md) | v0.30.0 (new example) |
 
 ## Archive
 
