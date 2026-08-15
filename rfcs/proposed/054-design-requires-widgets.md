@@ -1,6 +1,7 @@
 # RFC 054 — `design` requires `widgets`, and the engine surface pays for it
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-15) — as an **investigation**: the
+deliverable is a measured recommendation among A/B/C, not a chosen option.
 **Tracks.** Feature graph and crate boundaries. Answers
 [RFC-053](../done/053-responsive-render-excludes-the-design-path.md) Q-1, asked
 directly by apimokka.

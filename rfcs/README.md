@@ -97,7 +97,7 @@ Numbers remain stable forever and are never reused.
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | v0.30.0 (accepted; handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
-| 054 | [`design` requires `widgets`, and the engine surface pays for it](./proposed/054-design-requires-widgets.md) | undecided (answers RFC-053 Q-1) |
+| 054 | [`design` requires `widgets`, and the engine surface pays for it](./proposed/054-design-requires-widgets.md) | accepted as an investigation (answers RFC-053 Q-1; handoff: [`handoffs/054-…`](./handoffs/054-design-requires-widgets/implementation-handoff.md)) |
 
 ## Archive
 
