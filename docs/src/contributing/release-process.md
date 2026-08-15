@@ -115,6 +115,11 @@ them in sync is a release-process invariant.
     # that has never executed is exactly the failure RFC-041 was raised to
     # fix — do not skip this.
 [ ] git commit, THEN pull --rebase, THEN tag — in that order
+    git tag -s X.Y.Z -m "X.Y.Z"
+    # -s is REQUIRED: this repo sets `tag.gpgsign true`, so a bare
+    # `git tag X.Y.Z` fails with "fatal: no tag message?" — which reads
+    # like a message problem and is actually a signing one. Signed tags
+    # are annotated, so -m is mandatory too.
     # Tagging before rebasing leaves the tag on a commit the rebase
     # orphans: `git merge-base --is-ancestor X.Y.Z^{commit} main` fails,
     # and the release tag is not in main's history. The measurement bots
