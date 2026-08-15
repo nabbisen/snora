@@ -20,9 +20,10 @@
 //!   mapping, not an invented derivation.
 //! - **Card text contrast**: `text_primary` on the card fill meets WCAG
 //!   AA, independently re-verified here even though the underlying
-//!   values come from [`snora_widgets::design::style::container::card_raised`],
-//!   which has its own tests — this is the guarantee for *this* code
-//!   path specifically.
+//!   values come from [`snora_style::container::card_raised`]
+//!   (RFC-055 — formerly `snora_widgets::design::style::container::card_raised`,
+//!   removed in RFC-056), which has its own tests — this is the
+//!   guarantee for *this* code path specifically.
 
 use super::*;
 use iced::Size;

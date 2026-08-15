@@ -1,15 +1,22 @@
-//! iced style bridge for Snora Design tokens.
+//! Prefab design widgets for Snora Design tokens.
 //!
-//! This module is available when the `design` feature is enabled. It provides:
+//! This module is available when the `design` feature is enabled. It
+//! provides the token-styled prefab widgets — `button`, `card`,
+//! `notice`, `chip`, `progress`, and `widget` (chrome geometry). Each
+//! wraps a plain iced widget and applies [`snora_style`] styling
+//! internally; none of them expose the underlying style functions
+//! themselves.
 //!
-//! * [`style::color::to_iced_color`] — explicit `snora_design::Color` →
-//!   `iced::Color` conversion (no implicit `From` impl, to keep the iced
-//!   boundary intentional).
-//! * [`style::button`] — semantic button style functions for `primary`,
-//!   `secondary`, `ghost`, and `danger` variants.
-//! * [`style::container`] — card/container style functions for `surface`,
-//!   `raised`, and `selected` variants.
-//! * [`style::text`] — text style helpers derived from [`snora_design::Tokens`].
+//! **The iced style bridge — the `Tokens → iced style struct` mapping
+//! functions these widgets are built on — is [`snora_style`], not this
+//! module.** It moved there in RFC-055 and the compatibility re-export
+//! that used to live here (`snora_widgets::design::{style, theme}`) was
+//! removed in RFC-056: `snora-widgets` never documented a supported
+//! path to it, and the widgets in this module consume it internally, so
+//! there was nothing here for an application to keep depending on.
+//! Applications wanting the style functions directly use
+//! `snora::design::style::*` / `snora::design::theme` (through the
+//! `snora` facade) or depend on `snora-style` directly.
 //!
 //! # iced 0.14 focus limitation
 //!
@@ -26,8 +33,9 @@
 //!
 //! ```text
 //! snora_design::Tokens
-//!   → style function (tokens + iced Status)
+//!   → snora_style function (tokens + iced Status)
 //!   → iced::widget::button::Style / container::Style
+//!   → this module's prefab widgets
 //!   → iced rendering
 //! ```
 //!
@@ -35,11 +43,10 @@
 //!
 //! ```rust,ignore
 //! use snora_design::Tokens;
-//! use snora_widgets::design::style;
+//! use snora_widgets::design::button;
 //!
 //! let tokens = Tokens::light();
-//! let btn = button("Save")
-//!     .style(move |_theme, status| style::button::primary(&tokens, status));
+//! let btn = button::primary(&tokens, "Save", Message::Save);
 //! ```
 
 /// Ergonomic pilot button helpers (RFC-028).
@@ -74,15 +81,6 @@ pub mod chip;
 /// `iced::widget::progress_bar`. Indeterminate state is rendered as
 /// 0% with a "…" suffix (iced 0.14 limitation).
 pub mod progress;
-
-/// iced style functions for Snora Design tokens.
-pub mod style;
-
-/// Token-derived `iced::Theme` emission (RFC-038).
-///
-/// Re-exported from `snora-style` (RFC-055) — resolves exactly as
-/// before the move. See [`theme::theme`].
-pub use snora_style::theme;
 
 /// Token-derived chrome geometry — styled variants of the prefab chrome
 /// widgets (RFC-040).

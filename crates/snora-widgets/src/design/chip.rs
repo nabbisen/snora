@@ -51,7 +51,7 @@ use iced::{
 };
 use snora_design::Tokens;
 
-use super::style;
+use snora_style as style;
 
 // ---------------------------------------------------------------------------
 // Private helpers

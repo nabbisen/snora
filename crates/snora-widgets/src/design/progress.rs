@@ -34,7 +34,8 @@ use iced::{
 };
 use snora_design::{Tokens, Tone};
 
-use super::{card, style};
+use super::card;
+use snora_style as style;
 
 // ---------------------------------------------------------------------------
 // Internal helpers

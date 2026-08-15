@@ -6,16 +6,18 @@
 snora
   ├── (always)          snora-core          — iced-free vocabulary
   ├── (feature=widgets) snora-widgets       — prefab iced elements
-  │                       └── (feature=design, opt-in) snora-style — re-exported
+  │                       └── (feature=design, opt-in) snora-style — used internally
   └── (feature=design)  snora-design        — iced-free design tokens
                         snora-style         — iced style bridge (RFC-055)
 ```
 
 `widgets` and `design` are **independent** (RFC-055) — neither requires
 the other. `snora-widgets` also takes `snora-style` as an optional
-dependency, activated by its own `design` feature, purely so
-`snora_widgets::design::style::*` keeps resolving at its existing path;
-that edge does not make `snora`'s `design` feature depend on `widgets`.
+dependency, activated by its own `design` feature, because its own
+prefab widgets (`button`, `card`, `notice`, `chip`, `progress`) style
+themselves with it internally — not to re-export it; `snora_widgets::
+design::{style, theme}` were removed in RFC-056. That edge does not
+make `snora`'s `design` feature depend on `widgets`.
 
 ## Flags
 

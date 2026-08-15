@@ -20,26 +20,30 @@
 //!
 //! # Consumers, one vocabulary
 //!
-//! - The **card widget** (`snora_widgets::design::card`) and the other
-//!   prefab widgets in `snora-widgets` — the original, and still valid,
-//!   consumer of the style functions.
+//! - The **prefab widgets** in `snora-widgets` (`snora_widgets::design::card`
+//!   and its siblings) — the original, and still valid, consumer of the
+//!   style functions, reached directly (`use snora_style as style;`
+//!   internally, since RFC-056).
 //! - The **engine chrome** (`snora::design::render`'s dialog card and
 //!   `snora::design::responsive_render`) — reaches the style functions
 //!   here directly, without depending on `snora-widgets` at all.
 //! - **Applications**, via `snora::design::style::*` /
-//!   `snora::design::theme` or `snora_widgets::design::style::*` /
-//!   `snora_widgets::design::theme` (all four re-export this crate at
-//!   their existing paths — see those crates' own docs; no import here
-//!   changed by this crate's existence).
+//!   `snora::design::theme` (the `snora` facade re-exports this crate
+//!   at those paths — see `snora`'s own docs), or by depending on this
+//!   crate directly.
 //!
-//! # The `snora_widgets` re-exports are now compatibility shims
+//! # `snora_widgets::design::{style, theme}` no longer exist (RFC-056)
 //!
-//! Not deprecated in this release — deliberately: `snora::design::*`,
-//! the paths applications actually use, are re-exported *through*
-//! `snora-widgets` today, so deprecating the widgets paths first would
-//! warn consumers who did nothing wrong. See RFC-055 §"Q-4" for the
-//! planned order (re-point `snora`'s own re-exports at this crate first,
-//! document this crate as consumer-facing, *then* deprecate).
+//! RFC-055 kept `snora_widgets::design::style` and `::theme` as
+//! compatibility re-exports while the style layer moved here. RFC-056
+//! removed them once `snora::design::style`/`::theme` (the documented
+//! consumer route) pointed at this crate directly, on the reasoning
+//! that `#[deprecated]` on a bare `pub use` re-export emits no warning
+//! at all in this workspace, and no documentation ever directed anyone
+//! to `snora-widgets` directly. `snora::design::*` is unaffected; only
+//! a direct `snora_widgets::design::style`/`::theme` import breaks, with
+//! a compile error naming this crate as the replacement. See
+//! `docs/src/guides/migration-0.32-to-0.33.md`.
 
 /// Color conversion between `snora_design::Color` and `iced::Color`.
 pub mod color;

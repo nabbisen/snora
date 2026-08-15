@@ -151,22 +151,25 @@ grows but the cause is a transitive iced bump that affects all
 crates equally, splitting widget features will not help; the right
 fix is elsewhere. Indicators trigger a discussion, not a refactor.
 
-## Documentation scope when a `design`-gated capability lands
+## Documentation scope when a capability arrives or leaves
 
-**When a `design`-gated capability lands, every default-path page that
-states the capability is absent is part of the change scope.**
-Documenting the new behaviour in `docs/src/design/` is necessary and not
-sufficient: a consumer who never reads `design/` is left with the old
-denial, which now reads as a statement that the capability will not
-exist.
+**When a capability lands, every default-path page that states it is
+absent is part of the change scope. When a capability — or a path to
+one — is removed, every page that states it still resolves is part of
+the change scope, symmetrically.** Documenting the new behaviour (or
+the removal) in `docs/src/design/` or a migration guide is necessary
+and not sufficient: a consumer who never reads that page is left with
+the stale claim, which now reads as a statement about behaviour that
+shipped differently.
 
-This is not hypothetical. Two downstream reports, three releases apart,
-were the same omission:
+This is not hypothetical. Three downstream/review reports, across both
+directions, were the same omission:
 
-| Report | Capability shipped | Page that still denied it |
+| Report | Change | Page that still stated the old world |
 |---|---|---|
 | apimokka (2026-08-04) | focus/AT limitation documented under `contributing/` | consumer-facing docs had no route to it |
-| arama (2026-08-15) | dialog card, RFC-039, v0.27.0 | `guides/overlays.md` still said "positioner, not a styler" with no scope |
+| arama (2026-08-15) | dialog card, RFC-039, v0.27.0 (**arrival**) | `guides/overlays.md` still said "positioner, not a styler" with no scope |
+| RFC-056 review (2026-08-15) | `snora_widgets::design::{style, theme}` removed (**removal**) | `design/feature-flags.md`, `contributing/api-governance.md`, `contributing/semantic-accessibility.md` still named the removed path — one of them asserting it "keeps resolving" |
 
 RFC-039 correctly documented the dialog card in `docs/src/design/`. What
 neither that RFC nor its review caught was that
@@ -174,12 +177,21 @@ neither that RFC nor its review caught was that
 dialogs — still stated the opposite. Adding the new page was not the
 whole job; retracting the old denial was the missed half.
 
-When gating a capability behind `design` (or any feature), grep the
-default-path docs for the specific claim the new capability
-contradicts before considering the documentation done. An empty grep is
-not the acceptance signal by itself — read each surviving hit and
-confirm it is still true for the path it describes; a claim can also
-hide across a line wrap that a naive single-line grep pattern misses.
+RFC-056 was the mirror-image miss: the implementation grepped `crates/`
+for stale references to the removed shim and fixed what it found there,
+but the rule as originally written only named capabilities *landing*,
+so the equivalent sweep of `docs/src/` for the capability *leaving*
+wasn't in scope until review caught it.
+
+When gating, ungating, or removing a capability (or a specific path to
+one) behind `design` (or any feature), grep the default-path docs for
+the specific claim the change contradicts before considering the
+documentation done — arrival claims ("X is not available") when adding,
+resolution claims ("X resolves at this path") when removing. An empty
+grep is not the acceptance signal by itself — read each surviving hit
+and confirm it is still true for the path it describes; a claim can
+also hide across a line wrap that a naive single-line grep pattern
+misses.
 
 ## Current status (snora 0.25.0)
 

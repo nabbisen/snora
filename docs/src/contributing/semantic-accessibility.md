@@ -111,8 +111,8 @@ the style closure receives only `&Theme`.
 
 ### Consequence for the style bridge
 
-The Snora Design style bridge (`snora_widgets::design::style::button` and
-`snora_widgets::design::style::container`) maps the statuses iced does expose.
+The Snora Design style bridge (`snora_style::button` and
+`snora_style::container`, RFC-055) maps the statuses iced does expose.
 It **cannot** render a custom focus ring on a standard button or card surface
 through `button::Style` / `container::Style` in iced 0.14.
 

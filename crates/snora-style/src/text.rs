@@ -12,7 +12,7 @@
 //!
 //! ```rust,ignore
 //! use snora_design::Tokens;
-//! use snora_widgets::design::style::text;
+//! use snora_style::text;
 //! use iced::widget::text as iced_text;
 //!
 //! let tokens = Tokens::light();

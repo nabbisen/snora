@@ -164,8 +164,8 @@ it.
 - The `contrast` module's three functions: `relative_luminance`,
   `contrast_ratio`, `composite_over`.
 
-**Style-bridge surface** — all public functions of
-`snora_widgets::design::style`:
+**Style-bridge surface** — all public functions of `snora_style`
+(RFC-055; formerly `snora_widgets::design::style`, removed in RFC-056):
 
 - `color::to_iced_color`.
 - `button::{primary, secondary, ghost, danger}`.

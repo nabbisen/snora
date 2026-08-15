@@ -18,7 +18,7 @@
 //!
 //! ```rust,ignore
 //! use snora_design::Tokens;
-//! use snora_widgets::design::style::button;
+//! use snora_style::button;
 //!
 //! let tokens = Tokens::light();
 //! let btn = iced::widget::button("Save")

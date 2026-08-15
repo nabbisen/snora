@@ -9,6 +9,10 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.32 → 0.33](migration-0.32-to-0.33.md) — `snora_widgets::design::{style,
+  theme}` removed; use `snora_style::*` directly, or
+  `snora::design::style::*`/`snora::design::theme` (unaffected — the
+  documented consumer route already pointed at `snora-style`).
 - [0.28 → 0.29](migration-0.28-to-0.29.md) — `snora-dialog-card` was
   attached to the wrong element since v0.27.0; re-pointed to the actual
   card, with a new `snora-dialog` identifier for the centring container

@@ -38,7 +38,7 @@
 use iced::{Element, widget::container};
 use snora_design::Tokens;
 
-use super::style;
+use snora_style as style;
 
 // ---- internal helper --------------------------------------------------------
 

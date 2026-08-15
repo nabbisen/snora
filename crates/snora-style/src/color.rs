@@ -11,7 +11,7 @@
 ///
 /// ```rust,ignore
 /// use snora_design::Color;
-/// use snora_widgets::design::style::color::to_iced_color;
+/// use snora_style::color::to_iced_color;
 ///
 /// let ic = to_iced_color(Color::rgb(0.1, 0.3, 0.85));
 /// assert_eq!(ic.r, 0.1);

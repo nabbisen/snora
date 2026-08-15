@@ -13,6 +13,29 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [Unreleased]
+
+### Removed
+
+- **`snora_widgets::design::style` and `snora_widgets::design::theme`
+  removed (RFC-056).** RFC-055 (0.32.0) relocated the iced style bridge
+  to a new peer crate, `snora-style`, and kept these two paths as
+  compatibility re-exports so nothing broke mid-move. Its precondition
+  for removing them is met: `snora::design::style::*` and
+  `snora::design::theme` — the documented consumer route through the
+  `snora` facade — already point at `snora-style` directly and are
+  **completely unaffected** by this change. Removed rather than
+  deprecated: `#[deprecated]` on a bare `pub use` re-export emits no
+  warning at all in this workspace (verified — a deprecation cycle
+  would have required wrapping the re-export in a local module purely
+  to carry the attribute, machinery for a warning the hypothetical
+  audience would likely never see anyway, since no documentation ever
+  directed anyone to depend on `snora-widgets` directly). Breaking only
+  for direct `snora-widgets` consumers importing these paths, of which
+  none are known. See
+  [the 0.32→0.33 migration guide](docs/src/guides/migration-0.32-to-0.33.md)
+  for the two-row old→new path table.
+
 ## [0.32.0] — 2026-08-15
 
 ### Changed

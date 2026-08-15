@@ -116,9 +116,11 @@ particular, not `snora-core`. It is reached through the `design`
 feature, independently of `widgets`: `snora --features design` compiles
 `snora::design::style::*`, `snora::design::theme`, `design::render`,
 and `design::responsive_render` without pulling in `snora-widgets` at
-all. `snora_widgets::design::style::*` and `snora_widgets::design::theme`
-re-export the same crate at their existing paths, so nothing that
-already imports through `snora-widgets` changes.
+all. `snora-widgets`' own prefab widgets (`button`, `card`, `notice`,
+`chip`, `progress`) consume `snora-style` internally when its `design`
+feature is on, but no longer re-export it —
+`snora_widgets::design::{style, theme}` were removed in RFC-056; the
+`snora::design::*` paths above are unaffected.
 
 ## `snora` — engine
 

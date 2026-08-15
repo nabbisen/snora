@@ -45,7 +45,7 @@ use iced::{
 };
 use snora_design::Tokens;
 
-use super::style;
+use snora_style as style;
 
 // ---- helpers ----------------------------------------------------------------
 
@@ -56,7 +56,7 @@ fn make_button<'a, Message: Clone + 'a>(
     style_fn: fn(&Tokens, button::Status) -> button::Style,
 ) -> Element<'a, Message> {
     let t = tokens.clone();
-    button(text(label.into()).size(super::style::text::label_size(tokens)))
+    button(text(label.into()).size(style::text::label_size(tokens)))
         .on_press_maybe(on_press)
         .style(move |_theme, status| style_fn(&t, status))
         .into()

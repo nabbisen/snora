@@ -38,7 +38,7 @@ use iced::{
 };
 use snora_design::{Tokens, Tone};
 
-use super::style;
+use snora_style as style;
 
 // ---------------------------------------------------------------------------
 // Internal action type
