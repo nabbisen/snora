@@ -159,6 +159,19 @@ it does not replace a fourth. `snora-widgets` keeps re-exporting the same
 paths, so even the module path survives. No crate, module, or import is
 retired, and no deprecation notice is needed anywhere.
 
+**Q-4 — when does the `snora-widgets` re-export get deprecated?**
+`snora_widgets::design::style::*` becomes a compatibility shim the moment
+`snora-style` exists, and shims accumulate.
+
+**Not in this release.** `snora::design::style::*` — the path applications
+actually use — is re-exported *through* `snora-widgets`, so deprecating the
+widgets path first would warn consumers who did nothing wrong. The order is:
+re-point `snora`'s own re-export at `snora-style`, document `snora-style` as a
+consumer-facing path, *then* deprecate.
+
+Recorded here so the obligation stays visible rather than being discovered as
+debt later.
+
 *(Q-2 and Q-3 were resolved by the owner, 2026-08-15, and are now acceptance
 criteria 5 and 9 rather than open questions.)*
 
