@@ -65,12 +65,13 @@ them in sync is a release-process invariant.
 [ ] If minor: bump snora-core / snora-widgets dep versions across crates
 [ ] If minor: bump the hand-pinned `snora` version in
     examples/size_probe_engine/Cargo.toml AND
-    examples/responsive_body/Cargo.toml. Both use an explicit
-    `default-features = false` path dependency instead of
+    examples/responsive_body/Cargo.toml AND
+    examples/size_probe_design_engine/Cargo.toml. All three use an
+    explicit `default-features = false` path dependency instead of
     `snora = { workspace = true }` (workspace inheritance cannot
-    override `default-features`), so neither follows the workspace
+    override `default-features`), so none follows the workspace
     version table and each must be hand-edited on every minor bump —
-    missing either fails EVERY `cargo` command in the workspace with
+    missing any fails EVERY `cargo` command in the workspace with
     "failed to select a version for the requirement `snora = "^0.NN"`"
     (this has already happened once, on the 0.26.0 bump). Grep for the
     old minor across all `Cargo.toml` files before assuming the

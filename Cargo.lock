@@ -3097,6 +3097,7 @@ dependencies = [
  "lucide-icons",
  "snora-core",
  "snora-design",
+ "snora-style",
  "snora-widgets",
 ]
 
@@ -3248,6 +3249,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "snora-size-probe-design-engine"
+version = "0.31.0"
+dependencies = [
+ "iced",
+ "snora",
+]
+
+[[package]]
 name = "snora-size-probe-engine"
 version = "0.31.0"
 dependencies = [
@@ -3264,6 +3273,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "snora-style"
+version = "0.31.0"
+dependencies = [
+ "iced",
+ "snora-design",
+]
+
+[[package]]
 name = "snora-widgets"
 version = "0.31.0"
 dependencies = [
@@ -3271,6 +3288,7 @@ dependencies = [
  "lucide-icons",
  "snora-core",
  "snora-design",
+ "snora-style",
 ]
 
 [[package]]

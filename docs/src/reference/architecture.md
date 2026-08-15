@@ -1,9 +1,11 @@
 # Architecture overview
 
-Snora is four crates with a strict dependency direction. `snora-core`
-and `snora-design` are independent, iced-free leaves; `snora-widgets`
-depends on both; `snora` depends on `snora-core` always and on the
-other two behind its `widgets` / `design` features.
+Snora is five crates with a strict dependency direction. `snora-core`
+and `snora-design` are independent, iced-free leaves; `snora-style`
+depends only on `snora-design` and `iced`; `snora-widgets` depends on
+`snora-core`, `snora-design`, and (opt-in) `snora-style`; `snora`
+depends on `snora-core` always and on the other three behind its
+`widgets` / `design` features — independently of each other (RFC-055).
 
 ```text
 your application
@@ -15,17 +17,23 @@ your application
        │
        ├──► snora-design    (design tokens — no iced dependency; opt-in)
        │
+       ├──► snora-style     (iced style bridge — opt-in, independent of widgets)
+       │        │
+       │        └──► snora-design
+       │
        └──► snora-widgets   (optional, prefab UI parts — depends on iced)
                 │
                 ├──► snora-core
-                └──► snora-design
+                ├──► snora-design
+                └──► snora-style   (opt-in, when its own `design` feature is on)
 ```
 
 Applications normally depend on a single crate, `snora`, which
 re-exports the vocabulary from `snora-core`, (when its `widgets`
 feature is enabled, the default) the prefab widgets from
-`snora-widgets`, and (when its `design` feature is enabled, opt-in)
-the design tokens from `snora-design`.
+`snora-widgets`, and (when its `design` feature is enabled, opt-in,
+independent of `widgets`) the design tokens and iced style bridge from
+`snora-design` and `snora-style`.
 
 ## `snora-core` — vocabulary
 
@@ -75,9 +83,42 @@ theme. It contains:
 
 `snora-design` has zero dependency on iced, matching `snora-core`'s
 guarantee. It is reached through the `design` feature (opt-in;
-requires `widgets`), which activates the iced style bridge and
-shallow primitives in `snora-widgets` and re-exports the token types
-under `snora::design`.
+**independent of `widgets`** as of RFC-055 — see the next section),
+which re-exports the token types under `snora::design`.
+
+## `snora-style` — the iced style bridge
+
+This crate owns the **mapping from tokens to iced values**: six
+modules — `color`, `button`, `container`, `text`, `progress` (each
+taking `&Tokens` and returning a plain `iced` style value), and `theme`
+(taking `&Tokens` and returning a complete `iced::Theme`). No
+`Element`, no layout, no message — a style, not a widget.
+
+Extracted from `snora-widgets` by RFC-055: the style layer has three
+consumers — the prefab widgets in `snora-widgets` (which style
+themselves with it), the engine chrome in `snora` (`design::render`'s
+dialog card and derived modal dim reach it directly), and applications
+styling their own iced widgets (or theming iced's *own* stock widgets,
+via `theme`) via `snora::design::*`. It was structurally below the
+widget layer even while it lived inside `snora-widgets` — RFC-054
+found the style modules import nothing from the widget layer, while
+five widget-layer modules import them — so its previous placement was
+an accident of where the original crate split happened to land, not a
+requirement. `theme` joined the other five one round later in review
+(RFC-055): it has the identical property — zero widget-layer imports —
+and its one known consumer uses it with zero `snora::widget::*` call
+sites, so gating it behind `widgets` would have made
+design-without-widgets incomplete for exactly the consumer that
+configuration exists to serve.
+
+`snora-style` depends on `iced` and `snora-design` only — in
+particular, not `snora-core`. It is reached through the `design`
+feature, independently of `widgets`: `snora --features design` compiles
+`snora::design::style::*`, `snora::design::theme`, `design::render`,
+and `design::responsive_render` without pulling in `snora-widgets` at
+all. `snora_widgets::design::style::*` and `snora_widgets::design::theme`
+re-export the same crate at their existing paths, so nothing that
+already imports through `snora-widgets` changes.
 
 ## `snora` — engine
 

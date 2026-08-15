@@ -13,6 +13,56 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [Unreleased]
+
+### Changed
+
+- **Extracted the iced style bridge into its own crate, `snora-style`
+  (RFC-055). No import path moved.** `snora-widgets/src/design/style/`
+  and `snora-widgets/src/design/theme.rs`
+  — six modules mapping `Tokens` to plain `iced` style structs or a
+  complete `iced::Theme`, no `Element`, no widget — had three consumers
+  (the prefab widgets, the engine chrome's dialog card, and
+  applications via `snora::design::style::*` / `snora::design::theme`)
+  while living inside one of them. RFC-054's investigation established
+  the style layer is structurally *below* the widget layer (it imports
+  nothing from the widget layer; widget-layer modules import it), so
+  its placement in `snora-widgets` was the accident — `theme` has the
+  identical property and joined the move for the same reason, one
+  review round later. Moved to a new peer crate, `snora-style`,
+  depending on `iced` and `snora-design` only. Both
+  `snora_widgets::design::{style::*, theme}` and
+  `snora::design::{style::*, theme}` re-export it at their existing
+  paths — **every import that worked before this release still works,
+  unchanged; no migration guide is needed.**
+
+  **`design` no longer requires `widgets`.** `snora --features design`
+  (with `default-features = false`) now compiles — `design::render`,
+  `design::responsive_render`, `design::style::*`, and `design::theme`
+  are reachable without pulling in the ~46 KB `snora-widgets` crate a
+  consumer with zero `snora::widget::*` call sites never used. This is
+  the configuration `examples/responsive_body` (v0.30.0) was built to
+  match and could not itself run — and, per the review that shaped this
+  entry, the reporting consumer uses `theme` specifically with zero
+  widget call sites, which is why it moved alongside the style
+  functions rather than staying gated behind `widgets`. The
+  prefab-widget re-exports under `snora::design` (`widget`, `button`,
+  `card`, `notice`, `chip`, `progress`) still require `widgets` and are
+  `#[cfg]`-gated for it.
+
+  **The default configuration is unaffected — proven by measurement,
+  not assertion.** `snora-style` stays an optional dependency of
+  `snora-widgets`, gated by the same `design` feature as before
+  extraction: `size_probe_widgets` and `size_probe_design` are
+  byte-for-byte identical before and after this change.
+
+  **`snora_widgets::design::{style::*, theme}` are now compatibility
+  re-exports**, not deprecated in this release. The `snora::design`
+  paths applications actually use are re-exported independently,
+  directly from `snora-style`, not routed through the widgets path;
+  deprecating the widgets-crate paths is a separate future decision,
+  recorded here so it stays visible rather than becoming silent debt.
+
 ## [0.31.0] — 2026-08-15
 
 ### Added

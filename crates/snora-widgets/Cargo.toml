@@ -13,9 +13,11 @@ categories = ["gui"]
 
 [features]
 # When enabled, exposes the Snora Design style bridge (`snora_widgets::design`).
-# Pulls in the iced-free `snora-design` token crate. This feature is opt-in
-# and does NOT activate by default; it targets the v0.20 release surface.
-design = ["dep:snora-design"]
+# Pulls in the iced-free `snora-design` token crate and the style-function
+# crate `snora-style` (RFC-055; `design::style::*` re-exports it at its
+# existing paths). This feature is opt-in and does NOT activate by
+# default; it targets the v0.20 release surface.
+design = ["dep:snora-design", "dep:snora-style"]
 # Pass-through to snora-core's icon-source features. Applications that
 # enable `snora/lucide-icons` automatically light up the matching path
 # in this crate.
@@ -25,5 +27,9 @@ svg-icons = ["snora-core/svg-icons", "iced/svg"]
 [dependencies]
 snora-core = { workspace = true }
 snora-design = { workspace = true, optional = true }
+# The iced style bridge (RFC-055). Optional, tied to the `design`
+# feature — keeping it optional is what stops the default configuration
+# (`widgets` without `design`) from compiling any style code.
+snora-style = { workspace = true, optional = true }
 iced = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

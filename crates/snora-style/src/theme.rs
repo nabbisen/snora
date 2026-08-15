@@ -118,7 +118,7 @@ use iced::theme::palette::{
 use snora_design::Tokens;
 use snora_design::contrast::contrast_ratio;
 
-use super::style::color::to_iced_color;
+use super::color::to_iced_color;
 
 /// Shift amount for a semantic set's `weak` tier.
 const WEAK_SHIFT_AMOUNT: f32 = 0.06;

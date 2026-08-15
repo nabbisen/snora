@@ -80,8 +80,9 @@ pub mod style;
 
 /// Token-derived `iced::Theme` emission (RFC-038).
 ///
-/// See [`theme::theme`].
-pub mod theme;
+/// Re-exported from `snora-style` (RFC-055) — resolves exactly as
+/// before the move. See [`theme::theme`].
+pub use snora_style::theme;
 
 /// Token-derived chrome geometry — styled variants of the prefab chrome
 /// widgets (RFC-040).

@@ -26,8 +26,9 @@
 //! ## The dialog card
 //!
 //! Fill `surface_raised`, edge `border`, radius `radius.lg`, padding
-//! `spacing.lg` — reusing [`snora_widgets::design::style::container::card_raised`]
-//! (RFC-029) directly rather than recomputing the same color/border
+//! `spacing.lg` — reusing [`snora_style::container::card_raised`]
+//! (RFC-029, relocated from `snora-widgets` by RFC-055) directly rather
+//! than recomputing the same color/border
 //! mapping, with its drop shadow zeroed out. **Border-defined, not
 //! shadow-defined**, deliberately: shadows are close to meaningless in
 //! the high-contrast presets (`high_contrast_light`'s shadow color and
@@ -63,7 +64,10 @@ use iced::widget::Responsive;
 use iced::{Element, Size};
 use snora_core::AppLayout;
 use snora_design::Tokens;
-use snora_widgets::design::style::color::to_iced_color;
+// RFC-055: relocated from snora_widgets::design::style::color — the
+// engine surface reaches snora-style directly, without depending on
+// snora-widgets.
+use snora_style::color::to_iced_color;
 
 use crate::overlay::dialog::DialogCardStyle;
 use crate::render::{ChromeStyle, render_with_style};
@@ -170,7 +174,7 @@ fn dim_color(tokens: &Tokens) -> iced::Color {
 
 /// See the module documentation's "The dialog card" section.
 fn dialog_card_style(tokens: &Tokens) -> DialogCardStyle {
-    let mut style = snora_widgets::design::style::container::card_raised(tokens);
+    let mut style = snora_style::container::card_raised(tokens);
     // Border-defined, not shadow-defined (RFC-039) — card_raised's shadow
     // is meant for popovers/floating panels, not this surface.
     style.shadow = iced::Shadow::default();

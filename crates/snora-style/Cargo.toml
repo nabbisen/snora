@@ -1,0 +1,25 @@
+[package]
+name = "snora-style"
+description = "iced style bridge for Snora Design tokens — maps Tokens to iced style structs. No widgets, no Element, no layout."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "../../README.md"
+keywords = ["gui", "design-system", "tokens", "iced"]
+categories = ["gui"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+# Deliberately minimal (RFC-054/RFC-055): the style layer is structurally
+# below the widget layer — it imports nothing from snora-widgets or
+# snora-core, only iced (the styles it produces) and snora-design (the
+# tokens it maps from). If a change here ever needs a third dependency,
+# that is a finding, not a routine addition — see RFC-055 §6 step 1.
+[dependencies]
+snora-design = { workspace = true }
+iced = { workspace = true }

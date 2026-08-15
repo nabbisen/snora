@@ -1,0 +1,23 @@
+[package]
+name = "snora-size-probe-design-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[[bin]]
+name = "snora-size-probe-design-engine"
+path = "src/main.rs"
+
+# Design without widgets (RFC-054/RFC-055): the configuration this crate
+# exists to measure. Uses an explicit path dep (not workspace
+# inheritance) so that default-features = false can be set independently
+# of the workspace snora entry — same reason examples/size_probe_engine
+# and examples/responsive_body do. This is the THIRD such example; see
+# the comment on workspace.dependencies.snora in the root Cargo.toml,
+# which must be edited alongside this one on every minor bump.
+[dependencies]
+snora = { path = "../../crates/snora", version = "0.31", default-features = false, features = ["design"] }
+iced  = { workspace = true }
