@@ -136,20 +136,20 @@ Two further costs, both one-time:
 
 ## Open questions
 
-**Q-1 — Is `snora-style` the right name?**
-The docs already call it "the iced style bridge". `snora-style` matches the
-family and reads correctly in the dependency chain. The spike used
-`snora-style-bridge`. Pick one and keep it — a published crate name is
-permanent in a way the module path is not.
+**Q-1 — the crate name.** Recommended: **`snora-style`**. snora's family
+convention is plain functional suffixes — `core`, `design`, `widgets` — and
+`snora-style` slots into the chain reading correctly. `snora-style-bridge`
+names the implementation rather than the layer, and a published crate name is
+permanent in a way a module path is not.
 
-**Q-2 — Does `snora-style` need its own feature flags?**
-`snora-widgets` gates its `design` submodule today. If `snora-style` is
-unconditional, a `widgets`-only consumer may start compiling style code they
-did not before. **Measure this**: `size_probe_widgets` must not regress.
+**Nothing is deprecated by this RFC.** The style layer is a *module inside*
+`snora-widgets` today, not a published crate — extraction adds a fifth crate,
+it does not replace a fourth. `snora-widgets` keeps re-exporting the same
+paths, so even the module path survives. No crate, module, or import is
+retired, and no deprecation notice is needed anywhere.
 
-**Q-3 — What happens to `snora::design::style`'s gating?**
-It can now be available without `widgets`. Confirm that is intended and that no
-existing configuration loses a path it had.
+*(Q-2 and Q-3 were resolved by the owner, 2026-08-15, and are now acceptance
+criteria 5 and 9 rather than open questions.)*
 
 ## Acceptance criteria
 
@@ -161,12 +161,23 @@ existing configuration loses a path it had.
    `"snora-widgets?/design"` conditionally.
 4. **`snora --no-default-features --features design` compiles**, and a probe
    in that configuration builds — the configuration this RFC exists to create.
-5. `widgets` + `design` still compiles, and `size_probe_widgets` and
-   `size_probe_design` do not regress in size (Q-2).
+5. **The default configuration must not start compiling style code.** Today
+   `snora-widgets` gates its whole `design` module — which contains `style/` —
+   behind its own opt-in `design` feature, so a consumer with `widgets` and
+   without `design` compiles none of it. `snora-style` must therefore stay an
+   **optional** dependency of `snora-widgets`, activated by that same feature:
+   `design = ["dep:snora-design", "dep:snora-style"]`. Prove it by measuring:
+   `size_probe_widgets` must not grow, and `size_probe_design` must not
+   regress.
 6. `render_semantics` passes **unmodified**.
 7. `architecture.md` describes five crates with the corrected diagram;
    `feature-flags.md` **loses** the "Requires `widgets`" caveat.
 8. No consumer-visible import path changes; no migration guide needed.
+9. **`design` and `widgets` are independent**, giving four expressible
+   configurations where three exist today: neither (engine only), `widgets`
+   alone (today's default), **`design` alone (new)**, and both. Confirm no
+   existing configuration loses a path it has today — the new one is purely
+   additional.
 
 ## Compatibility and security
 
