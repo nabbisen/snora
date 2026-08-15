@@ -213,7 +213,20 @@ mdbook build docs && mdbook test docs
 is that one identifier is now conditional, and a test suite run only with
 `--all-features` cannot see the difference.
 
-### On `cargo fmt` — the standing gate is broken
+### On `cargo fmt` — resolved in 0.28.1
+
+**Superseded.** The drift described below was cleared by a workspace-wide
+`cargo fmt --all` in 0.28.1, and CI now runs `cargo fmt --all --check` on
+every PR and push. **Use the plain gate:**
+
+```bash
+cargo fmt --all --check      # must pass
+```
+
+The delta procedure below is kept as the historical record of why it was
+needed; it is no longer the instruction.
+
+### (historical) The standing gate was broken
 
 `cargo fmt --check` does **not** pass on a clean tree at v0.28.0: **82 hunks**
 workspace-wide, **7 under `-p snora`, all in

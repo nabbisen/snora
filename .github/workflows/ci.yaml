@@ -18,6 +18,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - name: Formatting
+        # Runs first and cheapest. This gate was absent until 0.28.1, and in
+        # its absence `cargo fmt --check` silently stopped passing on a clean
+        # tree for several releases while release-process.md still listed it
+        # as a checklist item. A gate nothing runs is not a gate.
+        run: cargo fmt --all --check
       - name: Check workspace
         run: cargo check --workspace --all-features
       - name: Clippy

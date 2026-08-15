@@ -85,7 +85,12 @@ them in sync is a release-process invariant.
     # at release time is a claim, not a fact
 [ ] Confirm no resolved dependency declares a higher rust-version than the
     declared MSRV: cargo metadata --format-version 1 --all-features
-[ ] cargo fmt --check
+[ ] cargo fmt --all --check
+    # Note --all: a bare `cargo fmt --check` misses the example crates,
+    # where most drift accumulates. CI enforces this on every PR and push
+    # as of 0.28.1; before that nothing ran it, and it had silently stopped
+    # passing on a clean tree for several releases while still sitting in
+    # this checklist. Do not tick a gate you have not seen pass.
 [ ] cargo check --workspace --all-features
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
 [ ] cargo test -p snora-core
