@@ -57,6 +57,20 @@ rename of a rendered-surface identifier with known adopters on the old
 name should retire the string rather than repurpose it, precisely to
 avoid this risk.
 
+**The premise was subsequently confirmed, and has since expired.** It was
+an inference when v0.29.0 shipped. Days later a downstream team reported
+independently that the v0.28.0 identifiers were inert for them — no
+`iced_test`, no `widget::Id` usage, nothing walking or snapshotting a
+widget tree — which is the strongest form this check can take: a
+statement from the adopter rather than an assessment of them.
+
+That same team then scheduled work to build scripted verification
+**against** these identifiers. So the condition that made repurposing
+acceptable is **no longer expected to hold**, and the next rename should
+assume adopters exist. Re-check by asking the known integrations
+directly; do not re-derive it from their last reported version, which
+lags what they are building.
+
 ## MSRV bump policy
 
 Snora declares `rust-version` in `[workspace.package]` (adopted in RFC-041,

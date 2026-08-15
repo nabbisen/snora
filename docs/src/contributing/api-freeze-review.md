@@ -98,7 +98,7 @@ Type-names audit: **complete as of v0.17.0.**
 | 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
 | 3. At least one third-party or production-grade app | ⬜ first downstream user identified (v0.18.1 build failure report from nabbisen/logolig) |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
-| 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests including 2 RTL |
+| 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests at the time, **11 as of v0.29.0**, including 2 RTL. **Semantic, not pixel** — see the note below. |
 | 6. Feature-matrix CI stable | ✅ v0.11 |
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
@@ -114,6 +114,29 @@ whole. Its two measurements are in genuinely different conditions, and
 collapsing them either way would misstate one of them: ticking it claims a
 compile-time trend the variance contradicts, holding it whole denies
 binary-size work that does exactly what the gate asks.
+
+### What gate 5 does and does not establish
+
+`render_semantics` is what backs snora's headline compatibility claim —
+that with the `design` feature inactive, rendered output is unchanged. It
+is a real gate: it must pass **unmodified** across every release, and an
+implementer who needs to edit it has changed composition and must escalate
+rather than adjust the test.
+
+It asserts **composition**: layer order, which surfaces materialise, which
+are dismissible, and how direction mirrors them. It does not compare
+pixels, and nothing in CI does.
+
+**As of v0.29.0 no downstream team has visually verified the guarantee.**
+Two integrations exist. One adopted 0.28.0 and reported that its
+before/after capture across the four presets is outstanding, blocked on an
+internal gate — recording the four commit SHAs so the comparison can be
+reconstructed later. The other has not upgraded past 0.25.0.
+
+There is no reason to doubt the guarantee. But it should be described as
+*test-backed* rather than *downstream-confirmed*, because those are
+different claims and this project has been bitten before by the gap between
+them — see gate 9's history below, and RFC-041.
 
 Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
 compile-time measurement noise (gate 9b). The previous
