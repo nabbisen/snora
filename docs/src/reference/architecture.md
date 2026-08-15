@@ -88,9 +88,10 @@ This crate binds the vocabulary to iced 0.14:
   `iced::Element<'_, M>`.
 - Toast layer — builds the stacked toast column and resolves
   `ToastPosition` to a physical anchor.
-- Overlay renderers — `dialog`, `sheet`. They paint the centered
-  card / edge-anchored panel; the dim backdrop is owned by `render`
-  itself.
+- Overlay renderers — `dialog`, `sheet`. `dialog` centers content — no
+  card on the default path, a token-styled card via `design::render`
+  (RFC-039) opt-in — and `sheet` paints an edge-anchored panel; the dim
+  backdrop is owned by `render` itself.
 - Lifecycle helpers — `snora::toast::subscription`,
   `snora::toast::sweep_expired`.
 - Re-exports of `snora-widgets` (when the `widgets` feature is on)
@@ -132,7 +133,7 @@ The `render` function composes layers in this order, bottom to top:
 1. menu backdrop     transparent click sink (if a menu is open)
 2. header_menu
 3. context_menu
-4. modal dim         40 % black click sink (if a modal is present)
+4. modal dim         40 % dim click sink (if a modal is present)
 5. dialog
 6. sheet
 7. toasts            always on top, even over modals

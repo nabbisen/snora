@@ -2,7 +2,7 @@
 
 **Status.** Proposed
 **Tracks.** Rendered-surface identifiers (RFC-047). Corrects a defect shipped
-in v0.28.0. Split out of [RFC-048](./048-dialog-card-documentation-contradiction.md) F-5
+in v0.28.0. Split out of [RFC-048](../done/048-dialog-card-documentation-contradiction.md) F-5
 because it is a **minor** bump and RFC-048 is a patch.
 **Touches.** `crates/snora/src/identifiers.rs`,
 `crates/snora/src/overlay/dialog.rs`,

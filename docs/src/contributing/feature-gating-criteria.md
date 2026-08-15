@@ -151,6 +151,36 @@ grows but the cause is a transitive iced bump that affects all
 crates equally, splitting widget features will not help; the right
 fix is elsewhere. Indicators trigger a discussion, not a refactor.
 
+## Documentation scope when a `design`-gated capability lands
+
+**When a `design`-gated capability lands, every default-path page that
+states the capability is absent is part of the change scope.**
+Documenting the new behaviour in `docs/src/design/` is necessary and not
+sufficient: a consumer who never reads `design/` is left with the old
+denial, which now reads as a statement that the capability will not
+exist.
+
+This is not hypothetical. Two downstream reports, three releases apart,
+were the same omission:
+
+| Report | Capability shipped | Page that still denied it |
+|---|---|---|
+| apimokka (2026-08-04) | focus/AT limitation documented under `contributing/` | consumer-facing docs had no route to it |
+| arama (2026-08-15) | dialog card, RFC-039, v0.27.0 | `guides/overlays.md` still said "positioner, not a styler" with no scope |
+
+RFC-039 correctly documented the dialog card in `docs/src/design/`. What
+neither that RFC nor its review caught was that
+`docs/src/guides/overlays.md` — the page a consumer actually reads about
+dialogs — still stated the opposite. Adding the new page was not the
+whole job; retracting the old denial was the missed half.
+
+When gating a capability behind `design` (or any feature), grep the
+default-path docs for the specific claim the new capability
+contradicts before considering the documentation done. An empty grep is
+not the acceptance signal by itself — read each surviving hit and
+confirm it is still true for the path it describes; a claim can also
+hide across a line wrap that a naive single-line grep pattern misses.
+
 ## Current status (snora 0.25.0)
 
 | Indicator | Status |

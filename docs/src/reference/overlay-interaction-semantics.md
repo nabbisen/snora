@@ -17,7 +17,7 @@ framework contract; it must not change without an RFC.
 2. header_menu    — dropdown under the header bar
 3. context_menu   — floating menu at click point
 4. modal dim      — 40%-dim click sink (if a modal is present)
-5. dialog         — centered card
+5. dialog         — centered; token-styled card via design::render
 6. sheet          — edge-anchored panel
 7. toasts         — always on top, RTL-aware anchor
 ```

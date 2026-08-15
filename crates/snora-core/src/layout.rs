@@ -111,7 +111,11 @@ where
     // dimmed backdrop behind them (when any modal is present) and wires
     // outside-click to `on_close_modals`.
     // -----------------------------------------------------------------
-    /// A centered modal card.
+    /// Centered modal content. The engine centers `Dialog`'s content and
+    /// paints the dim backdrop around it; by default no card chrome is
+    /// drawn — the application supplies its own, or opts into a
+    /// token-styled card via `snora::design::render` (see the `snora`
+    /// crate's overlays guide).
     pub dialog: Option<Dialog<Node, Message>>,
     /// A modal panel anchored to one of the four window edges. The
     /// specific edge is configured on the [`Sheet`] itself.

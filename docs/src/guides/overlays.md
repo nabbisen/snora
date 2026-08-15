@@ -29,8 +29,12 @@ overlay content. snora never silently drops a populated overlay.
 
 ## Dialog
 
-A centered modal card. Snora paints the dim backdrop and centers your
-content; everything else is your decision.
+Snora paints the dim backdrop and centers your content. On the
+**default path** (`snora::render`), that is all it does — no card, no
+border, no fill. `Dialog` does not own the card chrome: you decide
+whether the dialog content is a plain `container`, a styled card with a
+border, an entire form. snora is a positioner, not a styler, **on this
+path**.
 
 ```rust,ignore
 use snora::{AppLayout, Dialog};
@@ -40,9 +44,14 @@ let layout = AppLayout::new(body)
     .on_close_modals(Message::CloseModals);
 ```
 
-`Dialog` does not own the card chrome — you decide whether the dialog
-content is a plain `container`, a styled card with a border, an entire
-form. snora is a positioner, not a styler.
+**As of v0.27.0**, a token-styled card — fill, border, radius, all
+derived from your active preset — is available opt-in via
+`snora::design::render` (RFC-039) in place of `snora::render`, with no
+other change to how you build your `AppLayout`. This matters if your
+dialog content can land over saturated or dark backgrounds, where
+unstyled centered content is easy to lose. See [Token-derived engine
+surfaces](../design/engine-surfaces.md) for the mapping and how to opt
+in.
 
 ## Sheet
 
@@ -129,8 +138,8 @@ From bottom of the stack to top:
 1. menu backdrop      transparent click sink (if any menu is open)
 2. header_menu        header-attached dropdown
 3. context_menu       floating context menu
-4. modal dim          40 % black click sink (if a modal is present)
-5. dialog             centered card
+4. modal dim          40 % dim click sink (if a modal is present)
+5. dialog             centered; token-styled card via design::render
 6. sheet              edge-anchored panel
 7. toasts             always on top so they survive over modals
 ```

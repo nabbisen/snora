@@ -86,12 +86,12 @@ Numbers remain stable forever and are never reused.
 | 045 | [Assistive technology: stated position, and bounding the ABDD claim](./done/045-assistive-technology-position.md) | v0.27.1 (handoff: [`handoffs/045-…`](./handoffs/045-assistive-technology-position/implementation-handoff.md)) |
 | 046 | [Layout width exposure](./done/046-layout-width-exposure.md) | v0.28.0 (handoff: [`handoffs/046-…`](./handoffs/046-layout-width-exposure/implementation-handoff.md)) |
 | 047 | [Stable identifiers on snora-rendered surfaces](./done/047-stable-identifiers-on-rendered-surfaces.md) | v0.28.0 (handoff: [`handoffs/047-…`](./handoffs/047-stable-identifiers-on-rendered-surfaces/implementation-handoff.md)) |
+| 048 | [The dialog card: contradictory documentation and an undiscoverable capability](./done/048-dialog-card-documentation-contradiction.md) | v0.28.1 (handoff: [`handoffs/048-…`](./handoffs/048-dialog-card-documentation-contradiction/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 048 | [The dialog card: contradictory documentation and an undiscoverable capability](./proposed/048-dialog-card-documentation-contradiction.md) | v0.28.1 (documentation only; handoff: [`handoffs/048-…`](./handoffs/048-dialog-card-documentation-contradiction/implementation-handoff.md)) |
 | 049 | [`snora-dialog-card` denotes the wrong element](./proposed/049-dialog-identifier-denotes-the-wrong-element.md) | v0.29.0 (identifier rename; split from 048 F-5; handoff: [`handoffs/049-…`](./handoffs/049-dialog-identifier-denotes-the-wrong-element/implementation-handoff.md)) |
 
 ## Archive

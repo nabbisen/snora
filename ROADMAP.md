@@ -90,6 +90,17 @@ D-gates.
 
 ## Recently shipped
 
+- **0.28.1** — From a second downstream field report (**arama**). snora's
+  documentation contradicted itself about the dialog card: `overlays.md`
+  promised "a centered modal card" and denied any card chrome eleven lines
+  later, in the same file, since at least v0.25.0. The behaviour was correct
+  and the card had shipped in 0.27.0 — the docs were what was wrong. Seven
+  claim sites and four z-stack tables now distinguish what `snora::render`
+  draws from what `snora::design::render` draws, and the dialogs guide
+  surfaces the card instead of implying it will never exist (RFC-048). The
+  rule whose absence caused this — **when a `design`-gated capability lands,
+  every default-path page that denies it is in scope** — is now written down.
+  Documentation only; no code changed.
 - **0.28.0** — From the first substantive downstream field report.
   `snora::responsive_render` exposes the layout's available width — snora
   observed window size nowhere before, so every consumer wanting

@@ -1,4 +1,6 @@
-//! Dialog — the centered modal card.
+//! Dialog — centers content and paints the dim backdrop around it. The
+//! default path draws no card; a token-styled card is available via
+//! [`crate::design::render::render`] (RFC-039).
 
 use iced::widget::container;
 use iced::{Element, widget::center};

@@ -1,6 +1,6 @@
 # RFC 048 — The dialog card: contradictory documentation and an undiscoverable capability
 
-**Status.** Proposed
+**Status.** Implemented (v0.28.1)
 **Tracks.** Documentation consistency. Answers a downstream report from the
 **arama** team (2026-08-15) and corrects a contradiction snora has shipped
 since at least v0.25.0.

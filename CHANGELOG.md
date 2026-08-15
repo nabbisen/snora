@@ -13,9 +13,44 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
-## [Unreleased]
+## [0.28.1] — 2026-08-15
 
-Nothing yet.
+### Changed
+
+- **Corrected a self-contradicting documentation claim about the dialog
+  card (RFC-048).** A downstream team (**arama**, credited — this is
+  their finding) reported that `render_dialog`'s module doc "is
+  documented as producing *the centered modal card*, but draws no card."
+  The behavior was correct and deliberate, and the card they wanted had
+  already shipped in v0.27.0 via `snora::design::render` (RFC-039) — they
+  were on v0.25.0. **The documentation was what was wrong, and it was
+  wrong before v0.27.0 too:** `docs/src/guides/overlays.md` promised "a
+  centered modal card" at one line and denied any card chrome eleven
+  lines later, in the same file, since at least v0.25.0 — verified
+  against the v0.25.0 tag directly, not inferred. This is not a case of a
+  consumer missing documentation that contradicted the code; it is
+  snora's own page contradicting itself, which leaves no way for a reader
+  to tell which half binds. Corrected seven sites (the six identified,
+  plus one the RFC's own grep missed — an `architecture.md` prose claim
+  split across a line wrap, undetectable by a single-line pattern match)
+  and the four z-stack tables describing layer order, distinguishing what
+  the default `snora::render` path draws (no card, only centering and the
+  dim) from what `snora::design::render` draws (a token-styled card) for
+  both the card and the dim — the dim's 40% alpha is unchanged on both
+  paths and was left alone; only its color derivation is path-specific.
+  `docs/src/guides/overlays.md` — the page a consumer with exactly
+  arama's problem would read — now states the card is available and
+  links `docs/src/design/engine-surfaces.md`, rather than stating "snora
+  is a positioner, not a styler" unscoped, which read as a promise the
+  capability would never exist. `docs/src/contributing/
+  feature-gating-criteria.md` now records the rule whose absence produced
+  this: when a `design`-gated capability lands, every default-path page
+  that states the capability is absent is part of the change scope, not
+  only the new page documenting the capability itself — the same
+  omission, three releases apart, that also produced RFC-045's
+  discoverability gap. Documentation only: no executable code changed
+  (`git diff --stat -- 'crates/**/*.rs'` touches doc-comment lines only),
+  `render_semantics` passes unmodified, no API or gate-row change.
 
 ## [0.28.0] — 2026-08-04
 

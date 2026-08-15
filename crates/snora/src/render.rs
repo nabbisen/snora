@@ -13,7 +13,7 @@
 //! 2. header_menu       — dropdown under the header bar
 //! 3. context_menu      — floating menu at click point
 //! 4. modal backdrop    — 40%-dim mouse_area, dispatches on_close_modals
-//! 5. dialog            — centered card
+//! 5. dialog            — centered; token-styled card via `design::render`
 //! 6. sheet             — edge-anchored panel, size per SheetSize
 //! 7. toasts            — stacked at the configured ToastPosition (RTL-aware),
 //!                        newest toast closest to the anchor edge

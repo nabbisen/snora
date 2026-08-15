@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-048 dialog card documentation
 
-**Governing RFC.** [RFC-048](../../proposed/048-dialog-card-documentation-contradiction.md)
-**Status.** Inherited from RFC-048 — Proposed.
+**Governing RFC.** [RFC-048](../../done/048-dialog-card-documentation-contradiction.md)
+**Status.** Inherited from RFC-048 — Implemented (v0.28.1).
 **Release target.** 0.28.1 (patch). Ships alone.
 **Implementation units.** One. **Documentation and doc-comments only — no
 executable code changes.**
@@ -31,7 +31,7 @@ This handoff moves the documentation half.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/048-dialog-card-documentation-contradiction.md` in full.
+- `rfcs/done/048-dialog-card-documentation-contradiction.md` in full.
 - `.git-exclude/reviewed/arama-dialog-overlay-card/review-result.md` — the
   verification behind every claim below.
 - `docs/src/design/engine-surfaces.md` §"The dialog card" — what actually
