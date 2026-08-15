@@ -1,8 +1,8 @@
 # RFC 056 — Remove the `snora-widgets` style shims
 
-**Status.** Accepted (owner, 2026-08-15)
+**Status.** Implemented (v0.33.0)
 **Tracks.** Crate boundaries. Discharges
-[RFC-055](../done/055-extract-the-style-bridge.md) Q-4.
+[RFC-055](./055-extract-the-style-bridge.md) Q-4.
 **Touches.** `crates/snora-widgets/src/design.rs` and its four style-consuming
 modules; `CHANGELOG.md`; `docs/src/guides/migration-0.32-to-0.33.md` (new).
 **Release target.** 0.33.0 (minor — a public path is removed from

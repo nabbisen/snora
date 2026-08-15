@@ -97,6 +97,17 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.33.0** — `snora_widgets::design::{style, theme}` removed (RFC-056). The
+  compatibility re-exports RFC-055 left behind while relocating the style layer
+  are gone one release later, rather than deprecated: `#[deprecated]` on a
+  `pub use` emits no warning at all, and the audience for one was hypothetical
+  — nothing documents `snora-widgets` as a direct dependency. A compile error
+  with a named replacement serves that reader better than a warning they may
+  never see. **`snora::design::*` consumers are unaffected**; a migration guide
+  covers the direct-import case. `snora-widgets` now exposes no style surface
+  at all, which makes `architecture.md`'s description of it — optional prefab
+  widgets, consumed through `snora` — true without qualification for the first
+  time since the design system landed.
 - **0.32.0** — `snora-style`, a fifth crate (RFC-055). The token→iced style
   bridge — `card_raised`, `to_iced_color`, the theme emitter — lived inside
   `snora-widgets` while having **three** consumers: the prefab widgets, the

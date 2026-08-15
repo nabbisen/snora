@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-056 remove the style shims
 
-**Governing RFC.** [RFC-056](../../proposed/056-remove-the-style-shims.md)
-**Status.** Inherited from RFC-056 — Accepted (owner, 2026-08-15).
+**Governing RFC.** [RFC-056](../../done/056-remove-the-style-shims.md)
+**Status.** Inherited from RFC-056 — Implemented (v0.33.0).
 **Release target.** 0.33.0 (minor — a public path is removed from
 `snora-widgets`).
 **Implementation units.** One.
