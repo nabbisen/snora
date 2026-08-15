@@ -131,6 +131,48 @@ Three things to notice:
 - **Layout measurements.** Whether two columns fit, whether a sheet
   reaches the top of the screen, etc. These are renderer-side concerns.
 
+## Pattern: hash captures to check a snora upgrade changed nothing
+
+Contributed by the **arama** team, who used it to produce the only
+pixel-level confirmation snora's no-visual-change guarantee has.
+
+Everything above tests *logic*. This tests *rendered output*, and it is the
+one technique that closes the gap `render_semantics` leaves — that suite
+asserts composition, not pixels, and nothing in snora's CI compares images.
+
+The method is ordinary and the discipline is the point:
+
+1. **Split the upgrade into two commits** — the version bump alone, then any
+   adoption of new entry points such as `snora::design::render`. This is what
+   makes the first step verifiable in isolation; a single combined commit
+   cannot distinguish "snora changed nothing" from "our own change offset it".
+2. Capture the same screen, preset and content at both commits. Window-scoped,
+   fixed size, a scratch profile with deterministic fixtures rather than real
+   user data.
+3. **Compare hashes, not eyes.**
+
+```text
+md5  daae7534fc2a219d58e145339a9ea236   before-01-high_contrast_dark.png
+md5  daae7534fc2a219d58e145339a9ea236   commit1-01-high_contrast_dark.png
+```
+
+Byte-identical output across four minor versions, with the render call
+unchanged, on a real application.
+
+**Why hashing beats looking.** A visual comparison yields "we could not see a
+difference", which is a judgement. A hash yields a fact, and it catches
+sub-perceptual drift a reviewer would pass. It also costs nothing to re-run.
+
+**What it does not establish.** One application, one preset, one dialog is not
+a general proof, and a hash tells you *that* something changed, never *what*.
+When it differs you still need the images. Determinism also depends on your
+own fixtures: fonts, scaling, animation, timestamps and any real content will
+each break it before snora does.
+
+If you adopt it, snora would like to hear the result either way — a hash that
+*differs* across a snora upgrade with your own code unchanged is a bug report
+we would want.
+
 ## What Snora tests internally
 
 Snora uses [`iced_test`](https://crates.io/crates/iced_test) — a

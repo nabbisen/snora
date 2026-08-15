@@ -127,16 +127,32 @@ It asserts **composition**: layer order, which surfaces materialise, which
 are dismissible, and how direction mirrors them. It does not compare
 pixels, and nothing in CI does.
 
-**As of v0.29.0 no downstream team has visually verified the guarantee.**
-Two integrations exist. One adopted 0.28.0 and reported that its
-before/after capture across the four presets is outstanding, blocked on an
-internal gate — recording the four commit SHAs so the comparison can be
-reconstructed later. The other has not upgraded past 0.25.0.
+**As of v0.33.0 the guarantee has one pixel-level confirmation, from arama.**
+They split their upgrade into two commits — version bump alone, then
+`design::render` adoption — specifically so the first could be verified in
+isolation, then captured the same dialog, preset and thumbnail at **0.25.0**
+and **0.29.0** with the render call unchanged:
 
-There is no reason to doubt the guarantee. But it should be described as
-*test-backed* rather than *downstream-confirmed*, because those are
-different claims and this project has been bitten before by the gap between
-them — see gate 9's history below, and RFC-041.
+```text
+md5  daae7534fc2a219d58e145339a9ea236   before-01-high_contrast_dark.png
+md5  daae7534fc2a219d58e145339a9ea236   commit1-01-high_contrast_dark.png
+```
+
+Byte-identical across four minor versions, on a real application. That is
+stronger than the visual comparison originally asked for: hashing converts
+"we could not see a difference" into a fact.
+
+**Its scope is one application, one preset, one dialog, four minors** — not a
+general proof. The other two integrations still have no visual verification:
+apimokka's is blocked on an internal gate (four commit SHAs recorded so the
+comparison can be reconstructed), and orbok states theirs is outstanding for
+both 0.30.0 and 0.33.0.
+
+So the guarantee is **test-backed, with one downstream confirmation**, and
+neither "unverified" nor "downstream-confirmed" is accurate on its own. The
+distinction matters because this project has been bitten by the gap between a
+true-sounding claim and its evidence — see gate 9's history below, and
+RFC-041.
 
 Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
 compile-time measurement noise (gate 9b). The previous
