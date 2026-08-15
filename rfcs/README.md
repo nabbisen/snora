@@ -99,7 +99,7 @@ Numbers remain stable forever and are never reused.
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **parked** — needs ~2 more releases of comparable data (see the RFC's Parked section) |
-| 056 | [Remove the `snora-widgets` style shims](./proposed/056-remove-the-style-shims.md) | v0.33.0 (discharges RFC-055 Q-4) |
+| 056 | [Remove the `snora-widgets` style shims](./proposed/056-remove-the-style-shims.md) | v0.33.0 (accepted; discharges RFC-055 Q-4; handoff: [`handoffs/056-…`](./handoffs/056-remove-the-style-shims/implementation-handoff.md)) |
 
 ## Archive
 
