@@ -97,6 +97,19 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.31.0** — `snora::design::responsive_render` (RFC-053). Width exposure
+  shipped in 0.28.0 rendered through the engine path unconditionally, so a
+  `design`-path application adopting it silently lost the styled dialog card
+  and the token-derived modal dim — responsive layout and design chrome were
+  mutually exclusive. Reported by apimokka, for whom that dim *is* the
+  accessibility fix their adoption existed to deliver, and who therefore could
+  not adopt width exposure at all. **It also self-blocked**: RFC-046 deferred
+  breakpoint behaviour pending real consumer thresholds, and the consumer who
+  would supply them was blocked by this.
+  **Also fixes** the compile-time measurement clean, which never reached the
+  `release` profiles it was meant to invalidate (RFC-052). Gate 9b's clock
+  **resets** — third methodology discontinuity; the gate moved further from
+  closure, not nearer.
 - **0.30.0** — `examples/responsive_body`: an engine-only responsive example
   composed the way snora's known consumers actually build (RFC-051).
   `responsive_render` shipped in 0.28.0 because a downstream team asked for

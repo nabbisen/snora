@@ -1,8 +1,8 @@
 # Developer Handoff — RFC-052 profile-scoped clean
 
-**Governing RFC.** [RFC-052](../../proposed/052-clean-never-invalidates-release-artifacts.md)
-**Status.** Inherited from RFC-052 — Proposed.
-**Release target.** 0.30.0 (release shape not yet fixed — see §2).
+**Governing RFC.** [RFC-052](../../done/052-clean-never-invalidates-release-artifacts.md)
+**Status.** Inherited from RFC-052 — Implemented (v0.31.0).
+**Release target.** 0.31.0.
 **Implementation units.** One. **Must land before RFC-050**, which is blocked
 on it.
 
@@ -29,7 +29,7 @@ release-note wording that assumes a particular release.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/052-clean-never-invalidates-release-artifacts.md` in full.
+- `rfcs/done/052-clean-never-invalidates-release-artifacts.md` in full.
 - `docs/src/reference/build-cost-budget.md`'s three existing data-integrity
   notes (RFC-041, RFC-043, RFC-044). **Yours is the fourth.** Match their
   structure: what was wrong, the evidence, what closes it.

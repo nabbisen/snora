@@ -1,6 +1,6 @@
 # RFC 052 — The compile-time clean never invalidates release artifacts
 
-**Status.** Proposed
+**Status.** Implemented (v0.31.0)
 **Tracks.** Measurement integrity (continues RFC-041, RFC-043, RFC-044).
 **Blocks.** [RFC-050](./050-compile-time-measurement-is-runner-noise.md) — see
 §"Why this lands first".
@@ -57,8 +57,16 @@ $ cargo build -p snora-widgets --features design --release
     Finished in 0.07s          ← nothing recompiled
 ```
 
-Reproducing the script's exact step 2 → clean → step 3 sequence, the
-`build_engine_only` measurement compiles **nothing at all**.
+**Correction (2026-08-15, post-implementation):** an earlier revision said the
+`build_engine_only` measurement "compiles **nothing at all**". That was true of
+one local reproduction and does not generalise. The accurate account, from the
+implementation evidence: the buggy clean spared exactly **`snora-core`** — the
+only crate with no feature-set variation between measurement steps. `snora`
+itself rebuilt in both cases, its fingerprint having already changed for
+reasons unrelated to the clean. The measurement was a *partial* rebuild that
+silently omitted one dependency, not a freshness check. See the RFC-052 note in
+`docs/src/reference/build-cost-budget.md`, which carries the corrected
+mechanism.
 
 ## Which measurements are affected
 

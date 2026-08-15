@@ -197,7 +197,7 @@ the `design` path, and `design = ["widgets", …]` — so any design-path consum
 compiles `snora-widgets` regardless of call sites. "Engine-only" is true of
 their *call sites* and false of their *build*.
 
-Worse, [RFC-053](../proposed/053-responsive-render-excludes-the-design-path.md)
+Worse, [RFC-053](./053-responsive-render-excludes-the-design-path.md)
 records that `responsive_render` hardcodes the engine renderer, so a design-path
 consumer adopting it loses the dialog card and the token-derived modal dim. The
 example is therefore unusable by the team it was modelled on, for two

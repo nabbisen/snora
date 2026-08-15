@@ -1,7 +1,7 @@
 # RFC 050 — Compile-time measurement reports runner speed, not snora
 
 **Status.** Accepted (owner, 2026-08-15) — **blocked on
-[RFC-052](./052-clean-never-invalidates-release-artifacts.md)**; ratio
+[RFC-052](../done/052-clean-never-invalidates-release-artifacts.md)**; ratio
 selection must be re-derived on post-fix data. See §"Blocked" below.
 **Tracks.** Measurement integrity (continues RFC-041, RFC-043, RFC-044).
 Closes gate **9b**.
@@ -17,7 +17,7 @@ Closes gate **9b**.
 Answering Q-1 established that `cargo clean -p` **never invalidates
 release-profile artifacts**, so `build_engine_only_ms` and
 `build_widgets_design_ms` measure cargo's freshness check rather than a build.
-[RFC-052](./052-clean-never-invalidates-release-artifacts.md) fixes that and
+[RFC-052](../done/052-clean-never-invalidates-release-artifacts.md) fixes that and
 must land first.
 
 **What survives:** the common-mode noise analysis below, computed from

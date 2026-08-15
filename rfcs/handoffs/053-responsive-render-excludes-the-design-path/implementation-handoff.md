@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-053 `design::responsive_render`
 
-**Governing RFC.** [RFC-053](../../proposed/053-responsive-render-excludes-the-design-path.md)
-**Status.** Inherited from RFC-053 — Proposed.
+**Governing RFC.** [RFC-053](../../done/053-responsive-render-excludes-the-design-path.md)
+**Status.** Inherited from RFC-053 — Implemented (v0.31.0).
 **Release target.** 0.31.0 (minor — new public API).
 **Implementation units.** One. Independent of RFC-052/RFC-050; any order.
 
@@ -25,7 +25,7 @@ accessibility fix, and who therefore cannot adopt width exposure at all.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/053-responsive-render-excludes-the-design-path.md` in full.
+- `rfcs/done/053-responsive-render-excludes-the-design-path.md` in full.
 - `crates/snora/src/responsive.rs` — 80 lines, the function you are pairing.
 - `crates/snora/src/design/render.rs` — `pub fn render(layout, tokens)`, which
   your new function calls.

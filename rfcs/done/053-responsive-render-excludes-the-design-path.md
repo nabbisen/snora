@@ -1,6 +1,6 @@
 # RFC 053 — `responsive_render` excludes the design path
 
-**Status.** Proposed
+**Status.** Implemented (v0.31.0)
 **Tracks.** Engine surface. Corrects a defect in
 [RFC-046](../done/046-layout-width-exposure.md), which this author wrote.
 **Touches.** `crates/snora/src/design/` (new entry point),
