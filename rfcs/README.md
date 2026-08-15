@@ -98,7 +98,7 @@ Numbers remain stable forever and are never reused.
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | v0.30.0 (accepted; handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
 | 054 | [`design` requires `widgets`, and the engine surface pays for it](./proposed/054-design-requires-widgets.md) | accepted as an investigation (answers RFC-053 Q-1; handoff: [`handoffs/054-…`](./handoffs/054-design-requires-widgets/implementation-handoff.md)) |
-| 055 | [Extract the iced style bridge into its own crate](./proposed/055-extract-the-style-bridge.md) | v0.32.0 (implements RFC-054 option B′; handoff: [`handoffs/055-…`](./handoffs/055-extract-the-style-bridge/implementation-handoff.md)) |
+| 055 | [Extract the iced style bridge into its own crate](./proposed/055-extract-the-style-bridge.md) | v0.32.0 (accepted; implements RFC-054 option B′; handoff: [`handoffs/055-…`](./handoffs/055-extract-the-style-bridge/implementation-handoff.md)) |
 
 ## Archive
 

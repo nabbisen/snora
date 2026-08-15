@@ -1,6 +1,6 @@
 # RFC 055 — Extract the iced style bridge into its own crate
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-15)
 **Tracks.** Crate boundaries. Implements option **B′** from
 [RFC-054](./054-design-requires-widgets.md), whose investigation supplies every
 number here.
