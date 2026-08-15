@@ -24,8 +24,11 @@ unintended growth before it becomes invisible.
 | `example_workbench_ms` | `cargo build --profile release-baseline -p snora-example-design-workbench` |
 
 "Cold" means `snora-core`, `snora-design`, `snora-widgets`, and `snora`
-are cleaned before each measurement, **and**, from the release after
-0.25.3 onward (RFC-043), the CI job runs with no dependency cache at all,
+are cleaned before each measurement, across every profile a measurement
+in this run builds with — dev, `release`, and `release-baseline` — as of
+the RFC-052 fix; see that note below for why this was not true before it
+for two of the six columns. **And**, from the release after 0.25.3
+onward (RFC-043), the CI job runs with no dependency cache at all,
 so iced's transitive closure is rebuilt from scratch too. Through 0.25.3,
 `build-cost.yaml` restored a
 `Swatinem/rust-cache` between runs; because the per-measurement clean only
@@ -137,6 +140,89 @@ Closing 9b needs the measurement made noise-controlled — repeated runs per
 tag reduced to a median, or a metric less dependent on runner load, such as
 instruction counts or a self-relative ratio — **and then** ≥2 data points
 under the new method. Adding more single-sample rows will not close it.
+
+### Data integrity note (RFC-052)
+
+**`cargo clean -p <package>` only reaches the dev profile.** `-r`/`--release`
+and `--profile <NAME>` are separate, required flags — `cargo clean --help`
+documents this directly. The script's per-measurement clean,
+`cargo clean -p snora-core -p snora-design -p snora-widgets -p snora`, never
+passed either, so it cleaned dev-profile artifacts only, while four of the
+six measurements build `release` or `release-baseline`. Found while
+answering RFC-050's Q-1 ("is `build_engine_only_ms` measuring anything?").
+
+Confirmed directly:
+
+```text
+$ cargo build -p snora-core --release
+$ ls target/release/libsnora_core.rlib          → present
+$ cargo clean -p snora-core -p snora-design -p snora-widgets -p snora
+     Removed 0 files                            ← the dev profile only
+$ ls target/release/libsnora_core.rlib          → STILL PRESENT
+```
+
+And the consequence — reproducing the script's own step order, so a
+`release`-profile measurement runs immediately after another one already
+warmed the same profile:
+
+```text
+# BEFORE the fix (dev-only clean, `release` artifacts survive):
+$ cargo build -p snora --no-default-features --release
+    Finished `release` profile [optimized] target(s) in 0.18s   ← nothing compiled
+
+# AFTER the fix (dev + release + release-baseline all cleaned):
+$ cargo build -p snora --no-default-features --release
+   Compiling snora-core v0.30.0 (...)
+   Compiling snora v0.30.0 (...)
+    Finished `release` profile [optimized] target(s) in 0.24s   ← genuinely cold
+```
+
+The same before/after pattern holds for `build_widgets_design_ms`: before
+the fix, only `snora-design`/`snora-widgets` compiled (forced by the
+`design`-feature fingerprint change, independent of the clean bug) while
+`snora-core` rode on a stale `release` artifact; after the fix, `snora-core`
+compiles too.
+
+**Which columns are affected — not all four release/release-baseline
+columns, only two:**
+
+| Column | Profile | Affected? |
+|---|---|---|
+| `check_workspace_ms` | dev | No — the dev-only clean already reached it; confirmed unaffected (RFC-052 Q-1) |
+| `build_widgets_ms` | `release` | No — the first `release`-profile build in an uncached job (RFC-043), cold regardless of the clean bug |
+| `build_engine_only_ms` | `release` | **Yes** — previously measured a freshness check, not a rebuild |
+| `example_hello_ms` | `release-baseline` | No — the first `release-baseline` build in the run, cold regardless |
+| `build_widgets_design_ms` | `release` | **Yes** — `snora-core` now correctly invalidated alongside `snora-design`/`snora-widgets` |
+| `example_workbench_ms` | `release-baseline` | No, materially — real compilation already happened via the `design`-feature difference despite the no-op clean (RFC-052 Q-2) |
+
+A local before/after full-script comparison (two complete runs, same reset
+starting point, no interleaving) put both affected columns' magnitude
+change within normal run-to-run noise on this machine — `build_engine_only_ms`
+moved from 190 ms to 217 ms, `build_widgets_design_ms` from 250 ms to 256 ms.
+**This is not surprising and is not the evidence for the fix**: `snora-core`
+has no dependencies at all, and snora's crates are small enough that a
+genuinely cold rebuild of them can land near the old, no-op measurement's
+time — the same observation RFC-052 made from its own local run (248 ms
+against a 323–421 ms historical range, the same order). The `Compiling`
+lines above are the proof; a small or noisy local delta does not undermine
+that, and CI is the authority for magnitude, not a local machine with warm
+rustc/target caches from repeated testing.
+
+**Rows before this fix and rows after it are not comparable for
+`build_engine_only_ms` and `build_widgets_design_ms`.** No historical row
+is edited or back-filled (RFC-041 N-1) — the discontinuity is recorded,
+not repaired. This is the **third** methodology discontinuity (after
+RFC-043, RFC-044); gate 9b's ≥2-comparable-post-fix-rows clock resets
+again, moving further from closure, not closer — see
+[`api-freeze-review.md`](../contributing/api-freeze-review.md).
+
+RFC-050's `widgets_design_ratio` (`build_widgets_design_ms / build_widgets_ms`)
+was already unsound before this fix: it divides a snora-crates-only rebuild
+by an iced-plus-snora cold build, two different quantities sharing a unit.
+The defect fixed here made the numerator additionally wrong in a second way
+(a freshness check, not a build); RFC-050's ratio selection is being
+re-derived on post-fix data rather than implemented on the columns as they
+stood.
 
 ### Watch points
 

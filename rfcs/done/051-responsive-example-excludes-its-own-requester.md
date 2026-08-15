@@ -40,7 +40,10 @@ with the reason:
 > a slot `AppLayout` names
 
 They also report **zero `snora::widget::*` call sites**, unchanged from
-0.25.2 through 0.28.0. arama, the other known consumer, is the same shape.
+0.25.2 through 0.28.0. **(Correction, 2026-08-15: an earlier revision added
+"arama, the other known consumer, is the same shape." arama has never stated
+their `AppLayout` or widget usage. That claim was unsupported and is
+withdrawn — see the correction note at the end.)**
 
 Every responsive demonstration snora ships:
 
@@ -175,3 +178,40 @@ No library API, no rendering change.
 **0.30.0, minor** — a new workspace member. No migration guide; nothing to
 migrate. Worth a CHANGELOG line under **Added**, naming who it is for, since
 the point is discoverability by a particular kind of reader.
+
+---
+
+## Correction (2026-08-15, post-implementation)
+
+Two claims in this RFC were wrong. Recorded rather than edited away, because
+both shaped what shipped in v0.30.0.
+
+**1. "arama … is the same shape" was invented.** arama has never told snora
+their `AppLayout` slots or whether they use prefab widgets. Their only report
+concerns the dialog card. The generalisation from one consumer to "both known
+consumers" had a sample of one.
+
+**2. The example demonstrates a configuration its intended reader cannot
+run.** `examples/responsive_body` is `default-features = false`. apimokka is on
+the `design` path, and `design = ["widgets", …]` — so any design-path consumer
+compiles `snora-widgets` regardless of call sites. "Engine-only" is true of
+their *call sites* and false of their *build*.
+
+Worse, [RFC-053](../proposed/053-responsive-render-excludes-the-design-path.md)
+records that `responsive_render` hardcodes the engine renderer, so a design-path
+consumer adopting it loses the dialog card and the token-derived modal dim. The
+example is therefore unusable by the team it was modelled on, for two
+independent reasons.
+
+**3. A third consumer has the opposite architecture.** orbok (`snora = "0.25"`,
+`design`) uses `snora::widget::app_side_bar`, `app_tab_bar` and
+`AppLayout::side_bar` — precisely the surface this RFC described as having no
+demonstrated downstream adoption. Their warning is worth keeping: *"We would
+not want the slot-based path to become the undocumented one."*
+
+**What stands.** The gap this RFC identified is real: every responsive
+demonstration taught slot-based chrome, and a consumer composing into `body`
+had nothing to copy. The example is correct and well-tested. What was wrong was
+the claim about *who* it serves — asserted from one report, generalised to a
+population of three, one of which was unknown at the time and one of which had
+never been asked.

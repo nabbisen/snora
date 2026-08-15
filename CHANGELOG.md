@@ -13,6 +13,33 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`measure-compile-time.sh`'s per-measurement clean never invalidated
+  `release`/`release-baseline` artifacts (RFC-052).** `cargo clean -p
+  <package>` reaches the dev profile only — `-r`/`--release` and
+  `--profile <NAME>` are separate, required flags. Four of the six
+  compile-time columns build `release` or `release-baseline`; two of
+  them, `build_engine_only_ms` and `build_widgets_design_ms`, ran
+  immediately after another `release`-profile measurement in the same
+  script invocation and silently rode on its still-warm artifacts
+  instead of measuring a rebuild — confirmed by `Compiling`-line
+  evidence (nothing recompiled before the fix; `snora-core` and the
+  target crates recompile after it), not by a timing delta, since
+  snora's small crates can compile fast enough either way that the
+  numbers alone don't show it. Found while answering RFC-050's Q-1.
+  Fixed by cleaning all three profiles unconditionally before every
+  measurement, decoupling a measurement from its own profile so a
+  future one cannot be added with the wrong clean. **Rows before this
+  fix and after it are not comparable** for `build_engine_only_ms` and
+  `build_widgets_design_ms` — no historical row is edited or
+  back-filled — and gate 9b's compile-time trend closure condition
+  resets again, the third such discontinuity after RFC-043 and
+  RFC-044. See `docs/src/reference/build-cost-budget.md`'s RFC-052 note
+  for the full evidence.
+
 ## [0.30.0] — 2026-08-15
 
 ### Added
