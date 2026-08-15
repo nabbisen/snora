@@ -1,6 +1,6 @@
 # RFC 050 — Compile-time measurement reports runner speed, not snora
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-15) — not yet implemented
 **Tracks.** Measurement integrity (continues RFC-041, RFC-043, RFC-044).
 Closes gate **9b**.
 **Touches.** `scripts/measure-compile-time.sh`,
@@ -155,8 +155,10 @@ trend), and a 10% error does not matter to it.
 ## Non-goals
 
 - **No repeat runs.** See above; revisit only if ratios prove insufficient.
-- **No rewriting or back-filling historical rows.** Existing rows get `N/A`
-  in the new columns. Append-only (RFC-041 N-1).
+- **No rewriting or back-filling historical rows** — including not padding
+  them with `N/A` to match the new header. Historical rows simply have fewer
+  fields than the header; the next appended row is the first complete one.
+  Append-only (RFC-041 N-1).
 - **No CI failure gate.** Compile cost still fails no build; it is a trend
   signal read by humans.
 - **No change to binary-size measurement.** Gate 9a is satisfied and

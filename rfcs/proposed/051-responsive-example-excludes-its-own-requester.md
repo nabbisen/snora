@@ -1,11 +1,13 @@
 # RFC 051 — The responsive example excludes the consumer who asked for it
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-15) — not yet implemented
 **Tracks.** Examples and documentation. Follow-through from apimokka's
 post-adoption report (2026-08-15).
-**Touches.** `examples/` (one new crate), `docs/src/guides/responsive.md`,
-`Cargo.toml` (workspace members), `docs/src/SUMMARY.md` if the guide gains a
-section. **No library code.**
+**Touches.** `examples/` (one new crate), `examples/README.md`,
+`docs/src/guides/responsive.md`, the root `Cargo.toml` **comment** and
+`docs/src/contributing/release-process.md` (see the handoff §4 — this adds a
+second hand-pinned example). **No library code**, and no `workspace.members`
+edit: the root manifest globs `examples/*`.
 **Release target.** 0.30.0 (minor — a new example crate is a workspace
 member; no API change).
 
