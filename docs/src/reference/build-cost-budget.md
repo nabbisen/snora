@@ -168,7 +168,8 @@ warmed the same profile:
 ```text
 # BEFORE the fix (dev-only clean, `release` artifacts survive):
 $ cargo build -p snora --no-default-features --release
-    Finished `release` profile [optimized] target(s) in 0.18s   ← nothing compiled
+   Compiling snora v0.30.0 (...)
+    Finished `release` profile [optimized] target(s) in 0.18s   ← snora-core NOT among the Compiling lines
 
 # AFTER the fix (dev + release + release-baseline all cleaned):
 $ cargo build -p snora --no-default-features --release
@@ -177,11 +178,25 @@ $ cargo build -p snora --no-default-features --release
     Finished `release` profile [optimized] target(s) in 0.24s   ← genuinely cold
 ```
 
-The same before/after pattern holds for `build_widgets_design_ms`: before
-the fix, only `snora-design`/`snora-widgets` compiled (forced by the
-`design`-feature fingerprint change, independent of the clean bug) while
-`snora-core` rode on a stale `release` artifact; after the fix, `snora-core`
+`snora` itself rebuilt in both cases — its own fingerprint had already
+changed for a reason unrelated to the clean (see below), so the bug did
+not spare it. Only `snora-core` rode on a stale `release` artifact
+before the fix, and only `snora-core` is new in the `Compiling` output
+after it.
+
+The same pattern holds for `build_widgets_design_ms`: before the fix,
+`snora-design`/`snora-widgets` compiled (forced by the `design`-feature
+fingerprint change, independent of the clean bug) while `snora-core`
+again rode on a stale `release` artifact; after the fix, `snora-core`
 compiles too.
+
+**In both cases the fix recovers exactly one crate: `snora-core`.** It
+is the only one of the three with no feature-set or package-selection
+variation between measurement steps, so it is the only one cargo's own
+fingerprinting left fresh regardless of the clean bug — `snora` and
+`snora-widgets`/`snora-design` were already being rebuilt for reasons
+unrelated to the clean (a different top-level package, or a changed
+feature flag), and so were never actually spared by it.
 
 **Which columns are affected — not all four release/release-baseline
 columns, only two:**
@@ -190,23 +205,26 @@ columns, only two:**
 |---|---|---|
 | `check_workspace_ms` | dev | No — the dev-only clean already reached it; confirmed unaffected (RFC-052 Q-1) |
 | `build_widgets_ms` | `release` | No — the first `release`-profile build in an uncached job (RFC-043), cold regardless of the clean bug |
-| `build_engine_only_ms` | `release` | **Yes** — previously measured a freshness check, not a rebuild |
+| `build_engine_only_ms` | `release` | **Yes** — previously a partial rebuild that silently omitted `snora-core` (`snora` itself did rebuild; only its one dependency was stale) |
 | `example_hello_ms` | `release-baseline` | No — the first `release-baseline` build in the run, cold regardless |
-| `build_widgets_design_ms` | `release` | **Yes** — `snora-core` now correctly invalidated alongside `snora-design`/`snora-widgets` |
+| `build_widgets_design_ms` | `release` | **Yes** — same pattern: `snora-design`/`snora-widgets` already rebuilt via the feature-flag change; `snora-core` now correctly joins them |
 | `example_workbench_ms` | `release-baseline` | No, materially — real compilation already happened via the `design`-feature difference despite the no-op clean (RFC-052 Q-2) |
 
 A local before/after full-script comparison (two complete runs, same reset
 starting point, no interleaving) put both affected columns' magnitude
 change within normal run-to-run noise on this machine — `build_engine_only_ms`
 moved from 190 ms to 217 ms, `build_widgets_design_ms` from 250 ms to 256 ms.
-**This is not surprising and is not the evidence for the fix**: `snora-core`
-has no dependencies at all, and snora's crates are small enough that a
-genuinely cold rebuild of them can land near the old, no-op measurement's
-time — the same observation RFC-052 made from its own local run (248 ms
-against a 323–421 ms historical range, the same order). The `Compiling`
-lines above are the proof; a small or noisy local delta does not undermine
-that, and CI is the authority for magnitude, not a local machine with warm
-rustc/target caches from repeated testing.
+**This is not surprising and is not the evidence for the fix**: per the
+mechanical account above, the fix recovers compiling exactly one crate,
+`snora-core`, which has no dependencies at all — a small addition on top
+of a measurement that was already compiling something else regardless of
+the bug. That the total time barely moves is consistent with the fix,
+not evidence against it — the same magnitude-vs-mechanism gap RFC-052's
+own local run showed (248 ms against a 323–421 ms historical range, the
+same order). The `Compiling` lines above are the proof; a small or noisy
+local delta does not undermine that, and CI is the authority for
+magnitude, not a local machine with warm rustc/target caches from
+repeated testing.
 
 **Rows before this fix and rows after it are not comparable for
 `build_engine_only_ms` and `build_widgets_design_ms`.** No historical row
@@ -220,9 +238,9 @@ RFC-050's `widgets_design_ratio` (`build_widgets_design_ms / build_widgets_ms`)
 was already unsound before this fix: it divides a snora-crates-only rebuild
 by an iced-plus-snora cold build, two different quantities sharing a unit.
 The defect fixed here made the numerator additionally wrong in a second way
-(a freshness check, not a build); RFC-050's ratio selection is being
-re-derived on post-fix data rather than implemented on the columns as they
-stood.
+(silently omitting `snora-core` from what it rebuilt); RFC-050's ratio
+selection is being re-derived on post-fix data rather than implemented on
+the columns as they stood.
 
 ### Watch points
 
