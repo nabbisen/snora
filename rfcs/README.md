@@ -89,8 +89,10 @@ Numbers remain stable forever and are never reused.
 
 ## Proposed
 
-_(none — RFC-045/046/047 shipped. Next themes await the post-adoption
-report from apimokka and a planning discussion.)_
+| ID | Title | Target |
+|----|-------|--------|
+| 048 | [The dialog card: contradictory documentation and an undiscoverable capability](./proposed/048-dialog-card-documentation-contradiction.md) | v0.28.1 (documentation only) |
+| 049 | [`snora-dialog-card` denotes the wrong element](./proposed/049-dialog-identifier-denotes-the-wrong-element.md) | v0.29.0 (identifier rename; split from 048 F-5) |
 
 ## Archive
 
