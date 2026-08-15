@@ -64,12 +64,27 @@ independently that the v0.28.0 identifiers were inert for them — no
 widget tree — which is the strongest form this check can take: a
 statement from the adopter rather than an assessment of them.
 
-That same team then scheduled work to build scripted verification
-**against** these identifiers. So the condition that made repurposing
-acceptable is **no longer expected to hold**, and the next rename should
-assume adopters exist. Re-check by asking the known integrations
-directly; do not re-derive it from their last reported version, which
-lags what they are building.
+Their report also said they had scheduled work to build scripted
+verification **against** these identifiers — which would have ended the
+premise. **They then corrected that**: their verification drives the
+application from a separate process over compositor IPC, and an
+`iced::widget::Id` lives inside iced's widget tree, never surfaced to the
+compositor, to X11, or to any accessibility API. It is invisible to them.
+The task is not scheduled, and would only return if they adopted an
+in-process harness such as `iced_test`.
+
+So the premise holds longer than either side first thought. Two lessons
+worth more than the conclusion:
+
+- **`Id`s serve in-process harnesses only.** Any consumer driving snora
+  externally gets nothing from them. That bounds who the compatibility
+  surface is *for*, and it is a narrower group than "anyone writing GUI
+  tests" — see [`guides/testing.md`](../guides/testing.md), which is what
+  led them to the correction.
+- **Ask the adopter; do not infer from their last reported version.** Both
+  the original premise and its apparent expiry were inferences, and the
+  expiry was wrong. Before any further rename, ask the known integrations
+  directly what they assert on.
 
 ## MSRV bump policy
 
