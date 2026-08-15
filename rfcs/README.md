@@ -91,6 +91,7 @@ Numbers remain stable forever and are never reused.
 | 051 | [The responsive example excludes the consumer who asked for it](./done/051-responsive-example-excludes-its-own-requester.md) | v0.30.0 (handoff: [`handoffs/051-…`](./handoffs/051-responsive-example-excludes-its-own-requester/implementation-handoff.md)) |
 | 052 | [The compile-time clean never invalidates release artifacts](./done/052-clean-never-invalidates-release-artifacts.md) | v0.31.0 (handoff: [`handoffs/052-…`](./handoffs/052-clean-never-invalidates-release-artifacts/implementation-handoff.md)) |
 | 053 | [`responsive_render` excludes the design path](./done/053-responsive-render-excludes-the-design-path.md) | v0.31.0 (handoff: [`handoffs/053-…`](./handoffs/053-responsive-render-excludes-the-design-path/implementation-handoff.md)) |
+| 055 | [Extract the iced style bridge into its own crate](./done/055-extract-the-style-bridge.md) | v0.32.0 (handoff: [`handoffs/055-…`](./handoffs/055-extract-the-style-bridge/implementation-handoff.md)) |
 
 ## Proposed
 
@@ -98,7 +99,6 @@ Numbers remain stable forever and are never reused.
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | v0.30.0 (accepted; handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
 | 054 | [`design` requires `widgets`, and the engine surface pays for it](./proposed/054-design-requires-widgets.md) | accepted as an investigation (answers RFC-053 Q-1; handoff: [`handoffs/054-…`](./handoffs/054-design-requires-widgets/implementation-handoff.md)) |
-| 055 | [Extract the iced style bridge into its own crate](./proposed/055-extract-the-style-bridge.md) | v0.32.0 (accepted; implements RFC-054 option B′; handoff: [`handoffs/055-…`](./handoffs/055-extract-the-style-bridge/implementation-handoff.md)) |
 
 ## Archive
 

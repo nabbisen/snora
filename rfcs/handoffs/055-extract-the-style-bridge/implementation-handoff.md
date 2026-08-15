@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-055 extract `snora-style`
 
-**Governing RFC.** [RFC-055](../../proposed/055-extract-the-style-bridge.md)
-**Status.** Inherited from RFC-055 — Accepted (owner, 2026-08-15).
+**Governing RFC.** [RFC-055](../../done/055-extract-the-style-bridge.md)
+**Status.** Inherited from RFC-055 — Implemented (v0.32.0).
 **Release target.** 0.32.0 (minor — new published crate, no public path
 changes).
 **Implementation units.** One. Independent of RFC-050.
@@ -29,7 +29,7 @@ This is a relocation. **No behaviour changes anywhere.**
 
 ## 3. Background — read first
 
-- `rfcs/proposed/055-extract-the-style-bridge.md` in full.
+- `rfcs/done/055-extract-the-style-bridge.md` in full.
 - `rfcs/proposed/054-design-requires-widgets.md` — the investigation, including
   the measured figures and the feature-propagation bug (§5 below).
 - `docs/src/reference/architecture.md` — opens *"Snora is four crates"*. You

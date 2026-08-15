@@ -97,6 +97,19 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.32.0** — `snora-style`, a fifth crate (RFC-055). The token→iced style
+  bridge — `card_raised`, `to_iced_color`, the theme emitter — lived inside
+  `snora-widgets` while having **three** consumers: the prefab widgets, the
+  engine chrome's dialog card, and applications calling
+  `snora::design::style::*` on their own iced widgets. One vocabulary,
+  physically inside one of its three users, so the engine reached sideways and
+  `design` could not be enabled without `widgets`.
+  **`design` and `widgets` are now independent** — four expressible
+  configurations where three existed, the new one being design without widgets.
+  No public path changed and nothing is deprecated; the `snora-widgets`
+  re-exports remain as compatibility shims. The default configuration is
+  **byte-for-byte unchanged**, which is what proves the new crate is a genuinely
+  conditional dependency.
 - **0.31.0** — `snora::design::responsive_render` (RFC-053). Width exposure
   shipped in 0.28.0 rendered through the engine path unconditionally, so a
   `design`-path application adopting it silently lost the styled dialog card
