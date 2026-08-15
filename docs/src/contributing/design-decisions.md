@@ -19,7 +19,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | Default `ToastPosition` is `TopEnd` | Accepted | User research showing another default is more ergonomic |
 | Application owns toast `Vec` | Firm boundary | Framework-owned queue that apps cannot control |
 | No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve |
-| Four crates (`-core`, `-design`, `-widgets`, engine) | Accepted | iced-free core becomes unnecessary |
+| Five crates (`-core`, `-design`, `-style`, `-widgets`, engine) | Accepted | A layer gains a second consumer that does not fit its crate, as the style bridge did (RFC-055) |
 | `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly |
 | Coarse `widgets` feature gate | Accepted | Two of the five feature-gating indicators are met |
 | `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) |
@@ -158,7 +158,7 @@ inspector, mock AppLayout). Decided against:
 
 If the pattern becomes painful in practice, we will revisit.
 
-## Why four crates
+## Why five crates
 
 In 0.4 and 0.5, snora was a two-crate workspace
 (`snora-core` + `snora`). In 0.6 we carved out the prefab widgets
@@ -205,10 +205,45 @@ one layer up. `snora-widgets` depends on `snora-design` (behind the
 does not depend on `snora-design`. See RFC-020 and RFC-021 for the
 full design-system boundary and crate/feature architecture.
 
-The four-crate split remains invisible to applications that depend
-only on `snora` — the `design` feature (opt-in) re-exports
-`snora-design`'s types and `snora-widgets`' style bridge under
-`snora::design`.
+### A fifth crate: `snora-style`
+
+In 0.32 we carved a fifth crate, `snora-style`, out of `snora-widgets`
+(RFC-055). The trigger was not size — the whole style layer is ~48 KB and
+0.3% of a release binary — but **consumer count**.
+
+`card_raised` had three callers: the card *widget* in `snora-widgets`, the
+*engine chrome*'s dialog card in `snora`, and *applications* directly, since
+`snora::design::style::*` re-exports the style modules for use on an
+application's own iced widgets. One style vocabulary with three consumers,
+physically located inside one of the three. The engine therefore reached
+sideways into a crate it otherwise did not need, and `design` could not be
+enabled without `widgets`.
+
+The layering test is the one that settled it: the style layer imports nothing
+from the widget layer, while five widget-layer modules import *it*. It was
+structurally below the widget layer already, inside the widget crate. The
+theme emitter moved for the same reason — its imports are `iced`,
+`snora-design` and `style::color`, with nothing from the widget layer.
+
+The result is that **`design` and `widgets` are independent**: four
+expressible configurations where three existed, the new one being design
+without widgets. The default configuration is byte-for-byte unchanged, which
+is what proves `snora-style` is a genuinely conditional dependency.
+
+The cost is one more crate to publish and one more `Cargo.toml`, plus
+`snora::design` being partially available — its widget-layer re-exports are
+`#[cfg(feature = "widgets")]`-gated, which is unavoidable for any design
+configuration that does not include widgets.
+
+**Reconsideration trigger:** *a layer inside one crate acquires a consumer
+outside it that does not depend on that crate.* That is what happened here
+twice — `snora-design` in 0.19 and `snora-style` in 0.32 — and it is the
+signal to check layering rather than to add a re-export.
+
+The five-crate split remains invisible to applications that depend only on
+`snora` — the `design` feature (opt-in) re-exports `snora-design`'s types and
+`snora-style`'s bridge under `snora::design`, and every pre-0.32 import path
+still resolves through compatibility re-exports in `snora-widgets`.
 
 ## Why `Tab` and `Crumb` are separate vocabulary, not one navigation type
 

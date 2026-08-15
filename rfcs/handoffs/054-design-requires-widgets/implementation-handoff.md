@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-054 `design` requires `widgets`
 
-**Governing RFC.** [RFC-054](../../proposed/054-design-requires-widgets.md)
-**Status.** Inherited from RFC-054 — Accepted (owner, 2026-08-15).
+**Governing RFC.** [RFC-054](../../done/054-design-requires-widgets.md)
+**Status.** Inherited from RFC-054 — Closed (v0.32.0).
 **Release target.** None yet — see §1.
 **Implementation units.** One. **This is an investigation, not an
 implementation.**
@@ -32,7 +32,7 @@ A spike is expected and welcome. **Revert it before you report.**
 
 ## 2. Background — read first
 
-- `rfcs/proposed/054-design-requires-widgets.md` in full.
+- `rfcs/done/054-design-requires-widgets.md` in full.
 - `rfcs/done/039-engine-surface-styling.md` §"The dialog card" — why
   `card_raised` is reused rather than reimplemented. That decision constrains
   every option.

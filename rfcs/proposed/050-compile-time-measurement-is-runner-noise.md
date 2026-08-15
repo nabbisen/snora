@@ -12,6 +12,25 @@ Closes gate **9b**.
 `docs/src/contributing/api-freeze-review.md`.
 **Release target.** 0.30.0 (minor — the CSV gains columns).
 
+## Parked — do not implement yet (2026-08-15)
+
+RFC-052 shipped in v0.31.0, so the clean is fixed and the two post-fix rows
+(0.31.0, 0.32.0) now exist. **That is not enough data**, for two reasons:
+
+- **Two points do not support this RFC's analysis.** The common-mode finding
+  below was derived from *four* rows spanning three orders of magnitude. Two
+  rows give a range, not a variance estimate.
+- **The two rows bracket a crate extraction.** v0.32.0 added `snora-style`
+  (RFC-055) and changed what the widgets and design builds compile, so the
+  delta between them mixes real structural change with runner noise — the
+  exact confound this RFC exists to separate.
+
+**Wait for roughly two more releases of quiet data**, then re-derive. Forcing
+a trend rule out of two non-comparable points would repeat the error RFC-041
+was raised to end.
+
+Gate 9b remains open and its clock is unchanged by this.
+
 ## Blocked — read before implementing
 
 Answering Q-1 established that `cargo clean -p` **never invalidates
