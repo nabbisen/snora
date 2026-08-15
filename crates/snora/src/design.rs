@@ -50,8 +50,14 @@ pub use snora_widgets::design::theme::theme;
 /// [`render`] is a sibling to [`crate::render::render`] (`snora::render`),
 /// not a replacement — see [`render`]'s own documentation for the
 /// derivation and the gating-invariant guarantee.
+///
+/// [`responsive_render`] is the `design`-path pair to
+/// [`crate::responsive::responsive_render`] (`snora::responsive_render`)
+/// — width-aware layout that keeps the styled dialog card and derived
+/// modal dim, where the engine-path function would silently drop them
+/// (RFC-053).
 pub mod render;
-pub use render::render;
+pub use render::{render, responsive_render};
 
 /// Token-derived chrome geometry: styled variants of the header, sidebar,
 /// footer, tab bar, and breadcrumb (RFC-040).

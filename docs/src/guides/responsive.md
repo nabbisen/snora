@@ -56,6 +56,17 @@ call from there.
 the same way `snora::design::render` (RFC-039) sits beside it for
 token-derived styling.
 
+## Two entry points, one per render path (RFC-053)
+
+`snora::responsive_render` renders through `snora::render` — the
+engine path, no card, no derived dim. If your application calls
+`snora::design::render` elsewhere, use `snora::design::responsive_render`
+instead: same shape, `&Tokens` as a second argument, and it keeps the
+styled dialog card and token-derived modal dim that the engine-path
+function does not have. Mixing the two — `design::render` for the rest
+of your app but the engine-path `responsive_render` for width — was
+not possible before this pair existed.
+
 ## Try it
 
 ```text

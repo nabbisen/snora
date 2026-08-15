@@ -286,3 +286,51 @@ fn dialog_card_identifier_resolves_to_the_card_not_the_window() {
          to catch"
     );
 }
+
+// ---------------------------------------------------------------------------
+// `design::responsive_render` keeps the design chrome (RFC-053).
+// ---------------------------------------------------------------------------
+
+/// The defect RFC-053 exists to catch: `crate::responsive::responsive_render`
+/// (the engine path) renders through `crate::render::render`
+/// unconditionally, so a `design`-path application that adopted it lost
+/// the styled dialog card and the derived modal dim — silently, since
+/// the layout still renders and the width still reaches the closure. An
+/// identifier- or width-*presence* check cannot see this, the same shape
+/// as RFC-049: the defect is "renders, but through the wrong path," and
+/// presence is unchanged by which path rendered it.
+///
+/// This test instead resolves `snora-dialog-card` — emitted **only** on
+/// the design path (see [`identifiers_present_in_rendered_output`] in
+/// `identifiers/tests.rs`, which asserts its absence on the engine path)
+/// — through `design::responsive_render`'s own output. If this function
+/// ever silently forwarded to the engine path instead of calling
+/// [`render`], `snora-dialog-card` would not exist to resolve. Verified
+/// empirically, not just by reading the test: pointed this same body at
+/// `crate::responsive::responsive_render` (the engine path) instead, and
+/// it failed with `SelectorNotFound` for `snora-dialog-card` — the exact
+/// RFC-053 defect. Restored and reconfirmed passing before landing.
+#[test]
+fn responsive_render_keeps_the_design_chrome() {
+    let tokens = Tokens::light();
+    let window_size = Size::new(1024.0, 768.0);
+
+    let element = responsive_render(
+        move |_width| {
+            let dialog: Dialog<Element<'_, Msg>, Msg> =
+                Dialog::new(iced::widget::text("dialog content").into());
+            AppLayout::new(iced::widget::text("body").into())
+                .dialog(dialog)
+                .on_close_modals(Msg::Noop)
+        },
+        &tokens,
+    );
+
+    let mut sim = Simulator::with_size(iced_test::core::Settings::default(), window_size, element);
+
+    sim.find(Id::new(crate::identifiers::DIALOG_CARD)).expect(
+        "snora-dialog-card must resolve through design::responsive_render — if it does not, \
+         this function is silently rendering through the engine path instead of design::render, \
+         which is exactly the RFC-053 defect this test exists to catch",
+    );
+}

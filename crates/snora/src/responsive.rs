@@ -33,6 +33,16 @@
 //! directly — the same public entry point applications call today. There
 //! is no second copy of the layer-composition logic; RFC-039 already
 //! extracted the shared path this reuses.
+//!
+//! # This is the engine path (RFC-053)
+//!
+//! [`responsive_render`] renders through [`crate::render::render`]
+//! **unconditionally** — a `design`-path application that adopts it
+//! loses the styled dialog card and the token-derived modal dim, since
+//! neither exists on the engine path. Use
+//! [`crate::design::render::responsive_render`] (`snora::design::responsive_render`)
+//! instead if your application calls [`crate::design::render::render`]
+//! (`snora::design::render`) elsewhere.
 
 use iced::widget::Responsive;
 use iced::{Element, Size};
@@ -50,6 +60,13 @@ use snora_core::AppLayout;
 /// engine capability, not `design`-gated, so it lives in the default
 /// surface next to `render`. Applications not calling this entry point
 /// are unaffected; `render`'s own behavior and signature are unchanged.
+///
+/// **Renders through the engine path unconditionally** (RFC-053) — see
+/// the module documentation's "This is the engine path" section. A
+/// `design`-path application wants
+/// [`crate::design::render::responsive_render`] instead, or this
+/// function silently drops the styled dialog card and derived modal
+/// dim.
 ///
 /// ```rust,ignore
 /// use snora::{AppLayout, responsive_render};

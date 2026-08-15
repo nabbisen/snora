@@ -15,6 +15,22 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+### Added
+
+- **`snora::design::responsive_render` — the `design`-path pair to
+  `snora::responsive_render` (RFC-053).** `snora::responsive_render`
+  renders through the engine path unconditionally, so a `design`-path
+  application that adopted it silently lost the styled dialog card and
+  the token-derived modal dim — including the `high_contrast_dark`
+  visibility fix RFC-039 shipped. Reported by apimokka, whose entire
+  0.28 adoption existed to deliver that accessibility fix, and who
+  therefore could not adopt width exposure at all without regressing
+  it. `snora::design::responsive_render(build, &tokens)` wraps
+  `snora::design::render` the same way the engine-path function wraps
+  `snora::render` — same shape, `&Tokens` as a second argument, no new
+  composition path. `snora::responsive_render`'s own documentation now
+  states plainly that it renders through the engine path.
+
 ### Fixed
 
 - **`measure-compile-time.sh`'s per-measurement clean never invalidated
@@ -26,10 +42,14 @@ are recorded in the per-version migration guides under
   immediately after another `release`-profile measurement in the same
   script invocation and silently rode on its still-warm artifacts
   instead of measuring a rebuild — confirmed by `Compiling`-line
-  evidence (nothing recompiled before the fix; `snora-core` and the
-  target crates recompile after it), not by a timing delta, since
-  snora's small crates can compile fast enough either way that the
-  numbers alone don't show it. Found while answering RFC-050's Q-1.
+  evidence, not by a timing delta, since snora's small crates can
+  compile fast enough either way that the numbers alone don't show it.
+  Specifically, `snora-core` — the one crate with no feature-set
+  variation between measurement steps — was the only one left stale by
+  the bug; the other crates in each measurement were already being
+  rebuilt for unrelated reasons (a different top-level package, or a
+  changed feature flag) and so were never actually spared by it. Found
+  while answering RFC-050's Q-1.
   Fixed by cleaning all three profiles unconditionally before every
   measurement, decoupling a measurement from its own profile so a
   future one cannot be added with the wrong clean. **Rows before this

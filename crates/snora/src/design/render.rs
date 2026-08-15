@@ -58,8 +58,9 @@
 //! move a color away from its own tone; it only ever chooses between two
 //! fixed, maximally-distinct poles.
 
-use iced::Element;
 use iced::theme::palette::is_dark;
+use iced::widget::Responsive;
+use iced::{Element, Size};
 use snora_core::AppLayout;
 use snora_design::Tokens;
 use snora_widgets::design::style::color::to_iced_color;
@@ -97,6 +98,52 @@ where
     Message: Clone + 'a,
 {
     render_with_style(layout, &chrome_style(tokens))
+}
+
+/// Renders an [`AppLayout`] that may depend on the available width,
+/// through the `design` path — the styled dialog card and the
+/// token-derived modal dim survive, unlike [`crate::responsive::responsive_render`]
+/// (RFC-053).
+///
+/// `build` receives the width available to the layout (in logical
+/// pixels) and returns the `AppLayout` to render at that width. It may
+/// be called again whenever the available size changes — see
+/// [`iced::widget::Responsive`]'s own documentation for the underlying
+/// mechanism. Mirrors [`crate::responsive::responsive_render`] exactly,
+/// with [`render`] in place of [`crate::render::render`]; it is a
+/// wrapper around the existing composition path, not a second one — see
+/// this module's documentation for why that duplication is exactly what
+/// RFC-039 built [`render`] to avoid.
+///
+/// `&'a Tokens`, matching [`render`]'s own `(layout, &tokens)` shape:
+/// the borrow is natural in the usual `fn view(&self) -> Element<'_,
+/// Message>`, where the returned element already borrows `&self`.
+///
+/// ```rust,ignore
+/// use snora::{AppLayout, design::{Tokens, responsive_render}};
+///
+/// fn view(state: &State) -> Element<'_, Message> {
+///     let tokens = Tokens::light();
+///     responsive_render(
+///         move |width| {
+///             let layout = AppLayout::new(body(state));
+///             if width < 600.0 {
+///                 layout
+///             } else {
+///                 layout.side_bar(sidebar(state))
+///             }
+///         },
+///         &tokens,
+///     )
+/// }
+/// ```
+#[must_use]
+pub fn responsive_render<'a, Message, F>(build: F, tokens: &'a Tokens) -> Element<'a, Message>
+where
+    F: Fn(f32) -> AppLayout<Element<'a, Message>, Message> + 'a,
+    Message: Clone + 'a,
+{
+    Responsive::new(move |size: Size| render(build(size.width), tokens)).into()
 }
 
 fn chrome_style(tokens: &Tokens) -> ChromeStyle {
