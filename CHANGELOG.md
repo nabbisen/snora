@@ -13,7 +13,7 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
-## [Unreleased]
+## [0.30.0] — 2026-08-15
 
 ### Added
 

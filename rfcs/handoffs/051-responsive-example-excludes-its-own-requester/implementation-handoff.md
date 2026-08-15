@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-051 engine-only responsive example
 
-**Governing RFC.** [RFC-051](../../proposed/051-responsive-example-excludes-its-own-requester.md)
-**Status.** Inherited from RFC-051 — Accepted, not yet implemented.
+**Governing RFC.** [RFC-051](../../done/051-responsive-example-excludes-its-own-requester.md)
+**Status.** Inherited from RFC-051 — Implemented (v0.30.0).
 **Release target.** 0.30.0 (minor — new workspace member).
 **Implementation units.** One. Independent of RFC-050; either may land first.
 
@@ -29,7 +29,7 @@ against whatever example they work from.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/051-responsive-example-excludes-its-own-requester.md` in full.
+- `rfcs/done/051-responsive-example-excludes-its-own-requester.md` in full.
 - `examples/responsive/src/main.rs` — what you are *complementing*, not
   replacing.
 - `examples/dialog/` or `examples/hello/` — existing engine-only examples, for

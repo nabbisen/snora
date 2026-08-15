@@ -1,6 +1,6 @@
 # RFC 051 — The responsive example excludes the consumer who asked for it
 
-**Status.** Accepted (owner, 2026-08-15) — not yet implemented
+**Status.** Implemented (v0.30.0)
 **Tracks.** Examples and documentation. Follow-through from apimokka's
 post-adoption report (2026-08-15).
 **Touches.** `examples/` (one new crate), `examples/README.md`,

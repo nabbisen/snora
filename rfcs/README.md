@@ -88,13 +88,13 @@ Numbers remain stable forever and are never reused.
 | 047 | [Stable identifiers on snora-rendered surfaces](./done/047-stable-identifiers-on-rendered-surfaces.md) | v0.28.0 (handoff: [`handoffs/047-…`](./handoffs/047-stable-identifiers-on-rendered-surfaces/implementation-handoff.md)) |
 | 048 | [The dialog card: contradictory documentation and an undiscoverable capability](./done/048-dialog-card-documentation-contradiction.md) | v0.28.1 (handoff: [`handoffs/048-…`](./handoffs/048-dialog-card-documentation-contradiction/implementation-handoff.md)) |
 | 049 | [`snora-dialog-card` denotes the wrong element](./done/049-dialog-identifier-denotes-the-wrong-element.md) | v0.29.0 (handoff: [`handoffs/049-…`](./handoffs/049-dialog-identifier-denotes-the-wrong-element/implementation-handoff.md)) |
+| 051 | [The responsive example excludes the consumer who asked for it](./done/051-responsive-example-excludes-its-own-requester.md) | v0.30.0 (handoff: [`handoffs/051-…`](./handoffs/051-responsive-example-excludes-its-own-requester/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | v0.30.0 (accepted; handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
-| 051 | [The responsive example excludes the consumer who asked for it](./proposed/051-responsive-example-excludes-its-own-requester.md) | v0.30.0 (accepted; handoff: [`handoffs/051-…`](./handoffs/051-responsive-example-excludes-its-own-requester/implementation-handoff.md)) |
 | 052 | [The compile-time clean never invalidates release artifacts](./proposed/052-clean-never-invalidates-release-artifacts.md) | v0.30.0 (**blocks RFC-050**; handoff: [`handoffs/052-…`](./handoffs/052-clean-never-invalidates-release-artifacts/implementation-handoff.md)) |
 
 ## Archive

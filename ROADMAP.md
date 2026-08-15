@@ -97,6 +97,15 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.30.0** — `examples/responsive_body`: an engine-only responsive example
+  composed the way snora's known consumers actually build (RFC-051).
+  `responsive_render` shipped in 0.28.0 because a downstream team asked for
+  it, yet every demonstration of it taught `AppLayout::side_bar` built from
+  prefab widgets — which that team uses none of. The new example varies
+  `body`'s own composition instead, with engine-only enforced by the compiler
+  rather than by discipline. Additive; nothing else changed.
+  **Also fixes** version snippets in the icons guide, stale since 0.28.0
+  because the 0.29.0 release missed a checklist item that names that file.
 - **0.29.0** — `snora-dialog-card` now names the card. Since 0.27.0 it was
   attached to the dialog's full-window centring container, so resolving it
   returned window-sized bounds and the actual card carried no identifier at
