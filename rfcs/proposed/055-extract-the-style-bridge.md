@@ -31,6 +31,17 @@ is **0.3%**, and no consumer decision turns on it.
 
 The reasons that do carry weight:
 
+**0. The style layer already has three consumers, and widgets is one of
+them.** `card_raised` is called by the card *widget*
+(`snora-widgets/src/design/card.rs:81`), by the *engine chrome*
+(`snora/src/design/render.rs:173`, the dialog card), and by *applications*
+directly — `snora::design::style::*` re-exports all five style modules, so an
+application can style its own iced widgets with them.
+
+There are not two kinds of style with a boundary between them. There is **one
+style vocabulary with three consumers**, physically located inside one of the
+three. That is the whole finding; everything below is consequence.
+
 **1. The misplacement compounds.** Two RFCs have already reached across the
 boundary: RFC-039 for `card_raised`, RFC-053 via `design::render`. Every future
 engine-surface styling feature reaches again, and every style function added
