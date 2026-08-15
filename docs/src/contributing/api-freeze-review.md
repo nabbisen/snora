@@ -96,7 +96,7 @@ Type-names audit: **complete as of v0.17.0.**
 |---|---|
 | 1. One iced major upgrade completed and lived on ≥1 minor | ⬜ |
 | 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
-| 3. At least one third-party or production-grade app | ⬜ first downstream user identified (v0.18.1 build failure report from nabbisen/logolig) |
+| 3. At least one third-party or production-grade app | ⬜ **verdict open; evidence updated v0.33.0.** The v0.18.1 entry (a build-failure report from `nabbisen/logolig`) is superseded. Three integrations now exist: **apimokka** (desktop GUI for apimock-rs, public repository, on 0.29.0, engine + `design`, zero `snora::widget::*` call sites), **arama** (image/video browser, on 0.25.0), and **orbok** (AI-driven document search, on 0.25.1, `widgets` + `design`, the only consumer exercising the prefab widgets and chrome geometry). Between them they have driven RFCs 045–056 across eight releases. What remains a judgement rather than a fact: whether any of these is *third-party* — all three are adjacent projects, not unaffiliated adopters — and whether "production-grade" is met by an application whose own visual-verification pass is still outstanding. Decide those two words before ticking this. |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
 | 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests at the time, **11 as of v0.29.0**, including 2 RTL. **Semantic, not pixel** — see the note below. |
 | 6. Feature-matrix CI stable | ✅ v0.11 |
