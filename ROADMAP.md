@@ -90,6 +90,13 @@ D-gates.
 
 ## Recently shipped
 
+- **Gate 9 split (recorded v0.29.0).** Binary-size trend monitoring is
+  **satisfied** — four rows on one runner and methodology, and the series
+  tracks real change. Compile-time monitoring stays **open**: the same four
+  rows spread 21–27%, and the documentation-only 0.28.1 moved them 8–11%
+  with zero code changed, so the variance exceeds any per-release signal.
+  Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
+  was once declared satisfied on data that did not support it.
 - **0.29.0** — `snora-dialog-card` now names the card. Since 0.27.0 it was
   attached to the dialog's full-window centring container, so resolving it
   returned window-sized bounds and the actual card carried no identifier at
@@ -173,6 +180,10 @@ D-gates.
   `binary-size.csv` schema corrected (7-field rows); Gate 9 ✅ (binary-size
   and build-cost both have ≥2 real CI data points). Remaining 1.0 blockers:
   gate 1 (iced upgrade) and gate 3 (third-party app).
+  **This gate-9 claim was false and was retracted in 0.25.3 (RFC-041):**
+  the workflows had never run on a release tag, and every row was `N/A`.
+  Left here as written rather than edited, per the append-only record
+  policy — see 0.25.3 above and 0.29.0 for where the gate actually stands.
 - **0.19.0** — Snora Design System foundation (RFC-020–030, opt-in `design`
   feature): `snora-design` crate, style bridge, pilot button/card helpers,
   CI quality gates, accessibility docs, API governance, design workbench.

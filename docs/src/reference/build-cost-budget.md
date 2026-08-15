@@ -101,6 +101,43 @@ the append-only policy (RFC-041 N-1). This criterion is not closed by the
 fix landing; it closes only when the next tagged release's row is
 confirmed to read `ubuntu-latest`.
 
+### Data integrity note (gate 9b, v0.29.0)
+
+**These numbers are not yet a usable trend, and gate 9b stays open because
+of it.** Four rows now share a runner, rustc and methodology — 0.27.0,
+0.27.1, 0.28.0, 0.28.1, all `ubuntu-latest`. Across those four:
+
+| Column | min | max | spread |
+|---|---|---|---|
+| `check_workspace_ms` | 46 099 | 56 016 | **21.5%** |
+| `build_widgets_ms` | 77 807 | 97 086 | **24.8%** |
+| `example_hello_ms` | 121 337 | 154 160 | **27.1%** |
+
+The decisive case is 0.28.0 → 0.28.1. That release changed **no code at
+all** — RFC-048 was documentation and doc comments only, proven by
+`git diff --stat -- 'crates/**/*.rs'` touching comment lines exclusively —
+yet `check_workspace_ms` rose **11.3%**, `build_widgets_ms` **9.5%** and
+`example_hello_ms` **7.7%**. Whatever those deltas measure, it is not
+snora.
+
+Shared GitHub runners vary in CPU model and neighbour load between jobs,
+and a single wall-clock sample per tag cannot separate that from real
+change. **The "Watch points" thresholds below should be read with this in
+mind:** a step-change smaller than roughly 25% is not currently
+distinguishable from runner variance.
+
+Compare `binary-size.csv`, which does not have this problem — engine size
+moved **−0.0008%** across the same documentation-only release. Binary size
+is deterministic given the same toolchain; wall-clock time is not. That
+asymmetry is why gate 9 is recorded as split (9a satisfied, 9b open) in
+[`api-freeze-review.md`](../contributing/api-freeze-review.md) rather than
+ticked or held whole.
+
+Closing 9b needs the measurement made noise-controlled — repeated runs per
+tag reduced to a median, or a metric less dependent on runner load, such as
+instruction counts or a self-relative ratio — **and then** ≥2 data points
+under the new method. Adding more single-sample rows will not close it.
+
 ### Watch points
 
 No CI failures are triggered by compile time in the first iteration.

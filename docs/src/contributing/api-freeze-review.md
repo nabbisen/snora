@@ -102,18 +102,31 @@ Type-names audit: **complete as of v0.17.0.**
 | 6. Feature-matrix CI stable | ✅ v0.11 |
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
-| 9. Binary-size and compile-time trends monitored (≥2 data points) | ⬜ **reopened (RFC-041).** Both measurement workflows triggered on `refs/tags/v*`, but all 38 project tags carry no `v` prefix, so the append-on-tag step never fired on any release tag. `binary-size.csv` holds three rows in which every measurement column is `N/A`; `compile-time.csv` has two rows, one on `runner_os = unknown` (a sandbox, not CI). Zero usable CI data points exist. Fixed in 0.25.3; re-satisfy once ≥2 real post-fix data points exist on the same runner and methodology. |
+| 9a. **Binary-size** trend monitored (≥2 data points) | ✅ v0.29.0 — four post-fix rows on one runner and methodology (0.27.0, 0.27.1, 0.28.0, 0.28.1, all `ubuntu-latest`, same rustc). The series tracks real change: `widgets_diff_bytes` 44,928 → 45,056 → 46,592 → 46,720. Across the documentation-only 0.28.1, engine size moved **−0.0008%** — signal dominates noise. |
+| 9b. **Compile-time** trend monitored (≥2 data points) | ⬜ **open — data exists but is too noisy to call a trend.** The same four rows spread 21.5% (`check_workspace_ms`), 24.8% (`build_widgets_ms`) and 27.1% (`example_hello_ms`). 0.28.0 → 0.28.1 changed **no code at all** — documentation only — yet moved those figures **+11.3%, +9.5%, +7.7%**. Shared-runner variance exceeds any plausible per-release signal, so "trend monitored" would claim more than the numbers support. Re-satisfy once the measurement is noise-controlled — e.g. repeated runs per tag reduced to a median, or a metric less dependent on runner load — **and** ≥2 post-change data points exist. |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-**Gates satisfied: 2, 4, 5, 6, 7, 8, 10 = seven of ten.**
+**Gates satisfied: 2, 4, 5, 6, 7, 8, 9a, 10 = seven of ten, plus the
+binary-size half of gate 9.**
+
+Gate 9 is deliberately recorded as **split** rather than ticked or held
+whole. Its two measurements are in genuinely different conditions, and
+collapsing them either way would misstate one of them: ticking it claims a
+compile-time trend the variance contradicts, holding it whole denies
+binary-size work that does exactly what the gate asks.
 
 Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
-measurement trend data (gate 9, reopened by RFC-041). The previous
+compile-time measurement noise (gate 9b). The previous
 "Gate 9 fully satisfied: binary-size has three CI data points" claim was
 wrong on two counts: `v0.17.0`'s `runner_os` is `unknown` (not CI), and all
 three rows are `N/A` — so the honest count was never eight of ten. See
 `docs/src/reference/binary-size-budget.md` and `build-cost-budget.md` for
 the full data-integrity record.
+
+The 9a/9b split follows the same principle as that correction. RFC-041 was
+raised because a gate had been declared satisfied on data that did not
+support the claim; satisfying 9b now on a 25%-noise series would be a
+quieter instance of the same mistake.
 
 ## How to use this document
 
