@@ -3176,6 +3176,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "snora-example-responsive-body"
+version = "0.29.0"
+dependencies = [
+ "iced",
+ "snora",
+]
+
+[[package]]
 name = "snora-example-rtl"
 version = "0.29.0"
 dependencies = [

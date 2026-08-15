@@ -26,13 +26,13 @@ authors = ["nabbisen"]
 # When the workspace version bumps, the entries below cover every
 # example that uses `snora = { workspace = true }`.
 #
-# NOT every example does. `examples/size_probe_engine` needs
-# `default-features = false`, so it pins `snora` explicitly and does
-# **not** follow this table. On a minor bump it must be edited too —
-# missing it fails every `cargo` command in the workspace with
-# "failed to select a version for the requirement `snora = "^0.NN"`".
-# Grep for the old minor across all `Cargo.toml` files before assuming
-# the workspace table is sufficient.
+# NOT every example does. `examples/size_probe_engine` and
+# `examples/responsive_body` both need `default-features = false`, so
+# each pins `snora` explicitly and does **not** follow this table. On a
+# minor bump **both** must be edited too — missing either fails every
+# `cargo` command in the workspace with "failed to select a version for
+# the requirement `snora = "^0.NN"`". Grep for the old minor across all
+# `Cargo.toml` files before assuming the workspace table is sufficient.
 #
 # Including a `version` field (alongside `path`) is required by
 # `cargo publish`, even though examples themselves are

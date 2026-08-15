@@ -63,6 +63,18 @@ them in sync is a release-process invariant.
 ```text
 [ ] Bump [workspace.package].version
 [ ] If minor: bump snora-core / snora-widgets dep versions across crates
+[ ] If minor: bump the hand-pinned `snora` version in
+    examples/size_probe_engine/Cargo.toml AND
+    examples/responsive_body/Cargo.toml. Both use an explicit
+    `default-features = false` path dependency instead of
+    `snora = { workspace = true }` (workspace inheritance cannot
+    override `default-features`), so neither follows the workspace
+    version table and each must be hand-edited on every minor bump —
+    missing either fails EVERY `cargo` command in the workspace with
+    "failed to select a version for the requirement `snora = "^0.NN"`"
+    (this has already happened once, on the 0.26.0 bump). Grep for the
+    old minor across all `Cargo.toml` files before assuming the
+    workspace table alone is sufficient.
 [ ] Move the [Unreleased] section in CHANGELOG.md to the new version,
     and reset [Unreleased] to "Nothing yet."
 [ ] Update docs/guides/migration-X.Y-to-X.Z.md (minor only)

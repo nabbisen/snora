@@ -65,3 +65,8 @@ cargo run -p snora-example-responsive
 Resize the window narrower than ~600px and back — the example's sidebar
 drops and returns. The threshold and what happens at it are the
 example's own choice, stated in its own source, not snora's.
+
+`examples/responsive` is for slot-based chrome — an `AppLayout::side_bar`
+that collapses. If your chrome is composed into `body` instead (no
+`snora::widget::*`, no `side_bar`), see `examples/responsive_body` — the
+same width number, varying a tab bar instead of a slot.

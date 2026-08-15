@@ -95,6 +95,7 @@ Numbers remain stable forever and are never reused.
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | v0.30.0 (accepted; handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
 | 051 | [The responsive example excludes the consumer who asked for it](./proposed/051-responsive-example-excludes-its-own-requester.md) | v0.30.0 (accepted; handoff: [`handoffs/051-…`](./handoffs/051-responsive-example-excludes-its-own-requester/implementation-handoff.md)) |
+| 052 | [The compile-time clean never invalidates release artifacts](./proposed/052-clean-never-invalidates-release-artifacts.md) | v0.30.0 (**blocks RFC-050**) |
 
 ## Archive
 

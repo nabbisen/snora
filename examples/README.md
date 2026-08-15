@@ -29,6 +29,7 @@ before a release is tagged.
 | `snora-example-workbench` | **All surfaces together** | Header, sidebar, menus, dialog, sheet, toasts (all intents/positions), tab bar, breadcrumb, Escape wiring, LTR/RTL toggle |
 | `snora-example-design-workbench` | **Snora Design visual QA** | Token presets, high contrast, buttons (all variants/states), cards, notices (all tones), chips (filter/removable), progress (tones, indeterminate), typography |
 | `snora-example-responsive` | Width-aware layout | `responsive_render`; application-chosen threshold dropping the sidebar below 600px |
+| `snora-example-responsive-body` | Width-aware layout, engine-only | `responsive_render` varying `body`'s own composition (a tab bar) by width; no prefab widgets, no `side_bar` — for consumers who compose their own chrome into `body` |
 
 ## Manual QA: design workbench
 

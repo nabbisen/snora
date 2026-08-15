@@ -1,6 +1,8 @@
 # RFC 050 — Compile-time measurement reports runner speed, not snora
 
-**Status.** Accepted (owner, 2026-08-15) — not yet implemented
+**Status.** Accepted (owner, 2026-08-15) — **blocked on
+[RFC-052](./052-clean-never-invalidates-release-artifacts.md)**; ratio
+selection must be re-derived on post-fix data. See §"Blocked" below.
 **Tracks.** Measurement integrity (continues RFC-041, RFC-043, RFC-044).
 Closes gate **9b**.
 **Touches.** `scripts/measure-compile-time.sh`,
@@ -9,6 +11,24 @@ Closes gate **9b**.
 `docs/src/reference/build-cost-budget.md`,
 `docs/src/contributing/api-freeze-review.md`.
 **Release target.** 0.30.0 (minor — the CSV gains columns).
+
+## Blocked — read before implementing
+
+Answering Q-1 established that `cargo clean -p` **never invalidates
+release-profile artifacts**, so `build_engine_only_ms` and
+`build_widgets_design_ms` measure cargo's freshness check rather than a build.
+[RFC-052](./052-clean-never-invalidates-release-artifacts.md) fixes that and
+must land first.
+
+**What survives:** the common-mode noise analysis below, computed from
+`check_workspace_ms`, `build_widgets_ms` and `example_hello_ms` — all genuine
+measurements — and the 0.28.0 → 0.28.1 documentation-only evidence.
+
+**What does not:** the ratio *selection*. `widgets_design_ratio` divides a
+snora-only rebuild by an iced-plus-snora cold build, and its numerator is
+currently not a build at all. Its observed 7.3% stability reflects cargo's
+startup consistency, not snora's compile cost. Re-derive both ratios on
+post-fix data rather than reinstating these.
 
 ## Summary
 

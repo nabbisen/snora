@@ -13,6 +13,23 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [Unreleased]
+
+### Added
+
+- **`examples/responsive_body` — an engine-only responsive example
+  composed the way snora's known consumers actually build (RFC-051).**
+  `responsive_render` shipped in v0.28.0 because apimokka asked for it,
+  but every existing demonstration teaches it through `AppLayout::side_bar`
+  built with `snora::widget::app_side_bar` — apimokka uses neither (zero
+  `snora::widget::*` call sites; `side_bar` is on their ignored list).
+  The new example varies `body`'s own composition (a tab bar) by width
+  instead, with no prefab widgets and no `side_bar`/`footer` anywhere in
+  its source — compiler-enforced via `default-features = false`, not
+  merely by discipline. For readers who compose their own chrome into
+  `body`, this is the copyable one; `examples/responsive` (slot-based,
+  unchanged) remains the one for `side_bar` collapse.
+
 ## [0.29.0] — 2026-08-15
 
 ### Changed
