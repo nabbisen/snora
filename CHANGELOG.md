@@ -13,6 +13,32 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [0.29.0] — 2026-08-15
+
+### Changed
+
+- **`snora-dialog-card`'s referent changed — it now names the actual
+  card, not the window (RFC-049).** Since v0.27.0, `snora-dialog-card`
+  was attached to the dialog's full-window centring container, not the
+  styled card RFC-039 introduced; the card itself carried no identifier.
+  Resolving `snora-dialog-card` always returned window-sized bounds,
+  never the card's — a stable identifier that was "present" on every
+  render but pointed at the wrong element, exactly the failure mode this
+  system exists to prevent. Fixed by splitting the name: the centring
+  container is now `snora-dialog` (always present, both paths), and
+  `snora-dialog-card` is **re-pointed**, not retired, to the actual
+  styled card (present only on `snora::design::render`). This is a
+  **minor** bump, per the [versioning policy's rendered-surface-
+  identifiers rule](docs/src/contributing/versioning-policy.md#rendered-surface-identifiers)
+  — the first rename exercised under that rule. **No deprecation bridge
+  is possible**: these are plain strings, not Rust symbols, so a
+  downstream test asserting on the old referent does not fail on
+  upgrade — it silently starts resolving the card instead of the window.
+  Accepted for this one release only because no known consumer had
+  adopted 0.28.0 identifiers yet. See the [migration
+  guide](docs/src/guides/migration-0.28-to-0.29.md) for the exact
+  before/after table.
+
 ## [0.28.1] — 2026-08-15
 
 ### Changed

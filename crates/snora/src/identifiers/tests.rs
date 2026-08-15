@@ -7,11 +7,23 @@
 //!   source.
 //! - **Documentation drift**: `docs/src/reference/
 //!   rendered-surface-identifiers.md`'s identifier table lists exactly
-//!   [`ALL_STATIC`] — no more, no fewer. This is the test that earns its
-//!   keep, per the Handoff: a hand-maintained list drifts, and a stale
-//!   reference is worse than none.
+//!   [`all_static`]'s output — no more, no fewer. This is the test that
+//!   earns its keep, per the Handoff: a hand-maintained list drifts, and
+//!   a stale reference is worse than none.
 //! - **Toast identifier stability**: the same toast id always derives the
 //!   same identifier.
+//!
+//! # RFC-049: `DIALOG_CARD` is conditional, not `ALWAYS_EMITTED`
+//!
+//! [`identifiers_present_in_rendered_output`] renders through the
+//! **default** `crate::render::render` path, so it checks
+//! [`ALWAYS_EMITTED`] — which excludes [`DIALOG_CARD`] — and separately
+//! asserts the card identifier is genuinely **absent** there, not merely
+//! unchecked. Presence of `DIALOG_CARD` on the `design` path, and that it
+//! resolves to the actual styled card rather than the centring wrapper,
+//! is `design/render/tests.rs`'s job — that is the property this RFC
+//! exists to fix, and an identifier-presence check alone cannot catch it
+//! (the old, wrong identifier was "present" too).
 
 use super::*;
 use iced::Element;
@@ -57,7 +69,7 @@ fn identifiers_present_in_rendered_output() {
     let element = crate::render::render(layout);
     let mut sim = simulator(element);
 
-    for name in ALL_STATIC {
+    for name in ALWAYS_EMITTED {
         sim.find(Id::new(name))
             .unwrap_or_else(|_| panic!("expected to find a widget with id {name:?}"));
     }
@@ -65,6 +77,15 @@ fn identifiers_present_in_rendered_output() {
     // The per-toast identifier, derived from the toast's own id (7 above).
     sim.find(Id::from(toast_id(7)))
         .expect("expected to find the individual toast's identifier");
+
+    // RFC-049: the card identifier must be genuinely absent on the
+    // default path — not merely excluded from the check above, but
+    // actually unresolvable. A dialog is present in this layout, so a
+    // spurious card identifier would have every opportunity to appear.
+    assert!(
+        sim.find(Id::new(DIALOG_CARD)).is_err(),
+        "DIALOG_CARD must not resolve on the default render() path — no card exists there"
+    );
 }
 
 /// `dim_without_capture` (no `on_close_modals` wired) is a distinct code
@@ -113,13 +134,14 @@ fn documented_identifiers_match_emitted_set() {
     documented.sort();
     documented.dedup();
 
-    let mut emitted: Vec<String> = ALL_STATIC.iter().map(|s| (*s).to_string()).collect();
+    let mut emitted: Vec<String> = all_static().iter().map(|s| (*s).to_string()).collect();
     emitted.sort();
 
     assert_eq!(
         documented, emitted,
         "docs/src/reference/rendered-surface-identifiers.md's identifier table must list \
-         exactly ALL_STATIC — no more, no fewer. A stale reference is worse than none."
+         exactly the union of ALWAYS_EMITTED and DESIGN_PATH_ONLY — no more, no fewer. \
+         A stale reference is worse than none."
     );
 }
 

@@ -35,6 +35,28 @@ less. Adding a new identifier is additive (patch-or-minor, per the table
 above); renaming or removing an existing one requires the same migration-
 guide discipline as renaming a public type.
 
+**Worked example: RFC-049, v0.29.0** — the first rename exercised under
+this rule. `snora-dialog-card` had been attached to the wrong element
+since v0.27.0 (the dialog's full-window centring container, not the
+actual card). The fix split it: the centring container is now
+`snora-dialog`, and `snora-dialog-card` was **re-pointed**, not retired,
+to the element it should have named from the start — see the
+[reference page](../reference/rendered-surface-identifiers.md#static-identifiers)
+and the [migration guide](../guides/migration-0.28-to-0.29.md).
+
+This is a **minor**, per the table above, but it does not fit the
+[deprecation bridge](#deprecation-bridges) mechanism cleanly: these
+identifiers are plain strings, not Rust symbols, so there is no
+`#[deprecated]` to attach — a downstream test asserting on the old name
+does not get a compiler warning, and does not fail at all after the
+upgrade. It silently starts resolving the actual card instead of the
+window. That silent-repurposing risk was accepted for this one release
+only because no known consumer had adopted 0.28.0 identifiers yet
+(checked against the two known integrations at the time). A future
+rename of a rendered-surface identifier with known adopters on the old
+name should retire the string rather than repurpose it, precisely to
+avoid this risk.
+
 ## MSRV bump policy
 
 Snora declares `rust-version` in `[workspace.package]` (adopted in RFC-041,

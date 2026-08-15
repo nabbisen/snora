@@ -9,6 +9,10 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.28 → 0.29](migration-0.28-to-0.29.md) — `snora-dialog-card` was
+  attached to the wrong element since v0.27.0; re-pointed to the actual
+  card, with a new `snora-dialog` identifier for the centring container
+  it used to name.
 - [0.27 → 0.28](migration-0.27-to-0.28.md) — layout width exposure
   (`responsive_render`) and stable identifiers on snora-rendered surfaces.
   Both additive; identifier names become a compatibility surface.

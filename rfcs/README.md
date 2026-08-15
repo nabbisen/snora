@@ -87,12 +87,11 @@ Numbers remain stable forever and are never reused.
 | 046 | [Layout width exposure](./done/046-layout-width-exposure.md) | v0.28.0 (handoff: [`handoffs/046-…`](./handoffs/046-layout-width-exposure/implementation-handoff.md)) |
 | 047 | [Stable identifiers on snora-rendered surfaces](./done/047-stable-identifiers-on-rendered-surfaces.md) | v0.28.0 (handoff: [`handoffs/047-…`](./handoffs/047-stable-identifiers-on-rendered-surfaces/implementation-handoff.md)) |
 | 048 | [The dialog card: contradictory documentation and an undiscoverable capability](./done/048-dialog-card-documentation-contradiction.md) | v0.28.1 (handoff: [`handoffs/048-…`](./handoffs/048-dialog-card-documentation-contradiction/implementation-handoff.md)) |
+| 049 | [`snora-dialog-card` denotes the wrong element](./done/049-dialog-identifier-denotes-the-wrong-element.md) | v0.29.0 (handoff: [`handoffs/049-…`](./handoffs/049-dialog-identifier-denotes-the-wrong-element/implementation-handoff.md)) |
 
 ## Proposed
 
-| ID | Title | Target |
-|----|-------|--------|
-| 049 | [`snora-dialog-card` denotes the wrong element](./proposed/049-dialog-identifier-denotes-the-wrong-element.md) | v0.29.0 (identifier rename; split from 048 F-5; handoff: [`handoffs/049-…`](./handoffs/049-dialog-identifier-denotes-the-wrong-element/implementation-handoff.md)) |
+_(none — RFC-048 shipped in v0.28.1 and RFC-049 in v0.29.0.)_
 
 ## Archive
 

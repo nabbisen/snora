@@ -48,10 +48,34 @@ pub(crate) const MENU_BACKDROP: &str = "snora-menu-backdrop";
 /// two different surfaces.
 pub(crate) const MODAL_DIM: &str = "snora-modal-dim";
 
-/// The dialog's centered container — attached whether or not the
-/// `design`-gated card styling (RFC-039) is active, so the identifier is
-/// stable across both `snora::render` and `snora::design::render`.
-/// Attached in `overlay/dialog.rs`.
+/// The dialog's centring container — the full-window layer that
+/// positions dialog content. **Always present**, on both
+/// `snora::render` and `snora::design::render`. Attached in
+/// `overlay/dialog.rs`.
+///
+/// Named `snora-dialog`, not `snora-dialog-card` (RFC-049, v0.29.0):
+/// before this release, `snora-dialog-card` was attached to *this*
+/// container — a full-window wrapper, not a card — on both paths, so
+/// resolving it always returned window-sized bounds. See
+/// [`DIALOG_CARD`] for what carries the corrected name now.
+pub(crate) const DIALOG: &str = "snora-dialog";
+
+/// The dialog's styled card container — fill, border, radius (RFC-039).
+/// **`design` path only**: on the default `snora::render` path no card
+/// exists, so this identifier is never emitted there — the `design`
+/// gate applies to *the element*, not to the identifier (RFC-049; see
+/// [`DESIGN_PATH_ONLY`]). Attached in `overlay/dialog.rs`, on the
+/// *inner* styled container, not the centring wrapper — see
+/// [`DIALOG`] for that.
+///
+/// Before RFC-049 (i.e. at v0.28.0), this name was attached to the
+/// centring wrapper on both paths, and the card itself carried no
+/// identifier at all. Kept as a name — re-pointed, not retired —
+/// because no known consumer had adopted 0.28.0 identifiers yet; see
+/// RFC-049 §"The one real risk: silent repurposing". A downstream test
+/// written against 0.28.0 does not fail on upgrade; it silently starts
+/// resolving the card instead of the window. That is deliberate and
+/// accepted for this one release, not a general policy.
 pub(crate) const DIALOG_CARD: &str = "snora-dialog-card";
 
 /// The sheet's own surface container (the styled, opaque panel — not the
@@ -96,19 +120,21 @@ pub(crate) fn toast_id(id: u64) -> String {
     format!("snora-toast-{id}")
 }
 
-/// Every static identifier name snora emits. Used by the documentation-
-/// drift test to confirm `docs/src/reference/
-/// rendered-surface-identifiers.md` lists exactly this set — no more, no
-/// fewer. [`toast_id`] is intentionally excluded; see its own docs.
+/// Every identifier snora emits **unconditionally**, on the default
+/// `snora::render` path — i.e. regardless of whether `design`-gated
+/// rendering is used. [`DIALOG_CARD`] is deliberately excluded (RFC-049):
+/// the default path never emits it, so a test asserting presence for
+/// *this* set must render through `crate::render::render`, not
+/// `crate::design::render::render`, or the exclusion is untested.
 ///
-/// `#[cfg(test)]`: this constant's only purpose is the drift test; it has
-/// no non-test consumer, so it is scoped out of non-test builds entirely
-/// rather than left to trip `dead_code` there.
+/// `#[cfg(test)]`: this constant's only purpose is the presence and
+/// drift tests; it has no non-test consumer, so it is scoped out of
+/// non-test builds entirely rather than left to trip `dead_code` there.
 #[cfg(test)]
-pub(crate) const ALL_STATIC: &[&str] = &[
+pub(crate) const ALWAYS_EMITTED: &[&str] = &[
     MENU_BACKDROP,
     MODAL_DIM,
-    DIALOG_CARD,
+    DIALOG,
     SHEET_PANEL,
     TOAST_STACK,
     HEADER_REGION,
@@ -116,6 +142,31 @@ pub(crate) const ALL_STATIC: &[&str] = &[
     BODY_REGION,
     FOOTER_REGION,
 ];
+
+/// Identifiers that exist only when `design`-gated rendering
+/// (`crate::design::render::render`) is used, because the *element*
+/// they label is conditional — not because the identifier itself is
+/// feature-gated (RFC-047 Q-2's always-on principle still holds; RFC-049
+/// clarifies it applies to identifiers whose element always renders).
+/// Currently just the dialog card.
+#[cfg(test)]
+pub(crate) const DESIGN_PATH_ONLY: &[&str] = &[DIALOG_CARD];
+
+/// Every static identifier name snora can emit, on **either** path — the
+/// union of [`ALWAYS_EMITTED`] and [`DESIGN_PATH_ONLY`], computed from
+/// them rather than listed a third time, so the union cannot drift from
+/// its parts. Used by the documentation-drift test to confirm
+/// `docs/src/reference/rendered-surface-identifiers.md` lists exactly
+/// this set — no more, no fewer, regardless of which path emits any
+/// single row. [`toast_id`] is intentionally excluded; see its own docs.
+#[cfg(test)]
+pub(crate) fn all_static() -> Vec<&'static str> {
+    ALWAYS_EMITTED
+        .iter()
+        .chain(DESIGN_PATH_ONLY)
+        .copied()
+        .collect()
+}
 
 #[cfg(test)]
 mod tests;

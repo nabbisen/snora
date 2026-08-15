@@ -25,9 +25,18 @@
 //!   path specifically.
 
 use super::*;
+use iced::Size;
+use iced::widget::Id;
+use iced_test::Simulator;
+use snora_core::{AppLayout, Dialog};
 use snora_design::{Color as SnColor, Tokens, contrast::contrast_ratio};
 
 const AA: f32 = 4.5;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum Msg {
+    Noop,
+}
 
 /// Modest, clearly-nonzero visibility floor for the dim composited over
 /// `background`, and for the card border against `background`. Chosen the
@@ -217,4 +226,63 @@ fn card_text_meets_aa_all_presets() {
             "{name}: card text contrast {r:.2} < {AA} (WCAG AA)"
         );
     }
+}
+
+// ---------------------------------------------------------------------------
+// The dialog identifier resolves to the card, not its centring wrapper
+// (RFC-049).
+// ---------------------------------------------------------------------------
+
+/// The defect RFC-049 exists to catch: before this release,
+/// `snora-dialog-card` was attached to the dialog's full-window centring
+/// container, not the styled card — "present" in every render, on both
+/// paths, but never resolving to the actual card. A presence-only check
+/// (`sim.find(id).is_ok()`) cannot distinguish this from a correct fix,
+/// because the old, wrong identifier was present too. This test instead
+/// asserts a property only the real card has: its bounds are strictly
+/// smaller than the window, since it is padded content behind a border,
+/// not a container that fills the screen — see `dialog_card_style`
+/// above, whose `padding` and `style.border` this element actually
+/// applies.
+///
+/// If this regresses to asserting presence alone, it stops catching the
+/// RFC-049 defect class even though it would still pass.
+#[test]
+fn dialog_card_identifier_resolves_to_the_card_not_the_window() {
+    let tokens = Tokens::light();
+    let window_size = Size::new(1024.0, 768.0);
+
+    let dialog: Dialog<Element<'_, Msg>, Msg> =
+        Dialog::new(iced::widget::text("dialog content").into());
+    let layout = AppLayout::new(iced::widget::text("body").into())
+        .dialog(dialog)
+        .on_close_modals(Msg::Noop);
+
+    let element = render(layout, &tokens);
+    let mut sim = Simulator::with_size(iced_test::core::Settings::default(), window_size, element);
+
+    let wrapper_bounds = sim
+        .find(Id::new(crate::identifiers::DIALOG))
+        .expect("snora-dialog must resolve on the design path")
+        .bounds();
+    let card_bounds = sim
+        .find(Id::new(crate::identifiers::DIALOG_CARD))
+        .expect("snora-dialog-card must resolve on the design path")
+        .bounds();
+
+    assert!(
+        (wrapper_bounds.width - window_size.width).abs() < 1.0
+            && (wrapper_bounds.height - window_size.height).abs() < 1.0,
+        "sanity check: snora-dialog's centring wrapper is expected to fill the window \
+         ({wrapper_bounds:?} vs window {window_size:?}) — if this no longer holds, this \
+         test needs a different baseline to compare the card's bounds against"
+    );
+
+    assert!(
+        card_bounds.width < wrapper_bounds.width && card_bounds.height < wrapper_bounds.height,
+        "snora-dialog-card must resolve to bounds strictly smaller than snora-dialog's \
+         ({card_bounds:?} vs wrapper {wrapper_bounds:?}) — equal bounds would mean it is \
+         still resolving to the full-window wrapper, the RFC-049 defect this test exists \
+         to catch"
+    );
 }

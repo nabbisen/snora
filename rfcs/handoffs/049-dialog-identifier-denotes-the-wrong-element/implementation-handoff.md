@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-049 `snora-dialog-card` denotes the wrong element
 
-**Governing RFC.** [RFC-049](../../proposed/049-dialog-identifier-denotes-the-wrong-element.md)
-**Status.** Inherited from RFC-049 — Proposed.
+**Governing RFC.** [RFC-049](../../done/049-dialog-identifier-denotes-the-wrong-element.md)
+**Status.** Inherited from RFC-049 — Implemented (v0.29.0).
 **Release target.** 0.29.0 (**minor** — an identifier rename is a minor bump
 by the policy RFC-047 shipped in v0.28.0).
 **Implementation units.** One. **Do not start before RFC-048 has landed** —
@@ -38,7 +38,7 @@ RFC-047 existed for — that is a wrong answer, not a vague label.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/049-dialog-identifier-denotes-the-wrong-element.md` in full,
+- `rfcs/done/049-dialog-identifier-denotes-the-wrong-element.md` in full,
   especially §"The one real risk: silent repurposing".
 - `rfcs/done/047-stable-identifiers-on-rendered-surfaces.md` — the policy you
   are exercising for the first time.

@@ -33,6 +33,7 @@
   - [0.25 → 0.26](guides/migration-0.25-to-0.26.md)
   - [0.26 → 0.27](guides/migration-0.26-to-0.27.md)
   - [0.27 → 0.28](guides/migration-0.27-to-0.28.md)
+  - [0.28 → 0.29](guides/migration-0.28-to-0.29.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design

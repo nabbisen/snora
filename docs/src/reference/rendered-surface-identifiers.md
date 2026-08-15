@@ -33,7 +33,8 @@ application also populates, which prevents collisions.
 |---|---|---|
 | `snora-menu-backdrop` | The menu backdrop — a transparent, full-window click sink shown while a header or context menu is open. | `render.rs` |
 | `snora-modal-dim` | The modal dim — the full-window scrim shown while a dialog or sheet is open. Shared by both the click-capturing and non-capturing variants; see "Why the two dim variants share a name" below. | `render.rs` |
-| `snora-dialog-card` | The dialog's centered container. Present whether or not `design`-gated card styling (RFC-039) is active. | `overlay/dialog.rs` |
+| `snora-dialog` | The dialog's centring container — the full-window layer that positions dialog content. **Always present**, on both `snora::render` and `snora::design::render`. | `overlay/dialog.rs` |
+| `snora-dialog-card` | The dialog's styled card container (fill, border, radius; RFC-039). **`design` path only** — on the default `snora::render` path no card exists, so this identifier is never emitted there. Before v0.29.0, this name was attached to the centring container instead; see the [migration guide](../guides/migration-0.28-to-0.29.md). | `overlay/dialog.rs` |
 | `snora-sheet-panel` | The sheet's own surface panel (the styled, opaque container — not the spacer cells around it). | `overlay/sheet.rs` |
 | `snora-toast-stack` | The toast stack's outer container. | `toast.rs` |
 | `snora-header` | The header **region** — the skeleton slot, not the application's header content. | `render.rs` |

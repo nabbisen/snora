@@ -90,6 +90,17 @@ D-gates.
 
 ## Recently shipped
 
+- **0.29.0** — `snora-dialog-card` now names the card. Since 0.27.0 it was
+  attached to the dialog's full-window centring container, so resolving it
+  returned window-sized bounds and the actual card carried no identifier at
+  all — a stable identifier that was present on every render and pointed at
+  the wrong element. The centring container is now `snora-dialog`; the card
+  keeps the `snora-dialog-card` name, re-pointed (RFC-049). **First rename
+  exercised under the identifier compatibility policy** shipped in 0.28.0:
+  it is a minor bump, announced in the CHANGELOG and migration guide rather
+  than avoided. No deprecation bridge is possible for string identifiers, so
+  a test asserting the old referent changes meaning silently — accepted only
+  because no consumer had adopted 0.28.0 identifiers yet.
 - **0.28.1** — From a second downstream field report (**arama**). snora's
   documentation contradicted itself about the dialog card: `overlays.md`
   promised "a centered modal card" and denied any card chrome eleven lines

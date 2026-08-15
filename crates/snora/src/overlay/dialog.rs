@@ -32,18 +32,17 @@ where
     Message: Clone + 'a,
 {
     match card {
-        None => center(dialog.content)
-            .id(crate::identifiers::DIALOG_CARD)
-            .into(),
+        None => center(dialog.content).id(crate::identifiers::DIALOG).into(),
         Some(card) => {
             let padding = card.padding;
             let style = card.style;
             center(
                 container(dialog.content)
                     .padding(padding)
-                    .style(move |_theme| style),
+                    .style(move |_theme| style)
+                    .id(crate::identifiers::DIALOG_CARD),
             )
-            .id(crate::identifiers::DIALOG_CARD)
+            .id(crate::identifiers::DIALOG)
             .into()
         }
     }

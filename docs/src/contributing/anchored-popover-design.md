@@ -137,4 +137,4 @@ issue with a concrete scenario.
 
 - [Adding a new overlay kind](adding-an-overlay.md)
 - [Overlay interaction semantics](../reference/overlay-interaction-semantics.md)
-- RFC-013-A in `rfcs/proposed/`
+- RFC-013-A in `rfcs/done/013-a-anchored-popover-design-study.md`
