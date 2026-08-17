@@ -33,8 +33,29 @@ figures:
 | `high_contrast_light` | 21.00:1 | 21.00:1 | 21.00:1 |
 | `high_contrast_dark` | 21.00:1 | 21.00:1 | 19.80:1 |
 
-`text_muted` already passes — **4.83:1** light, **5.44:1** dark — so asserting
-it costs nothing and locks in what we have.
+~~`text_muted` already passes — **4.83:1** light, **5.44:1** dark — so asserting
+it costs nothing and locks in what we have.~~
+
+**Corrected during implementation (2026-08-18).** Those two figures, taken from
+tekstide's report, are the `text_muted/**background**` pair only. Computing the
+`surface` pair — which this RFC's own scope asks to assert — gives
+**`light`: 4.46:1, below `AA_TEXT`**. `dark/surface` (5.00:1) and both
+high-contrast presets pass. So `text_muted` is a **second defect**, not a
+ratchet, and this RFC asserted otherwise without computing it.
+
+Two further facts found with it:
+
+- `crates/snora-design/src/palette.rs:19` documents `text_muted` as *"exempt
+  from the mandatory body-text contrast checks"*. Asserting it at `AA_TEXT`
+  therefore **reverses a deliberate exemption**; this RFC never acknowledged
+  the exemption existed. The exemption is not WCAG-grounded — SC 1.4.3 exempts
+  incidental text, logotypes and large text, not "non-essential" text.
+- **No snora widget renders `text_muted`** (`snora-style/src/theme.rs:94`), so
+  the role is vocabulary handed to applications — which is why an untrue
+  exemption in its doc comment is worth withdrawing rather than keeping.
+
+The repair is imperceptible: `#6B7280` → `#6A717E` (1–2 of 255 per channel)
+gives 4.55:1 against `surface`. See the review result for the disposition.
 
 The high-contrast presets are correct by construction, exactly as the
 checklist requires. The defect is confined to `light` and `dark`.
@@ -75,7 +96,9 @@ produces the gap.
 1. **Assert `border` at 3.0** against `background`, `surface` and
    `surface_raised`, for all four presets, in `mandatory_pairs`.
 2. **Assert `text_muted` at `AA_TEXT`** against `background` and `surface`.
-   Passes today; this is a ratchet, not a repair.
+   ~~Passes today; this is a ratchet, not a repair.~~ **A repair after all** —
+   `light/surface` measures 4.46:1. See the corrected note under *The evidence*,
+   and withdraw the `palette.rs` exemption alongside it.
 3. **Repair `light` and `dark`'s `border`** so the new assertions pass.
 4. **Generalise the checklist's 3:1 rule** out of *Focus visibility* into
    *Contrast*, covering non-text boundaries as a class rather than one role.
@@ -143,9 +166,12 @@ repair rather than another styling decision.
 ## Open questions
 
 **Q-1 — what value should `border` become?** *Answered — computed, in the
-handoff §4.* Three pairs must pass simultaneously per preset, and in `light`
-`surface_raised == background` (both pure white), so the binding constraint is
-the lightest surface. The binding pair is **`surface`** in `light` (border
+handoff §4.* Three pairs must pass simultaneously per preset, and the binding
+one is **the surface closest in luminance to the border**: the *darkest*
+surface in `light`, where the border must be darker than all three, and the
+*lightest* in `dark`, where it must be lighter. In `light` that is `surface`
+(L = 0.919), not the two pure-white surfaces. The binding pair is
+**`surface`** in `light` (border
 relative luminance **≤ 0.2731**) and **`surface_raised`** in `dark` (**≥
 0.1518**). Do not pick a value that passes `background` and fails `surface`.
 
