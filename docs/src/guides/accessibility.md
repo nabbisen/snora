@@ -23,6 +23,8 @@ contributor-facing documents linked below, not duplicated here.
 - **Keyboard reachability inherited from iced.** Native iced controls
   (`button`, `checkbox`, `pick_list`, …) keep iced's own keyboard event
   routing; snora does not intercept it.
+- **A typography scale with usable line-height**, for text you write on top
+  of snora. See [Readability](readability.md) for how to pick a role.
 
 ## What snora does not provide
 

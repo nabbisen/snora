@@ -126,9 +126,11 @@ Snora Design does not and cannot guarantee:
 ```text
 [ ] The primitive uses text roles from the token typography scale rather
     than magic pixel values.
-[ ] Line-height multipliers (stored in TextRole.line_height) are used where
-    the rendering path supports them. In iced 0.14, line-height is
-    vocabulary-only; the limitation is documented.
+[ ] Line-height multipliers (stored in TextRole.line_height) are available
+    today via iced::widget::text::LineHeight::Relative — see
+    docs/src/design/typography.md. Snora's own prefab widgets do not yet
+    apply it to the text they render internally; wiring it in (and/or
+    adding *_line_height() style helpers) is deferred, not blocked.
 [ ] Text in notices, labels, and help content uses at least body or
     body_small roles, not a custom size smaller than 12 logical pixels.
 ```

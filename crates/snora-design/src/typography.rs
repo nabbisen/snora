@@ -3,8 +3,10 @@
 /// A single text role: a font size paired with a line-height multiplier.
 ///
 /// `line_height` is a **renderer-independent multiplier** (e.g. `1.4` means
-/// 140% of the font size). Conversion to the pinned iced version's
-/// line-height configuration happens in `snora-widgets`, not here.
+/// 140% of the font size). Applying it to the pinned iced version's own
+/// `iced::widget::text::LineHeight::Relative` is the application's own
+/// call (see `docs/src/design/typography.md`); this crate does not depend
+/// on iced or apply it itself.
 ///
 /// ```
 /// use snora_design::TextRole;

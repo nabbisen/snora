@@ -113,9 +113,10 @@ demos are in the
   The look of your dialog card and header typography are your decisions
   by default. Opt in to **Snora Design** (`features = ["widgets",
   "design"]`) for an iced-free token vocabulary — four built-in presets,
-  WCAG AA–tested palettes — that also supplies, incrementally (chrome
-  colours as of v0.26), a coherent default for snora's own rendered
-  surfaces, not only the primitives you build.
+  WCAG AA–tested palettes, a six-role typography scale (size **and**
+  line-height) for your own text — that also supplies, incrementally
+  (chrome colours as of v0.26), a coherent default for snora's own
+  rendered surfaces, not only the primitives you build.
 
 ## Read more
 

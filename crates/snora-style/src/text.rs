@@ -3,10 +3,12 @@
 //! These helpers derive `iced::Pixels` sizes from a [`Tokens`] typography
 //! scale, avoiding magic numbers in application view code.
 //!
-//! Line-height is not currently configurable through `iced::widget::text` in
-//! iced 0.14's standard API; the `line_height` fields in `Typography` are
-//! stored in the token vocabulary for future use and for documentation
-//! purposes.
+//! Line-height **is** configurable through `iced::widget::text` in iced
+//! 0.14, via `iced::widget::text::LineHeight::Relative`, which takes exactly
+//! the multiplier stored in each role's `line_height` field — applying it is
+//! the application's own call (see `docs/src/design/typography.md`). Snora's
+//! own prefab widgets do not yet apply it to the text they render
+//! internally; these helpers cover size only.
 //!
 //! # Usage
 //!
