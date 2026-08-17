@@ -1,7 +1,7 @@
 # Developer Handoff — RFC-057 typography documentation
 
-**Governing RFC.** [RFC-057](../../proposed/057-typography-is-undiscoverable.md)
-**Status.** Inherited from RFC-057 — Proposed.
+**Governing RFC.** [RFC-057](../../done/057-typography-is-undiscoverable.md)
+**Status.** Inherited from RFC-057 — Implemented (v0.33.1).
 **Release target.** 0.33.1 (patch). Ships alone.
 **Implementation units.** One. **Documentation only — no executable code.**
 
@@ -27,7 +27,7 @@ capability gap.
 
 ## 3. Background — read first
 
-- `rfcs/proposed/057-typography-is-undiscoverable.md` in full, especially
+- `rfcs/done/057-typography-is-undiscoverable.md` in full, especially
   §"The honesty constraint".
 - `crates/snora-design/src/typography.rs` — the six roles and their doc
   comments, which already describe each role's purpose well. **Reuse that

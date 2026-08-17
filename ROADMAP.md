@@ -97,6 +97,13 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.33.1** — Typography made discoverable (RFC-057). A six-role text scale
+  with size *and* line-height has existed since v0.20, tested and demonstrated
+  in the workbench, and nothing told a developer it was there. Two new pages,
+  plus removal of a **contributor checklist item asserting line-height was
+  unusable in iced 0.14** — false, and a review gate rather than a stale
+  comment, which is why it survived several design releases. Documentation
+  only; nothing about rendering changed.
 - **0.33.0** — `snora_widgets::design::{style, theme}` removed (RFC-056). The
   compatibility re-exports RFC-055 left behind while relocating the style layer
   are gone one release later, rather than deprecated: `#[deprecated]` on a

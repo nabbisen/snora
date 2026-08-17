@@ -13,6 +13,40 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [0.33.1] — 2026-08-15
+
+### Changed
+
+- **Typography is now discoverable (RFC-057).** snora has carried a six-role
+  text scale — `body`, `body_small`, `label`, `title`, `heading`, `display`,
+  each with a size **and** a line-height multiplier — since v0.20. It is
+  tested, demonstrated in the design workbench, and fully usable today through
+  public API with no change to snora. Nothing told you it existed: there was no
+  typography page, typography was absent from the book's navigation entirely,
+  the consumer accessibility guide said nothing about text, and the README's
+  only mention was a disclaimer. Two new pages fix that —
+  [`design/typography.md`](docs/src/design/typography.md) for the vocabulary
+  and [`guides/readability.md`](docs/src/guides/readability.md) for the task —
+  and the accessibility guide links to the latter rather than absorbing it,
+  since accessibility and readability are different concerns.
+- **Corrected a false claim that line-height was unusable.** Four places said,
+  in effect, that `TextRole.line_height` was vocabulary-only because iced 0.14
+  does not expose line-height. It does:
+  `iced::widget::text::LineHeight::Relative` takes exactly the multiplier each
+  role stores. One of the four was an item in the **contributor accessibility
+  checklist** — a review gate instructing reviewers to skip line-height, which
+  is why the gap survived several design releases.
+
+  **Nothing about rendering changed.** snora's own prefab widgets still use two
+  of the six roles (`label` and `body`), and the notice still renders its title
+  at `label_size`. The typography page says so plainly rather than implying a
+  hierarchy snora does not render. Applying more of the scale to snora's own
+  chrome is deferred — it is an appearance change, and the one consumer
+  exercising those widgets has an earlier appearance change still unadopted.
+
+  Documentation only: the two changed `.rs` files carry doc-comment lines and
+  nothing else.
+
 ## [0.33.0] — 2026-08-15
 
 ### Removed

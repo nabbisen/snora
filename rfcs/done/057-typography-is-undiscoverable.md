@@ -1,6 +1,6 @@
 # RFC 057 — The typography vocabulary is complete and undiscoverable
 
-**Status.** Proposed
+**Status.** Implemented (v0.33.1)
 **Tracks.** Documentation and accessibility. Third instance of the
 discoverability failure mode RFC-045 and RFC-048 each fixed once.
 **Touches.** `docs/src/design/typography.md` (new), `docs/src/SUMMARY.md`,

@@ -94,13 +94,13 @@ Numbers remain stable forever and are never reused.
 | 054 | [`design` requires `widgets`, and the engine surface pays for it](./done/054-design-requires-widgets.md) | closed v0.32.0 — investigation; B′ implemented by RFC-055 |
 | 055 | [Extract the iced style bridge into its own crate](./done/055-extract-the-style-bridge.md) | v0.32.0 (handoff: [`handoffs/055-…`](./handoffs/055-extract-the-style-bridge/implementation-handoff.md)) |
 | 056 | [Remove the `snora-widgets` style shims](./done/056-remove-the-style-shims.md) | v0.33.0 (handoff: [`handoffs/056-…`](./handoffs/056-remove-the-style-shims/implementation-handoff.md)) |
+| 057 | [The typography vocabulary is complete and undiscoverable](./done/057-typography-is-undiscoverable.md) | v0.33.1 (handoff: [`handoffs/057-…`](./handoffs/057-typography-is-undiscoverable/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **parked** — needs ~2 more releases of comparable data (see the RFC's Parked section) |
-| 057 | [The typography vocabulary is complete and undiscoverable](./proposed/057-typography-is-undiscoverable.md) | v0.33.1 (documentation only; handoff: [`handoffs/057-…`](./handoffs/057-typography-is-undiscoverable/implementation-handoff.md)) |
 
 ## Archive
 
