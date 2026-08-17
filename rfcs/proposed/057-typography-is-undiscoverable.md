@@ -100,14 +100,16 @@ deliver.
 
 ## Scope
 
-Documentation only. Four deliverables:
+Documentation only. Four deliverables, two of them new pages:
 
-1. **`docs/src/design/typography.md`**, registered in `SUMMARY.md`: the six
-   roles and what each is for, the compile-verified size + line-height
-   snippet, the 12-logical-pixel floor promoted from the contributor
-   checklist, and an honest statement of which roles snora's own widgets use.
-2. **A readability section in `guides/accessibility.md`**, linking the new
-   page rather than duplicating it.
+1. **`docs/src/design/typography.md`** (Snora Design chapter): the six roles
+   and what each is for, the compile-verified size + line-height snippet, and
+   an honest statement of which roles snora's own widgets use.
+2. **`docs/src/guides/readability.md`** (Guides chapter): the task-oriented
+   page — how to pick a role, why line-height matters for prose, the
+   12-logical-pixel floor promoted from the contributor checklist. Links the
+   typography page; does not restate it. `guides/accessibility.md` gains one
+   line pointing here (Q-2).
 3. **README** — correct the scoping sentence so typography is not presented as
    outside what Snora Design supplies.
 4. **`accessibility-checklist.md`** — replace the false line-height item, and
@@ -138,25 +140,57 @@ costs them nothing.
 
 ## Open questions
 
-**Q-1 — does the no-visual-change guarantee extend to `design::widget::*`?**
-RFC-040 changed chrome geometry there, so there is precedent for the design
-path changing appearance. The answer governs how the deferred work is
-packaged, not this RFC. Worth settling before that RFC is written.
+**Q-1 — may `design::widget::*` change appearance in place between minors?**
+**Resolved as a question, not as an answer: snora has two conflicting
+precedents and no stated rule.**
 
-**Q-2 — should `guides/accessibility.md` own the readability content, or link
-it?** Linking avoids the duplication RFC-045 explicitly warned against. The
-risk is that a reader looking for "is my text readable" stops at the
-accessibility guide. Recommend a short section with the concrete floor (12 px)
-inline and the role detail linked.
+The guarantee (`design/overview.md:30`) is scoped to the `design` feature being
+**inactive**. It says nothing about the design path. Meanwhile:
+
+- **RFC-039** did not change `snora::render`; it added `snora::design::render`
+  as a **sibling entry point**, per-call-site opt-in. apimokka named this as
+  what made the release adoptable: *"a minor-version bump that changed
+  appearance implicitly would have been unadoptable at this point."*
+- **RFC-040** changed `design::widget::*` **in place** — the sidebar item gap
+  moved 16 → 12. Existing call sites render differently on a minor bump.
+
+So the deferred work (notice title `label_size` → `title_size`) either changes
+an existing function or adds an opt-in, and **both have precedent**. This is a
+function-design decision, not a changelog or documentation one.
+
+Live consequence: **orbok has not adopted RFC-040's in-place change yet.**
+Repeating the pattern would leave them two unadopted appearance changes
+stacked.
+
+**Out of scope here** — this RFC changes no code. It must be settled before the
+deferred RFC is written, and it deserves its own decision record.
+
+**Q-2 — where does the readability content live?** **Resolved (owner):
+accessibility and readability are different things; link rather than absorb.**
+
+Two pages, in the chapters the book already implies by audience:
+
+| Page | Chapter | Answers |
+|---|---|---|
+| `design/typography.md` | **Snora Design**, beside Tokens / Buttons / Cards | *what the vocabulary is* |
+| `guides/readability.md` | **Guides**, beside Accessibility / Direction | *how do I make my text readable* |
+
+`guides/accessibility.md` gains **one line linking to readability**, not a
+section absorbing it — which also avoids the duplication RFC-045 warned
+against.
+
+**Optional and separate:** grouping Direction, Accessibility and Readability
+under one "usable by people" heading in `SUMMARY.md`. That restructures
+existing pages, so it should not ride inside a documentation patch.
 
 ## Acceptance criteria
 
-1. `docs/src/design/typography.md` exists and is registered in `SUMMARY.md`.
+1. `docs/src/design/typography.md` and `docs/src/guides/readability.md` exist and are registered in `SUMMARY.md`, in the chapters named in Q-2.
 2. It contains the size + line-height snippet, **compile-checked**, not
    transcribed from this RFC.
 3. It states which roles snora's own widgets use, without implying more.
-4. `guides/accessibility.md` has a readability section reachable from the
-   consumer side of the book.
+4. `guides/accessibility.md` links to the readability guide and does not
+   duplicate it.
 5. The checklist's line-height item no longer claims the capability is
    unavailable; `typography.rs`'s pointer is corrected.
 6. The README no longer scopes typography outside what Snora Design supplies.
