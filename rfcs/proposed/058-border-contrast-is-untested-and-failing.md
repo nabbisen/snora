@@ -95,10 +95,15 @@ produces the gap.
 
 1. **Assert `border` at 3.0** against `background`, `surface` and
    `surface_raised`, for all four presets, in `mandatory_pairs`.
-2. **Assert `text_muted` at `AA_TEXT`** against `background` and `surface`.
+2. **Assert `text_muted` at `AA_TEXT`** against ~~`background` and `surface`~~
+   **all three surfaces** — asserting a role against only some of the surfaces
+   it appears on is the very defect this RFC exists to fix.
    ~~Passes today; this is a ratchet, not a repair.~~ **A repair after all** —
    `light/surface` measures 4.46:1. See the corrected note under *The evidence*,
-   and withdraw the `palette.rs` exemption alongside it.
+   and withdraw the `palette.rs` exemption alongside it. `dark/surface_raised`
+   passes at **4.526** — by 0.026, which a two-surface assertion would have
+   hidden; assert it and leave the value alone, as the carve-out permits no
+   change to a passing pair.
 3. **Repair `light` and `dark`'s `border`** so the new assertions pass.
 4. **Generalise the checklist's 3:1 rule** out of *Focus visibility* into
    *Contrast*, covering non-text boundaries as a class rather than one role.
@@ -185,10 +190,12 @@ contrast to a constant meaning "focus minimum", which will read oddly. Suggest
 a separate `NON_TEXT_MIN = 3.0` so the two obligations can diverge later
 without one silently following the other.
 
-**Q-3 — do any other roles carry an untested obligation?**
-`border` and `text_muted` are the two tekstide found. A sweep of `Palette`'s 18
-roles against the twelve asserted pairs would establish whether there is a
-third, and is cheap to do while the file is open.
+**Q-3 — do any other roles carry an untested obligation?** *Answered — no
+third.* `border` and `text_muted` are the two tekstide found, and the
+implementation sweep confirmed no other `Palette` role is both under-asserted
+and at risk. `text_secondary` is the only other role with an unasserted pair
+(`surface_raised`), and it clears every surface in every preset at 7.62–17.40 —
+a free ratchet, not a defect.
 
 ## Acceptance criteria
 
