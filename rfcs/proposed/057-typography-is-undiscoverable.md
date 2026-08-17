@@ -140,30 +140,33 @@ costs them nothing.
 
 ## Open questions
 
-**Q-1 — may `design::widget::*` change appearance in place between minors?**
-**Resolved as a question, not as an answer: snora has two conflicting
-precedents and no stated rule.**
+**Q-1 — how should a change to an already-shipped design surface be packaged?**
 
-The guarantee (`design/overview.md:30`) is scoped to the `design` feature being
-**inactive**. It says nothing about the design path. Meanwhile:
+**Corrected 2026-08-15. An earlier revision claimed RFC-039 and RFC-040
+disagreed on this. They do not, and the claim was wrong.**
 
-- **RFC-039** did not change `snora::render`; it added `snora::design::render`
-  as a **sibling entry point**, per-call-site opt-in. apimokka named this as
-  what made the release adoptable: *"a minor-version bump that changed
-  appearance implicitly would have been unadoptable at this point."*
-- **RFC-040** changed `design::widget::*` **in place** — the sidebar item gap
-  moved 16 → 12. Existing call sites render differently on a minor bump.
+Both did the same thing — added a new opt-in surface and left the existing one
+untouched:
 
-So the deferred work (notice title `label_size` → `title_size`) either changes
-an existing function or adds an opt-in, and **both have precedent**. This is a
-function-design decision, not a changelog or documentation one.
+| RFC | Existing surface | What it added |
+|---|---|---|
+| 039 | `snora::render`, byte-for-byte unchanged (G-3) | `snora::design::render` |
+| 040 | `snora::widget::*`, *"leaving the existing unstyled set exactly as it is"* | `snora::design::widget::*` |
 
-Live consequence: **orbok has not adopted RFC-040's in-place change yet.**
-Repeating the pattern would leave them two unadopted appearance changes
-stacked.
+The error came from reading `chrome-geometry.md`'s 16 → 12 sidebar-gap row as
+an in-place change. That row compares the **new** styled variant against the
+old hardcoded literal — the difference between `snora::widget::app_side_bar`
+and `snora::design::widget::app_side_bar`. No existing call site moved.
 
-**Out of scope here** — this RFC changes no code. It must be settled before the
-deferred RFC is written, and it deserves its own decision record.
+**What is genuinely unanswered** is narrower: both RFCs *created* surfaces.
+Neither faced changing a design surface that **already exists and has
+adopters** — which is what the deferred typography work would be, since
+`design::widget::*` shipped in v0.27.0 and orbok uses it.
+
+That is an unencountered case, not an inconsistency, and the established
+pattern points at the answer: make it opt-in rather than in-place. It needs
+deciding when the deferred RFC is written, not before, and it does not need a
+separate decision record.
 
 **Q-2 — where does the readability content live?** **Resolved (owner):
 accessibility and readability are different things; link rather than absorb.**
