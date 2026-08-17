@@ -100,6 +100,7 @@ Numbers remain stable forever and are never reused.
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **parked** — needs ~2 more releases of comparable data (see the RFC's Parked section) |
+| 057 | [The typography vocabulary is complete and undiscoverable](./proposed/057-typography-is-undiscoverable.md) | v0.33.1 (documentation only) |
 
 ## Archive
 
