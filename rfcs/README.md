@@ -101,6 +101,8 @@ Numbers remain stable forever and are never reused.
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **parked** — needs ~2 more releases of comparable data (see the RFC's Parked section) |
+| 058 | [`border` contrast is untested, and `light`/`dark` ship it at ~1.3:1](./proposed/058-border-contrast-is-untested-and-failing.md) | v0.34.0 (shipped defect; reported by tekstide) |
+| 059 | [Two more answers filed where consumers do not read](./proposed/059-answers-filed-where-consumers-do-not-read.md) | v0.34.0 (documentation; 4th/5th instance) |
 
 ## Archive
 
