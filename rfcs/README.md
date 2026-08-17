@@ -101,8 +101,8 @@ Numbers remain stable forever and are never reused.
 | ID | Title | Target |
 |----|-------|--------|
 | 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **parked** — needs ~2 more releases of comparable data (see the RFC's Parked section) |
-| 058 | [`border` contrast is untested, and `light`/`dark` ship it at ~1.3:1](./proposed/058-border-contrast-is-untested-and-failing.md) | v0.34.0 (shipped defect; reported by tekstide) |
-| 059 | [Two more answers filed where consumers do not read](./proposed/059-answers-filed-where-consumers-do-not-read.md) | v0.34.0 (documentation; 4th/5th instance) |
+| 058 | [`border` contrast is untested, and `light`/`dark` ship it at ~1.3:1](./proposed/058-border-contrast-is-untested-and-failing.md) | **accepted** → v0.34.0 (shipped defect; reported by tekstide) — handoff: [`handoffs/058-…`](./handoffs/058-border-contrast-is-untested-and-failing/implementation-handoff.md) |
+| 059 | [Two more answers filed where consumers do not read](./proposed/059-answers-filed-where-consumers-do-not-read.md) | **accepted** → v0.34.0 (documentation; 4th/5th instance) — handoff: [`handoffs/059-…`](./handoffs/059-answers-filed-where-consumers-do-not-read/implementation-handoff.md) |
 
 ## Archive
 

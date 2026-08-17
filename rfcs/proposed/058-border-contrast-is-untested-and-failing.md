@@ -1,6 +1,7 @@
 # RFC 058 — `border` contrast is untested, and `light`/`dark` ship it at ~1.3:1
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-17). Handoff:
+[`handoffs/058-…`](../handoffs/058-border-contrast-is-untested-and-failing/implementation-handoff.md)
 **Tracks.** Accessibility. Reported by **tekstide** (2026-08-17), verified
 independently.
 **Touches.** `crates/snora-design/src/tests.rs`,
@@ -99,6 +100,19 @@ the proof the carve-out requires.
 **No gate reopening is needed.** D-3/D-4 stay closed, because this is the
 permitted path rather than a forbidden change.
 
+### And the covenant rules out the tempting alternative
+
+tekstide's decorative-exempt caveat invites a second role — keep `border`
+decorative, add a `border_strong` at 3:1 for identifying boundaries. **The
+covenant forbids exactly that**: its prohibited list includes *"adding,
+removing, renaming, or retyping a `Palette` role"*, which would reopen D-3 and
+D-4.
+
+So the cost asymmetry is the opposite of intuition — changing the value is
+**permitted**, adding a role is **forbidden**. That settles the design choice
+without further argument, and it is why this RFC changes values rather than
+extending the palette.
+
 ## This changes appearance, and who sees it
 
 Preset border colours change, so **every `design`-path consumer's borders
@@ -128,11 +142,16 @@ repair rather than another styling decision.
 
 ## Open questions
 
-**Q-1 — what value should `border` become?**
-Three pairs must pass simultaneously per preset, and in `light`
+**Q-1 — what value should `border` become?** *Answered — computed, in the
+handoff §4.* Three pairs must pass simultaneously per preset, and in `light`
 `surface_raised == background` (both pure white), so the binding constraint is
-the lightest surface. Do not pick a value that passes `background` and fails
-`surface`. Compute it; do not eyeball it.
+the lightest surface. The binding pair is **`surface`** in `light` (border
+relative luminance **≤ 0.2731**) and **`surface_raised`** in `dark` (**≥
+0.1518**). Do not pick a value that passes `background` and fails `surface`.
+
+Note the magnitude: `light`'s border moves from luminance ≈ 0.707 to ≤ 0.273 — a
+very light grey becoming a mid grey. This is a **large** appearance change, not a
+nudge, which sharpens the §"This changes appearance" obligation below.
 
 **Q-2 — should `border` be asserted at 3.0 or at `FOCUS_MIN`?**
 They are the same number today. Using the named constant couples border

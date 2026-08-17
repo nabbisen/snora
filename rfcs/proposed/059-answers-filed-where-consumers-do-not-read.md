@@ -1,12 +1,18 @@
 # RFC 059 — Two more answers filed where consumers do not read
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-17). Handoff:
+[`handoffs/059-…`](../handoffs/059-answers-filed-where-consumers-do-not-read/implementation-handoff.md)
 **Tracks.** Documentation. **Fourth and fifth instances** of the failure mode
 RFC-045, RFC-048 and RFC-057 each fixed once.
-**Touches.** `docs/src/contributing/semantic-accessibility.md`,
-`docs/src/design/` (a governance-stability page or section),
+**Touches.** `docs/src/design/iced-style-bridge.md`,
+`docs/src/contributing/semantic-accessibility.md`,
+`docs/src/contributing/accessibility-checklist.md`,
 `crates/snora-design/src/focus.rs` (doc comment),
-`docs/src/guides/accessibility.md`, `CHANGELOG.md`. **No code.**
+`docs/src/design/stability.md` (new), `docs/src/SUMMARY.md`,
+`docs/src/design/{feature-flags,tokens}.md`,
+`docs/src/guides/accessibility.md`,
+`docs/src/contributing/feature-gating-criteria.md`,
+`docs/src/contributing/release-process.md`, `CHANGELOG.md`. **No code.**
 **Release target.** 0.34.0, alongside RFC-058 (documentation only in itself).
 
 ## Summary
@@ -156,30 +162,63 @@ the rules themselves are now the undiscoverable thing is a judgement.
 - **No `FocusTokens` application in snora's own widgets.** snora's primitives
   let iced own focus; that is unchanged.
 
-## Open questions
+## Open questions — all three now answered
 
-**Q-1 — write a fifth documentation rule, or stop adding rules?** See above.
+**Q-1 — write a fifth documentation rule, or stop adding rules? Neither: widen
+the rule that already exists.** `contributing/feature-gating-criteria.md`
+§ *"Documentation scope when a capability arrives or leaves"* is that rule, and
+RFC-056 already widened it once from arrivals to removals. A fifth standalone
+rule would itself land in `contributing/` and reproduce the defect it describes.
 
-**Q-2 — where does the stability statement live?** `design/overview.md` has the
-audience but is already long. A short `design/stability.md` is findable and
-linkable from `feature-flags.md` and `tokens.md`. Owner's call.
+Widen it a second time to cover **standing answers** — a governance guarantee,
+or the true scope of a constraint — and add a pointer to it from
+`release-process.md`, so following the release process reaches the rule. Five
+misses while the rule sat in a page titled *feature-gating criteria* is evidence
+the rule's problem is its address, not its absence.
 
-**Q-3 — does the `BLOCKED` label appear in any primitive's recorded
-checklist?** If reviewers have already written it into per-primitive records,
-those inherit the over-scoped claim and are part of the fix. Grep before
-scoping.
+**Q-2 — where does the stability statement live? A new
+`docs/src/design/stability.md`,** registered under **Snora Design** in
+`SUMMARY.md`, linked from `design/feature-flags.md` and `design/tokens.md`.
+`design/overview.md` has the audience but is already long, and a prospective
+adopter needs a page that can be linked at them.
+
+**Q-3 — does the `BLOCKED` label appear in any primitive's recorded checklist?
+No.** Grepped: three `BLOCKED` sites and no per-primitive record, so there is no
+inherited-claim cleanup. But the grep found something the scope above had
+missed —
+
+### The most important instance was not in the original scope
+
+`docs/src/design/iced-style-bridge.md:76–83` — under **Snora Design**, i.e. the
+**consumer-facing** half of the book — carries the same over-scoped claim *and*
+the "will be wired when iced exposes focus state" framing. That is the copy a
+consumer reads, and it is the one that tells an application which already owns
+focus state to wait for a future iced.
+
+`contributing/accessibility-checklist.md:26` repeats it a third time.
+`accessibility-checklist.md:192`, by contrast, is a correct generic definition
+of the `BLOCKED` severity category and stays as it is.
+
+Four sites, one claim, three of them needing the same narrowing. Fixing only the
+contributor copy would have been this same defect one more time.
 
 ## Acceptance criteria
 
-1. `semantic-accessibility.md` states the narrow constraint and no longer
-   instructs reviewers not to file.
+1. **All three over-scoped sites** — `design/iced-style-bridge.md`,
+   `contributing/semantic-accessibility.md`,
+   `contributing/accessibility-checklist.md:26` — state the narrow constraint,
+   and `semantic-accessibility.md` no longer instructs reviewers not to file.
+   `accessibility-checklist.md:192` is unchanged.
 2. `FocusTokens` is documented as usable today by focus-owning applications.
 3. A consumer-facing page or section states the token-surface guarantee,
    linking `api-governance.md` without duplicating it, and **does not claim
    version-upgrade compatibility** the covenant does not provide.
-4. Q-3 answered: existing `BLOCKED` records found and corrected, or none exist.
-5. `git diff --stat -- 'crates/**/*.rs'` shows doc-comment lines only.
-6. `mdbook build` / `mdbook test` pass; `render_semantics` unmodified.
+4. Q-3 re-confirmed by a fresh grep: no per-primitive `BLOCKED` record exists.
+5. The documentation-scope rule in `feature-gating-criteria.md` covers standing
+   answers, its instance table gains both tekstide rows, and
+   `release-process.md` points at it.
+6. `git diff --stat -- 'crates/**/*.rs'` shows doc-comment lines only.
+7. `mdbook build` / `mdbook test` pass; `render_semantics` unmodified.
 
 ## Compatibility and security
 
