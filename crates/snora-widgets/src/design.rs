@@ -41,9 +41,12 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::Tokens;
 //! use snora_widgets::design::button;
+//!
+//! #[derive(Clone)]
+//! enum Message { Save }
 //!
 //! let tokens = Tokens::light();
 //! let btn = button::primary(&tokens, "Save", Message::Save);

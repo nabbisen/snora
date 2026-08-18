@@ -68,8 +68,20 @@ use snora_core::AppLayout;
 /// function silently drops the styled dialog card and derived modal
 /// dim.
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// use iced::{Element, widget::text};
 /// use snora::{AppLayout, responsive_render};
+///
+/// struct State;
+/// #[derive(Debug, Clone)]
+/// enum Message {}
+///
+/// fn body(_state: &State) -> Element<'_, Message> {
+///     text("body").into()
+/// }
+/// fn sidebar(_state: &State) -> Element<'_, Message> {
+///     text("sidebar").into()
+/// }
 ///
 /// fn view(state: &State) -> Element<'_, Message> {
 ///     responsive_render(move |width| {

@@ -242,20 +242,32 @@ fn close_button_style(status: button::Status) -> button::Style {
 ///
 /// Wire this into your `iced::Application::subscription` like so:
 ///
-/// ```ignore
-/// fn subscription(&self) -> Subscription<Message> {
-///     snora::toast::subscription(&self.toasts, || Message::ToastTick)
+/// ```rust,no_run
+/// use iced::{Subscription, Task};
+/// use snora::Toast;
+///
+/// #[derive(Debug, Clone)]
+/// enum Message {
+///     ToastTick,
 /// }
 ///
-/// // ...
-/// fn update(&mut self, msg: Message) -> Task<Message> {
-///     match msg {
-///         Message::ToastTick => {
-///             snora::toast::sweep_expired(&mut self.toasts, std::time::Instant::now());
-///         }
-///         // ...
+/// struct MyState {
+///     toasts: Vec<Toast<Message>>,
+/// }
+///
+/// impl MyState {
+///     fn subscription(&self) -> Subscription<Message> {
+///         snora::toast::subscription(&self.toasts, || Message::ToastTick)
 ///     }
-///     Task::none()
+///
+///     fn update(&mut self, msg: Message) -> Task<Message> {
+///         match msg {
+///             Message::ToastTick => {
+///                 snora::toast::sweep_expired(&mut self.toasts, std::time::Instant::now());
+///             }
+///         }
+///         Task::none()
+///     }
 /// }
 /// ```
 ///

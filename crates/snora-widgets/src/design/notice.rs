@@ -19,17 +19,21 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::{Tokens, Tone};
 //! use snora_widgets::design::notice::Notice;
 //!
+//! #[derive(Clone)]
+//! enum Message { RebuildIndex, DismissNotice }
+//!
 //! let tokens = Tokens::light();
 //!
-//! Notice::new(&tokens, Tone::Warning, "Index is out of date.")
-//!     .title("Stale index")
-//!     .action("Rebuild", Message::RebuildIndex)
-//!     .dismiss(Message::DismissNotice)
-//!     .render()
+//! let _notice: iced::Element<'_, Message> =
+//!     Notice::new(&tokens, Tone::Warning, "Index is out of date.")
+//!         .title("Stale index")
+//!         .action("Rebuild", Message::RebuildIndex)
+//!         .dismiss(Message::DismissNotice)
+//!         .render();
 //! ```
 
 use iced::{

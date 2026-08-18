@@ -24,15 +24,19 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::Tokens;
 //! use snora_widgets::design::card;
 //! use iced::widget::text;
 //!
+//! enum Message {}
+//!
 //! let tokens = Tokens::light();
 //!
-//! let my_card = card::surface(&tokens, text("Card content"));
-//! let highlighted = card::selected(&tokens, text("Active item"));
+//! let my_card: iced::Element<'_, Message> =
+//!     card::surface(&tokens, text("Card content"));
+//! let highlighted: iced::Element<'_, Message> =
+//!     card::selected(&tokens, text("Active item"));
 //! ```
 
 use iced::{Element, widget::container};

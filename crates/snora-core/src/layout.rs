@@ -12,7 +12,17 @@
 //! `AppLayout::new(body)` is the minimum — just a body element. Every
 //! other slot has a sensible default and is set via a chainable method:
 //!
-//! ```rust,ignore
+//! ```rust,no_run
+//! use snora_core::{AppLayout, LayoutDirection};
+//!
+//! #[derive(Clone)]
+//! enum Message { CloseMenus, CloseModals }
+//!
+//! fn my_body() -> () {}
+//! fn my_header() -> () {}
+//! fn my_sidebar() -> () {}
+//! fn my_footer() -> () {}
+//!
 //! let layout = AppLayout::new(my_body())
 //!     .header(my_header())
 //!     .side_bar(my_sidebar())
@@ -59,7 +69,16 @@ use crate::{
 /// Use [`AppLayout::new`] plus chainable builder methods. This is the
 /// stable, long-term construction path:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// use snora_core::AppLayout;
+///
+/// #[derive(Clone)]
+/// enum Message { CloseMenus, CloseModals }
+///
+/// let body: () = ();
+/// let header: () = ();
+/// let sidebar: () = ();
+///
 /// let layout = AppLayout::new(body)
 ///     .header(header)
 ///     .side_bar(sidebar)

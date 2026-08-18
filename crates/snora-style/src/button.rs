@@ -16,13 +16,14 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::Tokens;
 //! use snora_style::button;
 //!
 //! let tokens = Tokens::light();
 //! let btn = iced::widget::button("Save")
 //!     .style(move |_theme, status| button::primary(&tokens, status));
+//! # let _: iced::widget::Button<'_, (), iced::Theme, iced::Renderer> = btn;
 //! ```
 
 use iced::{Border, Color, Shadow, widget::button};

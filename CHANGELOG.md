@@ -17,6 +17,26 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.36.1] — 2026-08-18
+
+### Changed
+
+- **Every `ignore`-fenced doctest in `crates/` is now audited, not just
+  written and forgotten (RFC-064).** Of 19 fences, 16 are promoted to
+  their strongest reachable rung: 1 to a full run (`snora-style`'s
+  `to_iced_color`, which had an `assert_eq!` that had simply never
+  executed), and 15 to `no_run` (compiles, catches API drift, costs no
+  runtime). The 3 that genuinely cannot compile (two partial-fragment
+  examples in `snora/src/keyboard.rs`, one real-event-loop example in
+  `snora-style/src/theme.rs`) stay `ignore`, each with a stated reason
+  above the fence. `documentation-test-policy.md` now records the
+  three-rung ladder as the rule, covers all five crates (previously only
+  `snora-core` and `snora-widgets` were mentioned), states the
+  pure-function distinction `snora-style` missed by analogy in 0.32.0,
+  and corrects a false "17 doctests, tracked in the release checklist"
+  claim — the count is now genuinely tracked there. Doc comments only;
+  no code, API, or behaviour changed.
+
 ## [0.36.0] — 2026-08-18
 
 ### Added

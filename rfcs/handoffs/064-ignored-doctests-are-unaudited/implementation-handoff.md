@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-064 ignored doctests
 
-**Governing RFC.** [RFC-064](../../proposed/064-ignored-doctests-are-unaudited.md)
+**Governing RFC.** [RFC-064](../../done/064-ignored-doctests-are-unaudited.md)
 **Status.** Inherited from RFC-064 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.1. **Documentation and doc comments only** — no
 behaviour change.

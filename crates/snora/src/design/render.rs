@@ -87,10 +87,16 @@ const DIM_ALPHA: f32 = 0.4;
 /// to [`crate::render::render`], not a replacement. Applications opt in
 /// explicitly:
 ///
-/// ```rust,ignore
-/// use snora::design::{Tokens, render};
+/// ```rust,no_run
+/// use iced::{Element, widget::text};
+/// use snora::{AppLayout, design::{Tokens, render}};
+///
+/// #[derive(Debug, Clone)]
+/// enum Message {}
 ///
 /// let tokens = Tokens::light();
+/// let body: Element<'_, Message> = text("Hello, snora!").into();
+/// let layout = AppLayout::new(body);
 /// let element = render(layout, &tokens);
 /// ```
 #[must_use]
@@ -123,11 +129,22 @@ where
 /// the borrow is natural in the usual `fn view(&self) -> Element<'_,
 /// Message>`, where the returned element already borrows `&self`.
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// use iced::{Element, widget::text};
 /// use snora::{AppLayout, design::{Tokens, responsive_render}};
 ///
-/// fn view(state: &State) -> Element<'_, Message> {
-///     let tokens = Tokens::light();
+/// struct State;
+/// #[derive(Debug, Clone)]
+/// enum Message {}
+///
+/// fn body(_state: &State) -> Element<'_, Message> {
+///     text("body").into()
+/// }
+/// fn sidebar(_state: &State) -> Element<'_, Message> {
+///     text("sidebar").into()
+/// }
+///
+/// fn view<'a>(state: &'a State, tokens: &'a Tokens) -> Element<'a, Message> {
 ///     responsive_render(
 ///         move |width| {
 ///             let layout = AppLayout::new(body(state));
@@ -137,7 +154,7 @@ where
 ///                 layout.side_bar(sidebar(state))
 ///             }
 ///         },
-///         &tokens,
+///         tokens,
 ///     )
 /// }
 /// ```

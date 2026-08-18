@@ -102,12 +102,12 @@ Numbers remain stable forever and are never reused.
 | 061 | [Pointer target size is a checklist rule with no assertion](./done/061-pointer-target-size-is-unasserted.md) | v0.36.0 (handoff: [`handoffs/061-…`](./handoffs/061-pointer-target-size-is-unasserted/implementation-handoff.md)) |
 | 062 | [The feature-gating status table contradicts its own threshold](./done/062-feature-gating-indicators-are-uncalibrated.md) | v0.36.0 (handoff: [`handoffs/062-…`](./handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md)) |
 | 063 | [The contrast pair list is hand-maintained](./done/063-contrast-pairs-are-a-hand-maintained-list.md) | v0.36.0 (handoff: [`handoffs/063-…`](./handoffs/063-contrast-pairs-are-a-hand-maintained-list/implementation-handoff.md)) |
+| 064 | [`rust,ignore` is the default nobody has to justify](./done/064-ignored-doctests-are-unaudited.md) | v0.36.1 (handoff: [`handoffs/064-…`](./handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 064 | [`rust,ignore` is the default nobody has to justify](./proposed/064-ignored-doctests-are-unaudited.md) | **accepted** → v0.36.1 — handoff: [`handoffs/064-…`](./handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md) |
 
 ## Archive
 

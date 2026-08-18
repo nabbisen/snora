@@ -38,11 +38,16 @@ These constrain what *can* be on the roadmap:
 1. One iced major upgrade completed. ⬜
 3. At least one third-party or production-grade app. ⬜
 7. Public API freeze review completed. ✅ v0.18
-9. Binary-size and compile-time trends (≥2 data points). ⬜ **reopened
-   v0.25.3** — the measurement workflows had never fired on a release tag
-   (RFC-041), and the methodology itself measures ~0 marginal cost
-   (RFC-043). Previously recorded as satisfied at v0.19.1; that was not
-   supported by the data.
+9. Binary-size and compile-time trends (≥2 data points). ⬜ — **split
+   into 9a/9b at v0.29.0.** 9a (binary size) is **satisfied**, on four
+   post-fix rows. 9b (compile time) is **open**: RFC-050 supplied the
+   noise-controlled metric it was waiting for, and as of 0.36.0 the literal
+   ≥2 condition is met (`design_overhead_ratio` 0.042941 → 0.043451, 1.19%
+   spread while its inputs moved ~18%) — but it is deliberately held to
+   9a's four-row precedent. Reopened at v0.25.3 because the measurement
+   workflows had never fired on a release tag (RFC-041) and the methodology
+   measured ~0 marginal cost (RFC-043); previously recorded as satisfied at
+   v0.19.1, which the data did not support.
 
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
@@ -97,6 +102,19 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.36.1** — Every `ignore`-fenced doctest audited (RFC-064). `ignore` was
+  the fence anyone reached for and nothing asked why: of 19, 16 were promoted
+  to their strongest reachable rung — one to a full run, having carried an
+  `assert_eq!` that had never executed, and 15 to `no_run`, which compiles and
+  catches API drift at no runtime cost. The audit found **three documented
+  examples that did not compile at all**, invisible because nothing compiled
+  them. The three that remain ignored now each carry a stated reason. The
+  policy's claim that doctest counts were "tracked in the release checklist"
+  was false in both halves — the count was stale and the checklist line did not
+  exist; both are fixed, and the policy now covers all five crates rather than
+  the two it was written for. Also recorded: gate **9b**'s literal closure
+  condition is met, and the gate is deliberately held to 9a's four-row
+  precedent rather than closed at its own weakest reading.
 - **0.36.0** — Three accessibility gates that existed only as prose now have
   mechanisms behind them. The 24×24 pointer-target rule gains a height-axis
   assertion (RFC-061) — the width axis is marked review-only, because content
@@ -323,6 +341,8 @@ The full readiness checklist is in
 7. Public API freeze review completed. ✅ v0.18
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
 9. Binary-size and compile-time trends monitored (≥2 data points). ⬜
+   — **9a satisfied v0.29.0; 9b open, closing at four ratio rows** (see
+   `api-freeze-review.md`).
    (reopened v0.25.3 — see above and RFC-041 / RFC-043)
 10. No hidden feature-combination failures. ✅ (CI gate)
 

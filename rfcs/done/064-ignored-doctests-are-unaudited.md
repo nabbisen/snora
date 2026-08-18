@@ -1,6 +1,6 @@
 # RFC 064 — `rust,ignore` is the default nobody has to justify, and it is hiding a runnable test
 
-**Status.** Accepted (owner, 2026-08-18). Handoff:
+**Status.** Done — shipped in v0.36.1 (2026-08-18). Handoff:
 [`handoffs/064-…`](../handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md)
 **Tracks.** Quality gates / measurement integrity. Continues the RFC-058 →
 RFC-061 → RFC-063 line: a rule with no mechanism behind it.

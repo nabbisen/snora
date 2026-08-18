@@ -347,6 +347,11 @@ fn to_sn_color(color: iced::Color) -> snora_design::Color {
 /// application stores the returned value and passes it to iced's
 /// `.theme()` hook:
 ///
+/// `ignore` (RFC-064): calls `.run()`, a real event loop with no
+/// headless mode, and references an undefined `App` type standing in for
+/// the reader's own application — neither is satisfiable without the
+/// padding this policy explicitly rejects.
+///
 /// ```rust,ignore
 /// use snora::design::{Tokens, theme};
 ///

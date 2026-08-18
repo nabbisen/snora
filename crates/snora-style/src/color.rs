@@ -9,7 +9,7 @@
 /// All four channels (`r`, `g`, `b`, `a`) are passed through unchanged.
 /// Both types represent normalized sRGB, so this is a lossless field copy.
 ///
-/// ```rust,ignore
+/// ```
 /// use snora_design::Color;
 /// use snora_style::color::to_iced_color;
 ///

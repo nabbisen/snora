@@ -12,13 +12,14 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::Tokens;
 //! use snora_style::text;
 //! use iced::widget::text as iced_text;
 //!
 //! let tokens = Tokens::light();
 //! let heading = iced_text("Settings").size(text::heading_size(&tokens));
+//! # let _: iced::widget::Text<'_, iced::Theme, iced::Renderer> = heading;
 //! ```
 
 use iced::Pixels;

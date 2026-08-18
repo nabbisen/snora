@@ -23,14 +23,66 @@ rule is simple: **tag every Rust fence in `docs/src` at write time**.
 
 The CI `docs` job runs `mdbook test docs` and enforces this.
 
-## `snora-core` crate doctests
+## Crate doctests
 
-Crate-level doctests (`///` comments in `src/`) are tested by
-`cargo test -p snora-core`. They may use bare code blocks because
-they run inside the crate's own compilation context. The current
-count is 17 doctests (tracked in the release checklist). Do not
-accidentally break these by changing vocabulary without updating
-the examples in the doc comments.
+Crate-level doctests (`///`/`//!` comments in `src/`) are tested by
+`cargo test -p <crate> --doc` (or `cargo test --workspace --all-features`
+for all five crates at once). Unlike the `docs/src` prose fences above,
+these run inside the crate's own compilation context, so a bare
+` ```rust ` fence compiles **and executes**.
+
+**Needing `iced` as a dependency does not imply needing a renderer at
+runtime.** Constructing a style or a widget *value* is a pure function
+call; only running an `iced::application` needs an event loop. This
+distinction was missed when `snora-style` (RFC-055, 0.32.0) inherited
+`snora-widgets`'s "needs a full `iced::Application`" guidance by analogy,
+which is how it ended up with all four of its doctests `ignore`d while
+`snora-design` — genuinely pure, no `iced` dependency at all — ran 8 of 8.
+
+### The three-rung ladder
+
+Every crate doctest fence is placed at the **highest rung it can reach**:
+
+| Rung | Fence | Behaviour | Use when |
+|---|---|---|---|
+| Full run | bare ` ```rust ` | compiles **and executes** | the snippet asserts something (e.g. `assert_eq!`) |
+| `no_run` | ` ```rust,no_run ` | compiles, does not execute | complete and compilable, but only demonstrates API shape |
+| `ignore` | ` ```rust,ignore ` | **not compiled at all** | genuinely cannot compile — partial fragments, undefined types, event loops |
+
+`ignore` is the weakest rung and buys nothing: an ignored fence is not a
+test, it is a comment that looks like one, and it silently rots as the API
+moves. `no_run` is the important middle rung — it costs no runtime and
+still catches API drift.
+
+**Every fence left at `ignore` must carry a one-line reason directly above
+the fence**, stating what specifically prevents it from compiling (a
+partial fragment, an undefined type standing in for the reader's own
+application, a real event loop with no headless mode). "Obvious to
+whoever wrote it" is not a reason; it is how fences drift apart from
+identical justifications without anyone noticing (RFC-064).
+
+A grep for unexplained `ignore` fences
+(`grep -rn '```rust,ignore\|```ignore' crates/ --include="*.rs"`) is
+mechanisable and could become a CI gate. **Deferred as of RFC-064**: the
+audit and this written rule ship first, so the fence count is known,
+small, and stable before a gate is pointed at it.
+
+### Current counts
+
+As of 0.36.1 (RFC-064 audit):
+
+| Crate | Full run + `no_run` | `ignore` |
+|---|---|---|
+| `snora-core` | 20 | 0 |
+| `snora-design` | 8 | 0 |
+| `snora-style` | 3 | 1 |
+| `snora-widgets` | 6 | 0 |
+| `snora` | 5 | 2 |
+| **Total** | **42** | **3** |
+
+Tracked in the [release checklist](release-process.md). Do not
+accidentally break these by changing vocabulary without updating the
+examples in the doc comments.
 
 ## `snora-widgets` builder examples
 

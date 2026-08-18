@@ -43,11 +43,16 @@
 //!
 //! # A minimal application view
 //!
-//! ```ignore
+//! ```rust,no_run
 //! use iced::{Element, widget::text};
 //! use snora::{AppLayout, render, LayoutDirection};
 //!
-//! fn view(state: &MyState) -> Element<'_, Message> {
+//! struct MyState;
+//!
+//! #[derive(Debug, Clone)]
+//! enum Message {}
+//!
+//! fn view(_state: &MyState) -> Element<'_, Message> {
 //!     let body: Element<'_, Message> = text("Hello, snora!").into();
 //!
 //!     let layout = AppLayout::new(body)

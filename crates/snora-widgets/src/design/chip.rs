@@ -35,14 +35,25 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::Tokens;
 //! use snora_widgets::design::chip;
 //!
-//! let tokens = Tokens::light();
+//! #[derive(Clone)]
+//! enum Message { ToggleDrafts, ToggleTag, RemoveTag }
 //!
-//! chip::filter(&tokens, "Draft", self.show_drafts, Message::ToggleDrafts)
-//! chip::removable(&tokens, "Tag: Rust", true, Message::ToggleTag, Message::RemoveTag)
+//! let tokens = Tokens::light();
+//! let show_drafts = true; // stands in for e.g. `self.show_drafts`
+//!
+//! let _draft_chip: iced::Element<'_, Message> =
+//!     chip::filter(&tokens, "Draft", show_drafts, Message::ToggleDrafts);
+//! let _tag_chip: iced::Element<'_, Message> = chip::removable(
+//!     &tokens,
+//!     "Tag: Rust",
+//!     true,
+//!     Message::ToggleTag,
+//!     Message::RemoveTag,
+//! );
 //! ```
 
 use iced::{

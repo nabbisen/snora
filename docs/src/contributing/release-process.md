@@ -97,6 +97,12 @@ them in sync is a release-process invariant.
     `cargo tree -p snora --all-features | grep -i accesskit` — and update
     design-decisions.md's register with the result and this release's
     date if it changed.
+[ ] Check gate 9b (api-freeze-review.md): count the rows in
+    compile-time.csv carrying `design_overhead_ratio`. The literal closure
+    condition (>=2) was met at 0.36.0 and the gate was deliberately held to
+    9a's four-row precedent. At **four** rows, assess and close it — do not
+    let it drift open past its own condition the way the feature-gating
+    table drifted stale for ten minors.
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)
 [ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their
@@ -129,6 +135,13 @@ them in sync is a release-process invariant.
 [ ] cargo test -p snora-widgets --features design
 [ ] cargo test -p snora --lib --all-features
 [ ] cargo test -p snora --test render_semantics   # CI hardware; may OOM locally
+[ ] cargo test --workspace --all-features | grep -A2 "Doc-tests"
+    # Confirm the passed/ignored counts per crate match
+    # documentation-test-policy.md's "Current counts" table; update that
+    # table if a doctest was added, removed, promoted, or newly ignored.
+    # Every fence left at `ignore` must carry a stated reason (RFC-064) —
+    # `grep -B1 '```rust,ignore\|```ignore' crates/ -r --include="*.rs"`
+    # to spot-check one wasn't added without one.
 [ ] cargo check -p snora --no-default-features
 [ ] mdbook build docs               # validates the book renders
 [ ] mdbook test docs                # validates the doc-fence policy

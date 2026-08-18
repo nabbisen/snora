@@ -18,14 +18,18 @@
 //!
 //! # Usage
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! use snora_design::{Tokens, Tone};
 //! use snora_widgets::design::progress;
 //!
+//! enum Message {}
+//!
 //! let tokens = Tokens::light();
 //!
-//! progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent)
-//! progress::card(&tokens, "Syncing", None, Tone::Info)
+//! let _row: iced::Element<'_, Message> =
+//!     progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent);
+//! let _card: iced::Element<'_, Message> =
+//!     progress::card(&tokens, "Syncing", None, Tone::Info);
 //! ```
 
 use iced::{

@@ -25,6 +25,10 @@ use snora_core::focus::Cycle;
 ///
 /// # Example
 ///
+/// `ignore` (RFC-064): a `match` arm fragment plus a `&self` method,
+/// neither a standalone compilable item — genuinely partial, not merely
+/// unassembled.
+///
 /// ```rust,ignore
 /// // In your subscription:
 /// fn subscription(&self) -> Subscription<Message> {
@@ -91,6 +95,10 @@ pub fn dismiss_on_escape<Message: Clone>(
 /// other.
 ///
 /// # Example
+///
+/// `ignore` (RFC-064): a bare `match` arm fragment referencing
+/// application-owned methods (`self.focus_zone`, `self.zone_presence()`,
+/// `self.focus_task_for`) — not a standalone item.
 ///
 /// ```rust,ignore
 /// // In your update, alongside dismiss_on_escape:
