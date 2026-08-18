@@ -109,6 +109,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 066 | [The dim assertion is an endpoint check, not a sweep](./proposed/066-the-dim-assertion-is-an-endpoint-check.md) | v0.38.0 — two presets have an interior minimum RFC-065 did not see; reported by tekstide |
 
 ## Archive
 

@@ -206,6 +206,10 @@ hand-written pair list). The declaration is crate-private and
 are otherwise unconstrained — the enforcement is about *measuring* a new
 role, not about permission to add one.
 
+**The enforcement is crate-local by construction, and consumers do not need it.** `#[non_exhaustive]` permits exhaustive destructuring only *inside* the crate that defines the type. From a consuming crate the compiler requires `..` in the pattern (`E0638: `..` required with struct marked as non-exhaustive`) — and `..` is exactly what defeats the mechanism. A downstream team hit this trying to copy the pattern onto snora's `Palette` and reported that `E0638` alone reads like a mistake rather than a boundary (orbok, 2026-08-18).
+
+This is not a gap to close. A consumer maintaining a pair list over **snora's** roles is duplicating a check snora already runs, and [`design/stability.md`](../design/stability.md) states the token surface is contractually frozen. The mechanism *is* portable — to a consumer's **own** palette type, in their own crate, where the same `E0027` enforcement applies.
+
 **Adding a composited or derived surface carries the same obligation,
 beside the role rule above (RFC-065).** `Palette::usages` can only
 declare where a *role* renders; it has no way to express a surface that

@@ -10,6 +10,15 @@ use crate::Color;
 /// closure — an arbitrary `Fn(&iced::Theme) -> Style` — and set border
 /// colour and width from these tokens. That is not blocked by iced 0.14.
 ///
+/// **Two of the three fields map directly; [`FocusTokens::ring_offset`] does
+/// not.** `iced::Border` carries exactly `color`, `width` and `radius` — there
+/// is no offset — so a ring drawn *outside* the control's edge is not
+/// expressible as a container border alone. Honour the offset with padding or
+/// a nested container, or accept an inset ring and decide that deliberately;
+/// inset rings read differently against dense content. Named because a
+/// consumer read this paragraph carefully and still had to ask (arama,
+/// 2026-08-18).
+///
 /// What iced 0.14 does not support is **standard** `button`/`container`
 /// styling telling its *own* style closure that the widget is focused —
 /// iced does not report that state, so a closure that does not already

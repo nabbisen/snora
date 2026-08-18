@@ -44,6 +44,25 @@ the mechanism that lets a defect like the one in
 reopening the gates. See the governance page linked above for the full
 rule and its forbidden alternatives.
 
+## You do not need to re-check our contrast
+
+Every `Palette` role declares which surfaces it renders on and at what
+threshold, and the contrast pairs are *derived* from that declaration rather
+than maintained beside it. A role cannot be added without answering the
+question — the compiler refuses (`E0027`). So the roles you consume are
+asserted by us, on every build.
+
+If you keep your own pair list over snora's roles, you are duplicating that
+work. Your list only needs to cover **your own** roles and **your own**
+surfaces.
+
+Two consumers have asked whether they can copy the mechanism itself. You can —
+onto your own palette type, in your own crate. You cannot apply it to *snora's*
+`Palette` from outside: `#[non_exhaustive]` permits exhaustive destructuring
+only inside the defining crate, so the compiler will require `..`
+(`E0638`), and `..` silently defeats the enforcement. That is a language
+boundary, not a mistake on your side.
+
 ## What is not frozen
 
 The design **primitives** — the `button`, `card`, `notice`, `chip`,
