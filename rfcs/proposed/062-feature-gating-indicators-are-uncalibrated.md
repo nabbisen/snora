@@ -1,6 +1,7 @@
 # RFC 062 — The feature-gating status table contradicts its own threshold
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-18). Handoff:
+[`handoffs/062-…`](../handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md)
 **Tracks.** Measurement integrity / governance. Continues RFC-041, RFC-043,
 RFC-050.
 **Touches.** `docs/src/contributing/feature-gating-criteria.md`,
@@ -177,9 +178,26 @@ judgement about what the indicator is *for*:
   actually turns on, and it is closer to what `widgets_diff_bytes` does for
   indicator 2. Requires deciding whether an existing column expresses it.
 
-**(c) is the most coherent with what the indicator is deciding**, but it is also
-the largest change and interacts with RFC-050's warning against new columns.
-Owner's call.
+**Resolved during handoff (2026-08-18): option (b).** Checking closed the other
+two rather than weighing them.
+
+- **(c) is blocked.** No existing column expresses the marginal compile cost of
+  `widgets` over an engine-only build — `build_widgets_ms` includes iced,
+  `build_engine_only_ms` builds against a warm graph. It needs a new column, and
+  RFC-050's non-goals forbid one: *"Adding one would reset the comparability
+  clock again."* Coherent, and unavailable at acceptable cost.
+- **(a) inherits the defect RFC-050 documented.** The absolute columns carry
+  36–60% spread, so *any* absolute CI threshold decides a crate split on runner
+  luck near the line. Recalibrating the number does not fix the instrument.
+- **(b) is right on its own merits**, not merely by elimination. The threshold
+  says *"a developer's machine of average specs"*; CI is not that machine, and
+  since RFC-043 the column rebuilds iced's whole closure. The proxy was always
+  measuring a different quantity — RFC-043 only made it visible.
+
+So: keep the 30-second threshold, retire the proxy claim, state how the
+indicator *is* assessed, and record it as currently unassessed. Less satisfying
+than a live number, and honest — an indicator openly unassessed beats one
+assessed by an instrument measuring something else.
 
 **Q-2 — should a "measured, not met" verdict carry its numbers?** Suggest yes,
 and that this becomes the table's format: every row states its measured value
