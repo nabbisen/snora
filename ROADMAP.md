@@ -33,21 +33,23 @@ These constrain what *can* be on the roadmap:
 
 ## Post-0.17: toward 1.0
 
-**Seven** of ten 1.0 gates are satisfied. The remaining path:
+**Eight** of ten 1.0 gates are satisfied. The remaining path:
 
 1. One iced major upgrade completed. ⬜
 3. At least one third-party or production-grade app. ⬜
 7. Public API freeze review completed. ✅ v0.18
-9. Binary-size and compile-time trends (≥2 data points). ⬜ — **split
-   into 9a/9b at v0.29.0.** 9a (binary size) is **satisfied**, on four
-   post-fix rows. 9b (compile time) is **open**: RFC-050 supplied the
-   noise-controlled metric it was waiting for, and as of 0.36.0 the literal
-   ≥2 condition is met (`design_overhead_ratio` 0.042941 → 0.043451, 1.19%
-   spread while its inputs moved ~18%) — but it is deliberately held to
-   9a's four-row precedent. Reopened at v0.25.3 because the measurement
-   workflows had never fired on a release tag (RFC-041) and the methodology
-   measured ~0 marginal cost (RFC-043); previously recorded as satisfied at
-   v0.19.1, which the data did not support.
+9. Binary-size and compile-time trends (≥2 data points). ✅ **v0.37.0** —
+   split into 9a/9b at v0.29.0 and both now satisfied. 9a (binary size) on
+   four post-fix rows. 9b (compile time) on four `design_overhead_ratio`
+   rows, closed **with its sensitivity stated rather than ticked clean**:
+   the ratio moved −4.44% across a release that changed no executable
+   code, so it detects a regression above roughly 10% and cannot see a 5%
+   one — a ~5× improvement on the absolute columns it replaced (23–30%
+   spread over the same releases), and materially weaker than 9a, whose
+   series moved −0.0008% on the same kind of control. Closed because no
+   better number is available: RFC-050 examined and rejected
+   repeat-runs/median-of-N, and nothing else is queued. This gate had been
+   reopened or clock-reset four times since v0.25.3.
 
 Work on these proceeds alongside any v0.18+ feature work. There is no
 scheduled date for 1.0.
@@ -351,9 +353,9 @@ The full readiness checklist is in
 6. Feature-matrix CI stable. ✅ v0.11
 7. Public API freeze review completed. ✅ v0.18
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
-9. Binary-size and compile-time trends monitored (≥2 data points). ⬜
-   — **9a satisfied v0.29.0; 9b open, closing at four ratio rows** (see
-   `api-freeze-review.md`).
+9. Binary-size and compile-time trends monitored (≥2 data points). ✅
+   v0.37.0 — 9a v0.29.0, 9b on four ratio rows, the latter closed with
+   its measured sensitivity stated (see `api-freeze-review.md`).
    (reopened v0.25.3 — see above and RFC-041 / RFC-043)
 10. No hidden feature-combination failures. ✅ (CI gate)
 

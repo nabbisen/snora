@@ -97,12 +97,13 @@ them in sync is a release-process invariant.
     `cargo tree -p snora --all-features | grep -i accesskit` — and update
     design-decisions.md's register with the result and this release's
     date if it changed.
-[ ] Check gate 9b (api-freeze-review.md): count the rows in
-    compile-time.csv carrying `design_overhead_ratio`. The literal closure
-    condition (>=2) was met at 0.36.0 and the gate was deliberately held to
-    9a's four-row precedent. At **four** rows, assess and close it — do not
-    let it drift open past its own condition the way the feature-gating
-    table drifted stale for ten minors.
+[ ] Read the new `design_overhead_ratio` row against
+    build-cost-budget.md's watch points. Gate 9b closed at 0.37.0 on four
+    rows, so this is ongoing monitoring, not a closure check — and it is
+    monitoring with a stated floor: the ratio moved -4.44% across a release
+    that changed no executable code, so treat a move under ~10% as noise
+    and investigate above it. The absolute millisecond columns are raw
+    record, never a trend (RFC-050).
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)
 [ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their

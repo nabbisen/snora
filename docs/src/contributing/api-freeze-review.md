@@ -3,11 +3,12 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.25.3):** Seven of ten core gates satisfied. Remaining
-blockers: gate 1 (iced major upgrade), gate 3 (confirmed third-party
-production app), and gate 9 (measurement automation never fired on a
-release tag — reopened by RFC-041; see below). Design-track D-gates
-tracking in progress; see table below.
+**Current status (v0.37.0):** Eight of ten core gates satisfied. Remaining
+blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
+production app). **Gate 9 closed at v0.37.0** — 9a at v0.29.0, 9b on four
+`design_overhead_ratio` rows, the latter with its sensitivity stated in
+the row below rather than ticked clean. Design-track D-gates tracking in
+progress; see table below.
 
 ## Crate-level surface
 
@@ -103,7 +104,7 @@ Type-names audit: **complete as of v0.17.0.**
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
 | 9a. **Binary-size** trend monitored (≥2 data points) | ✅ v0.29.0 — four post-fix rows on one runner and methodology (0.27.0, 0.27.1, 0.28.0, 0.28.1, all `ubuntu-latest`, same rustc). The series tracks real change: `widgets_diff_bytes` 44,928 → 45,056 → 46,592 → 46,720. Across the documentation-only 0.28.1, engine size moved **−0.0008%** — signal dominates noise. |
-| 9b. **Compile-time** trend monitored (≥2 data points) | ⬜ **open. RFC-050 supplies the noise-controlled metric this gate has been waiting for (`design_overhead_ratio`, 2.5% spread on five identical-runner rows vs. 36–60% for the absolute columns), but the gate does not close on the RFC landing.** Closure condition: **≥2 released versions measured with `design_overhead_ratio` present** — the same discipline RFC-044 applied to itself, and the reason this row stays open even though the methodology problem is now resolved. **Read "trend monitored ✅" here, when it eventually appears, as meaning the ratio only — the absolute millisecond columns remain runner-dominated regardless of what this row says**; see `build-cost-budget.md`'s RFC-050 note for the full evidence, including the two directional controls (a documentation-only release moved every absolute column +36% to +55%; a code-changing release moved them −11% to −21%) that the ratio was unmoved by. **Status 2026-08-18 (0.36.0): the literal closure condition is now met and the gate is deliberately still open.** Two released versions carry the ratio — 0.35.0 at `0.042941` and 0.36.0 at `0.043451`, a **1.19% spread** across an interval in which both its own inputs moved ~18% (`example_hello_ms` 150,579 → 123,197). The metric is behaving exactly as selected. We are nonetheless holding to **9a's precedent, which closed on four post-fix rows** despite carrying the same "(≥2 data points)" wording — closing 9b at its literal minimum would be the first time gate 9 was closed on the weakest reading of its own condition, and this gate has been reopened or clock-reset three times (RFC-041, RFC-043, RFC-052), with RFC-041 existing *because* gate 9 was once declared satisfied on data that did not support it. Waiting is free: the ratio appends automatically on every release tag. **Close at four rows.** 0.36.1 makes three. |
+| 9b. **Compile-time** trend monitored (≥2 data points) | ✅ **v0.37.0 — closed on four `design_overhead_ratio` rows (0.35.0, 0.36.0, 0.36.1, 0.37.0), and closed with its sensitivity stated rather than ticked clean.** ✅ here means **the ratio only**; the six absolute millisecond columns remain runner-dominated and are raw record, not a trend (RFC-050). **Measured sensitivity: the ratio moved −4.44% across 0.36.0 → 0.36.1, a release that changed doc comments and no executable code at all** — so its noise floor is ~4.4%, which is 79% of the 5.57% total spread observed across the four rows. It detects a regression above roughly 10%; it cannot see a 5% one. Over those same four releases the absolute columns spread 23.3–30.0%, so the ratio is a ~5× improvement on what it replaced. **It is materially weaker than 9a**, and the comparison should not be glossed: 9a's series moved **−0.0008%** across its own documentation-only control, roughly 5,000× less. Closed anyway because **no better number is available** — RFC-050 examined and rejected repeat-runs/median-of-N (CI minutes per release for a signal that fails no build, and it addresses within-runner jitter when the dominant effect is between-runner speed), and nothing else is queued. Holding open would not have been waiting for better data; it would have been declining to decide, on a gate already reopened or clock-reset four times since v0.25.3 (RFC-041, RFC-043, RFC-052, and this RFC-050 methodology change). |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
 **Gates satisfied: 2, 4, 5, 6, 7, 8, 9a, 10 = seven of ten, plus the
