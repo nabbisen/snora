@@ -253,9 +253,10 @@ row state both.
 
 1. `measure-compile-time.sh` emits `design_overhead_ratio`, computed from
    same-run values, at 5 significant figures.
-2. The CSV header documents it. **No existing row is edited or padded** —
-   historical rows stay short (this supersedes the earlier draft's
-   contradictory "historical rows carry `N/A`").
+2. The CSV header documents it, **appended as the last field, not inserted** —
+   see Compatibility. **No existing row is edited or padded** — historical rows
+   stay short (this supersedes the earlier draft's contradictory "historical
+   rows carry `N/A`").
 3. `build-cost-budget.md` states that absolute columns are runner-dominated,
    with the post-RFC-052 spread table and the 0.33.0 → 0.33.1
    documentation-only evidence, and moves the trend watch points onto the ratio
@@ -271,9 +272,23 @@ data points exist — the same discipline RFC-044 applied to itself.
 
 ## Compatibility and security
 
-**Compatibility.** The CSV gains a column; anything parsing it positionally
-past column 9 breaks. Nothing in-repo does — the drift and budget tooling read
-by header. No library API changes; no user-visible behaviour changes.
+**Compatibility.** The CSV gains a column. ~~Nothing in-repo parses it
+positionally — the drift and budget tooling read by header.~~
+
+**Wrong, corrected during implementation review (2026-08-18).**
+`release-process.md`'s release checklist does `cut -d, -f9` on this exact file
+to content-check `runner_os`, and `-f2` to sanity-check `check_workspace_ms`.
+The claim was not verified before it was written.
+
+The consequence is a design constraint rather than a caveat: **the column is
+appended as the last field, never inserted.** Historical rows are deliberately
+short (RFC-041 N-1), so inserting mid-row would make a given field number mean
+different things depending on a row's age — old rows and new rows would need
+different parsing, in a file whose entire RFC lineage (041, 043, 044, 052)
+exists to keep measurements trustworthy. Appending keeps fields 1–10 stable for
+every row ever written and leaves the existing `cut` checks correct untouched.
+
+No library API changes; no user-visible behaviour changes.
 
 **Security.** No new data flow, dependency, or integration.
 
