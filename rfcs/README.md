@@ -108,6 +108,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 065 | [The modal dim is an unmeasured surface](./proposed/065-the-modal-dim-is-an-unmeasured-surface.md) | v0.37.0 — `light` dialog card at 2.85:1 against its own dim; axis reported by tekstide |
 
 ## Archive
 
