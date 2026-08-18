@@ -1,6 +1,6 @@
 # RFC 066 — The dim assertion checks three surfaces; the dim composites over a continuum
 
-**Status.** Accepted (owner, 2026-08-18). Handoff:
+**Status.** Done — shipped in v0.37.1 (2026-08-18). Handoff:
 [`handoffs/066-…`](../handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md)
 **Tracks.** Accessibility / measurement integrity. Continues RFC-065.
 **Reported by** **tekstide** (2026-08-18), as a question about our method rather
@@ -8,7 +8,10 @@ than a finding about our code — and it was right.
 **Touches.** `crates/snora-design/src/tests.rs`,
 `docs/src/reference/` or `docs/src/contributing/accessibility-checklist.md`,
 `CHANGELOG.md`. **No preset value changes expected.**
-**Release target.** 0.38.0.
+**Release target.** 0.37.1 — **corrected from 0.38.0 at cut time.** Test and
+documentation only: the sole `crates/` change is inside `#[cfg(test)]`, no API,
+no rendering, no preset value. Per the versioning policy that is a patch, and
+the original 0.38.0 target was an error in this RFC rather than a decision.
 
 ## Summary
 

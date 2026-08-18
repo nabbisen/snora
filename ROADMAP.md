@@ -104,6 +104,17 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.37.1** — The dim assertion became a sweep (RFC-066). RFC-065 checked the
+  dialog card against the dim over three *discrete* surfaces; the dim is painted
+  over whatever the application rendered, a *continuum*, and for two presets the
+  true worst case is an **interior** minimum where the card's border and fill
+  contrast cross — invisible to a three-point check. Nothing failed, but two
+  published figures were overstated: `high_contrast_light` 7.37 → **4.58**,
+  `high_contrast_dark` 5.25 → **4.45**. Demonstrated rather than argued: a
+  perturbation where all three named surfaces pass at 3.16–3.21 while the swept
+  minimum is **2.98** — a boundary the old check would have shipped. Reported by
+  **tekstide** as a question about our method, from a team that had already
+  closed its correspondence thread.
 - **0.37.0** — The modal dim became a measurable surface (RFC-065). RFC-063
   closed the *role* axis — no `Palette` role can be added without declaring
   where it renders — but not the *surface* axis: the dim is derived at render

@@ -17,6 +17,37 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.37.1] — 2026-08-18
+
+### Changed
+
+- **The modal-dim contrast assertion swept its content range instead of
+  checking three discrete surfaces, and two published figures from
+  0.37.0's RFC-065 entry were overstated (RFC-066).** The dim is
+  painted over whatever the application actually rendered — a
+  continuum — not just `background`/`surface`/`surface_raised`; for two
+  of the four built-in presets the true worst case is an **interior**
+  minimum (where the card's border and fill contrast cross) that a
+  three-surface check cannot see. **Correction to the table published
+  in the [0.37.0] entry below:** `high_contrast_light`'s recorded 7.37
+  was measuring only an endpoint — the true worst case, swept, is
+  **4.58** (at 82% grey content, not white); `high_contrast_dark`'s
+  recorded 5.25 is similarly **4.45** (at 5% grey, not its nominal
+  `surface_raised`). `light` (3.24) and `dark` (3.64) are unchanged —
+  both true minima are at an endpoint, which the old check already
+  measured exactly. **Nothing failed and no preset value changed**:
+  both corrected figures remain comfortably above WCAG 2.1 SC 1.4.11's
+  3:1, and `DIM_ALPHA` (0.44, RFC-065) is unaffected — it was chosen
+  against the endpoint figures, which were always correct. The
+  assertion now sweeps 1000 greyscale content steps per preset
+  (`crates/snora-design/src/tests.rs`); greyscale suffices because the
+  dim composites channelwise and luminance is monotonic per channel, so
+  RGB content anywhere is bounded by its black/white greyscale
+  endpoints. See the corrected-figure note added to the
+  [0.36 → 0.37 migration guide](docs/src/guides/migration-0.36-to-0.37.md)
+  (left as a correction note, not a rewrite — that guide shipped with
+  0.37.0).
+
 ## [0.37.0] — 2026-08-18
 
 ### Fixed

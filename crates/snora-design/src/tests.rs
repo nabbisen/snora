@@ -143,7 +143,103 @@ fn all_presets_pass_mandatory_contrast() {
     }
 }
 
-// ---- the modal dim, a composited/derived surface (RFC-065) ----
+// ---- the modal dim, a composited/derived surface (RFC-065, swept RFC-066) ----
+
+/// Content-range sweep resolution for [`worst_case_over_content_sweep`]
+/// (RFC-066 Q-3). Convergence was measured directly: 10, 100, 1000, and
+/// 10 000 steps give `hc_dark` minima of 4.9091, 4.4565, 4.4515, 4.4497
+/// and `hc_light` minima of 4.7939, 4.6012, 4.5827, 4.5827 — **1000
+/// lands within 0.002 of the 10 000-step answer**, at a cost (a
+/// thousand float ops per preset) that is free in a unit test. The two
+/// presets nearer the 3:1 floor (`light`, `dark`) are unaffected by
+/// resolution at all: their true minimum sits at an *endpoint*
+/// (content = white or black), exact at any step count — resolution
+/// only changes the reported margin on the two presets already nowhere
+/// near the bar. A bare `1000` invites someone to change it on taste;
+/// this is why it is not one.
+const DIM_SWEEP_STEPS: usize = 1000;
+
+/// Worst-case contrast of the dialog card against the modal dim, swept
+/// over the full achievable content range (RFC-066) rather than checked
+/// at discrete surfaces — the dim is painted over whatever the
+/// application actually rendered, which is a continuum, and for two of
+/// the four built-in presets the true worst case is an **interior**
+/// minimum a discrete check cannot see (RFC-065 recorded `high_contrast_light`
+/// at 7.37 and `high_contrast_dark` at 5.25, checking only three
+/// surfaces; the true minima are 4.58 and 4.45).
+///
+/// Returns `(worst_best, worst_content, worst_border, worst_fill)`: the
+/// worst either-signal contrast found, the greyscale content value it
+/// occurred at, and both channel contrasts there.
+///
+/// **Greyscale is the whole sweep, not a simplification of one.** The
+/// dim composites channelwise in sRGB:
+/// `dim_over_i = α·base_i + (1−α)·content_i`. Contrast depends only on
+/// relative luminance, which is monotonic in each channel — so for
+/// *any* content color in the RGB cube, `relative_luminance(dim_over)`
+/// is bounded by its values at `content = black` and `content = white`,
+/// and a greyscale sweep traverses that interval continuously. A 3D
+/// sweep would add roughly 10⁶ points and **no** additional coverage —
+/// if this is later "improved" into a color-cube sweep, that improvement
+/// costs CI time for nothing.
+///
+/// **Sweep, not the analytic crossing, on purpose (Q-2).** The minimum
+/// of `max(f, g)` lies either at an endpoint or where `f == g`, and
+/// that crossing is solvable directly — three evaluations instead of
+/// `DIM_SWEEP_STEPS`. The sweep is used anyway: it is exact enough (see
+/// [`DIM_SWEEP_STEPS`]'s own convergence numbers) and is far less code
+/// to get subtly wrong, in a test whose entire purpose is to be
+/// trusted. The analytic form was declined for robustness, not
+/// overlooked.
+fn worst_case_over_content_sweep(
+    dim: crate::Color,
+    border: crate::Color,
+    fill: crate::Color,
+) -> (f32, f32, f32, f32) {
+    let mut worst_best = f32::INFINITY;
+    let mut worst_content = 0.0;
+    let mut worst_border = 0.0;
+    let mut worst_fill = 0.0;
+
+    for step in 0..=DIM_SWEEP_STEPS {
+        let c = step as f32 / DIM_SWEEP_STEPS as f32;
+        let dim_over_content = composite_over(dim, crate::Color::rgb(c, c, c));
+        let border_contrast = contrast_ratio(border, dim_over_content);
+        let fill_contrast = contrast_ratio(fill, dim_over_content);
+        let best = border_contrast.max(fill_contrast);
+
+        if best < worst_best {
+            worst_best = best;
+            worst_content = c;
+            worst_border = border_contrast;
+            worst_fill = fill_contrast;
+        }
+    }
+
+    (worst_best, worst_content, worst_border, worst_fill)
+}
+
+/// Failure-message context: the three named surfaces RFC-065 originally
+/// checked, reported alongside the sweep's own worst case (RFC-066 §6)
+/// so a failure names a location a maintainer can go look at, not just
+/// a bare content fraction — `content 0.822` alone tells nobody which
+/// part of their palette to inspect.
+fn named_surface_report(t: &Tokens, dim: crate::Color) -> String {
+    [
+        ("background", t.palette.background),
+        ("surface", t.palette.surface),
+        ("surface_raised", t.palette.surface_raised),
+    ]
+    .into_iter()
+    .map(|(label, backdrop)| {
+        let dim_over_backdrop = composite_over(dim, backdrop);
+        let border = contrast_ratio(t.palette.border, dim_over_backdrop);
+        let fill = contrast_ratio(t.palette.surface_raised, dim_over_backdrop);
+        format!("{label} (border {border:.2}, fill {fill:.2})")
+    })
+    .collect::<Vec<_>>()
+    .join("; ")
+}
 
 /// The dialog card ([`crate::surfaces`] doc; styled by the `snora` crate's
 /// `design::render` module) sits over the modal dim, not directly over
@@ -152,43 +248,44 @@ fn all_presets_pass_mandatory_contrast() {
 /// contrast suite this crate has, rather than split into a second suite
 /// in `snora` (Q-1, RFC-065).
 ///
-/// **Worst case across all three neutral surfaces the dim can sit
-/// over** — `background`, `surface`, and `surface_raised` — since an
-/// application can open a dialog over any of them. This is not a
-/// simplification for symmetry: `high_contrast_dark`'s worst backdrop is
-/// `surface_raised` (5.25:1), not `background` (5.74:1) — checking only
-/// `background` would silently under-measure that preset.
+/// **Swept over the full content range, not checked at three discrete
+/// surfaces (RFC-066).** The sweep subsumes the three-surface check —
+/// `background`, `surface`, and `surface_raised` are three specific
+/// points inside the range it covers — so this replaces that check
+/// rather than keeping both (Q-1, RFC-066): a strictly stronger
+/// assertion alongside a strictly weaker one is only cost, and the
+/// weaker one had just demonstrated what it costs by reporting 7.37
+/// where the truth was 4.58. See [`worst_case_over_content_sweep`] for
+/// the sweep itself and why greyscale suffices.
 ///
 /// **Either-signal, not both.** Under WCAG 2.1 SC 1.4.11 the card is
 /// identifiable if *either* its border *or* its fill clears the bar —
-/// `max(contrast(border, dim), contrast(surface_raised, dim))`, not two
-/// separate assertions. Asserting both individually would fail two
-/// presets that are genuinely fine: `dark` passes on fill alone (its
-/// border measures ~1:1 against the dim — border and dim land on the same
-/// luminance there), and `high_contrast_light` passes on border alone
-/// (its fill equals `background`, by token design, so it cannot signal on
-/// its own). Splitting this into two assertions would fail two correct
-/// presets — read `max(...)` as intentional, not as a mistake to tighten.
+/// `max(border ǀ dim, fill ǀ dim)`, not two separate assertions.
+/// Asserting both individually would fail two presets that are
+/// genuinely fine: `dark` passes on fill alone (its border measures
+/// ~1:1 against the dim — border and dim land on the same luminance
+/// there), and `high_contrast_light` passes on border alone (its fill
+/// equals `background`, by token design, so it cannot signal on its
+/// own). Splitting this into two assertions would fail two correct
+/// presets — read `max(...)` as intentional, not as a mistake to
+/// tighten. `max` is also *why the interior minimum this sweep exists
+/// to catch exists at all*: it is the point where the border and fill
+/// contrast cross and neither channel alone is carrying the boundary.
 #[test]
 fn dialog_card_distinguishable_from_modal_dim_all_presets() {
     for (name, t) in all_presets() {
         let dim = modal_dim(&t);
-        for (backdrop_label, backdrop) in [
-            ("background", t.palette.background),
-            ("surface", t.palette.surface),
-            ("surface_raised", t.palette.surface_raised),
-        ] {
-            let dim_over_backdrop = composite_over(dim, backdrop);
-            let border_contrast = contrast_ratio(t.palette.border, dim_over_backdrop);
-            let fill_contrast = contrast_ratio(t.palette.surface_raised, dim_over_backdrop);
-            let best = border_contrast.max(fill_contrast);
-            assert!(
-                best >= NON_TEXT_MIN,
-                "{name}/{backdrop_label}: dialog card vs modal dim contrast {best:.2} < \
-                 {NON_TEXT_MIN} (border {border_contrast:.2}, fill {fill_contrast:.2}) — the \
-                 card would not be distinguishable from its own dimmed backdrop by either signal"
-            );
-        }
+        let (worst_best, worst_content, worst_border, worst_fill) =
+            worst_case_over_content_sweep(dim, t.palette.border, t.palette.surface_raised);
+
+        assert!(
+            worst_best >= NON_TEXT_MIN,
+            "{name}: dialog card vs modal dim worst-case contrast {worst_best:.2} < \
+             {NON_TEXT_MIN} at content {worst_content:.3} (border {worst_border:.2}, fill \
+             {worst_fill:.2}) — swept over the full achievable content range (RFC-066), not \
+             just three named surfaces. Named-surface context: {}",
+            named_surface_report(&t, dim)
+        );
     }
 }
 

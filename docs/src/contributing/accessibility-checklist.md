@@ -96,6 +96,20 @@ Snora Design does not and cannot guarantee:
     role axis (previous item) and the surface axis are declared
     separately in `api-governance.md`; a primitive can violate either one
     independently of the other.
+[ ] If the surface composites over **whatever the application actually
+    rendered**, rather than over a fixed, enumerable set of `Palette`
+    colors, checking a handful of named surfaces is not sufficient —
+    those are discrete points on a continuum, and the worst case can be
+    an **interior** minimum between them that no named point sees
+    (RFC-066). Sweep the achievable content range instead (a greyscale
+    sweep suffices — see `crates/snora-design/src/tests.rs`'s
+    `worst_case_over_content_sweep` for why RGB coverage adds no more
+    than luminance already bounds). RFC-065's own three-named-surface
+    check for the modal dim overstated `high_contrast_light` by 61%
+    (7.37 recorded vs. 4.58 true) and `high_contrast_dark` by 18% (5.25
+    vs. 4.45) this way — everything still passed, but the margins it
+    reported were wrong, in the optimistic direction, which is worse
+    than reporting nothing.
 [ ] If the primitive uses an alpha/translucent color, it is composited over
     the tested background before the contrast ratio is computed.
     **This rule is correct and stays armed, but untested by anything

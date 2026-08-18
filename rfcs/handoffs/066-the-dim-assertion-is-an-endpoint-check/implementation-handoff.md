@@ -1,8 +1,8 @@
 # Developer Handoff — RFC-066 sweep the dim assertion
 
-**Governing RFC.** [RFC-066](../../proposed/066-the-dim-assertion-is-an-endpoint-check.md)
+**Governing RFC.** [RFC-066](../../done/066-the-dim-assertion-is-an-endpoint-check.md)
 **Status.** Inherited from RFC-066 — Accepted (owner, 2026-08-18).
-**Release target.** 0.38.0. **Test and documentation only** — no preset values,
+**Release target.** 0.37.1 (corrected from 0.38.0). **Test and documentation only** — no preset values,
 no rendering.
 **Implementation units.** One.
 

@@ -104,12 +104,12 @@ Numbers remain stable forever and are never reused.
 | 063 | [The contrast pair list is hand-maintained](./done/063-contrast-pairs-are-a-hand-maintained-list.md) | v0.36.0 (handoff: [`handoffs/063-…`](./handoffs/063-contrast-pairs-are-a-hand-maintained-list/implementation-handoff.md)) |
 | 064 | [`rust,ignore` is the default nobody has to justify](./done/064-ignored-doctests-are-unaudited.md) | v0.36.1 (handoff: [`handoffs/064-…`](./handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md)) |
 | 065 | [The modal dim is an unmeasured surface](./done/065-the-modal-dim-is-an-unmeasured-surface.md) | v0.37.0 (handoff: [`handoffs/065-…`](./handoffs/065-the-modal-dim-is-an-unmeasured-surface/implementation-handoff.md)) |
+| 066 | [The dim assertion is an endpoint check, not a sweep](./done/066-the-dim-assertion-is-an-endpoint-check.md) | v0.37.1 (handoff: [`handoffs/066-…`](./handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 066 | [The dim assertion is an endpoint check, not a sweep](./proposed/066-the-dim-assertion-is-an-endpoint-check.md) | **accepted** → v0.38.0 (reported by tekstide) — handoff: [`handoffs/066-…`](./handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md) |
 
 ## Archive
 

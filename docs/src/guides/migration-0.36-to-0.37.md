@@ -54,6 +54,26 @@ either-signal rule. `0.42` would have cleared `light` too, at 3.04:1, a
 1.3% margin; `0.44` was chosen for an 8% margin instead, following the
 precedent RFC-058 set when repairing `border`.)
 
+> **Correction (RFC-066, 0.38.0).** The `high_contrast_light` and
+> `high_contrast_dark` figures above check only the three named
+> surfaces the dim can sit over — but the dim is painted over whatever
+> the application actually rendered, a continuum, not three discrete
+> points, and for these two presets the true worst case is an
+> **interior** minimum the three-surface check could not see. Swept
+> over the full achievable content range: `high_contrast_light` is
+> **4.58**, not 7.37; `high_contrast_dark` is **4.45**, not 5.25. Both
+> figures are still comfortably above SC 1.4.11's 3:1 — **nothing here
+> failed, and `DIM_ALPHA` did not change** — the method that produced
+> this table was measuring the wrong thing for these two presets, not
+> the repair. `light` (3.24) and `dark` (3.64) are unaffected: both
+> presets' true minima are at an endpoint (pure white/black content),
+> which the three-surface check already evaluates exactly. This note
+> is left here rather than silently editing the table above, since the
+> table is what 0.37.0 shipped with; see `CHANGELOG.md`'s RFC-066 entry
+> for the full reasoning. No migration guide was needed for RFC-066
+> itself — test-and-documentation only, no API, no rendering, no preset
+> value changed; nothing a consumer can observe is different.
+
 ## Mechanical migration
 
 None. No public API changed.
