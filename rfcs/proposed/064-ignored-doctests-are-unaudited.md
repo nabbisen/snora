@@ -1,12 +1,15 @@
 # RFC 064 — `rust,ignore` is the default nobody has to justify, and it is hiding a runnable test
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-18). Handoff:
+[`handoffs/064-…`](../handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md)
 **Tracks.** Quality gates / measurement integrity. Continues the RFC-058 →
 RFC-061 → RFC-063 line: a rule with no mechanism behind it.
 **Touches.** `crates/snora-style/src/{color,button,text}.rs`,
 `docs/src/contributing/documentation-test-policy.md`,
 `docs/src/contributing/release-process.md`, `CHANGELOG.md`.
-**Release target.** 0.36.0 (recut) — documentation and doc-comment fences only.
+**Release target.** 0.36.1 — documentation and doc-comment fences only. (0.36.0
+shipped and published before this RFC opened; a patch is the honest
+classification for a change with no API or behaviour impact.)
 
 ## Summary
 

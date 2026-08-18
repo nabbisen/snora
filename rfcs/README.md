@@ -107,7 +107,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 064 | [`rust,ignore` is the default nobody has to justify](./proposed/064-ignored-doctests-are-unaudited.md) | v0.36.0 (recut) — one ignored doctest proven runnable, with an assertion |
+| 064 | [`rust,ignore` is the default nobody has to justify](./proposed/064-ignored-doctests-are-unaudited.md) | **accepted** → v0.36.1 — handoff: [`handoffs/064-…`](./handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md) |
 
 ## Archive
 
