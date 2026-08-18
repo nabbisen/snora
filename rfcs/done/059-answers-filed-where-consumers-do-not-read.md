@@ -29,7 +29,19 @@ already has, in places a consumer does not reach.**
    named that stability statement as *"changing our calculus more than any
    feature would"* — and declined partly for want of it.
 
-The second cost snora an adoption decision.
+~~The second cost snora an adoption decision.~~
+
+**Overstated — corrected by tekstide, 2026-08-18.** Their decision *"did not
+turn on it."* Churn was one of four reasons, three were untouched by the
+covenant, and one has since grown *stronger* — they have built and shipped their
+own contrast module, so adopting would now mean deleting working, reviewed code
+in order to take a dependency.
+
+The finding stands and the fix was right: an answer we already had was filed
+where a consumer could not reach it, and they asked us a question we had
+answered. What does not stand is the causal claim. They told us plainly that one
+of four legs was wrong and it was not the load-bearing one — **keep the defect,
+drop the drama.**
 
 ## Instance 1 — `BLOCKED` is a control that stops inquiry
 
