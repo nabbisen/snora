@@ -102,7 +102,8 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **open** → v0.35.0 — unparked 2026-08-18; re-derived on four post-RFC-052 rows, which dropped one of the two proposed ratios |
+| 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **open** → v0.35.0 — unparked 2026-08-18; re-derived on five post-RFC-052 rows, which dropped one of the two proposed ratios |
+| 060 | [Frame-level keyboard navigation](./proposed/060-frame-level-keyboard-navigation.md) | v0.35.0 — closes the 14-minor-stale RFC-014-B deferral; zone cycling only, trapping staged behind Q-1 |
 
 ## Archive
 
