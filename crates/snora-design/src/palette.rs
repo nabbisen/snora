@@ -16,8 +16,10 @@ use crate::Color;
 /// rather than a struct literal; you may still mutate individual fields
 /// (`tokens.palette.accent = ...`).
 ///
-/// `text_muted` is intentionally lower-contrast, for non-essential text, and
-/// is exempt from the mandatory body-text contrast checks.
+/// `text_muted` is the lowest-contrast text role, for non-essential text,
+/// and — like every other text role — meets WCAG AA body-text contrast
+/// (4.5:1) against all three surfaces, asserted in the contrast suite
+/// (RFC-058).
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Palette {
@@ -30,9 +32,12 @@ pub struct Palette {
 
     /// Primary body text.
     pub text_primary: Color,
-    /// Secondary text (still meets body contrast on primary surfaces).
+    /// Secondary text. Meets WCAG AA body-text contrast (4.5:1) against all
+    /// three surfaces.
     pub text_secondary: Color,
-    /// Muted text for non-essential content (exempt from mandatory contrast).
+    /// Muted text for non-essential content. Meets WCAG AA body-text
+    /// contrast (4.5:1) against all three surfaces (RFC-058), same as every
+    /// other text role.
     pub text_muted: Color,
 
     /// Borders and separators.

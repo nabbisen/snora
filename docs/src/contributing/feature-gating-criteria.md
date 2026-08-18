@@ -151,25 +151,31 @@ grows but the cause is a transitive iced bump that affects all
 crates equally, splitting widget features will not help; the right
 fix is elsewhere. Indicators trigger a discussion, not a refactor.
 
-## Documentation scope when a capability arrives or leaves
+## Documentation scope when a capability arrives, leaves, or a standing answer is invisible
 
 **When a capability lands, every default-path page that states it is
 absent is part of the change scope. When a capability — or a path to
 one — is removed, every page that states it still resolves is part of
-the change scope, symmetrically.** Documenting the new behaviour (or
-the removal) in `docs/src/design/` or a migration guide is necessary
-and not sufficient: a consumer who never reads that page is left with
-the stale claim, which now reads as a statement about behaviour that
-shipped differently.
+the change scope, symmetrically. And when a governance decision or
+policy answers a question a consumer would ask — a stability guarantee,
+the true scope of a constraint — recording it only in a contributor
+document is the same defect as either of the above:** the answer exists,
+and the consumer asking the question cannot reach it. Documenting the
+change (or the standing answer) in `docs/src/design/` or a migration
+guide is necessary and not sufficient: a consumer who never reads that
+page, or never reads `contributing/`, is left without the answer, or
+worse, with a stale one.
 
-This is not hypothetical. Three downstream/review reports, across both
-directions, were the same omission:
+This is not hypothetical. Five downstream/review reports, across all
+three cases, were the same omission:
 
-| Report | Change | Page that still stated the old world |
+| Report | Change | Page that still stated the old world (or lacked the answer) |
 |---|---|---|
 | apimokka (2026-08-04) | focus/AT limitation documented under `contributing/` | consumer-facing docs had no route to it |
 | arama (2026-08-15) | dialog card, RFC-039, v0.27.0 (**arrival**) | `guides/overlays.md` still said "positioner, not a styler" with no scope |
 | RFC-056 review (2026-08-15) | `snora_widgets::design::{style, theme}` removed (**removal**) | `design/feature-flags.md`, `contributing/api-governance.md`, `contributing/semantic-accessibility.md` still named the removed path — one of them asserting it "keeps resolving" |
+| tekstide, RFC-059 (1) (2026-08-17) | the `BLOCKED` focus-ring label over-scoped a constraint (**standing answer, mis-scoped**) | `design/iced-style-bridge.md` — consumer-facing — repeated the same over-scoped claim the contributor copy was fixed for |
+| tekstide, RFC-059 (2) (2026-08-17) | the token-surface stability covenant answers "does it churn?" (**standing answer, undiscoverable**) | no consumer-facing page stated it; only `contributing/api-governance.md` and two passing mentions existed |
 
 RFC-039 correctly documented the dialog card in `docs/src/design/`. What
 neither that RFC nor its review caught was that
@@ -183,11 +189,23 @@ but the rule as originally written only named capabilities *landing*,
 so the equivalent sweep of `docs/src/` for the capability *leaving*
 wasn't in scope until review caught it.
 
+RFC-059's two instances are neither arrival nor removal — nothing about
+snora changed. A review control (`BLOCKED`) closed a question with an
+over-scoped claim, and a governance covenant answered a question that was
+never asked outside `contributing/`. Both are **standing answers**: true
+facts about snora that already existed, reachable only from the half of
+the book a consumer does not read. tekstide declined to adopt snora
+partly for want of the second one — the cost of this omission is not
+hypothetical either.
+
 When gating, ungating, or removing a capability (or a specific path to
-one) behind `design` (or any feature), grep the default-path docs for
-the specific claim the change contradicts before considering the
-documentation done — arrival claims ("X is not available") when adding,
-resolution claims ("X resolves at this path") when removing. An empty
+one) behind `design` (or any feature) — or when recording a governance
+decision that answers a question a consumer would ask — grep the
+default-path docs for the specific claim the change contradicts, or add
+a consumer-facing page/line stating the answer, before considering the
+documentation done. Arrival claims ("X is not available") when adding,
+resolution claims ("X resolves at this path") when removing, and a
+reachable statement of the answer when it is a standing one. An empty
 grep is not the acceptance signal by itself — read each surviving hit
 and confirm it is still true for the path it describes; a claim can
 also hide across a line wrap that a naive single-line grep pattern

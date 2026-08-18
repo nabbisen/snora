@@ -114,21 +114,40 @@ the style closure receives only `&Theme`.
 The Snora Design style bridge (`snora_style::button` and
 `snora_style::container`, RFC-055) maps the statuses iced does expose.
 It **cannot** render a custom focus ring on a standard button or card surface
-through `button::Style` / `container::Style` in iced 0.14.
+through `button::Style` / `container::Style` in iced 0.14 — because iced does
+not tell the style closure that the widget is focused, not because a
+`container` style closure is somehow incapable of drawing one. A `container`
+style closure is an arbitrary `Fn(&Theme) -> Style`; anything the *caller*
+already knows (including its own focus state) is available inside it.
 
 `FocusTokens` (`tokens.focus.ring_color`, `.ring_width`, `.ring_offset`)
-remain valid vocabulary for:
+therefore has a **present-day audience**, not only a future one:
 
-- future iced versions that do expose focus state;
-- custom widgets built outside the standard button/container path;
-- any iced mechanism that separately surfaces focus (if one becomes available).
+- any application that already owns focus as its own state — a
+  focus-zone enum cycled by Tab, say — can read that boolean inside its own
+  `container` style closure and set border colour *and* width from it. This
+  is not a snora capability; it is ordinary use of an `Fn` closure, and
+  `FocusTokens` is the vocabulary for what to set it to.
+- future iced versions that expose focus state to `button`/`container`
+  styling directly, so snora's own prefab widgets can wire it in without an
+  application owning focus itself.
+- custom widgets built outside the standard button/container path.
 
 ### What this means for QA
 
-A **missing focus ring on a standard button or card** is a **known,
-documented limitation**, not a QA regression. Do not file it as a bug. Do
-record it in the primitive's accessibility checklist under "Known limitations"
-with severity `BLOCKED (iced 0.14 — no focus variant in button::Status)`.
+A **missing focus ring on snora's own standard button or card** — where
+snora hands the widget to iced and iced owns its focus state — is a
+**known, documented limitation**, not a QA regression: record it in the
+primitive's accessibility checklist under "Known limitations" with
+severity `BLOCKED (iced 0.14 — no focus variant in button::Status)`.
+
+**File it as a bug when it is one:** a missing ring on a widget the
+*application* already owns focus for — where the application's own
+`container` style closure could set it and does not — is not this
+limitation, and treating every focus-ring gap as `BLOCKED` closes the
+question before it is asked. This is the second review instruction in two
+releases that did that; see RFC-057's line-height checklist item for the
+first.
 
 When iced exposes focus state in a future version, layer the focus ring
 separately rather than reworking the status mapping.

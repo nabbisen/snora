@@ -13,6 +13,115 @@ This file begins its history at the 0.7.0 release. Earlier release notes
 are recorded in the per-version migration guides under
 [`docs/guides/`](docs/src/guides/).
 
+## [Unreleased]
+
+Nothing yet.
+
+## [0.34.0] — 2026-08-18
+
+### Fixed
+
+- **`border` contrast repaired in `light` and `dark` (RFC-058).** snora's
+  contrast suite asserted twelve pairs; `border` was in none of them, and
+  the untested role was failing WCAG 2.1 SC 1.4.11's 3.0:1 minimum for
+  non-text boundaries that identify a component — a border is that
+  boundary for the RFC-039 dialog card, which was deliberately chosen as
+  border-defined rather than shadow-defined. Reported by tekstide,
+  verified independently. Measured before repair (`cargo test -p
+  snora-design`, failing):
+
+  | preset | border/background | border/surface | border/surface_raised |
+  |---|---|---|---|
+  | `light` | 1.39:1 | 1.28:1 | 1.39:1 |
+  | `dark` | 1.43:1 | 1.32:1 | 1.19:1 |
+
+  After (`light` border `#898C8F`, `dark` border `#69717D`, chosen to clear
+  the *binding* pair per preset — `surface` for `light`, `surface_raised`
+  for `dark` — not merely the easiest one):
+
+  | preset | border/background | border/surface | border/surface_raised |
+  |---|---|---|---|
+  | `light` | 3.38:1 | 3.12:1 | 3.38:1 |
+  | `dark` | 3.81:1 | 3.50:1 | 3.17:1 |
+
+  `high_contrast_light` and `high_contrast_dark` are unchanged — they
+  already pass at 19.8–21:1. This is the first exercise of RFC-036's
+  accessibility carve-out: the assertion was added and its failure
+  captured *before* the palette values changed, per the carve-out's
+  required order. **This is an appearance change**, not a silent fix —
+  borders in `light`/`dark` render visibly more present. See
+  [the 0.33→0.34 migration guide](docs/src/guides/migration-0.33-to-0.34.md).
+
+  **A second role, `text_muted`, was found untested in the same pass and
+  is fixed here too.** `Palette`'s doc comment previously claimed
+  `text_muted` was "exempt from the mandatory body-text contrast checks"
+  — an exemption WCAG 2.1 SC 1.4.3 does not grant (its exemptions are
+  incidental/decorative/invisible text, logotypes, and large text at
+  3:1; rendered, readable "non-essential" text is not among them). That
+  invented exemption is why the role went untested, and it is withdrawn:
+  `text_muted` is now asserted at `AA_TEXT` against all three surfaces,
+  the same as every other text role. Measured before repair:
+  `light/surface` **4.4626:1** (failing). After (`light`'s `text_muted`
+  repaired to `#6A717E`): `light/surface` **4.55:1**,
+  `light/{background,surface_raised}` **4.93:1**. `dark` is **unchanged**
+  — its worst pair, `dark/surface_raised`, already passes at **4.53:1**,
+  and RFC-036's carve-out permits a value change only where a contrast
+  test proves a defect; there is none in `dark`. That margin is thin
+  enough to note here as a fact for the next palette edit to respect, not
+  a surprise to rediscover. `text_secondary/surface_raised`, the one
+  remaining unasserted pair from the same body-text family, is also now
+  asserted (all four presets pass with wide margin, 7.6:1 or better) —
+  a free ratchet completing the class, not a repair.
+
+### Changed
+
+- **The checklist's 3.0:1 non-text-boundary rule generalized (RFC-058).**
+  It previously existed only under *Focus visibility*, attached to the
+  `focus` role — which is why a second role (`border`) carrying the same
+  obligation went unassessed for several releases. Moved into *Contrast*
+  as a rule about the class of non-text boundaries.
+
+- **Two answers snora already had, moved to where a consumer can find
+  them (RFC-059).** tekstide evaluated snora end to end and declined to
+  adopt it; neither finding was about missing capability.
+
+  **The `BLOCKED` focus-ring claim was over-scoped, at four sites.** A
+  review label instructed reviewers to record a missing focus ring as
+  `BLOCKED (iced 0.14 — no focus variant in button::Status)` and
+  explicitly "do not file it as a bug." That is true only for a widget
+  that lets **iced** own focus. It is not a property of iced 0.14: a
+  `container` style closure is an arbitrary `Fn(&Theme) -> Style`, so an
+  application that already owns focus as its own state can style it
+  today — colour *and* width — with no snora change. Re-scoped at all
+  four sites carrying the claim, the most important of which
+  (`design/iced-style-bridge.md`) was not in this RFC's own original
+  scope list — found by a grep the RFC's own review ran, the same class
+  of miss RFC-056 and RFC-058 each had once. `FocusTokens`
+  (`crates/snora-design/src/focus.rs`) is now documented with this
+  present-day audience, not only a future one.
+
+  **The token-surface stability guarantee had no consumer-facing page.**
+  RFC-036's additive-only covenant answers "does the token surface
+  churn?" with a contractual "no" — and tekstide named exactly that
+  question as *"changing our calculus more than any feature would,"*
+  then declined partly for want of an answer that already existed in
+  `contributing/api-governance.md`. New page:
+  [`design/stability.md`](docs/src/design/stability.md), linked from
+  `feature-flags.md` and `tokens.md`, states what is frozen, what is
+  not, and — explicitly — that the covenant does not promise
+  upgrade-mechanical-painlessness, only that the surface itself does not
+  move.
+
+  **The documentation-scope rule widened a second time.**
+  `feature-gating-criteria.md`'s rule (RFC-048, widened to cover removals
+  by RFC-056) now covers a third case: a governance answer that exists
+  only in a contributor document. `release-process.md` now points at it,
+  so following the release checklist reaches the rule without anyone
+  having to remember it exists.
+
+  Documentation only: `git diff --stat -- 'crates/**/*.rs'` shows one
+  file (`focus.rs`), doc-comment lines only.
+
 ## [0.33.1] — 2026-08-15
 
 ### Changed

@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-059 answers filed where consumers do not read
 
-**Governing RFC.** [RFC-059](../../proposed/059-answers-filed-where-consumers-do-not-read.md)
+**Governing RFC.** [RFC-059](../../done/059-answers-filed-where-consumers-do-not-read.md)
 **Status.** Inherited from RFC-059 — Accepted (owner, 2026-08-17).
 **Release target.** 0.34.0, alongside RFC-058. **Documentation only** — doc
 comments are the sole `crates/` change.

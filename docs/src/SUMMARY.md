@@ -36,12 +36,14 @@
   - [0.27 → 0.28](guides/migration-0.27-to-0.28.md)
   - [0.28 → 0.29](guides/migration-0.28-to-0.29.md)
   - [0.32 → 0.33](guides/migration-0.32-to-0.33.md)
+  - [0.33 → 0.34](guides/migration-0.33-to-0.34.md)
 - [Migration guide template](guides/migration-template.md)
 
 # Snora Design
 
 - [Overview](design/overview.md)
 - [Feature flags](design/feature-flags.md)
+- [Stability](design/stability.md)
 - [Design tokens](design/tokens.md)
 - [Typography](design/typography.md)
 - [High contrast](design/high-contrast.md)

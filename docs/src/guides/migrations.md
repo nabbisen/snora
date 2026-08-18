@@ -9,6 +9,10 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.33 → 0.34](migration-0.33-to-0.34.md) — `light`/`dark`'s `border` colour
+  repaired for WCAG 2.1 SC 1.4.11 (was 1.19-1.43:1 against surfaces, now
+  >= 3.0:1) — an accessibility fix, not a restyle; `high_contrast_*`
+  unaffected.
 - [0.32 → 0.33](migration-0.32-to-0.33.md) — `snora_widgets::design::{style,
   theme}` removed; use `snora_style::*` directly, or
   `snora::design::style::*`/`snora::design::theme` (unaffected — the

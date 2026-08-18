@@ -73,10 +73,22 @@ Active | Hovered | Pressed | Disabled   // no Focused
 The style bridge maps every status iced exposes. It cannot render a custom
 focus ring through `button::Style` or `container::Style` in iced 0.14.
 
-`FocusTokens` (`tokens.focus.*`) are valid vocabulary and will be wired
-when iced exposes focus state. In the meantime, native iced focus handling
-(keyboard activation) still works; only the *visual* ring is absent.
+**The accurate constraint is narrower than "iced 0.14 cannot render a focus
+ring":** iced cannot tell a style closure that a widget *iced owns* is
+focused. `FocusTokens` (`tokens.focus.*`) therefore has a present-day
+audience, not only a future one — any application that already owns focus
+as its own state (a focus-zone enum cycled by Tab, say) can read that state
+in its own `container` style closure — an arbitrary `Fn(&iced::Theme) ->
+Style` — and set border colour *and* width from it, exactly as it would for
+any other conditional style. That is not a snora capability; it is what
+`Fn` closures already let an application do, and `FocusTokens` supplies the
+colour/width/offset vocabulary for it.
 
-A missing focus ring on a standard button is a known `BLOCKED` limitation,
-not a QA regression. See
-[Semantic accessibility](../contributing/semantic-accessibility.md).
+What remains genuinely blocked: a focus ring on a **standard button or
+card that lets iced own focus** — snora's own prefab widgets do this, and
+that is unchanged; snora will wire the ring in when iced exposes focus
+state, rather than build an interim mechanism of its own. Native iced
+focus handling (keyboard activation) works today regardless; only the
+*visual* ring on iced-owned widgets is absent. See
+[Semantic accessibility](../contributing/semantic-accessibility.md) for the
+full statement.

@@ -3,8 +3,14 @@
 //!
 //! Threshold policy:
 //! * normal/body text pairs: >= 4.5:1 (WCAG AA);
-//! * non-text focus indicator pairs: >= 3.0:1;
+//! * non-text boundary pairs (focus indicators, borders that identify a
+//!   component, e.g. the RFC-039 dialog card): >= 3.0:1 (WCAG 2.1 SC 1.4.11);
 //! * high-contrast presets are expected to exceed these comfortably.
+//!
+//! `NON_TEXT_MIN` and `FOCUS_MIN` are both `3.0` today (RFC-058); they are
+//! kept as separate constants rather than one shared name so focus and
+//! border contrast can diverge later without one silently following the
+//! other.
 //!
 //! All colors used in mandatory pairs must be fully opaque (the assertions
 //! check this); alpha roles would need compositing first.
@@ -14,6 +20,7 @@ use crate::{Palette, Tokens};
 
 const AA_TEXT: f32 = 4.5;
 const FOCUS_MIN: f32 = 3.0;
+const NON_TEXT_MIN: f32 = 3.0;
 
 fn all_presets() -> [(&'static str, Tokens); 4] {
     [
@@ -133,6 +140,38 @@ fn mandatory_pairs(preset: &str, p: &Palette) {
         p.surface,
         AA_TEXT,
     );
+    assert_pair(
+        preset,
+        "text_secondary/surface_raised",
+        p.text_secondary,
+        p.surface_raised,
+        AA_TEXT,
+    );
+    // Muted text (RFC-058): lowest-contrast text role, previously exempt
+    // from mandatory contrast on an invented WCAG basis — SC 1.4.3 has no
+    // "non-essential text" exemption. Asserted against all three surfaces,
+    // like every other text role.
+    assert_pair(
+        preset,
+        "text_muted/background",
+        p.text_muted,
+        p.background,
+        AA_TEXT,
+    );
+    assert_pair(
+        preset,
+        "text_muted/surface",
+        p.text_muted,
+        p.surface,
+        AA_TEXT,
+    );
+    assert_pair(
+        preset,
+        "text_muted/surface_raised",
+        p.text_muted,
+        p.surface_raised,
+        AA_TEXT,
+    );
     // On-accent text.
     assert_pair(
         preset,
@@ -168,6 +207,24 @@ fn mandatory_pairs(preset: &str, p: &Palette) {
     // Focus indicator (non-text target).
     assert_pair(preset, "focus/background", p.focus, p.background, FOCUS_MIN);
     assert_pair(preset, "focus/surface", p.focus, p.surface, FOCUS_MIN);
+    // Border (non-text target; identifies component boundaries on surfaces
+    // where the border is the sole visual boundary, e.g. the RFC-039 dialog
+    // card). RFC-058.
+    assert_pair(
+        preset,
+        "border/background",
+        p.border,
+        p.background,
+        NON_TEXT_MIN,
+    );
+    assert_pair(preset, "border/surface", p.border, p.surface, NON_TEXT_MIN);
+    assert_pair(
+        preset,
+        "border/surface_raised",
+        p.border,
+        p.surface_raised,
+        NON_TEXT_MIN,
+    );
 }
 
 #[test]

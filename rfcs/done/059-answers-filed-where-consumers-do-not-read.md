@@ -1,6 +1,6 @@
 # RFC 059 — Two more answers filed where consumers do not read
 
-**Status.** Accepted (owner, 2026-08-17). Handoff:
+**Status.** Done — shipped in v0.34.0 (2026-08-18). Handoff:
 [`handoffs/059-…`](../handoffs/059-answers-filed-where-consumers-do-not-read/implementation-handoff.md)
 **Tracks.** Documentation. **Fourth and fifth instances** of the failure mode
 RFC-045, RFC-048 and RFC-057 each fixed once.

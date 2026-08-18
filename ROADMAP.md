@@ -97,6 +97,18 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.34.0** — Border and muted-text contrast repaired (RFC-058), and two
+  answers moved to where consumers read them (RFC-059). Both came from
+  **tekstide**, a prospective adopter who evaluated snora end to end, declined,
+  and sent their findings anyway. `border` was asserted in **none** of the
+  twelve mandatory contrast pairs and shipped at 1.19–1.43:1 against WCAG 2.1
+  SC 1.4.11's 3:1; asserting it surfaced a second untested role, `text_muted`,
+  failing AA at 4.46:1 on one pair. First exercise of RFC-036's accessibility
+  carve-out — assertion first, failure captured, then the value repaired. The
+  `light`/`dark` border change is **visible**, and stated as such. Alongside it:
+  a consumer-facing `design/stability.md`, because the token-surface guarantee
+  they said would *"change our calculus more than any feature"* already existed
+  — filed where only contributors read it.
 - **0.33.1** — Typography made discoverable (RFC-057). A six-role text scale
   with size *and* line-height has existed since v0.20, tested and demonstrated
   in the workbench, and nothing told a developer it was there. Two new pages,

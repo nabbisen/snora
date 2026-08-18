@@ -60,5 +60,5 @@ vocabulary adjustments if a concrete need appears.
 ## Related
 
 - [Internal architecture](architecture.md)
-- [Design decisions](design-decisions.md) — "Why four crates"
+- [Design decisions](design-decisions.md) — "Why five crates"
 - RFC-016-A in `rfcs/done/`

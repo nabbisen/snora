@@ -79,6 +79,13 @@ them in sync is a release-process invariant.
 [ ] Move the [Unreleased] section in CHANGELOG.md to the new version,
     and reset [Unreleased] to "Nothing yet."
 [ ] Update docs/guides/migration-X.Y-to-X.Z.md (minor only)
+[ ] For any capability that arrived, left, or any governance/policy
+    decision that answers a question a consumer would ask: apply
+    feature-gating-criteria.md § "Documentation scope when a capability
+    arrives, leaves, or a standing answer is invisible" — grep the
+    default-path docs for the claim it contradicts, or add a
+    consumer-facing statement. Five misses reached this checklist before
+    the rule did; this line is why it won't be a sixth.
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)
 [ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their
@@ -118,9 +125,11 @@ them in sync is a release-process invariant.
     (covered by workspace check above; verify no example was removed)
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
 [ ] cargo package --workspace
-    # Inspects all four .crate archives. Examples are `publish = false`
-    # and are skipped automatically — no exclusion flag is needed.
-    # Do NOT package the four crates individually (see "Publishing").
+    # Inspects all five .crate archives (snora-core, snora-design,
+    # snora-style, snora-widgets, snora — snora-style added in RFC-055,
+    # 0.32.0). Examples are `publish = false` and are skipped
+    # automatically — no exclusion flag is needed.
+    # Do NOT package the five crates individually (see "Publishing").
 [ ] Merge to main, then dispatch the `unpinned-build` workflow on main and
     confirm a green run BEFORE tagging.
     # `workflow_dispatch` only works for workflows already on the default
@@ -197,11 +206,11 @@ them in sync is a release-process invariant.
     #   git worktree add --detach /tmp/pub X.Y.Z && cd /tmp/pub && cargo publish --workspace
     # Cargo refuses a dirty tree by default. NEVER pass --allow-dirty.
     # ONE command — cargo resolves member order itself. Do not publish the
-    # four crates individually; an interrupted per-crate sequence leaves a
+    # five crates individually; an interrupted per-crate sequence leaves a
     # public tag with `snora` itself missing from crates.io, and anyone
     # depending on the new minor gets a resolution failure until it is
     # finished. See "Publishing" below.
-[ ] Confirm all four crates report the new version on crates.io
+[ ] Confirm all five crates report the new version on crates.io
 ```
 
 ### Publishing
@@ -210,7 +219,7 @@ them in sync is a release-process invariant.
 cargo publish --workspace
 ```
 
-**One command. Do not publish the four crates individually.**
+**One command. Do not publish the five crates individually.**
 
 **Publish from a clean tree at the tag** — not from a working directory
 with other work in flight. `cargo publish` packages the **working

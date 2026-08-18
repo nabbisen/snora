@@ -33,11 +33,16 @@ contributor-facing documents linked below, not duplicated here.
   snora's stated position — and why it will not build an interim
   abstraction of its own — is in
   [Position on assistive technology](../contributing/semantic-accessibility.md#position-on-assistive-technology-rfc-045).
-- **No custom focus ring on standard buttons or cards.** This is a hard
-  constraint of the pinned iced 0.14 version (`button::Status` has no
-  `Focused` variant), not a snora design choice. Full detail —
-  including what iced *does* provide (keyboard activation still works;
-  only the visual ring is missing) — is in the
+- **No custom focus ring on snora's own standard buttons or cards** — the
+  widgets that let iced own their focus state. This is a hard constraint
+  of the pinned iced 0.14 version (`button::Status` has no `Focused`
+  variant), not a snora design choice. It does **not** mean focus styling
+  is unavailable to your own code: an application that already owns focus
+  as its own state can style it in its own `container` closure today,
+  using `FocusTokens` for the colour/width vocabulary — see
+  [Semantic accessibility § Consequence for the style bridge](../contributing/semantic-accessibility.md#consequence-for-the-style-bridge).
+  Full detail on what iced *does* provide (keyboard activation still
+  works; only the visual ring on iced-owned widgets is missing) is in the
   [iced 0.14 focus-state limitation](../contributing/semantic-accessibility.md#iced-014-focus-state-limitation).
 - **No semantic identifiers or roles.** `iced::widget::Id`s attached to
   snora-rendered surfaces (RFC-047, where implemented) are labels for

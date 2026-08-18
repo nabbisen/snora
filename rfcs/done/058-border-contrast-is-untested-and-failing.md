@@ -1,6 +1,6 @@
 # RFC 058 — `border` contrast is untested, and `light`/`dark` ship it at ~1.3:1
 
-**Status.** Accepted (owner, 2026-08-17). Handoff:
+**Status.** Done — shipped in v0.34.0 (2026-08-18). Handoff:
 [`handoffs/058-…`](../handoffs/058-border-contrast-is-untested-and-failing/implementation-handoff.md)
 **Tracks.** Accessibility. Reported by **tekstide** (2026-08-17), verified
 independently.

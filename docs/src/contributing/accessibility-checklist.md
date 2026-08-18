@@ -23,9 +23,13 @@ accessible; see [§ What applications still own](#what-applications-still-own).
   [`semantic-accessibility.md`](semantic-accessibility.md)).
 - **High-contrast preset.** Two high-contrast token presets are provided for
   users who need stronger visual separation.
-- **Focus-ring vocabulary.** `FocusTokens` exist for future iced versions and
-  custom widgets that expose focus state; the limitation in the current version
-  is documented.
+- **Focus-ring vocabulary.** `FocusTokens` exist for applications that already
+  own focus as their own state today — not only for future iced versions and
+  custom widgets. The constraint is narrower than "focus rings are
+  unavailable in iced 0.14": iced cannot tell a *standard* button/container
+  style closure that it is focused; an application's own closure that
+  already knows its focus state is unaffected. See
+  [`semantic-accessibility.md`](semantic-accessibility.md).
 
 The allowed claim is:
 
@@ -54,6 +58,13 @@ Snora Design does not and cannot guarantee:
 ```text
 [ ] Foreground / background pairs for this primitive are drawn from palette
     roles that have verified mandatory contrast (>= 4.5:1 for body text).
+[ ] Any non-text boundary this primitive relies on to identify a component —
+    a border, a focus ring, or any other visual boundary that is not purely
+    decorative (WCAG 2.1 SC 1.4.11) — meets >= 3.0:1 against every adjacent
+    surface it can appear on. This is a rule about the class of non-text
+    boundaries, not one role: RFC-058 found `border` untested and failing
+    (1.19-1.43:1 in light/dark) precisely because this rule had only ever
+    been written against `focus`.
 [ ] Any new palette pair added for this primitive is listed in the
     contrast-tests module in snora-design and passes `cargo test -p snora-design`.
 [ ] If the primitive uses an alpha/translucent color, it is composited over
@@ -81,9 +92,9 @@ Snora Design does not and cannot guarantee:
     interaction status. See semantic-accessibility.md for the full
     statement.)
 [ ] If a focus ring IS expressible (custom widget or future iced version),
-    it meets the >= 3:1 contrast ratio requirement against adjacent colors
-    and uses the focus token (tokens.focus.ring_color, ring_width,
-    ring_offset).
+    it meets the non-text boundary contrast requirement (see § Contrast)
+    against adjacent colors and uses the focus token
+    (tokens.focus.ring_color, ring_width, ring_offset).
 [ ] The absence of a custom focus ring is documented as a known limitation,
     not left undiscovered.
 ```

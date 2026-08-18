@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-058 border contrast
 
-**Governing RFC.** [RFC-058](../../proposed/058-border-contrast-is-untested-and-failing.md)
+**Governing RFC.** [RFC-058](../../done/058-border-contrast-is-untested-and-failing.md)
 **Status.** Inherited from RFC-058 — Accepted (owner, 2026-08-17).
 **Release target.** 0.34.0 (minor — preset values change; `design`-path
 appearance changes).
@@ -64,8 +64,16 @@ In `light`, `surface_raised == background == pure white`, so optimising against
 `background` passes the easy pair and fails `surface`. **Solve for the binding
 pair.**
 
-`text_muted` already passes — 4.83:1 light, 5.44:1 dark. Its assertion is a
-ratchet, not a repair.
+~~`text_muted` already passes — 4.83:1 light, 5.44:1 dark. Its assertion is a
+ratchet, not a repair.~~
+
+**Wrong, corrected in implementation review (2026-08-18).** Those two figures
+are the `background` pair only. `text_muted/surface` in `light` measures
+**4.46:1** — a second defect, not a ratchet — and `dark/surface_raised` passes
+by just 0.026. The assertion shipped against **all three** surfaces, `light`
+was repaired to `#6A717E`, and `dark` was left alone because the carve-out
+permits no change to a passing pair. See the RFC and
+`.git-exclude/reviewed/058-…/review-result.md` rounds 2–3.
 
 ## 5. This is a large visual change, not a nudge
 

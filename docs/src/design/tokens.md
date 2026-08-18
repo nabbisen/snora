@@ -22,6 +22,9 @@ future minor releases without breaking downstream code. All other token
 sub-types (`Spacing`, `Radius`, `Typography`, `FocusTokens`) are
 constructible by struct literal and are not marked `#[non_exhaustive]`.
 
+This entire surface is under a contractual additive-only covenant — see
+[Stability](stability.md) for what is and is not frozen.
+
 ## Picking a preset
 
 ```rust,ignore

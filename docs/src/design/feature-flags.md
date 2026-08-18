@@ -101,3 +101,9 @@ snora-design = { version = "0.25" }
 
 This is useful for testing token values, computing contrast in a CLI tool,
 or building an alternative renderer against the token vocabulary.
+
+## Does the token surface churn?
+
+See [Stability](stability.md) for the contractual answer: `Tokens`,
+`Palette`, and the rest of the token/style-bridge surface are under an
+additive-only covenant, with one narrow accessibility-repair exception.

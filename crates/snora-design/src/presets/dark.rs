@@ -10,7 +10,7 @@ pub(crate) fn palette() -> Palette {
         text_primary: Color::rgb(0.945098, 0.952941, 0.964706),
         text_secondary: Color::rgb(0.682353, 0.713725, 0.752941),
         text_muted: Color::rgb(0.509804, 0.545098, 0.592157),
-        border: Color::rgb(0.168627, 0.192157, 0.227451),
+        border: Color::rgb(0.411765, 0.443137, 0.490196),
         accent: Color::rgb(0.356863, 0.607843, 1.0),
         accent_text: Color::rgb(0.0313725, 0.0666667, 0.121569),
         success: Color::rgb(0.290196, 0.870588, 0.501961),

@@ -4,11 +4,19 @@ use crate::Color;
 
 /// Tokens describing a focus ring.
 ///
-/// These are design *vocabulary*. Whether a given widget can render a ring
-/// depends on the renderer: in iced 0.14, standard `button`/`container`
-/// styling does not expose focus state, so these tokens apply only where the
-/// widget surface allows it (and on future iced versions). See the
-/// `snora-widgets` style bridge for the documented limitations.
+/// These are design *vocabulary*, with a **present-day audience**: any
+/// application that already owns focus as its own state (a focus-zone enum
+/// cycled by Tab, say) can read that state inside its own `container` style
+/// closure — an arbitrary `Fn(&iced::Theme) -> Style` — and set border
+/// colour and width from these tokens. That is not blocked by iced 0.14.
+///
+/// What iced 0.14 does not support is **standard** `button`/`container`
+/// styling telling its *own* style closure that the widget is focused —
+/// iced does not report that state, so a closure that does not already
+/// know it cannot draw a ring from it. This affects only widgets that let
+/// iced own focus (snora's own prefab widgets do); it does not affect
+/// applications with their own focus state. See the `snora-style` style
+/// bridge for the documented limitation.
 ///
 /// ```
 /// use snora_design::{Color, FocusTokens};
