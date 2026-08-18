@@ -106,6 +106,7 @@ Numbers remain stable forever and are never reused.
 |----|-------|--------|
 | 061 | [Pointer target size is a checklist rule with no assertion](./proposed/061-pointer-target-size-is-unasserted.md) | **accepted** → v0.36.0 (raised by tekstide, Q4 + Q3) — handoff: [`handoffs/061-…`](./handoffs/061-pointer-target-size-is-unasserted/implementation-handoff.md) |
 | 062 | [The feature-gating status table contradicts its own threshold](./proposed/062-feature-gating-indicators-are-uncalibrated.md) | **accepted** → v0.36.0 — handoff: [`handoffs/062-…`](./handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md) |
+| 063 | [The contrast pair list is hand-maintained](./proposed/063-contrast-pairs-are-a-hand-maintained-list.md) | v0.36.0 — reported by tekstide; closes the class RFC-058 fixed two instances of |
 
 ## Archive
 
