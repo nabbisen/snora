@@ -1,6 +1,7 @@
 # RFC 065 — The modal dim is a surface nothing measures against, and `light` fails on it
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-18). Handoff:
+[`handoffs/065-…`](../handoffs/065-the-modal-dim-is-an-unmeasured-surface/implementation-handoff.md)
 **Tracks.** Accessibility. Reported by **tekstide** (2026-08-18) as a finding in
 *their* codebase; transposed to snora, where it fails.
 **Touches.** `crates/snora/src/design/render.rs`,
