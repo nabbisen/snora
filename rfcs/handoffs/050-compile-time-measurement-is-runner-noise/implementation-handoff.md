@@ -1,271 +1,220 @@
-# Developer Handoff — RFC-050 compile-time measurement is runner noise
+# Developer Handoff — RFC-050 compile-time measurement
 
 **Governing RFC.** [RFC-050](../../proposed/050-compile-time-measurement-is-runner-noise.md)
-**Status.** Inherited from RFC-050 — Accepted, not yet implemented.
-**Release target.** 0.30.0 (minor — the CSV gains columns).
-**Implementation units.** One. Independent of RFC-051; either may land first.
+**Status.** Accepted (owner, 2026-08-15); parked, then unparked and re-derived
+2026-08-18.
+**Release target.** 0.35.0 (minor — the CSV gains one column).
+**Implementation units.** One.
 
 ---
 
 ## 1. Task title
 
-Add two derived ratio columns to the compile-time measurement, move the trend
-watch points onto them, and record why the absolute milliseconds are not a
-trend signal.
+Emit `design_overhead_ratio` from `measure-compile-time.sh`, move the trend
+watch points onto it, and record why the absolute columns are not a trend.
 
 ## 2. Purpose
 
-The six compile-time columns each vary **20–27%** across four releases measured
-on identical runner, rustc and methodology. A **documentation-only** release
-moved them 8–11%. The numbers report which GitHub runner the job landed on.
+Six compile-time columns vary **36–60%** across four releases on identical
+runner, rustc and methodology, and a **documentation-only** release moved every
+one of them 36–55%. The variance is common-mode, so a ratio between two
+same-run measurements cancels the runner. One ratio does this well:
+**1.8% spread**, a 23-fold noise reduction.
 
-Gate 9b is open because of this. This task is its route to closure.
+Gate 9b has now been reopened or reset three times (RFC-041, RFC-043,
+RFC-052) and the noise has **roughly doubled** since the RFC was first written.
+More rows are not converging on a satisfiable gate. This is 9b's route to
+closure.
 
-## 3. Background — read first
+## 3. Read this before writing code — the RFC was re-derived and two of its earlier conclusions are dead
 
-- `rfcs/proposed/050-compile-time-measurement-is-runner-noise.md` in full,
-  especially §"The finding this RFC turns on" — the reasoning constrains the
-  implementation and you should not re-derive it.
-- `docs/src/reference/build-cost-budget.md`, including its three existing
-  data-integrity notes (RFC-041, RFC-043, RFC-044). **This will be the
-  fourth.** Match their tone: state what was wrong, what the evidence was,
-  and what closes it.
-- `scripts/measure-compile-time.sh` — small, readable, and the only place the
-  row is produced.
+The version of RFC-050 you are implementing is **not** the one from 2026-08-15.
+The re-derivation on post-RFC-052 data reversed two things:
 
-Conventions: English only. `cargo fmt --all --check` now passes on a clean
-tree and is enforced in CI as of 0.28.1 — the delta-check workaround older
-handoffs describe is obsolete.
+1. **`widgets_design_ratio` is dropped.** It measured 5.9% pre-fix and
+   **14.9% post-fix** — worse than several columns' raw spread. Its earlier
+   apparent stability was cargo's startup consistency, not snora's compile
+   cost, exactly as the parked note suspected. **Do not implement it.** If you
+   find it referenced anywhere, that reference is stale.
+2. **"Similarly-sized measurements" was the wrong selection rule.** The winning
+   pair has a 23.7× size disparity; two near-equal-sized pairs score 10.0% and
+   14.7%. The real property is that numerator and denominator **do the same
+   kind of work under the same profile** — `example_workbench_ms` and
+   `example_hello_ms` are the only two measurements that are both
+   `--profile release-baseline` builds of an example *binary*.
 
-## 4. The reasoning you must not lose
+Implement one ratio. Do not add a second on your own judgement; if you think
+you have found one, report it rather than shipping it (§9).
 
-The fix is ratios **because the noise is common-mode**. Two facts establish
-that, and both belong in the doc note you write:
+## 4. What to implement
 
-1. Four of six columns rank the four releases identically
-   (`0.28.0 < 0.28.1 < 0.27.0 < 0.27.1`).
-2. The coefficient of variation is 8.6%–11.5% across columns spanning three
-   orders of magnitude (389 ms to 139 545 ms).
+### 4.1 `scripts/measure-compile-time.sh`
 
-That is a multiplicative whole-run factor. Dividing two same-run measurements
-cancels it.
+Emit a seventh data field, `design_overhead_ratio` =
+`example_workbench_ms / example_hello_ms`, at **5 significant figures**
+(observed values ~0.042). Both inputs are already collected in the same run —
+**no new measurement, no extra build time.**
 
-**This is why the two ratios are specified rather than left to your judgement:**
+Append it to the CSV line and to the documented output format in the header
+comment. Mind the column order against the existing header.
 
-| Ratio | spread on existing data |
-|---|---|
-| `example_workbench_ms / example_hello_ms` | **3.6%** (from ~27%) |
-| `build_widgets_design_ms / build_widgets_ms` | **7.3%** (from ~25%) |
-| `build_engine_only_ms / build_widgets_ms` | 23.5% — **does not collapse** |
+`bash` has no floating-point arithmetic. Use `awk` or `bc`; whichever you pick,
+make the precision explicit rather than inherited from a default, and handle a
+zero denominator without emitting a malformed row.
 
-The third fails because `build_engine_only_ms` is ~389 ms, where process
-startup and timer granularity are *additive* constants that a ratio cannot
-cancel. **Ratios must be between comparable, similarly-sized measurements.**
-Do not add a third ratio involving the sub-second columns.
+### 4.2 `docs/src/reference/build-cost-budget/compile-time.csv`
 
-## 5. Change scope
+Header gains the column. **Do not touch a single existing row** — see §5.
+
+### 4.3 `docs/src/reference/build-cost-budget.md`
+
+- State that the **absolute columns are runner-dominated**, with the
+  post-RFC-052 spread table (36–60%) and the 0.33.0 → 0.33.1
+  documentation-only evidence (+36% to +55% with zero code changed).
+- **Move the trend watch points onto the ratio.** State the sensitivity it
+  actually has (~1.8% spread, so a 3% move is visible; the absolute columns
+  cannot see 50%).
+- **Keep the absolute 30 s watch point on `build_widgets_ms`.** It is an
+  absolute ceiling on developer experience, not a trend, and runner error does
+  not matter to it.
+- Record that `build_engine_only_ms` (~457 ms) and `build_widgets_design_ms`
+  (~561 ms) are **raw record only** and no ratio may be built from them — they
+  are dominated by process startup and timer granularity.
+- Record that `widgets_design_ratio` **was derived, tested at 14.9% on
+  post-fix data, and rejected.** This is the point of the note: so it is not
+  proposed a third time.
+
+### 4.4 `docs/src/contributing/api-freeze-review.md`
+
+Gate 9b's row gains the closure condition: **≥2 releases measured with
+`design_overhead_ratio` present.** Per Q-2, state alongside it that the
+absolute columns remain runner-dominated and only the ratio is a trend — a
+future reader seeing "✅" should not conclude the milliseconds became
+trustworthy.
+
+**Gate 9b does not close with this RFC.** It closes when two post-change data
+points exist. Do not tick it.
+
+### 4.5 `.github/workflows/build-cost.yaml`
+
+Per Q-1: print **both** the absolute values and the ratio in the job summary,
+with the ratio labelled as the comparable one. Nobody has an intuition for
+0.042 yet.
+
+### 4.6 `CHANGELOG.md`
+
+Under **Changed**. Say plainly that the absolute numbers were never a trend
+signal, rather than presenting the ratio as a refinement of something that
+worked.
+
+## 5. The append-only rule, and a contradiction that is now resolved
+
+RFC-041 N-1: **historical rows are never edited, rewritten, or back-filled.**
+
+The earlier draft of RFC-050 contradicted itself — its acceptance criterion 2
+said *"historical rows carry `N/A`"* while its non-goals forbade *"padding them
+with `N/A` to match the new header."* **Resolved in favour of the non-goal:**
+historical rows stay short. A row written before the column existed has fewer
+fields than the header, and that is the honest record. The next appended row is
+the first complete one.
+
+If you find tooling that cannot read a short row, fix the tooling.
+
+## 6. Change scope
 
 | File | Purpose |
 |---|---|
-| `scripts/measure-compile-time.sh` | compute and emit two ratio columns |
-| `docs/src/reference/build-cost-budget/compile-time.csv` | header only — see §7 |
-| `docs/src/reference/build-cost-budget.md` | data-integrity note; watch points |
-| `.github/workflows/build-cost.yaml` | job summary (Q-2) |
-| `docs/src/contributing/api-freeze-review.md` | gate 9b closure condition |
-| `CHANGELOG.md` | `[Unreleased]` **Changed** |
+| `scripts/measure-compile-time.sh` | emit the ratio (§4.1) |
+| `docs/src/reference/build-cost-budget/compile-time.csv` | header only (§4.2) |
+| `docs/src/reference/build-cost-budget.md` | the noise statement, watch points, both rejection notes (§4.3) |
+| `docs/src/contributing/api-freeze-review.md` | gate 9b closure condition (§4.4) |
+| `.github/workflows/build-cost.yaml` | job summary (§4.5) |
+| `CHANGELOG.md` | **Changed** (§4.6) |
 
-## 6. Required implementation
+**`docs/src/contributing/feature-gating-criteria.md:67` — checked, and it needs
+care rather than a blanket fix.** It reads *"The `build_widgets_ms` column is
+the indicator 1 proxy"*, and indicator 1 (line 54) triggers a crate split when
+compile time *"exceeds 30 seconds on a developer's machine of average specs"*.
 
-### Step 1 — Answer Q-1 first, before anything else
+Do **not** simply move indicator 1 onto the ratio. It is an **absolute
+ceiling**, and RFC-050 explicitly keeps absolute ceilings — a ratio cannot
+answer "does this exceed 30 seconds". Two real caveats do belong there:
 
-`build_engine_only_ms` is ~389 ms for a release build of `snora` +
-`snora-core`, and its ordering disagrees with the other columns.
+- the proxy column carries **54.8% spread**, so a single reading near the
+  threshold decides a crate split on runner luck; and
+- the threshold is written against *a developer's machine* while the proxy is
+  *CI*, which was already a loose substitution before this RFC quantified it.
 
-**Determine whether it is measuring a real rebuild.** Run
-`scripts/measure-compile-time.sh` locally and check whether
-`cargo clean -p snora-core -p snora-design -p snora-widgets -p snora`
-actually invalidates what the subsequent `cargo build -p snora
---no-default-features --release` recompiles — `cargo build -v` or timing a
-manual clean/build pair will show it.
+Add the caveat and leave the check absolute. If you conclude something stronger
+is needed, report it — changing a 1.0-gate-adjacent decision rule is not this
+task's call.
 
-- If it is a genuinely small compile, say so with the evidence.
-- If `cargo clean -p` is not invalidating what the script assumes, **stop and
-  report**. That is a second instance of RFC-043's defect class — a
-  measurement that does not measure what it claims — and it changes what this
-  task should do.
-
-Do not skip this because the ratios do not depend on it. RFC-043 happened
-because nobody checked.
-
-### Step 2 — Emit the ratios
-
-In `scripts/measure-compile-time.sh`, after the existing measurements:
-
-- `design_overhead_ratio` = `example_workbench_ms / example_hello_ms`
-- `widgets_design_ratio` = `build_widgets_design_ms / build_widgets_ms`
-
-Computed from values already collected in the same run. **No new builds, no
-extra CI time.** Append both to the emitted row, after `example_workbench_ms`
-and before `rustc` — see §7 for why position matters.
-
-Bash has no floating point; use `awk` or `bc`. Emit **5 significant figures**
-(observed values are ~0.042 and ~0.0057, so `%.5f` is adequate but check that
-`widgets_design_ratio` does not lose resolution).
-
-Guard against divide-by-zero: if a denominator is `0` or empty, emit `N/A`
-rather than crashing the release measurement. A missing ratio must not fail a
-release.
-
-### Step 3 — CSV header
-
-Add both columns to the header row. **Do not touch any existing data row** —
-append-only, RFC-041 N-1. Historical rows will have fewer fields than the
-header; that is correct and expected, and the next appended row will be the
-first complete one.
-
-If you believe existing rows need `N/A` padding to stay parseable, say so in
-the review request with the reason — but the default is *do not edit history*.
-
-### Step 4 — The data-integrity note
-
-Add to `build-cost-budget.md`, matching the three existing notes. It must
-carry:
-
-- the CV table (all six columns, mean/stdev/CV);
-- the 0.28.0 → 0.28.1 evidence — a release that changed **no code** and moved
-  the numbers 8–11%;
-- the common-mode reasoning from §4;
-- the explicit statement that **absolute columns are runner-dominated and are
-  raw record, not trend signal**.
-
-### Step 5 — Watch points
-
-`build-cost-budget.md`'s "Watch points" currently trigger on absolute
-milliseconds. Replace the **trend** watch points with ratio-based ones and
-state what sensitivity each actually has.
-
-**Keep the absolute 30 000 ms ceiling on `build_widgets_ms`.** It is a
-different kind of check — an absolute bound on developer experience, mapped to
-`feature-gating-criteria.md` indicator 1 — and a 10% measurement error does not
-matter to it. Say why it stays, so a later reader does not "finish the job" by
-removing it.
-
-### Step 6 — Job summary (Q-2)
-
-`build-cost.yaml` prints absolute ms in the GitHub job summary. Print the
-ratios too, labelled as the comparable figures. Keep the absolutes: a human
-skimming a release has intuition for milliseconds and none for `0.042`.
-
-The summary reads the row positionally via `IFS=',' read -r …`. **That read
-will break when the row gains two fields** — it currently unpacks 10 into 10
-named variables. Update it; this is the one place in-repo that parses the row
-positionally.
-
-### Step 7 — Gate 9b
-
-Update the gate 9b row in `api-freeze-review.md` to record the new closure
-condition: **≥2 releases measured with the ratio columns present.**
-
-Gate 9b is **not** closed by this task landing. Do not mark it satisfied.
-
-## 7. The one thing that will break
-
-`build-cost.yaml`'s "Write job summary" step does:
-
-```bash
-IFS=',' read -r v ws_ms wid_ms eng_ms hel_ms wid_design_ms wb_ms rustc os date <<<"$ROW"
-```
-
-Ten fields, ten variables. Adding two columns **before** `rustc` shifts
-`rustc`, `runner_os` and `date` — so the summary would print a ratio where it
-says "Rustc:" and silently mislabel the rest.
-
-Placing the ratios at the **end** would avoid touching this, and is the wrong
-choice: the row's trailing three fields are provenance (`rustc`, `runner_os`,
-`date`) and belong last, as they are in every existing row and in
-`binary-size.csv`. Keep the schema coherent and fix the reader.
-
-## 8. Explicit non-change scope
+## 7. Explicit non-change scope
 
 Do **not**:
 
-- **Add repeat runs or medians.** Considered and declined in the RFC —
-  it costs CI minutes and corrects within-runner jitter rather than the
-  between-runner bias the evidence points at.
-- **Edit or back-fill any historical CSV row.** Append-only (RFC-041 N-1).
-- **Add a CI failure gate on compile time.** It still fails no build.
-- **Add a ratio involving `build_engine_only_ms`** (§4).
-- **Touch `binary-size.csv`, `measure-binary-size.sh`, or gate 9a.** Binary
-  size does not have this problem — engine size moved −0.0008% across the same
-  documentation-only release.
-- **Re-enable dependency caching** in `build-cost.yaml`. The uncached build is
-  deliberate (RFC-043) and its rationale is in the workflow comments.
+- **Implement `widgets_design_ratio`** or any ratio using a sub-second column.
+- **Add a new measurement column.** It would reset the comparability clock a
+  fourth time. This RFC derives from what is already collected.
+- **Add repeat runs / median-of-N.** Considered and rejected in the RFC: it
+  costs CI minutes and addresses within-runner jitter, when the evidence says
+  the dominant effect is *between*-runner speed.
+- **Edit, pad, reorder or back-fill any historical CSV row** (§5).
+- **Tick gate 9b.**
+- **Change the binary-size measurement.** 9a is satisfied and does not have
+  this problem.
+- **Add a CI failure gate.** Compile cost fails no build.
+- **Change the uncached build policy** (RFC-043).
 
-## 9. Required tests
+## 8. Required tests
+
+There is no unit-test harness for this script, so the evidence *is* the test:
 
 ```bash
-bash -n scripts/measure-compile-time.sh
-scripts/measure-compile-time.sh 0.0.0-test        # run it; inspect the row
-mdbook build docs && mdbook test docs
-cargo fmt --all --check
+scripts/measure-compile-time.sh 0.0.0-test     # full run; slow, expected
 ```
 
-The script is not covered by `cargo test`; **running it and reading the row is
-the test.** Include the emitted row in your evidence, and confirm by hand that
-each ratio equals the quotient of the two columns in that same row.
+- Show the emitted row, and that `design_overhead_ratio` equals
+  `example_workbench_ms / example_hello_ms` to the precision emitted —
+  recompute it by hand from the row's own two fields.
+- Show the header and the row have the **same field count**, and that a
+  historical short row still parses in whatever reads this file.
+- `mdbook build docs && mdbook test docs`.
+- `cargo fmt --all --check`, `cargo clippy --workspace --all-targets
+  --all-features -- -D warnings` (unchanged by this RFC, but the release gate
+  runs them).
 
-Also verify the job-summary parse: paste a 12-field row through the updated
-`IFS=',' read` line and confirm every variable lands in the right place.
+A `shellcheck` pass on the modified script if available; report if not.
+
+## 9. Required evidence
+
+- The script diff, and one **real emitted row** from an actual run.
+- The hand-recomputed ratio from that row's own fields, matching.
+- The CSV header diff, plus `git diff` proving **no existing row changed**.
+- The `build-cost-budget.md` diff, showing all four required statements
+  (§4.3).
+- The gate 9b row, showing the condition recorded and the gate **not ticked**.
+- The job-summary output (§4.5).
+- What you found in `feature-gating-criteria.md` indicator 1 (§6).
 
 ## 10. Acceptance criteria
 
-RFC-050 §Acceptance criteria 1–5:
+RFC-050 §Acceptance criteria 1–5. The two most likely to be got wrong:
 
-1. Both ratio columns are emitted, computed from same-run values.
-2. The CSV header documents both; no existing row is edited.
-3. `build-cost-budget.md` carries the data-integrity note with the CV table
-   and the 0.28.0 → 0.28.1 evidence; trend watch points move to the ratios;
-   the absolute 30 s ceiling stays with a stated reason.
-4. **Q-1 is answered with evidence either way** (§6 step 1).
-5. Gate 9b records the ≥2-releases-with-ratios closure condition and is **not**
-   marked satisfied.
+- **2** — no existing row edited or padded. The earlier draft asked for the
+  opposite; §5 governs.
+- **4** — the rejection notes for both the sub-second columns and
+  `widgets_design_ratio`. Omitting them means the next person re-derives a
+  ratio that has now failed twice.
 
-## 11. Prohibited shortcuts
+## 11. Required review-request format
 
-- Do not skip Q-1 because the ratios do not depend on it.
-- Do not "fix" historical rows to match the new header.
-- Do not move the ratios to the end of the row to avoid updating the job
-  summary (§7).
-- Do not report the ratios as satisfying gate 9b. Two releases must pass first.
-- Do not delete the absolute columns. They are the raw record and the only
-  thing comparable to the 30 s ceiling.
-
-## 12. Compatibility and security
-
-**Compatibility.** The CSV gains two columns. Anything parsing it positionally
-past field 7 breaks; in-repo, that is exactly one place (§7) and it is in
-scope. No library API change, no user-visible behaviour change.
-
-**Security.** No new data flow, dependency, or integration.
-
-## 13. Required evidence
-
-- The full diff of `measure-compile-time.sh`.
-- **A real emitted row** from a local run, with the two ratios verified by
-  hand against the columns in that same row.
-- Your Q-1 finding, with the command output behind it.
-- The job-summary parse check (§9).
-- The `build-cost-budget.md` diff in full.
-- `mdbook build` / `mdbook test` output.
-
-## 14. Required review-request format
-
-Per workflow policy §9.2 and the packaging convention: `README.md` entry
-point, full `review-request.md`, `evidence/`, under
+Per workflow policy §9.2: `README.md` entry point, full `review-request.md`,
+`evidence/`, under
 `.git-exclude/review-request/050-compile-time-measurement-is-runner-noise/`.
-**State the single entry-point path to hand to the reviewer** in the
-completion summary.
+**State the single entry-point path** in the completion summary.
 
-**Requested review focus:** Q-1. If `build_engine_only_ms` is not measuring a
-real rebuild, that finding is worth more than the ratios, and the ratios are
-the easy part of this task.
+**Requested review focus:** the emitted ratio's precision and correctness
+against its own row, and whether `build-cost-budget.md` now makes it impossible
+to read the absolute columns as a trend. The failure mode is a reader who sees
+six millisecond columns, a ratio, and no statement of which one means anything.

@@ -102,7 +102,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **parked** — needs ~2 more releases of comparable data (see the RFC's Parked section) |
+| 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **open** → v0.35.0 — unparked 2026-08-18; re-derived on four post-RFC-052 rows, which dropped one of the two proposed ratios |
 
 ## Archive
 
