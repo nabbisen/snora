@@ -64,7 +64,28 @@ How to measure: `scripts/measure-compile-time.sh <version>` (see
 Per-release values are tracked in
 [`reference/build-cost-budget/compile-time.csv`](../reference/build-cost-budget/compile-time.csv),
 appended on every release tag by the `build-cost` GitHub Actions workflow.
-The `build_widgets_ms` column is the indicator 1 proxy.
+The `build_widgets_ms` column is the indicator 1 proxy — with two caveats
+(RFC-050), stated because this is an absolute ceiling, not a trend, so
+RFC-050's `design_overhead_ratio` cannot substitute for it here:
+
+- **The proxy currently reads 2.2×–3.5× the 30-second threshold on
+  every one of the last twelve releases** (0.26.0 through 0.34.0; the
+  one row under threshold, 0.25.3 at 353 ms, is the pre-RFC-043
+  cached-methodology artifact, not a real cold build) — so it cannot be
+  used as a trip-wire until it is recalibrated. By the letter of
+  indicator 1 ("if two or more of these become true, open a
+  discussion"), this one alone has read true for twelve consecutive
+  releases with no discussion opened, which is itself evidence the
+  proxy is miscalibrated rather than that the threshold is genuinely
+  and repeatedly breached.
+- **The likely reason: the threshold is written against "a developer's
+  machine of average specs" building `snora-widgets` cold, while the
+  proxy measures CI rebuilding the entire iced closure from scratch
+  (RFC-043)** — not the same quantity, and the calibration was never
+  restated when RFC-043 changed the methodology to a fully uncached
+  build. This caveat states the situation; **recalibrating the
+  threshold or deciding whether indicator 1 is genuinely tripped is a
+  separate decision, out of RFC-050's scope**, not resolved here.
 
 ### 2. Binary size measurably increases for engine-only consumers
 

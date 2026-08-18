@@ -97,13 +97,13 @@ Numbers remain stable forever and are never reused.
 | 057 | [The typography vocabulary is complete and undiscoverable](./done/057-typography-is-undiscoverable.md) | v0.33.1 (handoff: [`handoffs/057-…`](./handoffs/057-typography-is-undiscoverable/implementation-handoff.md)) |
 | 058 | [`border` contrast is untested, and `light`/`dark` ship it at ~1.3:1](./done/058-border-contrast-is-untested-and-failing.md) | v0.34.0 (handoff: [`handoffs/058-…`](./handoffs/058-border-contrast-is-untested-and-failing/implementation-handoff.md)) |
 | 059 | [Two more answers filed where consumers do not read](./done/059-answers-filed-where-consumers-do-not-read.md) | v0.34.0 (handoff: [`handoffs/059-…`](./handoffs/059-answers-filed-where-consumers-do-not-read/implementation-handoff.md)) |
+| 050 | [Compile-time measurement reports runner speed, not snora](./done/050-compile-time-measurement-is-runner-noise.md) | v0.35.0 (handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
+| 060 | [Frame-level keyboard navigation](./done/060-frame-level-keyboard-navigation.md) | v0.35.0 (handoff: [`handoffs/060-…`](./handoffs/060-frame-level-keyboard-navigation/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 050 | [Compile-time measurement reports runner speed, not snora](./proposed/050-compile-time-measurement-is-runner-noise.md) | **open** → v0.35.0 — unparked 2026-08-18; re-derived on five post-RFC-052 rows, which dropped one of the two proposed ratios |
-| 060 | [Frame-level keyboard navigation](./proposed/060-frame-level-keyboard-navigation.md) | v0.35.0 — closes the 14-minor-stale RFC-014-B deferral; zone cycling only, trapping staged behind Q-1 |
 
 ## Archive
 

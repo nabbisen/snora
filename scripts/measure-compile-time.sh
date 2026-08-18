@@ -8,12 +8,30 @@
 #   scripts/measure-compile-time.sh 0.12.0
 #
 # Output (one line):
-#   version,check_workspace_ms,build_widgets_ms,build_engine_only_ms,example_hello_ms,build_widgets_design_ms,example_workbench_ms,rustc,runner_os,date
+#   version,check_workspace_ms,build_widgets_ms,build_engine_only_ms,example_hello_ms,build_widgets_design_ms,example_workbench_ms,rustc,runner_os,date,design_overhead_ratio
 #
 #   runner_os is read from $SNORA_RUNNER_OS if set, else $RUNNER_OS, else
 #   "unknown" (RFC-044: SNORA_RUNNER_OS exists because GitHub Actions
 #   reserves the RUNNER_* namespace and silently ignores any attempt to
 #   override RUNNER_OS itself via a step's `env:` block).
+#
+#   design_overhead_ratio = example_workbench_ms / example_hello_ms, at 5
+#   significant figures (RFC-050). Both inputs are already measured above;
+#   this is a derived column, not a new measurement. The absolute
+#   millisecond columns vary 36-60% across identical-runner releases —
+#   common-mode runner noise, not a snora signal — while this same-run
+#   ratio cancels it (2.5% spread on five post-RFC-052 rows). See
+#   docs/src/reference/build-cost-budget.md for the full evidence; treat
+#   the ratio, not the milliseconds, as the trend signal.
+#
+#   Appended as the LAST field, not inserted before rustc/runner_os/date
+#   (RFC-050 round 2). Columns are always appended, never inserted:
+#   historical rows are deliberately left short rather than padded
+#   (RFC-041 N-1), so inserting a column mid-row would split what a given
+#   field number means depending on the row's age — the exact defect this
+#   RFC's own lineage (RFC-041, 043, 044, 052) exists to prevent. Appending
+#   keeps every field number meaning one thing for every row in the file;
+#   the new column is simply absent (short row) on anything before 0.35.0.
 #
 # Design notes:
 # - Uses `cargo clean -p <package>` for per-measurement cold builds so only
@@ -78,4 +96,12 @@ cargo clean -p snora-example-design-workbench --release 2>/dev/null || true
 cargo clean -p snora-example-design-workbench --profile release-baseline 2>/dev/null || true
 example_workbench_ms=$(measure_ms "example_workbench"  cargo build --profile release-baseline -p snora-example-design-workbench)
 
-echo "${VERSION},${check_workspace_ms},${build_widgets_ms},${build_engine_only_ms},${example_hello_ms},${build_widgets_design_ms},${example_workbench_ms},${RUSTC},${RUNNER_OS},${DATE}"
+# design_overhead_ratio = example_workbench_ms / example_hello_ms (RFC-050).
+# Both are same-run measurements already captured above; no new build, no
+# extra time. 5 significant figures (observed values ~0.042). Guard against
+# a zero denominator so a pathological measurement cannot emit a malformed
+# row (division by zero, or bash's `set -e` tripping on awk's exit status).
+design_overhead_ratio=$(awk -v n="$example_workbench_ms" -v d="$example_hello_ms" \
+    'BEGIN { if (d + 0 == 0) { print "N/A" } else { printf "%.5g", n / d } }')
+
+echo "${VERSION},${check_workspace_ms},${build_widgets_ms},${build_engine_only_ms},${example_hello_ms},${build_widgets_design_ms},${example_workbench_ms},${RUSTC},${RUNNER_OS},${DATE},${design_overhead_ratio}"

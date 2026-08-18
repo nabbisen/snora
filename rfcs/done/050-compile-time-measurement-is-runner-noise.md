@@ -1,6 +1,6 @@
 # RFC 050 — Compile-time measurement reports runner speed, not snora
 
-**Status.** Accepted (owner, 2026-08-15). **Parked 2026-08-15 pending
+**Status.** Done — shipped in v0.35.0 (2026-08-18). Parked 2026-08-15 pending
 post-RFC-052 data; unparked and re-derived 2026-08-18** on five post-fix rows.
 The re-derivation changed the design — see §"What the post-fix data changed".
 **Tracks.** Measurement integrity (continues RFC-041, RFC-043, RFC-044).

@@ -1,6 +1,6 @@
 # RFC 060 — Frame-level keyboard navigation
 
-**Status.** Proposed. Handoff:
+**Status.** Done — shipped in v0.35.0 (2026-08-18). Handoff:
 [`handoffs/060-…`](../handoffs/060-frame-level-keyboard-navigation/implementation-handoff.md)
 **Tracks.** Accessibility / vocabulary. Closes the 14-minor-stale deferral
 recorded as **RFC-014-B**.

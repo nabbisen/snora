@@ -29,7 +29,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | Tooltip vocabulary deferred | Deferred | Second consumer type in the codebase |
 | Persistent-toast helper deferred | Deferred | Two separate apps repeat `.persistent()` |
 | Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. |
-| Focus trapping deferred | Deferred | Concrete app + stable iced focus API |
+| Focus trapping deferred | Deferred — trigger fired, Q-1 (RFC-060) now the blocker | Concrete app: met (tekstide). Focus *querying* API: needs iced's `advanced` feature — a separate, measured decision (RFC-060 Q-1), not stable-by-default |
 | Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases |
 | No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API |
 
@@ -404,14 +404,46 @@ feature-gating. (4) Does it affect binary size? Measure.
 ## Why focus trapping is deferred (v0.14)
 
 Snora's modal dim provides visual modality and pointer blocking. It does
-not trap keyboard focus (Law 8, RFC-011-E). iced 0.14's `operate`
-machinery and `widget::Id` make programmatic focus queries possible, but
-a reliable cross-platform focus trap at the framework level is unproven.
+not trap keyboard focus (Law 8, RFC-011-E).
 
-Reconsideration trigger: a concrete downstream app demonstrates the need
-and iced provides a stable, cross-platform focus API. Any focus
-implementation must be additive — a new optional `Dialog`/`Sheet` field
-per RFC-011-C rules.
+**Corrected (RFC-060):** the previous text here said iced 0.14's
+`operate` machinery and `widget::Id` "make programmatic focus queries
+possible" — true, but incomplete in the way that matters. Verified
+against snora's exact feature set (`canvas`, `svg`, `tokio`, no
+`advanced`): *moving* focus (`operation::focus_next()` /
+`focus_previous()` → `Task`) is reachable today without any new
+feature. *Querying* which widget is focused (`focusable::find_focused()`)
+is reachable only with iced's `advanced` feature, which snora does not
+enable. A reader taking the old sentence at face value would conclude
+the query is free; it is not.
+
+**The reconsideration trigger fired, and nothing checked it.** The
+condition was "a concrete downstream app demonstrates the need and iced
+provides a stable, cross-platform focus API." tekstide is that
+downstream app — they implemented zone-based focus cycling themselves
+and called modal focus trapping "security machinery... proven with a
+positive control," specifically because snora did not offer it. And the
+API split above means the *moving* half of the condition is met today.
+Nobody re-read this record when either half changed; a reconsideration
+trigger with no scheduled re-check is a note, not a mechanism. RFC-060
+is the response to the first half (frame-level zone navigation, which
+only needs *moving* focus) — trapping itself needs the *querying* half,
+which still needs a decision.
+
+**The additive constraint survives this correction and is inherited.**
+Any focus implementation must remain additive: trapping must arrive as
+a new optional `Dialog`/`Sheet` field, per RFC-011-C rules, not a change
+to an existing field or a new default behaviour. RFC-060 binds its own
+Q-1 (whether to enable iced's `advanced` feature for trapping) to this
+constraint explicitly, rather than treating it as settled by that
+RFC alone — enabling `advanced` has its own compile-cost, binary-size
+and API-stability consequences, measured separately, not decided as a
+side effect of shipping zone navigation.
+
+**What actually changed here:** the *reason* trapping stays deferred,
+from "unproven" to "measured, scoped, and waiting on one feature
+decision (Q-1)." The decision itself is not reversed — trapping is
+still not shipped.
 
 ## Why binary size is measured via three feature-exercising probes
 

@@ -97,6 +97,18 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.35.0** — Frame-level keyboard navigation (RFC-060) and a compile-time
+  trend signal that is actually a signal (RFC-050). `snora-core::focus` adds
+  pure, iced-free zone vocabulary — `FocusZone`, `Cycle`, `ZonePresence`,
+  `next_zone` — cycling the four skeleton slots in logical order, suspended
+  while a modal is open. Snora deliberately **does not take Tab**: it supplies
+  the decision and recommends F6/Shift+F6, leaving Tab meaning "next control".
+  This closes a deferral that had sat at "out of v0.20 scope" for fourteen
+  minors; modal focus *trapping* remains staged, now behind one measured
+  question rather than "unproven". Alongside it, RFC-050 replaced the
+  compile-time trend watch points with `design_overhead_ratio`, after five
+  post-fix releases showed the absolute columns swinging 36–60% — including a
+  documentation-only release that moved every one of them +36% to +55%.
 - **0.34.0** — Border and muted-text contrast repaired (RFC-058), and two
   answers moved to where consumers read them (RFC-059). Both came from
   **tekstide**, a prospective adopter who evaluated snora end to end, declined,

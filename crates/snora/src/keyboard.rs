@@ -1,12 +1,14 @@
-//! Keyboard dismissal helpers.
+//! Keyboard dismissal and navigation helpers.
 //!
-//! Snora does not own application shortcut routing, but it provides a
-//! small helper for the most common overlay-dismissal pattern: pressing
-//! `Escape` to close menus or modals. See
+//! Snora does not own application shortcut routing, but it provides
+//! small helpers for the two patterns every multi-region application
+//! needs: pressing `Escape` to close menus or modals, and cycling
+//! between frame-level zones. See
 //! [overlay interaction semantics](https://docs.snora.dev/reference/overlay-interaction-semantics.html)
 //! Laws 7 and 8 for the normative policy.
 
-use iced::keyboard::{Key, key::Named};
+use iced::keyboard::{Key, Modifiers, key::Named};
+use snora_core::focus::Cycle;
 
 /// Returns the message to emit when `Escape` is pressed, following the
 /// Snora overlay dismissal priority.
@@ -71,6 +73,55 @@ pub fn dismiss_on_escape<Message: Clone>(
     None
 }
 
+/// Returns the [`Cycle`] direction for `F6` / `Shift+F6`, snora's
+/// recommended binding for frame-level zone navigation
+/// ([`snora_core::focus::next_zone`]).
+///
+/// **Not the only legitimate binding.** F6 / Shift+F6 is the desktop
+/// convention for region cycling (Tab already means "next control," so
+/// snora does not claim it — see [`dismiss_on_escape`] for the same
+/// non-capture policy applied to `Escape`). An application is free to
+/// bind a different key to [`snora_core::focus::next_zone`] directly;
+/// this helper exists so the common case does not require re-deriving
+/// which modifier means "backward."
+///
+/// Returns `None` for any other key, so it composes with
+/// [`dismiss_on_escape`] in the same `if let Some(...) = ... else if
+/// let Some(...) = ...` chain without either needing to know about the
+/// other.
+///
+/// # Example
+///
+/// ```rust,ignore
+/// // In your update, alongside dismiss_on_escape:
+/// Message::KeyPressed(key, modifiers) => {
+///     if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
+///         let next = snora_core::focus::next_zone(
+///             self.focus_zone,
+///             cycle,
+///             self.zone_presence(),
+///             self.show_dialog || self.show_sheet,
+///             self.open_menu.is_some(),
+///         );
+///         if let Some(zone) = next {
+///             self.focus_zone = zone;
+///             return self.focus_task_for(zone); // application-owned iced::Task
+///         }
+///     }
+/// }
+/// ```
+#[must_use]
+pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
+    if key != Key::Named(Named::F6) {
+        return None;
+    }
+    if modifiers.shift() {
+        Some(Cycle::Backward)
+    } else {
+        Some(Cycle::Forward)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,6 +182,34 @@ mod tests {
         assert_eq!(
             dismiss_on_escape(false, true, Some("modal"), None::<&str>, ESC),
             None,
+        );
+    }
+
+    const F6: Key = Key::Named(Named::F6);
+
+    #[test]
+    fn f6_without_shift_cycles_forward() {
+        assert_eq!(cycle_zones(F6, Modifiers::empty()), Some(Cycle::Forward));
+    }
+
+    #[test]
+    fn shift_f6_cycles_backward() {
+        assert_eq!(cycle_zones(F6, Modifiers::SHIFT), Some(Cycle::Backward));
+    }
+
+    #[test]
+    fn non_f6_key_returns_none_even_with_shift() {
+        assert_eq!(cycle_zones(ESC, Modifiers::SHIFT), None);
+        assert_eq!(cycle_zones(ENTER, Modifiers::empty()), None);
+    }
+
+    #[test]
+    fn other_modifiers_alongside_f6_do_not_change_direction() {
+        // Ctrl+F6 (no Shift) is still forward; Ctrl+Shift+F6 is still backward.
+        assert_eq!(cycle_zones(F6, Modifiers::CTRL), Some(Cycle::Forward));
+        assert_eq!(
+            cycle_zones(F6, Modifiers::CTRL | Modifiers::SHIFT),
+            Some(Cycle::Backward)
         );
     }
 }

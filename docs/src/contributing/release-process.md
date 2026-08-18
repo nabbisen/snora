@@ -192,8 +192,13 @@ them in sync is a release-process invariant.
 [ ] CONTENT-check that same compile-time row (RFC-044, same rationale as
     the binary-size content-check above):
     `git show main:docs/src/reference/build-cost-budget/compile-time.csv | tail -1 | cut -d, -f9`
-    must print `ubuntu-latest` — field 9, `runner_os`. If it prints
-    `Linux`, treat it as a release blocker, same as above.
+    must print `ubuntu-latest` — field 9, `runner_os`. This field number
+    does NOT move when a column is added (RFC-050 appends
+    `design_overhead_ratio` as the LAST field, field 11, specifically so
+    this check and every other positional read of an existing field
+    keeps working unchanged — see build-cost-budget.md's append-only
+    column note). If it prints `Linux`, treat it as a release blocker,
+    same as above.
     `... | cut -d, -f2` (`check_workspace_ms`) must be **at least 10 000**
     (plausibly cold — tens of seconds, not milliseconds). A value in the
     hundreds or low thousands means a dependency cache was restored and
@@ -241,7 +246,9 @@ patch from shipping two unreleased features' source.
 
 Cargo computes the dependency order from the manifests
 (`snora-core` and `snora-design` have no internal dependencies;
-`snora-widgets` depends on both; `snora` depends on all three) and waits
+`snora-style` depends on `snora-design`; `snora-widgets` depends on
+`snora-core`, `snora-design` and `snora-style`; `snora` depends on all
+four) and waits
 for each to become available on crates.io before publishing the next. The
 order cannot drift from the manifests, because nothing restates it.
 

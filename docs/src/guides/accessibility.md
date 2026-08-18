@@ -25,6 +25,36 @@ contributor-facing documents linked below, not duplicated here.
   routing; snora does not intercept it.
 - **A typography scale with usable line-height**, for text you write on top
   of snora. See [Readability](readability.md) for how to pick a role.
+- **Frame-level keyboard zone navigation.** snora supplies the decision
+  logic to move between skeleton regions — header, sidebar, body,
+  footer — as pure vocabulary in `snora_core::focus`:
+
+  ```rust,ignore
+  use snora_core::focus::{next_zone, Cycle, ZonePresence};
+
+  let next = next_zone(
+      self.focus_zone,
+      Cycle::Forward,
+      ZonePresence::none().header(true).side_bar(true).footer(true),
+      self.show_dialog || self.show_sheet,
+      self.open_menu.is_some(),
+  );
+  if let Some(zone) = next {
+      self.focus_zone = zone;
+  }
+  ```
+
+  **snora does not take Tab or Shift+Tab.** Tab already means "next
+  control" to iced and to every application with a form or a text
+  field; claiming it for zone cycling would break in-pane navigation
+  everywhere. Instead, snora recommends the desktop convention —
+  **F6 / Shift+F6** — and supplies a matching key helper,
+  `snora::keyboard::cycle_zones`, so you don't have to re-derive which
+  modifier means "backward." As with `dismiss_on_escape`, snora installs
+  no subscription: your application wires `iced::keyboard::listen()`
+  and calls the pure function itself. Cycling is automatically
+  suspended while a dialog or sheet is open (focus belongs inside the
+  modal), and unaffected by an open menu.
 
 ## What snora does not provide
 
@@ -48,6 +78,13 @@ contributor-facing documents linked below, not duplicated here.
   snora-rendered surfaces (RFC-047, where implemented) are labels for
   external observation, not accessibility roles or names — an `Id` is
   not a role.
+- **No modal focus trapping.** Zone navigation (above) is correctly
+  suspended while a dialog or sheet is open, but nothing bounds Tab
+  *inside* the modal's own content once focus is there — a keyboard
+  user can still Tab out to controls the modal is meant to be gating.
+  This is a known, staged gap, not an oversight: it needs iced's
+  `advanced` feature, which snora does not enable, and is a separate,
+  measured decision. See [design decisions](../contributing/design-decisions.md#why-focus-trapping-is-deferred-v014).
 
 ## What "ABDD" means, precisely
 

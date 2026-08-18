@@ -163,13 +163,18 @@ exclusively in **visual focus styling**: iced does not tell the style closure
 
 ## Keyboard ownership table
 
+**Rewritten for RFC-060, not amended** — the previous "Out of v0.20 scope
+(deferred, RFC-014-B)" row for focus trapping is retired below, not left
+beside a new one.
+
 | Behavior | Owner |
 |---|---|
 | Button activation via Enter / Space | iced (inherited) |
-| Snora visual focus ring | Snora, where iced exposes focus state |
+| Frame-level zone navigation (Header/SideBar/Body/Footer) | **Snora** — `snora_core::focus::next_zone`, a pure decision function; the application wires the key (`snora::keyboard::cycle_zones`, F6/Shift+F6 recommended) and owns the current zone as its own state (RFC-060). Snora installs no subscription. |
+| Snora visual focus ring | Snora, where iced exposes focus state — and, since RFC-059, reachable *today* by an application that already owns focus as its own state, styling it in its own `container` closure. Not rendered by snora's own widgets yet; staged behind Q-2 of RFC-060. |
 | Application keyboard shortcuts | Application |
 | Escape-key overlay dismissal | Application (via `snora::keyboard::dismiss_on_escape`) |
-| Focus trapping in modals | Out of v0.20 scope (deferred, RFC-014-B) |
+| Modal focus trapping | **Staged, not shipped.** The reconsideration trigger recorded in [design decisions](design-decisions.md#why-focus-trapping-is-deferred-v014) fired — a concrete downstream app (tekstide) demonstrated the need, and moving focus (not querying it) is reachable without the `advanced` iced feature — but trapping itself needs the query half, which does need `advanced`. Whether to enable it is Q-1 of RFC-060: a separate, measured decision, not an implementation detail of zone navigation. When it lands, it arrives as a new optional `Dialog`/`Sheet` field (RFC-011-C), inherited from the original deferral. |
 | Screen-reader announcements | iced accessibility layer + OS; Snora does not override |
 
 ---

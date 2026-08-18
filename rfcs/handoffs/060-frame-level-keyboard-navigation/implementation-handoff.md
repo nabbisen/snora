@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-060 frame-level keyboard navigation
 
-**Governing RFC.** [RFC-060](../../proposed/060-frame-level-keyboard-navigation.md)
+**Governing RFC.** [RFC-060](../../done/060-frame-level-keyboard-navigation.md)
 **Status.** Inherited from RFC-060.
 **Release target.** 0.35.0 (minor — `snora-core` gains public vocabulary).
 **Implementation units.** One. Independent of RFC-050, which may ship alongside.

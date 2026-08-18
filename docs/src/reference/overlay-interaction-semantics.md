@@ -2,9 +2,9 @@
 
 This page is the normative reference for how Snora's overlay surfaces
 coexist, how outside-click dismissal works, and what remains
-application-owned. Future RFCs that touch keyboard behavior (RFC-014-A) or
-accessibility boundaries (RFC-014-B) extend this page — they do not replace
-it.
+application-owned. Future RFCs that touch keyboard behavior (RFC-014-A,
+**RFC-060, landed**) or accessibility boundaries (RFC-014-B) extend this
+page — they do not replace it.
 
 ## Z-stack order (Law 1)
 
@@ -74,7 +74,18 @@ Toasts render above modals (layer 7). Operational feedback stays visible
 even during a modal workflow. Use persistent error toasts sparingly — they
 visually compete with a simultaneously open modal.
 
-### Law 7 — Keyboard dismissal is application-owned (for now)
+### Law 7 — Keyboard dismissal is application-owned
+
+**Resolved (RFC-060): the "(for now)" this law previously carried is
+retired, narrowly.** `Escape` dismissal itself is unchanged and stays
+application-wired — `snora::keyboard::dismiss_on_escape` remains a pure
+helper the application calls, not a subscription snora installs. What
+changed is that keyboard navigation now has a **second** decision, and
+it is snora's: frame-level zone cycling (`snora_core::focus::next_zone`,
+recommended binding F6/Shift+F6 via `snora::keyboard::cycle_zones`, see
+[Accessibility](../guides/accessibility.md)). Two keyboard concerns exist
+now, with two different owners — this is not "snora owns the keyboard,"
+it is one narrow addition alongside the one hedge this law used to carry.
 
 **Snora does not own application shortcut routing.** `Escape` behavior is
 not wired by the engine. Applications may map `Escape` to `CloseMenus` or
@@ -84,7 +95,7 @@ A future RFC (RFC-014-A) may add a documented recipe or a small optional
 helper. Any such addition will remain opt-in and will not change the
 existing two-sink model.
 
-### Law 8 — Focus management is out of scope until a concrete path exists
+### Law 8 — Modal focus trapping is staged, not shipped
 
 The modal dim/backdrop provides **visual modality** and **pointer blocking**.
 It does not promise keyboard focus trapping or screen-reader modal semantics.
@@ -95,7 +106,8 @@ These are distinct concerns:
 | Visual modality (dim layer) | yes |
 | Pointer blocking (backdrop capture) | yes |
 | Keyboard dismissal (Escape) | no — application-owned (Law 7) |
-| Focus trapping | no — deferred (RFC-014-B) |
+| Frame-level zone navigation | **yes (RFC-060)** — `snora_core::focus::next_zone`; **suspended** while a modal is open (it reports this rather than guessing where focus inside the modal should go), unaffected while only a menu is open |
+| Focus trapping *inside* an open modal | no — staged behind a separate decision (RFC-060 Q-1); see [design decisions](../contributing/design-decisions.md#why-focus-trapping-is-deferred-v014) for the constraint it inherits |
 
 ABDD is a **layout discipline**, not a complete accessibility or
 localization stack.
@@ -204,11 +216,19 @@ The workbench example demonstrates this pattern end-to-end.
 
 - **Escape handling** — Snora does not capture keyboard events. Wire
   `Escape` in your application's `subscription` or `update` using the
-  recipe above. (RFC-014-A covers future helpers.)
-- **Focus trapping** — The modal dim does not trap keyboard focus.
-  Applications that need focus management must implement it using iced's
-  focus primitives. (RFC-014-B covers the accessibility boundary
-  definition.)
+  recipe above. (RFC-014-A covers future helpers.) The same non-capture
+  policy applies to `snora::keyboard::cycle_zones` (RFC-060, below) —
+  snora supplies pure decision functions, never a subscription.
+- **Focus trapping *inside an open modal*** — The modal dim does not
+  trap keyboard focus once it is inside the modal's own content. This is
+  narrower than "focus management" generally: snora *does* now supply
+  frame-level zone navigation between the skeleton's own slots
+  (`snora_core::focus::next_zone`, RFC-060) — see [Law
+  8](#law-8--modal-focus-trapping-is-staged-not-shipped) — and that
+  navigation is correctly suspended while a modal is open. What remains
+  unsupplied is bounding Tab *inside* the modal's own application-owned
+  content, which needs iced's `advanced` feature and is staged behind a
+  separate decision (RFC-060 Q-1), not implemented here.
 - **Per-overlay close hooks** — There is no `on_close` on `Dialog` or
   `Sheet`. Use `AppLayout::on_close_modals` (Law 4).
 - **Collision detection for popovers** — Not yet a Snora concept.

@@ -37,6 +37,9 @@
 pub mod crumb;
 /// Reading direction and logical edges (`Start`, `End`).
 pub mod direction;
+/// Frame-level keyboard zone navigation — [`focus::FocusZone`],
+/// [`focus::next_zone`].
+pub mod focus;
 /// Icon enum and its source variants (text, Lucide, SVG).
 pub mod icon;
 /// The application skeleton ([`AppLayout`]).
@@ -54,6 +57,7 @@ pub mod toast;
 
 pub use crumb::{BreadcrumbAction, Crumb};
 pub use direction::{Edge, LayoutDirection};
+pub use focus::{Cycle, FocusZone, ZonePresence};
 pub use icon::Icon;
 pub use layout::AppLayout;
 pub use menu::{Menu, MenuAction, MenuItem};

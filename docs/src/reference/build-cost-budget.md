@@ -22,6 +22,7 @@ unintended growth before it becomes invisible.
 | `example_hello_ms` | `cargo build --profile release-baseline -p snora-example-hello` |
 | `build_widgets_design_ms` | `cargo build -p snora-widgets --features design --release` |
 | `example_workbench_ms` | `cargo build --profile release-baseline -p snora-example-design-workbench` |
+| `design_overhead_ratio` (RFC-050) | derived: `example_workbench_ms / example_hello_ms`, at 5 significant figures. **This is the trend signal** — see the note below. No new build; both inputs are already collected above. |
 
 "Cold" means `snora-core`, `snora-design`, `snora-widgets`, and `snora`
 are cleaned before each measurement, across every profile a measurement
@@ -242,17 +243,101 @@ The defect fixed here made the numerator additionally wrong in a second way
 selection is being re-derived on post-fix data rather than implemented on
 the columns as they stood.
 
+### Data integrity note (RFC-050) — the absolute columns are runner noise; `design_overhead_ratio` is the trend signal
+
+**The absolute millisecond columns are not, on their own, a usable trend.**
+Five rows now share runner, rustc and post-RFC-052 methodology — 0.31.0,
+0.32.0, 0.33.0, 0.33.1, 0.34.0:
+
+| Column | mean (ms) | min | max | spread |
+|---|---:|---:|---:|---:|
+| `check_workspace_ms` | 53 138 | 39 270 | 62 987 | **60.4%** |
+| `build_widgets_ms` | 90 819 | 67 296 | 104 190 | **54.8%** |
+| `build_engine_only_ms` | 448 | 355 | 506 | **42.5%** |
+| `example_hello_ms` | 143 227 | 111 226 | 156 549 | **40.7%** |
+| `build_widgets_design_ms` | 552 | 453 | 618 | **36.4%** |
+| `example_workbench_ms` | 6 061 | 4 690 | 6 564 | **41.6%** |
+
+Two directional controls, both against the same numbers, make the case that
+this is runner noise and not signal:
+
+- **0.33.0 → 0.33.1 changed no code at all** (RFC-057 was documentation and
+  doc comments only) and every column still moved **+36.4% to +54.8%**.
+- **0.33.1 → 0.34.0 changed code** (four preset colour values, RFC-058) and
+  every column moved **−10.9% to −21.2%** — the opposite direction, of
+  comparable magnitude. The absolute columns cannot tell these two releases
+  apart: one shipped nothing and jumped up sharply; the other shipped a
+  real, deliberate accessibility fix and dropped sharply.
+
+**`design_overhead_ratio` = `example_workbench_ms / example_hello_ms`
+cancels this**, because the variance is common-mode (a shared runner-speed
+factor moving the whole run) and a same-run ratio divides it out:
+
+| | 0.31.0 | 0.32.0 | 0.33.0 | 0.33.1 | 0.34.0 | spread |
+|---|---|---|---|---|---|---|
+| `design_overhead_ratio` | 0.04268 | 0.04191 | 0.04217 | 0.04193 | 0.04295 | **2.5%** |
+
+A 16-fold reduction versus the raw columns' 36–60%. The pair was chosen
+because both measurements are `--profile release-baseline` builds of an
+example *binary* — the same kind of work under the same profile — not
+because they are similarly sized (`example_workbench_ms` is 23.7× smaller
+in raw magnitude, and the two nearest-in-size pairs score 6–8× worse).
+0.34.0 is a genuine out-of-sample check: it was measured after this ratio
+was selected, and stayed inside 0.0419–0.0430 through a release that moved
+every absolute column double digits.
+
+**`build_engine_only_ms` (~448 ms) and `build_widgets_design_ms` (~552 ms)
+are raw record only — no ratio may be built from either.** At that
+magnitude both are dominated by process startup, cargo metadata resolution
+and timer granularity rather than by compiled code, and neither pairs with
+another column under the "same kind of work, same profile" rule above.
+
+**`widgets_design_ratio` (`build_widgets_design_ms / build_widgets_ms`) was
+derived, tested, and rejected — do not re-derive it.** It divides a
+snora-crates-only rebuild by an iced-plus-snora cold build, two different
+quantities under different profiles. Its apparent pre-fix stability (5.9%)
+was cargo's own startup consistency, not a snora signal: on post-RFC-052
+data it measures **14.9%**, worse than several raw columns, and cannot
+reliably detect a 10% regression.
+
+**Columns are always appended, never inserted.** `design_overhead_ratio`
+is the CSV's **last** field, after `date`, not slotted in among the
+existing seven. Historical rows are deliberately left short rather than
+padded to match a new header (RFC-041 N-1), so inserting a new column
+mid-row would split what a given field number *means* depending on the
+row's age — pre-0.35.0 rows would have `rustc` at field 8, post-0.35.0
+rows would have `design_overhead_ratio` there instead. That is exactly
+the kind of measurement-integrity defect this file's own RFC lineage
+(RFC-041, RFC-043, RFC-044, RFC-052) exists to prevent, and it would
+have broken `release-process.md`'s positional `cut -d, -f9` check for
+`runner_os` for every row from 0.35.0 onward. Appending keeps every
+field number meaning one thing for every row in the file; the new
+column is simply absent (a short row) on anything before 0.35.0. Apply
+the same rule to any future column.
+
+**The ratio is only comparable against rows from the same CI cold-build
+path.** A ratio computed from a local run (warm dependency cache, no
+per-measurement `cargo clean` reaching a truly cold iced rebuild) is a
+smoke test of the *arithmetic*, not a data point for the series — do
+not compare it against the CSV's CI-produced rows.
+
 ### Watch points
 
 No CI failures are triggered by compile time in the first iteration.
-Investigate when:
 
-- `build_widgets_ms` exceeds **30 000 ms** on the GitHub `ubuntu-latest`
-  runner. This maps to indicator 1 in the feature-gating criteria.
-- `build_engine_only_ms` grows toward `build_widgets_ms`. The
-  engine-only build should remain materially faster.
-- Any column shows a step-change jump without a corresponding
-  dependency addition.
+**Trend — watch `design_overhead_ratio`, not the absolute columns.** Its
+spread on identical-runner data is ~2.5%, so a ~5% move between releases is
+visible above noise; the absolute columns cannot distinguish a real 50%
+regression from ordinary runner variance (see the note above). Investigate
+a step-change in the ratio without a corresponding, explicable change to
+`example_workbench_ms`'s or `example_hello_ms`'s own dependency graph.
+
+**Absolute ceiling — `build_widgets_ms` exceeding 30 000 ms** on the GitHub
+`ubuntu-latest` runner still applies, unchanged. This maps to indicator 1
+in the feature-gating criteria, and — unlike the trend watch points above —
+it is a ceiling on developer experience, not a trend measurement, so
+runner-to-runner noise does not weaken it: 30 s is 30 s regardless of which
+host measured it.
 
 ### Running locally
 

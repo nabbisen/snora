@@ -17,6 +17,74 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.35.0] — 2026-08-18
+
+### Added
+
+- **Frame-level keyboard zone navigation (RFC-060).** Snora owns the
+  frame; applications own what is inside a pane — and until now snora
+  supplied none of its half of keyboard navigation, so every
+  multi-region application reimplemented the same logic. tekstide did,
+  and told us so. New, iced-free vocabulary in `snora-core::focus`:
+  `FocusZone` (`Header`/`SideBar`/`Body`/`Footer`), `Cycle`
+  (`Forward`/`Backward`), `ZonePresence`, and `next_zone` — a pure
+  function deciding the next zone in logical order
+  (`Header → SideBar → Body → Footer`, wrapping), skipping absent
+  slots. Logical order is deliberately **not** direction-mirrored: under
+  RTL the sidebar moves to the opposite physical edge but is still the
+  start-edge rail following the header, so — unlike `ToastPosition` —
+  this needs no `LayoutDirection` parameter.
+
+  **snora does not take Tab or Shift+Tab** — Tab already means "next
+  control," and claiming it would break in-pane navigation for every
+  application with a form. The recommended binding is **F6 / Shift+F6**,
+  via a new companion to `dismiss_on_escape`: `snora::keyboard::cycle_zones`.
+  Same shape, same non-capture policy — snora installs no subscription;
+  the application wires `iced::keyboard::listen()` and calls the pure
+  function itself.
+
+  Cycling is automatically **suspended** while a dialog or sheet is
+  open — reported, not silently redirected to `Body`, since modal
+  contents are an application-supplied `Node` snora cannot enumerate —
+  and **unaffected** while only a menu is open, mirroring
+  `dismiss_on_escape`'s modal-before-menu precedence exactly.
+
+  **This ships navigation, not containment.** Nothing bounds Tab inside
+  an open modal's own content yet; that needs iced's `advanced` feature
+  (verified: *moving* focus is reachable without it, *querying* which
+  widget is focused is not) and is a separate, measured decision, staged
+  behind Q-1. The keyboard ownership table in
+  `contributing/semantic-accessibility.md` is rewritten to reflect this,
+  retiring the 14-minor-stale "Out of v0.20 scope (deferred, RFC-014-B)"
+  row rather than adding beside it. Purely additive: new vocabulary in
+  `snora-core`, one new helper in `snora::keyboard`, no existing type,
+  field, or signature changed, no new iced feature enabled.
+
+### Changed
+
+- **Compile-time measurement gains a noise-controlled trend column,
+  `design_overhead_ratio` (RFC-050).** The six absolute-millisecond
+  columns `measure-compile-time.sh` has recorded since v0.20 **were
+  never a trend signal** — they vary 36–60% across five releases sharing
+  runner, rustc and methodology, and a documentation-only release
+  (0.33.1, RFC-057, zero code changed) moved every one of them 36% to
+  55%. That is runner noise, not snora. `design_overhead_ratio` =
+  `example_workbench_ms / example_hello_ms`, computed same-run from
+  measurements already collected (no new build), cancels it: 2.5%
+  spread on the same five releases, and it held through 0.34.0 (RFC-058,
+  which *did* change code) moving every absolute column −11% to −21% in
+  the opposite direction. The trend watch points move to the ratio; the
+  absolute 30-second ceiling on `build_widgets_ms` stays, unchanged,
+  since it is a developer-experience ceiling, not a trend. Two ratios
+  considered and rejected on the evidence: `widgets_design_ratio`
+  (14.9% spread post-fix, worse than several raw columns) and any ratio
+  built from the two sub-second columns (`build_engine_only_ms`,
+  `build_widgets_design_ms` — dominated by process startup, not compiled
+  code). Historical CSV rows are **not** edited or padded (RFC-041 N-1);
+  the next appended row is the first with all eleven fields. Gate 9b
+  (`api-freeze-review.md`) does **not** close with this change — it
+  closes when ≥2 released versions carry `design_overhead_ratio`.
+
 ## [0.34.0] — 2026-08-18
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-050 compile-time measurement
 
-**Governing RFC.** [RFC-050](../../proposed/050-compile-time-measurement-is-runner-noise.md)
+**Governing RFC.** [RFC-050](../../done/050-compile-time-measurement-is-runner-noise.md)
 **Status.** Accepted (owner, 2026-08-15); parked, then unparked and re-derived
 2026-08-18.
 **Release target.** 0.35.0 (minor — the CSV gains one column).
