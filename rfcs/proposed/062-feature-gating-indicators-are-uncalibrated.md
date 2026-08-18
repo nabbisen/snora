@@ -91,6 +91,21 @@ Its *number* is fine — see below. Its instructions are not.
 | 4. Platform-specific dep | any system library | none | no |
 | 5. Field requests | three independent applications | none received | no |
 
+**Indicator 5 has stronger evidence than "none received", added 2026-08-18.**
+Consumer replies confirm that **two of the three adopters compile zero prefab
+widgets**, and one — arama, at 0.33.0 — **removed `snora-widgets` from its build
+graph entirely** and verified it was gone rather than trusting the feature flag.
+apimokka has had zero `snora::widget::*` call sites since 0.25.2.
+
+That is not a request for per-widget gates. It is the opposite: **the coarse
+gate is doing its job.** RFC-055 made `design` and `widgets` independent at
+0.32.0, and the first consumer to want engine-plus-design-without-widgets simply
+took it. A consumer who can already opt out at the granularity they need does
+not ask for a finer one.
+
+Record this under indicator 5 rather than leaving a bare "none" — a "no" with
+evidence behind it is what makes the not-fired verdict checkable.
+
 The `widgets` gate's own reconsideration trigger, in `design-decisions.md`, is
 **"two of the five feature-gating indicators are met."**
 

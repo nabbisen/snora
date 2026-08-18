@@ -110,9 +110,18 @@ Three candidates, in the RFC. Choose and justify:
   elsewhere. snora's chip offers no other dismissal route, so this is probably
   **not** available — verify before relying on it.
 
-**This is an appearance change to a shipped primitive with one known consumer
-(orbok).** If you change it, it needs a CHANGELOG entry and a migration-guide
-note, the same treatment RFC-058's border change received.
+**This is an appearance change to a shipped primitive.** If you change it, it
+needs a CHANGELOG entry and a migration-guide note, the same treatment RFC-058's
+border change received.
+
+**Its blast radius is probably zero, and that is not a reason to be casual.**
+Consumer replies (2026-08-18) confirm orbok is the **only** prefab-widget
+consumer — apimokka has zero `snora::widget::*` call sites and arama has removed
+`snora-widgets` from its build graph entirely. orbok's own description of its UI
+names a side bar, a tab bar, result cards and source cards, and **does not
+mention chips**. Absence of mention is not confirmation, so treat chip usage as
+**unknown**, ship the migration note regardless, and do not use "nobody uses it"
+as licence to skip the failing-first evidence.
 
 If the measurement in §4 turns out to clear 24 after all, say so and change
 nothing — a fix applied to a non-defect is worse than no fix.
