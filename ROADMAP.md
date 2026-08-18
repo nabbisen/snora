@@ -97,6 +97,21 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.36.0** — Three accessibility gates that existed only as prose now have
+  mechanisms behind them. The 24×24 pointer-target rule gains a height-axis
+  assertion (RFC-061) — the width axis is marked review-only, because content
+  advance is not token-derivable and claiming otherwise would promise a
+  guarantee we cannot measure; `chip`'s dismiss control was measured against
+  iced's real fallback font at 15.0px and given a token-derived square target.
+  The contrast pair list is no longer hand-maintained (RFC-063): every
+  `Palette` role now declares where it renders and at what threshold, enforced
+  by exhaustive destructuring, so a nineteenth role cannot be added without
+  answering the question nobody asked about `text_muted` for its entire life —
+  35 pairs, 140 assertions, up from 19/76. And the feature-gating status table
+  no longer contradicts its own threshold (RFC-062): it had recorded "within
+  budget" beside a figure 3.2× over for ten minors. Every indicator now carries
+  a measured value; the crate-split trigger is verified **not** fired. RFC-061
+  and RFC-063 both originate with tekstide.
 - **0.35.0** — Frame-level keyboard navigation (RFC-060) and a compile-time
   trend signal that is actually a signal (RFC-050). `snora-core::focus` adds
   pure, iced-free zone vocabulary — `FocusZone`, `Cycle`, `ZonePresence`,

@@ -1,6 +1,6 @@
 # RFC 063 — The contrast pair list is hand-maintained, so the nineteenth role repeats the defect
 
-**Status.** Accepted (owner, 2026-08-18). Handoff:
+**Status.** Done — shipped in v0.36.0 (2026-08-18). Handoff:
 [`handoffs/063-…`](../handoffs/063-contrast-pairs-are-a-hand-maintained-list/implementation-handoff.md)
 **Tracks.** Accessibility / measurement integrity. Reported by **tekstide**
 (2026-08-18), who identified the class after RFC-058 fixed two instances.

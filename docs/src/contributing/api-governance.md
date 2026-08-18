@@ -191,6 +191,21 @@ which is a different and more permissive regime than this covenant.
   the change fixes an accessibility defect, recorded as **Fixed** in the
   CHANGELOG.
 
+**Adding a `Palette` role requires declaring where it renders, and the
+compiler enforces it (RFC-063).** `Palette::usages`
+(`crates/snora-design/src/palette.rs`) destructures `Palette`
+exhaustively and declares each role's intended surfaces and threshold
+class; `mandatory_pairs` in `tests.rs` is derived from that declaration,
+not maintained as a separate list. A role added to `Palette` without a
+matching entry in `usages` fails to compile (`E0027: pattern does not
+mention field ...`) — this is what closed the class of defect RFC-058
+found twice (`border`, `text_muted`: values existed, contrast was never
+asserted, because nothing forced anyone to add them to the old
+hand-written pair list). The declaration is crate-private and
+`#[cfg(test)]`, matching this covenant's own framing that role additions
+are otherwise unconstrained — the enforcement is about *measuring* a new
+role, not about permission to add one.
+
 ### Forbidden without reopening the gate
 
 - Removing, renaming, or retyping any item in the frozen surface.

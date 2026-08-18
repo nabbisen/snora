@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-062 feature-gating indicators
 
-**Governing RFC.** [RFC-062](../../proposed/062-feature-gating-indicators-are-uncalibrated.md)
+**Governing RFC.** [RFC-062](../../done/062-feature-gating-indicators-are-uncalibrated.md)
 **Status.** Inherited from RFC-062 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.0, alongside RFC-061. **Documentation only** — no code.
 **Implementation units.** One.

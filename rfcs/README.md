@@ -99,14 +99,14 @@ Numbers remain stable forever and are never reused.
 | 059 | [Two more answers filed where consumers do not read](./done/059-answers-filed-where-consumers-do-not-read.md) | v0.34.0 (handoff: [`handoffs/059-…`](./handoffs/059-answers-filed-where-consumers-do-not-read/implementation-handoff.md)) |
 | 050 | [Compile-time measurement reports runner speed, not snora](./done/050-compile-time-measurement-is-runner-noise.md) | v0.35.0 (handoff: [`handoffs/050-…`](./handoffs/050-compile-time-measurement-is-runner-noise/implementation-handoff.md)) |
 | 060 | [Frame-level keyboard navigation](./done/060-frame-level-keyboard-navigation.md) | v0.35.0 (handoff: [`handoffs/060-…`](./handoffs/060-frame-level-keyboard-navigation/implementation-handoff.md)) |
+| 061 | [Pointer target size is a checklist rule with no assertion](./done/061-pointer-target-size-is-unasserted.md) | v0.36.0 (handoff: [`handoffs/061-…`](./handoffs/061-pointer-target-size-is-unasserted/implementation-handoff.md)) |
+| 062 | [The feature-gating status table contradicts its own threshold](./done/062-feature-gating-indicators-are-uncalibrated.md) | v0.36.0 (handoff: [`handoffs/062-…`](./handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md)) |
+| 063 | [The contrast pair list is hand-maintained](./done/063-contrast-pairs-are-a-hand-maintained-list.md) | v0.36.0 (handoff: [`handoffs/063-…`](./handoffs/063-contrast-pairs-are-a-hand-maintained-list/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 061 | [Pointer target size is a checklist rule with no assertion](./proposed/061-pointer-target-size-is-unasserted.md) | **accepted** → v0.36.0 (raised by tekstide, Q4 + Q3) — handoff: [`handoffs/061-…`](./handoffs/061-pointer-target-size-is-unasserted/implementation-handoff.md) |
-| 062 | [The feature-gating status table contradicts its own threshold](./proposed/062-feature-gating-indicators-are-uncalibrated.md) | **accepted** → v0.36.0 — handoff: [`handoffs/062-…`](./handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md) |
-| 063 | [The contrast pair list is hand-maintained](./proposed/063-contrast-pairs-are-a-hand-maintained-list.md) | **accepted** → v0.36.0 (reported by tekstide) — handoff: [`handoffs/063-…`](./handoffs/063-contrast-pairs-are-a-hand-maintained-list/implementation-handoff.md) |
 
 ## Archive
 

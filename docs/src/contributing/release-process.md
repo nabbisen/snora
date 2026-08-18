@@ -86,6 +86,17 @@ them in sync is a release-process invariant.
     default-path docs for the claim it contradicts, or add a
     consumer-facing statement. Five misses reached this checklist before
     the rule did; this line is why it won't be a sixth.
+[ ] Re-evaluate feature-gating-criteria.md's "Current status" table
+    (RFC-062) — the table itself says to do this and nothing pointed at
+    it for ten minors, which is why it went stale in the first place.
+    Re-derive indicator 2 (`widgets_diff_bytes`) against the latest
+    binary-size.csv row; re-check indicators 3 and 4 against the current
+    manifests rather than inheriting the prior row's answer; note any
+    new field requests for indicator 5. Also re-run the accessibility-
+    tree trigger's check —
+    `cargo tree -p snora --all-features | grep -i accesskit` — and update
+    design-decisions.md's register with the result and this release's
+    date if it changed.
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)
 [ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their

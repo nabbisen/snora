@@ -52,59 +52,66 @@ per-widget feature gates.
 
 **Threshold:** `cargo build -p snora-widgets` from cold cache
 exceeds **30 seconds on a developer's machine of average specs**
-(8-core laptop, SSD, 16 GB RAM, no other heavy work).
+(8-core laptop, SSD, 16 GB RAM, no other heavy work). **Unchanged by
+RFC-062** — the number is not wrong, only what has been read as
+measuring it was.
 
-Reasoning: snora's selling point includes a fast iteration cycle.
-If `cargo check` of the widget set on its own approaches the cost
-of recompiling iced, the per-widget gate becomes worth its
-documentation cost.
+**`build_widgets_ms` (`reference/build-cost-budget/compile-time.csv`) is
+not indicator 1's proxy, and RFC-062 retires the claim that it was.**
+The threshold is written against *a developer's machine*;
+`build_widgets_ms` measures GitHub CI, which since RFC-043 rebuilds
+iced's entire transitive closure from scratch on a shared runner. Those
+are different quantities — CI cold-build time under contended shared
+hardware is not developer-machine build time — and RFC-050 additionally
+showed the CI column carries 36–60% spread between identical-runner
+releases, so even restated in CI's own terms no single reading would be
+trustworthy. **The proxy was always measuring something else; RFC-043
+only made the mismatch visible** by removing the warm-cache artifact
+that had coincidentally kept early readings looking plausible.
 
-How to measure: `scripts/measure-compile-time.sh <version>` (see
-[`reference/build-cost-budget.md`](../reference/build-cost-budget.md)).
-Per-release values are tracked in
-[`reference/build-cost-budget/compile-time.csv`](../reference/build-cost-budget/compile-time.csv),
-appended on every release tag by the `build-cost` GitHub Actions workflow.
-The `build_widgets_ms` column is the indicator 1 proxy — with two caveats
-(RFC-050), stated because this is an absolute ceiling, not a trend, so
-RFC-050's `design_overhead_ratio` cannot substitute for it here:
+**How indicator 1 is actually assessed:** run
+`cargo build -p snora-widgets --release` from a `cargo clean -p
+snora-widgets` state, timed, on a machine matching the threshold's own
+description. **Current status: unassessed.** No such run has been
+recorded as of 2026-08-18 (RFC-062). This is stated as a fact, not
+softened — an indicator can be honestly *unassessed*, and that is a
+better state than one silently assessed by a proxy measuring a different
+quantity.
 
-- **The proxy currently reads 2.2×–3.5× the 30-second threshold on
-  every one of the last twelve releases** (0.26.0 through 0.34.0; the
-  one row under threshold, 0.25.3 at 353 ms, is the pre-RFC-043
-  cached-methodology artifact, not a real cold build) — so it cannot be
-  used as a trip-wire until it is recalibrated. By the letter of
-  indicator 1 ("if two or more of these become true, open a
-  discussion"), this one alone has read true for twelve consecutive
-  releases with no discussion opened, which is itself evidence the
-  proxy is miscalibrated rather than that the threshold is genuinely
-  and repeatedly breached.
-- **The likely reason: the threshold is written against "a developer's
-  machine of average specs" building `snora-widgets` cold, while the
-  proxy measures CI rebuilding the entire iced closure from scratch
-  (RFC-043)** — not the same quantity, and the calibration was never
-  restated when RFC-043 changed the methodology to a fully uncached
-  build. This caveat states the situation; **recalibrating the
-  threshold or deciding whether indicator 1 is genuinely tripped is a
-  separate decision, out of RFC-050's scope**, not resolved here.
+`build_widgets_ms` stays tracked in
+[`reference/build-cost-budget/compile-time.csv`](../reference/build-cost-budget/compile-time.csv)
+(appended on every release tag by the `build-cost` GitHub Actions
+workflow) for context and as RFC-050's own trend material via
+`design_overhead_ratio` — but it is **not** indicator 1's assessment,
+and a reader should not treat a CSV row as one.
 
 ### 2. Binary size measurably increases for engine-only consumers
 
-**Threshold:** the difference between
-
-```bash
-cargo build --release -p snora-example-hello
-cargo build --release -p snora-example-hello --no-default-features
-```
-
-exceeds **150 KB stripped** on Linux x86_64.
+**Threshold:** `widgets_diff_bytes` exceeds **150 KB stripped** on Linux
+x86_64. Unchanged by RFC-062 — only the method description below was
+stale.
 
 Reasoning: at a small absolute size the noise from iced itself
 swamps any saving. The threshold reflects "noticeable in a
 discriminating distribution" rather than "the largest possible
 absolute saving".
 
-How to measure: build both binaries, strip them
-(`strip --strip-all`), `wc -c` each. Re-measure on each release.
+**How to measure — corrected (RFC-062): this is not a diff of two
+`snora-example-hello` builds.** That description predates RFC-041/043;
+since RFC-041 the actual method is three probe crates
+(`size_probe_engine`, `size_probe_widgets`, `size_probe_design`) sharing
+a common baseline application, each adding exactly one minimal,
+representative call to the feature it measures — see
+[`binary-size-budget.md`](../reference/binary-size-budget.md) for why a
+naive feature-on/feature-off diff undercounts (RFC-041 found the
+original two-binary approach measured **0** bytes, because the
+`widgets`-enabled binary never *called* a widget, so the linker stripped
+the whole unused feature). `widgets_diff_bytes` is recorded per release
+in
+[`reference/binary-size-budget/binary-size.csv`](../reference/binary-size-budget/binary-size.csv),
+appended by the `binary-size` GitHub Actions workflow. **Current status:
+46,464 B (~45 KB) as of 0.35.0 — comfortably under the 150 KB
+threshold, not met.**
 
 ### 3. A widget gains a heavy optional dependency
 
@@ -232,20 +239,30 @@ and confirm it is still true for the path it describes; a claim can
 also hide across a line wrap that a naive single-line grep pattern
 misses.
 
-## Current status (snora 0.25.0)
+## Current status (snora 0.36.0, re-derived 2026-08-18, RFC-062)
 
-| Indicator | Status |
-|---|---|
-| 1. Compile time | Within budget. `build_widgets_ms` ≈96 s on ubuntu-latest (v0.19.1 baseline); `build_widgets_design_ms` to be measured at next CI tag. |
-| 2. Binary size | **Tracked with probe crates** from v0.25. Three size-probe binaries (engine / widgets / design) measure the marginal cost of each feature in isolation. See [`reference/binary-size-budget.md`](../reference/binary-size-budget.md). First probe-based data points expected after v0.25 CI tag. |
-| 3. Heavy optional dep | None — widgets share `iced` and `snora-core`; `design` adds `snora-design` (no iced dep, zero extra external crates). |
-| 4. Platform-specific dep | None. |
-| 5. Field requests | None. |
+**Every row states a measured value against its threshold and whether
+the threshold is met — a prose verdict alone is what let "Within
+budget" sit beside a 3.2×-over-threshold figure for ten minors
+(RFC-062).**
 
-Re-evaluate at each release. Update this table as part of the
-release process if anything changed (e.g. when indicator 2 starts
-crossing the threshold, this row should move from "Tracked" to a
-specific assessment).
+| Indicator | Threshold | Current | Met? |
+|---|---|---|---|
+| 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | 46,464 B (~45 KB) — `binary-size.csv`'s **latest available** row at cut time, 0.35.0; this release's row appends after the tag, and 0.36.0 added no dependency | **No** |
+| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
+| 5. Field requests | Three independent applications | None received | **No** |
+
+**At most one indicator could be met** (indicator 1, if a
+developer-machine measurement were taken and found over threshold) —
+short of the "two or more" the trigger requires. See
+[design decisions § coarse `widgets` feature gate](design-decisions.md#why-widget-feature-gating-is-coarse-not-per-widget)
+for the full not-fired statement.
+
+Re-evaluate at each release — `release-process.md`'s checklist now
+points here (RFC-062; previously nothing did, which is how this table
+went ten minors without an update).
 
 ## Icon and asset feature policy
 

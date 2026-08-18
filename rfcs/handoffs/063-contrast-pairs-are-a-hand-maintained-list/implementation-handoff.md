@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-063 derived contrast pairs
 
-**Governing RFC.** [RFC-063](../../proposed/063-contrast-pairs-are-a-hand-maintained-list.md)
+**Governing RFC.** [RFC-063](../../done/063-contrast-pairs-are-a-hand-maintained-list.md)
 **Status.** Inherited from RFC-063 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.0, alongside RFC-061 and RFC-062.
 **Implementation units.** One.

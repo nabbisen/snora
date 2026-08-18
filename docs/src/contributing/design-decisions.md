@@ -21,7 +21,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve |
 | Five crates (`-core`, `-design`, `-style`, `-widgets`, engine) | Accepted | A layer gains a second consumer that does not fit its crate, as the style bridge did (RFC-055) |
 | `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly |
-| Coarse `widgets` feature gate | Accepted | Two of the five feature-gating indicators are met |
+| Coarse `widgets` feature gate | Accepted — trigger checked, not fired (RFC-062) | Two of the five feature-gating indicators are met; at most one is (2026-08-18) |
 | `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) |
 | `AppLayout` is `#[non_exhaustive]` | Firm boundary | 1.0 freeze; no new overlays needed |
 | No `mod.rs` | Firm boundary | Rust edition change |
@@ -31,7 +31,7 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 | Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. |
 | Focus trapping deferred | Deferred — trigger fired, Q-1 (RFC-060) now the blocker | Concrete app: met (tekstide). Focus *querying* API: needs iced's `advanced` feature — a separate, measured decision (RFC-060 Q-1), not stable-by-default |
 | Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases |
-| No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API |
+| No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API — checked via `cargo tree -p snora --all-features \| grep -i accesskit`, empty as of 2026-08-18 (RFC-062) |
 
 ## Why no `PageContract` trait
 
@@ -297,6 +297,20 @@ binary size threshold, heavy optional deps, platform-specific
 deps, field requests) so future maintainers do not have to
 reconstruct the reasoning.
 
+**The trigger has not fired, checkable against the record rather than
+asserted (RFC-062).** Re-derived 2026-08-18: indicator 1 (compile time)
+is currently unassessed — the CI proxy `feature-gating-criteria.md`
+previously cited was measuring a different quantity and has been
+retired as a stand-in; indicators 2 through 5 are each confirmed *not*
+met — indicator 2 (binary size) reads 46,464 B (~45 KB) against a
+150 KB threshold, and 3, 4, and 5 have no qualifying instance as of this
+date. **At most one of the five indicators could be met** (indicator 1,
+if a real developer-machine measurement were taken and found over
+threshold) — which is short of the "two or more" the trigger requires
+regardless of that one unknown value. This is a checkable conclusion,
+not a restated verdict: the four confirmed-unmet indicators alone are
+sufficient to establish it.
+
 ## Why `AppLayout` has both fields and a builder
 
 Both are supported; the builder is the stable, documented canonical path.
@@ -525,6 +539,24 @@ technology too.
 
 Reconsideration trigger: iced exposes an accessibility API. Until then
 this stands, revisited deliberately rather than left to expire quietly.
+
+**The check attached to this trigger, credit tekstide (RFC-062):** the
+`grep -rniE "accesskit|accessibility_tree|widget::Id|semantic_id"
+crates/*/src/` above detects **snora's own** adoption of an
+accessibility API — it correctly supports the claim that snora has not
+built one, but it says nothing about whether *iced* has since exposed
+one for snora to integrate. The trigger is about iced's readiness, not
+snora's; a different command answers that question:
+
+```bash
+cargo tree -p snora --all-features | grep -i accesskit
+```
+
+**Verified 2026-08-18 (re-run twice to confirm): empty.** `iced_core`
+0.14 has no accessibility module and pulls in no `accesskit` dependency.
+The trigger has **not** fired, and the position recorded above remains
+accurate. Re-run this check, not just the `crates/*/src/` grep, at each
+future re-read of this trigger.
 
 [`TabBar`]: ../reference/vocabulary.md
 [`Crumb`]: ../reference/vocabulary.md

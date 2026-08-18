@@ -17,6 +17,126 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.36.0] — 2026-08-18
+
+### Added
+
+- **The pointer-target-size rule now has a height-axis assertion
+  (RFC-061).** `accessibility-checklist.md` has mandated a 24×24
+  logical-pixel minimum pointer target since it was written; nothing
+  asserted it — RFC-058's shape exactly, and raised by tekstide, who
+  noted the parallel themselves. `pointer_target_height_meets_24px_for_every_role_and_padding_step`
+  (`crates/snora-design/src/tests.rs`) asserts every `TextRole` ×
+  `Spacing` step combination (36 combinations × 4 presets, all passing;
+  the tightest margin is `label`/`xs` at 24.8px, 0.8px above the floor
+  — recorded so the next token edit meets it knowingly). The **width**
+  axis is not asserted — `content_advance` depends on the rendered
+  string, the font, and the shaping engine, none of which snora can
+  compute without a renderer — and is documented as review-only,
+  explicitly, so it cannot be mistaken for enforced.
+
+### Fixed
+
+- **`chip::removable`'s dismiss button was under the mandatory 24×24
+  pointer-target floor on its width axis (RFC-061).** Measured directly
+  against iced's shipped fallback font (FiraSans-Regular), not
+  estimated: **15.0 logical pixels** wide, against the WCAG 2.5.8 floor
+  of 24. Height already cleared it (24.8px, token-computed). Padding
+  alone could not reliably fix this — even `spacing.sm` reaches only
+  23.0px on the same font, one pixel short — so the button now has an
+  explicit minimum width, computed the same way its height already
+  resolves (`line_box + 2 × spacing.xs`), making it square at ~24.8px
+  and keeping the fix tied to the same tokens rather than a hard-coded
+  second "24". **This is an appearance change**, not a silent fix — see
+  [the 0.35→0.36 migration guide](docs/src/guides/migration-0.35-to-0.36.md).
+  `chip::filter` is unaffected.
+
+### Changed
+
+- **Feature-gating indicators recalibrated; the CI compile-time proxy
+  retired (RFC-062).** `feature-gating-criteria.md`'s status table read
+  indicator 1 (compile time) as "Within budget" while citing ≈96 s
+  against a 30-second threshold — over budget, in the document that
+  decides. Every row since 0.26.0 read 2.2×–3.5× over. The cause: the
+  threshold is written against a developer's machine; the column cited
+  as its proxy (`build_widgets_ms`) measures GitHub CI, which since
+  RFC-043 rebuilds iced's entire closure from scratch on shared,
+  noisy hardware — a different quantity, made visible by RFC-043,
+  not created by it. The claim that this column is indicator 1's proxy
+  is retired; indicator 1 is now recorded honestly as **unassessed**,
+  with the correct developer-machine command stated. Indicator 2's
+  documented method — diffing two `snora-example-hello` builds — has
+  been stale since RFC-041 replaced it with the three-probe-crate
+  method; corrected, with the 150 KB threshold unchanged. Every row in
+  the status table now carries a measured value and a met/not-met
+  verdict instead of a prose-only claim; indicators 3 and 4 were
+  re-checked against current manifests (`snora-style` arrived since the
+  table was last written) rather than inherited. `design-decisions.md`
+  now states explicitly, with numbers: at most one of the five
+  indicators could be met, short of the two the `widgets`-gate trigger
+  requires — the trigger has not fired. Separately, attached the
+  accessibility-tree reconsideration trigger to an actual check
+  (`cargo tree -p snora --all-features | grep -i accesskit`, credit
+  tekstide) — verified empty, so that trigger has not fired either.
+  `release-process.md`'s checklist now points at the status table,
+  which previously told readers to "update this table as part of the
+  release process" with nothing pointing at the instruction for ten
+  minors. Documentation only — `git diff --stat -- '**/*.rs'` is empty.
+
+- **Contrast pairs are now derived from a compiler-enforced declaration,
+  not a hand-maintained list (RFC-063).** tekstide's diagnosis after
+  RFC-058 fixed two instances: *"the list did not fail because it was
+  short; it failed because nothing about adding a role forces anyone to
+  measure it."* `Palette::usages` (`crates/snora-design/src/palette.rs`)
+  destructures `Palette` exhaustively and declares each role's intended
+  rendering surfaces and threshold class — `#[non_exhaustive]`
+  constrains other crates, not the one that defines it, so a role added
+  without a matching declaration entry fails to compile
+  (`E0027: pattern does not mention field ...`), demonstrated by a
+  probe: a nineteenth field added, the error captured, then reverted
+  (`git diff --stat -- crates/snora-design/` empty afterward — only
+  `palette.rs`/`tests.rs`'s real changes remain).
+  `mandatory_pairs` in `tests.rs` is now derived from this declaration;
+  no hand-written pair list remains, and `Palette::roles()` — the same
+  defect one level down, an 18-element array a nineteenth field could
+  silently miss — is removed, replaced by `usages()` for both contrast
+  pairing and colour-validity checking.
+
+  Not the cross-product: each role declares where it is *intended* to
+  render, not everywhere it technically could — `accent_text` declares
+  only `accent`, not the three neutral surfaces, since asserting it
+  there would be noise, and noise in an accessibility gate is how gates
+  get ignored. True fill/surface roles (`background`, `surface`,
+  `surface_raised`) declare no measurable surfaces, explicitly, rather
+  than being silently omitted from the list.
+
+  **Deriving the list surfaced one previously-unasserted pair:**
+  `focus/surface_raised` — `focus` was declared against all three
+  neutral surfaces for consistency with `border`'s declaration (a focus
+  ring, like a border, can appear around a control on any of them), and
+  the hand-written list had only ever asserted `focus/background` and
+  `focus/surface`. Checked before landing, per RFC-058's discipline:
+  passes on all four presets with wide margin (6.2:1–21:1) — a ratchet,
+  not a defect.
+
+  **Review found two more roles declared as measuring nothing that
+  should not have been: `accent` and `danger`.** Both back *filled,
+  borderless* buttons (`snora_style::button::{primary, danger}` —
+  `Border::default()`, width 0), so the fill itself is the button's
+  identifying boundary, the same argument RFC-058 used for the dialog
+  card's border, applied to a fill instead of a stroke. Declared against
+  the three neutral surfaces; all six new pairs pass with wide margin
+  (5.6:1–11.8:1) — another ratchet, no value change. `success`,
+  `warning`, and `info` were measured too (worst case 4.63–5.01:1,
+  comfortably passing either bar) but left undeclared: their only
+  usage (`snora-widgets/src/design/notice.rs`, a left accent bar and
+  border) is on an informational panel that also carries the tone in
+  its own text, a weaker fit for SC 1.4.11's "user interface component"
+  than a filled interactive button — recorded as an open question for a
+  future decision rather than resolved here. **26 pairs now asserted
+  across four presets (104 assertions total, up from 19 pairs / 76
+  assertions before this RFC), all passing.**
+
 ## [0.35.0] — 2026-08-18
 
 ### Added

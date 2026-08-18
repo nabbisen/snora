@@ -1,6 +1,6 @@
 # RFC 062 — The feature-gating status table contradicts its own threshold
 
-**Status.** Accepted (owner, 2026-08-18). Handoff:
+**Status.** Done — shipped in v0.36.0 (2026-08-18). Handoff:
 [`handoffs/062-…`](../handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md)
 **Tracks.** Measurement integrity / governance. Continues RFC-041, RFC-043,
 RFC-050.

@@ -1,6 +1,6 @@
 # RFC 061 — Pointer target size is a checklist rule with no assertion, and one control looks under it
 
-**Status.** Accepted (owner, 2026-08-18). Handoff:
+**Status.** Done — shipped in v0.36.0 (2026-08-18). Handoff:
 [`handoffs/061-…`](../handoffs/061-pointer-target-size-is-unasserted/implementation-handoff.md)
 **Tracks.** Accessibility. Raised by **tekstide** (Q4 and Q3, 2026-08-17);
 answered in correspondence 2026-08-18 and not yet reflected in the repository.

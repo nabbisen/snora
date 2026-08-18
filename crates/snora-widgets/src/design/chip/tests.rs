@@ -124,6 +124,21 @@ fn darken_clamps_to_zero() {
 }
 
 // ---------------------------------------------------------------------------
+// Pointer target size (RFC-061)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn remove_btn_target_size_clears_24px_floor_for_all_presets() {
+    for t in all_presets() {
+        let size = remove_btn_target_size(&t);
+        assert!(
+            size >= 24.0,
+            "remove_btn_target_size {size} < 24.0 pointer-target floor"
+        );
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Test helpers
 // ---------------------------------------------------------------------------
 

@@ -47,7 +47,7 @@
 
 use iced::{
     Border, Color, Element,
-    widget::{button, row, text},
+    widget::{button, container, row, text},
 };
 use snora_design::Tokens;
 
@@ -65,6 +65,14 @@ fn darken(color: Color, amount: f32) -> Color {
         b: (color.b - amount).max(0.0),
         a: color.a,
     }
+}
+
+/// The `remove` button's square pointer-target size (RFC-061): computed
+/// the same way its height already resolves — `line_box + 2 × spacing.xs`
+/// — so the width fix tracks any future token change automatically
+/// rather than hard-coding a second "24".
+fn remove_btn_target_size(tokens: &Tokens) -> f32 {
+    tokens.typography.label.size * tokens.typography.label.line_height + 2.0 * tokens.spacing.xs
 }
 
 /// Selected chip style: solid accent background + accent_text foreground.
@@ -172,11 +180,24 @@ pub fn removable<'a, Message: Clone + 'a>(
             .style(move |_theme, status| style_fn(&t_label, status))
             .into();
 
-    let remove_btn: Element<'a, Message> = button(text("×").size(style::text::label_size(tokens)))
-        .on_press_maybe(on_remove.into())
-        .padding([tokens.spacing.xs, tokens.spacing.xs])
-        .style(move |_theme, status| style_fn(&t_remove, status))
-        .into();
+    // Pointer-target size (RFC-061): the "×" glyph's own advance width is
+    // not token-derivable (font/shaping-dependent — measured at 15.0px
+    // total for the shipped fallback font at the current tokens, well
+    // under the 24px WCAG 2.5.8 floor). Padding alone cannot fix this
+    // reliably: even bumping to `spacing.sm` only reaches 23.0px on that
+    // same font, still short. Instead, the *content* box inside the
+    // button is forced to a computed width and its text centered within
+    // it — `iced::widget::button`'s own layout does not re-center a
+    // child when the button is simply widened (see `layout::padded`),
+    // so the centering has to happen one level in.
+    let target_size = remove_btn_target_size(tokens);
+    let content_width = target_size - 2.0 * tokens.spacing.xs;
+    let remove_btn: Element<'a, Message> =
+        button(container(text("×").size(style::text::label_size(tokens))).center_x(content_width))
+            .on_press_maybe(on_remove.into())
+            .padding([tokens.spacing.xs, tokens.spacing.xs])
+            .style(move |_theme, status| style_fn(&t_remove, status))
+            .into();
 
     row![label_btn, remove_btn].spacing(0).into()
 }

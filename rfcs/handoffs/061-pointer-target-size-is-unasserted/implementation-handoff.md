@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-061 pointer target size
 
-**Governing RFC.** [RFC-061](../../proposed/061-pointer-target-size-is-unasserted.md)
+**Governing RFC.** [RFC-061](../../done/061-pointer-target-size-is-unasserted.md)
 **Status.** Inherited from RFC-061 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.0.
 **Implementation units.** One.

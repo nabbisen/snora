@@ -16,6 +16,7 @@
 //! check this); alpha roles would need compositing first.
 
 use crate::contrast::contrast_ratio;
+use crate::palette::ThresholdClass;
 use crate::{Palette, Tokens};
 
 const AA_TEXT: f32 = 4.5;
@@ -36,10 +37,12 @@ fn all_presets() -> [(&'static str, Tokens); 4] {
 #[test]
 fn constructors_produce_valid_colors() {
     for (name, t) in all_presets() {
-        for (i, c) in t.palette.roles().iter().enumerate() {
+        for usage in t.palette.usages() {
             assert!(
-                c.is_valid(),
-                "{name}: palette role #{i} out of range: {c:?}"
+                usage.fg.is_valid(),
+                "{name}: palette role {} out of range: {:?}",
+                usage.label,
+                usage.fg
             );
         }
         assert!(
@@ -103,128 +106,33 @@ fn assert_pair(preset: &str, label: &str, fg: crate::Color, bg: crate::Color, mi
     assert!(r >= min, "{preset}: {label} contrast {r:.2} < {min}");
 }
 
+/// Derives every mandatory contrast pair from [`Palette::usages`]
+/// (RFC-063) — no hand-written pair list. A role's surfaces and
+/// threshold class are declared once, in `palette.rs`, under exhaustive-
+/// destructuring compiler enforcement; adding a `Palette` field without
+/// declaring where it renders fails to compile there, before this
+/// function ever runs. `class: None` (the fill/surface roles) is
+/// skipped — they were declared as measuring nothing, deliberately.
 fn mandatory_pairs(preset: &str, p: &Palette) {
-    // Body text on surfaces.
-    assert_pair(
-        preset,
-        "text_primary/background",
-        p.text_primary,
-        p.background,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_primary/surface",
-        p.text_primary,
-        p.surface,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_primary/surface_raised",
-        p.text_primary,
-        p.surface_raised,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_secondary/background",
-        p.text_secondary,
-        p.background,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_secondary/surface",
-        p.text_secondary,
-        p.surface,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_secondary/surface_raised",
-        p.text_secondary,
-        p.surface_raised,
-        AA_TEXT,
-    );
-    // Muted text (RFC-058): lowest-contrast text role, previously exempt
-    // from mandatory contrast on an invented WCAG basis — SC 1.4.3 has no
-    // "non-essential text" exemption. Asserted against all three surfaces,
-    // like every other text role.
-    assert_pair(
-        preset,
-        "text_muted/background",
-        p.text_muted,
-        p.background,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_muted/surface",
-        p.text_muted,
-        p.surface,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "text_muted/surface_raised",
-        p.text_muted,
-        p.surface_raised,
-        AA_TEXT,
-    );
-    // On-accent text.
-    assert_pair(
-        preset,
-        "accent_text/accent",
-        p.accent_text,
-        p.accent,
-        AA_TEXT,
-    );
-    // Danger button foreground (mandatory: danger button ships in v0.20).
-    assert_pair(
-        preset,
-        "danger_text/danger",
-        p.danger_text,
-        p.danger,
-        AA_TEXT,
-    );
-    // Other status foregrounds (required as their primitives ship; verified now).
-    assert_pair(
-        preset,
-        "success_text/success",
-        p.success_text,
-        p.success,
-        AA_TEXT,
-    );
-    assert_pair(
-        preset,
-        "warning_text/warning",
-        p.warning_text,
-        p.warning,
-        AA_TEXT,
-    );
-    assert_pair(preset, "info_text/info", p.info_text, p.info, AA_TEXT);
-    // Focus indicator (non-text target).
-    assert_pair(preset, "focus/background", p.focus, p.background, FOCUS_MIN);
-    assert_pair(preset, "focus/surface", p.focus, p.surface, FOCUS_MIN);
-    // Border (non-text target; identifies component boundaries on surfaces
-    // where the border is the sole visual boundary, e.g. the RFC-039 dialog
-    // card). RFC-058.
-    assert_pair(
-        preset,
-        "border/background",
-        p.border,
-        p.background,
-        NON_TEXT_MIN,
-    );
-    assert_pair(preset, "border/surface", p.border, p.surface, NON_TEXT_MIN);
-    assert_pair(
-        preset,
-        "border/surface_raised",
-        p.border,
-        p.surface_raised,
-        NON_TEXT_MIN,
-    );
+    for usage in p.usages() {
+        let Some(class) = usage.class else {
+            continue;
+        };
+        let min = match class {
+            ThresholdClass::Text => AA_TEXT,
+            ThresholdClass::Focus => FOCUS_MIN,
+            ThresholdClass::NonText => NON_TEXT_MIN,
+        };
+        for (surface_label, surface_color) in usage.surfaces {
+            assert_pair(
+                preset,
+                &format!("{}/{surface_label}", usage.label),
+                usage.fg,
+                surface_color,
+                min,
+            );
+        }
+    }
 }
 
 #[test]
@@ -245,6 +153,58 @@ fn high_contrast_presets_exceed_aa_for_primary_text() {
         };
         let r = contrast_ratio(t.palette.text_primary, t.palette.background);
         assert!(r >= 7.0, "{name}: primary text contrast {r:.2} < 7.0");
+    }
+}
+
+// ---- pointer target size (RFC-061) ----
+
+/// WCAG 2.5.8 mandatory pointer-target minimum, logical pixels.
+const POINTER_TARGET_MIN_HEIGHT: f32 = 24.0;
+
+#[test]
+fn pointer_target_height_meets_24px_for_every_role_and_padding_step() {
+    // Height is `line_box + 2 × vertical_padding`, and both terms are
+    // token values — the same property that lets the contrast suite
+    // run without a renderer. Width (`content_advance +
+    // 2 × horizontal_padding`) depends on the rendered string, the
+    // font, and the shaping engine; snora cannot compute it and does
+    // not assert it here — see accessibility-checklist.md for why, and
+    // for the 44×44 preferred bar's per-combination status.
+    //
+    // Q-2 (RFC-061): asserts every `TextRole` × `Spacing` step
+    // combination, not only the ones a prefab control actually uses.
+    // Enumerating "the ones a control uses" would re-derive a
+    // hand-maintained list of call sites — the same failure mode that
+    // made three prior handoff scopes short this cycle. The full
+    // matrix costs nothing to compute and is a stronger ratchet.
+    for (name, t) in all_presets() {
+        let ty = t.typography;
+        let sp = t.spacing;
+        for (role_name, role) in [
+            ("body", ty.body),
+            ("body_small", ty.body_small),
+            ("label", ty.label),
+            ("title", ty.title),
+            ("heading", ty.heading),
+            ("display", ty.display),
+        ] {
+            for (step_name, step) in [
+                ("xs", sp.xs),
+                ("sm", sp.sm),
+                ("md", sp.md),
+                ("lg", sp.lg),
+                ("xl", sp.xl),
+                ("xxl", sp.xxl),
+            ] {
+                let line_box = role.size * role.line_height;
+                let height = line_box + 2.0 * step;
+                assert!(
+                    height >= POINTER_TARGET_MIN_HEIGHT,
+                    "{name}: {role_name}/{step_name} height {height:.1} \
+                     < {POINTER_TARGET_MIN_HEIGHT} (line_box {line_box:.1} + 2×{step})"
+                );
+            }
+        }
     }
 }
 

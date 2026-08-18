@@ -65,10 +65,26 @@ Snora Design does not and cannot guarantee:
     boundaries, not one role: RFC-058 found `border` untested and failing
     (1.19-1.43:1 in light/dark) precisely because this rule had only ever
     been written against `focus`.
-[ ] Any new palette pair added for this primitive is listed in the
-    contrast-tests module in snora-design and passes `cargo test -p snora-design`.
+[ ] If this primitive introduces a **new** `Palette` role, its intended
+    surfaces and threshold class are declared in `Palette::usages`
+    (`crates/snora-design/src/palette.rs`, RFC-063) — the compiler
+    enforces this: a role added without a declaration fails to compile
+    there (`E0027`), not silently ships untested. `mandatory_pairs` is
+    derived from the declaration; there is no separate pair list to
+    edit. If this primitive reuses an **existing** role on a surface it
+    is not yet declared to render on, add that surface to the role's
+    declaration and confirm `cargo test -p snora-design` passes.
 [ ] If the primitive uses an alpha/translucent color, it is composited over
     the tested background before the contrast ratio is computed.
+    **This rule is correct and stays armed, but untested by anything
+    snora ships (RFC-061, tekstide Q3): every colour across all four
+    built-in presets is `Color::rgb(...)`, not one `rgba` — verified by
+    `grep -rn "rgba" crates/snora-design/src/presets/` returning
+    nothing. The compositing path applies to applications introducing
+    their own translucent tokens, not to any preset role today.** If
+    this primitive is the first to introduce one, `composite_over` is
+    correct but has no prior in-repo exercise to point to as proof — it
+    is your primitive that first tests it for real.
 [ ] Disabled states are noted as exempt from mandatory contrast
     (WCAG 1.4.3 exception) but are still legible.
 ```
@@ -125,12 +141,71 @@ Snora Design does not and cannot guarantee:
 
 ### Pointer target size
 
+**The two axes are enforced differently, and a reader should not assume
+otherwise (RFC-061).** A control's target height is `line_box +
+2 × vertical_padding`, and both terms are token values — the same
+property that makes the contrast suite possible without a renderer, so
+the **height axis is mechanically asserted**:
+`pointer_target_height_meets_24px_for_every_role_and_padding_step` in
+`crates/snora-design/src/tests.rs` checks every `TextRole` × `Spacing`
+step combination (36 combinations, all four presets), not only the ones
+a prefab control actually uses — enumerating "the ones a control uses"
+would re-derive a hand-maintained list of call sites, the same failure
+mode RFC-058/059/060 each hit once this cycle.
+
+A control's target **width** is `content_advance +
+2 × horizontal_padding`, and `content_advance` depends on the rendered
+string, the font, and the shaping engine — snora cannot compute it
+without a renderer, and `render_semantics` asserts composition, not
+pixel geometry. **The width axis is review-only, not asserted, and this
+is a limitation to work around at review time, not a solved problem.**
+A primitive with a short, narrow label (an icon-only or single-glyph
+button, in particular) needs its width checked by hand or by a rendered
+probe — see the checklist item below.
+
 ```text
-[ ] Interactive controls have a minimum tap/click area of 24×24 logical
-    pixels. 44×44 is the preferred minimum for finger-sized targets.
+[ ] Height clears 24 logical pixels (mandatory) — verified by
+    `cargo test -p snora-design`, not by inspection; if the assertion is
+    green, this item is satisfied.
+[ ] Width clears 24 logical pixels (mandatory, but NOT mechanically
+    checked) — measure by hand or with a rendered/font-metrics probe for
+    any primitive whose visible label is short (a single glyph or icon
+    is the case most likely to fail; RFC-061 found `chip`'s dismiss "×"
+    button at 15.0px wide against the shipped fallback font before it
+    was fixed). Do not assume padding alone clears the floor — it does
+    not always: `spacing.sm` padding around that same "×" glyph reaches
+    only 23.0px, still short.
+[ ] 44×44 is the *preferred*, not mandatory, minimum — not every
+    role/padding combination meets it. See
+    `docs/src/contributing/accessibility-checklist.md`'s companion
+    reference for which combinations do (25 of 36 in the current token
+    set); do not assume 44 is met just because 24 is.
 [ ] Spacing tokens (tokens.spacing.sm or larger) are used for padding
     rather than zero or near-zero values that would collapse the target.
 ```
+
+**The thinnest height margin in the current token set: `label` role at
+`xs` padding clears 24 by 0.8 logical pixels** (24.8px) — the tightest
+combination in the 36-entry matrix. A future reduction to either
+`Typography::default_roles().label` or `Spacing::comfortable().xs`
+could push this below the mandatory floor; the height assertion would
+catch it, but the margin is recorded here too, the same way RFC-058
+recorded `dark`'s 4.526:1 contrast margin — a fact the next token edit
+should meet knowingly, not discover by a red CI run.
+
+**44×44 preferred-bar status, per role/padding combination** (36 total;
+✓ = meets 44px, current token set):
+
+| Role \ Step | xs | sm | md | lg | xl | xxl |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| `body` | | | ✓ | ✓ | ✓ | ✓ |
+| `body_small` | | | | ✓ | ✓ | ✓ |
+| `label` | | | | ✓ | ✓ | ✓ |
+| `title` | | | ✓ | ✓ | ✓ | ✓ |
+| `heading` | | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `display` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+
+25 of 36 combinations meet 44px; all 36 meet the mandatory 24px floor.
 
 ### Typography and line-height
 

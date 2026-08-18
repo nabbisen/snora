@@ -9,6 +9,10 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.35 → 0.36](migration-0.35-to-0.36.md) — `chip::removable`'s dismiss
+  button gained a fixed minimum width — a WCAG 2.5.8 pointer-target-size
+  repair (measured 15.0px wide against the shipped font, now ~24.8px
+  square); an appearance change, not an API change.
 - [0.33 → 0.34](migration-0.33-to-0.34.md) — `light`/`dark`'s `border` colour
   repaired for WCAG 2.1 SC 1.4.11 (was 1.19-1.43:1 against surfaces, now
   >= 3.0:1) — an accessibility fix, not a restyle; `high_contrast_*`
