@@ -65,6 +65,15 @@ Snora Design does not and cannot guarantee:
     boundaries, not one role: RFC-058 found `border` untested and failing
     (1.19-1.43:1 in light/dark) precisely because this rule had only ever
     been written against `focus`.
+[ ] Any contrast figure published outside this repository — CHANGELOG,
+    migration guide, release notes, correspondence — is the **worst case
+    across the surfaces the role renders on**, and *says so*. Quoting the
+    worst case is correct for a conformance claim; quoting it under a label
+    naming one surface is not. A downstream team (orbok, 2026-08-18) read a
+    disagreement into our 0.34.0 figures because a table header said "vs
+    `surface`" while the `dark` row quoted `surface_raised` — both numbers
+    right, the label wrong. They asked for the note explicitly: it tells a
+    reader which pairing to reproduce before concluding anything.
 [ ] If this primitive introduces a **new** `Palette` role, its intended
     surfaces and threshold class are declared in `Palette::usages`
     (`crates/snora-design/src/palette.rs`, RFC-063) — the compiler
