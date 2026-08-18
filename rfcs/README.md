@@ -104,6 +104,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 061 | [Pointer target size is a checklist rule with no assertion](./proposed/061-pointer-target-size-is-unasserted.md) | v0.36.0 — raised by tekstide (Q4); one candidate violation already identified |
 
 ## Archive
 
