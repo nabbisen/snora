@@ -1,8 +1,9 @@
 # RFC 061 — Pointer target size is a checklist rule with no assertion, and one control looks under it
 
-**Status.** Proposed
-**Tracks.** Accessibility. Raised by **tekstide** (Q4, 2026-08-17); answered in
-correspondence 2026-08-18 and not yet reflected in the repository.
+**Status.** Accepted (owner, 2026-08-18). Handoff:
+[`handoffs/061-…`](../handoffs/061-pointer-target-size-is-unasserted/implementation-handoff.md)
+**Tracks.** Accessibility. Raised by **tekstide** (Q4 and Q3, 2026-08-17);
+answered in correspondence 2026-08-18 and not yet reflected in the repository.
 **Touches.** `crates/snora-design/src/tests.rs`,
 `crates/snora-widgets/src/design/chip.rs` (possibly),
 `docs/src/contributing/accessibility-checklist.md`, `CHANGELOG.md`.
@@ -78,6 +79,35 @@ promise a guarantee on an axis we cannot measure.
 4. **Record the 44×44 preferred bar's status** — it is met by some
    role/padding combinations and not others; say which, rather than leaving a
    second unasserted number beside the first.
+5. **Answer tekstide's Q3 in the same file** — see below.
+
+## Folded in: `composite_over` is guidance nothing we ship exercises (Q3)
+
+`accessibility-checklist.md:70` reads:
+
+> `[ ]` If the primitive uses an alpha/translucent color, it is composited over
+> the tested background before the contrast ratio is computed.
+
+That guidance is **correct and stays**. What is missing is that **no built-in
+preset role is translucent** — verified: every colour across all four presets is
+`Color::rgb(...)`, and there is not one `rgba`. So the compositing path is not
+exercised by anything snora ships.
+
+tekstide asked precisely this, because they have a modal scrim at alpha 0.55 and
+had to reason it through, and said `composite_over` was *"the piece we would
+most likely have got wrong on our own."* They deserved to know it is correct but
+not battle-tested by us.
+
+This is folded in rather than given its own RFC because it is one caveat in the
+same file this RFC already opens — and because leaving it in outbound
+correspondence only would be the same defect RFC-059 exists to stop: an answer
+that lives where the consumer cannot find it.
+
+**Scope:** one note attached to that checklist line stating that no built-in
+role is translucent today, so the rule applies to applications introducing their
+own translucent tokens rather than to snora's own primitives. Do not weaken or
+remove the rule — a rule that becomes live the moment a translucent token is
+added is worth keeping armed.
 
 ## Non-goals
 
@@ -130,7 +160,10 @@ RFC-058 recorded `dark`'s 4.526:1 — as a fact the next token edit must respect
    failing-first evidence or documented as exempt with the reasoning.
 4. The 44×44 preferred bar's status recorded per role/padding combination.
 5. Q-3's margin recorded.
-6. `render_semantics` passes unmodified.
+6. **tekstide's Q3 answered in the checklist**: the `composite_over` line
+   carries a note that no built-in preset role is translucent, with the rule
+   itself unchanged.
+7. `render_semantics` passes unmodified.
 
 ## Compatibility and security
 
