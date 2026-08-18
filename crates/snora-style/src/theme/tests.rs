@@ -482,3 +482,46 @@ fn is_dark_matches_preset_intent() {
         "high_contrast_dark preset should be dark"
     );
 }
+
+/// RFC-065 review R-1: `snora_design::surfaces::modal_dim` reimplements
+/// `iced::theme::palette::is_dark`'s OKLCH-lightness classification
+/// iced-free, so `snora-design` can classify a background without
+/// depending on iced to do it. Nothing previously asserted the two
+/// classifications agree beyond the four built-in presets — an
+/// unasserted equivalence claim, the exact shape RFC-058/061/064 each
+/// closed elsewhere. `snora-style` is the only crate with both `iced`
+/// and `snora-design` in scope, so the check belongs here.
+///
+/// `modal_dim`'s pole choice is driven entirely by that classification
+/// (white pole iff the background classifies dark) — a change of pole
+/// as `background` sweeps a color grid is a direct, cheap probe of
+/// agreement with `iced::theme::palette::is_dark`, without needing
+/// `snora-design` to expose the classifier itself as public API.
+#[test]
+fn modal_dim_pole_choice_agrees_with_iced_is_dark_across_a_color_grid() {
+    let mut tokens = Tokens::light();
+    let steps = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+
+    for &r in &steps {
+        for &g in &steps {
+            for &b in &steps {
+                let background = SnColor::rgb(r, g, b);
+                tokens.palette.background = background;
+
+                let dim = snora_design::surfaces::modal_dim(&tokens);
+                let snora_design_dark = dim.r > 0.5; // white pole chosen iff classified dark
+                let iced_dark = is_dark(to_iced_color(background));
+
+                assert_eq!(
+                    snora_design_dark,
+                    iced_dark,
+                    "background rgb({r:.1}, {g:.1}, {b:.1}): snora_design::surfaces \
+                     classified {}, iced::theme::palette::is_dark classified {} — the two \
+                     implementations disagree",
+                    if snora_design_dark { "dark" } else { "light" },
+                    if iced_dark { "dark" } else { "light" }
+                );
+            }
+        }
+    }
+}

@@ -60,6 +60,9 @@ mod presets;
 pub mod radius;
 /// [`Spacing`] scale.
 pub mod spacing;
+/// Composited/derived surfaces that are not a `Palette` role
+/// ([`surfaces::modal_dim`], RFC-065).
+pub mod surfaces;
 /// The top-level [`Tokens`] bundle and its constructors.
 pub mod tokens;
 /// Text role and [`Typography`] scale (size + line-height).

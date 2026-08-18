@@ -17,6 +17,39 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.37.0] — 2026-08-18
+
+### Fixed
+
+- **The `design`-path modal dim is now a measured surface, and `light`'s
+  dialog card was failing on it (RFC-065).** RFC-063 closed the *role*
+  axis — no `Palette` role can ship without declaring where it renders —
+  but the modal dim is not a role; it is composited at render time, so
+  `Palette::usages` could not see it and nothing measured it. Measured:
+  the `light` preset's dialog card was distinguishable from its own
+  dimmed backdrop at **2.85:1** by either signal (border or fill), below
+  WCAG 2.1 SC 1.4.11's 3:1, worst case across the three surfaces a modal
+  can open over. Repaired by moving `DIM_ALPHA` from `0.40` to `0.44`
+  (`snora_design::surfaces::modal_dim`, previously a private helper in
+  the `snora` crate calling `iced::theme::palette::is_dark` directly, now
+  a pure `snora-design` function `snora`'s renderer calls). Before/after,
+  all four presets, worst backdrop:
+
+  | preset | before | after |
+  |---|---|---|
+  | `light` | **2.85 — FAIL** | **3.24** |
+  | `dark` | 3.18 | 3.64 |
+  | `high_contrast_light` | 7.37 | 6.48 |
+  | `high_contrast_dark` | 5.25 | 4.56 |
+
+  `documentation-test-policy.md`'s sibling gap is `api-governance.md`'s:
+  the *surface* axis is now recorded beside RFC-063's *role* axis — a new
+  composited/derived surface carries the same declare-and-measure
+  obligation a new role does, and `accessibility-checklist.md`'s Contrast
+  section covers it as a class. Appearance change on the `design` path
+  only; the unstyled/engine path's dim is untouched. See the
+  [0.36 → 0.37 migration guide](docs/src/guides/migration-0.36-to-0.37.md).
+
 ## [0.36.1] — 2026-08-18
 
 ### Changed

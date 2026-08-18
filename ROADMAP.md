@@ -102,6 +102,17 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.37.0** — The modal dim became a measurable surface (RFC-065). RFC-063
+  closed the *role* axis — no `Palette` role can be added without declaring
+  where it renders — but not the *surface* axis: the dim is derived at render
+  time and was invisible to a contrast suite that can only name `Palette`
+  surfaces. Measured, `light`'s dialog card was distinguishable from its own
+  dimmed backdrop at **2.85:1**, below SC 1.4.11's 3:1, by either available
+  signal. The derivation moved into `snora-design` as a pure function so one
+  definition serves both the engine and the suite, and `DIM_ALPHA` went 0.40 →
+  0.44 — an appearance change: every modal on the `design` path dims slightly
+  harder. Found by transposing a defect **tekstide** reported in their *own*
+  codebase, where it passed; here it failed.
 - **0.36.1** — Every `ignore`-fenced doctest audited (RFC-064). `ignore` was
   the fence anyone reached for and nothing asked why: of 19, 16 were promoted
   to their strongest reachable rung — one to a full run, having carried an

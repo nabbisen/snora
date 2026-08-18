@@ -9,6 +9,10 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.36 → 0.37](migration-0.36-to-0.37.md) — the `design`-path modal dim's
+  alpha repaired for WCAG 2.1 SC 1.4.11 (was 2.85:1 in `light`, now
+  >= 3.0:1 in all four presets) — an accessibility fix, not a restyle;
+  the unstyled/engine path unaffected.
 - [0.35 → 0.36](migration-0.35-to-0.36.md) — `chip::removable`'s dismiss
   button gained a fixed minimum width — a WCAG 2.5.8 pointer-target-size
   repair (measured 15.0px wide against the shipped font, now ~24.8px

@@ -19,7 +19,11 @@
 use crate::Color;
 
 /// Converts a single normalized sRGB channel to linear-light.
-fn linearize_srgb_channel(c: f32) -> f32 {
+///
+/// `pub(crate)`: reused by [`crate::surfaces`]'s OKLCH-lightness
+/// classification (RFC-065), so the sRGB→linear step has one definition
+/// rather than two that could drift apart.
+pub(crate) fn linearize_srgb_channel(c: f32) -> f32 {
     if c <= 0.04045 {
         c / 12.92
     } else {

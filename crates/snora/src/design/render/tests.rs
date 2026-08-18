@@ -30,7 +30,7 @@ use iced::Size;
 use iced::widget::Id;
 use iced_test::Simulator;
 use snora_core::{AppLayout, Dialog};
-use snora_design::{Color as SnColor, Tokens, contrast::contrast_ratio};
+use snora_design::{Color as SnColor, Tokens, contrast::contrast_ratio, surfaces::DIM_ALPHA};
 
 const AA: f32 = 4.5;
 

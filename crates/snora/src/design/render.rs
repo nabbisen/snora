@@ -44,22 +44,31 @@
 //! theme tiers, here for a fixed constant instead of a derived one.
 //!
 //! [`dim_color`] instead picks the dim's base color from
-//! **`background`'s own darkness**, not a fixed pole:
-//! [`iced::theme::palette::is_dark`] on the emitted `background` color —
-//! `Color::WHITE` if dark, `Color::BLACK` if light — at the same 40%
-//! alpha as before. This has no clamping edge case (unlike
+//! **`background`'s own darkness**, not a fixed pole — `Color::WHITE` if
+//! dark, `Color::BLACK` if light. This has no clamping edge case (unlike
 //! `shift_away_from`'s OKLCH-lightness shift): alpha-compositing a color
 //! chosen to be the *opposite* pole from the background's own category
 //! can never degenerate to a no-op, because the two poles cannot both
-//! describe the same background. Verified against all four presets in
-//! `render/tests.rs`, including the two clamping cases that broke
-//! RFC-038's first attempt — `light`'s pure-white background and
-//! `high_contrast_dark`'s pure-black one — neither of which is a
-//! clamping case *here* precisely because the derivation never tries to
-//! move a color away from its own tone; it only ever chooses between two
-//! fixed, maximally-distinct poles.
+//! describe the same background. Safe at both luminance extremes —
+//! `light`'s pure-white background and `high_contrast_dark`'s pure-black
+//! one, the two cases that broke RFC-038's first attempt — precisely
+//! because the derivation never tries to move a color away from its own
+//! tone; it only ever chooses between two fixed, maximally-distinct
+//! poles.
+//!
+//! **The derivation itself lives in [`snora_design::surfaces::modal_dim`]
+//! (RFC-065), not here.** `dim_color` is a thin adapter: it calls that
+//! function and converts the result to [`iced::Color`]. This is not the
+//! same alpha as the unstyled path's `0.4` any more —
+//! [`snora_design::surfaces::DIM_ALPHA`] is `0.44`, repaired because the
+//! `light` preset's dialog card was measured at 2.85:1 against its own
+//! dimmed backdrop, below SC 1.4.11's 3:1 floor, by either signal (border
+//! or fill). The two paths were symmetric at `0.40` by coincidence, not
+//! design; RFC-065 lets them diverge on purpose. See
+//! `crates/snora-design/src/tests.rs` for the either-signal assertion
+//! this repair answers, and `render/tests.rs` for the alpha and pole
+//! tests on this crate's own adapter.
 
-use iced::theme::palette::is_dark;
 use iced::widget::Responsive;
 use iced::{Element, Size};
 use snora_core::AppLayout;
@@ -71,11 +80,6 @@ use snora_style::color::to_iced_color;
 
 use crate::overlay::dialog::DialogCardStyle;
 use crate::render::{ChromeStyle, render_with_style};
-
-/// Alpha applied to the derived dim color. Matches the unstyled path's
-/// literal (`Color::from_rgba(0.0, 0.0, 0.0, 0.4)`) — only the base color
-/// becomes token-derived, not the strength of the dim.
-const DIM_ALPHA: f32 = 0.4;
 
 /// Derives a complete, token-styled render from an [`AppLayout`]: the
 /// dialog gets a real card (fill, border, radius, padding), and the
@@ -175,18 +179,13 @@ fn chrome_style(tokens: &Tokens) -> ChromeStyle {
 }
 
 /// See the module documentation's "The modal dim" section for the full
-/// derivation rationale.
+/// derivation rationale. A thin adapter over
+/// [`snora_design::surfaces::modal_dim`] (RFC-065) — the derivation
+/// itself, and [`snora_design::surfaces::DIM_ALPHA`], live there as the
+/// single source; this function only converts the result to
+/// [`iced::Color`].
 fn dim_color(tokens: &Tokens) -> iced::Color {
-    let background = to_iced_color(tokens.palette.background);
-    let base = if is_dark(background) {
-        iced::Color::WHITE
-    } else {
-        iced::Color::BLACK
-    };
-    iced::Color {
-        a: DIM_ALPHA,
-        ..base
-    }
+    to_iced_color(snora_design::surfaces::modal_dim(tokens))
 }
 
 /// See the module documentation's "The dialog card" section.

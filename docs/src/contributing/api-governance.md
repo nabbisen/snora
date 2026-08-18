@@ -206,6 +206,23 @@ hand-written pair list). The declaration is crate-private and
 are otherwise unconstrained — the enforcement is about *measuring* a new
 role, not about permission to add one.
 
+**Adding a composited or derived surface carries the same obligation,
+beside the role rule above (RFC-065).** `Palette::usages` can only
+declare where a *role* renders; it has no way to express a surface that
+is not a `Palette` field at all — the modal dim, composited at render
+time from `background`'s own darkness and an alpha constant, is such a
+surface, and RFC-063's mechanism could not see it. RFC-065 measured it
+at 2.85:1 in `light` against SC 1.4.11's 3:1, unmeasured for as long as
+the surface existed. The rule this establishes: a new composited or
+derived surface must be expressed as a pure function over `Tokens` in
+`snora-design` — not reimplemented at the render site that consumes it
+— and asserted in `snora-design`'s own test suite
+(`crates/snora-design/src/surfaces.rs`, `crates/snora-design/src/tests.rs`),
+the same one contrast suite the role rule keeps single. The role axis
+and the surface axis are declared independently; a primitive can
+violate either one without violating the other, so neither compiler
+enforcement nor a written rule for one substitutes for the other.
+
 ### Forbidden without reopening the gate
 
 - Removing, renaming, or retyping any item in the frozen surface.

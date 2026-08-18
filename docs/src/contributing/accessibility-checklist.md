@@ -83,6 +83,19 @@ Snora Design does not and cannot guarantee:
     edit. If this primitive reuses an **existing** role on a surface it
     is not yet declared to render on, add that surface to the role's
     declaration and confirm `cargo test -p snora-design` passes.
+[ ] If this primitive introduces a **new composited or derived surface** —
+    a color computed at render time rather than read directly from a
+    `Palette` role (an overlay scrim, a hover/pressed tint, anything
+    `Palette::usages` cannot see because it is not a `Palette` field) —
+    it is measured the same way a role would be: a pure function over
+    `Tokens` in `snora-design`, asserted in that crate's own test suite,
+    not left for `Palette::usages` to catch by coincidence. RFC-065 found
+    the modal dim this way: derived at render time in the `snora` crate,
+    invisible to the contrast suite, and failing in `light` (2.85:1
+    against SC 1.4.11's 3:1) for the entire time nothing measured it. The
+    role axis (previous item) and the surface axis are declared
+    separately in `api-governance.md`; a primitive can violate either one
+    independently of the other.
 [ ] If the primitive uses an alpha/translucent color, it is composited over
     the tested background before the contrast ratio is computed.
     **This rule is correct and stays armed, but untested by anything

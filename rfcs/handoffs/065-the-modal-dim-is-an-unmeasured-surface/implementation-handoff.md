@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-065 the modal dim
 
-**Governing RFC.** [RFC-065](../../proposed/065-the-modal-dim-is-an-unmeasured-surface.md)
+**Governing RFC.** [RFC-065](../../done/065-the-modal-dim-is-an-unmeasured-surface.md)
 **Status.** Inherited from RFC-065 — Accepted (owner, 2026-08-18).
 **Release target.** 0.37.0 (minor — `design`-path appearance change).
 **Implementation units.** One.

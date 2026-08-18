@@ -103,12 +103,12 @@ Numbers remain stable forever and are never reused.
 | 062 | [The feature-gating status table contradicts its own threshold](./done/062-feature-gating-indicators-are-uncalibrated.md) | v0.36.0 (handoff: [`handoffs/062-…`](./handoffs/062-feature-gating-indicators-are-uncalibrated/implementation-handoff.md)) |
 | 063 | [The contrast pair list is hand-maintained](./done/063-contrast-pairs-are-a-hand-maintained-list.md) | v0.36.0 (handoff: [`handoffs/063-…`](./handoffs/063-contrast-pairs-are-a-hand-maintained-list/implementation-handoff.md)) |
 | 064 | [`rust,ignore` is the default nobody has to justify](./done/064-ignored-doctests-are-unaudited.md) | v0.36.1 (handoff: [`handoffs/064-…`](./handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md)) |
+| 065 | [The modal dim is an unmeasured surface](./done/065-the-modal-dim-is-an-unmeasured-surface.md) | v0.37.0 (handoff: [`handoffs/065-…`](./handoffs/065-the-modal-dim-is-an-unmeasured-surface/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 065 | [The modal dim is an unmeasured surface](./proposed/065-the-modal-dim-is-an-unmeasured-surface.md) | **accepted** → v0.37.0 (axis reported by tekstide) — handoff: [`handoffs/065-…`](./handoffs/065-the-modal-dim-is-an-unmeasured-surface/implementation-handoff.md) |
 
 ## Archive
 
