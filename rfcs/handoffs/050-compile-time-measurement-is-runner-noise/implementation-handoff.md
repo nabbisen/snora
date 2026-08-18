@@ -15,11 +15,12 @@ watch points onto it, and record why the absolute columns are not a trend.
 
 ## 2. Purpose
 
-Six compile-time columns vary **36–60%** across four releases on identical
+Six compile-time columns vary **36–60%** across five releases on identical
 runner, rustc and methodology, and a **documentation-only** release moved every
 one of them 36–55%. The variance is common-mode, so a ratio between two
 same-run measurements cancels the runner. One ratio does this well:
-**1.8% spread**, a 23-fold noise reduction.
+**2.5% spread** across five rows, a 16-fold noise reduction — and it held on
+the 0.34.0 row, which was measured after the ratio was chosen.
 
 Gate 9b has now been reopened or reset three times (RFC-041, RFC-043,
 RFC-052) and the noise has **roughly doubled** since the RFC was first written.
@@ -32,7 +33,7 @@ The version of RFC-050 you are implementing is **not** the one from 2026-08-15.
 The re-derivation on post-RFC-052 data reversed two things:
 
 1. **`widgets_design_ratio` is dropped.** It measured 5.9% pre-fix and
-   **14.9% post-fix** — worse than several columns' raw spread. Its earlier
+   **14.9% post-fix** (unchanged when the fifth row landed) — worse than several columns' raw spread. Its earlier
    apparent stability was cargo's startup consistency, not snora's compile
    cost, exactly as the parked note suspected. **Do not implement it.** If you
    find it referenced anywhere, that reference is stale.
@@ -69,16 +70,19 @@ Header gains the column. **Do not touch a single existing row** — see §5.
 ### 4.3 `docs/src/reference/build-cost-budget.md`
 
 - State that the **absolute columns are runner-dominated**, with the
-  post-RFC-052 spread table (36–60%) and the 0.33.0 → 0.33.1
-  documentation-only evidence (+36% to +55% with zero code changed).
+  post-RFC-052 spread table (36–60%) and **both** directional controls: the
+  documentation-only 0.33.1 moved every column **+36% to +55%** with zero code
+  changed, and 0.34.0 moved them **−10.9% to −21.2%** *with* code changed. The
+  raw columns cannot distinguish those two releases; the ratio held through
+  both.
 - **Move the trend watch points onto the ratio.** State the sensitivity it
-  actually has (~1.8% spread, so a 3% move is visible; the absolute columns
+  actually has (~2.5% spread, so a 5% move is visible; the absolute columns
   cannot see 50%).
 - **Keep the absolute 30 s watch point on `build_widgets_ms`.** It is an
   absolute ceiling on developer experience, not a trend, and runner error does
   not matter to it.
-- Record that `build_engine_only_ms` (~457 ms) and `build_widgets_design_ms`
-  (~561 ms) are **raw record only** and no ratio may be built from them — they
+- Record that `build_engine_only_ms` (~448 ms) and `build_widgets_design_ms`
+  (~552 ms) are **raw record only** and no ratio may be built from them — they
   are dominated by process startup and timer granularity.
 - Record that `widgets_design_ratio` **was derived, tested at 14.9% on
   post-fix data, and rejected.** This is the point of the note: so it is not

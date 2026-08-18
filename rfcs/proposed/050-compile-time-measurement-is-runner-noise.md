@@ -1,7 +1,7 @@
 # RFC 050 — Compile-time measurement reports runner speed, not snora
 
 **Status.** Accepted (owner, 2026-08-15). **Parked 2026-08-15 pending
-post-RFC-052 data; unparked and re-derived 2026-08-18** on four post-fix rows.
+post-RFC-052 data; unparked and re-derived 2026-08-18** on five post-fix rows.
 The re-derivation changed the design — see §"What the post-fix data changed".
 **Tracks.** Measurement integrity (continues RFC-041, RFC-043, RFC-044).
 Closes gate **9b**.
@@ -14,14 +14,14 @@ Closes gate **9b**.
 
 ## Summary
 
-The compile-time budget's six columns each vary **36–60%** across four releases
+The compile-time budget's six columns each vary **36–60%** across five releases
 measured on identical runner, rustc and methodology. A documentation-only
 release moved every one of them **36–55%**. The numbers are dominated by which
 GitHub runner the job landed on, not by anything about snora.
 
 The variance is **common-mode**: the columns move together, so a *ratio*
 between two measurements from the same run can cancel the runner and leave a
-signal about snora. One such ratio reduces spread from 41% to **1.8%**.
+signal about snora. One such ratio reduces spread from 41% to **2.5%**.
 
 This RFC adds that derived ratio column, moves the trend watch points onto it,
 and keeps the absolute columns as raw record. It does **not** add repeat runs.
@@ -32,17 +32,17 @@ Gate 9 was split in v0.29.0: **9a (binary size) satisfied, 9b (compile time)
 open**, because "trend monitored" would claim more than the data supports. This
 RFC is 9b's route to closure.
 
-The four rows sharing runner, rustc and post-RFC-052 methodology are 0.31.0,
-0.32.0, 0.33.0 and 0.33.1:
+The five rows sharing runner, rustc and post-RFC-052 methodology are 0.31.0,
+0.32.0, 0.33.0, 0.33.1 and 0.34.0:
 
 | Column | mean (ms) | raw spread |
 |---|---:|---:|
-| `check_workspace_ms` | 54 776 | **60.4%** |
-| `build_widgets_ms` | 92 450 | **54.8%** |
-| `build_engine_only_ms` | 457 | **42.5%** |
-| `example_hello_ms` | 144 975 | **40.7%** |
-| `build_widgets_design_ms` | 561 | **36.4%** |
-| `example_workbench_ms` | 6 114 | **41.6%** |
+| `check_workspace_ms` | 53 138 | **60.4%** |
+| `build_widgets_ms` | 90 819 | **54.8%** |
+| `build_engine_only_ms` | 448 | **42.5%** |
+| `example_hello_ms` | 143 227 | **40.7%** |
+| `build_widgets_design_ms` | 552 | **36.4%** |
+| `example_workbench_ms` | 6 061 | **41.6%** |
 
 The decisive observation is **0.33.0 → 0.33.1**, which changed **no code at
 all** — RFC-057 was documentation and doc comments — yet moved every column:
@@ -69,7 +69,7 @@ size, is the problem.
 **The variance is common-mode, not per-measurement.** The columns rank the
 releases near-identically — 0.33.0 is the fastest row on all six columns,
 0.33.1 among the slowest on all six — and the spread is of a similar order
-across columns spanning **three orders of magnitude** (457 ms to 144 975 ms).
+across columns spanning **three orders of magnitude** (448 ms to 143 227 ms).
 That is the signature of a *multiplicative* factor applied to the whole run,
 which is exactly what "this job landed on a busier or slower host" looks like.
 
@@ -86,7 +86,7 @@ ratios. **Two of the original RFC's conclusions did not survive.**
 
 | Ratio | pre-RFC-052 | **post-RFC-052** |
 |---|---:|---:|
-| `example_workbench / example_hello` | 5.1% | **1.8%** |
+| `example_workbench / example_hello` | 5.1% | **2.5%** |
 | `build_widgets_design / build_widgets` | 5.9% | **14.9%** |
 
 The parked note suspected exactly this: *"its observed 7.3% stability reflects
@@ -102,7 +102,7 @@ similarly-sized measurements"*. The full sweep refutes this:
 
 | Ratio | size ratio | spread |
 |---|---:|---:|
-| `example_workbench / example_hello` | 23.7× | **1.8%** |
+| `example_workbench / example_hello` | 23.7× | **2.5%** |
 | `build_widgets / example_hello` | 1.6× | 10.0% |
 | `check_workspace / example_hello` | 2.6× | 14.7% |
 
@@ -123,21 +123,39 @@ This matters beyond bookkeeping: it is the rule for adding any future ratio.
 
 ## Evidence that the surviving ratio works
 
-Computed on the four post-RFC-052 rows:
+Computed on the five post-RFC-052 rows:
 
-| | 0.31.0 | 0.32.0 | 0.33.0 | 0.33.1 | spread |
-|---|---|---|---|---|---|
-| `example_workbench_ms` raw | 6 641 | 6 561 | 4 690 | 6 564 | 41.6% |
-| `example_hello_ms` raw | 155 591 | 156 534 | 111 226 | 156 549 | 40.7% |
-| **ratio** | 0.04268 | 0.04191 | 0.04217 | 0.04193 | **1.8%** |
+| | 0.31.0 | 0.32.0 | 0.33.0 | 0.33.1 | 0.34.0 | spread |
+|---|---|---|---|---|---|---|
+| `example_workbench_ms` raw | 6 641 | 6 561 | 4 690 | 6 564 | 5 851 | 41.6% |
+| `example_hello_ms` raw | 155 591 | 156 534 | 111 226 | 156 549 | 136 236 | 40.7% |
+| **ratio** | 0.04268 | 0.04191 | 0.04217 | 0.04193 | 0.04295 | **2.5%** |
 
-A 23-fold noise reduction, including across the documentation-only 0.33.1 that
-moved both inputs by ~40%. That is the difference between a number that cannot
-detect a 10% regression and one that can detect a 3% one.
+A **16-fold** noise reduction. **No other candidate comes close** — the next
+best of fifteen is 8.8%. This is one usable signal, not a family of them, and
+the RFC is scoped to what the data supports.
 
-**No other candidate comes close** — the next best of fifteen is 8.8%. This is
-one usable signal, not a family of them, and the RFC is scoped to what the data
-supports.
+### The 0.34.0 row is an out-of-sample test, and the ratio passed it
+
+0.34.0 was measured **after** this ratio was selected, on data that did not
+exist when the selection was made. It is therefore a genuine out-of-sample
+check rather than more of the fit:
+
+- The raw columns moved **−10.9% to −21.2%** from 0.33.1 — in the *opposite*
+  direction from the +36% to +55% the documentation-only 0.33.1 had produced,
+  and of comparable magnitude.
+- 0.34.0 **did** change code (four preset colour values, RFC-058) where 0.33.1
+  changed none. The raw columns cannot tell those two releases apart: one moved
+  them sharply up with no code, the other sharply down with code.
+- Through both, the ratio stayed inside 0.0419–0.0430.
+
+That is the thesis stated as cleanly as the data can state it: the absolute
+columns respond to the runner, not to snora, in both directions and regardless
+of what shipped — and the ratio does not.
+
+For contrast, `binary-size.csv` over the same release: engine size moved
+15 740 880 → 15 741 008 bytes, **+0.0008%**. Gate 9a's series behaves; 9b's
+does not.
 
 ## Why not repeat runs and take a median
 
@@ -192,7 +210,7 @@ trend), and runner error does not matter to it.
 
 ### Record what the sub-second columns are for
 
-`build_engine_only_ms` (~457 ms) and `build_widgets_design_ms` (~561 ms) are
+`build_engine_only_ms` (~448 ms) and `build_widgets_design_ms` (~552 ms) are
 legitimate measurements — `iced` is a non-optional dependency of `snora`, and
 these rebuild snora's own crates against a warm dependency graph — but at that
 magnitude they are dominated by process startup, cargo metadata resolution and
