@@ -51,6 +51,74 @@ derives the same identifier, so the same logical toast carries the same
 identifier across every render, verified directly in
 `crates/snora/src/identifiers/tests.rs`.
 
+## Driving a snora application under test
+
+Identifiers exist so a harness can find a surface. Getting *input* to that
+surface is a separate problem, and it is not one snora solves — we install no
+input path and inject nothing at the OS level. Two routes exist, and the cheaper
+one is not obvious.
+
+### In-process, no window: `iced_test`
+
+`iced_test::Simulator` drives the widget tree headlessly — no window, no
+compositor, no injection path to fail. It exposes `tap_key`, `press_key` and
+`typewrite`, and `snapshot(&Theme)` renders to pixels for comparison against a
+stored PNG.
+
+snora's own `render_semantics` suite uses this simulator (for clicks; we have
+never used `snapshot`). We assert composition rather than pixels by choice —
+RFC-011-D — so treat our experience as covering the input half only.
+
+**If your harness can run in-process, prefer this.** It removes the entire class
+of problem described below.
+
+### External, real window: verified bounds
+
+Where evidence must be about what a person sees rather than what a reducer
+believes, an external driver is the only option. **apimokka**
+([apimock-rs](https://github.com/nabbisen/apimock-rs)) verified the following
+and asked that it be published with its limits, because an over-broad version
+would be worse for a harness author than none:
+
+**Verified by running it:**
+
+- `wtype` — an ordinary Wayland client using `zwp_virtual_keyboard_manager_v1` —
+  delivered synthesized keystrokes to a Wayland client, confirmed by reading the
+  typed string back out of the target. **No root, no daemon, no `uinput`.**
+- **niri did not act on its own keybinding** when that keybinding arrived from
+  the virtual keyboard, while still forwarding the keys to clients. `Mod+Left`,
+  bound to `focus-column-left`, produced no focus change; `niri msg
+  focused-window` reported the same window before and after.
+
+**Not verified — do not assume:**
+
+- **Any compositor other than niri 26.04.** One compositor, once.
+- **Pointer injection.** `zwlr_virtual_pointer_manager_v1` is advertised by that
+  compositor; it was never exercised.
+
+### The oracle trap, which is the general lesson
+
+This is the part worth reading even if you never touch Wayland.
+
+apimokka's first three probes injected `Ctrl+K` into their own application and
+compared screenshots. All byte-identical, so they concluded delivery had failed.
+It had not: their `view` short-circuits to a first-run picker while one piece of
+state is unset, so **a successful injection and a failed one produced the same
+pixels.** They then tried a compositor keybinding as the oracle, which reported
+failure for the unrelated reason above — two independent false negatives,
+agreeing with each other, both wrong.
+
+> **Verify input delivery against a surface guaranteed to change, in a client you
+> can read** — not the application under test, until you know it can show you the
+> difference.
+
+A terminal running `cat` settled it in two minutes.
+
+The same shape applies to a snora application: if your `view` collapses to one
+branch under some state, identifier-based assertions and screenshots will agree
+with each other and both be uninformative. Establish that your harness can
+observe a difference *before* you trust it to report the absence of one.
+
 ## What is *not* identified
 
 Slot **contents** are the application's elements and the application's
