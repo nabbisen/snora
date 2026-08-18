@@ -1,6 +1,7 @@
 # RFC 066 — The dim assertion checks three surfaces; the dim composites over a continuum
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-18). Handoff:
+[`handoffs/066-…`](../handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md)
 **Tracks.** Accessibility / measurement integrity. Continues RFC-065.
 **Reported by** **tekstide** (2026-08-18), as a question about our method rather
 than a finding about our code — and it was right.
