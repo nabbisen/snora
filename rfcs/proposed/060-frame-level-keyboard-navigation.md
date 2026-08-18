@@ -1,11 +1,13 @@
 # RFC 060 — Frame-level keyboard navigation
 
-**Status.** Proposed
+**Status.** Proposed. Handoff:
+[`handoffs/060-…`](../handoffs/060-frame-level-keyboard-navigation/implementation-handoff.md)
 **Tracks.** Accessibility / vocabulary. Closes the 14-minor-stale deferral
 recorded as **RFC-014-B**.
 **Touches.** `crates/snora-core/src/focus.rs` (new),
 `crates/snora-core/src/lib.rs`, `crates/snora/src/keyboard.rs`,
 `docs/src/contributing/semantic-accessibility.md`,
+`docs/src/contributing/design-decisions.md`,
 `docs/src/reference/overlay-interaction-semantics.md`,
 `docs/src/guides/accessibility.md`, `CHANGELOG.md`.
 **Release target.** 0.35.0 (minor — `snora-core` gains public vocabulary).
@@ -43,6 +45,32 @@ Three things converged on this.
 Every application with more than one region reimplements this. The decision
 logic is identical across all of them, depends only on structure snora already
 owns, and is pure.
+
+### The reconsideration trigger already fired, and nothing checked it
+
+`design-decisions.md` § *"Why focus trapping is deferred (v0.14)"* records:
+
+> **Reconsideration trigger:** a concrete downstream app demonstrates the need
+> and iced provides a stable, cross-platform focus API. Any focus
+> implementation must be additive — a new optional `Dialog`/`Sheet` field per
+> RFC-011-C rules.
+
+**Both halves of that condition are now met**, and the mechanism designed to
+catch it did not fire — the trigger is written into a decision record nobody
+re-reads. That is the same class RFC-059 fixed for *answers*, now showing up
+for *triggers*, and it is worth noting that a reconsideration trigger with no
+scheduled re-check is a note, not a mechanism.
+
+Two consequences bind this RFC:
+
+- The additive constraint is **inherited**: any focus implementation must be
+  additive, and trapping specifically must arrive as a **new optional
+  `Dialog`/`Sheet` field per RFC-011-C**. Q-1 is bound by this.
+- The same section states that *"iced 0.14's `operate` machinery and
+  `widget::Id` make programmatic focus queries possible."* True, but incomplete
+  in the way that matters: they are reachable **only with the `advanced`
+  feature**, which snora does not enable. Correct it to the narrow form rather
+  than leaving a reader to conclude the query is free.
 
 ## What snora owns, precisely
 
@@ -183,6 +211,11 @@ snora's iced surface, has a compile-cost and binary-size consequence measurable
 under our own budgets, and touches API stability. **Do not enable it as an
 implementation detail of this RFC.** Measure it and decide separately; this RFC
 ships the useful half without betting on the answer.
+
+Whenever it is answered, it is **bound by `design-decisions.md`'s inherited
+constraint**: trapping must arrive as a *new optional `Dialog`/`Sheet` field*
+under RFC-011-C rules, not as a change to existing fields or a behaviour switch
+on the dim layer.
 
 **Q-2 — Should the frame render a focus ring on the active zone?** Snora draws
 the skeleton containers, so it *can* — and `FocusTokens` exists precisely for
