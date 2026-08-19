@@ -131,12 +131,12 @@ state.
 |----|-------|--------|
 | 071 | [The visibility floor tests a bar the palette cleared four minors ago](./accepted/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 — **do first** (handoff: [`handoffs/071-…`](./handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md)) |
 | 070 | [The typography scale was never stated against iced's default](./accepted/070-the-scale-is-uncalibrated-against-iceds-default.md) | v0.38.1 doc-only, or v0.39.0 if Q-1 forces a value change (handoff: [`handoffs/070-…`](./handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md)) |
+| 072 | [Contrast values are bounded below and never above](./accepted/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 — documentation only (handoff: [`handoffs/072-…`](./handoffs/072-contrast-values-are-bounded-below-and-never-above/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 072 | [Contrast values are bounded below and never above, and we have never said so](./proposed/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 — documentation only; a consumer has already asserted the opposite |
 
 ## Archive
 

@@ -1,6 +1,7 @@
 # RFC 072 — Contrast values are bounded below and never above, and we have never said so
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-19). Handoff written — see
+[`handoffs/072-…`](../handoffs/072-contrast-values-are-bounded-below-and-never-above/implementation-handoff.md).
 **Tracks.** API governance / consumer-facing standing answers.
 **Found by** the architect, from a **knotra** assertion (2026-08-19) that
 depends on the opposite being true.
