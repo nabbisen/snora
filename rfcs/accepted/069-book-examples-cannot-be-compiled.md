@@ -9,9 +9,17 @@
 `rust,ignore` fences.
 **Release target.** 0.38.0 — documentation only.
 
+## Correction (2026-08-19)
+
+**This RFC originally said 110.** The correct count is **111** — one fence in
+`docs/src/guides/accessibility.md` is indented two spaces and was missed by the
+line-anchored grep the audit used. Caught by the dev team, who re-derived the
+number instead of copying it. Non-migration figures corrected with it:
+**91** candidates, **24** referencing `self`.
+
 ## Summary
 
-**110 of 110 Rust code fences in `docs/src` are `rust,ignore`.** There are no
+**111 of 111 Rust code fences in `docs/src` are `rust,ignore`.** There are no
 bare `rust` fences and no `rust,no_run` fences in the book at all. No book
 example has ever reached a rung above the weakest one.
 
@@ -59,7 +67,7 @@ the same page:
 > 1. A small `examples/` crate that compiles in the workspace check; or
 > 2. A `rust,ignore` block in docs **linked to the relevant example crate**.
 
-**110 `ignore` fences; 2 references to `/examples/` anywhere in book prose.**
+**111 `ignore` fences; 2 references to `/examples/` anywhere in book prose.**
 The rule was written, and there is nothing that fires when it is skipped. This
 is the project's recurring defect shape, and this instance was already written
 down.
@@ -70,7 +78,7 @@ it. This is the only instance found.
 
 ## Evidence of harm: none yet, and that is stated honestly
 
-Every `snora*::` path in all 110 fences was extracted and checked against the
+Every `snora*::` path in all 111 fences was extracted and checked against the
 crate source. **Zero stale symbols.** Four flagged names — `ToastIntent::Error`,
 `ToastIntent::Info`, `ToastIntent::Success`, `ToastLifetime::Persistent` — all
 exist; they were regex false positives.
@@ -88,12 +96,12 @@ burned.
 ## The shape of the fix
 
 **Not per-fence reasons.** Extending RFC-064's one-line-reason rule to the book
-would produce **110 copies of one sentence** — and RFC-064's own rationale was
+would produce **111 copies of one sentence** — and RFC-064's own rationale was
 that identical justifications drift apart from each other without anyone
-noticing. At 110 copies that failure mode is the design, not a risk.
+noticing. At 111 copies that failure mode is the design, not a risk.
 
 The structural reason is one fact about the build. It belongs **once**, on the
-policy page, not 110 times.
+policy page, not 111 times.
 
 ## Open questions
 
@@ -111,7 +119,7 @@ policy page, not 110 times.
   requirement real.
 
 **Ruled after measurement (see the handoff §3): (a), with purpose-written
-source.** (b) is rejected — of the 90 non-migration fences, 23 reference `self`
+source.** (b) is rejected — of the 91 non-migration fences, 24 reference `self`
 and 34 reference a binding they never declare, so roughly half cannot compile
 whatever the library path; and the docs CI job performs no cargo build today, so
 a library path adds an iced-inclusive workspace build for partial coverage of
@@ -119,11 +127,11 @@ the half least likely to rot. (a) is right in mechanism and wrong in source: the
 20 existing examples are full applications, and a 7-line median fragment does
 not correspond to a region of one.
 
-**Q-2 — how much of the 110 should ever be compiled?** Not all of it. **20 of
-the 110 are in migration guides** (`migration-0.4-to-0.5.md` and successors),
+**Q-2 — how much of the 111 should ever be compiled?** Not all of it. **20 of
+the 111 are in migration guides** (`migration-0.4-to-0.5.md` and successors),
 which deliberately show *old* APIs. Compiling those against current source
 would be wrong — they are historical records, and their staleness is the point.
-That leaves **90** candidates, and probably fewer.
+That leaves **91** candidates, and probably fewer.
 
 **Q-3 — what replaces the reason rule for the book?** Suggest: one statement of
 the structural cause on the policy page, plus making finding 3's existing

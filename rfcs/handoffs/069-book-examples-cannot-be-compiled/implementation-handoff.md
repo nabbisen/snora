@@ -15,7 +15,7 @@ Correct the documentation-test policy's account of why book examples are
 
 ## 2. Purpose
 
-110 of 110 Rust fences in `docs/src` are `rust,ignore`. The policy presents that
+111 of 111 Rust fences in `docs/src` are `rust,ignore`. The policy presents that
 as a per-snippet judgement. It is not: `docs/book.toml` has no `[rust]` section
 and the docs CI job runs bare `mdbook test docs` with no `-L`, so **nothing
 importing snora can compile, however small or complete.**
@@ -23,12 +23,12 @@ importing snora can compile, however small or complete.**
 ## 3. Q-1 is decided: not a library path, and not the existing examples
 
 RFC-069 left the mechanism open and asked for measurement rather than guesswork.
-The measurement was taken before writing this handoff, over the **90
+The measurement was taken before writing this handoff, over the **91
 non-migration fences**:
 
-| property | count of 90 |
+| property | count of 91 |
 |---|---|
-| references `self` (needs an `impl` context) | 23 |
+| references `self` (needs an `impl` context) | 24 |
 | references a binding it never declares (`tokens`, `state`, `app`, `theme`) | 34 |
 | ≤ 6 lines | 38 |
 | contains `fn main` | **1** |
@@ -36,7 +36,7 @@ non-migration fences**:
 Median length is 7 lines; the longest is 61.
 
 **Option (b) — give the book a library path — is rejected.** Roughly half of the
-90 cannot compile *regardless* of a library path, because they are fragments
+91 cannot compile *regardless* of a library path, because they are fragments
 with no `impl` and no declarations. And the cost is not small: the docs CI job
 today installs mdBook and runs two mdbook commands — **it performs no cargo
 build at all.** A library path means building the workspace, iced included, in
@@ -54,7 +54,7 @@ compiled because a crate compiles them, not because a fence tag claims it.
 
 ## 4. Q-2 is decided: migration guides are excluded, permanently
 
-**20 of the 110 are in `docs/src/guides/migration-*.md`.** They deliberately
+**20 of the 111 are in `docs/src/guides/migration-*.md`.** They deliberately
 show APIs as they were. Compiling them against current source would be wrong —
 their staleness is the content. **Never include a migration guide fence in any
 compile mechanism**, and write that exclusion down with its reason so nobody
@@ -123,7 +123,7 @@ Mechanics:
 ## 7. Unit 3 — make the existing link rule checkable
 
 The policy already states the validated path: *"a `rust,ignore` block in docs
-linked to the relevant example crate."* There are **110 fences and 2 links.**
+linked to the relevant example crate."* There are **111 fences and 2 links.**
 
 Add the grep the crate side already has — `ignore` fences with no nearby
 `examples/` or `{{#include}}` reference — and **record the count**. Do not make
@@ -148,7 +148,7 @@ at it. Follow that precedent.
 - **No migration-guide fence is touched** (§4).
 - **No library path for `mdbook test`** (§3).
 - **No CI gate** on the new grep (§7).
-- **No conversion beyond the fifteen.** If the pilot works, the remaining ~75
+- **No conversion beyond the fifteen.** If the pilot works, the remaining ~76
   are a separate decision with the pilot's measured cost in hand.
 - **`readability.md:72`** — the false *"Compile-checked against the pinned iced
   0.14"* line — **belongs to RFC-068's handoff**, which is editing that exact
