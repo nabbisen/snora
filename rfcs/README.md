@@ -118,6 +118,8 @@ Numbers remain stable forever and are never reused.
 | 065 | [The modal dim is an unmeasured surface](./done/065-the-modal-dim-is-an-unmeasured-surface.md) | v0.37.0 (handoff: [`handoffs/065-…`](./handoffs/065-the-modal-dim-is-an-unmeasured-surface/implementation-handoff.md)) |
 | 066 | [The dim assertion is an endpoint check, not a sweep](./done/066-the-dim-assertion-is-an-endpoint-check.md) | v0.37.1 (handoff: [`handoffs/066-…`](./handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md)) |
 | 067 | [Withdrawing a claim does not retract it from consumers who acted on it](./done/067-withdrawing-a-claim-does-not-retract-it.md) | v0.37.2 (handoff: [`handoffs/067-…`](./handoffs/067-withdrawing-a-claim-does-not-retract-it/implementation-handoff.md)) |
+| 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./done/068-line-height-has-no-helper.md) | v0.38.0 (handoff: [`handoffs/068-…`](./handoffs/068-line-height-has-no-helper/implementation-handoff.md)) |
+| 069 | [Every Rust example in the book is `ignore`, and the policy blames the wrong cause](./done/069-book-examples-cannot-be-compiled.md) | v0.38.0 (handoff: [`handoffs/069-…`](./handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -127,8 +129,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./accepted/068-line-height-has-no-helper.md) | v0.38.0 (handoff: [`handoffs/068-…`](./handoffs/068-line-height-has-no-helper/implementation-handoff.md)) |
-| 069 | [Every Rust example in the book is `ignore`, and the policy blames the wrong cause](./accepted/069-book-examples-cannot-be-compiled.md) | v0.38.0 (handoff: [`handoffs/069-…`](./handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md)) |
 
 ## Proposed
 

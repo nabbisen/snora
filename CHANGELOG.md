@@ -17,6 +17,74 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.38.0] — 2026-08-19
+
+### Added
+
+- **`snora-style::text` gained six line-height helpers, one per role
+  (RFC-068).** `TextRole` carries `size` and `line_height`; the six size
+  helpers (`body_size`, `body_small_size`, `label_size`, `title_size`,
+  `heading_size`, `display_size`) had no line-height counterpart, so an
+  application applying line-height had to reach through
+  `tokens.typography.<role>.line_height` and construct
+  `iced::widget::text::LineHeight::Relative` by hand — including in
+  snora's own published examples. `body_line_height`, `body_small_line_height`,
+  `label_line_height`, `title_line_height`, `heading_line_height`, and
+  `display_line_height` now sit beside their size counterparts, same
+  module, same shape, returning `LineHeight::Relative`. A two-axis
+  exhaustive test (`crates/snora-style/src/text.rs`) makes both a new
+  `Typography` role and a new `TextRole` field a compile error until
+  tooled here, and a helper wired to the wrong role a test failure
+  naming which one. **Purely additive — no rendered output changes,
+  and this does not oblige snora's own prefab widgets to apply
+  line-height**, which remains a separate, larger decision gated on
+  adopter evidence (RFC-068 Q-2).
+
+  **Re-check, if this reached you before:** until this release
+  `docs/src/design/typography.md` stated outright that *"line-height is
+  not wrapped in a helper — read the multiplier straight off
+  `tokens.typography.<role>.line_height`."* That sentence was true and
+  is now withdrawn. **If you wrote your own helper, a local wrapper, or
+  a hand-built `LineHeight::Relative` because we told you none
+  existed**, the six helpers above replace it — and if you skipped
+  applying line-height at all because the token access looked like
+  reaching into internals, it never was, but it is now a one-call
+  helper either way. Nothing you wrote has broken; this is a
+  simplification you are free to take or ignore (RFC-067).
+
+### Changed
+
+- **The documentation-test policy stopped blaming snippet shape for
+  something structural, and 12 book examples are now actually compiled
+  (RFC-069).** All 111 Rust fences in `docs/src` were `rust,ignore`,
+  and the policy framed that as a per-snippet judgement —
+  "full-app-shaped snippets, partial `impl` blocks, event-loop shapes."
+  It wasn't: `docs/book.toml` has no `[rust]` section and the docs CI
+  job runs bare `mdbook test docs`, so **no fence importing `snora`
+  could compile, however small or complete.** The policy now states
+  the structural cause once instead of implying it per-snippet, fixes
+  a self-contradiction where its own classification table called
+  `no_run` "highlighted but not compiled" (the ladder table, correctly,
+  calls it "compiles, does not execute"), and does **not** extend
+  RFC-064's per-fence reason rule to the book — 111 copies of one
+  sentence is the exact drift failure that rule exists to prevent.
+  A new `publish = false` workspace member, `examples/book_snippets`,
+  holds anchored, genuinely compiled source for 12 fences on the frozen
+  covenant surface (design tokens, the `snora_style` bridge) —
+  `{{#include}}`-pulled into the book with **no fence tag changed
+  anywhere**; CI proves these compile because a crate compiles them,
+  not because a tag claims it. Three fences that showed a type's shape
+  or enumerated variants (not usage) were deliberately left as prose,
+  not converted — compiling what is code and leaving what is a diagram
+  alone. Zero CI cost: `{{#include}}` reads raw source text and never
+  invokes `cargo`, and the new crate is already swept up by the
+  existing `cargo check --workspace` / `clippy --workspace` steps via
+  the `examples/*` glob — no workflow file changed. Migration-guide
+  fences (20 of the 111) are permanently excluded from this or any
+  future compile mechanism, since their staleness is the content, not
+  a defect. Documentation and CI-adjacent only — no crate code, no
+  public API, no rendered output changed.
+
 ## [0.37.2] — 2026-08-19
 
 ### Changed

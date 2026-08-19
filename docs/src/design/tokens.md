@@ -28,12 +28,7 @@ This entire surface is under a contractual additive-only covenant — see
 ## Picking a preset
 
 ```rust,ignore
-use snora::design::Tokens;
-
-let tokens = Tokens::light();               // calm, readable light theme
-let tokens = Tokens::dark();                // low-glare dark theme
-let tokens = Tokens::high_contrast_light(); // WCAG enhanced contrast (light)
-let tokens = Tokens::high_contrast_dark();  // WCAG enhanced contrast (dark)
+{{#include ../../../examples/book_snippets/src/tokens.rs:tokens_picking_a_preset}}
 ```
 
 ## Customizing
@@ -41,20 +36,14 @@ let tokens = Tokens::high_contrast_dark();  // WCAG enhanced contrast (dark)
 Fields are `pub` — mutate what you need after cloning a preset:
 
 ```rust,ignore
-let mut tokens = Tokens::light();
-tokens.palette.accent = snora::design::Color::rgb(0.0, 0.5, 0.4);
-tokens.radius.md = 8.0;
+{{#include ../../../examples/book_snippets/src/tokens.rs:tokens_customizing}}
 ```
 
 When you customize a color, re-verify contrast for affected pairs using the
 `snora_design::contrast` module:
 
 ```rust,ignore
-use snora::design::Color;
-use snora_design::contrast::contrast_ratio;
-
-let ratio = contrast_ratio(my_text, my_background);
-assert!(ratio >= 4.5, "WCAG AA body text requires 4.5:1");
+{{#include ../../../examples/book_snippets/src/tokens.rs:tokens_reverify_contrast}}
 ```
 
 ## Storing tokens in application state
@@ -63,14 +52,5 @@ Because `view()` borrows from `&self`, store `Tokens` in your state struct
 rather than constructing them inline in `view()`:
 
 ```rust,ignore
-struct App {
-    tokens: snora::design::Tokens,
-}
-
-impl App {
-    fn view(&self) -> Element<'_, Message> {
-        let t = &self.tokens;   // no local token construction; no lifetime issues
-        snora::design::button::primary(t, "Save", Message::Save)
-    }
-}
+{{#include ../../../examples/book_snippets/src/tokens.rs:tokens_storing_in_state}}
 ```

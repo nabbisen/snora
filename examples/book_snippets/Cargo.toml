@@ -1,0 +1,16 @@
+[package]
+name = "snora-book-snippets"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+snora = { workspace = true, features = ["design"] }
+snora-design = { workspace = true }
+iced = { workspace = true }

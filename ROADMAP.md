@@ -104,6 +104,22 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.38.0** — The typography scale stopped being half-tooled (RFC-068), and
+  the book stopped claiming verification it did not have (RFC-069). `TextRole`
+  carries `size` and `line_height`; `snora-style::text` had six helpers for the
+  first and none for the second, so applying line-height meant reaching through
+  two struct fields and hand-building `LineHeight::Relative` — in snora's own
+  published examples. Six `<role>_line_height` helpers now sit beside their size
+  counterparts, guarded by a test exhaustive on **two** axes: a new `Typography`
+  role and a new `TextRole` field are each a compile error until tooled.
+  Separately, all **111** Rust fences in `docs/src` were `rust,ignore`, and the
+  policy blamed snippet shape — the real cause is that the book has no library
+  path, so nothing importing `snora` can compile at any size. Twelve fences on
+  the frozen covenant surface are now `{{#include}}`d from a compiled
+  `publish = false` member; three that showed a *type's shape* rather than usage
+  were deliberately left as prose. **No rendered output changed.** Found by
+  auditing after **knotra** measured no line-height applied anywhere across
+  three crates.
 - **0.37.2** — Release notes now name the **re-check**, not only the correction,
   when a claim is withdrawn (RFC-067). Two consumer-facing claims were withdrawn
   in 0.34.0 — an invented `text_muted` contrast exemption, and an over-scoped

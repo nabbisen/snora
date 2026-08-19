@@ -8,14 +8,7 @@ preset reaching only the primitives and the application maintaining a
 second, separately configured `iced::Theme` by hand.
 
 ```rust,ignore
-use snora::design::{Tokens, theme};
-
-let tokens = Tokens::high_contrast_dark();
-let iced_theme = theme(&tokens);
-
-iced::application(App::default, App::update, App::view)
-    .theme(move |_state| iced_theme.clone())
-    .run()
+{{#include ../../../examples/book_snippets/src/theme.rs:theme_basic_usage}}
 ```
 
 Snora never calls this function on the application's behalf — it returns

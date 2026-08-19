@@ -45,18 +45,7 @@ If you replace palette roles in a high-contrast preset, run the contrast
 verification in your own tests:
 
 ```rust,ignore
-#[test]
-fn custom_high_contrast_passes_mandatory_pairs() {
-    use snora_design::contrast::contrast_ratio;
-    use snora::design::Tokens;
-
-    let mut t = Tokens::high_contrast_light();
-    t.palette.accent = my_brand_color;
-    t.palette.accent_text = my_brand_text;
-
-    let r = contrast_ratio(t.palette.accent_text, t.palette.accent);
-    assert!(r >= 4.5, "accent_text on accent: {r:.2}:1");
-}
+{{#include ../../../examples/book_snippets/src/high_contrast.rs:high_contrast_custom_verification}}
 ```
 
 ## Visual fit checklist (high contrast)

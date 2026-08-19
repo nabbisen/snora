@@ -1,7 +1,7 @@
 # RFC 069 — Every Rust example in the book is `ignore`, and the policy blames the wrong cause
 
-**Status.** Accepted (owner, 2026-08-19). Q-1 and Q-2 ruled in the
-[handoff](../handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.0 (2026-08-19).
+[Handoff](../handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md).
 **Tracks.** Documentation integrity.
 **Found by** the architect, while writing RFC-068's handoff.
 **Touches.** `docs/src/contributing/documentation-test-policy.md`,

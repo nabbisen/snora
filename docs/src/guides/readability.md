@@ -43,6 +43,13 @@ The practical rule: **apply line-height to anything that might wrap**
 (`body`, `body_small`, and any `title`/`heading` text that isn't guaranteed
 short), and don't worry about it for text you know is always one line.
 
+Each role has a line-height helper beside its size helper —
+`body_line_height`, `title_line_height`, and so on, one per role, in
+`snora::design::style::text` — so applying this rule does not mean
+reaching through `tokens.typography.<role>.line_height` by hand (RFC-068).
+See [Typography § Applying a role to your own text](../design/typography.md#applying-a-role-to-your-own-text)
+for the full helper list.
+
 ## The floor
 
 **The floor is 12 logical pixels.** Nothing else. Below that, snora's
@@ -69,15 +76,9 @@ at roughly twice what it needed (knotra, 2026-08-19).
 
 ## Applying a role
 
-Compile-checked against the pinned iced 0.14:
-
 ```rust,ignore
-use iced::widget::text::LineHeight;
-
-iced::widget::text("wrapping prose")
-    .size(snora::design::style::text::body_size(&tokens))
-    .line_height(LineHeight::Relative(tokens.typography.body.line_height))
+{{#include ../../../examples/book_snippets/src/readability.rs:readability_applying_a_role}}
 ```
 
-Swap `body_size` / `tokens.typography.body` for whichever role fits, per the
-table on the [Typography](../design/typography.md) page.
+Swap `body_size` / `body_line_height` for whichever role's helper pair
+fits, per the table on the [Typography](../design/typography.md) page.

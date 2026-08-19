@@ -40,19 +40,19 @@ whatever its design calls for. See [Design tokens](tokens.md#customizing).
 ## Applying a role to your own text
 
 ```rust,ignore
-use iced::widget::text::LineHeight;
-
-iced::widget::text("wrapping prose")
-    .size(snora::design::style::text::body_size(&tokens))
-    .line_height(LineHeight::Relative(tokens.typography.body.line_height))
+{{#include ../../../examples/book_snippets/src/typography.rs:typography_applying_a_role}}
 ```
 
-`snora::design::style::text::*` exposes one size helper per role
-(`body_size`, `body_small_size`, `label_size`, `title_size`, `heading_size`,
-`display_size`), each returning `iced::Pixels`. Line-height is not wrapped in
-a helper — read the multiplier straight off `tokens.typography.<role>.line_height`
-and pass it to iced's own `LineHeight::Relative`, as above. `tokens.typography`
-is `pub`.
+`snora::design::style::text::*` exposes one size helper and one
+line-height helper per role — `body_size`/`body_line_height`,
+`body_small_size`/`body_small_line_height`, `label_size`/`label_line_height`,
+`title_size`/`title_line_height`, `heading_size`/`heading_line_height`,
+`display_size`/`display_line_height` — returning `iced::Pixels` and
+`iced::widget::text::LineHeight::Relative` respectively (RFC-068). Either
+can still be bypassed by reading `tokens.typography.<role>.size` /
+`.line_height` directly (`tokens.typography` is `pub`), but the helpers
+are the recommended form: same module, same shape, discoverable
+alongside each other.
 
 See [Readability](../guides/readability.md) for how to pick a role and why
 line-height matters for prose.

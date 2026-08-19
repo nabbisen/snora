@@ -7,9 +7,7 @@ where `snora_design::Color` crosses into `iced::Color`.
 ## Color conversion
 
 ```rust,ignore
-use snora::design::style::color::to_iced_color;
-
-let ic = to_iced_color(tokens.palette.accent);
+{{#include ../../../examples/book_snippets/src/iced_style_bridge.rs:bridge_color_conversion}}
 ```
 
 This is a named function, not a `From` impl. The explicit call keeps the
@@ -18,13 +16,7 @@ iced boundary visible in code review.
 ## Button styles
 
 ```rust,ignore
-use snora::design::style::button;
-use iced::widget::button as iced_button;
-
-let tok = tokens.clone();
-iced_button(my_content)
-    .on_press(Message::DoIt)
-    .style(move |_theme, status| button::primary(&tok, status))
+{{#include ../../../examples/book_snippets/src/iced_style_bridge.rs:bridge_button_styles}}
 ```
 
 Available functions: `primary`, `secondary`, `ghost`, `danger`.
@@ -36,12 +28,7 @@ All four map `iced::widget::button::Status` — `Active`, `Hovered`,
 ## Container / card styles
 
 ```rust,ignore
-use snora::design::style::container;
-use iced::widget::container as iced_container;
-
-let tok = tokens.clone();
-iced_container(my_content)
-    .style(move |_theme| container::card_surface(&tok))
+{{#include ../../../examples/book_snippets/src/iced_style_bridge.rs:bridge_container_styles}}
 ```
 
 Available functions: `card_surface`, `card_raised`, `card_selected`.
@@ -51,10 +38,7 @@ Available functions: `card_surface`, `card_raised`, `card_selected`.
 ## Typography sizes
 
 ```rust,ignore
-use snora::design::style::text;
-
-iced::widget::text("Hello")
-    .size(text::body_size(&tokens))
+{{#include ../../../examples/book_snippets/src/iced_style_bridge.rs:bridge_typography_sizes}}
 ```
 
 Available: `body_size`, `body_small_size`, `label_size`, `title_size`,

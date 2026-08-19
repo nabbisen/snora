@@ -1,7 +1,7 @@
 # RFC 068 — The typography scale is half-tooled: six size helpers, no line-height helper
 
-**Status.** Accepted (owner, 2026-08-19). Handoff written — see
-[`handoffs/068-…`](../handoffs/068-line-height-has-no-helper/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.0 (2026-08-19).
+[Handoff](../handoffs/068-line-height-has-no-helper/implementation-handoff.md).
 **Tracks.** Design vocabulary / readability.
 **Found by** the architect, auditing after **knotra** reported measuring **no
 line-height set anywhere** across their three crates (2026-08-19).

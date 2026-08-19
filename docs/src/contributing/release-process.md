@@ -164,8 +164,11 @@ them in sync is a release-process invariant.
 [ ] cargo package --workspace
     # Inspects all five .crate archives (snora-core, snora-design,
     # snora-style, snora-widgets, snora — snora-style added in RFC-055,
-    # 0.32.0). Examples are `publish = false` and are skipped
-    # automatically — no exclusion flag is needed.
+    # 0.32.0). Examples are ALSO packaged (each emits "manifest has no
+    # description"); `publish = false` stops them being *published*, not
+    # packaged, so no exclusion flag is needed but the output is noisier
+    # than "five archives". Corrected at 0.38.0 — the previous wording
+    # said they were skipped, and they are not.
     # Do NOT package the five crates individually (see "Publishing").
 [ ] Merge to main, then dispatch the `unpinned-build` workflow on main and
     confirm a green run BEFORE tagging.

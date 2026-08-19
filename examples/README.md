@@ -31,6 +31,12 @@ before a release is tagged.
 | `snora-example-responsive` | Width-aware layout | `responsive_render`; application-chosen threshold dropping the sidebar below 600px |
 | `snora-example-responsive-body` | Width-aware layout, engine-only | `responsive_render` varying `body`'s own composition (a tab bar) by width; no prefab widgets, no `side_bar` — for consumers who compose their own chrome into `body` |
 
+**Not every member of `examples/` is an example app.** The `size_probe_*`
+crates exist only to be measured by the binary-size workflow, and
+`book_snippets` (RFC-069, 0.38.0) holds the anchored source that
+`docs/src` pulls in with `{{#include}}` — it has no `[[bin]]` and is never
+run. All are `publish = false`. The matrix above is the runnable set.
+
 ## Manual QA: design workbench
 
 The design workbench is the primary manual regression target for Snora Design.

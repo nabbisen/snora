@@ -281,7 +281,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.37.2, re-derived 2026-08-19, RFC-062)
+## Current status (snora 0.38.0, re-derived 2026-08-19, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -291,8 +291,8 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s latest row, 0.37.1, unchanged. The series has oscillated between 46,336 and 46,464 B across six releases — alternation, not a trend, and well inside a 150 KB bar | **No** |
-| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s latest row, 0.37.2, unchanged. The series has oscillated between 46,336 and 46,464 B across seven releases — alternation, not a trend, and well inside a 150 KB bar. 0.38.0 adds six `snora-style` functions, each a one-line token read, and no widget code at all | **No** |
+| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
