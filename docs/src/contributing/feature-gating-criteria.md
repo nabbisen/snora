@@ -110,7 +110,7 @@ the whole unused feature). `widgets_diff_bytes` is recorded per release
 in
 [`reference/binary-size-budget/binary-size.csv`](../reference/binary-size-budget/binary-size.csv),
 appended by the `binary-size` GitHub Actions workflow. **Current status:
-46,592 B (~46 KB) as of 0.38.0 — comfortably under the 150 KB
+46,464 B (~45 KB) as of 0.38.1 — comfortably under the 150 KB
 threshold, not met.**
 
 ### 3. A widget gains a heavy optional dependency
@@ -283,7 +283,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.38.1, re-derived 2026-08-20, RFC-062)
+## Current status (snora 0.38.1, re-derived 2026-08-20 post-tag, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -293,7 +293,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,592 B (~46 KB)** — `binary-size.csv`'s 0.38.0 row, measured after the tag. **+128 B on 0.37.2, and a new high**: the series had alternated between 46,336 and 46,464 B for seven releases, so this is the first value outside that band rather than more alternation. It is 0.3% of a 150 KB bar, and the release added six one-line `snora-style` functions and no widget code — recorded as a real move, not smoothed into the band | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s 0.38.1 row. **Back inside the long-running band, and that corrects last release's reading:** 0.38.0 was recorded here as "+128 B, a new high" outside a seven-release 46,336–46,464 range; 0.38.1 returned to 46,464 having changed no executable code at all — documentation, one test constant, one compiled snippet. A ±128 B swing across a release that could not have moved code is the measurement's noise, not a trend, so 0.38.0's "new high" was over-read. Treat moves at this magnitude as noise; 0.3% of a 150 KB bar either way | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
