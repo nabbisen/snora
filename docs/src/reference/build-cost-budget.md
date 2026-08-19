@@ -245,6 +245,26 @@ factor moving the whole run) and a same-run ratio divides it out:
 |---|---|---|---|---|---|---|
 | `design_overhead_ratio` | 0.04268 | 0.04191 | 0.04217 | 0.04193 | 0.04295 | **2.5%** |
 
+**A true zero-code control, 0.38.2.** That release changed **no crate code at
+all** — `git diff -- crates/` empty; documentation, a `SUMMARY.md` entry, and
+one manual script. Its measured moves are therefore pure measurement, with no
+signal component available to confuse them:
+
+| Metric | 0.38.1 | 0.38.2 (zero code) | move |
+|---|---|---|---|
+| `design_overhead_ratio` | 0.043912 | 0.042133 | **−4.05%** |
+| `widgets_diff_bytes` | 46,464 B | 46,592 B | **+128 B** |
+
+**Read the ratio's ~10% investigate threshold against that −4.05%**, not against
+a hoped-for zero. And the binary-size series alternates 46,464 ↔ 46,592 across
+0.37.2 / 0.38.0 / 0.38.1 / 0.38.2 — a **±128 B** swing that this release proves
+is not code, since none changed. 0.38.0's +128 B was recorded at the time as
+"a new high"; it was not, and the correction is recorded in
+[`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md).
+**A release that changes nothing is the only measurement that can tell you what
+changing nothing looks like** — worth cutting one deliberately when the chance
+arises.
+
 A 16-fold reduction versus the raw columns' 36–60%. The pair was chosen
 because both measurements are `--profile release-baseline` builds of an
 example *binary* — the same kind of work under the same profile — not
