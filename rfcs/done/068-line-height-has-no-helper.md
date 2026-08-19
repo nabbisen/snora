@@ -225,6 +225,47 @@ both are weak:
 10. `render_semantics` passes unmodified; **no rendered output changes** —
     `git diff` shows no change to any widget's rendering path.
 
+## Q-2 resolved after shipping (2026-08-19)
+
+Q-2 asked whether adding the helpers obliges snora's own prefab widgets to
+apply line-height. The RFC answered "no, and it is gated on an adopter's
+deferred typography assessment." **That evidence arrived from orbok the same
+day 0.38.0 shipped, and it decides the question — the gate is closed.**
+
+**orbok's bound.** Exactly two prefab widgets render text for them —
+`app_side_bar` and `app_tab_bar` — because they call `snora::render`, not
+`snora::design::render`, and their dialogs are bespoke page states. Both
+widgets carry **short single-line labels**. They apply line-height at 28 of 125
+of their *own* call sites, none of them inside a snora widget, so there is no
+decision of theirs we would override.
+
+**The ruling: adoption is decided per widget, by whether the text can wrap.**
+
+- **Widgets rendering short, single-line labels — tab bar, sidebar, buttons,
+  chips — do not adopt line-height.** Line-height does nothing for the
+  readability of a single line; it only changes the height of the line box. And
+  the direction is *tighter*: `label` is 1.2 against iced's default 1.3
+  (see [RFC-070](../proposed/070-the-scale-is-uncalibrated-against-iceds-default.md)),
+  so applying it would shrink every label by roughly `0.1 × 14px` for no
+  legibility gain. **A rendered change with a cost and no benefit is not a
+  deferred improvement; it is a thing not to do.**
+- **Widgets that can render wrapping prose — notice bodies, dialog bodies,
+  card content — remain open**, and there the calculus reverses: `body` at 1.4
+  is *looser* than the default, so applying it is a real improvement. That is a
+  separate, smaller decision needing a per-widget list of which surfaces can
+  actually wrap, and it should not be taken before RFC-070 settles the baseline.
+
+**What this means for orbok:** no measurement is needed from Phase 4 for this
+question. Their exposure is the short-label case, and the answer there is "we
+will not change it." The chrome-geometry and border items in Phase 4 stand on
+their own.
+
+**knotra corroborates the same shape from the other path.** They render
+`notice()` at exactly two sites, both short non-wrapping messages, so internal
+leading would change nothing they draw today — and they said explicitly that if
+they later put a paragraph inside a notice they will tell us rather than assume
+we remember.
+
 ## Compatibility and security
 
 **Compatibility.** Purely additive — six new public functions in `snora-style`,
