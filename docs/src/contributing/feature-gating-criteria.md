@@ -283,7 +283,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.38.1, re-derived 2026-08-20 post-tag, RFC-062)
+## Current status (snora 0.38.2, re-derived 2026-08-20, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within

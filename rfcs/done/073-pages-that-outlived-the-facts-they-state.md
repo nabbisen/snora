@@ -1,7 +1,7 @@
 # RFC 073 — Three pages that outlived the facts they state, and the pattern behind them
 
-**Status.** Accepted (owner, 2026-08-20). Handoff written — see
-[`handoffs/073-…`](../handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.2 (2026-08-20).
+[Handoff](../handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md).
 **Tracks.** Documentation integrity.
 **Found by** the architect, in a pre-cut audit of `docs/` requested before
 0.38.1 was tagged. **No test can catch any of the three.**

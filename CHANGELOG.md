@@ -17,6 +17,50 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.38.2] — 2026-08-20
+
+### Fixed
+
+- **Three pages stated things that stopped being true, and nothing was
+  attached to any of them that would notice (RFC-073).** Found in a
+  pre-cut audit, and confirmed with a built-output link check — every
+  internal link under `docs/book` resolved to a file that exists — not
+  just a source-level one, since these defects were invisible to that.
+  **1. Three migration guides 404'd on the published site.**
+  `guides/migrations.md` linked `migration-0.4-to-0.5.md`,
+  `-0.5-to-0.6.md`, and `-0.6-to-0.7.md`; none was in `SUMMARY.md`, so
+  mdBook never built them — every source-level link check passed
+  while the defect shipped, because all three files exist on disk.
+  Added to `SUMMARY.md`. **2. `build-cost-budget.md` carried three
+  separate statements that gate 9b was still open, and one of them
+  misreported `api-freeze-review.md`'s own verdict by name.** Gate 9b
+  closed at v0.37.0 (verified against `api-freeze-review.md:107`
+  directly). The stale "Data integrity note (gate 9b, v0.29.0)"
+  section — unrevisited in nine releases, and reasoning from four rows
+  a later section (RFC-050) superseded — is deleted rather than
+  re-titled, since every figure in it is recomputable from the
+  `compile-time.csv` rows already committed; a third statement, inside
+  a separate RFC-052 note, is corrected to state that gate 9b closed
+  via a different metric (`design_overhead_ratio`) entirely, not by
+  the columns that note discusses reaching two comparable rows. The
+  page now states its trend signal in exactly one place. **3. The
+  accessibility checklist called shipped work "deferred."** The
+  `*_line_height()` helpers shipped in 0.38.0 (RFC-068), and widget
+  adoption isn't pending either — RFC-068 Q-2 ruled short-label
+  widgets will not adopt line-height. The checklist item now states
+  both facts instead of "deferred, not blocked." **A fourth broken
+  link of the same shape as (1) was caught by the required built-output
+  check and fixed alongside it**: `contributing/recipes.md` linked
+  `design/recipes/README.md`, which mdBook's own link-target rewriting
+  does not resolve to the built `index.html` the way it does for
+  `SUMMARY.md`'s own nav entries — fixed by renaming the source file
+  to `index.md` (not by repointing the link at a file that doesn't
+  exist, which would trade a built-output break for a source-level
+  one) and updating `SUMMARY.md` to match. The built-output link
+  checker (`scripts/check-built-links.py`) is now a committed, manual
+  tool — not wired into CI. No code change; no new CI gate, policy, or
+  checklist mechanism added.
+
 ## [0.38.1] — 2026-08-20
 
 ### Fixed

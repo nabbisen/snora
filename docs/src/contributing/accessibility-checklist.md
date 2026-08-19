@@ -248,11 +248,16 @@ should meet knowingly, not discover by a red CI run.
 ```text
 [ ] The primitive uses text roles from the token typography scale rather
     than magic pixel values.
-[ ] Line-height multipliers (stored in TextRole.line_height) are available
-    today via iced::widget::text::LineHeight::Relative — see
-    docs/src/design/typography.md. Snora's own prefab widgets do not yet
-    apply it to the text they render internally; wiring it in (and/or
-    adding *_line_height() style helpers) is deferred, not blocked.
+[ ] Line-height multipliers (stored in TextRole.line_height) have
+    `*_line_height()` style helpers, one per role, shipped in 0.38.0
+    (RFC-068) — see docs/src/design/typography.md. Snora's own prefab
+    widgets still do not apply line-height to the text they render
+    internally, but this is not deferred: RFC-068 Q-2 ruled that
+    short-label widgets (button, chip, tab labels, and similar) will
+    NOT adopt it — label's line-height (1.2) is tighter than iced's own
+    Relative(1.3) default and does nothing for text that never wraps to
+    a second line. Widgets rendering wrapping prose (notice bodies, and
+    similar) remain open for adoption, not ruled out.
 [ ] Text in notices, labels, and help content uses at least body or
     body_small roles, not a custom size smaller than 12 logical pixels.
 ```

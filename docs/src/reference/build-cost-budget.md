@@ -105,43 +105,6 @@ the append-only policy (RFC-041 N-1). This criterion is not closed by the
 fix landing; it closes only when the next tagged release's row is
 confirmed to read `ubuntu-latest`.
 
-### Data integrity note (gate 9b, v0.29.0)
-
-**These numbers are not yet a usable trend, and gate 9b stays open because
-of it.** Four rows now share a runner, rustc and methodology — 0.27.0,
-0.27.1, 0.28.0, 0.28.1, all `ubuntu-latest`. Across those four:
-
-| Column | min | max | spread |
-|---|---|---|---|
-| `check_workspace_ms` | 46 099 | 56 016 | **21.5%** |
-| `build_widgets_ms` | 77 807 | 97 086 | **24.8%** |
-| `example_hello_ms` | 121 337 | 154 160 | **27.1%** |
-
-The decisive case is 0.28.0 → 0.28.1. That release changed **no code at
-all** — RFC-048 was documentation and doc comments only, proven by
-`git diff --stat -- 'crates/**/*.rs'` touching comment lines exclusively —
-yet `check_workspace_ms` rose **11.3%**, `build_widgets_ms` **9.5%** and
-`example_hello_ms` **7.7%**. Whatever those deltas measure, it is not
-snora.
-
-Shared GitHub runners vary in CPU model and neighbour load between jobs,
-and a single wall-clock sample per tag cannot separate that from real
-change. **The "Watch points" thresholds below should be read with this in
-mind:** a step-change smaller than roughly 25% is not currently
-distinguishable from runner variance.
-
-Compare `binary-size.csv`, which does not have this problem — engine size
-moved **−0.0008%** across the same documentation-only release. Binary size
-is deterministic given the same toolchain; wall-clock time is not. That
-asymmetry is why gate 9 is recorded as split (9a satisfied, 9b open) in
-[`api-freeze-review.md`](../contributing/api-freeze-review.md) rather than
-ticked or held whole.
-
-Closing 9b needs the measurement made noise-controlled — repeated runs per
-tag reduced to a median, or a metric less dependent on runner load, such as
-instruction counts or a self-relative ratio — **and then** ≥2 data points
-under the new method. Adding more single-sample rows will not close it.
-
 ### Data integrity note (RFC-052)
 
 **`cargo clean -p <package>` only reaches the dev profile.** `-r`/`--release`
@@ -230,10 +193,15 @@ repeated testing.
 **Rows before this fix and rows after it are not comparable for
 `build_engine_only_ms` and `build_widgets_design_ms`.** No historical row
 is edited or back-filled (RFC-041 N-1) — the discontinuity is recorded,
-not repaired. This is the **third** methodology discontinuity (after
-RFC-043, RFC-044); gate 9b's ≥2-comparable-post-fix-rows clock resets
-again, moving further from closure, not closer — see
-[`api-freeze-review.md`](../contributing/api-freeze-review.md).
+not repaired. This is the **third** methodology discontinuity for these
+columns (after RFC-043, RFC-044), and at the time reset the
+≥2-comparable-post-fix-rows clock for them again. **Gate 9b closed
+anyway, at v0.37.0** — not by these absolute columns reaching two
+comparable rows, but by a different metric entirely,
+`design_overhead_ratio` (established below, RFC-050), which does not
+depend on `build_engine_only_ms` or `build_widgets_design_ms` at all.
+See [`api-freeze-review.md`](../contributing/api-freeze-review.md) for
+the closure record.
 
 RFC-050's `widgets_design_ratio` (`build_widgets_design_ms / build_widgets_ms`)
 was already unsound before this fix: it divides a snora-crates-only rebuild

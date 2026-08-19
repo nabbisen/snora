@@ -104,6 +104,17 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.38.2** — Three pages that outlived the facts they stated, found in a
+  pre-cut audit rather than by any test (RFC-073). `migrations.md` linked three
+  pre-0.7 guides that were absent from `SUMMARY.md`, so mdBook never built them
+  and every reader clicking got a **404 on the published site** — invisible to
+  source-level link checking, since all three files exist on disk.
+  `build-cost-budget.md` said **gate 9b was open** in three places; it closed at
+  v0.37.0. And the accessibility checklist still called the `*_line_height()`
+  helpers "deferred, not blocked" a release after they shipped. A fourth,
+  unrelated instance of the same shape surfaced during the work and was fixed
+  alongside. **No crate code changed at all.** `scripts/check-built-links.py`
+  now exists as a manual tool — deliberately not a CI gate.
 - **0.38.1** — Three assertions and pages that had drifted from the code they
   describe. `engine-surfaces.md` had published the **pre-repair** border figures
   since 0.34.0 and the **pre-RFC-065** dim figures since 0.37.0, and the

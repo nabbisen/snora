@@ -85,7 +85,7 @@ One of:
 ## Candidate recipes
 
 The following recipes were published in v0.23. See the
-[recipe index](../design/recipes/README.md) for the full catalog with
+[recipe index](../design/recipes/index.md) for the full catalog with
 promotion status.
 
 | Recipe | Status |

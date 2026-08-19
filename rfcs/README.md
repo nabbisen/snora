@@ -123,6 +123,7 @@ Numbers remain stable forever and are never reused.
 | 070 | [The typography scale was never stated against iced's default](./done/070-the-scale-is-uncalibrated-against-iceds-default.md) | v0.38.1 (handoff: [`handoffs/070-…`](./handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md)) |
 | 071 | [The visibility floor tests a bar the palette cleared four minors ago](./done/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 (handoff: [`handoffs/071-…`](./handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md)) |
 | 072 | [Contrast values are bounded below and never above](./done/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 (handoff: [`handoffs/072-…`](./handoffs/072-contrast-values-are-bounded-below-and-never-above/implementation-handoff.md)) |
+| 073 | [Three pages that outlived the facts they state](./done/073-pages-that-outlived-the-facts-they-state.md) | v0.38.2 (handoff: [`handoffs/073-…`](./handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -132,7 +133,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 073 | [Three pages that outlived the facts they state](./accepted/073-pages-that-outlived-the-facts-they-state.md) | v0.38.2 (handoff: [`handoffs/073-…`](./handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md)) |
 
 ## Proposed
 
