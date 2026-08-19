@@ -136,6 +136,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 072 | [Contrast values are bounded below and never above, and we have never said so](./proposed/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 — documentation only; a consumer has already asserted the opposite |
 
 ## Archive
 
