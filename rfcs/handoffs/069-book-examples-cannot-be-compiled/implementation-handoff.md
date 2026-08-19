@@ -72,7 +72,7 @@ compile mechanism**, and write that exclusion down with its reason so nobody
    test` has no library path, not because of snippet shape. An author reading
    the current page is told to reach for a rung that is not attached to
    anything. Say what is actually true, once, on this page.
-3. **Do not extend the per-fence reason rule to the book.** 110 copies of one
+3. **Do not extend the per-fence reason rule to the book.** 111 copies of one
    sentence is exactly the drift failure RFC-064 existed to prevent. The
    structural reason is one fact about the build and belongs in one place.
 4. **Leave the crate-side rule and its grep untouched.** They are correctly
