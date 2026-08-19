@@ -69,8 +69,9 @@ snora's own `render_semantics` suite uses this simulator (for clicks; we have
 never used `snapshot`). We assert composition rather than pixels by choice —
 RFC-011-D — so treat our experience as covering the input half only.
 
-**If your harness can run in-process, prefer this.** It removes the entire class
-of problem described below.
+**Prefer the in-process route for input.** `tap_key` removes the entire class of
+problem described below. **The `snapshot` half is a weaker recommendation** — see
+the two defaults immediately after, and the reference-churn cost below them.
 
 **Two defaults make a snapshot suite pass while testing nothing.** Both are
 reasonable for a tool used interactively and become traps in CI. Reported by
@@ -91,6 +92,21 @@ If you adopt this route, assert your references exist before trusting a green
 run, and treat a suite that has never failed as unproven rather than correct.
 That is the same rule as the oracle trap below, one layer up: **a check that
 cannot fail is not a check.**
+
+**And reference images have to survive our releases, which they may not.** snora
+shipped three rendered changes in the eleven releases 0.31.0–0.37.2 — the border
+repair (0.34.0), `chip`'s dismiss control (0.36.0), and the modal dim (0.37.0).
+Each invalidates every reference image that contains the affected surface.
+
+One consumer (**aaai**, 2026-08-19) declined snapshot testing for exactly this
+reason, and their reasoning is worth repeating rather than paraphrasing: they
+are moving *"anything assertable becomes a test, and screenshots shrink to the
+few things needing human judgement, kept out of CI."* Snapshot testing would
+rebuild the problem they are removing.
+
+We are not telling you not to use it. We are telling you the cost is recurring
+and paid by you, on our schedule — and that we have never run it, so we cannot
+tell you whether it needs a GPU in CI.
 
 ### External, real window: verified bounds
 
@@ -133,6 +149,41 @@ agreeing with each other, both wrong.
 > difference.
 
 A terminal running `cat` settled it in two minutes.
+
+**aaai** hit the same trap independently, from a different cause — three wrong
+conclusions that keyboard synthesis was unavailable, when the keys they were
+testing simply had no visible effect on the screen under test. Their settling
+check is the cheaper one: **`xdotool type` into a text field.** If characters
+appear, every later negative is an application finding, not a delivery finding.
+
+### Four more traps, from driving a real window
+
+Reported by **aaai** (2026-08-19), running an `iced` application under forced
+XWayland. None is snora-specific; all cost them a diagnosis cycle.
+
+- **Two clients of the same application, one at the wrong scale.** The same
+  button measured 139 px alone and 81 px with a second instance running —
+  identical commands, identical environment, no error, correct
+  compositor-reported window size, correct screenshot dimensions. Only the
+  content was wrong, and they misread it as a theme defect twice. **Launch
+  capture instances sequentially.**
+- **A compositor-reported window size does not validate a capture.** It reports
+  logical size and says nothing about the scale the application laid out
+  against. Re-taking a capture with the size re-verified immediately beforehand
+  produced a pixel-identical wrong result. What works is measuring a stable
+  element across the captures in a set.
+- **A window off the visible workspace eats clicks silently.** Pointer events go
+  by position and need no focus, but they do need the target displayed. A
+  floated window on a workspace that was not on screen took every click with no
+  error and a plausible-looking screenshot.
+- **The invocation matters more than the path.** aaai delivered both pointer and
+  keyboard events under forced XWayland using the *combined* form —
+  `xdotool mousemove <x> <y> click 1`, after `xdotool windowactivate --sync` —
+  and never separated `mousedown`/`mouseup`. **arama** reported pointer motion
+  arriving but button press/release not, on what appears to be the same path.
+  The two results are unreconciled; the combined-versus-separated call and
+  whether the window was activated first are the likeliest difference. Neither
+  team has reproduced the other, and snora has run neither.
 
 The same shape applies to a snora application: if your `view` collapses to one
 branch under some state, identifier-based assertions and screenshots will agree

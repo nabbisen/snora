@@ -59,10 +59,22 @@ line-height matters for prose.
 
 ## What snora's own widgets use today
 
-**snora's prefab widgets use two of these six roles: `label` and `body`.**
-`body_small`, `title`, `heading` and `display` are not applied by any widget
-in `snora-widgets` — they exist for the application's own text, not for
-snora's chrome.
+**snora uses two of these six roles: `label` and `body`.** `body_small`,
+`title`, `heading` and `display` are applied by **nothing in any snora crate**
+— not `snora-widgets`, not the engine, not the style bridge. They exist for the
+application's own text, not for snora's chrome.
+
+That is a **commitment, not just a description of the current source**: if a
+snora widget ever starts applying one of the other four roles, that is a
+rendered change and will be announced as one. It is stated as a commitment
+because consumers act on it — an application can safely redefine
+`body_small`, `title`, `heading` or `display` on its own `Tokens` knowing snora's
+chrome will not shift underneath it. Redefining `label` or `body` *will* reach
+snora's widgets.
+
+The previous wording scoped this to `snora-widgets` alone, which did not answer
+the question for a consumer reaching those widgets through `snora::design::*`
+(knotra, 2026-08-19, who audited all four crates rather than ask).
 
 One exception worth naming plainly: the [notice](notices.md) widget renders
 its *title* at `label_size`, not `title_size`. That is a known gap, named
