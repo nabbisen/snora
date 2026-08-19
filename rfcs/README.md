@@ -110,6 +110,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 067 | [Withdrawing a claim does not retract it from consumers who acted on it](./proposed/067-withdrawing-a-claim-does-not-retract-it.md) | v0.37.2 — two withdrawals, five propagations, four consumers; reported by knotra |
 
 ## Archive
 
