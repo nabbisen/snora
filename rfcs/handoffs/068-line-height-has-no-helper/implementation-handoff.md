@@ -182,6 +182,14 @@ absence:
    because there were none. Its `## Applying a role` example (line 74) is the
    other half of the asymmetry quoted in §2.
 
+   **Delete line 72 while you are there** — *"Compile-checked against the
+   pinned iced 0.14:"*. It sits directly above the `rust,ignore` fence you are
+   rewriting, and it is false: nothing compiles that block. This is the one
+   line RFC-069 hands to you rather than keeping, because leaving an untrue
+   sentence on top of a block you rewrote is worse than the scope discipline
+   that would preserve it. Replace it with nothing, or with a plain lead-in
+   that claims no verification.
+
 Both book examples become:
 
 ```rust
@@ -216,13 +224,12 @@ remove it.
   freezes both.
 - **No `#[non_exhaustive]` added to either struct** — see §4.
 - **No leading floor** — §5.
-- **Out of scope, and noticed while writing this handoff, so it is recorded
-  rather than fixed here:** `documentation-test-policy.md` says "*every* fence
-  left at `ignore` must carry a one-line reason," but the grep it names is
-  scoped to `crates/ --include="*.rs"`, and the book's own `rust,ignore` fences
-  carry no reason. That is an inconsistency in our own rule, not a defect in
-  this work. **Do not fix it here and do not add reasons to these fences** —
-  raise it back to the architect and it will get its own RFC if it warrants one.
+- **Out of scope — [RFC-069](../../proposed/069-book-examples-cannot-be-compiled.md)
+  owns it.** The book's 110 `rust,ignore` fences cannot be compiled at all,
+  because the book has no library path. **Do not add reasons to these fences,
+  do not change any fence tag, and do not touch
+  `documentation-test-policy.md`.** One single-line exception is carried into
+  scope below, because it sits inside a block you are already rewriting.
 
 ## 9. Required tests
 
@@ -265,6 +272,8 @@ Under `evidence/`:
    an accessibility threshold. No leading floor anywhere.
 6. The three passages in §6 no longer assert the absence of a helper; the true
    statement about snora's own widgets survives, with Q-2's reasoning attached.
+   `readability.md`'s false "Compile-checked" line is gone, and **no fence tag
+   anywhere has changed**.
 7. **No rendered output changes** — the `git diff --stat` above is empty.
 8. `render_semantics` passes unmodified.
 9. `CHANGELOG.md` `[Unreleased]` records the addition under **Added**.

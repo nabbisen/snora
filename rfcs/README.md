@@ -133,6 +133,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 069 | [Every Rust example in the book is `ignore`, and the policy blames the wrong cause](./proposed/069-book-examples-cannot-be-compiled.md) | v0.38.0 — 110 of 110 book fences uncompiled; a compiled corpus exists and is unused |
 
 ## Archive
 
