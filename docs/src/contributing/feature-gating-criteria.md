@@ -179,31 +179,62 @@ grows but the cause is a transitive iced bump that affects all
 crates equally, splitting widget features will not help; the right
 fix is elsewhere. Indicators trigger a discussion, not a refactor.
 
-## Documentation scope when a capability arrives, leaves, or a standing answer is invisible
+## Documentation scope when a capability arrives, leaves, a standing answer is invisible, or a claim is withdrawn
 
 **When a capability lands, every default-path page that states it is
 absent is part of the change scope. When a capability — or a path to
 one — is removed, every page that states it still resolves is part of
-the change scope, symmetrically. And when a governance decision or
-policy answers a question a consumer would ask — a stability guarantee,
-the true scope of a constraint — recording it only in a contributor
-document is the same defect as either of the above:** the answer exists,
-and the consumer asking the question cannot reach it. Documenting the
-change (or the standing answer) in `docs/src/design/` or a migration
-guide is necessary and not sufficient: a consumer who never reads that
-page, or never reads `contributing/`, is left without the answer, or
-worse, with a stale one.
+the change scope, symmetrically. When a governance decision or policy
+answers a question a consumer would ask — a stability guarantee, the
+true scope of a constraint — recording it only in a contributor
+document is the same defect as either of the above. And when a release
+withdraws or narrows a claim consumers may have relied on, correcting
+it in our own docs is *again* the same defect, in a fourth shape:**
+the answer (or the correction) exists, and the consumer who needs it
+cannot reach it, or reaches it without knowing what to do about it.
+Documenting the change (or the standing answer) in `docs/src/design/`
+or a migration guide is necessary and not sufficient: a consumer who
+never reads that page, or never reads `contributing/`, is left without
+the answer, or worse, with a stale one.
 
-This is not hypothetical. Five downstream/review reports, across all
-three cases, were the same omission:
+**The fourth case has a distinction the other three do not need:
+announcing a correction is not the same as prompting the action a
+consumer who relied on the withdrawn claim needs to take (RFC-067).**
+snora's 0.34.0 release withdrew two consumer-facing claims and
+explained each withdrawal thoroughly — the `text_muted` entry runs to a
+paragraph including "that exemption was ours, invented, and it is
+withdrawn." Neither explanation named what a consumer who had **already
+acted on the claim** should now do. The same release proves we already
+know the difference: its *rendered* change (a border-color repair)
+carries "re-check any screenshot tests or visual regression baselines
+that include card or dialog borders…"; its *documentary* withdrawal
+carries nothing. A withdrawal note must do what the rendered-change
+note already does: name the re-check, not only the correction. A page
+that states "X is withdrawn" without stating "if you relied on X,
+re-check Y" has announced a correction, not retracted the claim from
+where it landed.
 
-| Report | Change | Page that still stated the old world (or lacked the answer) |
+This is not hypothetical. Ten downstream/review reports, across all
+four cases, were the same omission:
+
+| Report | Change | Page or record that still carried the old claim |
 |---|---|---|
 | apimokka (2026-08-04) | focus/AT limitation documented under `contributing/` | consumer-facing docs had no route to it |
 | arama (2026-08-15) | dialog card, RFC-039, v0.27.0 (**arrival**) | `guides/overlays.md` still said "positioner, not a styler" with no scope |
 | RFC-056 review (2026-08-15) | `snora_widgets::design::{style, theme}` removed (**removal**) | `design/feature-flags.md`, `contributing/api-governance.md`, `contributing/semantic-accessibility.md` still named the removed path — one of them asserting it "keeps resolving" |
 | tekstide, RFC-059 (1) (2026-08-17) | the `BLOCKED` focus-ring label over-scoped a constraint (**standing answer, mis-scoped**) | `design/iced-style-bridge.md` — consumer-facing — repeated the same over-scoped claim the contributor copy was fixed for |
 | tekstide, RFC-059 (2) (2026-08-17) | the token-surface stability covenant answers "does it churn?" (**standing answer, undiscoverable**) | no consumer-facing page stated it; only `contributing/api-governance.md` and two passing mentions existed |
+| orbok (2026-08-19) | `text_muted` "exempt from mandatory contrast" invented and withdrawn, 0.34.0 (**claim withdrawn**) | orbok's WCAG conformance record cited the exemption as justification |
+| knotra (2026-08-19) | same withdrawal (**claim withdrawn**) | excluded the role from their WCAG AA suite, naming our doc comment as the authority; renders it as select-widget placeholder text |
+| aaai (2026-08-19) | same withdrawal (**claim withdrawn**) | excluded it from their contrast test across **28 call sites** — diff line numbers, a "Not selected" status, onboarding steps |
+| apimokka (2026-08-19) | focus ring "cannot be rendered" on iced 0.14, over-scoped, withdrawn, 0.34.0 (**claim withdrawn**) | written into **RFC MK-023**, their accessibility contract, as a reason full Tab traversal might be unachievable |
+| orbok (2026-08-19) | same withdrawal (**claim withdrawn**) | carried the same statement "almost verbatim" |
+
+Two withdrawals, five propagations, four consumers, and every one of
+the five found by the consumer — two of them only while reading a
+seven-release migration bundle. Naming five instances is not a claim
+that the propagation list is complete: four consumers told us; the
+others were not asked.
 
 RFC-039 correctly documented the dialog card in `docs/src/design/`. What
 neither that RFC nor its review caught was that
@@ -239,7 +270,18 @@ and confirm it is still true for the path it describes; a claim can
 also hide across a line wrap that a naive single-line grep pattern
 misses.
 
-## Current status (snora 0.37.1, re-derived 2026-08-18, RFC-062)
+**And when a release withdraws or narrows a claim consumers may have
+relied on**, the release note names what to re-check, not only what
+changed — in the same voice and the same place as the re-check line an
+appearance change already carries (see, e.g., the modal-dim migration
+guides' "re-check any screenshot tests…" convention). There is no grep
+for "we stopped asserting something" — this is not a check to
+mechanise, it is a question the release-note author answers, because
+they are the person who knows: *did this release withdraw, narrow, or
+correct anything we previously told consumers? If so, does the note say
+what a consumer who acted on it should now do?*
+
+## Current status (snora 0.37.2, re-derived 2026-08-19, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -249,7 +291,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s latest row, 0.37.0, unchanged from 0.36.1. The series has oscillated between 46,336 and 46,464 B across five releases — alternation, not a trend, and well inside a 150 KB bar. Each release cites the newest row available at cut time | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s latest row, 0.37.1, unchanged. The series has oscillated between 46,336 and 46,464 B across six releases — alternation, not a trend, and well inside a 150 KB bar | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |

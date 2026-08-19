@@ -82,10 +82,21 @@ them in sync is a release-process invariant.
 [ ] For any capability that arrived, left, or any governance/policy
     decision that answers a question a consumer would ask: apply
     feature-gating-criteria.md § "Documentation scope when a capability
-    arrives, leaves, or a standing answer is invisible" — grep the
-    default-path docs for the claim it contradicts, or add a
-    consumer-facing statement. Five misses reached this checklist before
-    the rule did; this line is why it won't be a sixth.
+    arrives, leaves, a standing answer is invisible, or a claim is
+    withdrawn" — grep the default-path docs for the claim it
+    contradicts, or add a consumer-facing statement. Five misses reached
+    this checklist before the rule did; this line is why it won't be a
+    sixth.
+[ ] Did this release withdraw, narrow, or correct anything we
+    previously told consumers (RFC-067)? There is no grep for this —
+    answer it yourself, since you are the person writing the note. If
+    yes, the note names **what to re-check**, not only what changed —
+    the same distinction a rendered-appearance change's "re-check any
+    screenshot tests…" line already makes, now required of a withdrawn
+    or narrowed *claim* too. A correction that does not say what to do
+    about it reaches nobody who already acted on the old claim — five
+    instances across four consumers (`feature-gating-criteria.md`'s
+    documentation-scope table) is why this line exists.
 [ ] Re-evaluate feature-gating-criteria.md's "Current status" table
     (RFC-062) — the table itself says to do this and nothing pointed at
     it for ten minors, which is why it went stale in the first place.

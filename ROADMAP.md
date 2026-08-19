@@ -104,6 +104,18 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.37.2** — Release notes now name the **re-check**, not only the correction,
+  when a claim is withdrawn (RFC-067). Two consumer-facing claims were withdrawn
+  in 0.34.0 — an invented `text_muted` contrast exemption, and an over-scoped
+  "a focus ring cannot be rendered on iced 0.14" — both explained thoroughly,
+  and neither saying what a consumer who had *already acted on them* should do.
+  **Five propagations across four consumers followed, every one found by the
+  consumer**: two accessibility suites narrowed on our authority (one across 28
+  call sites of user-facing text), and two downstream accessibility contracts
+  citing a limitation that was not one. The documentation-scope rule gains a
+  fourth case and the release checklist the question that fires it; this release
+  carries the retroactive re-check for both. Reported by **knotra** while
+  planning a migration, corroborated by **aaai**, **orbok** and **apimokka**.
 - **0.37.1** — The dim assertion became a sweep (RFC-066). RFC-065 checked the
   dialog card against the dim over three *discrete* surfaces; the dim is painted
   over whatever the application rendered, a *continuum*, and for two presets the

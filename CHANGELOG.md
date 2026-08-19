@@ -17,6 +17,44 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.37.2] — 2026-08-19
+
+### Changed
+
+- **Release notes now name the re-check, not only the correction, when
+  a claim is withdrawn or narrowed (RFC-067).** Two consumer-facing
+  claims were withdrawn in 0.34.0 — a `text_muted` contrast exemption
+  we had invented, and an over-scoped "cannot be rendered" statement
+  about a focus ring on iced 0.14 — and both were explained thoroughly.
+  Neither withdrawal said what a consumer who had already acted on it
+  should now do, and five instances across four consumers propagated
+  the old claims downstream before any of them told us: two into
+  orbok's and knotra's own accessibility suites/records, one across 28
+  call sites in aaai's contrast test, two into apimokka's and orbok's
+  own accessibility contracts (`feature-gating-criteria.md`'s
+  documentation-scope table has the full instance list). Every one was
+  found by the consumer, not by us. `feature-gating-criteria.md`'s
+  documentation-scope rule (RFC-048, widened by RFC-056/059) now covers
+  this as a fourth case — a claim withdrawn or narrowed — and
+  `release-process.md`'s checklist carries the question that fires it.
+  Retroactive re-check, for the two withdrawals already known to have
+  propagated:
+
+  - **If you excluded `text_muted` from a contrast or accessibility
+    suite on the strength of snora's documentation, that exemption was
+    invented and is withdrawn (0.34.0) — re-check the role.** It is
+    asserted at `AA_TEXT` (4.5:1) against all three surfaces as of
+    0.34.0; nothing exempts it.
+  - **If you recorded that a focus ring cannot be rendered on iced
+    0.14, that statement was over-scoped (0.34.0) — re-check any scope
+    decision that cited it.** An application owning focus as its own
+    state can style it today; the accurate constraint is narrower than
+    "cannot be rendered."
+
+  We know of five propagation instances across these two withdrawals
+  and cannot know the full set — four consumers told us; this note does
+  not imply the list above is complete.
+
 ## [0.37.1] — 2026-08-18
 
 ### Changed

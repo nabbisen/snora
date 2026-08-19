@@ -105,12 +105,12 @@ Numbers remain stable forever and are never reused.
 | 064 | [`rust,ignore` is the default nobody has to justify](./done/064-ignored-doctests-are-unaudited.md) | v0.36.1 (handoff: [`handoffs/064-…`](./handoffs/064-ignored-doctests-are-unaudited/implementation-handoff.md)) |
 | 065 | [The modal dim is an unmeasured surface](./done/065-the-modal-dim-is-an-unmeasured-surface.md) | v0.37.0 (handoff: [`handoffs/065-…`](./handoffs/065-the-modal-dim-is-an-unmeasured-surface/implementation-handoff.md)) |
 | 066 | [The dim assertion is an endpoint check, not a sweep](./done/066-the-dim-assertion-is-an-endpoint-check.md) | v0.37.1 (handoff: [`handoffs/066-…`](./handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md)) |
+| 067 | [Withdrawing a claim does not retract it from consumers who acted on it](./done/067-withdrawing-a-claim-does-not-retract-it.md) | v0.37.2 (handoff: [`handoffs/067-…`](./handoffs/067-withdrawing-a-claim-does-not-retract-it/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 067 | [Withdrawing a claim does not retract it from consumers who acted on it](./proposed/067-withdrawing-a-claim-does-not-retract-it.md) | **accepted** → v0.37.2 (reported by knotra) — handoff: [`handoffs/067-…`](./handoffs/067-withdrawing-a-claim-does-not-retract-it/implementation-handoff.md) |
 
 ## Archive
 
