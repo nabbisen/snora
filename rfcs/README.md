@@ -119,11 +119,20 @@ Numbers remain stable forever and are never reused.
 | 066 | [The dim assertion is an endpoint check, not a sweep](./done/066-the-dim-assertion-is-an-endpoint-check.md) | v0.37.1 (handoff: [`handoffs/066-…`](./handoffs/066-the-dim-assertion-is-an-endpoint-check/implementation-handoff.md)) |
 | 067 | [Withdrawing a claim does not retract it from consumers who acted on it](./done/067-withdrawing-a-claim-does-not-retract-it.md) | v0.37.2 (handoff: [`handoffs/067-…`](./handoffs/067-withdrawing-a-claim-does-not-retract-it/implementation-handoff.md)) |
 
+## Accepted
+
+Design settled, implementation may start, not yet shipped. See
+[`accepted/README.md`](./accepted/README.md). Empty is the normal resting
+state.
+
+| ID | Title | Target |
+|----|-------|--------|
+| 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./accepted/068-line-height-has-no-helper.md) | v0.38.0 (handoff: [`handoffs/068-…`](./handoffs/068-line-height-has-no-helper/implementation-handoff.md)) |
+
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./proposed/068-line-height-has-no-helper.md) | v0.38.0 — two of five adopters apply no line-height anywhere; all three questions ruled |
 
 ## Archive
 
