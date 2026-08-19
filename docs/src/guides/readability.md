@@ -45,12 +45,27 @@ short), and don't worry about it for text you know is always one line.
 
 ## The floor
 
-Text in notices, labels and help content uses at least `body` or
-`body_small` — never a custom size below 12 logical pixels. Below that,
-snora's WCAG-tested contrast pairs stop being a reliable readability
-guarantee regardless of how well the contrast ratio itself holds up: size
-and contrast both have to clear a floor for text to be legible, and this is
-the size half of that pair.
+**The floor is 12 logical pixels.** Nothing else. Below that, snora's
+WCAG-tested contrast pairs stop being a reliable readability guarantee
+regardless of how well the contrast ratio itself holds up: size and contrast
+both have to clear a floor for text to be legible, and this is the size half of
+that pair.
+
+**Separately, and not a second floor: express sizes through a role rather than
+a literal.** `body` and `body_small` are the roles for notices, labels and help
+content. That is about keeping sizes in one place, not about a minimum — a
+role's value is yours to set.
+
+The two combine in the case you may actually want: if your densest surface needs
+12px, **redefine `body_small` to 12.0 on your own `Tokens`** and use the role.
+The size still comes from the scale, and the floor is met. `Typography` is a
+plain struct with every field public, so this is supported rather than a
+loophole (see [typography](../design/typography.md)).
+
+An earlier version of this section read *"uses at least `body` or `body_small` —
+never a custom size below 12 logical pixels"*, which one consumer reasonably read
+as two floors — 14 from the role, 12 from the number — and costed a remediation
+at roughly twice what it needed (knotra, 2026-08-19).
 
 ## Applying a role
 

@@ -13,7 +13,7 @@ pub struct Tokens {             // #[non_exhaustive]
     pub typography: Typography, // body / title / heading / …
     pub radius:     Radius,     // sm / md / lg / pill
     pub focus:      FocusTokens,// ring_width / ring_offset / ring_color
-    pub density:    Density,    // Comfortable (Compact deferred)
+    pub density:    Density,    // *spacing* density — Comfortable; Compact deferred
 }
 ```
 
