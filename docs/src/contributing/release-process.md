@@ -117,7 +117,8 @@ them in sync is a release-process invariant.
     record, never a trend (RFC-050).
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)
-[ ] Move v0.NN RFCs from rfcs/proposed/ to rfcs/done/; update their
+[ ] Move v0.NN RFCs from rfcs/accepted/ to rfcs/done/ (five-folder
+    variant — an accepted RFC lives in accepted/, not proposed/); update their
     Status fields and the rfcs/README.md index
 [ ] Answer the four versioning-policy questions for any public API change
     (see docs/src/contributing/versioning-policy.md)

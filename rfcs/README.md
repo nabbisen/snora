@@ -5,11 +5,23 @@ This directory follows the RFC lifecycle policy in
 The **folder is the source of truth** for an RFC's state; each file's
 Status field is kept consistent with its folder.
 
-- `proposed/` — open for review; implementer should not assume the design
-  is final.
+- `proposed/` — open for review; implementer should **not** start.
+- `accepted/` — owner signed off; implementer may start; not yet shipped.
 - `done/` — implemented; historical record of the design.
 - `archive/` — withdrawn or superseded. Created on first use; no RFC
   has been withdrawn or superseded yet.
+
+snora uses the lifecycle policy's **five-folder variant** (adopted
+2026-08-19), because here *"the maintainer signed off"* and *"the implementer
+finished"* are separate events performed by different parties, mediated by a
+written handoff. Until that date accepted RFCs stayed in `proposed/` with a
+`Status: Accepted` line — a state the four-folder variant does not define,
+in a folder that says the design may still change. See
+[`accepted/README.md`](./accepted/README.md).
+
+An RFC's path is `proposed/` → `accepted/` → `done/`. It moves to `accepted/`
+when the owner accepts it and the handoff is written, and to `done/` in the
+release that ships it.
 
 Numbering uses the planning-pack scheme `0NN-x` (the `NNN` groups by the
 target minor; the `x` letter distinguishes RFCs within that group).
