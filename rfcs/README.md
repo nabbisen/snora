@@ -129,13 +129,13 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 071 | [The visibility floor tests a bar the palette cleared four minors ago](./accepted/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 — **do first** (handoff: [`handoffs/071-…`](./handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md)) |
+| 070 | [The typography scale was never stated against iced's default](./accepted/070-the-scale-is-uncalibrated-against-iceds-default.md) | v0.38.1 doc-only, or v0.39.0 if Q-1 forces a value change (handoff: [`handoffs/070-…`](./handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 070 | [The typography scale was never stated against iced's default, and half of it is tighter](./proposed/070-the-scale-is-uncalibrated-against-iceds-default.md) | v0.38.1 or v0.39.0 — found by orbok; two of six roles looser than iced's 1.3, one a no-op, three tighter |
-| 071 | [The visibility floor tests a bar the palette cleared four minors ago](./proposed/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 or v0.39.0 — `engine-surfaces.md` publishes pre-repair figures; the border assertion would pass a full regression |
 
 ## Archive
 
