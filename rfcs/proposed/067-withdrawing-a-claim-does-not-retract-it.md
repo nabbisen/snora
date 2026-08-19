@@ -1,6 +1,7 @@
 # RFC 067 — Withdrawing a claim does not retract it from consumers who acted on it
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-19). Handoff:
+[`handoffs/067-…`](../handoffs/067-withdrawing-a-claim-does-not-retract-it/implementation-handoff.md)
 **Tracks.** Documentation / release process. Sixth instance of the RFC-059
 class, and the first with a measurable propagation rate.
 **Reported by** **knotra** (2026-08-19), with corroborating instances from
