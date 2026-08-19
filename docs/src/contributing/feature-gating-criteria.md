@@ -229,9 +229,11 @@ four cases, were the same omission:
 | aaai (2026-08-19) | same withdrawal (**claim withdrawn**) | excluded it from their contrast test across **28 call sites** — diff line numbers, a "Not selected" status, onboarding steps |
 | apimokka (2026-08-19) | focus ring "cannot be rendered" on iced 0.14, over-scoped, withdrawn, 0.34.0 (**claim withdrawn**) | written into **RFC MK-023**, their accessibility contract, as a reason full Tab traversal might be unachievable |
 | orbok (2026-08-19) | same withdrawal (**claim withdrawn**) | carried the same statement "almost verbatim" |
+| knotra, RFC-072 (2026-08-19) | contrast thresholds are floors, never ceilings — never stated to consumers (**standing answer, undiscoverable**) | knotra asserted `border` against `surface` *stays below* AA (4.5) to justify excluding a notice tone — a bound snora has never held and does not guarantee; no consumer-facing page said thresholds are one-directional until this RFC |
 
-Two withdrawals, five propagations, four consumers, and every one of
-the five found by the consumer — two of them only while reading a
+Eleven downstream/review reports, across all four cases, and every one of
+the five withdrawal-propagation instances found by the consumer — two
+of them only while reading a
 seven-release migration bundle. Naming five instances is not a claim
 that the propagation list is complete: four consumers told us; the
 others were not asked.
@@ -281,7 +283,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.38.0, re-derived 2026-08-19, RFC-062)
+## Current status (snora 0.38.1, re-derived 2026-08-20, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within

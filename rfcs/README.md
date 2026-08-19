@@ -120,6 +120,9 @@ Numbers remain stable forever and are never reused.
 | 067 | [Withdrawing a claim does not retract it from consumers who acted on it](./done/067-withdrawing-a-claim-does-not-retract-it.md) | v0.37.2 (handoff: [`handoffs/067-…`](./handoffs/067-withdrawing-a-claim-does-not-retract-it/implementation-handoff.md)) |
 | 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./done/068-line-height-has-no-helper.md) | v0.38.0 (handoff: [`handoffs/068-…`](./handoffs/068-line-height-has-no-helper/implementation-handoff.md)) |
 | 069 | [Every Rust example in the book is `ignore`, and the policy blames the wrong cause](./done/069-book-examples-cannot-be-compiled.md) | v0.38.0 (handoff: [`handoffs/069-…`](./handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md)) |
+| 070 | [The typography scale was never stated against iced's default](./done/070-the-scale-is-uncalibrated-against-iceds-default.md) | v0.38.1 (handoff: [`handoffs/070-…`](./handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md)) |
+| 071 | [The visibility floor tests a bar the palette cleared four minors ago](./done/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 (handoff: [`handoffs/071-…`](./handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md)) |
+| 072 | [Contrast values are bounded below and never above](./done/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 (handoff: [`handoffs/072-…`](./handoffs/072-contrast-values-are-bounded-below-and-never-above/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -129,9 +132,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 071 | [The visibility floor tests a bar the palette cleared four minors ago](./accepted/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 — **do first** (handoff: [`handoffs/071-…`](./handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md)) |
-| 070 | [The typography scale was never stated against iced's default](./accepted/070-the-scale-is-uncalibrated-against-iceds-default.md) | v0.38.1 doc-only, or v0.39.0 if Q-1 forces a value change (handoff: [`handoffs/070-…`](./handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md)) |
-| 072 | [Contrast values are bounded below and never above](./accepted/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 — documentation only (handoff: [`handoffs/072-…`](./handoffs/072-contrast-values-are-bounded-below-and-never-above/implementation-handoff.md)) |
 
 ## Proposed
 

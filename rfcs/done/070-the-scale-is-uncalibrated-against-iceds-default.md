@@ -1,7 +1,7 @@
 # RFC 070 — The typography scale was never stated against iced's default, and half of it is tighter
 
-**Status.** Accepted (owner, 2026-08-19). Handoff written — see
-[`handoffs/070-…`](../handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.1 (2026-08-20).
+[Handoff](../handoffs/070-the-scale-is-uncalibrated-against-iceds-default/implementation-handoff.md).
 **Tracks.** Design vocabulary / readability.
 **Found by** **orbok**, answering RFC-068 Q-2's evidence request (2026-08-19).
 Verified against the pinned iced 0.14 by the architect before acceptance.

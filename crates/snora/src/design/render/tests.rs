@@ -39,15 +39,49 @@ enum Msg {
     Noop,
 }
 
-/// Modest, clearly-nonzero visibility floor for the dim composited over
-/// `background`, and for the card border against `background`. Chosen the
-/// same way RFC-038's `1.5:1` border floor was: well below WCAG SC
-/// 1.4.11's full `3.0` non-text-contrast threshold, but a real,
-/// non-trivial bar. Both floors reuse the same constant because both
-/// measure the same kind of thing — "is this element visually distinct
-/// from the page behind it" — not because the two elements are otherwise
-/// related.
-const VISIBILITY_FLOOR: f32 = 1.3;
+/// WCAG 2.1 SC 1.4.11 non-text-contrast floor, shared by two assertions
+/// below — the card border against `background`, and the modal dim
+/// (composited over `background`) against `background` itself — because
+/// both measure the same kind of thing: "is this element visually
+/// distinct from the page behind it." Not `1.3` (RFC-071): that value
+/// was chosen when the border's real worst case was believed to be
+/// 1.39:1, "with a small margin under" it. **That belief was wrong** —
+/// the border was repaired to clear `3.0` in 0.34.0 (RFC-058) and the
+/// test was never updated to match, so a regression from 3.38 back
+/// toward 1.3 would have passed silently for four minors.
+///
+/// Measured worst case, re-derived at 0.38.1 (RFC-071), by preset and
+/// release the underlying value was last chosen at:
+///
+/// - **Card border vs `background`**: worst is `light` at **3.38:1**
+///   (`dark` 3.81, both high-contrast presets 21.0) — the `border` role
+///   used directly and unmodified, chosen to clear `3.0` in **0.34.0**
+///   (RFC-058).
+/// - **Modal dim (composited over `background`) vs `background`**:
+///   worst is `light`/`high_contrast_light` at **3.2424:1** (`dark`
+///   4.3798, `high_contrast_dark` 4.2529) — `DIM_ALPHA = 0.44`, chosen
+///   to clear `3.0` in **0.37.0** (RFC-065).
+///
+/// Both real, unmodified values now clear `NON_TEXT_MIN` with margin —
+/// **8%** on the thinnest case (`light`'s dim, 3.24 against 3.0) — so
+/// this floor is not a discount from the WCAG threshold, it *is* the
+/// WCAG threshold. **This effectively freezes `border` and `DIM_ALPHA`
+/// at ≥3.0** under RFC-036: either value regressing below it fails this
+/// suite, and lowering either on purpose requires the accessibility
+/// carve-out (as 0.34.0's and 0.37.0's repairs both used) — an intent
+/// already acted on twice, not a new constraint invented here. If a
+/// future preset value fails this floor, that is a finding to report,
+/// not a threshold to relax.
+///
+/// **A sibling constant of the same name and value exists in
+/// `crates/snora-design/src/tests.rs`** (`NON_TEXT_MIN: f32 = 3.0`,
+/// RFC-058). It cannot be shared directly — that one lives in a
+/// `#[cfg(test)]` module, unreachable from this crate, and exporting it
+/// would add a public item to a covenant-frozen crate just to serve a
+/// test. If you change one, check the other: nothing links them beyond
+/// this comment, which is exactly the gap that let `1.3` drift from
+/// `3.0` unnoticed here in the first place (RFC-071 review, round 1).
+const NON_TEXT_MIN: f32 = 3.0;
 
 fn named_presets() -> [(&'static str, Tokens); 4] {
     [
@@ -87,8 +121,8 @@ fn dim_visible_against_background_all_presets() {
         let composited = composite(dim, background);
         let r = contrast_ratio(to_sn(composited), to_sn(background));
         assert!(
-            r >= VISIBILITY_FLOOR,
-            "{name}: dim composited over background contrast {r:.3} < {VISIBILITY_FLOOR} \
+            r >= NON_TEXT_MIN,
+            "{name}: dim composited over background contrast {r:.3} < {NON_TEXT_MIN} \
              — the modal dim is not visibly distinguishable from the page"
         );
     }
@@ -142,8 +176,8 @@ fn card_border_distinguishable_from_background_all_presets() {
         let card = dialog_card_style(&t);
         let r = contrast_ratio(to_sn(card.style.border.color), to_sn(background));
         assert!(
-            r >= VISIBILITY_FLOOR,
-            "{name}: card border vs background contrast {r:.3} < {VISIBILITY_FLOOR} \
+            r >= NON_TEXT_MIN,
+            "{name}: card border vs background contrast {r:.3} < {NON_TEXT_MIN} \
              — a border this close to the page would make the card's edge invisible"
         );
     }

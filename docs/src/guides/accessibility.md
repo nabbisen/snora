@@ -17,7 +17,11 @@ contributor-facing documents linked below, not duplicated here.
   active, all four built-in presets (`light`, `dark`,
   `high_contrast_light`, `high_contrast_dark`) are WCAG AA–verified —
   `light`/`dark` and AAA for the two high-contrast presets, where
-  applicable.
+  applicable. **Every threshold is a floor, never a ceiling** — if a
+  decision in your own code depends on a snora colour staying *below*
+  some contrast value, that is not a guarantee snora makes; see
+  [API governance § Permitted without reopening the gate](../contributing/api-governance.md#permitted-without-reopening-the-gate)
+  for the full statement.
 - **Non-colour status encoding.** Toast intents and notice tones are
   distinguishable by more than colour alone in snora's prefab widgets.
 - **Keyboard reachability inherited from iced.** Native iced controls

@@ -39,9 +39,29 @@ This is why `body`'s line-height (`1.4`) is the loosest of the six roles and
 tracks how much wrapping each role is expected to do. `title` sits between
 the two: usually one line, occasionally two, so it gets a middling `1.3`.
 
-The practical rule: **apply line-height to anything that might wrap**
-(`body`, `body_small`, and any `title`/`heading` text that isn't guaranteed
-short), and don't worry about it for text you know is always one line.
+**That scale is calibrated against itself, and separately against iced
+0.14's own default line-height, `Relative(1.3)`** — text you never call
+`.line_height()` on already renders at 1.3 (see
+[Typography](../design/typography.md) for the source citation). Stated
+against that baseline, not just against each other: applying `body` or
+`body_small` adds air over what you'd get by doing nothing; applying
+`title` changes nothing at all, because it *is* 1.3; and applying
+`label`, `heading`, or `display` **removes** air relative to doing
+nothing — deliberately, because larger or shorter text tolerates (and
+usually wants) tighter leading, not because those roles are
+under-specified.
+
+**So the practical rule is not "apply line-height to anything that
+might wrap" — that reads as uniformly an improvement, and for `title`
+and `heading`, the two other roles this guide previously named
+alongside `body`/`body_small`, it isn't.** The accurate rule: **apply
+`body` or `body_small`'s helper to anything that might wrap** — that is
+where it demonstrably helps. Applying `title`'s helper is harmless but
+does nothing observable. Applying `heading`'s or `display`'s helper on
+wrapping text is a deliberate typographic choice (tighter leading at
+larger sizes), not a bug to work around — know that you're trading air
+for density there, rather than assuming the helper is free improvement
+the way it is for `body`/`body_small`.
 
 Each role has a line-height helper beside its size helper —
 `body_line_height`, `title_line_height`, and so on, one per role, in

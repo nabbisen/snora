@@ -187,7 +187,7 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of 0.36.1 (RFC-064 audit); re-verified unchanged at 0.38.0:
+As of 0.36.1 (RFC-064 audit); re-verified unchanged at 0.38.1:
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|

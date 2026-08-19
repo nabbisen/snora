@@ -70,23 +70,25 @@ meaningless in the high-contrast presets (a light shadow on a
 near-white background, or a barely-there shadow on near-black), so a
 border is the one visual signal that works uniformly across all four.
 
-Measured border-vs-background contrast, all four presets:
+Measured border-vs-background contrast, all four presets (re-derived at
+0.38.1, RFC-071 — the figures below stood stale since 0.34.0):
 
 | Preset | Contrast |
 |---|---|
-| `light` | 1.39:1 |
-| `dark` | 1.43:1 |
+| `light` | 3.38:1 |
+| `dark` | 3.81:1 |
 | `high_contrast_light` | 21.0:1 |
 | `high_contrast_dark` | 21.0:1 |
 
-The floor tested is `1.3:1` — chosen because it is what the `border`
-role, used directly and unmodified (per the mapping above — no derived
-shift, unlike the modal dim below), actually achieves across all four
-built-in presets, with a small margin under the worst case (`light` at
-1.39). This is deliberately modest, well below WCAG SC 1.4.11's full
-`3.0` non-text-contrast threshold for arbitrary UI component boundaries —
-matching a real, unmodified token value rather than inventing a
-derivation to clear a stricter number.
+The floor tested is `NON_TEXT_MIN` (`3.0:1`, WCAG SC 1.4.11's own
+non-text-contrast threshold) — what the `border` role, used directly
+and unmodified (per the mapping above — no derived shift, unlike the
+modal dim below), actually achieves across all four built-in presets,
+with the worst case (`light`) clearing it by 13%. The border was
+repaired to clear this bar specifically in 0.34.0 (RFC-058); the
+assertion did not test the real bar until 0.38.1 (RFC-071) — for four
+minors it tested a discount value (`1.3:1`) chosen when the border's
+worst case was believed, incorrectly, to be 1.39:1.
 
 Card text (`text_primary` on the `surface_raised` fill) meets WCAG AA in
 all four presets — verified independently in `design/render/tests.rs`,
@@ -120,19 +122,23 @@ from its own tone; it only ever chooses between two fixed, maximally
 distinct poles.
 
 Measured contrast of the composited dim against the plain background,
-all four presets:
+all four presets (re-derived at 0.38.1, RFC-071 — stale since 0.37.0,
+the release that changed `DIM_ALPHA` without updating this table):
 
 | Preset | Pole chosen | Contrast |
 |---|---|---|
-| `light` | black | 2.85:1 |
-| `dark` | white | 3.83:1 |
-| `high_contrast_light` | black | 2.85:1 |
-| `high_contrast_dark` | white | 3.66:1 |
+| `light` | black | 3.2424:1 |
+| `dark` | white | 4.3798:1 |
+| `high_contrast_light` | black | 3.2424:1 |
+| `high_contrast_dark` | white | 4.2529:1 |
 
-All four comfortably clear the `1.3:1` floor tested (shared with the
-card border floor above — both measure "is this element visually
-distinct from the page behind it", not because the two elements are
-otherwise related).
+All four clear `NON_TEXT_MIN` (`3.0:1`) — `light` and
+`high_contrast_light` by the thinnest margin, 8%, which is exactly why
+`DIM_ALPHA` was set to `0.44` rather than the `0.42` that would have
+cleared it by 1.3% (RFC-065). Shared with the card border floor above,
+deliberately (RFC-071): both measure "is this element visually distinct
+from the page behind it," not because the two elements are otherwise
+related.
 
 ## What this RFC does not cover
 

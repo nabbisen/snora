@@ -191,6 +191,46 @@ which is a different and more permissive regime than this covenant.
   the change fixes an accessibility defect, recorded as **Fixed** in the
   CHANGELOG.
 
+**Contrast thresholds are floors, and that is a commitment, not
+currently-true trivia (RFC-072).** Every contrast assertion snora ships
+is `>=` — a role's ratio against its declared surfaces is guaranteed to
+be *at least* its threshold. **No maximum is guaranteed, now or
+later.** The bullet above is the reason: the only preset value change
+this covenant permits is one a contrast test proves fixes a defect —
+raising a ratio that was failing — so the only direction a value can
+move under this covenant is up. **We will not commit to keeping any
+snora colour insufficiently contrasty**, because a design system that
+promises accessibility repairs cannot also promise a ceiling those
+repairs might cross.
+
+**The practical consequence: do not assert that a snora colour stays
+below a threshold.** A repair can raise a ratio you were relying on
+staying low, at any time. What it carries when it does: **at minimum, a
+CHANGELOG entry under Fixed** — every permitted preset-value change
+requires one, per the bullet above — **and where the change is
+visible, an explicit appearance-change statement and a migration
+guide**, as 0.34.0's `border` repair carried — its CHANGELOG entry
+states plainly *"This is an appearance change, not a silent fix"*
+(`CHANGELOG.md`), and [the paired migration
+guide](../guides/migration-0.33-to-0.34.md) names the affected
+rendering regions and tells readers what to re-check — that is the
+only precedent of this kind, and it is the bar future repairs are held
+to, not a best-effort courtesy. None of that makes it
+a breaking change by this covenant's own definition, because nothing
+frozen changed shape or meaning — but it is not a silent one either. If
+a decision in your own application depends on a colour being illegible
+against something, assert that against **your own** colour, which you
+control, not against ours.
+
+**And the limit of this guarantee, stated as plainly as the guarantee
+itself: a repair is judged only on the pair that was failing, and
+preserves nothing else.** Changing `border`, for instance, moves its
+contrast against `background`, `surface`, and `surface_raised`
+simultaneously — the repair is correct if the failing pair now clears
+its floor; nothing about the covenant commits to any other pair's
+ratio staying where it was, moving by a bounded amount, or moving in a
+particular direction. The floor is the promise. No other ratio is.
+
 **Adding a `Palette` role requires declaring where it renders, and the
 compiler enforces it (RFC-063).** `Palette::usages`
 (`crates/snora-design/src/palette.rs`) destructures `Palette`

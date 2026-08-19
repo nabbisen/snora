@@ -77,6 +77,16 @@ pub fn title_size(tokens: &Tokens) -> Pixels {
 }
 
 /// Returns the `title` line-height as a relative [`LineHeight`].
+///
+/// **`title`'s value (`1.3`) is iced 0.14's own default line-height**
+/// (`impl Default for LineHeight` returns `Relative(1.3)`,
+/// `iced_core-0.14.0/src/text.rs:215-219`; every `iced::widget::text`
+/// that never calls `.line_height()` already renders at this value).
+/// Calling this helper is therefore harmless but has **no observable
+/// effect on any surface** — it restates what the renderer already
+/// does (RFC-070). Kept for symmetry with the other five roles' helpers
+/// (the two-axis contract below requires one per role), not because
+/// omitting it would change anything.
 #[must_use]
 pub fn title_line_height(tokens: &Tokens) -> LineHeight {
     LineHeight::Relative(tokens.typography.title.line_height)

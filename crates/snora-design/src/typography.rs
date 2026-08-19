@@ -18,6 +18,16 @@ pub struct TextRole {
     /// Font size in logical pixels.
     pub size: f32,
     /// Line-height multiplier (e.g. `1.4`), relative to `size`.
+    ///
+    /// **Not applying this at all is not the same as "no line-height"**:
+    /// the pinned iced version renders text at its own default,
+    /// `Relative(1.3)`, whenever `.line_height()` is never called (see
+    /// `docs/src/design/typography.md` for the source citation).
+    /// `Typography::default_roles()`'s six values are stated against
+    /// that baseline, not only against each other — `title`'s `1.3`
+    /// *is* the default (applying it changes nothing observable), and
+    /// three of the six roles are deliberately tighter than it, not
+    /// under-specified (RFC-070).
     pub line_height: f32,
 }
 

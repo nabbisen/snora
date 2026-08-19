@@ -104,6 +104,21 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.38.1** — Three assertions and pages that had drifted from the code they
+  describe. `engine-surfaces.md` had published the **pre-repair** border figures
+  since 0.34.0 and the **pre-RFC-065** dim figures since 0.37.0, and the
+  `VISIBILITY_FLOOR` those numbers justified was so slack that `light`'s border
+  could have regressed from 3.38:1 to 1.31:1 and still passed — the 0.34.0
+  accessibility repair was unprotected by the very test that measured it. The
+  floor is now `NON_TEXT_MIN` (3.0), unsplit, with both worst cases and the
+  release each was measured at recorded beside it (RFC-071). Separately, the
+  typography scale had never been stated against **iced's own default
+  line-height, `Relative(1.3)`** — so `title` matches it exactly and three roles
+  are deliberately tighter, while our readability guidance implied applying any
+  role was uniformly an improvement (RFC-070, found by **orbok**). And contrast
+  thresholds are now documented as **floors, never ceilings**, after a consumer
+  asserted the opposite (RFC-072, from **knotra**). No palette value changed, no
+  public API changed, nothing rendered differently.
 - **0.38.0** — The typography scale stopped being half-tooled (RFC-068), and
   the book stopped claiming verification it did not have (RFC-069). `TextRole`
   carries `size` and `line_height`; `snora-style::text` had six helpers for the

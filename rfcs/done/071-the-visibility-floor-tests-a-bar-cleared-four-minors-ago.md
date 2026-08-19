@@ -1,7 +1,7 @@
 # RFC 071 — The visibility floor tests a bar the palette cleared four minors ago, and the page still publishes the old numbers
 
-**Status.** Accepted (owner, 2026-08-19). Handoff written — see
-[`handoffs/071-…`](../handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.1 (2026-08-20).
+[Handoff](../handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md).
 **Tracks.** Accessibility assertions / documentation integrity.
 **Found by** the architect, while verifying a **knotra** report that turned out
 to be incorrect. The report was wrong; checking it found this.

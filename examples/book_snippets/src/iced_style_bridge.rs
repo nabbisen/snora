@@ -58,5 +58,6 @@ fn typography_sizes(tokens: Tokens) -> iced::widget::Text<'static> {
 
     iced::widget::text("Hello")
         .size(text::body_size(&tokens))
+        .line_height(text::body_line_height(&tokens))
 }
 // ANCHOR_END: bridge_typography_sizes

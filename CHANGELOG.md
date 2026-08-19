@@ -17,6 +17,96 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.38.1] — 2026-08-20
+
+### Fixed
+
+- **The style bridge's own reference page still listed six helpers when
+  there are twelve.** `design/iced-style-bridge.md` — the page a consumer
+  reads to learn what the bridge offers — had a section titled
+  "Typography sizes" enumerating `body_size` … `display_size` and never
+  mentioning line-height, one release after RFC-068 added a line-height
+  helper per role. Caught by the release checklist's documentation-scope
+  line (a capability arrived; a page still implied its absence), not by a
+  test — no test can see this. The section now lists all twelve as a
+  role table, its compiled snippet applies both halves, and it points at
+  [Typography](docs/src/design/typography.md) for each role stated
+  against iced's own `Relative(1.3)` default, since **applying a
+  line-height helper is not always an improvement over applying none**
+  (RFC-070).
+
+- **The engine-surface visibility floor tested a bar the palette
+  cleared four minors ago, and the docs page that justified it was
+  publishing pre-repair numbers (RFC-071).** `VISIBILITY_FLOOR` (now
+  `NON_TEXT_MIN`, `3.0:1`) was `1.3:1`, justified as "what the `border`
+  role actually achieves… with a small margin under the worst case
+  (`light` at 1.39)." That worst case was the *pre*-repair figure — the
+  border was fixed to clear `3.0:1` in 0.34.0 (RFC-058), and the
+  assertion was never updated to match, so a regression from the real
+  3.38:1 worst case back down to 1.31:1 would have passed silently for
+  four minors. `docs/src/design/engine-surfaces.md` carried the same
+  stale figures in its own table, plus a second, independently stale
+  table for the modal dim (frozen at pre-RFC-065 values since 0.37.0).
+  Both tables re-derived and corrected: border worst case **3.38:1**
+  (`light`), dim worst case **3.2424:1** (`light`/`high_contrast_light`)
+  — both clear the real `3.0:1` WCAG SC 1.4.11 floor with margin, so
+  one shared constant serves both assertions without splitting it.
+  Perturbation-tested: a border regressed toward `background` and a
+  lowered `DIM_ALPHA` both now fail the suite, which they did not
+  before. **No palette value or `DIM_ALPHA` changed** — this repairs an
+  assertion and a page, not a color.
+
+- **The typography scale was calibrated against itself and never
+  stated against iced's own default line-height, and the readability
+  guidance assumed applying a role's line-height is always an
+  improvement — it isn't, for half the scale (RFC-070, found by
+  orbok).** iced 0.14 renders text at `Relative(1.3)` whenever
+  `.line_height()` is never called
+  (`impl Default for LineHeight` → `Relative(1.3)`,
+  `iced_core-0.14.0/src/text.rs:215-219`). Stated against that
+  baseline: `body` (1.4) and `body_small` (1.35) are looser — the
+  intended benefit — `title` (1.3) is **identical**, so
+  `title_line_height` restates the renderer default and has no
+  observable effect on any surface, and `label` (1.2), `heading`
+  (1.25), and `display` (1.2) are **tighter** than doing nothing at
+  all, deliberately, because larger text tolerates less relative
+  leading. `readability.md`'s "apply line-height to anything that
+  might wrap" rule read as uniform improvement; it named `title` and
+  `heading` alongside `body`/`body_small`, and applying either of
+  those two does not help the way the rule implied. Corrected, along
+  with `typography.md`'s role table (now carries the baseline,
+  cited to source) and `TextRole::line_height`'s and
+  `title_line_height`'s own doc comments. **Measured whether `heading`
+  (1.25 vs. iced's 1.3, on a 24px heading) should change under RFC-036's
+  accessibility carve-out: no** — the difference is 1.2px per line
+  (3.85% of a 31.2px line box), ordinary typographic tightening at
+  larger sizes, not a legibility defect. **No preset value changed;**
+  documentation and doc-comment corrections only.
+
+### Changed
+
+- **Documented that snora's contrast thresholds are floors, never
+  ceilings — a property the codebase already had and had never told
+  consumers (RFC-072).** Verified across the entire contrast suite:
+  every assertion is `>=` (`snora-design/src/tests.rs:107`, the
+  derived mandatory pairs; `:302`, primary text at AAA; and every other
+  contrast assertion in the workspace, re-checked beyond just those
+  two files) — there is no upper-bound contrast assertion anywhere.
+  Combined with RFC-036's covenant, which permits changing a preset
+  value only where a test proves it fixes a defect, the only direction
+  a contrast ratio can move is up. A consumer (knotra) had asserted the
+  opposite — that `border` against `surface` *stays below* AA — to
+  justify excluding a notice tone; the reasoning was sound and the
+  figure right, but the bound is not one snora holds, and it has
+  already moved once (0.34.0 took it from 1.32 to 3.50). Stated as a
+  commitment in `api-governance.md`, beside the covenant's permitted-
+  changes list, with the practical consequence spelled out — do not
+  assert a snora colour stays below a threshold; assert against your
+  own — and the honest limit of the guarantee: a repair is judged only
+  on the pair that was failing, and preserves nothing else. A short
+  pointer added in `guides/accessibility.md`, not a second copy.
+  Documentation only; no code, no assertion, no value changed.
+
 ## [0.38.0] — 2026-08-19
 
 ### Added

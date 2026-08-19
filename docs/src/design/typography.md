@@ -22,14 +22,33 @@ pub struct TextRole {
 }
 ```
 
-| Role | Size | Line height | Purpose |
-|---|---|---|---|
-| `body` | 16.0 | 1.4 | ordinary explanatory text |
-| `body_small` | 14.0 | 1.35 | secondary metadata, compact help |
-| `label` | 14.0 | 1.2 | button, field and chip labels |
-| `title` | 18.0 | 1.3 | card / dialog / notice title |
-| `heading` | 24.0 | 1.25 | page or section heading |
-| `display` | 32.0 | 1.2 | rare major page title |
+**iced 0.14's own default line-height is `Relative(1.3)`** — text that
+never calls `.line_height()` already renders at 1.3
+(`iced_core::widget::text::Format::default()` sets
+`line_height: LineHeight::default()`,
+`iced_core-0.14.0/src/widget/text.rs:290`; `impl Default for LineHeight`
+returns `Self::Relative(1.3)`, `iced_core-0.14.0/src/text.rs:215-219`).
+Every role below is stated against that baseline, not only against each
+other, so what applying a role's helper actually buys you is legible
+from the table alone (RFC-070):
+
+| Role | Size | Line height | vs iced's 1.3 default | Purpose |
+|---|---|---|---|---|
+| `body` | 16.0 | 1.4 | **+0.10, looser** | ordinary explanatory text |
+| `body_small` | 14.0 | 1.35 | **+0.05, looser** | secondary metadata, compact help |
+| `label` | 14.0 | 1.2 | −0.10, tighter | button, field and chip labels |
+| `title` | 18.0 | 1.3 | **identical — no effect** | card / dialog / notice title |
+| `heading` | 24.0 | 1.25 | −0.05, tighter | page or section heading |
+| `display` | 32.0 | 1.2 | −0.10, tighter | rare major page title |
+
+**Two roles are looser than the default, one matches it exactly, and
+three are tighter — deliberately, because larger text tolerates (and
+typically wants) less relative leading, the same reason the ladder
+tightens as size grows.** The tighter roles are not a defect. `title`
+is worth knowing about specifically: `title_line_height` restates the
+renderer's own default, so calling it changes nothing observable — see
+its own doc comment. See [Readability](../guides/readability.md) for
+what this means in practice when picking a role for text that wraps.
 
 **These are defaults a preset supplies, not constants.** All four built-in
 presets (`light`, `dark`, `high_contrast_light`, `high_contrast_dark`) share

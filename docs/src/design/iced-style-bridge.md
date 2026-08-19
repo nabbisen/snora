@@ -35,14 +35,30 @@ Available functions: `card_surface`, `card_raised`, `card_selected`.
 
 `iced::widget::container` takes `&Theme` only — no status parameter.
 
-## Typography sizes
+## Typography
 
 ```rust,ignore
 {{#include ../../../examples/book_snippets/src/iced_style_bridge.rs:bridge_typography_sizes}}
 ```
 
-Available: `body_size`, `body_small_size`, `label_size`, `title_size`,
-`heading_size`, `display_size`.
+Available, one pair per role — a size and a line-height helper:
+
+| Role | Size | Line height |
+|---|---|---|
+| `body` | `body_size` | `body_line_height` |
+| `body_small` | `body_small_size` | `body_small_line_height` |
+| `label` | `label_size` | `label_line_height` |
+| `title` | `title_size` | `title_line_height` |
+| `heading` | `heading_size` | `heading_line_height` |
+| `display` | `display_size` | `display_line_height` |
+
+The size helpers return `iced::Pixels`; the line-height helpers return
+`iced::widget::text::LineHeight::Relative` (RFC-068). **Applying a
+line-height helper is not always an improvement over applying none** —
+iced already renders at `Relative(1.3)` by default, so `title`'s helper
+changes nothing and three roles are deliberately tighter than the
+default. See [Typography](typography.md) for each role stated against
+that baseline before choosing.
 
 ## Focus-state limitation (iced 0.14)
 
