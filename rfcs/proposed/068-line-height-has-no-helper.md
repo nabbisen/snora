@@ -80,21 +80,35 @@ are not changed by this RFC:
   floor, and inventing one here without evidence would be the shape of defect
   RFC-058 found.
 
+## Resolved questions
+
+**Q-1 — return `LineHeight` or the raw `f32` multiplier? → `LineHeight::Relative`.**
+**Ruled by the architect, 2026-08-19.**
+
+The two candidates were `iced::widget::text::LineHeight`, directly usable as
+`.line_height(text::body_line_height(&tokens))`, and a raw `f32`, which is
+renderer-agnostic and leaves the caller to choose `Relative` vs `Absolute`.
+
+**The ruling is `LineHeight::Relative`**, on consistency: the size helpers
+already return an iced type (`body_size` returns `Pixels`, not `f32`), and the
+multiplier stored in `TextRole` is *defined* as relative. Returning `f32` would
+make the caller re-state a fact the token already fixed, and would leave every
+call site free to reinterpret a relative multiplier as an absolute pixel height
+— a mistake the token's own meaning forbids.
+
+Implementation notes, verified against iced 0.14:
+
+- `LineHeight` is `iced_core::text::LineHeight`, re-exported at
+  `iced::widget::text::LineHeight`. Its variants are `Relative(f32)` and
+  `Absolute(Pixels)`. **`snora-style` already depends on `iced`** — no new
+  dependency, and no change to the crate's dependency graph.
+- The helpers therefore read
+  `LineHeight::Relative(tokens.typography.body.line_height)`, mirroring
+  `body_size`'s `tokens.typography.body.size.into()` one-liner.
+- **`snora-design` is unaffected.** The `f32` stays in the token; only the
+  bridge converts. The iced-free constraint on `snora-design` is untouched.
+
 ## Open questions
-
-**Q-1 — return `LineHeight` or the raw `f32` multiplier?**
-
-- **`iced::widget::text::LineHeight`** is directly usable —
-  `.line_height(text::body_line_height(&tokens))` — and matches how the size
-  helpers return `iced::Pixels` rather than `f32`. Consistent with the module's
-  existing shape.
-- **`f32`** is renderer-agnostic and leaves the caller to choose
-  `Relative` vs `Absolute`.
-
-**Suggest `LineHeight::Relative`**, on the consistency argument: the size
-helpers already return an iced type, and the multiplier stored in `TextRole` is
-*defined* as relative. Returning `f32` would make the caller re-state a fact the
-token already fixed.
 
 **Q-2 — does adding these oblige snora's widgets to apply line-height?**
 No, and the RFC should say so explicitly, because the obvious next question
@@ -111,7 +125,8 @@ what the roles provide, not mandating a minimum we have no evidence for.
 
 1. Six line-height helpers exist in `snora-style::text`, named consistently with
    the size helpers, one per role.
-2. Q-1 answered, with the reasoning recorded.
+2. The helpers return `iced::widget::text::LineHeight::Relative` (Q-1, ruled)
+   — not `f32`, and not `Absolute`.
 3. `text.rs`'s module doc no longer implies line-height is untooled, and keeps
    its accurate statement that snora's own widgets do not apply it.
 4. `typography.md` and `readability.md` point at the helpers.
