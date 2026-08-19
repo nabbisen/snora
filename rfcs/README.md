@@ -128,12 +128,12 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 | 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./accepted/068-line-height-has-no-helper.md) | v0.38.0 (handoff: [`handoffs/068-…`](./handoffs/068-line-height-has-no-helper/implementation-handoff.md)) |
+| 069 | [Every Rust example in the book is `ignore`, and the policy blames the wrong cause](./accepted/069-book-examples-cannot-be-compiled.md) | v0.38.0 (handoff: [`handoffs/069-…`](./handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 069 | [Every Rust example in the book is `ignore`, and the policy blames the wrong cause](./proposed/069-book-examples-cannot-be-compiled.md) | v0.38.0 — 110 of 110 book fences uncompiled; a compiled corpus exists and is unused |
 
 ## Archive
 

@@ -1,6 +1,7 @@
 # RFC 069 — Every Rust example in the book is `ignore`, and the policy blames the wrong cause
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-19). Q-1 and Q-2 ruled in the
+[handoff](../handoffs/069-book-examples-cannot-be-compiled/implementation-handoff.md).
 **Tracks.** Documentation integrity.
 **Found by** the architect, while writing RFC-068's handoff.
 **Touches.** `docs/src/contributing/documentation-test-policy.md`,
@@ -109,10 +110,14 @@ policy page, not 110 times.
 - **(c) Neither** — fix findings 1, 2 and 4, and make finding 3's link
   requirement real.
 
-**No recommendation yet, deliberately.** (a) and (b) are not exclusive and both
-carry CI cost that should be measured, not guessed, given that gate 9b's
-compile-time work just established how noisy this repo's timing measurements
-are.
+**Ruled after measurement (see the handoff §3): (a), with purpose-written
+source.** (b) is rejected — of the 90 non-migration fences, 23 reference `self`
+and 34 reference a binding they never declare, so roughly half cannot compile
+whatever the library path; and the docs CI job performs no cargo build today, so
+a library path adds an iced-inclusive workspace build for partial coverage of
+the half least likely to rot. (a) is right in mechanism and wrong in source: the
+20 existing examples are full applications, and a 7-line median fragment does
+not correspond to a region of one.
 
 **Q-2 — how much of the 110 should ever be compiled?** Not all of it. **20 of
 the 110 are in migration guides** (`migration-0.4-to-0.5.md` and successors),
