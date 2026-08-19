@@ -72,6 +72,26 @@ RFC-011-D — so treat our experience as covering the input half only.
 **If your harness can run in-process, prefer this.** It removes the entire class
 of problem described below.
 
+**Two defaults make a snapshot suite pass while testing nothing.** Both are
+reasonable for a tool used interactively and become traps in CI. Reported by
+**arama**, verified against `iced_test` 0.14:
+
+- **A missing reference auto-passes.** `matches_image` returns `Ok(true)` *and
+  writes the PNG* when the path does not exist. So does `matches_hash`. A first
+  run always passes — and so does a run after someone deletes a reference,
+  silently baselining whatever the code produced at that moment.
+- **The reference filename embeds the renderer**, formatted `{stem}-{renderer}`.
+  A `wgpu` reference and a `tiny-skia` reference are different files.
+
+**They compound.** A CI runner without a GPU falls back to `tiny-skia`, looks
+for a reference that does not exist under that name, creates it, and passes.
+**The suite is green and inert, and nothing says so.**
+
+If you adopt this route, assert your references exist before trusting a green
+run, and treat a suite that has never failed as unproven rather than correct.
+That is the same rule as the oracle trap below, one layer up: **a check that
+cannot fail is not a check.**
+
 ### External, real window: verified bounds
 
 Where evidence must be about what a person sees rather than what a reducer
