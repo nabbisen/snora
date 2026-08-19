@@ -132,12 +132,12 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 073 | [Three pages that outlived the facts they state](./accepted/073-pages-that-outlived-the-facts-they-state.md) | v0.38.2 (handoff: [`handoffs/073-…`](./handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 073 | [Three pages that outlived the facts they state](./proposed/073-pages-that-outlived-the-facts-they-state.md) | v0.38.2 — dead links in the built book, gate 9b reported open four minors after closing, shipped helpers called deferred |
 
 ## Archive
 

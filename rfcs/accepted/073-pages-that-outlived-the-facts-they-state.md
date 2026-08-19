@@ -1,6 +1,7 @@
 # RFC 073 — Three pages that outlived the facts they state, and the pattern behind them
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-20). Handoff written — see
+[`handoffs/073-…`](../handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md).
 **Tracks.** Documentation integrity.
 **Found by** the architect, in a pre-cut audit of `docs/` requested before
 0.38.1 was tagged. **No test can catch any of the three.**
@@ -88,40 +89,50 @@ try.** It fixes three pages. What it adds is the third and fourth data points,
 recorded so the question is decided on evidence rather than on the irritation of
 the moment.
 
-## Open questions
+## Resolved questions — all three ruled by the owner, 2026-08-20
 
-**Q-1 — SUMMARY, or the links?** Add the three pages to `SUMMARY.md` so they
-build, or drop the links from `migrations.md` and state that pre-0.7 guides live
-in the repository only. **Suggest adding them to `SUMMARY.md`**: they are
-already written, already linked, and a migration index that silently omits three
-jumps is worse than a longer sidebar. Cheap either way — but **decide, do not
-leave it ambiguous**, which is the state it is in now.
+**Q-1 — add the three guides to `SUMMARY.md`.** They are written and already
+linked; a migration index that silently omits three jumps is worse than a longer
+sidebar.
 
-**Q-2 — what happens to the v0.29.0 section?** Rewriting it as current would
-destroy a real record: it is the evidence that four rows spread 21–27% and that
-a zero-code release moved them 8–11%, which is *why* the ratio became the
-signal. **Suggest keeping the measurements, re-titling the section as
-historical, correcting both 9b statements, and pointing forward to the RFC-050
-note** — the same treatment `engine-surfaces.md` gave 1.39:1, which reads well.
+**Q-2 — correct the stale section. Do not preserve it.**
+**The owner's rule: information that is wrong *now* gets corrected, not
+labelled.** This RFC's first draft argued for keeping the v0.29.0 measurements
+as history. That was wrong, and checking dissolved the argument rather than
+supporting it:
 
-**Q-3 — should a page be able to state another page's status at all?**
-`:136` was wrong because it narrated what `api-freeze-review.md` says instead of
-linking and stopping. **Suggest a rule: link to the register, never restate its
-verdict.** One sentence in the contributing guide; it is the cheapest of the
-three fixes and the only one that prevents a recurrence.
+- The derived figures in that section — the 21–27% spread, the 8–11% move on a
+  zero-code release — **appear nowhere else in the repository.** So the concern
+  was real.
+- But **their inputs are all 24 rows of committed `compile-time.csv`.** Every
+  one of those percentages is recomputable from data we ship. Nothing is lost by
+  deleting the prose.
+- And a hand-written derived percentage sitting in prose, drifting from the CSV
+  that produced it, **is the exact artifact this RFC exists to remove.**
+  Preserving it would have re-created the defect while fixing it.
+
+So: the section goes. Its conclusions survive where they belong — in the
+RFC-050 note that supersedes it, which states the current signal and the current
+noise floor.
+
+**Q-3 — fix what is clearly wrong; add no rule.** `:136` narrates
+`api-freeze-review.md`'s verdict and gets it wrong. Correct it to a link.
+**No written rule, no mechanism** — a one-line error does not need a policy
+attached, and this project has enough rules that fire on things that have
+happened once.
 
 ## Acceptance criteria
 
 1. All three migration guides build and are reachable from the published book;
    Q-1's choice recorded with its reason.
-2. Both gate-9b statements corrected; the v0.29.0 measurements preserved as
-   history, not deleted.
-3. No two notes on `build-cost-budget.md` disagree about what the trend signal
-   is.
+2. The `(gate 9b, v0.29.0)` section is **gone**, not re-titled. Both gate-9b
+   statements are corrected, and `:136` links to `api-freeze-review.md` instead
+   of narrating its verdict.
+3. `build-cost-budget.md` states the trend signal in exactly one place, and
+   nothing on the page disagrees with it.
 4. The checklist no longer calls the `*_line_height()` helpers deferred, and
-   states Q-2's ruling for widget adoption rather than "not yet".
-5. Q-3 answered; if a rule is added, it is one sentence and cites `:136` as the
-   instance.
+   states RFC-068 Q-2's ruling for widget adoption rather than "not yet".
+5. **No new rule, policy, or checklist line is added by this RFC.**
 6. **A built-output link check** — every internal link in `docs/book` resolves
    to a file that exists. The source-level check passes today and missed this.
 7. No code change.
