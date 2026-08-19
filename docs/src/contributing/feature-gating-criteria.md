@@ -110,7 +110,7 @@ the whole unused feature). `widgets_diff_bytes` is recorded per release
 in
 [`reference/binary-size-budget/binary-size.csv`](../reference/binary-size-budget/binary-size.csv),
 appended by the `binary-size` GitHub Actions workflow. **Current status:
-46,464 B (~45 KB) as of 0.35.0 — comfortably under the 150 KB
+46,592 B (~46 KB) as of 0.38.0 — comfortably under the 150 KB
 threshold, not met.**
 
 ### 3. A widget gains a heavy optional dependency
@@ -291,7 +291,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s latest row, 0.37.2, unchanged. The series has oscillated between 46,336 and 46,464 B across seven releases — alternation, not a trend, and well inside a 150 KB bar. 0.38.0 adds six `snora-style` functions, each a one-line token read, and no widget code at all | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,592 B (~46 KB)** — `binary-size.csv`'s 0.38.0 row, measured after the tag. **+128 B on 0.37.2, and a new high**: the series had alternated between 46,336 and 46,464 B for seven releases, so this is the first value outside that band rather than more alternation. It is 0.3% of a 150 KB bar, and the release added six one-line `snora-style` functions and no widget code — recorded as a real move, not smoothed into the band | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
