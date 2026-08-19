@@ -108,18 +108,97 @@ Implementation notes, verified against iced 0.14:
 - **`snora-design` is unaffected.** The `f32` stays in the token; only the
   bridge converts. The iced-free constraint on `snora-design` is untouched.
 
-## Open questions
+**Q-2 — does adding these oblige snora's widgets to apply line-height? → No.**
+**Ruled by the architect, 2026-08-19.**
 
-**Q-2 — does adding these oblige snora's widgets to apply line-height?**
-No, and the RFC should say so explicitly, because the obvious next question
-after "we have helpers" is "why don't we use them?" The answer is that applying
-them changes rendering of shipped primitives and is gated on orbok's evidence —
-not that nobody noticed.
+It does not, and the RFC requires that to be written down where a reader hits
+the question — because the obvious next thought after "we have helpers" is "why
+don't we use them?", and the answer must not read as "nobody noticed." Applying
+them changes the rendering of shipped primitives, and is gated on orbok's Phase
+4 evidence.
 
-**Q-3 — should `readability.md` gain a leading section?** It currently covers
-size and contrast. Leading is the third variable and now has tooling. Suggest a
-short section pointing at the helpers, with **no floor asserted** — describing
-what the roles provide, not mandating a minimum we have no evidence for.
+**Q-3 — a contract, or documentation? → Both, and they cover different halves.**
+**Ruled by the architect, 2026-08-19.**
+
+The question is *who gets noticed*, and the answer splits sharply:
+
+| Audience | What can fire | Mechanism |
+|---|---|---|
+| A snora developer adding a role or a `TextRole` field | **A compile error** | The exhaustive test below |
+| A snora developer wiring a helper to the wrong role | **A test failure** | The same test |
+| An application developer who never sets line-height | **Nothing we ship** | Docs and API shape only |
+
+### The contract — two axes, both compile-enforced
+
+`Typography` and `TextRole` are **plain structs — neither is
+`#[non_exhaustive]`**, unlike `Tokens` and `Palette`. That is the enabling fact:
+exhaustive destructuring binds from *any* crate, so the enforcement can live in
+`snora-style`, next to the helpers it constrains. `Palette::usages()` had to be
+pushed into `snora-design` for exactly the opposite reason (RFC-063); this one
+does not.
+
+One test in `crates/snora-style/src/text.rs` destructures both:
+
+```rust
+// Exhaustive on the ROLE axis. A seventh role fails to compile (E0027)
+// until it is listed here with both helpers. Do NOT add `..`.
+let Typography { body, body_small, label, title, heading, display } = t.typography;
+
+for (role, size, line_height) in [
+    (body, body_size(&t), body_line_height(&t)),
+    // ... one row per role
+] {
+    // Exhaustive on the FIELD axis. A third TextRole field fails to compile
+    // until it is either tooled or explicitly declined here. Do NOT add `..`.
+    let TextRole { size: want_size, line_height: want_line_height } = role;
+    assert_eq!(size.0, want_size);
+    assert_eq!(line_height, LineHeight::Relative(want_line_height));
+}
+```
+
+The role axis catches a new role arriving untooled. **The field axis is the one
+that catches this RFC's own defect class** — a token field growing while the
+bridge silently does not follow. It could not have caught the present instance
+(both fields have existed since v0.20 and the test is written after the fact);
+it fires on the next one.
+
+The equality assertions are not ceremony. Six near-identical one-liners is a
+copy-paste bug waiting to happen — `title_line_height` returning `body`'s
+multiplier would pass any "the helper exists" check, and is not visible by
+reading.
+
+**It also repairs a live instance of the same defect.** `text.rs`'s existing
+`sizes_are_positive_and_monotonic` builds a **hand-written array of six**.
+Adding a seventh role does not break it. That is the RFC-063 hand-maintained-list
+shape, sitting in the file this RFC edits; fold it into the exhaustive test.
+
+### The value floor — declined, deliberately
+
+**No leading floor.** WCAG 2.1 SC 1.4.12 (Text Spacing) is the number that would
+be reached for, and it does not say what it appears to: it requires that content
+survive *a user setting* line height to 1.5, not that a design system ship 1.5.
+Deriving a shipped floor from it would fabricate a threshold from a
+misread standard — RFC-058's defect inverted, and this project has made that
+exact error once already.
+
+What is defensible is a **definitional sanity bound**: `line_height > 1.0`,
+below which lines overlap. `typography.rs`'s doctest already asserts it for
+`body` alone; extend it to all six inside the same exhaustive test, **labelled a
+sanity bound and not an accessibility threshold.**
+
+### The documentation half, which is not a fallback
+
+Nothing snora ships can fire in an application's source — no lint, no macro, no
+build script reaches it. **knotra's zero-occurrences finding would not have been
+caught by any contract available to us.** For that half, two levers exist and
+both are weak:
+
+1. **API shape.** A `body_line_height` sitting beside `body_size`, same module,
+   same naming, is discoverable at the point of use — autocomplete is the closest
+   thing to "noticed while implementing" an application developer will get from
+   us. This is the main reason the helpers are worth adding at all.
+2. **`readability.md` gains a leading section** — short, pointing at the helpers,
+   describing what the roles provide. **No floor asserted**, per the above.
 
 ## Acceptance criteria
 
@@ -131,8 +210,19 @@ what the roles provide, not mandating a minimum we have no evidence for.
    its accurate statement that snora's own widgets do not apply it.
 4. `typography.md` and `readability.md` point at the helpers.
 5. Q-2's answer is written down where a reader will hit the question.
-6. `render_semantics` passes unmodified; **no rendered output changes** —
-   `git diff` shows no change to any widget's rendering path.
+6. **The exhaustive test exists in `crates/snora-style/src/text.rs`**,
+   destructuring `Typography` on the role axis and `TextRole` on the field
+   axis, with no `..` in either pattern, and asserting each helper returns its
+   own role's value.
+7. **A perturbation demo, not a green run.** Show the compile error from adding
+   a seventh role, and from adding a third `TextRole` field, then restore.
+   A guard that has never fired is unproven.
+8. `sizes_are_positive_and_monotonic`'s hand-written six-element array is gone,
+   folded into the exhaustive test.
+9. All six roles assert `line_height > 1.0`, commented as a **sanity bound, not
+   an accessibility threshold**, and no leading floor is introduced anywhere.
+10. `render_semantics` passes unmodified; **no rendered output changes** —
+    `git diff` shows no change to any widget's rendering path.
 
 ## Compatibility and security
 

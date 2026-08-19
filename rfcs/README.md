@@ -123,7 +123,7 @@ Numbers remain stable forever and are never reused.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./proposed/068-line-height-has-no-helper.md) | v0.38.0 — two of five adopters apply no line-height anywhere; Q-1 ruled (`LineHeight::Relative`) |
+| 068 | [The typography scale is half-tooled: six size helpers, no line-height helper](./proposed/068-line-height-has-no-helper.md) | v0.38.0 — two of five adopters apply no line-height anywhere; all three questions ruled |
 
 ## Archive
 
