@@ -138,6 +138,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 074 | [The release checklist names two files by hand, so every other version snippet drifts](./proposed/074-version-snippets-are-a-hand-maintained-list.md) | v0.38.3 — `lib.rs` ships `0.25` to docs.rs; `widgets.md` shows `0.6`, 32 minors stale |
 
 ## Archive
 
