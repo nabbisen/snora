@@ -1,7 +1,7 @@
 # RFC 076 — `snora` publishes a function whose return type it does not export
 
-**Status.** Accepted (owner, 2026-08-20). Handoff written — see
-[`handoffs/076-…`](../handoffs/076-the-facade-publishes-a-type-it-does-not-export/implementation-handoff.md).
+**Status.** Done — shipped in v0.39.0 (2026-08-20).
+[Handoff](../handoffs/076-the-facade-publishes-a-type-it-does-not-export/implementation-handoff.md).
 **Tracks.** Public API / facade completeness.
 **Found by** **arama**, 2026-08-20, while shipping F6 zone navigation.
 **Touches.** `crates/snora/src/lib.rs`, `crates/snora/src/keyboard.rs`.

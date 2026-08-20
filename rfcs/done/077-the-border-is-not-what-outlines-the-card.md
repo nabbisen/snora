@@ -1,7 +1,7 @@
 # RFC 077 — The border is not what outlines the dialog card, and our own rationale says it is
 
-**Status.** Accepted (owner, 2026-08-20). Handoff written — see
-[`handoffs/077-…`](../handoffs/077-the-border-is-not-what-outlines-the-card/implementation-handoff.md).
+**Status.** Done — shipped in v0.39.0 (2026-08-20).
+[Handoff](../handoffs/077-the-border-is-not-what-outlines-the-card/implementation-handoff.md).
 **Tracks.** Accessibility rationale / design record.
 **Found by** **arama**, 2026-08-20, measuring a 27-photo gallery at 0.38.0.
 Arithmetic re-derived by the architect before acceptance.

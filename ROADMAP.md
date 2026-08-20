@@ -104,6 +104,19 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.39.0** — `snora::keyboard::cycle_zones` returned a type the facade did not
+  export (RFC-076). A consumer depending only on `snora` could call it and match
+  `Some(_)` but could not name `Cycle` — and our own doc comments told them to
+  reach into `snora_core` instead, which is how the gap survived a release.
+  `pub use snora_core::focus;` closes it; a sweep of all **25** `snora-core`
+  public types confirms no other instance. Separately, **arama measured the
+  dialog card over photographic content and found the border invisible against
+  the dim** — 1.02:1 — with the dim-to-fill step carrying the separation
+  (RFC-077). Swept over the full content range, `border ǀ dim` reaches **1.00:1
+  in every preset**; `dim ǀ fill` never drops below 3.16. So RFC-058's repair is
+  real but works at the card's *inner* edge, not the outline, and RFC-066's
+  `max(…)` assertion is load-bearing on one branch. **No palette value, no
+  `DIM_ALPHA`, no assertion changed.** Both found by **arama**.
 - **0.38.3** — The release checklist named two files by hand, so every version
   snippet outside them had drifted (RFC-074) — `crates/snora/src/lib.rs` told
   **docs.rs readers of 0.38.2 to depend on 0.25**, and `reference/widgets.md`

@@ -69,7 +69,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! snora = { version = "0.38", default-features = false }
+//! snora = { version = "0.39", default-features = false }
 //! ```
 //!
 //! In this configuration `snora-widgets` is not pulled in and the
@@ -86,6 +86,26 @@ pub use snora_core::{
     MenuItem, Sheet, SheetEdge, SheetSize, SideBar, SideBarItem, Tab, TabAction, TabBar, Toast,
     ToastIntent, ToastLifetime, ToastPosition,
 };
+
+/// Zone-navigation vocabulary (RFC-060): [`focus::Cycle`], [`focus::FocusZone`],
+/// [`focus::ZonePresence`], and [`focus::next_zone`].
+///
+/// Re-exported as a module, not as individual names (RFC-076 Q-1) — `focus` is
+/// a coherent unit, matching how [`keyboard`] already appears as a module.
+/// [`keyboard::cycle_zones`] returns `Option<focus::Cycle>`; before this
+/// re-export, a consumer depending only on `snora` could call that function but
+/// could not name its return type (RFC-076).
+///
+/// ```
+/// use iced::keyboard::{Key, Modifiers, key::Named};
+///
+/// // The whole point of this re-export: name the return type using only
+/// // `snora` — no `snora-core` dependency needed.
+/// let cycle: Option<snora::focus::Cycle> =
+///     snora::keyboard::cycle_zones(Key::Named(Named::F6), Modifiers::empty());
+/// assert_eq!(cycle, Some(snora::focus::Cycle::Forward));
+/// ```
+pub use snora_core::focus;
 
 // ---- Engine modules (always present) ----------------------------------
 /// Stable identifiers snora attaches to the surfaces it renders itself

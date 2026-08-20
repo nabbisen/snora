@@ -17,6 +17,65 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.39.0] — 2026-08-20
+
+### Added
+
+- **`snora::focus` re-exports the zone-navigation vocabulary
+  (`Cycle`, `FocusZone`, `ZonePresence`, `next_zone`) that
+  `snora::keyboard::cycle_zones` already returned (RFC-076).**
+  **arama** found it while shipping F6 zone navigation: the facade
+  provided `cycle_zones() -> Option<snora_core::focus::Cycle>` but
+  never re-exported `focus`, so a consumer depending only on `snora`
+  could call the function and could not name its own return type. Fixed
+  with a single module re-export, `pub use snora_core::focus;`
+  (RFC-076 Q-1: the module, not the four names individually — matches
+  how `keyboard` already appears as a module). `keyboard.rs`'s own doc
+  comments told readers to reach past the facade to
+  `snora_core::focus::next_zone` directly in three places; all three
+  now use the facade path. A compiling doctest demonstrates
+  `snora::focus::Cycle` is nameable using only a `snora` dependency —
+  no `snora-core` needed. **Swept every public signature in `snora`
+  for the same shape of gap (RFC-076 Q-2): none found** — of
+  `snora-core`'s 25 public types, 22 were already re-exported by name
+  and the 3 missing were exactly `focus::{Cycle, FocusZone,
+  ZonePresence}`, all closed by this one re-export. Purely additive;
+  nothing existing renamed or removed.
+
+### Fixed
+
+- **Our own rationale said the dialog card's border is what keeps it
+  visible against the dimmed page behind an open dialog. It is not
+  (RFC-077).** **arama** measured over real photographic content and
+  found the border essentially invisible against the modal dim — 1.02:1
+  in `light`, 1.23:1 in `dark`, against the 3.0:1 floor. Re-derived
+  independently, swept over the full greyscale content range: **every
+  preset** has a content luminance at which the border reaches exactly
+  1.00:1 against the dim — there is no preset in which it reliably
+  outlines the card there. What actually carries the separation is the
+  card's fill against the dim, which never drops below 3.16:1 in any
+  preset. The existing repair (RFC-058, 0.34.0) and the existing
+  either-signal assertion (RFC-066,
+  `dialog_card_distinguishable_from_modal_dim_all_presets`) were both
+  already correct — `max(border ǀ dim, fill ǀ dim) ≥ 3.0` — but the
+  prose around them implied two working mechanisms where arama's data
+  (and this independent re-derivation) show there is only one: the fill
+  branch always carries the assertion, the border branch never does.
+  `docs/src/design/engine-surfaces.md` now states which mechanism does
+  the work and which does not, without weakening the border requirement
+  — the border still does real, required work at the card's own inner
+  edge (3.38:1 `light`, **3.17:1** `dark`, previously unstated on this
+  page) and against the plain undimmed page (unchanged, still
+  documented). **Also measured, previously unmeasured: the sheet
+  panel**, which sits over the same dim. Its border clears the dim
+  floor more comfortably than the dialog's (minimum 2.41:1 vs 1.00:1)
+  but is not token-styled at all — RFC-039 never restyled it — so its
+  own border-to-fill contrast is only 1.02–1.35:1, well under the
+  floor, using `iced::Theme::extended_palette()`'s subtle
+  `background.weak` rather than a dedicated contrast-tested border
+  role. No palette value, `DIM_ALPHA`, or assertion changed —
+  documentation and rationale only.
+
 ## [0.38.3] — 2026-08-20
 
 ### Fixed

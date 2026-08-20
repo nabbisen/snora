@@ -79,13 +79,13 @@ pub fn dismiss_on_escape<Message: Clone>(
 
 /// Returns the [`Cycle`] direction for `F6` / `Shift+F6`, snora's
 /// recommended binding for frame-level zone navigation
-/// ([`snora_core::focus::next_zone`]).
+/// ([`crate::focus::next_zone`]).
 ///
 /// **Not the only legitimate binding.** F6 / Shift+F6 is the desktop
 /// convention for region cycling (Tab already means "next control," so
 /// snora does not claim it — see [`dismiss_on_escape`] for the same
 /// non-capture policy applied to `Escape`). An application is free to
-/// bind a different key to [`snora_core::focus::next_zone`] directly;
+/// bind a different key to [`crate::focus::next_zone`] directly;
 /// this helper exists so the common case does not require re-deriving
 /// which modifier means "backward."
 ///
@@ -104,7 +104,7 @@ pub fn dismiss_on_escape<Message: Clone>(
 /// // In your update, alongside dismiss_on_escape:
 /// Message::KeyPressed(key, modifiers) => {
 ///     if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
-///         let next = snora_core::focus::next_zone(
+///         let next = snora::focus::next_zone(
 ///             self.focus_zone,
 ///             cycle,
 ///             self.zone_presence(),

@@ -126,6 +126,8 @@ Numbers remain stable forever and are never reused.
 | 073 | [Three pages that outlived the facts they state](./done/073-pages-that-outlived-the-facts-they-state.md) | v0.38.2 (handoff: [`handoffs/073-…`](./handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md)) |
 | 074 | [The release checklist names two files by hand, so every other version snippet drifts](./done/074-version-snippets-are-a-hand-maintained-list.md) | v0.38.3 (handoff: [`handoffs/074-…`](./handoffs/074-version-snippets-are-a-hand-maintained-list/implementation-handoff.md)) |
 | 075 | [The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes](./done/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md) | v0.38.3 (handoff: [`handoffs/075-…`](./handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md)) |
+| 076 | [`snora` publishes a function whose return type it does not export](./done/076-the-facade-publishes-a-type-it-does-not-export.md) | v0.39.0 (handoff: [`handoffs/076-…`](./handoffs/076-the-facade-publishes-a-type-it-does-not-export/implementation-handoff.md)) |
+| 077 | [The border is not what outlines the dialog card](./done/077-the-border-is-not-what-outlines-the-card.md) | v0.39.0 (handoff: [`handoffs/077-…`](./handoffs/077-the-border-is-not-what-outlines-the-card/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -135,8 +137,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 076 | [`snora` publishes a function whose return type it does not export](./accepted/076-the-facade-publishes-a-type-it-does-not-export.md) | v0.39.0 (handoff: [`handoffs/076-…`](./handoffs/076-the-facade-publishes-a-type-it-does-not-export/implementation-handoff.md)) |
-| 077 | [The border is not what outlines the dialog card](./accepted/077-the-border-is-not-what-outlines-the-card.md) | v0.39.0 (handoff: [`handoffs/077-…`](./handoffs/077-the-border-is-not-what-outlines-the-card/implementation-handoff.md)) |
 
 ## Proposed
 
