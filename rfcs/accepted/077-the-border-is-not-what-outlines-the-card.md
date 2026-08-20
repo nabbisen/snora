@@ -1,6 +1,7 @@
 # RFC 077 — The border is not what outlines the dialog card, and our own rationale says it is
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-20). Handoff written — see
+[`handoffs/077-…`](../handoffs/077-the-border-is-not-what-outlines-the-card/implementation-handoff.md).
 **Tracks.** Accessibility rationale / design record.
 **Found by** **arama**, 2026-08-20, measuring a 27-photo gallery at 0.38.0.
 Arithmetic re-derived by the architect before acceptance.
@@ -75,7 +76,15 @@ State, where the border repair and the dim are explained:
 
 ## Open questions
 
-**Q-1 — does this reach `high_contrast_*`?** arama measured `light` and `dark`
+**Q-1 — answered, and it refuted the guess below.** Swept over greyscale content
+at `DIM_ALPHA = 0.44`, **every preset has a content luminance at which
+`border ǀ dim` reaches 1.00:1** — near-white in `light`, black in `dark` and
+`high_contrast_light`, white in `high_contrast_dark`. There is no preset in
+which the border reliably outlines the card, and `dim ǀ fill` never drops below
+**3.16** in any of them. The original speculation, kept below so the correction
+is visible:
+
+**~~Q-1 — does this reach `high_contrast_*`?~~** arama measured `light` and `dark`
 only. In the high-contrast presets the border is pure black or white and the dim
 composites from the opposite pole, so the border is very likely **highly**
 visible against the dim there — the opposite of `light`. **Derive all four
