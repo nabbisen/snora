@@ -68,33 +68,42 @@ minor, short where nothing broke); weaken `migrations.md` to match
 `versioning-policy.md`; or keep both and have the index say explicitly which
 jumps need no guide.
 
-**Revised recommendation, 2026-08-20** — the owner asked which is better *for
-snora as it is now*, and the first answer (a guide per minor) is not it.
+**Recommendation, third and final form — every minor gets a guide. No
+condition.**
 
-**The ambiguity is the defect, not the missing files**, and it can be removed
-without writing nineteen no-op guides. snora has cut **19 minors** since 0.20,
-most of them additive. Nineteen "nothing required" files would each be a new
-artifact that can itself go stale, in a project that has just spent a week
-removing stale artifacts — and each would duplicate what the CHANGELOG already
-records.
+Two earlier answers are recorded here because both were wrong and the way they
+were wrong is the point.
 
-**Recommend: the index carries a line for every minor; a linked guide exists
-only where a consumer has something to do or know.**
+**First answer: a guide per minor.** Right rule, weak argument.
 
-- Every minor appears in `migrations.md`. Absence becomes impossible rather
-  than ambiguous.
-- A jump that needs nothing says so **in the index**, one line, no file.
-- A jump with something to say gets a guide — and "something to say" is wider
-  than "something broke". **0.38 → 0.39 breaks nothing and still earned one**:
-  it lets an F6 consumer drop a dependency, and it corrects a claim we made
-  about what makes the dialog card visible.
+**Second answer: a guide only where a consumer "has something to do or know",
+an index line otherwise.** The owner rejected this, and correctly: *"I don't
+like complicated conditions attached to the rules."*
 
-This drops the double standard by making the index the single source: every
-minor is accounted for, and the presence of a guide carries information instead
-of being a coin toss. It also fits the owner's stated prior — fewer artifacts,
-no duplication.
+It reads as one rule and behaves as a judgement call. **"Something to do or
+know" is vaguer than "something broke", not sharper** — it has to be decided per
+release, by whoever is cutting, which is precisely how the original defect
+happened: three documents disagreed, and I resolved the conflict twice by
+judgement, silently. A rule whose application needs a decision reproduces that
+failure in a new coat.
 
-**All three documents are amended to say this**, in one change.
+**And my argument against the simple rule was based on a false analogy.** I
+objected that nineteen no-op guides are nineteen artifacts that can go stale, in
+a project that had just spent a week deleting stale artifacts. **Migration
+guides do not rot.** They describe a transition between two fixed versions and
+are written once — verified: `migration-0.32-to-0.33`, `-0.33-to-0.34` and
+`-0.35-to-0.36` have **exactly one commit each**, and `-0.36-to-0.37` has two.
+Unlike a reference page, there is nothing in them for reality to drift away
+from. The cost is a short file, once, and then nothing.
+
+So: **every minor release ships a guide. A guide for a minor that broke nothing
+says so in a sentence.** No conditions, no per-release judgement, and Q-3's
+check becomes trivially exact — *for every minor tag, a file exists* — with
+nothing for anyone to interpret.
+
+`migrations.md`'s existing promise is already this rule stated correctly. **It
+does not change; the other two documents are amended to match it**, and the
+practice is brought up to what the page has said all along.
 
 **Q-2 — how far back to backfill?**
 
