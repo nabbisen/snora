@@ -255,10 +255,16 @@ signal component available to confuse them:
 | `design_overhead_ratio` | 0.043912 | 0.042133 | **−4.05%** |
 | `widgets_diff_bytes` | 46,464 B | 46,592 B | **+128 B** |
 
-**Read the ratio's ~10% investigate threshold against that −4.05%**, not against
-a hoped-for zero. And the binary-size series alternates 46,464 ↔ 46,592 across
-0.37.2 / 0.38.0 / 0.38.1 / 0.38.2 — a **±128 B** swing that this release proves
-is not code, since none changed. 0.38.0's +128 B was recorded at the time as
+**0.38.3 is a second zero-code control** — also documentation and doc comments
+only — and it moved the ratio **+2.5%** (0.042133 → 0.043206). Two controls, in
+opposite directions, both under 5%: **−4.05%** and **+2.5%**.
+
+**Read the ratio's ~10% investigate threshold against those**, not against a
+hoped-for zero. The binary-size series reads 46,464 / 46,592 / 46,464 / 46,592 / 46,592 across
+0.37.2 → 0.38.3 — a **±128 B** swing that these releases prove is not code,
+since 0.38.2 and 0.38.3 changed none. Note it is **not a strict alternation**:
+the two zero-code releases landed on the same value. The amplitude is the
+finding, not a pattern in the sequence. 0.38.0's +128 B was recorded at the time as
 "a new high"; it was not, and the correction is recorded in
 [`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md).
 **A release that changes nothing is the only measurement that can tell you what
