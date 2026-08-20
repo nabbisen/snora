@@ -140,6 +140,8 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 076 | [`snora` publishes a function whose return type it does not export](./proposed/076-the-facade-publishes-a-type-it-does-not-export.md) | v0.39.0 — found by arama; `cycle_zones`' return type is unnameable through the facade |
+| 077 | [The border is not what outlines the dialog card](./proposed/077-the-border-is-not-what-outlines-the-card.md) | v0.39.0 — found by arama; border ǀ dim is 1.02:1, the dim-to-fill step carries it |
 
 ## Archive
 
