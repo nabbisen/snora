@@ -1,6 +1,7 @@
 # RFC 079 — The migration index promises a guide for every minor, and six are missing
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-20). Handoff written — see
+[`handoffs/079-…`](../handoffs/079-the-migration-index-promises-a-guide-for-every-minor/implementation-handoff.md).
 **Tracks.** Documentation integrity / release process.
 **Found by** the owner, 2026-08-20 — *"the docs lack migration about 0.38.0 to
 0.39.0."* The audit that followed found five more.

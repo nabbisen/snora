@@ -1,6 +1,7 @@
 # RFC 080 — The migration guide and the release letters say the same thing, and only one of them scales
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-20). Handoff written — see
+[`handoffs/080-…`](../handoffs/080-the-migration-guide-and-the-release-letters-are-the-same-document/implementation-handoff.md).
 **Tracks.** Correspondence / release process.
 **Found by** the owner, 2026-08-20, asking what RFC-079's rule costs per
 release. The guide is not the expensive part.
