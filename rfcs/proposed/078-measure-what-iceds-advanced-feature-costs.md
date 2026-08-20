@@ -48,6 +48,28 @@ only quantity this RFC needs.
 Binary size does not have this problem — it is deterministic given a toolchain —
 so the A/B there is simply a build with and without the feature.
 
+## The owner's prior, stated 2026-08-20
+
+> *"We should keep snora simple as possible. Unnecessary dependency should not
+> be added possibly."*
+
+**This sets the default to no**, and the measurement's job is to overturn it,
+not to inform a neutral choice. Two consequences for how the result is read:
+
+- **Q-3's thresholds should be read as a bar to clear, not a range to land in.**
+  "Between" is not a tie to be broken by preference; under this prior it
+  resolves to *no* unless the trapping design has a demand behind it.
+- **Q-4 gains weight over the byte count.** Feature unification hands every
+  consumer's iced `advanced` whether they wanted it or not. Under a
+  simplicity-first prior that is not a side effect to be traded against size —
+  it is close to the whole question, and a small byte cost does not answer it.
+
+**And the demand is still zero.** Four adopters have been in a position to want
+trapping: tekstide declined it explicitly, apimokka, orbok and knotra have not
+asked, and **arama shipped zone navigation without it** — F6, a permanent hint,
+working. The measurement is worth taking because the owner asked for the number
+rather than a guess; it is not worth taking as a step toward adoption.
+
 ## Open questions
 
 **Q-1 — which arm is "with"?** `advanced` on the workspace `iced` dependency
