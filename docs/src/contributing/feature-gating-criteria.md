@@ -110,7 +110,7 @@ the whole unused feature). `widgets_diff_bytes` is recorded per release
 in
 [`reference/binary-size-budget/binary-size.csv`](../reference/binary-size-budget/binary-size.csv),
 appended by the `binary-size` GitHub Actions workflow. **Current status:
-46,592 B (~46 KB) as of 0.38.3 — comfortably under the 150 KB
+46,464 B (~45 KB) as of 0.39.0 — comfortably under the 150 KB
 threshold, not met.**
 
 ### 3. A widget gains a heavy optional dependency
@@ -283,7 +283,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.39.0, re-derived 2026-08-20, RFC-062)
+## Current status (snora 0.39.0, re-derived 2026-08-20 post-tag, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -293,7 +293,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,592 B (~46 KB)** — `binary-size.csv`'s 0.38.3 row (unchanged from 0.38.2). **Now proven noise, not inferred:** the series alternates 46,464 ↔ 46,592 across the last four releases, and 0.38.2 changed **no crate code at all** (`git diff -- crates/` empty) yet moved +128 B. 0.38.0's +128 B was recorded here as "a new high" and was not one — a zero-code release is the control that settles it. Treat ±128 B as the measurement's floor; 0.3% of a 150 KB bar | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **46,464 B (~45 KB)** — `binary-size.csv`'s 0.39.0 row. The series has read 46,464 / 46,592 / 46,464 / 46,592 / 46,592 / 46,464 across 0.37.2 → 0.39.0 — **a ±128 B band, established as the measurement's noise by two zero-code releases** (0.38.2, 0.38.3) that moved within it. 0.39.0 added a module re-export and stayed inside the band, which is what a change of that size should look like. 0.3% of a 150 KB bar | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
