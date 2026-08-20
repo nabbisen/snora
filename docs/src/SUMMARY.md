@@ -41,6 +41,7 @@
   - [0.32 → 0.33](guides/migration-0.32-to-0.33.md)
   - [0.33 → 0.34](guides/migration-0.33-to-0.34.md)
   - [0.35 → 0.36](guides/migration-0.35-to-0.36.md)
+  - [0.38 → 0.39](guides/migration-0.38-to-0.39.md)
   - [0.36 → 0.37](guides/migration-0.36-to-0.37.md)
 - [Migration guide template](guides/migration-template.md)
 

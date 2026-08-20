@@ -68,10 +68,33 @@ minor, short where nothing broke); weaken `migrations.md` to match
 `versioning-policy.md`; or keep both and have the index say explicitly which
 jumps need no guide.
 
-**Suggest making the promise true.** It is the only option that removes the
-ambiguity rather than documenting it, and the cost is a short guide per additive
-minor — which is the case where writing it is cheapest. Whichever wins, **the
-other two documents must be amended to agree**, in the same change.
+**Revised recommendation, 2026-08-20** — the owner asked which is better *for
+snora as it is now*, and the first answer (a guide per minor) is not it.
+
+**The ambiguity is the defect, not the missing files**, and it can be removed
+without writing nineteen no-op guides. snora has cut **19 minors** since 0.20,
+most of them additive. Nineteen "nothing required" files would each be a new
+artifact that can itself go stale, in a project that has just spent a week
+removing stale artifacts — and each would duplicate what the CHANGELOG already
+records.
+
+**Recommend: the index carries a line for every minor; a linked guide exists
+only where a consumer has something to do or know.**
+
+- Every minor appears in `migrations.md`. Absence becomes impossible rather
+  than ambiguous.
+- A jump that needs nothing says so **in the index**, one line, no file.
+- A jump with something to say gets a guide — and "something to say" is wider
+  than "something broke". **0.38 → 0.39 breaks nothing and still earned one**:
+  it lets an F6 consumer drop a dependency, and it corrects a claim we made
+  about what makes the dialog card visible.
+
+This drops the double standard by making the index the single source: every
+minor is accounted for, and the presence of a guide carries information instead
+of being a coin toss. It also fits the owner's stated prior — fewer artifacts,
+no duplication.
+
+**All three documents are amended to say this**, in one change.
 
 **Q-2 — how far back to backfill?**
 
@@ -81,11 +104,18 @@ been on `snora = "0.25"` in recent months, and **knotra went 0.25 → 0.39 this
 month** — a jump that crosses all three of those gaps. They are not historical;
 they were traversed by a live migration days ago.
 
-**Suggest backfilling all six.** The recent three are unarguable. The
-0.29→0.32 span was crossed by a real consumer this month, which is the only
-test of relevance that matters here — and a jump from 0.25 is the *worst* case
-for the index, because the reader has the most ground to cover and the least
-context for inferring what changed.
+**Ruled by the owner, 2026-08-20: 0.38 → 0.39 only, now.** It is needed to
+announce 0.39.0 to the app teams, and the rest does not block that.
+
+**Written and shipped ahead of this RFC** —
+`docs/src/guides/migration-0.38-to-0.39.md`, indexed in `migrations.md` and
+`SUMMARY.md`, built and link-checked. It is the worked example of the Q-1
+recommendation: nothing is required, and it still has two things worth a
+consumer's attention.
+
+The remaining five gaps stay open under this RFC. The 0.29→0.32 span was
+crossed by a real consumer this month (knotra, 0.25 → 0.39), so it is not
+historical — but it is also not urgent, and nobody is blocked.
 
 **Q-3 — what stops the seventh?** The checklist line has been there throughout
 and did not fire, because ticking a checkbox produces no artefact. A check —

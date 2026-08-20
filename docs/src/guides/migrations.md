@@ -9,6 +9,11 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.38 → 0.39](migration-0.38-to-0.39.md) — **nothing required.**
+  `snora::focus` re-exports the zone-navigation vocabulary, so F6 users can drop
+  a direct `snora-core` dependency; and our explanation of what makes the dialog
+  card visible against the modal dim was wrong and is corrected. No value, no
+  rendered output, no API removed.
 - [0.36 → 0.37](migration-0.36-to-0.37.md) — the `design`-path modal dim's
   alpha repaired for WCAG 2.1 SC 1.4.11 (was 2.85:1 in `light`, now
   >= 3.0:1 in all four presets) — an accessibility fix, not a restyle;
