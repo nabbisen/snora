@@ -107,10 +107,13 @@ a derived one. The styled dim instead picks its base color from
 
 ```rust,ignore
 let base = if is_dark(background) { Color::WHITE } else { Color::BLACK };
-let dim_color = Color { a: 0.4, ..base };
+let dim_color = Color { a: DIM_ALPHA, ..base }; // DIM_ALPHA = 0.44
 ```
 
-using iced's own public `iced::theme::palette::is_dark`. Unlike
+using a **private, local** `is_dark` — `snora-design` has no iced
+dependency at all, enforced by a CI gate (RFC-021/022 Q3), so this
+reimplements `iced::theme::palette::is_dark`'s own algorithm (same
+sRGB→linear step, same OKLab matrices) rather than calling it. Unlike
 RFC-038's `shift_away_from`, this has **no clamping edge case**:
 alpha-compositing a color chosen to be the *opposite* pole from the
 background's own category can never degenerate to a no-op, because the

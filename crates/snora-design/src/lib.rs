@@ -9,9 +9,9 @@
 //! [`Tokens::high_contrast_light`], [`Tokens::high_contrast_dark`]).
 //!
 //! It has **no dependency on iced**. Converting these tokens into iced widget
-//! styles is the job of the `snora-widgets` style bridge; this crate stays
-//! renderer-independent so it can be unit-tested without a renderer and reused
-//! by any future engine.
+//! styles is the job of the `snora-style` style bridge (RFC-055); this crate
+//! stays renderer-independent so it can be unit-tested without a renderer and
+//! reused by any future engine.
 //!
 //! ## Usage
 //!

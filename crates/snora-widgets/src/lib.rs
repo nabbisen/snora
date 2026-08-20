@@ -41,11 +41,14 @@ mod sidebar;
 pub mod style;
 mod tab;
 
-/// iced style bridge for Snora Design tokens.
+/// Prefab design widgets for Snora Design tokens.
 ///
-/// Available when the `design` feature is enabled. Provides color conversion,
-/// semantic button styles, and card/container styles derived from a
-/// [`snora_design::Tokens`] bundle.
+/// Available when the `design` feature is enabled. Provides the
+/// token-styled prefab widgets (`button`, `card`, `notice`, `chip`,
+/// `progress`, chrome geometry) — each wraps a plain iced widget and
+/// applies [`snora_style`] styling internally. **The iced style
+/// bridge itself is [`snora_style`], not this module** — see this
+/// module's own doc comment for the full boundary.
 #[cfg(feature = "design")]
 pub mod design;
 

@@ -1,7 +1,7 @@
 # RFC 074 — The release checklist names two files by hand, so every other version snippet drifts
 
-**Status.** Accepted (owner, 2026-08-20). Handoff written — see
-[`handoffs/074-…`](../handoffs/074-version-snippets-are-a-hand-maintained-list/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.3 (2026-08-20).
+[Handoff](../handoffs/074-version-snippets-are-a-hand-maintained-list/implementation-handoff.md).
 **Tracks.** Release process / documentation integrity.
 **Found by** the owner, 2026-08-20, reading `crates/snora/src/lib.rs`.
 **Touches.** `crates/snora/src/lib.rs`, `README.md`,

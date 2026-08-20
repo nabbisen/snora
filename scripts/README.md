@@ -10,6 +10,7 @@ its header comment; this README is a brief inventory.
 | [`measure-compile-time.sh`](measure-compile-time.sh) | Measure six cold-build durations (engine-only check, widgets build, engine-only build, hello example, widgets+design build, design-workbench example), emit a single 11-field CSV row. | The `build-cost` GitHub Actions workflow on pushes and tags. |
 | [`measure-render-cost.sh`](measure-render-cost.sh) | Local performance envelope reference; not invoked by CI. | Manual: `scripts/measure-render-cost.sh` |
 | [`check-built-links.py`](check-built-links.py) | Confirms every internal link in the built `docs/book/` HTML resolves to a file that exists — catches a page that exists on disk but was never wired into `SUMMARY.md` (RFC-073), which a source-level `.md`-link check cannot see. | Manual: `mdbook build docs && python3 scripts/check-built-links.py` |
+| [`check-version-snippets.sh`](check-version-snippets.sh) | Finds every `snora`/`snora-*` version-bearing Cargo snippet under `docs/` and crate doc comments and reports any whose minor doesn't match `[workspace.package].version` in `Cargo.toml` (RFC-074) — replaces a release-checklist line that named two files by hand while every other snippet drifted. | Manual: `scripts/check-version-snippets.sh`, part of the release checklist. |
 
 Together `measure-binary-size.sh` and `measure-compile-time.sh` implement
 the [binary size budget][bin-budget] and [build cost budget][build-budget]

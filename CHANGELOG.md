@@ -17,6 +17,91 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.38.3] — 2026-08-20
+
+### Fixed
+
+- **`release-process.md`'s checklist named two files by hand
+  (`install.md`, `icons.md`); every other version snippet drifted
+  since the line was written (RFC-074).** Worst instance: `crates/snora/src/lib.rs`
+  shipped to docs.rs telling every reader of snora 0.38.2's own API
+  docs to write `snora = { version = "0.25" }` — 13 minors stale,
+  predating `snora-style`, the border repair, the modal dim, and the
+  line-height helpers. Also stale: `README.md`'s Quick Start (`0.37`),
+  `docs/src/reference/widgets.md` (`0.6`, 32 minors), and six snippets
+  across `docs/src/design/feature-flags.md` (three different stale
+  versions on one page). All corrected to `0.38`. A seventh instance
+  the checklist could never have named: `release-process.md`'s own
+  "bump snora-core's dep" example described a hand-pinned
+  `path + version` dependency that no longer exists — every internal
+  workspace dependency now uses `{ workspace = true }` — so the
+  paragraph described a mechanism, not just a number, that was
+  obsolete; corrected to state the actual current mechanism. The
+  checklist line now invokes `scripts/check-version-snippets.sh`
+  instead of naming files — it derives the expected minor from
+  `Cargo.toml` itself and covers crate doc comments as well as
+  `docs/`, so an eighth instance is discovered rather than remembered.
+  Migration guides, `CHANGELOG.md`, and `rfcs/**` are excluded by
+  design — they quote historical versions on purpose, and a check that
+  cannot tell a live snippet from a quoted one is worse than no check.
+  The seventh instance's first fix said internal dependency versions
+  never need a per-crate bump — true for a patch, false for a minor:
+  `[workspace.dependencies]` still carries five `version = "0.38"`
+  pins that a minor must move, and the release checklist immediately
+  below already said so. Corrected to state the pin is centralised,
+  not absent, and point at the checklist rather than duplicate it.
+
+- **The 1.0 gate register disagreed with itself about whether gate 9b
+  was closed, and the frozen style-bridge surface omitted seven of the
+  functions it freezes (RFC-075).** `api-freeze-review.md`'s own gate
+  table and top summary correctly said gate 9b closed at v0.37.0, but
+  the count immediately under the table said "seven of ten" (omitting
+  9b), the "Remaining blockers" list still named 9b, and a third
+  paragraph argued in the present tense for closing it on a stale
+  25%-noise figure RFC-073 had already deleted elsewhere. All three
+  corrected to agree with the table; the blocker list — a second,
+  independently-drifting restatement of the same count — is removed
+  rather than repaired. Separately, `api-governance.md`'s frozen
+  style-bridge enumeration named 15 of `snora_style`'s 22 public
+  functions, missing all six `*_line_height` helpers (RFC-068, shipped
+  this same cycle) and `theme::theme` (missing since RFC-055, six
+  minors). The covenant's own defining sentence — "all public
+  functions of `snora_style`" — is already complete; the list added no
+  governance and could only go stale, so it's deleted in favor of
+  naming the six modules and pointing at the crate's rustdoc.
+  `docs/src/design/stability.md` carried the same enumeration and the
+  same fix. Also corrected in the same pass: `feature-gating-criteria.md`
+  said "Ten downstream/review reports" before its own table and
+  "Eleven" after it — the table has eleven rows, an RFC-072-era miss
+  from earlier this session; `engine-surfaces.md`'s illustrative
+  snippet showed the pre-RFC-065 `0.4` alpha and credited iced's public
+  `is_dark` — the real constant is `DIM_ALPHA = 0.44` and the real
+  `is_dark` is private and iced-free, enforced by a CI gate;
+  `overlay-interaction-semantics.md` described RFC-014-A and RFC-014-B
+  as future work in four places while recommending RFC-014-A's shipped
+  `dismiss_on_escape` as current API on the same page — both RFCs
+  landed at v0.14.0; `snora-style/src/text.rs`'s module doc still
+  framed widget line-height adoption as pending an adopter's evidence —
+  that evidence arrived and RFC-068 Q-2 ruled on it (short-label
+  widgets will not adopt it; wrapping-prose widgets remain open);
+  `snora-widgets/src/lib.rs` described its own `design` module as "the
+  iced style bridge" while `design.rs`'s own module doc, one file
+  down, correctly said the bridge is `snora_style` and named the
+  module prefab widgets — rewritten to match; `snora-design/src/lib.rs`
+  and `color.rs` still attributed the style bridge to `snora-widgets`;
+  `docs/src/design/theme.md` pointed at
+  `crates/snora-widgets/src/design/theme.rs`, which hasn't existed
+  since RFC-055 (`crates/snora-style/src/theme.rs` is current); and
+  `snora-widgets/src/design/card.rs` carried a "Cards in v0.20 are
+  non-interactive" qualifier in two places — the same wording already
+  fixed once, in a sibling location, at 0.22.0. Also, authorised into
+  scope after the fact: `architecture.md` and
+  `overlay-interaction-semantics.md` both described the modal dim as
+  "40 %" with no qualifier — correct only for the unstyled
+  `snora::render` path; `snora::design::render` composites it at 44%
+  (`DIM_ALPHA`, RFC-065). Both now name which path each figure
+  belongs to instead of stating one number as if it were the only one.
+
 ## [0.38.2] — 2026-08-20
 
 ### Fixed

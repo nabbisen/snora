@@ -166,13 +166,12 @@ it.
 
 **Style-bridge surface** — all public functions of `snora_style`
 (RFC-055; formerly `snora_widgets::design::style`, removed in RFC-056):
-
-- `color::to_iced_color`.
-- `button::{primary, secondary, ghost, danger}`.
-- `container::{card_surface, card_raised, card_selected}`.
-- `progress::toned`.
-- `text::{body_size, body_small_size, label_size, title_size,
-  heading_size, display_size}`.
+the `color`, `button`, `container`, `progress`, `text`, and `theme`
+modules. See the crate's own rustdoc for the current function list —
+that sentence defines the surface completely; a hand-listed
+enumeration adds no governance and can only go stale, which it has
+twice (RFC-075: missing the `text::*_line_height` helpers shipped in
+RFC-068, and `theme::theme`, missing since RFC-055).
 
 **Not frozen.** The design **primitives** — `button`, `card`, `notice`,
 `chip`, `progress` helper modules — are deliberately excluded from the

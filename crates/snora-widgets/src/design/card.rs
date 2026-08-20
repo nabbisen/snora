@@ -5,7 +5,7 @@
 //!
 //! # Non-interactive cards only
 //!
-//! Cards in v0.20 are **non-interactive visual grouping surfaces**. They do
+//! Cards are **non-interactive visual grouping surfaces**. They do
 //! not own application behaviour and do not emit messages. Interactive card
 //! semantics (selection, navigation) require a separate semantic construction
 //! review before they can be safely added; see RFC-027.
@@ -90,7 +90,7 @@ pub fn raised<'a, Message: 'a>(
 /// Use when multiple peer cards can be selected and the active one must be
 /// visually distinguished.
 ///
-/// **Non-interactive in v0.20.** The visual selection state is controlled by
+/// **Non-interactive.** The visual selection state is controlled by
 /// the caller (pass `card::selected` when the card's id matches the active
 /// selection, `card::surface` otherwise). Interactive selection semantics
 /// require a separate review; see RFC-027.

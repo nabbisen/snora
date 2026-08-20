@@ -214,7 +214,7 @@ that states "X is withdrawn" without stating "if you relied on X,
 re-check Y" has announced a correction, not retracted the claim from
 where it landed.
 
-This is not hypothetical. Ten downstream/review reports, across all
+This is not hypothetical. Eleven downstream/review reports, across all
 four cases, were the same omission:
 
 | Report | Change | Page or record that still carried the old claim |
@@ -283,7 +283,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.38.2, re-derived 2026-08-20, RFC-062)
+## Current status (snora 0.38.3, re-derived 2026-08-20, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within

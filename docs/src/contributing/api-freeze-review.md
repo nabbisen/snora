@@ -107,8 +107,8 @@ Type-names audit: **complete as of v0.17.0.**
 | 9b. **Compile-time** trend monitored (≥2 data points) | ✅ **v0.37.0 — closed on four `design_overhead_ratio` rows (0.35.0, 0.36.0, 0.36.1, 0.37.0), and closed with its sensitivity stated rather than ticked clean.** ✅ here means **the ratio only**; the six absolute millisecond columns remain runner-dominated and are raw record, not a trend (RFC-050). **Measured sensitivity: the ratio moved −4.44% across 0.36.0 → 0.36.1, a release that changed doc comments and no executable code at all** — so its noise floor is ~4.4%, which is 79% of the 5.57% total spread observed across the four rows. It detects a regression above roughly 10%; it cannot see a 5% one. Over those same four releases the absolute columns spread 23.3–30.0%, so the ratio is a ~5× improvement on what it replaced. **It is materially weaker than 9a**, and the comparison should not be glossed: 9a's series moved **−0.0008%** across its own documentation-only control, roughly 5,000× less. Closed anyway because **no better number is available** — RFC-050 examined and rejected repeat-runs/median-of-N (CI minutes per release for a signal that fails no build, and it addresses within-runner jitter when the dominant effect is between-runner speed), and nothing else is queued. Holding open would not have been waiting for better data; it would have been declining to decide, on a gate already reopened or clock-reset four times since v0.25.3 (RFC-041, RFC-043, RFC-052, and this RFC-050 methodology change). |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-**Gates satisfied: 2, 4, 5, 6, 7, 8, 9a, 10 = seven of ten, plus the
-binary-size half of gate 9.**
+**Gates satisfied: 2, 4, 5, 6, 7, 8, 9, 10 = eight of ten** (gate 9
+whole — both 9a and 9b closed, per the table above).
 
 Gate 9 is deliberately recorded as **split** rather than ticked or held
 whole. Its two measurements are in genuinely different conditions, and
@@ -155,18 +155,20 @@ distinction matters because this project has been bitten by the gap between a
 true-sounding claim and its evidence — see gate 9's history below, and
 RFC-041.
 
-Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
-compile-time measurement noise (gate 9b). The previous
-"Gate 9 fully satisfied: binary-size has three CI data points" claim was
-wrong on two counts: `v0.17.0`'s `runner_os` is `unknown` (not CI), and all
-three rows are `N/A` — so the honest count was never eight of ten. See
+Remaining blockers: iced upgrade (gate 1), third-party app (gate 3) —
+see the gate table above for the full status rather than a second,
+separately-maintained list here. The previous "Gate 9 fully satisfied:
+binary-size has three CI data points" claim was wrong on two counts:
+`v0.17.0`'s `runner_os` is `unknown` (not CI), and all three rows are
+`N/A` — so the honest count was never eight of ten. See
 `docs/src/reference/binary-size-budget.md` and `build-cost-budget.md` for
 the full data-integrity record.
 
-The 9a/9b split follows the same principle as that correction. RFC-041 was
+The 9a/9b split followed the same principle as that correction. RFC-041 was
 raised because a gate had been declared satisfied on data that did not
-support the claim; satisfying 9b now on a 25%-noise series would be a
-quieter instance of the same mistake.
+support the claim; 9b was closed with its real noise floor stated
+(~4.4%, see the table row above) rather than glossed over, which is how
+this project avoided a quieter instance of the same mistake.
 
 ## How to use this document
 

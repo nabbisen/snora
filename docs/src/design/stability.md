@@ -25,8 +25,12 @@ freezes two surfaces by name:
   individually — the `contrast` module's `relative_luminance`,
   `contrast_ratio`, `composite_over`.
 - **The style-bridge surface** — every public function of `snora_style`
-  (`color::to_iced_color`, `button::*`, `container::*`, `progress::toned`,
-  `text::*_size`).
+  (the `color`, `button`, `container`, `progress`, `text`, and `theme`
+  modules) — see [API governance § Additive-only
+  covenant](../contributing/api-governance.md#additive-only-covenant-design-surface)
+  for the current function list rather than a second, hand-maintained
+  copy here; a per-function list on this page went stale once already
+  (RFC-075: missing `text::*_line_height` and `theme::theme`).
 
 Removing, renaming, or retyping any item on either list, or changing the
 signature of any style-bridge function, is **forbidden** without reopening

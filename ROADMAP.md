@@ -104,6 +104,19 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.38.3** — The release checklist named two files by hand, so every version
+  snippet outside them had drifted (RFC-074) — `crates/snora/src/lib.rs` told
+  **docs.rs readers of 0.38.2 to depend on 0.25**, and `reference/widgets.md`
+  showed `0.6`, thirty-two minors stale. The checklist line now invokes a check
+  that derives the expected minor from `Cargo.toml` and scans crate doc comments
+  as well as the book. Separately, the **1.0 gate register disagreed with itself
+  about gate 9b** in three live statements while its own table said closed
+  (RFC-075) — the register other pages are told to defer to — and
+  `api-governance.md`'s frozen style-bridge enumeration named **15 of 22**
+  public functions, missing the six line-height helpers and `theme()`. The
+  enumeration is deleted rather than extended: the covenant's own sentence
+  already defines the surface completely. Sixteen findings from a commissioned
+  audit; **no crate code changed**, doc comments only.
 - **0.38.2** — Three pages that outlived the facts they stated, found in a
   pre-cut audit rather than by any test (RFC-073). `migrations.md` linked three
   pre-0.7 guides that were absent from `SUMMARY.md`, so mdBook never built them

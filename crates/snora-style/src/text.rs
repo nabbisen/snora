@@ -4,17 +4,20 @@
 //! values from a [`Tokens`] typography scale, avoiding magic numbers — and
 //! hand-built `LineHeight`s — in application view code.
 //!
-//! Applying line-height (or not) is still the application's own call; snora's
-//! own prefab widgets do not yet apply it to the text they render
-//! internally. **That is not an oversight this module leaves standing
-//! (RFC-068 Q-2):** wiring it into shipped primitives is a rendered
-//! change to widgets already in use, and it is gated on an adopter's
-//! deferred typography assessment landing its own evidence first — not
-//! on "nobody built the helpers yet." What changed here is that an
-//! application that *does* want to apply line-height no longer has to
-//! reach through two struct fields and construct the iced enum by hand
-//! — `body_line_height(&tokens)` sits beside `body_size(&tokens)`,
-//! mirrored in name, order, and shape, for all six roles.
+//! Applying line-height (or not) is still the application's own call for its
+//! own view code. For snora's **own** prefab widgets, RFC-068 Q-2 ruled on
+//! this per widget, by whether the text can wrap: short single-line labels
+//! (tab bar, sidebar, buttons, chips) will **not** adopt line-height — `label`
+//! at 1.2 is already tighter than iced's own 1.3 default, and line-height does
+//! nothing for the readability of a single line, so applying it would only
+//! shrink the label for no legibility gain. Widgets that can render wrapping
+//! prose (notice bodies, dialog bodies, card content) remain an open,
+//! separate decision — there `body` at 1.4 is looser than the default, so the
+//! calculus reverses. What this module adds is the helper for the
+//! application-side call: no longer reaching through two struct fields and
+//! constructing the iced enum by hand — `body_line_height(&tokens)` sits
+//! beside `body_size(&tokens)`, mirrored in name, order, and shape, for all
+//! six roles.
 //!
 //! # Usage
 //!

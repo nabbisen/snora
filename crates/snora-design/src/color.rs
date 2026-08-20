@@ -3,8 +3,8 @@
 /// A color expressed as normalized sRGB channels in `0.0..=1.0`, plus alpha.
 ///
 /// This is deliberately **not** `iced::Color`: `snora-design` is iced-free.
-/// The `snora-widgets` style bridge converts this into the pinned iced
-/// version's color type at the boundary.
+/// The `snora-style` style bridge (RFC-055) converts this into the pinned
+/// iced version's color type at the boundary.
 ///
 /// ```
 /// use snora_design::Color;

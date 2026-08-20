@@ -1,7 +1,7 @@
 # RFC 075 — The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes
 
-**Status.** Accepted (owner, 2026-08-20). Handoff written — see
-[`handoffs/075-…`](../handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md).
+**Status.** Done — shipped in v0.38.3 (2026-08-20).
+[Handoff](../handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md).
 **Tracks.** Governance records / documentation integrity.
 **Found by** a commissioned dev-team audit of `docs/` and crate doc comments,
 2026-08-20. Every load-bearing claim below re-verified against source by the

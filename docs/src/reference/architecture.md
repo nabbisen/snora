@@ -188,6 +188,14 @@ click-to-close behavior is driven by `on_close_modals` /
 `on_close_menus`; if those are `None`, the layers still render but
 without click-outside dismissal.
 
+**The `40 %` above is this `render` function's own (unstyled engine
+path) dim alpha.** `snora::design::render` (the `design`-active path)
+composites the modal dim at `44 %` (`DIM_ALPHA`, RFC-065) instead —
+the two were symmetric at `0.40` by coincidence, not by design, and
+they diverge deliberately. See [Token-derived engine
+surfaces](../design/engine-surfaces.md#the-modal-dim) for the styled
+path's derivation.
+
 ## What is not in any of these crates
 
 - Form widgets (validation, fields). Use iced's primitives.

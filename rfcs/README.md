@@ -124,6 +124,8 @@ Numbers remain stable forever and are never reused.
 | 071 | [The visibility floor tests a bar the palette cleared four minors ago](./done/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago.md) | v0.38.1 (handoff: [`handoffs/071-…`](./handoffs/071-the-visibility-floor-tests-a-bar-cleared-four-minors-ago/implementation-handoff.md)) |
 | 072 | [Contrast values are bounded below and never above](./done/072-contrast-values-are-bounded-below-and-never-above.md) | v0.38.1 (handoff: [`handoffs/072-…`](./handoffs/072-contrast-values-are-bounded-below-and-never-above/implementation-handoff.md)) |
 | 073 | [Three pages that outlived the facts they state](./done/073-pages-that-outlived-the-facts-they-state.md) | v0.38.2 (handoff: [`handoffs/073-…`](./handoffs/073-pages-that-outlived-the-facts-they-state/implementation-handoff.md)) |
+| 074 | [The release checklist names two files by hand, so every other version snippet drifts](./done/074-version-snippets-are-a-hand-maintained-list.md) | v0.38.3 (handoff: [`handoffs/074-…`](./handoffs/074-version-snippets-are-a-hand-maintained-list/implementation-handoff.md)) |
+| 075 | [The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes](./done/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md) | v0.38.3 (handoff: [`handoffs/075-…`](./handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -133,8 +135,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 074 | [The release checklist names two files by hand, so every other version snippet drifts](./accepted/074-version-snippets-are-a-hand-maintained-list.md) | v0.38.3 (handoff: [`handoffs/074-…`](./handoffs/074-version-snippets-are-a-hand-maintained-list/implementation-handoff.md)) |
-| 075 | [The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes](./accepted/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md) | v0.38.3 (handoff: [`handoffs/075-…`](./handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md)) |
 
 ## Proposed
 

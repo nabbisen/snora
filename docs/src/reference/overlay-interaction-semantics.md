@@ -2,9 +2,10 @@
 
 This page is the normative reference for how Snora's overlay surfaces
 coexist, how outside-click dismissal works, and what remains
-application-owned. Future RFCs that touch keyboard behavior (RFC-014-A,
-**RFC-060, landed**) or accessibility boundaries (RFC-014-B) extend this
-page — they do not replace it.
+application-owned. RFC-014-A (keyboard behavior) and RFC-014-B
+(accessibility boundaries) — both landed at v0.14.0 — and RFC-060
+(frame-level keyboard navigation, landed at v0.35.0) extend this page;
+they do not replace it.
 
 ## Z-stack order (Law 1)
 
@@ -16,7 +17,9 @@ framework contract; it must not change without an RFC.
 1. menu backdrop  — transparent click sink (if a menu is open)
 2. header_menu    — dropdown under the header bar
 3. context_menu   — floating menu at click point
-4. modal dim      — 40%-dim click sink (if a modal is present)
+4. modal dim      — dim click sink (if a modal is present): 40% via
+                     `snora::render` (unstyled), 44% via
+                     `snora::design::render` (`DIM_ALPHA`, RFC-065)
 5. dialog         — centered; token-styled card via design::render
 6. sheet          — edge-anchored panel
 7. toasts         — always on top, RTL-aware anchor
@@ -91,9 +94,10 @@ it is one narrow addition alongside the one hedge this law used to carry.
 not wired by the engine. Applications may map `Escape` to `CloseMenus` or
 `CloseModals` using iced subscriptions or event handlers.
 
-A future RFC (RFC-014-A) may add a documented recipe or a small optional
-helper. Any such addition will remain opt-in and will not change the
-existing two-sink model.
+RFC-014-A added exactly this: a documented recipe and a small opt-in
+helper, `snora::keyboard::dismiss_on_escape` (see [Keyboard
+dismissal](#keyboard-dismissal) below). It remains opt-in and does not
+change the existing two-sink model.
 
 ### Law 8 — Modal focus trapping is staged, not shipped
 
@@ -216,8 +220,9 @@ The workbench example demonstrates this pattern end-to-end.
 
 - **Escape handling** — Snora does not capture keyboard events. Wire
   `Escape` in your application's `subscription` or `update` using the
-  recipe above. (RFC-014-A covers future helpers.) The same non-capture
-  policy applies to `snora::keyboard::cycle_zones` (RFC-060, below) —
+  recipe above — `snora::keyboard::dismiss_on_escape` (RFC-014-A,
+  v0.14.0). The same non-capture policy applies to
+  `snora::keyboard::cycle_zones` (RFC-060, below) —
   snora supplies pure decision functions, never a subscription.
 - **Focus trapping *inside an open modal*** — The modal dim does not
   trap keyboard focus once it is inside the modal's own content. This is

@@ -99,8 +99,8 @@ an oversight: a semantic tier's job is legibility of the text painted on
 it, while a background tier's job is visibility against its own
 neighbors, and the correct reference color differs accordingly.
 
-The full derivation lives in `crates/snora-widgets/src/design/theme.rs`;
-`crates/snora-widgets/src/design/theme/tests.rs` independently
+The full derivation lives in `crates/snora-style/src/theme.rs`;
+`crates/snora-style/src/theme/tests.rs` independently
 re-computes each transform and asserts every derived tier matches it,
 plus a dedicated fidelity/contrast/distinctness suite described below.
 
@@ -259,6 +259,6 @@ comparison that matters for its role as a border color, which the
 text-contrast checks above can't catch (see "Why `strong`'s direction
 mattered" above).
 
-All of this is verified by `crates/snora-widgets/src/design/theme/tests.rs`;
+All of this is verified by `crates/snora-style/src/theme/tests.rs`;
 if a future token change or transform edit ever breaks one of these, the
 tests fail loudly rather than shipping a regressed theme.

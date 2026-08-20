@@ -28,20 +28,21 @@ This is enforced by `[workspace.package].version` inheritance.
 version = "0.5.1"        # bump
 ```
 
-This change propagates to every member crate via
-`version.workspace = true`. No per-crate edit is needed.
+This change propagates to every member crate's own version via
+`version.workspace = true`. No per-crate *package*-version edit is
+needed for that part — internal dependencies between workspace crates
+declare `{ workspace = true }` too (e.g. `crates/snora/Cargo.toml`'s
+`snora-core = { workspace = true }`) rather than a hand-pinned path and
+version.
 
-If `snora-core`'s on-disk version changes minor digits, also bump
-`snora`'s declared dep:
-
-```toml
-# crates/snora/Cargo.toml
-[dependencies]
-snora-core = { path = "../snora-core", version = "0.5" }
-```
-
-The trailing `"0.5"` is a caret range (`^0.5`), so all `0.5.*`
-patch releases are accepted. Bump it only on a minor.
+That covers a **patch** bump completely: the one-edit
+`[workspace.package].version` change is the whole release. A **minor**
+bump is not one edit, though — `[workspace.dependencies]` at the
+workspace root carries its own five `version = "0.38"` pins (one per
+internal crate), centralised rather than absent, and a minor must move
+all of them, plus three example manifests that can't use workspace
+inheritance at all. See the release checklist below for the specific
+files and the exact failure mode of missing one.
 
 ## GitHub Actions workflows
 
@@ -123,8 +124,9 @@ them in sync is a release-process invariant.
 [ ] Answer the four versioning-policy questions for any public API change
     (see docs/src/contributing/versioning-policy.md)
 [ ] Confirm migration guide exists if any public API broke or renamed
-[ ] Update user-facing version snippets in install.md and icons.md to the
-    new version (snora = "X.Y" — iced version stays unchanged)
+[ ] Run scripts/check-version-snippets.sh and fix every snippet it names
+    (RFC-074 — derives the expected minor from Cargo.toml itself, so this
+    replaces enumerating files by hand; iced version stays unchanged)
 [ ] Re-run cargo metadata; confirm every crate reports new version
 [ ] Confirm Cargo.lock is current and its diff (if any) is intentional —
     `git status --porcelain Cargo.lock`; if it shows a diff, review what
