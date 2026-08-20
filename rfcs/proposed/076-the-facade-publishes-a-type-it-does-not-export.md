@@ -5,13 +5,16 @@
 **Found by** **arama**, 2026-08-20, while shipping F6 zone navigation.
 **Touches.** `crates/snora/src/lib.rs`, `crates/snora/src/keyboard.rs`.
 **Release target.** 0.39.0 — **minor**, public API addition.
+**Still live.** arama measured against 0.38.0; verified against the **0.38.3**
+tag — the re-export list is byte-identical to 0.38.0, so nothing in the three
+intervening releases addressed this.
 
 ## Summary
 
 `snora::keyboard::cycle_zones` returns `Option<snora_core::focus::Cycle>`.
 **`snora` does not re-export `focus`.**
 
-`crates/snora/src/lib.rs:84-88` re-exports 21 `snora_core` items by name —
+`crates/snora/src/lib.rs:84-88` re-exports 22 `snora_core` items by name —
 `AppLayout`, `Dialog`, `SideBar`, `Toast` and the rest. `FocusZone`, `Cycle`,
 `ZonePresence` and `next_zone` are not among them, and there is no blanket
 `pub use snora_core;` anywhere in the crate.

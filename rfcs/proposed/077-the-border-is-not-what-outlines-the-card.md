@@ -7,6 +7,10 @@ Arithmetic re-derived by the architect before acceptance.
 **Touches.** `docs/src/design/engine-surfaces.md`, `rfcs/done/058`'s rationale as
 restated in `CHANGELOG.md` and `docs/src/contributing/accessibility-checklist.md`.
 **Release target.** 0.39.0 — documentation and rationale only. **No values.**
+**Figures still current.** arama measured at 0.38.0. `git diff 0.38.0 0.38.3` on
+`presets/` and `surfaces.rs` is **empty** — no palette value and no `DIM_ALPHA`
+changed in the three intervening releases, so their numbers hold as measured and
+do not need re-taking.
 
 ## Summary
 
