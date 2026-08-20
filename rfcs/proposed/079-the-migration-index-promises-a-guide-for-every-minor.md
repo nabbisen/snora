@@ -73,11 +73,19 @@ ambiguity rather than documenting it, and the cost is a short guide per additive
 minor — which is the case where writing it is cheapest. Whichever wins, **the
 other two documents must be amended to agree**, in the same change.
 
-**Q-2 — how far back to backfill?** The three ancient gaps (0.29→0.32) predate
-every current adopter's floor; the two recent ones do not. **Suggest backfilling
-0.34→0.35, 0.37→0.38 and 0.38→0.39, and marking the 0.29–0.32 span explicitly in
-the index as not-written rather than silently absent.** A stated gap is honest;
-an unstated one is the defect.
+**Q-2 — how far back to backfill?**
+
+**Correction, 2026-08-20:** this RFC's first draft said the 0.29→0.32 gaps
+"predate every current adopter's floor." **That is false.** Three adopters have
+been on `snora = "0.25"` in recent months, and **knotra went 0.25 → 0.39 this
+month** — a jump that crosses all three of those gaps. They are not historical;
+they were traversed by a live migration days ago.
+
+**Suggest backfilling all six.** The recent three are unarguable. The
+0.29→0.32 span was crossed by a real consumer this month, which is the only
+test of relevance that matters here — and a jump from 0.25 is the *worst* case
+for the index, because the reader has the most ground to cover and the least
+context for inferring what changed.
 
 **Q-3 — what stops the seventh?** The checklist line has been there throughout
 and did not fire, because ticking a checkbox produces no artefact. A check —
