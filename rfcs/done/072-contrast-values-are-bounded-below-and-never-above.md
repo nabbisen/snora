@@ -112,6 +112,37 @@ class keeps recurring, and a case with no instances logged reads as theoretical.
 5. Q-3's instance row added or explicitly declined with a reason.
 6. No code change, no assertion change, no value change.
 
+## Outcome after shipping (2026-08-20)
+
+**The rule fired, on the consumer whose assertion prompted it, before it bit.**
+
+knotra reported that they ship exactly what RFC-072 tells consumers not to:
+
+```rust
+let neutral_ratio = contrast_ratio(p.border, surface);
+assert!(neutral_ratio < AA_NORMAL, "… NoticeTone's exclusion of Neutral is now stale");
+```
+
+Their own reading of the consequence, which is the one this RFC was written to
+prevent: *"A further repair past 4.5 would fail that assertion — not because
+anything regressed, but because you improved a colour we asserted would stay
+bad. **We would have been the reason a repair was held back.**"*
+
+They amended their migration RFC and **revised the handoff for that stage before
+issuing it**, rather than shipping and correcting. No test of theirs now depends
+on a snora colour staying below a threshold.
+
+**The limit mattered more than the guarantee.** They singled out the honest-limit
+paragraph — that a repair is judged only on the failing pair and preserves no
+other ratio — as the more useful half, and derived a design decision from it:
+their new boundary assertion reads `>= 3.0` against the binding pair per preset
+**and nothing tighter**, because a tighter figure would assert something we have
+explicitly not promised.
+
+That paragraph was the requested review focus and was nearly cut as a caveat.
+Recorded here because the case for stating a guarantee's limits alongside the
+guarantee is usually theoretical, and this is one instance where it is not.
+
 ## Compatibility and security
 
 **Compatibility.** Documentation only. It documents a property the codebase
