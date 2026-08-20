@@ -61,6 +61,19 @@ them in sync is a release-process invariant.
 
 ## Release checklist
 
+**The migration guide is the canonical statement of what a release
+means for a consumer; a letter to a downstream team carries only what
+is specific to that team (RFC-080).** Not because a letter costs more
+than the guide — because of *reach*. The RFC-067 re-check obligation
+below currently depended on us choosing to write to a team, so it
+reached only the teams we decided to write to, and nobody else —
+including no future adopter jumping through that version, who is
+exactly the person most likely to be carrying a withdrawn claim
+without knowing it. Put the re-check in the guide and it reaches
+everyone who reads the guide, on their own schedule, whether or not we
+ever wrote to them. A letter may still point at the guide; it does not
+restate the guide's content.
+
 ```text
 [ ] Bump [workspace.package].version
 [ ] If minor: bump snora-core / snora-widgets dep versions across crates
@@ -79,7 +92,21 @@ them in sync is a release-process invariant.
     workspace table alone is sufficient.
 [ ] Move the [Unreleased] section in CHANGELOG.md to the new version,
     and reset [Unreleased] to "Nothing yet."
-[ ] Update docs/guides/migration-X.Y-to-X.Z.md (minor only)
+[ ] If minor: write docs/guides/migration-X.Y-to-X.Z.md. **Unconditional
+    — no exceptions for "nothing broke."** A guide for a minor that
+    changed nothing required says so in a sentence (RFC-079); it is
+    never skipped. Run scripts/check-migration-guides.sh to confirm
+    every released minor has one.
+[ ] After the guide is written, decide correspondence (RFC-080): which
+    teams have something **specific to them** that the guide does not
+    already cover for everyone? Write only to those teams, and write
+    only the team-specific part — the guide is canonical, the letter
+    is specific. **If no team has anything specific, send nothing.** A
+    bare "0.X.0 is out, here is the guide" letter is exactly the note
+    tekstide asked us to stop sending, and the guide is on the
+    published site whether or not anyone gets a letter. The
+    correspondence bar itself is unchanged: broken-now, a withdrawn
+    claim a team acted on, or they asked.
 [ ] For any capability that arrived, left, or any governance/policy
     decision that answers a question a consumer would ask: apply
     feature-gating-criteria.md § "Documentation scope when a capability
@@ -97,7 +124,11 @@ them in sync is a release-process invariant.
     or narrowed *claim* too. A correction that does not say what to do
     about it reaches nobody who already acted on the old claim — five
     instances across four consumers (`feature-gating-criteria.md`'s
-    documentation-scope table) is why this line exists.
+    documentation-scope table) is why this line exists. **The note
+    lands in the migration guide, not (only) a letter (RFC-080)** — a
+    letter to a team with a known stake may point at it in one line,
+    but the guide is what reaches a future adopter who was never
+    written to.
 [ ] Re-evaluate feature-gating-criteria.md's "Current status" table
     (RFC-062) — the table itself says to do this and nothing pointed at
     it for ten minors, which is why it went stale in the first place.
@@ -123,7 +154,11 @@ them in sync is a release-process invariant.
     Status fields and the rfcs/README.md index
 [ ] Answer the four versioning-policy questions for any public API change
     (see docs/src/contributing/versioning-policy.md)
-[ ] Confirm migration guide exists if any public API broke or renamed
+[ ] Confirm the migration guide required above was actually written —
+    not conditional on whether anything broke or renamed (RFC-079; this
+    line previously said "if any public API broke or renamed," which
+    disagreed with the unconditional rule above and was the second copy
+    of the same requirement drifting on its own)
 [ ] Run scripts/check-version-snippets.sh and fix every snippet it names
     (RFC-074 — derives the expected minor from Cargo.toml itself, so this
     replaces enumerating files by hand; iced version stays unchanged)

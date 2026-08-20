@@ -212,7 +212,12 @@ carries nothing. A withdrawal note must do what the rendered-change
 note already does: name the re-check, not only the correction. A page
 that states "X is withdrawn" without stating "if you relied on X,
 re-check Y" has announced a correction, not retracted the claim from
-where it landed.
+where it landed. **The re-check statement lands in the migration guide
+(RFC-080), not in correspondence.** A letter to a team with a known
+stake in the withdrawal may point at the guide in one line, but the
+guide is the canonical statement — it is what reaches a team we never
+wrote to, and a future adopter jumping through that version who was
+never in a position to be written to at all.
 
 This is not hypothetical. Eleven downstream/review reports, across all
 four cases, were the same omission:
@@ -283,7 +288,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.39.0, re-derived 2026-08-20 post-tag, RFC-062)
+## Current status (snora 0.39.1, re-derived 2026-08-20, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within

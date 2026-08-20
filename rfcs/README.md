@@ -128,6 +128,8 @@ Numbers remain stable forever and are never reused.
 | 075 | [The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes](./done/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md) | v0.38.3 (handoff: [`handoffs/075-…`](./handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md)) |
 | 076 | [`snora` publishes a function whose return type it does not export](./done/076-the-facade-publishes-a-type-it-does-not-export.md) | v0.39.0 (handoff: [`handoffs/076-…`](./handoffs/076-the-facade-publishes-a-type-it-does-not-export/implementation-handoff.md)) |
 | 077 | [The border is not what outlines the dialog card](./done/077-the-border-is-not-what-outlines-the-card.md) | v0.39.0 (handoff: [`handoffs/077-…`](./handoffs/077-the-border-is-not-what-outlines-the-card/implementation-handoff.md)) |
+| 079 | [The migration index promises a guide for every minor, and six are missing](./done/079-the-migration-index-promises-a-guide-for-every-minor.md) | v0.39.1 (handoff: [`handoffs/079-…`](./handoffs/079-the-migration-index-promises-a-guide-for-every-minor/implementation-handoff.md)) |
+| 080 | [The migration guide and the release letters say the same thing](./done/080-the-migration-guide-and-the-release-letters-are-the-same-document.md) | v0.39.1 (handoff: [`handoffs/080-…`](./handoffs/080-the-migration-guide-and-the-release-letters-are-the-same-document/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -137,8 +139,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 079 | [The migration index promises a guide for every minor, and six are missing](./accepted/079-the-migration-index-promises-a-guide-for-every-minor.md) | v0.39.1 (handoff: [`handoffs/079-…`](./handoffs/079-the-migration-index-promises-a-guide-for-every-minor/implementation-handoff.md)) |
-| 080 | [The migration guide and the release letters say the same thing](./accepted/080-the-migration-guide-and-the-release-letters-are-the-same-document.md) | v0.39.1 (handoff: [`handoffs/080-…`](./handoffs/080-the-migration-guide-and-the-release-letters-are-the-same-document/implementation-handoff.md)) |
 
 ## Proposed
 

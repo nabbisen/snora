@@ -14,6 +14,9 @@ This page is the index — pick the guide that matches your jump.
   a direct `snora-core` dependency; and our explanation of what makes the dialog
   card visible against the modal dim was wrong and is corrected. No value, no
   rendered output, no API removed.
+- **0.37 → 0.38 — known gap, guide not yet written** (RFC-079). Predates
+  this page's rule being enforced; not backfilled, per the owner's
+  ruling — deferred, not forgotten.
 - [0.36 → 0.37](migration-0.36-to-0.37.md) — the `design`-path modal dim's
   alpha repaired for WCAG 2.1 SC 1.4.11 (was 2.85:1 in `light`, now
   >= 3.0:1 in all four presets) — an accessibility fix, not a restyle;
@@ -22,6 +25,8 @@ This page is the index — pick the guide that matches your jump.
   button gained a fixed minimum width — a WCAG 2.5.8 pointer-target-size
   repair (measured 15.0px wide against the shipped font, now ~24.8px
   square); an appearance change, not an API change.
+- **0.34 → 0.35 — known gap, guide not yet written** (RFC-079). Same
+  status as 0.37 → 0.38 above.
 - [0.33 → 0.34](migration-0.33-to-0.34.md) — `light`/`dark`'s `border` colour
   repaired for WCAG 2.1 SC 1.4.11 (was 1.19-1.43:1 against surfaces, now
   >= 3.0:1) — an accessibility fix, not a restyle; `high_contrast_*`
@@ -30,6 +35,10 @@ This page is the index — pick the guide that matches your jump.
   theme}` removed; use `snora_style::*` directly, or
   `snora::design::style::*`/`snora::design::theme` (unaffected — the
   documented consumer route already pointed at `snora-style`).
+- **0.31 → 0.32, 0.30 → 0.31, 0.29 → 0.30 — known gaps, guides not yet
+  written** (RFC-079). Crossed by a real jump this month (knotra,
+  0.25 → 0.39), so not merely historical — but not urgent, and nobody
+  is blocked; deferred by the owner, same as the other gaps above.
 - [0.28 → 0.29](migration-0.28-to-0.29.md) — `snora-dialog-card` was
   attached to the wrong element since v0.27.0; re-pointed to the actual
   card, with a new `snora-dialog` identifier for the centring container

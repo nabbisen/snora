@@ -17,6 +17,66 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.39.1] — 2026-08-20
+
+### Fixed
+
+- **`docs/src/guides/migrations.md` promised a migration guide for every
+  minor release; three other documents disagreed with it, silently
+  (RFC-079).** `contributing/release-process.md` carried two
+  conditional checklist lines ("minor only", "if any public API broke
+  or renamed") and `contributing/versioning-policy.md`'s version-level
+  table required a guide only for rename/removal/feature-flag-rename —
+  a reader following any of the three would reasonably skip the guide
+  for an additive-only minor. `migrations.md`'s own promise was already
+  correct and does not change; the other three statements (the two
+  checklist lines and the table) are amended to agree with it —
+  **every minor ships a guide, no condition**, even to say plainly that
+  nothing is required. Six such gaps existed; the newest
+  (0.38 → 0.39) was already written ahead of this RFC and is the
+  worked example of the rule. The remaining five
+  (0.29→0.30, 0.30→0.31, 0.31→0.32, 0.34→0.35, 0.37→0.38) are **not
+  backfilled** — named explicitly in `migrations.md` as known,
+  deferred gaps rather than left silently absent, per the owner's
+  ruling. `scripts/check-migration-guides.sh` derives every consecutive
+  minor pair from `git tag` and the filesystem and reports every gap it
+  finds (18 on the current tree, including several older than the ones
+  this RFC named); it fails only for a gap at or after one boundary
+  constant (`ADOPTION_MINOR = 39`), so the five known-historical gaps
+  don't fail a check nobody expects to be clean yet. Also fixed while
+  making `mdbook test` pass cleanly (a required gate for this change,
+  unrelated to the rule itself): `migration-0.38-to-0.39.md`'s
+  before/after code example used free variables (`key`, `modifiers`)
+  and cross-crate paths as if linked, which mdbook was actually trying
+  to compile as a real doctest; marked `ignore`, matching this
+  project's existing convention for the same shape of fragment
+  elsewhere (RFC-064).
+
+### Changed
+
+- **The migration guide is now the canonical statement of what a
+  release means for a consumer; a downstream letter carries only what
+  is specific to that team (RFC-080).** Not a cost-cutting move — a
+  reach one: the RFC-067 re-check obligation (name what to re-check
+  when a claim is withdrawn or narrowed) previously depended on us
+  choosing to write to a team, so it reached only the teams we decided
+  to write to. In the guide it reaches everyone who reads the guide,
+  including a future adopter jumping through that version who was
+  never in a position to receive a letter at all. Written down in
+  `contributing/release-process.md`, near the (now-unconditional,
+  RFC-079) migration-guide checklist step, with the reasoning stated
+  alongside the practice. A new checklist line operationalizes it:
+  after the guide is written, decide correspondence per team — write
+  only the team-specific part, and if no team has anything specific,
+  send nothing (this is the note tekstide asked us to stop sending).
+  **The correspondence bar itself does not change** — broken-now, a
+  withdrawn claim a team acted on, or they asked. Every place stating
+  the RFC-067 re-check obligation (`release-process.md`'s checklist
+  line, `feature-gating-criteria.md`'s documentation-scope section) now
+  says the same thing: the note lands in the guide, and correspondence
+  may point at it but does not restate it. No code; no letter written
+  or altered.
+
 ## [0.39.0] — 2026-08-20
 
 ### Added

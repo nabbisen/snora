@@ -104,6 +104,18 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.39.1** — `migrations.md` promised *"each minor release ships a focused
+  migration guide"* and **six minors had none** — two of them from this month,
+  written off by applying a different document's rule without checking what the
+  index said. Three documents carried three rules, and a fourth statement turned
+  up in the same file as the first. They now say one thing, unconditionally:
+  **every minor ships a guide**, and one for a minor that broke nothing says so
+  in a sentence. A derived check found **18** gaps where a hand audit found six.
+  Separately, a release was being written up four times, and the letters and the
+  guide were answering the same question for the same audience (RFC-080). The
+  guide is now canonical and a letter carries only what is specific to a team —
+  **because RFC-067's re-check reaches a future adopter through the guide and
+  never through a letter they were not sent.**
 - **0.39.0** — `snora::keyboard::cycle_zones` returned a type the facade did not
   export (RFC-076). A consumer depending only on `snora` could call it and match
   `Some(_)` but could not name `Cycle` — and our own doc comments told them to

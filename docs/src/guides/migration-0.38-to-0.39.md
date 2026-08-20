@@ -26,7 +26,11 @@ could call the function and match `Some(_)`, but could not name its return
 type. Our own doc comments told you to reach into `snora_core` instead — which
 is how the gap survived from 0.35.0.
 
-```rust
+`ignore` (RFC-064): a before/after fragment with `key`/`modifiers` as
+free variables from the caller's own event handling — not a standalone
+compilable item.
+
+```rust,ignore
 // 0.38 and earlier — needed a direct `snora-core` dependency:
 let cycle: Option<snora_core::focus::Cycle> =
     snora::keyboard::cycle_zones(key, modifiers);

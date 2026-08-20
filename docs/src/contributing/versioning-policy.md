@@ -5,15 +5,22 @@ how public API changes are versioned, communicated, and bridged.
 
 ## Version levels
 
+**Every minor release ships a migration guide. No condition** (RFC-079)
+— including a release that only adds API, where the guide says plainly
+that nothing is required. This is not one requirement among several in
+the table below; it is unconditional at the minor level, and the table's
+per-row requirements are *additional* to it (a deprecation alias, a
+feature bridge), not a gate on whether a guide is written at all.
+
 | Change type | Version level | Migration requirement |
 |---|---|---|
 | Bug fix, no API change | patch | Changelog note if behavior is visible |
-| Additive API (new type, method, or variant) | minor or patch | Docs update |
-| Rename public type or method | minor | Deprecation alias for ≥2 minors when practical; migration guide required |
+| Additive API (new type, method, or variant) | minor or patch | Migration guide required when minor (RFC-079 — every minor ships one, even to say nothing is required); changelog note if patch |
+| Rename public type or method | minor | Migration guide required; deprecation alias for ≥2 minors when practical |
 | Remove public type or method | minor (pre-1.0 only) | Migration guide required |
-| Feature flag rename | minor | Old feature name bridge if feasible; migration guide required |
-| Behavior semantics change (fixes doc invariant) | patch or minor | Explicit changelog note; see rule below |
-| Behavior semantics change (changes doc invariant) | minor | Changelog note under **Changed** |
+| Feature flag rename | minor | Migration guide required; old feature name bridge if feasible |
+| Behavior semantics change (fixes doc invariant) | patch or minor | Migration guide required when minor; explicit changelog note always — see rule below |
+| Behavior semantics change (changes doc invariant) | minor | Migration guide required; changelog note under **Changed** |
 | 1.0+ breaking change | major | Full migration guide |
 
 ## Rendered surface identifiers
