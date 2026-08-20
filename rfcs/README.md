@@ -133,13 +133,13 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 074 | [The release checklist names two files by hand, so every other version snippet drifts](./accepted/074-version-snippets-are-a-hand-maintained-list.md) | v0.38.3 (handoff: [`handoffs/074-…`](./handoffs/074-version-snippets-are-a-hand-maintained-list/implementation-handoff.md)) |
+| 075 | [The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes](./accepted/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md) | v0.38.3 (handoff: [`handoffs/075-…`](./handoffs/075-the-gate-register-and-the-frozen-surface-are-both-wrong/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 075 | [The gate register contradicts itself, and the frozen-surface list omits seven of the functions it freezes](./proposed/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md) | v0.38.3 — from a commissioned audit; 16 confirmed defects, two with governance weight |
-| 074 | [The release checklist names two files by hand, so every other version snippet drifts](./proposed/074-version-snippets-are-a-hand-maintained-list.md) | v0.38.3 — `lib.rs` ships `0.25` to docs.rs; `widgets.md` shows `0.6`, 32 minors stale |
 
 ## Archive
 
