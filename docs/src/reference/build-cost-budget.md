@@ -256,8 +256,9 @@ signal component available to confuse them:
 | `widgets_diff_bytes` | 46,464 B | 46,592 B | **+128 B** |
 
 **0.38.3 is a second zero-code control** — also documentation and doc comments
-only — and it moved the ratio **+2.5%** (0.042133 → 0.043206). Two controls, in
-opposite directions, both under 5%: **−4.05%** and **+2.5%**.
+only — and it moved the ratio **+2.5%** (0.042133 → 0.043206). **0.39.1 is a
+third**, moving **−1.05%**. Three controls, in both directions, all under 5%:
+**−4.05%**, **+2.5%**, **−1.05%**.
 
 **Read the ratio's ~10% investigate threshold against those**, not against a
 hoped-for zero. The binary-size series reads 46,464 / 46,592 / 46,464 / 46,592 / 46,592 across
