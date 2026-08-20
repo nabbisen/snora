@@ -142,6 +142,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 080 | [The migration guide and the release letters say the same thing](./proposed/080-the-migration-guide-and-the-release-letters-are-the-same-document.md) | v0.39.1 — a release is written up four times; the re-check reaches more people in the guide than in a letter |
 | 079 | [The migration index promises a guide for every minor, and six are missing](./proposed/079-the-migration-index-promises-a-guide-for-every-minor.md) | v0.39.1 — found by the owner; two of the six are from this month |
 | 078 | [Measure what iced's `advanced` feature costs](./proposed/078-measure-what-iceds-advanced-feature-costs.md) | no release — owner ruled RFC-060 Q-1 is answered by measuring |
 
