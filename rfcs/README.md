@@ -142,6 +142,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 078 | [Measure what iced's `advanced` feature costs](./proposed/078-measure-what-iceds-advanced-feature-costs.md) | no release — owner ruled RFC-060 Q-1 is answered by measuring |
 
 ## Archive
 
