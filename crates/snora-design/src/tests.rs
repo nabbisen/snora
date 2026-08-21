@@ -18,6 +18,7 @@
 use crate::contrast::{composite_over, contrast_ratio};
 use crate::palette::ThresholdClass;
 use crate::surfaces::modal_dim;
+use crate::typography::{TextRole, Typography};
 use crate::{Palette, Tokens};
 
 const AA_TEXT: f32 = 4.5;
@@ -325,16 +326,8 @@ fn pointer_target_height_meets_24px_for_every_role_and_padding_step() {
     // made three prior handoff scopes short this cycle. The full
     // matrix costs nothing to compute and is a stronger ratchet.
     for (name, t) in all_presets() {
-        let ty = t.typography;
         let sp = t.spacing;
-        for (role_name, role) in [
-            ("body", ty.body),
-            ("body_small", ty.body_small),
-            ("label", ty.label),
-            ("title", ty.title),
-            ("heading", ty.heading),
-            ("display", ty.display),
-        ] {
+        for (role_name, role) in every_text_role(t.typography) {
             for (step_name, step) in [
                 ("xs", sp.xs),
                 ("sm", sp.sm),
@@ -365,6 +358,39 @@ fn pointer_target_height_meets_24px_for_every_role_and_padding_step() {
 /// it already caused one consumer).
 const TEXT_SIZE_MIN: f32 = 12.0;
 
+/// Every `TextRole` in a bundle, paired with its name, **derived by
+/// exhaustive destructuring rather than listed by hand**.
+///
+/// A seventh role added to [`Typography`] makes the pattern below fail to
+/// compile (`E0027: pattern does not mention field ...`) until it is named
+/// here — and every caller then covers it automatically. **Do not add `..`
+/// to the pattern.** The compiler suggests it on a missing-field error, and
+/// that suggestion silently returns this to the hand-maintained list it
+/// replaced: two accessibility floors (the 12px text size and the 24px
+/// pointer target) both iterate this function, and a role missing from a
+/// literal array would escape both without failing anything.
+///
+/// Same mechanism, same reason, as [`crate::palette::Palette::usages`]
+/// (RFC-063) one file over.
+fn every_text_role(ty: Typography) -> [(&'static str, TextRole); 6] {
+    let Typography {
+        body,
+        body_small,
+        label,
+        title,
+        heading,
+        display,
+    } = ty;
+    [
+        ("body", body),
+        ("body_small", body_small),
+        ("label", label),
+        ("title", title),
+        ("heading", heading),
+        ("display", display),
+    ]
+}
+
 /// Asserts every `TextRole`'s `size` in all four **built-in** presets
 /// clears [`TEXT_SIZE_MIN`]. **What this does and does not prove:** it
 /// proves our four shipped presets comply, and would catch a future
@@ -380,15 +406,7 @@ const TEXT_SIZE_MIN: f32 = 12.0;
 #[test]
 fn text_size_meets_12px_floor_for_every_role() {
     for (name, t) in all_presets() {
-        let ty = t.typography;
-        for (role_name, role) in [
-            ("body", ty.body),
-            ("body_small", ty.body_small),
-            ("label", ty.label),
-            ("title", ty.title),
-            ("heading", ty.heading),
-            ("display", ty.display),
-        ] {
+        for (role_name, role) in every_text_role(t.typography) {
             assert!(
                 role.size >= TEXT_SIZE_MIN,
                 "{name}: {role_name} size {:.1} < {TEXT_SIZE_MIN} — see \
