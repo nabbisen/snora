@@ -1,6 +1,7 @@
 # RFC 082 — Three keyboard-and-focus statements a reader cannot trust: one stale, one uncheckable, one absent
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-20). Handoff written — see
+[`handoffs/082-…`](../handoffs/082-three-keyboard-and-focus-statements-a-reader-cannot-trust/implementation-handoff.md).
 **Tracks.** Decision register / accessibility documentation.
 **Found by** **tekstide**, 2026-08-20. All three verified against source.
 **Touches.** `docs/src/contributing/design-decisions.md`,

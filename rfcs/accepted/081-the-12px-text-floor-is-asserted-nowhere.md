@@ -1,6 +1,7 @@
 # RFC 081 — The 12-pixel text floor is the one mandatory number nothing asserts
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-08-20). Handoff written — see
+[`handoffs/081-…`](../handoffs/081-the-12px-text-floor-is-asserted-nowhere/implementation-handoff.md).
 **Tracks.** Accessibility assertions.
 **Found by** **tekstide**, 2026-08-20. Verified against source before opening.
 **Touches.** `crates/snora-design/src/tests.rs`,
