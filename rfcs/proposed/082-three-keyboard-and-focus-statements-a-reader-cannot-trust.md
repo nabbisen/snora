@@ -62,11 +62,42 @@ entry — **owned, or deliberately deferred and said so.**
 
 ## Open questions
 
-**Q-1 — what does §3 become?** Three options: state that in-menu traversal is the
-application's own (consistent with "intra-pane structure snora does not own");
-state it is deferred with a trigger; or scope it. **Suggest the first** — it
-matches where we already drew the line for tabs and breadcrumbs in RFC-060 — but
-this is a scope decision and belongs to the owner, not to this RFC.
+**Q-1 — ruled by the owner, 2026-08-20: in-menu traversal is the application's
+own**, matching where RFC-060 drew the line for tabs and breadcrumbs.
+
+**The ruling is recorded, and it cannot be written into `menus.md` as it
+stands.** Checking the parallel it invokes shows the parallel is what breaks it:
+
+| | can the application express its own keyboard state? |
+|---|---|
+| `TabBar { tabs, **active: TabId** }` | **yes** — snora renders `active` with an active treatment |
+| `Menu { id, label, icon, items }` | **no field** |
+| `MenuItem { menu_id, id, label, icon }` | **no field** |
+
+**Tabs got an `active` field precisely so the application could drive
+selection. Menus never got one.** So an application can bind arrow keys and
+track a highlighted index in its own state, and then has **no channel to make
+snora render it** — snora draws the items.
+
+As written, *"the application's own"* is indistinguishable from *"not
+possible"*, and that is a worse answer than deferring, because it reads as
+available.
+
+**And the fix is not free.** Neither `Menu` nor `MenuItem` is
+`#[non_exhaustive]`, so adding a field breaks every consumer constructing one
+with a struct literal — which is how they are built. Pre-1.0 that is a permitted
+minor under RFC-011-C, with a migration guide; it is not a documentation edit.
+
+**Back to the owner**, with three options and no recommendation from this RFC
+because the choice is scope, not correctness:
+
+1. **Record the ruling and say so plainly** — in-menu traversal is the
+   application's own *and* snora currently provides no way to render it.
+   Honest, cheap, and leaves a keyboard-only user with nothing.
+2. **Make the ruling true** — add a highlighted-item field mirroring
+   `TabBar::active`, as a breaking minor with a guide. Small surface, real cost.
+3. **Defer with a trigger**, which is what the register already does for focus
+   trapping — and which tekstide's report shows we then fail to revisit.
 
 **Q-2 — should §1's correction be mechanised?** The register's demand column
 depends on what consumers say, which no check can derive. **Suggest not.** State
