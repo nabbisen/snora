@@ -144,6 +144,8 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 081 | [The 12-pixel text floor is the one mandatory number nothing asserts](./proposed/081-the-12px-text-floor-is-asserted-nowhere.md) | v0.39.2 — found by tekstide; its two neighbouring floors are both enforced |
+| 082 | [Three keyboard-and-focus statements a reader cannot trust](./proposed/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md) | v0.39.2 — found by tekstide; the decision register lists them as a trigger they withdrew from |
 | 078 | [Measure what iced's `advanced` feature costs](./proposed/078-measure-what-iceds-advanced-feature-costs.md) | no release — owner ruled RFC-060 Q-1 is answered by measuring |
 
 ## Archive
