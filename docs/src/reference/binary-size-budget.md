@@ -34,6 +34,40 @@ The threshold values that govern when to act on the data live in
 [`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md)
 indicator (2). This page is the data; that page is the policy.
 
+### Data integrity note (rustc 1.97.1 → 1.98.0, at 0.39.2)
+
+**The runner's compiler changed between 0.39.1 and 0.39.2**, and it moved the
+derived columns far more than snora did — snora changed nothing that ships. The
+release added one `#[cfg(test)]` assertion and edited documentation;
+`git diff 0.39.1 0.39.2 -- crates/` is a single test file.
+
+| column | 0.39.1 | 0.39.2 | move |
+|---|---|---|---|
+| `rustc` | `1.97.1 (8bab26f4f 2026-07-14)` | **`1.98.0 (88d9e12ae 2026-08-18)`** | — |
+| `engine_bytes` | 15,690,704 | 15,689,304 | −1,400 B (−0.0089%) |
+| `widgets_bytes` | 15,737,168 | 15,738,072 | +904 B (+0.0057%) |
+| **`widgets_diff_bytes`** | 46,464 | **48,768** | **+2,304 B (+4.96%)** |
+| **`design_diff_bytes`** | 3,840 | **1,664** | **−2,176 B (−56.7%)** |
+
+**Read the absolute and derived columns differently here.** The two absolute
+totals moved by under 0.01% — the compiler produced almost the same binary. The
+two *differences* moved by 5% and 57%, because a difference between two large
+near-equal numbers amplifies any redistribution between them. **Nothing grew;
+the split moved.**
+
+**This is a methodology discontinuity, the fourth** (after RFC-043, RFC-044,
+RFC-052). Per RFC-041 N-1 no historical row is edited or back-filled — it is
+recorded, not repaired. **`widgets_diff_bytes` and `design_diff_bytes` are not
+comparable across the 0.39.1 / 0.39.2 boundary.**
+
+**It also puts the ±128 B noise band in its place.** That band was established
+on three zero-code releases *on one compiler*, and it holds only within a
+toolchain. A rustc change is not noise and is not signal about snora — it is a
+third category, and the `rustc` column exists so it can be told apart from both.
+Without that column this row would read as a 5% regression on a documentation
+release.
+
+
 ## How this is updated
 
 The flow is split between automation and human discipline:
