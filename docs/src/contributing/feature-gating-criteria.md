@@ -110,7 +110,7 @@ the whole unused feature). `widgets_diff_bytes` is recorded per release
 in
 [`reference/binary-size-budget/binary-size.csv`](../reference/binary-size-budget/binary-size.csv),
 appended by the `binary-size` GitHub Actions workflow. **Current status:
-48,768 B (~48 KB) as of 0.39.2, across a compiler change — comfortably under the 150 KB
+48,512 B (~47 KB) as of 0.39.3 — comfortably under the 150 KB
 threshold, not met.**
 
 ### 3. A widget gains a heavy optional dependency
@@ -288,7 +288,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.39.3, re-derived 2026-08-21, RFC-062)
+## Current status (snora 0.39.3, re-derived 2026-08-21 post-tag, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -298,7 +298,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **48,768 B (~48 KB)** — `binary-size.csv`'s 0.39.2 row, **and not comparable to the rows before it**: the runner's compiler moved `1.97.1 → 1.98.0` at that release. snora shipped one `#[cfg(test)]` assertion and documentation, nothing that ships. Both absolute totals moved under 0.01% while this difference moved +4.96% — a redistribution between two large near-equal numbers, not growth. Still **32% of a 150 KB bar**, and the next same-compiler row is the one to compare against | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **48,512 B (~47 KB)** — `binary-size.csv`'s 0.39.3 row, the **second** on `rustc 1.98.0` and a deliberate zero-code control. It moved **−256 B** from 0.39.2 having shipped nothing, so the ±128 B band established on 1.97.1 did not carry across the compiler change. Rows before 0.39.2 are not comparable. **32% of a 150 KB bar** | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |

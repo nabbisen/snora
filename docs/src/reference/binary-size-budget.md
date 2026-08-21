@@ -60,6 +60,32 @@ RFC-052). Per RFC-041 N-1 no historical row is edited or back-filled — it is
 recorded, not repaired. **`widgets_diff_bytes` and `design_diff_bytes` are not
 comparable across the 0.39.1 / 0.39.2 boundary.**
 
+### The band did not carry over — measured, at 0.39.3
+
+**0.39.3 was cut to produce a second row on 1.98.0**, with no shipped code in
+it, precisely so the toolchain's own variance could be read on its own. It was:
+
+| | 0.39.2 | 0.39.3 (zero code) | move |
+|---|---|---|---|
+| `engine_bytes` | 15,689,304 | 15,689,304 | **0** |
+| `design_bytes` | 15,739,736 | 15,739,736 | **0** |
+| `widgets_bytes` | 15,738,072 | 15,737,816 | −256 B |
+| **`widgets_diff_bytes`** | 48,768 | 48,512 | **−256 B** |
+| `design_diff_bytes` | 1,664 | 1,920 | +256 B |
+
+**−256 B on a release that shipped nothing — twice the ±128 B amplitude
+established on 1.97.1.** The band did **not** carry across the compiler change,
+and one observation is all we have on 1.98.0, so treat **256 B as the floor of
+what is currently distinguishable**, not as a new band.
+
+Note what did *not* move: `engine_bytes` and `design_bytes` are **byte-identical**
+across the two rows. The variance on this compiler is confined to the widgets
+binary, which is also the numerator of the column the budget is judged on.
+
+**The general lesson, which cost two releases to learn:** a noise band belongs to
+a toolchain, not to a project. Every figure quoted in this file is implicitly
+suffixed *"on the compiler it was measured with."*
+
 **It also puts the ±128 B noise band in its place.** That band was established
 on three zero-code releases *on one compiler*, and it holds only within a
 toolchain. A rustc change is not noise and is not signal about snora — it is a

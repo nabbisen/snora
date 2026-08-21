@@ -257,8 +257,24 @@ signal component available to confuse them:
 
 **0.38.3 is a second zero-code control** — also documentation and doc comments
 only — and it moved the ratio **+2.5%** (0.042133 → 0.043206). **0.39.1 is a
-third**, moving **−1.05%**. Three controls, in both directions, all under 5%:
-**−4.05%**, **+2.5%**, **−1.05%**.
+third**, moving **−1.05%**.
+
+**0.39.3 is a fourth, and the first on `rustc 1.98.0` — it moved −6.35%**
+(0.044495 → 0.041670), larger than any of the three before it.
+
+| control | compiler | move |
+|---|---|---|
+| 0.38.2 | 1.97.1 | −4.05% |
+| 0.38.3 | 1.97.1 | +2.5% |
+| 0.39.1 | 1.97.1 | −1.05% |
+| **0.39.3** | **1.98.0** | **−6.35%** |
+
+**Read the ~10% investigate threshold against −6.35%, not against −4.44%.** The
+threshold was set when the largest zero-code move on record was 4.44%; a single
+observation on the new compiler is already 6.35%, which leaves far less margin
+than the figure implies. **One observation is not a floor** — but it is enough
+that the next release's move should not be called signal on the strength of the
+old number.
 
 **Read the ratio's ~10% investigate threshold against those**, not against a
 hoped-for zero. The binary-size series reads 46,464 / 46,592 / 46,464 / 46,592 / 46,592 across
