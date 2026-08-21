@@ -63,42 +63,41 @@ entry — **owned, or deliberately deferred and said so.**
 
 ## Open questions
 
-**Q-1 — ruled by the owner, 2026-08-20: in-menu traversal is the application's
-own**, matching where RFC-060 drew the line for tabs and breadcrumbs.
+**Q-1 — ruled by the owner: in-menu traversal is the application's own**,
+matching where RFC-060 drew the line for tabs and breadcrumbs.
 
-**The ruling is recorded, and it cannot be written into `menus.md` as it
-stands.** Checking the parallel it invokes shows the parallel is what breaks it:
+**A correction to this RFC's own first answer.** It said the ruling was blocked
+because `Menu`/`MenuItem` carry no highlighted-item field and therefore an
+application could not render its own keyboard state. **That reading was wrong.
+It assumed snora draws menu items. On one of the two paths it does not.**
 
-| | can the application express its own keyboard state? |
-|---|---|
-| `TabBar { tabs, **active: TabId** }` | **yes** — snora renders `active` with an active treatment |
-| `Menu { id, label, icon, items }` | **no field** |
-| `MenuItem { menu_id, id, label, icon }` | **no field** |
+| path | who builds the dropdown | can the application highlight an item? |
+|---|---|---|
+| `AppLayout::header_menu(Node)` / `context_menu(Node)` | **the application** — the slot takes an already-built `Option<Node>` | **yes, today.** Nothing is needed from snora |
+| `snora_widgets::menu::render_menu(menu, on_action, is_active)` | **snora** | **no channel** |
 
-**Tabs got an `active` field precisely so the application could drive
-selection. Menus never got one.** So an application can bind arrow keys and
-track a highlighted index in its own state, and then has **no channel to make
-snora render it** — snora draws the items.
+So the ruling is **already true on the engine path**, and the gap is confined to
+the prefab widget.
 
-As written, *"the application's own"* is indistinguishable from *"not
-possible"*, and that is a worse answer than deferring, because it reads as
-available.
+**And the fix is smaller than this RFC claimed.** It is a parameter on
+`render_menu` — a function — **not a field on `Menu` or `MenuItem`.** Those
+structs do not change, so the "breaking change to a struct literal every
+consumer writes" argument does not apply. I asserted that without checking who
+draws the items.
 
-**And the fix is not free.** Neither `Menu` nor `MenuItem` is
-`#[non_exhaustive]`, so adding a field breaks every consumer constructing one
-with a struct literal — which is how they are built. Pre-1.0 that is a permitted
-minor under RFC-011-C, with a migration guide; it is not a documentation edit.
+**Resolution, with the owner's steer that migration cost is not decisive and the
+final design is what matters:**
 
-**Back to the owner**, with three options and no recommendation from this RFC
-because the choice is scope, not correctness:
+1. **`menus.md` states the ruling and distinguishes the two paths** — on the
+   engine path in-menu traversal is the application's own and already possible;
+   on the widgets path snora renders the items.
+2. **`render_menu` gains a highlight channel**, so the ruling is true on both
+   paths rather than true in principle and impossible in practice.
 
-1. **Record the ruling and say so plainly** — in-menu traversal is the
-   application's own *and* snora currently provides no way to render it.
-   Honest, cheap, and leaves a keyboard-only user with nothing.
-2. **Make the ruling true** — add a highlighted-item field mirroring
-   `TabBar::active`, as a breaking minor with a guide. Small surface, real cost.
-3. **Defer with a trigger**, which is what the register already does for focus
-   trapping — and which tekstide's report shows we then fail to revisit.
+**Item 2 is a public API change and is not documentation.** It is scoped out of
+this RFC and needs its own, with the design question — an `Option<MenuItemId>`
+parameter, a builder, or a `MenuGeometry`-style options struct — decided there
+rather than assumed here.
 
 **Q-2 — should §1's correction be mechanised?** The register's demand column
 depends on what consumers say, which no check can derive. **Suggest not.** State

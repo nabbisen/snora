@@ -146,8 +146,14 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 078 | [Measure what iced's `advanced` feature costs](./proposed/078-measure-what-iceds-advanced-feature-costs.md) | no release — owner ruled RFC-060 Q-1 is answered by measuring |
 
 ## Archive
+
+Withdrawn or superseded — see [`archive/README.md`](./archive/README.md).
+
+| ID | Title | Superseded by |
+|----|-------|---------------|
+| 078 | [Measure what iced's `advanced` feature costs](./archive/078-measure-what-iceds-advanced-feature-costs.md) | The owner's ruling that `advanced` must never be a default, plus the finding that **no consumer ever requested it** — the measurement's only question |
+
 
 _(none yet)_

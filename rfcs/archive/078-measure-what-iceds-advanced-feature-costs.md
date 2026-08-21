@@ -1,12 +1,51 @@
 # RFC 078 — Measure what iced's `advanced` feature costs, before deciding whether trapping is worth it
 
-**Status.** Proposed
+**Status.** **Archived — superseded, 2026-08-20, before implementation.**
+Never accepted; no measurement was taken. See "Why this was archived" below.
 **Tracks.** Measurement / 1.0 readiness.
 **Ruled by** the owner, 2026-08-20: RFC-060 Q-1 is answered by **measuring**,
 not by closing or holding.
 **Touches.** measurement only — **no crate change ships from this RFC.**
 **Release target.** None. The measurement lands as a record; any decision that
 follows is a separate RFC.
+
+## Why this was archived
+
+**The measurement existed to answer one question: should `advanced` be enabled
+by default?** The owner answered it directly instead:
+
+> *"If snora does not require iced's `advanced` feature, snora should not
+> introduce it **as default**. Why did some app team need it?"*
+
+**The answer to that second question is: none did.** Checked before archiving —
+`advanced` appears in RFC-060 as **our own inference** (trapping needs
+`find_focused`, which needs `advanced`), not as a consumer request. And the
+demand is not merely absent, it is **withdrawn**: tekstide, the team
+`design-decisions.md` still lists as the concrete-app trigger, said they *"would
+not switch to trapping even if you shipped it."* arama shipped zone navigation
+without it. apimokka declined.
+
+`design-decisions.md:32` already carried the conclusion in its own words —
+*"not stable-by-default"*.
+
+**And the owner's framing supplies an option this RFC never contained.** If
+trapping is ever built, `advanced` belongs behind **an opt-in snora feature**,
+never a default. Cargo's feature unification then reaches only consumers who ask
+for it — which dissolves Q-4, the consequence this RFC named as likely to
+dominate the decision.
+
+So the RFC's own question — *what does enabling it by default cost?* — is no
+longer a question anyone needs answered.
+
+**What is not lost.** The measurement design is still the right one **if the
+opt-in feature is ever built and someone asks what it costs to turn on**: local
+A/B on one machine with alternating arms, because CI's between-runner variance
+is the dominant error term and is exactly what that removes. And Q-3's rule
+stands whenever this is revisited — **fix the affordability thresholds before
+taking the number**, or the number argues for itself.
+
+**Superseded by:** the owner's ruling of 2026-08-20, and the absence of any
+consumer requesting the feature.
 
 ## The question being costed
 

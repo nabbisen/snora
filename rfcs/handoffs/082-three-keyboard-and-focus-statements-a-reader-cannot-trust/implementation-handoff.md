@@ -3,23 +3,33 @@
 **Governing RFC.** [RFC-082](../../accepted/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md)
 **Status.** Inherited from RFC-082 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.2 — documentation only. **No code.**
-**Implementation units.** Two now, **one held.**
+**Implementation units.** Three.
 
 ---
 
-## 1. Held — §3 (menus) is NOT in this handoff
+## 1. §3 (menus) — unheld, and narrowed
 
-The owner ruled in-menu traversal is the application's own. **Recording that
-ruling is blocked on a scope decision that has not been made**, and the RFC
-states why: `TabBar` carries `active: TabId` so an application can drive tab
-selection; `Menu` and `MenuItem` carry **no field** for a highlighted item, so
-an application can track arrow keys and has no way to make snora render it.
+The hold is lifted. **This RFC's own account of the blocker was wrong** and the
+RFC now records the correction: snora does not always draw menu items.
 
-As written, "the application's own" would read as available and be impossible.
+| path | who builds the dropdown | state today |
+|---|---|---|
+| `AppLayout::header_menu(Node)` / `context_menu(Node)` | the **application** — an already-built `Option<Node>` | in-menu traversal is **already possible**; nothing needed from snora |
+| `snora_widgets::menu::render_menu(...)` | **snora** | no way for the application to express a highlighted item |
 
-**Do not write anything into `menus.md`.** Not the ruling, not a caveat, not a
-"deferred" note. Three options are with the owner and one of them is a breaking
-minor. **If you have an opinion, send it to the architect; do not implement it.**
+**What you write in `menus.md`:** the ruling — in-menu keyboard traversal is the
+application's own — **and the distinction between the two paths**, so a reader on
+the engine path learns they can do it today and a reader on the widgets path
+learns they currently cannot.
+
+**Do not write that it is deferred**, and **do not promise the widgets-path
+fix.** A separate RFC owns that; it is a public API change with a real design
+question, and naming it here as forthcoming would commit a design nobody has
+chosen.
+
+**Verify both halves before writing them.** `layout.rs:121` and `:124` for the
+slot types, `snora-widgets/src/menu.rs:42` for `render_menu`. If either reads
+differently to you, stop — this RFC has already been wrong about it once.
 
 ## 2. Unit 1 — the decision register is wrong about who is asking
 
@@ -72,7 +82,7 @@ guarantee RFC-079's check gives for guides.
 
 ## 5. Explicit non-change scope
 
-- **Nothing in `menus.md`** (§1).
+- **No promise of the widgets-path fix in `menus.md`** (§1) — a separate RFC owns it.
 - **No resolution of RFC-060 Q-1**, and no touching RFC-078.
 - **No new marker vocabulary** (§3).
 - **No code.** `git diff -- crates/` must be empty.
@@ -96,7 +106,7 @@ guarantee RFC-079's check gives for guides.
    omitted.
 4. The `high-contrast.md` bullet is marked or reworded, matching an existing
    convention you name.
-5. **`menus.md` is untouched.**
+5. `menus.md` states the ruling and distinguishes the two paths; it promises no future API and does not call the matter deferred.
 6. `CHANGELOG.md` `[Unreleased]`, crediting tekstide.
 
 ## 8. Required review-request format
