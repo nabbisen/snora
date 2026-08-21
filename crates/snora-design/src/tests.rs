@@ -355,6 +355,50 @@ fn pointer_target_height_meets_24px_for_every_role_and_padding_step() {
     }
 }
 
+// ---- 12px text floor (RFC-081) ----
+
+/// Snora's own minimum text size, logical pixels — **not a WCAG number.**
+/// SC 1.4.4 is about *resize*, not a minimum size; this floor has no
+/// standards citation and the assertion below must not invent one. See
+/// `docs/src/guides/readability.md` for the floor's own rationale
+/// (including the remediation cost an earlier, less precise wording of
+/// it already caused one consumer).
+const TEXT_SIZE_MIN: f32 = 12.0;
+
+/// Asserts every `TextRole`'s `size` in all four **built-in** presets
+/// clears [`TEXT_SIZE_MIN`]. **What this does and does not prove:** it
+/// proves our four shipped presets comply, and would catch a future
+/// preset edit that dropped a role below the floor. **It cannot
+/// constrain a consumer's own `Tokens`** — `Typography`'s fields are
+/// public and RFC-036's covenant freezes that surface, so
+/// `tokens.typography.body.size = 8.0` in an application is
+/// unreachable by any test this crate ships. Enforcing the floor at
+/// construction would require private fields, a breaking change to a
+/// frozen surface — out of scope (RFC-081 Q-1: presets only, no public
+/// validator; nobody has asked for one, and a helper nobody calls is a
+/// third thing to keep true).
+#[test]
+fn text_size_meets_12px_floor_for_every_role() {
+    for (name, t) in all_presets() {
+        let ty = t.typography;
+        for (role_name, role) in [
+            ("body", ty.body),
+            ("body_small", ty.body_small),
+            ("label", ty.label),
+            ("title", ty.title),
+            ("heading", ty.heading),
+            ("display", ty.display),
+        ] {
+            assert!(
+                role.size >= TEXT_SIZE_MIN,
+                "{name}: {role_name} size {:.1} < {TEXT_SIZE_MIN} — see \
+                 docs/src/guides/readability.md for snora's own text-size floor",
+                role.size
+            );
+        }
+    }
+}
+
 #[test]
 fn customizing_a_token_does_not_affect_other_presets() {
     let mut a = Tokens::light();

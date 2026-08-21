@@ -17,6 +17,76 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.39.2] — 2026-08-20
+
+### Fixed
+
+- **The 12px text-size floor was stated flatly in `readability.md` and
+  asserted nowhere (RFC-081).** Its two neighboring mandatory
+  floors — the 24px pointer target and the contrast thresholds — are
+  both enforced, one per role and padding step, the other as a compile
+  error; the text floor had nothing. Found by **tekstide**. Added
+  `text_size_meets_12px_floor_for_every_role`
+  (`crates/snora-design/src/tests.rs`), asserting every `TextRole`'s
+  `size` in all four built-in presets clears 12.0 — the failure
+  message names the preset and the role, and cites
+  `docs/src/guides/readability.md`, never a WCAG criterion (12px is
+  snora's own rule; SC 1.4.4 is about resize, not a minimum, and this
+  project has published a misattributed threshold before). No public
+  validator added — presets only, per the owner's stated prior toward
+  simplicity. The limit is stated in both the test's doc comment and
+  `readability.md`: the assertion proves the four shipped presets
+  comply and would catch a future preset edit that dropped a role
+  below the floor, but cannot constrain an application's own `Tokens`
+  — `Typography`'s fields are public and stay that way under RFC-036's
+  covenant, so a custom `body_small: 8.0` is unreachable by any test
+  snora ships. Also fixed while cross-checking every restatement of the
+  floor: `docs/src/design/typography.md`'s "Accessibility floor"
+  section still carried the exact pre-repair wording ("uses at least
+  `body` or `body_small` — never a custom size below 12 logical
+  pixels") that `readability.md` itself already documents as having
+  cost knotra a remediation at roughly twice the size it needed, by
+  reading as two floors instead of one — a third, unswept copy of an
+  already-corrected misstatement. Corrected to match. No preset value
+  changed; every role is 14–32px today and the assertion passes on
+  arrival.
+
+- **Three keyboard-and-focus statements a reader could not trust
+  (RFC-082, credit tekstide for all three).** `design-decisions.md`'s
+  focus-trapping row listed tekstide as a concrete app whose need "met"
+  the reconsideration trigger; tekstide withdrew as a demand signal on
+  2026-08-18 ("we would not switch to trapping even if you shipped
+  it"), which our own 0.36.1 note had already recorded the consequence
+  of. The row now says no consumer is currently a demand signal, cites
+  the withdrawal, and — this does **not** resolve RFC-060 Q-1 — the
+  decision stays **deferred**, only the evidence changed. (Round 2:
+  the row initially pointed at RFC-078 as the pending measurement that
+  would decide `advanced`'s enablement; RFC-078 was archived the same
+  day, superseded by the owner's direct ruling that `advanced` will
+  never be a default and no consumer ever requested it — corrected to
+  match, in both the row and its prose section.) Every other row in
+  the register was read against current
+  source or correspondence the same day and given an "Evidence
+  confirmed" date (new column) — Q-2 ruled this is stated, not
+  mechanised, since the demand column depends on what consumers say,
+  which no check can derive. `high-contrast.md` carried a mandatory
+  checklist bullet whose own parenthetical said it could not be
+  satisfied (the focus ring isn't rendered through `button::Style` in
+  iced 0.14); marked `BLOCKED (iced 0.14 — no focus variant in
+  button::Status)`, the exact severity label
+  `accessibility-checklist.md`'s "Known limitations" section already
+  defines for this shape of gap, rather than inventing a fourth
+  marker. `guides/menus.md` said nothing about in-menu keyboard
+  traversal in either direction; it now states the ruling and
+  distinguishes the two menu-building paths — building the dropdown
+  yourself (`AppLayout::header_menu`/`context_menu` with your own
+  `Node`) already lets an application implement arrow-key traversal
+  today, while the prefab `snora::widget::app_header` path
+  (`render_menu`) currently has no channel for the application to
+  express a highlighted item. No promise of a fix to the widgets path
+  is made — that's a public API change with its own design question,
+  scoped to a separate RFC. No code.
+
 ## [0.39.1] — 2026-08-20
 
 ### Fixed

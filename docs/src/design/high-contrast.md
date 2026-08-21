@@ -56,6 +56,12 @@ When testing under a high-contrast preset in the workbench:
 - All swatch backgrounds must be visually distinct.
 - Button text must be readable in all four states (active, hover, pressed,
   disabled).
-- The focus ring at `3.0` width must be visible when tabbing through controls.
-  (In iced 0.14 the focus ring is not rendered through `button::Style` — see
-  [Semantic accessibility](../contributing/semantic-accessibility.md).)
+- The focus ring at `3.0` width must be visible when tabbing through
+  controls. **`BLOCKED (iced 0.14 — no focus variant in
+  button::Status)`**, matching the severity label
+  `accessibility-checklist.md`'s "Known limitations" section defines
+  for exactly this shape of gap: the ring is not rendered through
+  `button::Style` in iced 0.14, so this item cannot pass on snora's
+  own standard button today — see [Semantic
+  accessibility](../contributing/semantic-accessibility.md) for the
+  full limitation and what does and does not fall under it.

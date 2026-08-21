@@ -104,6 +104,10 @@ snora renders a full type hierarchy on your behalf.
 
 ## Accessibility floor
 
-Text in notices, labels and help content should use at least `body` or
-`body_small` — never a custom size below 12 logical pixels. See
-[Readability](../guides/readability.md) for the full guidance.
+**The floor is 12 logical pixels.** Nothing else — using a role
+(`body`, `body_small`, or any other) is separate guidance about
+keeping sizes in one place, not a second floor. See
+[Readability](../guides/readability.md) for the full guidance,
+including what's actually asserted for the four built-in presets
+(RFC-081) and what stays the application's own responsibility on a
+custom `Tokens`.

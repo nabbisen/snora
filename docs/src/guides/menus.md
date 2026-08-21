@@ -131,3 +131,39 @@ menu is open, please install the click-outside backdrop". Using
 This may become an actual element in a future version if iced exposes
 absolute overlay positioning. The application-facing shape stays the
 same.
+
+## Keyboard navigation within an open menu (RFC-082)
+
+Arrow-key traversal **between items inside an open menu** — moving the
+highlighted item down the list with `↓`, wrapping, picking with
+`Enter` — is a different concern from the two keyboard axes snora
+already owns: `snora::keyboard::cycle_zones` moves **between**
+skeleton regions (RFC-060), and `dismiss_on_escape` **closes** an open
+menu or modal. Neither moves between items inside one.
+
+**Whether you can implement it today depends on which of the two menu
+paths you use:**
+
+- **You build the dropdown yourself**, passing your own `Node` to
+  `AppLayout::header_menu` / `AppLayout::context_menu` (rather than
+  using `app_header`'s prefab dropdown) — **in-menu keyboard traversal
+  is already possible today, and it is entirely your own.** The
+  content is your own iced widget tree; nothing about snora's overlay
+  wiring restricts you from tracking a highlighted index in your own
+  state and rendering it however you like. This is the application's
+  concern in the same sense window-level shortcut routing is (see
+  [Overlay interaction semantics](../reference/overlay-interaction-semantics.md),
+  Law 7).
+- **You use `snora::widget::app_header`** (the prefab widget shown
+  above, built on `snora_widgets::menu::render_menu`) — **snora draws
+  the menu items, and there is currently no channel for your
+  application to express which item is highlighted.** `render_menu`'s
+  signature takes the `Menu` data, an action callback, and whether the
+  menu is active — nothing that names a highlighted item. This is not
+  deferred and nothing here promises it will change; a highlight
+  channel on `render_menu` is a public API decision with its own
+  design question (a parameter, a builder, or an options struct) and
+  belongs to a separate RFC, not asserted here.
+
+If you need in-menu arrow-key traversal today, build the dropdown
+yourself.

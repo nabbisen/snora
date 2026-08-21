@@ -94,6 +94,18 @@ never a custom size below 12 logical pixels"*, which one consumer reasonably rea
 as two floors — 14 from the role, 12 from the number — and costed a remediation
 at roughly twice what it needed (knotra, 2026-08-19).
 
+**What's actually asserted, and what isn't (RFC-081).**
+`text_size_meets_12px_floor_for_every_role` in
+`crates/snora-design/src/tests.rs` asserts every role's `size` clears
+12.0 in all four **built-in presets** — it proves the presets snora
+ships comply, and would catch a future preset edit that dropped a role
+below the floor. **It cannot enforce this on your own `Tokens`.**
+`Typography`'s fields are public and stay that way (RFC-036's
+additive-only covenant freezes that surface), so a custom
+`body_small: 8.0` on your own tokens is unreachable by any test snora
+ships — the floor above is real guidance, not a guarantee snora
+verifies for you once you redefine a role.
+
 ## Applying a role
 
 ```rust,ignore

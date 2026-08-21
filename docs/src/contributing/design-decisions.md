@@ -11,27 +11,40 @@ to reopen. *Accepted* — current approach; open to revision with evidence.
 
 ## Decision index
 
-| Decision | Status | Reconsideration trigger |
-|---|---|---|
-| No `PageContract` trait | Firm boundary | A trait that an engine actually consumes |
-| One close sink per channel | Firm boundary | A concrete app needing per-overlay close |
-| One `Sheet` type, not `BottomSheet`/`TopSheet` | Firm boundary | — (settled; axis-relative design is correct) |
-| Default `ToastPosition` is `TopEnd` | Accepted | User research showing another default is more ergonomic |
-| Application owns toast `Vec` | Firm boundary | Framework-owned queue that apps cannot control |
-| No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve |
-| Five crates (`-core`, `-design`, `-style`, `-widgets`, engine) | Accepted | A layer gains a second consumer that does not fit its crate, as the style bridge did (RFC-055) |
-| `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly |
-| Coarse `widgets` feature gate | Accepted — trigger checked, not fired (RFC-062) | Two of the five feature-gating indicators are met; at most one is (2026-08-18) |
-| `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) |
-| `AppLayout` is `#[non_exhaustive]` | Firm boundary | 1.0 freeze; no new overlays needed |
-| No `mod.rs` | Firm boundary | Rust edition change |
-| English-only comments | Firm boundary | Multi-language team adopts the project |
-| Tooltip vocabulary deferred | Deferred | Second consumer type in the codebase |
-| Persistent-toast helper deferred | Deferred | Two separate apps repeat `.persistent()` |
-| Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. |
-| Focus trapping deferred | Deferred — trigger fired, Q-1 (RFC-060) now the blocker | Concrete app: met (tekstide). Focus *querying* API: needs iced's `advanced` feature — a separate, measured decision (RFC-060 Q-1), not stable-by-default |
-| Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases |
-| No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API — checked via `cargo tree -p snora --all-features \| grep -i accesskit`, empty as of 2026-08-18 (RFC-062) |
+**The "Evidence confirmed" column dates when a row's reconsideration
+trigger was last checked against current reality — not when the
+decision was made.** Most of this project's triggers depend on a fact
+(what a consumer says, what a check reports) that no automated check
+can derive on its own (RFC-082 Q-2); this column is the honest
+substitute — staleness becomes visible instead of assumed. Every row
+below was read against current source or current correspondence on
+2026-08-20 as part of this pass (RFC-082); rows whose trigger is a
+static design threshold with nothing to measure today (most "Firm
+boundary" rows) are dated by that same read-through confirming the
+row's text still accurately describes the decision, not by a fresh
+empirical re-check.
+
+| Decision | Status | Reconsideration trigger | Evidence confirmed |
+|---|---|---|---|
+| No `PageContract` trait | Firm boundary | A trait that an engine actually consumes | 2026-08-20 |
+| One close sink per channel | Firm boundary | A concrete app needing per-overlay close | 2026-08-20 |
+| One `Sheet` type, not `BottomSheet`/`TopSheet` | Firm boundary | — (settled; axis-relative design is correct) | 2026-08-20 |
+| Default `ToastPosition` is `TopEnd` | Accepted | User research showing another default is more ergonomic | 2026-08-20 |
+| Application owns toast `Vec` | Firm boundary | Framework-owned queue that apps cannot control | 2026-08-20 |
+| No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve | 2026-08-20 |
+| Five crates (`-core`, `-design`, `-style`, `-widgets`, engine) | Accepted | A layer gains a second consumer that does not fit its crate, as the style bridge did (RFC-055) | 2026-08-20 |
+| `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly | 2026-08-20 |
+| Coarse `widgets` feature gate | Accepted — trigger checked, not fired (RFC-062) | Two of the five feature-gating indicators are met; at most one is | 2026-08-20 — matches [feature-gating-criteria.md's own re-derivation](feature-gating-criteria.md#current-status-snora-0391-re-derived-2026-08-20-rfc-062), same date |
+| `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) | 2026-08-20 |
+| `AppLayout` is `#[non_exhaustive]` | Firm boundary | 1.0 freeze; no new overlays needed | 2026-08-20 |
+| No `mod.rs` | Firm boundary | Rust edition change | 2026-08-20 |
+| English-only comments | Firm boundary | Multi-language team adopts the project | 2026-08-20 |
+| Tooltip vocabulary deferred | Deferred | Second consumer type in the codebase | 2026-08-20 — re-checked: `SideBarItem.tooltip: String` remains the only typed tooltip-like field in `crates/snora-core/src/*.rs` |
+| Persistent-toast helper deferred | Deferred | Two separate apps repeat `.persistent()` | 2026-08-20 — re-checked: one production call site (`examples/toast/src/main.rs`), not two |
+| Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. | 2026-08-20 |
+| Focus trapping deferred | Deferred — Q-1 (RFC-060) is the blocker; no consumer is currently a demand signal | Concrete app: **none** — tekstide withdrew 2026-08-18 (*"we would not switch to trapping even if you shipped it"*); arama out, apimokka declined. Focus *querying* API: needs iced's `advanced` feature — the measurement that would have decided this (RFC-078) was **archived 2026-08-20, superseded by the owner's direct ruling: `advanced` will not be enabled by default, and no consumer ever requested it.** If trapping is ever built, `advanced` belongs behind its own opt-in feature, never a default — not stable-by-default today | 2026-08-20 (RFC-082) |
+| Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases | 2026-08-20 |
+| No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API — checked via `cargo tree -p snora --all-features \| grep -i accesskit` | 2026-08-20 — re-run fresh, still empty |
 
 ## Why no `PageContract` trait
 
@@ -458,6 +471,27 @@ side effect of shipping zone navigation.
 from "unproven" to "measured, scoped, and waiting on one feature
 decision (Q-1)." The decision itself is not reversed — trapping is
 still not shipped.
+
+**Corrected again (RFC-082, 2026-08-20): tekstide, the concrete app
+that fired the trigger above, has since withdrawn as a demand
+signal.** On 2026-08-18 they told us directly: *"keystroke suppression
+is stronger than trapping for our threat model and we would not
+switch to trapping even if you shipped it."* Our own 0.36.1 note
+already recorded the consequence — *"the demand column for modal
+focus trapping is empty"* — alongside arama (out) and apimokka
+(declined). **No consumer is currently a demand signal for trapping.**
+
+**This does not resolve Q-1.** Whether to enable iced's `advanced`
+feature by default is a separate decision — it does not depend on
+consumer demand and is not decided by this correction. **The
+measurement that would have decided it (RFC-078) was archived
+2026-08-20**, superseded by the owner's direct ruling: `advanced` will
+not be enabled by default, and no consumer ever requested it. If
+trapping is ever built, `advanced` belongs behind its own opt-in
+feature, never a default. **The decision stays deferred** — only the
+evidence changed: the register no longer lists a consumer as currently
+asking for it, but the blocker and the additive constraint above are
+unaffected.
 
 ## Why binary size is measured via three feature-exercising probes
 

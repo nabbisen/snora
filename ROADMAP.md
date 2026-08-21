@@ -104,6 +104,19 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.39.2** — Four findings from **tekstide**, who declined adoption and closed
+  their channel, then sent the most precise report of the cycle. The **12-pixel
+  text floor** — stated in two guides as *"the floor is 12 logical pixels,
+  nothing else"* — was asserted by nothing, while both its neighbouring
+  mandatory floors are enforced (24px pointer targets per role and padding step;
+  contrast thresholds as a compile error). It is asserted now for all four
+  presets, and the docs say what the assertion **cannot** cover: a consumer's
+  own `Tokens`, whose fields are public and covenant-frozen. Separately, the
+  decision register listed tekstide as a live concrete-app trigger for focus
+  trapping **after they withdrew**, a high-contrast checklist bullet was
+  mandatory and unsatisfiable in the same breath, and `menus.md` said nothing
+  about in-menu keyboard traversal either way. Every register row now carries
+  the date its evidence was last confirmed.
 - **0.39.1** — `migrations.md` promised *"each minor release ships a focused
   migration guide"* and **six minors had none** — two of them from this month,
   written off by applying a different document's rule without checking what the
