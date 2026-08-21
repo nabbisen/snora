@@ -104,6 +104,13 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.39.3** — A zero-code release, cut deliberately. Its only change is
+  test-side: the 12px text-size and 24px pointer-target floors each iterated a
+  hand-written list of six `Typography` roles, so a seventh would have escaped
+  both silently; both now destructure exhaustively and a new role is a compile
+  error. **The release exists as much for its measurement row** — 0.39.2 crossed
+  a `rustc 1.97.1 → 1.98.0` boundary, and a second same-compiler row is what
+  makes the next real release readable against anything.
 - **0.39.2** — Four findings from **tekstide**, who declined adoption and closed
   their channel, then sent the most precise report of the cycle. The **12-pixel
   text floor** — stated in two guides as *"the floor is 12 logical pixels,

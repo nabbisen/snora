@@ -17,6 +17,21 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.39.3] — 2026-08-21
+
+### Fixed
+
+- **Two accessibility floors iterated a hand-written list of six roles.**
+  The 12px text-size floor (RFC-081) and the 24px pointer-target floor
+  (RFC-061) each enumerated `Typography`'s roles in a literal array, in
+  the crate that defines the type, one file from `Palette::usages` doing
+  exhaustive destructuring for exactly this reason (RFC-063). **A seventh
+  role would have escaped both without failing anything.** Both now
+  iterate `every_text_role()`, which destructures `Typography`
+  exhaustively — adding a role is a compile error (`E0027`) until it is
+  named. **Test-only; nothing a consumer compiles or runs changed**, and
+  `git diff` on shipped code across this release is empty.
+
 ## [0.39.2] — 2026-08-20
 
 ### Fixed
