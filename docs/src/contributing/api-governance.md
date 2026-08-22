@@ -179,6 +179,28 @@ frozen surface. They remain governed by the promotion lifecycle above
 (Recipe → Experimental helper → Stable primitive → Deprecated → Removed),
 which is a different and more permissive regime than this covenant.
 
+### What the covenant has actually delivered (knotra, 0.25 → 0.38)
+
+**One consumer has now crossed thirteen minors with no source change required by
+the upgrade itself** — `snora = "0.25"` to `"0.38"`, features unchanged, clean
+build on the first attempt (knotra, reported 2026-08-21).
+
+Five claims we made to them ahead of the bump were each verified on arrival and
+**all five held**: nothing removed or renamed across 0.25→0.32 or 0.30→0.33; the
+0.28→0.29 `snora-dialog-card` rename not reaching them; `snora-widgets`' sixteen
+removed items not reaching them; MSRV 1.88.
+
+The source edits their upgrade did carry were **the two they went in for** — the
+border figures 0.34.0's repair moved, and adding `text_muted` to their AA suite
+after we withdrew its invented exemption. Both are accessibility repairs the
+covenant explicitly permits and requires be recorded as **Fixed**, not surface
+changes.
+
+**Worth stating because the covenant's cost is visible and its benefit is not.**
+Every gate it holds shut, every enumeration it forbids, every "reopen D-3/D-4"
+it demands, is paid in the moment. This is the first end-to-end evidence of what
+was bought: a thirteen-minor jump that cost its consumer nothing structural.
+
 ### Permitted without reopening the gate
 
 - Adding new items to `snora-design` (new token types, new fields on
