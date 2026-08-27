@@ -104,6 +104,17 @@ D-gates.
   with zero code changed, so the variance exceeds any per-release signal.
   Recorded as 9a/9b rather than ticked whole — RFC-041 exists because a gate
   was once declared satisfied on data that did not support it.
+- **0.40.0** — One workspace line did three kinds of damage, found from a **live
+  docs.rs build failure** on the published `snora-core` (RFC-083). The workspace
+  declared `lucide-icons` with its `iced` feature, every member inherited it, and
+  lucide's own manifest turns that feature into **iced with `advanced`** — so the
+  dependency-free vocabulary crate pulled the whole GUI stack, its docs.rs page
+  would not build, and **`iced/advanced` was silently enabled for every consumer
+  using `lucide-icons`** while our governance page said it was *"not
+  stable-by-default"*. Nothing in snora used the feature: `snora-widgets`'
+  own comment tells us not to call the method it exists to provide. One line
+  removed it; a CI gate now holds `snora-core` iced-free under every feature
+  combination, matching the gate `snora-design` has always had.
 - **0.39.3** — A zero-code release, cut deliberately. Its only change is
   test-side: the 12px text-size and 24px pointer-target floors each iterated a
   hand-written list of six `Typography` roles, so a seventh would have escaped

@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.40.0] — 2026-08-21
+
 ### Fixed
 
 - **`snora-core`'s published documentation did not build, because one

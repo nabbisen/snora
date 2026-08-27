@@ -1,7 +1,7 @@
 # RFC 083 — One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`
 
-**Status.** Accepted (owner, 2026-08-21). Handoff written — see
-[`handoffs/083-…`](../handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md).
+**Status.** Done — shipped in v0.40.0 (2026-08-21).
+[Handoff](../handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md).
 **Tracks.** Dependency layering / governance / published-artifact integrity.
 **Found by** the owner, 2026-08-21, from a **live docs.rs build failure** on
 `snora-core` 0.39.3.

@@ -132,6 +132,7 @@ Numbers remain stable forever and are never reused.
 | 080 | [The migration guide and the release letters say the same thing](./done/080-the-migration-guide-and-the-release-letters-are-the-same-document.md) | v0.39.1 (handoff: [`handoffs/080-…`](./handoffs/080-the-migration-guide-and-the-release-letters-are-the-same-document/implementation-handoff.md)) |
 | 081 | [The 12-pixel text floor is the one mandatory number nothing asserts](./done/081-the-12px-text-floor-is-asserted-nowhere.md) | v0.39.2 (handoff: [`handoffs/081-…`](./handoffs/081-the-12px-text-floor-is-asserted-nowhere/implementation-handoff.md)) |
 | 082 | [Three keyboard-and-focus statements a reader cannot trust](./done/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md) | v0.39.2 (handoff: [`handoffs/082-…`](./handoffs/082-three-keyboard-and-focus-statements-a-reader-cannot-trust/implementation-handoff.md)) |
+| 083 | [One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`](./done/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md) | v0.40.0 (handoff: [`handoffs/083-…`](./handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -141,7 +142,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 083 | [One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`](./accepted/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md) | v0.40.0 (handoff: [`handoffs/083-…`](./handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md)) |
 
 ## Proposed
 
