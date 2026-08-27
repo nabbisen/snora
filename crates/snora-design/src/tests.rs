@@ -265,9 +265,19 @@ fn named_surface_report(t: &Tokens, dim: crate::Color) -> String {
 /// Asserting both individually would fail two presets that are
 /// genuinely fine: `dark` passes on fill alone (its border measures
 /// ~1:1 against the dim — border and dim land on the same luminance
-/// there), and `high_contrast_light` passes on border alone (its fill
-/// equals `background`, by token design, so it cannot signal on its
-/// own). Splitting this into two assertions would fail two correct
+/// there), and in `high_contrast_light` the two signals **cross**, so
+/// the worst point is carried by neither alone — border and fill are
+/// equal there at 4.58:1.
+///
+/// **Corrected 2026-08-21.** This previously said `high_contrast_light`
+/// "passes on border alone (its fill equals `background` … so it cannot
+/// signal on its own)". That conflates two different pairs. Its fill
+/// equals `background`, so it cannot signal against **the background** —
+/// but this assertion measures against **the dim**, and there its worst
+/// `fill ǀ dim` is **3.24:1**, clearing the bar on its own. Measured
+/// worst-point figures, all four presets: `light` fill 3.24 / border
+/// 1.04; `dark` fill 3.16 / border 1.00; `high_contrast_light` 4.58 /
+/// 4.58; `high_contrast_dark` 4.45 / 4.45. Splitting this into two assertions would fail two correct
 /// presets — read `max(...)` as intentional, not as a mistake to
 /// tighten. `max` is also *why the interior minimum this sweep exists
 /// to catch exists at all*: it is the point where the border and fill
