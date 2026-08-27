@@ -141,12 +141,12 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 083 | [One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`](./accepted/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md) | v0.40.0 (handoff: [`handoffs/083-…`](./handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 083 | [One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`](./proposed/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md) | v0.40.0 — **live docs.rs failure on the published 0.39.3** |
 
 ## Archive
 
