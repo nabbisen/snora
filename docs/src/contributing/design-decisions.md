@@ -42,7 +42,7 @@ empirical re-check.
 | Tooltip vocabulary deferred | Deferred | Second consumer type in the codebase | 2026-08-20 — re-checked: `SideBarItem.tooltip: String` remains the only typed tooltip-like field in `crates/snora-core/src/*.rs` |
 | Persistent-toast helper deferred | Deferred | Two separate apps repeat `.persistent()` | 2026-08-20 — re-checked: one production call site (`examples/toast/src/main.rs`), not two |
 | Theme-producing, not theme-owning | Accepted; theme-*owning* stays Firm boundary | Owning: an RFC with a concrete scenario. Producing: evidence the emission approach itself needs revision. | 2026-08-20 |
-| Focus trapping deferred | Deferred — Q-1 (RFC-060) is the blocker; no consumer is currently a demand signal | Concrete app: **none** — tekstide withdrew 2026-08-18 (*"we would not switch to trapping even if you shipped it"*); arama out, apimokka declined. Focus *querying* API: needs iced's `advanced` feature — the measurement that would have decided this (RFC-078) was **archived 2026-08-20, superseded by the owner's direct ruling: `advanced` will not be enabled by default, and no consumer ever requested it.** If trapping is ever built, `advanced` belongs behind its own opt-in feature, never a default — not stable-by-default today | 2026-08-20 (RFC-082) |
+| Focus trapping deferred | Deferred — Q-1 (RFC-060) is the blocker; no consumer is currently a demand signal | Concrete app: **none** — tekstide withdrew 2026-08-18 (*"we would not switch to trapping even if you shipped it"*); arama out, apimokka declined. Focus *querying* API: needs iced's `advanced` feature — the measurement that would have decided this (RFC-078) was **archived 2026-08-20, superseded by the owner's direct ruling: `advanced` will not be enabled by default, and no consumer ever requested it.** If trapping is ever built, `advanced` belongs behind its own opt-in feature, never a default. **As of 0.40.0, `advanced` is enabled by snora in no feature combination, for any consumer** — see [Why `advanced` is enabled nowhere](#why-advanced-is-enabled-nowhere-v040) below; before 0.40.0 it was transitively enabled for every `lucide-icons` user, undocumented. | 2026-08-21 (RFC-083) |
 | Binary size measured via three feature-exercising probes | Accepted | Probe drift makes the marginal-cost diff unreliable across releases | 2026-08-20 |
 | No interim accessibility tree; ABDD bounded to layout + visual | Accepted | iced exposes an accessibility API — checked via `cargo tree -p snora --all-features \| grep -i accesskit` | 2026-08-20 — re-run fresh, still empty |
 
@@ -492,6 +492,60 @@ feature, never a default. **The decision stays deferred** — only the
 evidence changed: the register no longer lists a consumer as currently
 asking for it, but the blocker and the additive constraint above are
 unaffected.
+
+## Why `advanced` is enabled nowhere (v0.40)
+
+**This page has said `advanced` is "not stable-by-default" since before
+0.40.0. That was true, and it was easy to misread as "snora never
+enables it" — which was false for every `lucide-icons` user.**
+
+Found from a live docs.rs build failure on the published `snora-core`
+0.39.3 (RFC-083): the workspace declared `lucide-icons = { version =
+"1", features = ["iced"] }`, and `lucide-icons`' own manifest maps that
+feature to `iced` **with `features = ["advanced"]` and no default
+features**. Every member of the workspace inherits that, so
+`snora-core` — the crate whose entire identity is "no GUI
+dependency" — compiled all of iced, including `winit`, under
+`--all-features`. docs.rs builds every crate that way, and
+`snora-core`'s own documentation page did not build.
+
+**Nothing in snora used the integration that feature provided.**
+`snora-core` uses `lucide_icons::Icon`, a plain enum; `snora-widgets`
+uses that plus `LUCIDE_FONT_BYTES`, a byte slice. Neither is gated on
+lucide's `iced` feature, and `snora-widgets/src/icon.rs`'s own comment
+instructs against calling the method that feature exists to provide,
+for reasons unrelated to this one. The feature bought an integration we
+had separately told ourselves never to use.
+
+**Fixed by removing the feature entirely:**
+`lucide-icons = { version = "1", default-features = false }`. Verified:
+`cargo tree -p snora-core --all-features` now shows `lucide-icons` and
+nothing else — zero iced, zero winit, zero `advanced`. A CI gate
+(matching `snora-design`'s iced-free enforcement, RFC-021/022 Q3) now
+holds `snora-core` to the same property going forward, so this cannot
+silently recur — see `.github/workflows/ci.yaml`'s `snora-core-iced-free`
+job.
+
+**Corrected governance statement: as of 0.40.0, iced's `advanced`
+feature is enabled by snora in no feature combination, for any
+consumer — not "not by default," which left the transitive case
+unaddressed, but *nowhere, full stop*.** Before 0.40.0, it was enabled
+transitively for every `lucide-icons` user, undocumented as a
+consequence of that feature and never surfaced as a decision anyone
+made. The corrected statement is stronger than the one it replaces, and
+it says plainly that it was not always true — a governance claim that
+quietly starts being accurate teaches a reader nothing about how much
+to trust the next one.
+
+**This does not reopen RFC-078** (archived, superseded — see the focus
+trapping section above). If anything it makes that ruling's premise
+more solid: the archived RFC treated "`advanced` must never be a
+default" as the governing constraint, and this fix closes the one gap
+where that was not quite true. One further fact for whoever eventually
+builds the opt-in feature RFC-078 describes: `lucide-icons` users had
+been paying whatever cost `advanced` carries, unmeasured, the whole
+time — recorded in RFC-078's own archive note as a fact worth having if
+that measurement is ever taken.
 
 ## Why binary size is measured via three feature-exercising probes
 

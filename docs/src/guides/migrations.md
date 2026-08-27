@@ -9,6 +9,12 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.39 → 0.40](migration-0.39-to-0.40.md) — **possibly breaking, for a
+  narrow case.** `lucide-icons` no longer transitively enables iced's
+  `advanced` feature (or pulls in `iced`/`winit` at all in `snora-core`);
+  an application relying on that transitive edge for its own
+  `iced::advanced::` calls needs to enable `advanced` itself, one line.
+  Fixes a docs.rs build failure on `snora-core`.
 - [0.38 → 0.39](migration-0.38-to-0.39.md) — **nothing required.**
   `snora::focus` re-exports the zone-navigation vocabulary, so F6 users can drop
   a direct `snora-core` dependency; and our explanation of what makes the dialog

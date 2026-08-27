@@ -1764,9 +1764,6 @@ name = "lucide-icons"
 version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c06438dbeddbe9dafd9911a1fa74c8f483d1248458f01eec42e245aad5d182d0"
-dependencies = [
- "iced",
-]
 
 [[package]]
 name = "lyon"

@@ -182,8 +182,11 @@ which is a different and more permissive regime than this covenant.
 ### What the covenant has actually delivered (knotra, 0.25 → 0.38)
 
 **One consumer has now crossed thirteen minors with no source change required by
-the upgrade itself** — `snora = "0.25"` to `"0.38"`, features unchanged, clean
-build on the first attempt (knotra, reported 2026-08-21).
+the upgrade itself** — from 0.25 to 0.38, features unchanged, clean build on the
+first attempt (knotra, reported 2026-08-21). *(Versions written as bare numbers
+here on purpose: a `snora = "…"` form in prose reads as a live dependency
+snippet to `scripts/check-version-snippets.sh`, and a check that cries wolf on
+narrative text is a check people stop running.)*
 
 Five claims we made to them ahead of the bump were each verified on arrival and
 **all five held**: nothing removed or renamed across 0.25→0.32 or 0.30→0.33; the

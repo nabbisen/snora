@@ -79,7 +79,8 @@ jobs:
 
   design-isolation:
     # Q2-B and Q3: verify that widgets-without-design compiles cleanly and
-    # that snora-design itself has no iced dependency.
+    # that snora-design itself has no iced dependency. Also RFC-083: the
+    # same iced-free property, held for snora-core under --all-features.
     name: Design feature isolation
     runs-on: ubuntu-latest
     steps:
@@ -100,6 +101,21 @@ jobs:
             exit 1
           fi
           echo "Q3 pass: no iced in snora-design dependency tree"
+      - name: snora-core has no iced dependency, under any feature (RFC-083)
+        # Same mechanism as the snora-design gate above, checked under
+        # --all-features specifically: that is exactly the combination
+        # under which lucide-icons' now-removed `iced` feature pulled iced
+        # (and winit, and iced's `advanced` feature) into snora-core, the
+        # vocabulary crate whose entire identity is "no GUI dependency" —
+        # and the combination docs.rs builds, which is how this was found.
+        run: |
+          TREE=$(cargo tree -p snora-core --all-features --prefix none)
+          if echo "$TREE" | grep -q "^iced "; then
+            echo "ERROR: snora-core depends on iced under --all-features — RFC-083 gate violated"
+            echo "$TREE"
+            exit 1
+          fi
+          echo "RFC-083 pass: no iced in snora-core --all-features dependency tree"
       - name: snora-design token tests (contract check)
         run: cargo test -p snora-design
 

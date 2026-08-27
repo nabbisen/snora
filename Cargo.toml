@@ -53,7 +53,7 @@ snora-design = { version = "0.39", path = "crates/snora-design" }
 snora-style = { version = "0.39", path = "crates/snora-style" }
 
 iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
-lucide-icons = { version = "1", features = ["iced"] }
+lucide-icons = { version = "1", default-features = false }
 
 [profile.release]
 opt-level = "z"

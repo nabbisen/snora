@@ -15,7 +15,48 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **`snora-core`'s published documentation did not build, because one
+  workspace line pulled all of iced — and iced's `advanced`
+  feature — into the crate whose entire identity is "no GUI
+  dependency" (RFC-083).** Found from a live docs.rs build failure on
+  `snora-core` 0.39.3 (`error: The platform you're compiling for is
+  not supported by winit`). Root cause: the workspace declared
+  `lucide-icons = { version = "1", features = ["iced"] }`;
+  `lucide-icons`' own manifest maps that feature to `iced` **with
+  `features = ["advanced"]` and no default features**, and every
+  workspace member inherits it. Nothing in snora used the integration
+  that feature provides — `snora-core` and `snora-widgets` only use
+  `lucide_icons::Icon` and `LUCIDE_FONT_BYTES`, a plain enum and a byte
+  slice, and `snora-widgets`' own source carries a comment instructing
+  against calling the one method the feature exists to enable. Fixed
+  with one line: `lucide-icons = { version = "1", default-features =
+  false }`. Verified: `cargo tree -p snora-core --all-features` now
+  shows `lucide-icons` and nothing else; `cargo check`/`test`/`clippy`
+  all clean across the workspace (34 test-result lines, matching the
+  pre-fix count exactly); iced's `advanced` feature appears in zero
+  feature trees, workspace-wide. **A CI gate now holds `snora-core` to
+  the same iced-free property `snora-design` already has** (matching
+  that gate's exact mechanism — `cargo tree --prefix none`, grep for a
+  leading `iced ` line — rather than inventing a second style),
+  checked under `--all-features` specifically, since that is the
+  combination that broke and the one docs.rs builds. Perturbation
+  demo: re-added the removed feature, watched the gate fail naming the
+  violation, restored. **Possibly breaking for a narrow case**: an
+  application whose own code calls `iced::advanced::` without
+  separately enabling that feature, relying on this transitive edge,
+  needs to add `iced = { features = ["advanced"] }` itself — named in
+  the new [0.39 → 0.40 migration guide](docs/src/guides/migration-0.39-to-0.40.md).
+  `design-decisions.md`'s governance statement corrected: `advanced`
+  is enabled by snora in no feature combination as of 0.40.0 — not
+  merely "not by default," which left this transitive case
+  unaddressed — with a record that it was not always so. Does **not**
+  reopen the archived RFC-078; if anything it makes that ruling's
+  premise (`advanced` must never be a default) hold without
+  qualification, and records that `lucide-icons` users had been paying
+  its cost, unmeasured, the whole time. **docs.rs build success is
+  checked on the published release, not claimed here.**
 
 ## [0.39.3] — 2026-08-21
 
