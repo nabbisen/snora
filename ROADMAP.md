@@ -95,6 +95,41 @@ Future design work is governed by
 [`api-governance.md`](docs/src/contributing/api-governance.md) and the
 D-gates.
 
+## Scheduled — the 2026-09-01 external audit
+
+An external architect audited both the specification and the codebase.
+Thirty-nine findings. **Eight were verified by the snora architect and all
+eight held** — the two Criticals reproduced empirically (F-01 by a failing test,
+F-13 by measurement), six more confirmed against source. **The remaining
+thirty-one are taken on the audit's own evidence and are marked as such**;
+each RFC requires its implementer to re-derive the figures it acts on rather
+than inherit them.
+
+One count was restated (F-29: 57 unrun tests by our measurement, not 68) and one
+finding contradicted a standing ruling of ours and was right anyway (F-39 — see
+RFC-087).
+
+**Two are Critical and both are shipped today, in the default configuration.**
+
+| Release | RFCs | Why this grouping |
+|---|---|---|
+| **0.40.2** | 087, 089 | **No crate code.** CI coverage, gate-5 correction, documentation sweep. Ships first because it costs nothing and removes noise from the two that matter |
+| **0.41.0** | 084, 086 | Both are shipped defects on the **default path** — a dialog that dismisses on inside-click, and toast colours below their own thresholds. Small, validated fixes; one migration guide covers the behaviour and appearance changes together |
+| **0.42.0** | 085, 088 | Both need real work before they are safe: a **new widget-layer contrast suite in a crate that has never had one**, and a dependency-feature removal that must be measured. Neither should delay 0.41.0 |
+
+**Why 084 and 085 are not in the same release, both being Critical.** 084 is a
+one-line fix already validated against the full test suite. 085 needs a contrast
+suite built in `snora-widgets`, which has never had one. Bundling them would
+hold a validated fix for a Critical behind weeks of new test infrastructure, and
+the dialog is dismissing itself today.
+
+**What the audit found about us, not just about the code.** Our contrast
+assertions guard the token layer thoroughly — RFC-058, 063, 065, 066, 071, 081
+all tightened `snora-design` — and the widget layer, which actually paints text,
+has no contrast assertion of any kind. Every containment test is positive, so a
+dialog that dismissed itself passed all of them. **The suites' reach ends one
+crate short of the pixels**, and that is RFC-085's real subject.
+
 ## Recently shipped
 
 - **Gate 9 split (recorded v0.29.0).** Binary-size trend monitoring is
