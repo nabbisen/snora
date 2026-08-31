@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-080 the guide is canonical, the letter is specific
 
-**Governing RFC.** [RFC-080](../../accepted/080-the-migration-guide-and-the-release-letters-are-the-same-document.md)
+**Governing RFC.** [RFC-080](../../done/080-the-migration-guide-and-the-release-letters-are-the-same-document.md)
 **Status.** Inherited from RFC-080 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.1 — process and documentation only. **No code.**
 **Implementation units.** One, small. **Ships with RFC-079**, which it depends

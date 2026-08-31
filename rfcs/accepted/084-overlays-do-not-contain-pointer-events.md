@@ -1,6 +1,7 @@
 # RFC 084 — Overlays do not contain pointer events, and the dialog dismisses itself
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-09-01). Handoff written — see
+[`handoffs/084-…`](../handoffs/084-overlays-do-not-contain-pointer-events/implementation-handoff.md).
 **Tracks.** Overlay semantics / correctness. **Severity: Critical.**
 **Found by** an external architect's audit, 2026-09-01 (F-01, F-02, F-03, F-04).
 **F-01 reproduced and its remedy validated by the architect before opening.**

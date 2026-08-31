@@ -143,19 +143,24 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 
-## Proposed
+## Accepted
 
 All six are from the external architect's audit of 2026-09-01. Two are
 release-blocking Criticals, both reproduced by the architect before opening.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 084 | [Overlays do not contain pointer events, and the dialog dismisses itself](./proposed/084-overlays-do-not-contain-pointer-events.md) | **v0.41.0 — Critical.** Reproduced: a click on a dialog's own text emits `on_close_modals` |
-| 085 | [The widget layer pairs colours from different families, and no contrast suite can see it](./proposed/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite.md) | **v0.42.0 — Critical.** Menu text measured at 1.89:1 |
-| 086 | [The engine's toast colours fail their own thresholds](./proposed/086-engine-toast-contrast.md) | v0.41.0 — High |
-| 087 | [CI runs a subset of the tests, and a conditional deferral has been renewed by habit](./proposed/087-ci-runs-a-subset-of-the-tests.md) | v0.40.2 — High |
-| 088 | [The workspace forces three iced features nobody asked for](./proposed/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High |
-| 089 | [Documentation and hygiene sweep from the external audit](./proposed/089-documentation-and-hygiene-sweep.md) | v0.40.2 — Medium/Low |
+| 084 | [Overlays do not contain pointer events, and the dialog dismisses itself](./accepted/084-overlays-do-not-contain-pointer-events.md) | **v0.41.0 — Critical.** Reproduced: a click on a dialog's own text emits `on_close_modals` |
+| 085 | [The widget layer pairs colours from different families, and no contrast suite can see it](./accepted/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite.md) | **v0.42.0 — Critical.** Menu text measured at 1.89:1 |
+| 086 | [The engine's toast colours fail their own thresholds](./accepted/086-engine-toast-contrast.md) | v0.41.0 — High |
+| 087 | [CI runs a subset of the tests, and a conditional deferral has been renewed by habit](./accepted/087-ci-runs-a-subset-of-the-tests.md) | v0.40.2 — High |
+| 088 | [The workspace forces three iced features nobody asked for](./accepted/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High |
+| 089 | [Documentation and hygiene sweep from the external audit](./accepted/089-documentation-and-hygiene-sweep.md) | v0.40.2 — Medium/Low |
+
+## Proposed
+
+| ID | Title | Target |
+|----|-------|--------|
 
 ## Archive
 

@@ -1,6 +1,7 @@
 # RFC 088 — The workspace forces three iced features, one used only under a feature that already enables it
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-09-01). Handoff written — see
+[`handoffs/088-…`](../handoffs/088-the-workspace-forces-three-iced-features-nobody-asked-for/implementation-handoff.md).
 **Tracks.** Dependency layering / build cost. **Severity: High.**
 **Found by** the external audit, 2026-09-01 (F-26). Usage verified by the
 architect before opening.

@@ -1,6 +1,7 @@
 # RFC 087 — CI runs a subset of the tests, and a conditional deferral has been renewed by habit
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-09-01). Handoff written — see
+[`handoffs/087-…`](../handoffs/087-ci-runs-a-subset-of-the-tests/implementation-handoff.md).
 **Tracks.** CI / measurement integrity. **Severity: High.**
 **Found by** the external audit, 2026-09-01 (F-29, F-30, F-39).
 **Touches.** `.github/workflows/ci.yaml`,

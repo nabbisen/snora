@@ -1,6 +1,7 @@
 # RFC 086 — The engine's toast colours fail their own thresholds
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-09-01). Handoff written — see
+[`handoffs/086-…`](../handoffs/086-engine-toast-contrast/implementation-handoff.md).
 **Tracks.** Accessibility. **Severity: High.**
 **Found by** the external audit, 2026-09-01 (F-05, F-06).
 **Touches.** `crates/snora/src/toast.rs`.

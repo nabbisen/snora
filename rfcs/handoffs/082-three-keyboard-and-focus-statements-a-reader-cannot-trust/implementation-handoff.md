@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-082 three statements a reader cannot trust
 
-**Governing RFC.** [RFC-082](../../accepted/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md)
+**Governing RFC.** [RFC-082](../../done/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md)
 **Status.** Inherited from RFC-082 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.2 — documentation only. **No code.**
 **Implementation units.** Three.

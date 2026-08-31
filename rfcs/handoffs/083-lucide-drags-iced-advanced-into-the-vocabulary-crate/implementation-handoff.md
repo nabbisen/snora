@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-083 the lucide feature chain
 
-**Governing RFC.** [RFC-083](../../accepted/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md)
+**Governing RFC.** [RFC-083](../../done/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md)
 **Status.** Inherited from RFC-083 — Accepted (owner, 2026-08-21).
 **Release target.** 0.40.0 — **minor.** It changes which features a consumer's
 build resolves.

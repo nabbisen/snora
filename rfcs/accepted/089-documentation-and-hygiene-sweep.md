@@ -1,6 +1,7 @@
 # RFC 089 — Documentation and hygiene sweep from the external audit
 
-**Status.** Proposed
+**Status.** Accepted (owner, 2026-09-01). Handoff written — see
+[`handoffs/089-…`](../handoffs/089-documentation-and-hygiene-sweep/implementation-handoff.md).
 **Tracks.** Documentation / hygiene. **Severity: Medium and Low.**
 **Found by** the external audit, 2026-09-01 (F-07, F-16–F-25, F-28, F-33, F-34,
 F-38).

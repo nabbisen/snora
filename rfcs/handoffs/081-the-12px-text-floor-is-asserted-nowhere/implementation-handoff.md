@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-081 assert the 12px text floor
 
-**Governing RFC.** [RFC-081](../../accepted/081-the-12px-text-floor-is-asserted-nowhere.md)
+**Governing RFC.** [RFC-081](../../done/081-the-12px-text-floor-is-asserted-nowhere.md)
 **Status.** Inherited from RFC-081 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.2 — **patch.** One test and documentation. **No values.**
 **Implementation units.** One.
