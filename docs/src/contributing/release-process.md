@@ -69,10 +69,19 @@ symmetrically — the architect as much as the dev team.
 - **The architect commits** review results, RFCs, handoffs, and the release
   mechanics — version bump, CHANGELOG roll, RFC folder moves, tag.
 
-**`git add -A` is the instrument that makes the violation possible.** Stage
-explicitly. **If `git status` shows paths you did not touch, stop and say so**
-rather than including them — that moment is the whole control, and it is visible
-in the staging output every time.
+**Review the diff, not the path.** Two controls, and the first one alone is not
+enough:
+
+1. **`git add -A` is the instrument that makes the coarse violation possible.**
+   Stage explicitly. **If `git status` shows paths you did not touch, stop and
+   say so** rather than including them.
+2. **A file you *did* touch can still contain work you did not.** Explicit
+   staging does not help when someone else's uncommitted change sits in the same
+   file. **Read `git diff <path>` before staging it**, or stage by hunk with
+   `git add -p`.
+
+The second control exists because the first one was not sufficient — see the
+second instance below.
 
 **A consequence, and it is intended:** if implementation work is still
 uncommitted at cut time, the release is *blocked* until its author commits it.
@@ -99,6 +108,26 @@ force-pushed the same day.
 Raised as a clarification request by the dev team, who noticed that nothing
 assigned commit responsibility in writing and declined to keep calling the
 observed pattern a rule.
+
+### The second instance — the commit that wrote this rule broke it
+
+Commit **`302a83d`**, which added the section you are reading, contains the
+dev team's RFC-087 checklist line (*"Has any recorded conditional deferral's
+ending condition been met"*). The architect staged
+`docs/src/contributing/release-process.md` **explicitly**, not with `-A`,
+believing the file held only his own new section. Their accepted-but-uncommitted
+line was already in it.
+
+**Explicit staging was not enough, and that is the whole point of control 2.**
+The rule as first written caught unexpected *files*; this was an unexpected
+*hunk* inside a file the architect legitimately owned. Found minutes later when
+the dev team's own commit (`c651e93`) turned out not to contain a line that
+should have been theirs.
+
+Left in place rather than re-split: the line is correct, it names RFC-087 in its
+own text, and both commits describe their subject honestly. **Splitting history
+twice in one day for one checklist line would cost more than the tidiness is
+worth** — but the rule gained control 2 the same hour.
 
 ## Release checklist
 
