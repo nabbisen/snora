@@ -1,13 +1,8 @@
 # Snora
 
-[![snora](https://img.shields.io/crates/v/snora?label=snora)](https://crates.io/crates/snora)
-[![snora Docs](https://docs.rs/snora/badge.svg?version=latest)](https://docs.rs/snora)
-[![snora Deps Status](https://deps.rs/crate/snora/latest/status.svg)](https://deps.rs/crate/snora)    
-[![snora-core](https://img.shields.io/crates/v/snora-core?label=snora-core)](https://crates.io/crates/snora-core)
-[![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core)
-[![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core)    
+[![documentation](https://img.shields.io/badge/docs-github_pages-brightgreen)](https://nabbisen.github.io/snora/)
 [![License](https://img.shields.io/github/license/nabbisen/snora)](https://github.com/nabbisen/snora/blob/main/LICENSE)
-[![Docs](https://github.com/nabbisen/snora/actions/workflows/docs.yaml/badge.svg)](https://github.com/nabbisen/snora/actions/workflows/docs.yaml)
+[![CI Docs](https://github.com/nabbisen/snora/actions/workflows/docs.yaml/badge.svg)](https://github.com/nabbisen/snora/actions/workflows/docs.yaml)
 
 **An iced GUI framework that gets out of the way of your application.**
 
@@ -18,6 +13,16 @@ Snora gives an iced application a small, opinionated **skeleton**
 certainly needs (dialog, bottom sheet, context menu, toasts) — and
 then steps back. Every slot accepts any `iced::Element`, so your UI
 code stays your UI code.
+
+### Crates
+
+| Crate | Purpose | Version | Docs | Dependencies |
+|---|---|---|---|---|
+| [`snora`](https://crates.io/crates/snora) | The engine — the only crate applications depend on | [![snora](https://img.shields.io/crates/v/snora?label=snora)](https://crates.io/crates/snora) | [![snora Docs](https://docs.rs/snora/badge.svg?version=latest)](https://docs.rs/snora) | [![snora Deps Status](https://deps.rs/crate/snora/latest/status.svg)](https://deps.rs/crate/snora) |
+| [`snora-core`](https://crates.io/crates/snora-core) | Iced-free vocabulary and contract | [![snora-core](https://img.shields.io/crates/v/snora-core?label=snora-core)](https://crates.io/crates/snora-core) | [![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core) | [![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core) |
+| [`snora-design`](https://crates.io/crates/snora-design) | Iced-free design tokens (opt-in) | [![snora-design](https://img.shields.io/crates/v/snora-design?label=snora-design)](https://crates.io/crates/snora-design) | [![snora-design Docs](https://docs.rs/snora-design/badge.svg?version=latest)](https://docs.rs/snora-design) | [![snora-design Deps Status](https://deps.rs/crate/snora-design/latest/status.svg)](https://deps.rs/crate/snora-design) |
+| [`snora-style`](https://crates.io/crates/snora-style) | Iced style bridge for those tokens (opt-in) | [![snora-style](https://img.shields.io/crates/v/snora-style?label=snora-style)](https://crates.io/crates/snora-style) | [![snora-style Docs](https://docs.rs/snora-style/badge.svg?version=latest)](https://docs.rs/snora-style) | [![snora-style Deps Status](https://deps.rs/crate/snora-style/latest/status.svg)](https://deps.rs/crate/snora-style) |
+| [`snora-widgets`](https://crates.io/crates/snora-widgets) | Prefab UI parts — header, footer, sidebar, menu, icon (optional) | [![snora-widgets](https://img.shields.io/crates/v/snora-widgets?label=snora-widgets)](https://crates.io/crates/snora-widgets) | [![snora-widgets Docs](https://docs.rs/snora-widgets/badge.svg?version=latest)](https://docs.rs/snora-widgets) | [![snora-widgets Deps Status](https://deps.rs/crate/snora-widgets/latest/status.svg)](https://deps.rs/crate/snora-widgets) |
 
 ## When to use it
 
