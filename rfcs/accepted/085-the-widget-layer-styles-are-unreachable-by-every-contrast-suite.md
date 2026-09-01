@@ -8,6 +8,20 @@
 **Touches.** `crates/snora-widgets/src/style.rs`,
 `crates/snora-widgets/src/sidebar.rs`, chrome border styles, and the contrast
 suites in `crates/snora-design/src/tests.rs`.
+**Release target.** **0.41.0** — **minor.** Rendered appearance changes.
+
+*Three values, recorded because the reasoning matters more than the number.*
+This header first said **0.41.0**. I corrected it to **0.42.0** when the ROADMAP
+split the two Criticals, on the ground that RFC-085 needed a contrast suite
+built from nothing and must not delay RFC-084's validated fix. **The suite was
+finished before 0.41.0 was cut, so that condition ended and the split with it** —
+holding 085 back would have cost a release cycle for a reason that no longer
+applied, which is the exact failure RFC-087 names. Back to 0.41.0. The dev
+team's original instinct was right; the middle value was not wrong when it was
+written.
+**Touches.** `crates/snora-widgets/src/style.rs`,
+`crates/snora-widgets/src/sidebar.rs`, chrome border styles, and the contrast
+suites in `crates/snora-design/src/tests.rs`.
 **Release target.** **0.42.0** — **minor.** Rendered appearance changes.
 *(Corrected 2026-09-01: this header said 0.41.0. The handoff and the ROADMAP
 both say 0.42.0, and the ROADMAP gives the reason — 085 needs a contrast suite

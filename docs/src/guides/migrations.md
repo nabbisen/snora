@@ -9,12 +9,7 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
-- [0.41 → 0.42](migration-0.41-to-0.42.md) — **rendered appearance
-  changes on both theme paths.** Menu text, sidebar highlight, chrome
-  borders, tab labels, and breadcrumb text all had contrast failures no
-  suite could see — a new widget-layer contrast suite found and fixed
-  them. `high_contrast_dark` went from the worst preset (1.51:1) to the
-  best (9.96:1 worst case). Reference images are invalidated.
+
 - [0.40 → 0.41](migration-0.40-to-0.41.md) — **breaking: a real bug
   fixed.** Overlays did not contain pointer input — a click inside a
   dialog dismissed it, a modal with no close sink blocked nothing, and

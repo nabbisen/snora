@@ -114,14 +114,17 @@ RFC-087).
 | Release | RFCs | Why this grouping |
 |---|---|---|
 | **0.40.2** | 087, 089 | **No crate code.** CI coverage, gate-5 correction, documentation sweep. Ships first because it costs nothing and removes noise from the two that matter |
-| **0.41.0** | 084, 086 | Both are shipped defects on the **default path** — a dialog that dismisses on inside-click, and toast colours below their own thresholds. Small, validated fixes; one migration guide covers the behaviour and appearance changes together |
-| **0.42.0** | 085, 088 | Both need real work before they are safe: a **new widget-layer contrast suite in a crate that has never had one**, and a dependency-feature removal that must be measured. Neither should delay 0.41.0 |
+| **0.41.0** | 084, **085** | **Both Criticals, together.** The plan split them so 085's new contrast suite would not delay 084's validated fix — **the suite was finished before the cut, so the condition ended and the split with it.** Holding 085 for a separate release would have cost a cycle for a reason that no longer applied (RFC-087's own finding, applied to ourselves) |
+| **0.42.0** | 086, 088 | Toast contrast and the `iced` feature removal — neither submitted yet, both needing their own measurements |
 
-**Why 084 and 085 are not in the same release, both being Critical.** 084 is a
-one-line fix already validated against the full test suite. 085 needs a contrast
-suite built in `snora-widgets`, which has never had one. Bundling them would
-hold a validated fix for a Critical behind weeks of new test infrastructure, and
-the dialog is dismissing itself today.
+**Why 084 and 085 ended up in the same release after all.** The split was
+right when it was made: 085 needed a contrast suite built in `snora-widgets`,
+which had never had one, and bundling would have held a validated Critical fix
+behind weeks of new infrastructure. **The suite was finished before 0.41.0 was
+cut.** The condition ended, so the split ended — keeping it would have delayed a
+Critical for a reason that had stopped being true, which is precisely what
+RFC-087 was opened about. A deferral that outlives its condition is the failure;
+noticing costs nothing.
 
 **What the audit found about us, not just about the code.** Our contrast
 assertions guard the token layer thoroughly — RFC-058, 063, 065, 066, 071, 081
