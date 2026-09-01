@@ -8,7 +8,13 @@
 **Touches.** `crates/snora-widgets/src/style.rs`,
 `crates/snora-widgets/src/sidebar.rs`, chrome border styles, and the contrast
 suites in `crates/snora-design/src/tests.rs`.
-**Release target.** 0.41.0 — **minor.** Rendered appearance changes.
+**Release target.** **0.42.0** — **minor.** Rendered appearance changes.
+*(Corrected 2026-09-01: this header said 0.41.0. The handoff and the ROADMAP
+both say 0.42.0, and the ROADMAP gives the reason — 085 needs a contrast suite
+built from nothing and must not delay 0.41.0's validated Critical fix. The RFC
+was written before that split was decided and I never came back to it. Flagged
+by the dev team, who reasoned it out and named their migration guide
+`migration-0.41-to-0.42.md` rather than picking silently.)*
 
 ## Measured, not asserted
 
