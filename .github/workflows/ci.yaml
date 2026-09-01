@@ -37,6 +37,25 @@ jobs:
         run: cargo test -p snora-design
       - name: Test engine (render semantics)
         run: cargo test -p snora
+      - name: Test engine, all features (RFC-087)
+        # The default-features run above never exercised anything gated
+        # behind widgets/design/lucide-icons/svg-icons — 10 additional
+        # unit tests and 2 additional doc-tests, counted 2026-09-01.
+        run: cargo test -p snora --all-features
+      - name: Test widgets, all features (RFC-087)
+        # snora-widgets had no test step in CI at all before this — not a
+        # feature gap, an entire crate. 28 unit tests + 6 doc-tests
+        # counted 2026-09-01, including the RFC-085 contrast suite, which
+        # only exists under --all-features (it needs the `design` feature
+        # to construct a `Tokens` preset).
+        run: cargo test -p snora-widgets --all-features
+      - name: Test style, all features (RFC-087)
+        # Also never run. 26 unit tests + 3 doc-tests (1 ignored) counted
+        # 2026-09-01. snora-style declares no [features], so this is
+        # identical to a default-features run — --all-features here is
+        # for uniformity with the other two new steps, not because it
+        # changes anything.
+        run: cargo test -p snora-style --all-features
       - name: Check engine-only build (Q1 — minimal path)
         run: cargo check -p snora --no-default-features
 
@@ -81,6 +100,14 @@ jobs:
     # Q2-B and Q3: verify that widgets-without-design compiles cleanly and
     # that snora-design itself has no iced dependency. Also RFC-083: the
     # same iced-free property, held for snora-core under --all-features.
+    #
+    # RFC-087: this job used to also run `cargo test -p snora-design`
+    # (the "contract check" step, below the RFC-083 gate). Confirmed
+    # byte-identical to `rust-quality`'s "Test design tokens" step —
+    # snora-design declares no [features], so there is no feature-set
+    # difference between the two invocations to justify running it
+    # twice. Removed here; it stays exactly once, in `rust-quality`,
+    # which already carries the Q4/Q5 rationale comment.
     name: Design feature isolation
     runs-on: ubuntu-latest
     steps:
@@ -116,8 +143,6 @@ jobs:
             exit 1
           fi
           echo "RFC-083 pass: no iced in snora-core --all-features dependency tree"
-      - name: snora-design token tests (contract check)
-        run: cargo test -p snora-design
 
   docs:
     name: Docs build
@@ -131,4 +156,16 @@ jobs:
         run: mdbook build docs
       - name: Test docs (classify fences)
         run: mdbook test docs
+      - name: Built links resolve (RFC-073 / RFC-087)
+        # Catches a page that exists on disk but was never wired into
+        # SUMMARY.md — a source-level .md-link check can't see this,
+        # only the built HTML can. Confirmed passing on a clean tree
+        # 2026-09-01 before being wired here (RFC-087, RFC-079's own
+        # precedent: a gate ships only once the number it checks is
+        # known and stable).
+        run: python3 scripts/check-built-links.py
+      - name: Version snippets match workspace version (RFC-074 / RFC-087)
+        run: scripts/check-version-snippets.sh
+      - name: Migration guide exists for every adopted minor pair (RFC-079 / RFC-087)
+        run: scripts/check-migration-guides.sh
 
