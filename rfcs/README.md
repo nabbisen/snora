@@ -145,17 +145,18 @@ Design settled, implementation may start, not yet shipped. See
 state.
 
 Four of the audit's six are shipped; RFC-086 and RFC-088 remain.
+RFC-090 is not from the audit — it comes from the 0.41.1 cut.
 
 | ID | Title | Target |
 |----|-------|--------|
 | 086 | [The engine's toast colours fail their own thresholds](./accepted/086-engine-toast-contrast.md) | v0.42.0 — High |
 | 088 | [The workspace forces three iced features nobody asked for](./accepted/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High |
+| 090 | [The release rules nothing enforces](./accepted/090-the-release-rules-nothing-enforces.md) | before the v0.42.0 tag — High |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 090 | [The release rules nothing enforces](./proposed/090-the-release-rules-nothing-enforces.md) | before the v0.42.0 tag — High |
 
 ## Archive
 

@@ -1,6 +1,7 @@
 # RFC 090 — The release rules nothing enforces
 
-**Status.** Proposed (2026-09-02).
+**Status.** Accepted (owner, 2026-09-02). Handoff written — see
+[`handoffs/090-…`](../handoffs/090-the-release-rules-nothing-enforces/implementation-handoff.md).
 **Tracks.** Release integrity / process. **Severity: High.**
 **Found by** the 0.41.1 cut, 2026-09-02 — three of this document's own rules
 broken in one release by the person who wrote them.
@@ -94,14 +95,15 @@ working directory currently contains", which is not reversible at all.
 
 ## Ordering constraint — this RFC cannot ship first
 
-CI is **red right now**, and has been since `c651e93`, on the
-`Migration guide exists for every adopted minor pair` step (RFC-087 D-1:
-`actions/checkout` fetches no tags, the script derives its input from
-`git tag --list`, `pipefail` kills it silently). A green-CI precondition
-introduced today would block **every** release until that is fixed.
+~~CI is **red right now**~~ — **discharged 2026-09-02.** D-1 is fixed in
+`e0eeda5` and CI run `33565992772` is green on every job. The gate now prints
+its own result in CI (*"18 total gap(s) found; 0 at or after 0.39"*), where
+before it printed nothing at all.
 
-**D-1 lands first.** This RFC is written now so the sequencing is deliberate
-rather than discovered at the next cut.
+The constraint was real: a green-CI precondition introduced before `e0eeda5`
+would have blocked **every** release. It is recorded here rather than deleted,
+because the sequencing was the point — it was written down before the next cut
+rather than discovered during it.
 
 ## Open questions
 

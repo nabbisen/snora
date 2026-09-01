@@ -2,13 +2,13 @@
 
 **Status.** Done — shipped in v0.41.1 (2026-09-02).
 [Handoff](../handoffs/087-ci-runs-a-subset-of-the-tests/implementation-handoff.md).
-**Open defect: D-1** — the migration-guide gate cannot run in CI
-(`actions/checkout` fetches no tags; the script derives its input from
-`git tag --list` and dies under `pipefail` before its first line of output).
-CI has been red since `c651e93`. Reproduction and required fixes in
-`.git-exclude/reviewed/087-ci-runs-a-subset-of-the-tests/review-result.md`.
-**RFC-090 is blocked on this** — a green-CI precondition would block every
-release until D-1 lands.
+**D-1 — closed 2026-09-02 (`e0eeda5`).** The migration-guide gate could not
+run in CI: `actions/checkout` fetches no tags, the script derived its input
+from `git tag --list`, and it died under `pipefail` before its first line of
+output — silently red from `c651e93` to `f153a2b`. Fixed by pinning
+`fetch-depth: 0` and by making an empty tag list a loud failure rather than a
+"no gaps" pass. Proven failing three ways before being called fixed; CI run
+`33565992772` green. **D-1 is where RFC-090 came from.**
 **Tracks.** CI / measurement integrity. **Severity: High.**
 **Found by** the external audit, 2026-09-01 (F-29, F-30, F-39).
 **Touches.** `.github/workflows/ci.yaml`,
