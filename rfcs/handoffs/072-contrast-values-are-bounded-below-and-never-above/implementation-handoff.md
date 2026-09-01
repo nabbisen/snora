@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-072 contrast values are floors
 
-**Governing RFC.** [RFC-072](../../accepted/072-contrast-values-are-bounded-below-and-never-above.md)
+**Governing RFC.** **RFC-072** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-072 — Accepted (owner, 2026-08-19).
 **Release target.** 0.38.1 — **patch, documentation only.** No code, no
 assertion, no value.

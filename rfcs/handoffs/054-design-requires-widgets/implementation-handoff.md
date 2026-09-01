@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-054 `design` requires `widgets`
 
-**Governing RFC.** [RFC-054](../../done/054-design-requires-widgets.md)
+**Governing RFC.** **RFC-054** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-054 — Closed (v0.32.0).
 **Release target.** None yet — see §1.
 **Implementation units.** One. **This is an investigation, not an

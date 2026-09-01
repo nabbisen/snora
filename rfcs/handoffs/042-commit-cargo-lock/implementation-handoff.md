@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-042 commit `Cargo.lock`
 
-**Governing RFC.** [RFC-042](../../done/042-commit-cargo-lock.md)
+**Governing RFC.** **RFC-042** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-042 — Implemented (v0.25.3).
 **Release target.** 0.25.3 (patch), alongside RFC-035, RFC-036, RFC-041.
 **Implementation units.** One. Small.

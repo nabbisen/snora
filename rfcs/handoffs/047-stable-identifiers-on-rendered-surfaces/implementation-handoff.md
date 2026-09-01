@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-047 stable identifiers on rendered surfaces
 
-**Governing RFC.** [RFC-047](../../done/047-stable-identifiers-on-rendered-surfaces.md)
+**Governing RFC.** **RFC-047** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-047 — Implemented (v0.28.0).
 **Release target.** 0.28.0, alongside RFC-046.
 **Implementation units.** One. **Read §4 before starting — this and

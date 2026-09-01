@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-053 `design::responsive_render`
 
-**Governing RFC.** [RFC-053](../../done/053-responsive-render-excludes-the-design-path.md)
+**Governing RFC.** **RFC-053** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-053 — Implemented (v0.31.0).
 **Release target.** 0.31.0 (minor — new public API).
 **Implementation units.** One. Independent of RFC-052/RFC-050; any order.

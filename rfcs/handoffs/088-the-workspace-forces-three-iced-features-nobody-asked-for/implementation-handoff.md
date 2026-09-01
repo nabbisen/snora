@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-088 workspace iced features
 
-**Governing RFC.** [RFC-088](../../accepted/088-the-workspace-forces-three-iced-features-nobody-asked-for.md)
+**Governing RFC.** **RFC-088** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Accepted (owner, 2026-09-01). High.
 **Release target.** 0.42.0 — **minor.** Changes what a consumer's build
 resolves.

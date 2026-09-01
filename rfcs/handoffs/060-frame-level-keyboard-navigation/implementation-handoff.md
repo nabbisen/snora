@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-060 frame-level keyboard navigation
 
-**Governing RFC.** [RFC-060](../../done/060-frame-level-keyboard-navigation.md)
+**Governing RFC.** **RFC-060** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-060.
 **Release target.** 0.35.0 (minor — `snora-core` gains public vocabulary).
 **Implementation units.** One. Independent of RFC-050, which may ship alongside.

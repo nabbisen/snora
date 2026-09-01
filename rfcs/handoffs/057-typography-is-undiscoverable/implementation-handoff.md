@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-057 typography documentation
 
-**Governing RFC.** [RFC-057](../../done/057-typography-is-undiscoverable.md)
+**Governing RFC.** **RFC-057** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-057 — Implemented (v0.33.1).
 **Release target.** 0.33.1 (patch). Ships alone.
 **Implementation units.** One. **Documentation only — no executable code.**

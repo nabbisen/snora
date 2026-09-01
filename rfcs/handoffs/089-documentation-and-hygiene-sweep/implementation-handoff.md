@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-089 documentation and hygiene sweep
 
-**Governing RFC.** [RFC-089](../../accepted/089-documentation-and-hygiene-sweep.md)
+**Governing RFC.** **RFC-089** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Accepted (owner, 2026-09-01). Medium/Low.
 **Release target.** **0.41.1** — documentation and metadata. **No public API,
 no behaviour.**

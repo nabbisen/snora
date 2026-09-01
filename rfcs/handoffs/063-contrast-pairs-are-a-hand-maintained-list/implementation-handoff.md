@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-063 derived contrast pairs
 
-**Governing RFC.** [RFC-063](../../done/063-contrast-pairs-are-a-hand-maintained-list.md)
+**Governing RFC.** **RFC-063** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-063 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.0, alongside RFC-061 and RFC-062.
 **Implementation units.** One.

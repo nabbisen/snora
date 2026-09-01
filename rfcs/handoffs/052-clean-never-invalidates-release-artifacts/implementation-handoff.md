@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-052 profile-scoped clean
 
-**Governing RFC.** [RFC-052](../../done/052-clean-never-invalidates-release-artifacts.md)
+**Governing RFC.** **RFC-052** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-052 — Implemented (v0.31.0).
 **Release target.** 0.31.0.
 **Implementation units.** One. **Must land before RFC-050**, which is blocked

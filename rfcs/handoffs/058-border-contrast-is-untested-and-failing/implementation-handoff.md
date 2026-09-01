@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-058 border contrast
 
-**Governing RFC.** [RFC-058](../../done/058-border-contrast-is-untested-and-failing.md)
+**Governing RFC.** **RFC-058** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-058 — Accepted (owner, 2026-08-17).
 **Release target.** 0.34.0 (minor — preset values change; `design`-path
 appearance changes).

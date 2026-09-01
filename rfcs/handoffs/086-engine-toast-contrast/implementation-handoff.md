@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-086 engine toast contrast
 
-**Governing RFC.** [RFC-086](../../accepted/086-engine-toast-contrast.md)
+**Governing RFC.** **RFC-086** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Accepted (owner, 2026-09-01). High.
 **Release target.** **0.42.0** — **minor.** Rendered appearance changes.
 *(Re-targeted 2026-09-01: this said 0.41.0, and 0.41.0 shipped without it. The

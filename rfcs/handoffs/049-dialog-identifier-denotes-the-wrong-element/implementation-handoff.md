@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-049 `snora-dialog-card` denotes the wrong element
 
-**Governing RFC.** [RFC-049](../../done/049-dialog-identifier-denotes-the-wrong-element.md)
+**Governing RFC.** **RFC-049** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-049 — Implemented (v0.29.0).
 **Release target.** 0.29.0 (**minor** — an identifier rename is a minor bump
 by the policy RFC-047 shipped in v0.28.0).

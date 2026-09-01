@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-083 the lucide feature chain
 
-**Governing RFC.** [RFC-083](../../done/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md)
+**Governing RFC.** **RFC-083** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-083 — Accepted (owner, 2026-08-21).
 **Release target.** 0.40.0 — **minor.** It changes which features a consumer's
 build resolves.

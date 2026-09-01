@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-077 what actually outlines the dialog card
 
-**Governing RFC.** [RFC-077](../../accepted/077-the-border-is-not-what-outlines-the-card.md)
+**Governing RFC.** **RFC-077** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-077 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.0 — documentation and rationale only. **No values, no
 assertions, no rendered output.**

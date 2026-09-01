@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-076 the facade's unexported return type
 
-**Governing RFC.** [RFC-076](../../accepted/076-the-facade-publishes-a-type-it-does-not-export.md)
+**Governing RFC.** **RFC-076** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-076 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.0 — **minor.** Public API addition.
 **Implementation units.** Two: the re-export, then the sweep.

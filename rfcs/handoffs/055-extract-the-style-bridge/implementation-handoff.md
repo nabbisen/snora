@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-055 extract `snora-style`
 
-**Governing RFC.** [RFC-055](../../done/055-extract-the-style-bridge.md)
+**Governing RFC.** **RFC-055** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-055 — Implemented (v0.32.0).
 **Release target.** 0.32.0 (minor — new published crate, no public path
 changes).

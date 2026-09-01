@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-039 engine surfaces: dialog card and modal dim
 
-**Governing RFC.** [RFC-039](../../done/039-engine-surface-styling.md)
+**Governing RFC.** **RFC-039** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-039 — Implemented (v0.27.0).
 **Release target.** v0.27.0, alongside RFC-040.
 **Implementation units.** One. Independent of RFC-040 — they can run in

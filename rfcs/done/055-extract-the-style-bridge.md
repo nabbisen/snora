@@ -2,7 +2,7 @@
 
 **Status.** Implemented (v0.32.0)
 **Tracks.** Crate boundaries. Implements option **B′** from
-[RFC-054](../proposed/054-design-requires-widgets.md), whose investigation supplies every
+**RFC-054**, whose investigation supplies every
 number here.
 **Touches.** New `crates/snora-style/`; `crates/snora-widgets/`;
 `crates/snora/{Cargo.toml, src/design.rs, src/design/render.rs}`;

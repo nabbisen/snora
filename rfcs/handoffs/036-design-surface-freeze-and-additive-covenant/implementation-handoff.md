@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-036 design surface freeze and additive-only covenant
 
-**Governing RFC.** [RFC-036](../../done/036-design-surface-freeze-and-additive-covenant.md)
+**Governing RFC.** **RFC-036** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-036 — Implemented (v0.25.3).
 **Release target.** 0.25.3 (patch), alongside RFC-035 and RFC-041.
 **Implementation units.** One. Documentation and governance only.

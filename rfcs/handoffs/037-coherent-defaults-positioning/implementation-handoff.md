@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-037 coherent defaults positioning
 
-**Governing RFC.** [RFC-037](../../done/037-coherent-defaults-positioning.md)
+**Governing RFC.** **RFC-037** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-037 — Implemented (v0.26.0).
 **Release target.** v0.26.0, alongside RFC-038 and RFC-043.
 **Implementation units.** One. Documentation and governance only — no code.

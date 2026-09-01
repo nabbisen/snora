@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-051 engine-only responsive example
 
-**Governing RFC.** [RFC-051](../../done/051-responsive-example-excludes-its-own-requester.md)
+**Governing RFC.** **RFC-051** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-051 — Implemented (v0.30.0).
 **Release target.** 0.30.0 (minor — new workspace member).
 **Implementation units.** One. Independent of RFC-050; either may land first.

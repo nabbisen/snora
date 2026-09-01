@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-061 pointer target size
 
-**Governing RFC.** [RFC-061](../../done/061-pointer-target-size-is-unasserted.md)
+**Governing RFC.** **RFC-061** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-061 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.0.
 **Implementation units.** One.

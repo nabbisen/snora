@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-041 measurement integrity and gate 9
 
-**Governing RFC.** [RFC-041](../../done/041-measurement-integrity-and-gate-9.md)
+**Governing RFC.** **RFC-041** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-041 — Implemented (v0.25.3).
 **Release target.** 0.25.3 (patch), alongside RFC-035 and RFC-036.
 **Implementation units.** One, in four steps. CI, manifest metadata, and docs.

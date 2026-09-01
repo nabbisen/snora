@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-048 dialog card documentation
 
-**Governing RFC.** [RFC-048](../../done/048-dialog-card-documentation-contradiction.md)
+**Governing RFC.** **RFC-048** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-048 — Implemented (v0.28.1).
 **Release target.** 0.28.1 (patch). Ships alone.
 **Implementation units.** One. **Documentation and doc-comments only — no

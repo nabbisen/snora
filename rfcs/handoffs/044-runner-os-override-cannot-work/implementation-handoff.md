@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-044 `runner_os` override and content verification
 
-**Governing RFC.** [RFC-044](../../done/044-runner-os-override-cannot-work.md)
+**Governing RFC.** **RFC-044** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-044 — Implemented (v0.27.0).
 **Release target.** Next release — fold in rather than cutting one for it.
 **Implementation units.** One. Small: CI, two scripts, docs.

@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-062 feature-gating indicators
 
-**Governing RFC.** [RFC-062](../../done/062-feature-gating-indicators-are-uncalibrated.md)
+**Governing RFC.** **RFC-062** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-062 — Accepted (owner, 2026-08-18).
 **Release target.** 0.36.0, alongside RFC-061. **Documentation only** — no code.
 **Implementation units.** One.

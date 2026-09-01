@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-070 the scale against iced's default
 
-**Governing RFC.** [RFC-070](../../accepted/070-the-scale-is-uncalibrated-against-iceds-default.md)
+**Governing RFC.** **RFC-070** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-070 — Accepted (owner, 2026-08-19).
 **Release target.** 0.38.1 — **patch, documentation only**, *unless* Q-1
 concludes a value must change, in which case **stop and report** (§4).

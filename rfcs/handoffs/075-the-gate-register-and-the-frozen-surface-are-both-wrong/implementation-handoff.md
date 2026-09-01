@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-075 the gate register and the frozen surface
 
-**Governing RFC.** [RFC-075](../../accepted/075-the-gate-register-and-the-frozen-surface-are-both-wrong.md)
+**Governing RFC.** **RFC-075** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Source report.** `.git-exclude/review-request/docs-and-comments-staleness-audit/`
 **Status.** Inherited from RFC-075 — Accepted (owner, 2026-08-20).
 **Release target.** 0.38.3 — **patch.** Documentation and doc comments only.

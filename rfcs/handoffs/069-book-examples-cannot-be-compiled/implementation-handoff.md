@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-069 book examples cannot be compiled
 
-**Governing RFC.** [RFC-069](../../accepted/069-book-examples-cannot-be-compiled.md)
+**Governing RFC.** **RFC-069** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-069 — Accepted (owner, 2026-08-19).
 **Release target.** 0.38.0. **Documentation, CI, and one new `publish = false`
 workspace member.** No crate change, no public API change, no rendered output.

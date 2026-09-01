@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-046 layout width exposure
 
-**Governing RFC.** [RFC-046](../../done/046-layout-width-exposure.md)
+**Governing RFC.** **RFC-046** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-046 — Implemented (v0.28.0).
 **Release target.** 0.28.0, alongside RFC-047.
 **Implementation units.** One. **Read §5 before starting — this and

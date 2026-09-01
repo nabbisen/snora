@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-079 a guide for every minor
 
-**Governing RFC.** [RFC-079](../../accepted/079-the-migration-index-promises-a-guide-for-every-minor.md)
+**Governing RFC.** **RFC-079** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-079 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.1 — documentation and one script. **No code.**
 **Implementation units.** Two.

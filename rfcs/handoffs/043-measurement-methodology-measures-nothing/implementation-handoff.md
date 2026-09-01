@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-043 fix the budget measurement methodology
 
-**Governing RFC.** [RFC-043](../../done/043-measurement-methodology-measures-nothing.md)
+**Governing RFC.** **RFC-043** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-043 — Implemented (v0.26.0).
 **Release target.** Next patch (0.25.4) or folded into v0.26 — owner's call
 at release time. Independent of the v0.26 appearance work.

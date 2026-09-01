@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-084 overlay pointer containment
 
-**Governing RFC.** [RFC-084](../../accepted/084-overlays-do-not-contain-pointer-events.md)
+**Governing RFC.** **RFC-084** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Accepted (owner, 2026-09-01). **Critical.**
 **Release target.** 0.41.0 — **minor.** Behaviour changes on the default path.
 **Implementation units.** Four, plus the suite. **Unit 1 first, alone if

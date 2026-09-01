@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-067 withdrawn claims
 
-**Governing RFC.** [RFC-067](../../done/067-withdrawing-a-claim-does-not-retract-it.md)
+**Governing RFC.** **RFC-067** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-067 — Accepted (owner, 2026-08-19).
 **Release target.** 0.37.2. **Documentation and process only** — no code.
 **Implementation units.** One.

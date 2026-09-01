@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-035 documentation consistency audit
 
-**Governing RFC.** [RFC-035](../../done/035-documentation-consistency-audit.md)
+**Governing RFC.** **RFC-035** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-035 — Implemented (v0.25.3).
 **Implementation units.** One. This is a single reviewable change.
 

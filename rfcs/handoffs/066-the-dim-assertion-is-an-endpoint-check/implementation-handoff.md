@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-066 sweep the dim assertion
 
-**Governing RFC.** [RFC-066](../../done/066-the-dim-assertion-is-an-endpoint-check.md)
+**Governing RFC.** **RFC-066** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-066 — Accepted (owner, 2026-08-18).
 **Release target.** 0.37.1 (corrected from 0.38.0). **Test and documentation only** — no preset values,
 no rendering.

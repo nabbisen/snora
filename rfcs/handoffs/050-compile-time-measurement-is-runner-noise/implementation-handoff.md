@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-050 compile-time measurement
 
-**Governing RFC.** [RFC-050](../../done/050-compile-time-measurement-is-runner-noise.md)
+**Governing RFC.** **RFC-050** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Accepted (owner, 2026-08-15); parked, then unparked and re-derived
 2026-08-18.
 **Release target.** 0.35.0 (minor — the CSV gains one column).

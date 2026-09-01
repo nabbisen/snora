@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-085 widget-layer contrast
 
-**Governing RFC.** [RFC-085](../../accepted/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite.md)
+**Governing RFC.** **RFC-085** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Accepted (owner, 2026-09-01). **Critical.**
 **Release target.** 0.42.0 — **minor.** Rendered appearance changes.
 **Implementation units.** Two: **the suite first, then the fixes.**

@@ -121,7 +121,7 @@ built for, and would let a design-path consumer with zero widget call sites
 stop compiling `snora-widgets`.
 
 This is a feature-graph change with binary-size consequences and is **not in
-scope here**. **Now tracked as [RFC-054](../proposed/054-design-requires-widgets.md)**,
+scope here**. **Now tracked as **RFC-054****,
 which establishes that the coupling is two style functions in
 `design/render.rs`, one of them reused on RFC-039's explicit instruction.
 

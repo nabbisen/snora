@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-038 token-derived `iced::Theme` emission
 
-**Governing RFC.** [RFC-038](../../done/038-token-derived-theme-emission.md)
+**Governing RFC.** **RFC-038** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-038 — Implemented (v0.26.0).
 **Release target.** v0.26 (minor — first additive public API of the milestone).
 **Implementation units.** One.

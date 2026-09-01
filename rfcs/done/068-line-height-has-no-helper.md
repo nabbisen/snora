@@ -245,7 +245,7 @@ decision of theirs we would override.
   chips — do not adopt line-height.** Line-height does nothing for the
   readability of a single line; it only changes the height of the line box. And
   the direction is *tighter*: `label` is 1.2 against iced's default 1.3
-  (see [RFC-070](../proposed/070-the-scale-is-uncalibrated-against-iceds-default.md)),
+  (see **RFC-070**),
   so applying it would shrink every label by roughly `0.1 × 14px` for no
   legibility gain. **A rendered change with a cost and no benefit is not a
   deferred improvement; it is a thing not to do.**

@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-073 three stale pages
 
-**Governing RFC.** [RFC-073](../../accepted/073-pages-that-outlived-the-facts-they-state.md)
+**Governing RFC.** **RFC-073** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-073 — Accepted (owner, 2026-08-20).
 **Release target.** 0.38.2 — **patch, documentation only.** No code.
 **Implementation units.** Three, independent. Any order.

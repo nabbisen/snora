@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-068 line-height helpers
 
-**Governing RFC.** [RFC-068](../../accepted/068-line-height-has-no-helper.md)
+**Governing RFC.** **RFC-068** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-068 — Accepted (owner, 2026-08-19).
 **Release target.** 0.38.0 — **minor**, because `snora-style` gains public
 functions. **No rendering changes.**
@@ -224,7 +224,7 @@ remove it.
   freezes both.
 - **No `#[non_exhaustive]` added to either struct** — see §4.
 - **No leading floor** — §5.
-- **Out of scope — [RFC-069](../../proposed/069-book-examples-cannot-be-compiled.md)
+- **Out of scope — **RFC-069**
   owns it.** The book's 110 `rust,ignore` fences cannot be compiled at all,
   because the book has no library path. **Do not add reasons to these fences,
   do not change any fence tag, and do not touch

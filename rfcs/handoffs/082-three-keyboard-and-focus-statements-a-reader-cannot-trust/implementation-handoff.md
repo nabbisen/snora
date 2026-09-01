@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-082 three statements a reader cannot trust
 
-**Governing RFC.** [RFC-082](../../done/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md)
+**Governing RFC.** **RFC-082** — find it under `rfcs/done/`, `rfcs/accepted/` or `rfcs/archive/` via the index at [`rfcs/README.md`](../../README.md). *(Not linked by folder: an RFC moves between folders as it ships, and a folder-bearing link here goes stale the moment it does — 14 of them had.)*
 **Status.** Inherited from RFC-082 — Accepted (owner, 2026-08-20).
 **Release target.** 0.39.2 — documentation only. **No code.**
 **Implementation units.** Three.
