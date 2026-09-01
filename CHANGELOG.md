@@ -15,7 +15,25 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **The accessibility guide claimed toast and notice tone was
+  distinguishable by more than colour — it is not (F-20, RFC-089).**
+  `docs/src/guides/accessibility.md` said *"Toast intents and notice
+  tones are distinguishable by more than colour alone in snora's
+  prefab widgets."* Checked against the actual renderers
+  (`snora::toast`'s `toast_style`, `snora_widgets::design::notice`):
+  both vary only background/accent colour by tone — identical title
+  and body text, no icon, no textual prefix. This is a WCAG 2.1 1.4.1
+  (use of colour) gap, published as solved when it was not. Moved to
+  "What snora does not provide," naming the exact functions and the
+  gap; adding a non-colour cue is a behaviour change and is not part
+  of this fix.
+
+  **Re-check, if this reached you before:** if you recorded that
+  snora's prefab toasts or notices distinguish intent by more than
+  colour, that came from us and is wrong — re-check any 1.4.1 claim
+  that relied on it (RFC-067).
 
 ## [0.41.0] — 2026-09-01
 

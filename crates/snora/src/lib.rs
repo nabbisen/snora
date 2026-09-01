@@ -3,7 +3,7 @@
 //! The iced engine for the Snora GUI framework.
 //!
 //! This crate binds [`snora_core`] vocabulary to iced. It exposes a single
-//! entry point, [`render`], a toast lifecycle helper module, and — when
+//! entry point, [`render()`], a toast lifecycle helper module, and — when
 //! the `widgets` feature is enabled (the default) — a re-exported set of
 //! prefab `iced::Element` builders from the [`snora-widgets`] crate.
 //!
@@ -62,6 +62,38 @@
 //! }
 //! ```
 //!
+//! # The `README.md` quick start
+//!
+//! This exact block is `README.md`'s own "Quick start" section — kept
+//! byte-identical on purpose (F-23, RFC-089) so it is compile-checked
+//! here instead of only looking correct. If you change one, change the
+//! other.
+//!
+//! ```rust,no_run
+//! use iced::{Element, widget::text};
+//! use snora::{AppLayout, render};
+//!
+//! #[derive(Debug, Clone)]
+//! enum Message {}
+//!
+//! #[derive(Default)]
+//! struct App;
+//!
+//! impl App {
+//!     fn update(&mut self, _msg: Message) {}
+//!     fn view(&self) -> Element<'_, Message> {
+//!         let body: Element<'_, Message> = text("Hello, snora!").into();
+//!         render(AppLayout::new(body))
+//!     }
+//! }
+//!
+//! fn main() -> iced::Result {
+//!     iced::application(App::default, App::update, App::view)
+//!         .title(|_: &App| String::from("Hello"))
+//!         .run()
+//! }
+//! ```
+//!
 //! # Engine-only builds
 //!
 //! Applications that supply 100 % of their UI parts and do not want the
@@ -115,7 +147,7 @@ mod identifiers;
 /// Keyboard dismissal helper: [`keyboard::dismiss_on_escape`].
 pub mod keyboard;
 mod overlay;
-/// The single rendering entry point: [`render`].
+/// The single rendering entry point: [`render()`].
 pub mod render;
 /// Width-aware rendering: [`responsive::responsive_render`] (RFC-046).
 pub mod responsive;

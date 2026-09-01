@@ -2,11 +2,11 @@
 //!
 //! Three semantic variants:
 //!
-//! * [`card_surface`] — standard card on a `surface` background; the default
+//! * `card_surface` — standard card on a `surface` background; the default
 //!   card style.
-//! * [`card_raised`] — elevated card on a `surface_raised` background with a
+//! * `card_raised` — elevated card on a `surface_raised` background with a
 //!   drop shadow, for popovers or prominent panels.
-//! * [`card_selected`] — card with an `accent`-colored border indicating
+//! * `card_selected` — card with an `accent`-colored border indicating
 //!   selection.
 //!
 //! # iced 0.14 limitation

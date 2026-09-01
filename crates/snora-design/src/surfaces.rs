@@ -3,7 +3,7 @@
 //!
 //! `Palette::usages` (RFC-063) declares where a *role* renders — but a
 //! surface does not have to be a role to need measuring. The modal dim is
-//! composited at render time from [`DIM_ALPHA`] and `background`'s own
+//! composited at render time from `DIM_ALPHA` and `background`'s own
 //! darkness; it exists in no `Palette` field, so `Palette::usages` cannot
 //! see it and the contrast suite silently had nothing to check it
 //! against. This module makes it a pure function over [`Tokens`] instead,

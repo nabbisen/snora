@@ -1,8 +1,8 @@
 //! Token-derived `iced::Theme` emission for Snora Design (RFC-038).
 //!
 //! [`theme`] builds a complete `iced::Theme` from a Snora Design token
-//! bundle without letting iced substitute its own colors. Every [`Pair`] in
-//! the emitted `Extended` palette is a struct literal — never [`Pair::new`],
+//! bundle without letting iced substitute its own colors. Every `Pair` in
+//! the emitted `Extended` palette is a struct literal — never `Pair::new`,
 //! which "corrects" a foreground color by lightening or darkening it until
 //! it clears a heuristic `relative_contrast >= 6.0` bar. Routing
 //! `snora-design`'s contrast-tested roles through that would silently
@@ -24,16 +24,16 @@
 //! *exactly* (proving iced's heuristic never ran). **Derived** tiers
 //! (`weak`, `strong`, and the eight `Background` sub-tiers) are computed by
 //! a deterministic transform, `shift_away_from` — built as `Pair` struct
-//! literals so the *text* color is never routed through [`Pair::new`]'s
+//! literals so the *text* color is never routed through `Pair::new`'s
 //! `readable()` heuristic; it stays fixed at the token's own paired
 //! foreground.
 //!
 //! `shift_away_from` uses iced's own public [`iced::theme::palette::lighten`]
 //! / [`iced::theme::palette::darken`], but its direction depends on *which*
-//! call site is asking — this is [`shift_away_from`]'s `reference`
+//! call site is asking — this is `shift_away_from`'s `reference`
 //! parameter, and the two derivations below use it differently on purpose.
 //!
-//! For semantic sets ([`derive_tiers`] — `weak`/`strong` of `primary`,
+//! For semantic sets (`derive_tiers` — `weak`/`strong` of `primary`,
 //! `secondary`, `success`, `warning`, `danger`), the direction comes from
 //! the *fixed paired text*'s darkness, not the base color's own (unlike
 //! iced's own [`iced::theme::palette::deviate`]). This guarantees each
@@ -51,7 +51,7 @@
 //! tier to 4.40:1, just under the 4.5 AA floor. Text-relative direction
 //! removed both failures without per-preset tuning — see `theme/tests.rs`.
 //!
-//! For `Background` ([`derive_background`]), the direction instead comes
+//! For `Background` (`derive_background`), the direction instead comes
 //! from the seed color's *own* darkness — matching `deviate` exactly. An
 //! earlier revision (round 2) used the text-relative rule here too, which
 //! was wrong (R-3, round-2 review): in the `dark` preset, a dark-but-not-
@@ -70,7 +70,7 @@
 //! pure-black background forcing the clamp fallback.
 //!
 //! These two derivations are deliberately inconsistent with each other —
-//! see [`derive_tiers`]'s doc comment for why that's a flagged choice, not
+//! see `derive_tiers`'s doc comment for why that's a flagged choice, not
 //! an oversight.
 //!
 //! # The 18 → 6 mapping

@@ -45,6 +45,9 @@
 //! a compile error naming this crate as the replacement. See
 //! `docs/src/guides/migration-0.32-to-0.33.md`.
 
+#![warn(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 /// Color conversion between `snora_design::Color` and `iced::Color`.
 pub mod color;
 

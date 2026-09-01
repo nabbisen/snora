@@ -2,7 +2,7 @@
 //!
 //! Two layout variants:
 //!
-//! * [`row`] — compact inline label + bar, for use inside existing surfaces.
+//! * `row` — compact inline label + bar, for use inside existing surfaces.
 //! * [`card`] — the same content wrapped in a `card::surface` for prominence.
 //!
 //! Both accept `Option<f32>` for the value:

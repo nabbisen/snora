@@ -96,10 +96,9 @@ where
         }
         (SheetEdge::Top, _) => {
             let ratio = size.as_ratio().unwrap_or(1.0 / 3.0);
-            let (sheet_pct, spacer_pct) = ((ratio * 100.0).round().clamp(1.0, 100.0) as u16, {
-                let s = (ratio * 100.0).round().clamp(0.0, 100.0) as u16;
-                100u16.saturating_sub(s).max(1)
-            });
+            // portions returns (spacer, sheet); Top wants sheet first, so
+            // swap — same pattern render_horizontal's on_left branch uses.
+            let (spacer_pct, sheet_pct) = portions(ratio);
             (
                 Element::from(
                     container(body)

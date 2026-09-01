@@ -61,8 +61,8 @@ pub use snora_style::theme::theme;
 /// Token-derived engine surface styling: the dialog card and the modal
 /// dim (RFC-039).
 ///
-/// [`render`] is a sibling to [`crate::render::render`] (`snora::render`),
-/// not a replacement — see [`render`]'s own documentation for the
+/// [`render()`] is a sibling to [`crate::render::render`] (`snora::render`),
+/// not a replacement — see [`render()`]'s own documentation for the
 /// derivation and the gating-invariant guarantee.
 ///
 /// [`responsive_render`] is the `design`-path pair to
@@ -117,7 +117,7 @@ pub mod button {
 ///
 /// `widgets`-gated (RFC-055): see [`style::container`] for the
 /// underlying style functions these wrap, which work without `widgets`
-/// — the same ones [`crate::design::render`]'s dialog card uses.
+/// — the same ones [`crate::design::render()`]'s dialog card uses.
 #[cfg(feature = "widgets")]
 pub mod card {
     pub use snora_widgets::design::card::{raised, selected, surface};

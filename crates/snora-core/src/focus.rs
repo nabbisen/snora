@@ -11,14 +11,14 @@
 //!
 //! * **Not a key binding.** Snora does not claim Tab or Shift+Tab — Tab
 //!   already means "next control" to iced and to every application with
-//!   a form. [`next_zone`] takes a [`Cycle`] direction, not a key; the
+//!   a form. `next_zone` takes a [`Cycle`] direction, not a key; the
 //!   recommended binding is **F6 / Shift+F6**, via `snora::keyboard`'s
 //!   companion helper.
 //! * **Not event capture.** No subscription is installed by this crate
 //!   or by `snora`. The application wires `iced::keyboard::listen()`
 //!   itself and calls this pure function — the same shape as
 //!   `snora::keyboard::dismiss_on_escape`.
-//! * **Not modal focus trapping.** [`next_zone`] reports when cycling is
+//! * **Not modal focus trapping.** `next_zone` reports when cycling is
 //!   suspended because a modal is open; it does not enumerate or bound
 //!   the modal's contents. Trapping is a separate, staged decision — see
 //!   `docs/src/contributing/design-decisions.md`.

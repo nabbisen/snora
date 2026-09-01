@@ -11,6 +11,10 @@ readme = "../../README.md"
 keywords = ["gui", "iced", "ui", "framework"]
 categories = ["gui"]
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [features]
 # When enabled, exposes the Snora Design prefab widgets (`snora_widgets::design`
 # — button, card, notice, chip, progress, chrome geometry). NOT the style

@@ -2,10 +2,10 @@
 //!
 //! Four variants are provided:
 //!
-//! * [`primary`] — filled accent button; the strongest call to action.
-//! * [`secondary`] — outlined accent button; secondary action.
-//! * [`ghost`] — no fill or border at rest; low-emphasis tertiary action.
-//! * [`danger`] — filled danger/destructive button; uses `danger` / `danger_text`.
+//! * `primary` — filled accent button; the strongest call to action.
+//! * `secondary` — outlined accent button; secondary action.
+//! * `ghost` — no fill or border at rest; low-emphasis tertiary action.
+//! * `danger` — filled danger/destructive button; uses `danger` / `danger_text`.
 //!
 //! # iced 0.14 focus limitation
 //!

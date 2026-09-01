@@ -22,6 +22,7 @@
 - [Responsive layout width](guides/responsive.md)
 - [Icons](guides/icons.md)
 - [Testing UI logic](guides/testing.md)
+- [Troubleshooting](guides/troubleshooting.md)
 - [Migrating between versions](guides/migrations.md)
   - [0.4 → 0.5](guides/migration-0.4-to-0.5.md)
   - [0.5 → 0.6](guides/migration-0.5-to-0.6.md)

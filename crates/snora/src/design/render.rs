@@ -1,6 +1,6 @@
 //! Token-derived engine surface styling for Snora Design (RFC-039).
 //!
-//! [`render`] is a sibling to [`crate::render::render`], not a
+//! [`render()`] is a sibling to [`crate::render::render`], not a
 //! replacement: with `design` inactive, [`crate::render::render`]'s
 //! output is byte-for-byte unchanged (RFC-037's gating invariant).
 //! Applications opt in by calling the other function; nothing here runs
@@ -43,7 +43,7 @@
 //! defect RFC-038's `shift_away_from` was built to prevent for derived
 //! theme tiers, here for a fixed constant instead of a derived one.
 //!
-//! [`dim_color`] instead picks the dim's base color from
+//! `dim_color` instead picks the dim's base color from
 //! **`background`'s own darkness**, not a fixed pole — `Color::WHITE` if
 //! dark, `Color::BLACK` if light. This has no clamping edge case (unlike
 //! `shift_away_from`'s OKLCH-lightness shift): alpha-compositing a color

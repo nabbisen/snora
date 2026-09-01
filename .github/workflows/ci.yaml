@@ -28,6 +28,12 @@ jobs:
         run: cargo check --workspace --all-features
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Rustdoc (F-38, RFC-089)
+        # RFC-083 shipped because a docs.rs build failed on a published crate.
+        # 46 warnings (44 by our own 2026-09-01 recount) is the state that came
+        # from — cleared first (RFC-089), gated here second, per RFC-079's
+        # own rule: a gate that ships red is one people learn to ignore.
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
       - name: Test core
         run: cargo test -p snora-core
       - name: Test design tokens (Q4 + Q5 — token sanity and contrast)

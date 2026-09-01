@@ -2,10 +2,10 @@
 //!
 //! Two variants:
 //!
-//! * [`filter`] — a toggle chip for filtering or categorizing. Solid accent
+//! * `filter` — a toggle chip for filtering or categorizing. Solid accent
 //!   background + `accent_text` foreground when selected; neutral border at
 //!   rest.
-//! * [`removable`] — a chip with a separate remove (×) button.
+//! * `removable` — a chip with a separate remove (×) button.
 //!
 //! Both are backed by `iced::widget::button` and are keyboard-reachable.
 //! The application owns selection/filter state.

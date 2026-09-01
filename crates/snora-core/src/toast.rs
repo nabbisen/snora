@@ -10,7 +10,7 @@
 //! Each [`Toast`] declares a [`ToastLifetime`]:
 //!
 //! * [`ToastLifetime::Transient`] — the toast auto-dismisses after the
-//!   given [`Duration`]. The engine provides a subscription helper that
+//!   given `Duration`. The engine provides a subscription helper that
 //!   wakes the runtime periodically and the `snora::toast::sweep_expired`
 //!   helper removes entries whose deadlines have passed.
 //! * [`ToastLifetime::Persistent`] — the toast remains until the user

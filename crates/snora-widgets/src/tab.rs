@@ -98,12 +98,10 @@ where
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
     let active = bar.active.clone();
-    let mut tab_row = match direction {
-        LayoutDirection::Ltr => row![],
-        LayoutDirection::Rtl => row![],
-    }
-    .spacing(geometry.bar_gap)
-    .align_y(Center);
+    // Direction affects tab order below (declaration order vs. reversed),
+    // not this row's construction — both arms built the same `row![]`
+    // here (F-33, RFC-089).
+    let mut tab_row = row![].spacing(geometry.bar_gap).align_y(Center);
 
     // We push tabs in declaration order under LTR and reverse order
     // under RTL, so that the *first declared* tab visually leads in

@@ -1,7 +1,7 @@
 //! Text style helpers for Snora Design tokens.
 //!
 //! These helpers derive `iced::Pixels` sizes and `iced::widget::text::LineHeight`
-//! values from a [`Tokens`] typography scale, avoiding magic numbers — and
+//! values from a `Tokens` typography scale, avoiding magic numbers — and
 //! hand-built `LineHeight`s — in application view code.
 //!
 //! Applying line-height (or not) is still the application's own call for its

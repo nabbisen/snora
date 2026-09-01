@@ -38,6 +38,9 @@ for fuller fit guidance.
 
 ## Quick start
 
+<!-- This block is compile-tested as a doctest in crates/snora/src/lib.rs
+     ("The README.md quick start") — F-23, RFC-089. Keep both in sync. -->
+
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
@@ -96,10 +99,11 @@ demos are in the
 - **Navigation widgets out of the box.** `app_header`, `app_side_bar`,
   `app_tab_bar`, `app_breadcrumb`, plus dropdown menus and context
   menus — direction-aware, theme-aware, and entirely opt-in.
-- **Four crates, one umbrella.** `snora-core` is the iced-free
+- **Five crates, one umbrella.** `snora-core` is the iced-free
   vocabulary, `snora-design` is the iced-free (opt-in) token system,
-  `snora-widgets` is the optional prefab UI parts, and `snora` is the
-  engine — applications only depend on `snora`.
+  `snora-style` is the opt-in iced style bridge, `snora-widgets` is the
+  optional prefab UI parts, and `snora` is the engine — applications
+  only depend on `snora`.
 
 ## Design notes
 

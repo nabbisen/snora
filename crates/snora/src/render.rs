@@ -2,7 +2,7 @@
 //!
 //! This is the only place in snora where composition of layers, backdrops,
 //! and z-order happens. Nothing else in the framework mutates layer state,
-//! and application code never touches [`iced::widget::stack`] directly when
+//! and application code never touches [`iced::widget::stack()`] directly when
 //! using snora.
 //!
 //! # Layer order (bottom to top)

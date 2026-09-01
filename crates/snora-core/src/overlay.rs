@@ -8,7 +8,7 @@
 //!
 //! # Sheets
 //!
-//! A [`Sheet`] is a panel that slides in from one of the four window
+//! A [`Sheet`] is a panel anchored to one of the four window
 //! edges ([`SheetEdge`]) and occupies a configurable size ([`SheetSize`])
 //! along the perpendicular axis. The engine resolves the enums to concrete
 //! pixels at render time, so this module remains iced-free.
@@ -171,7 +171,12 @@ impl SheetSize {
     }
 }
 
-/// A panel that slides in from one of the window edges.
+/// A panel anchored to one of the window edges.
+///
+/// No transition or animation is applied — the engine renders the sheet
+/// at its final position immediately (F-07, RFC-089); "slides in" in
+/// earlier revisions of this doc described the intended visual metaphor,
+/// not implemented behavior.
 ///
 /// Like [`Dialog`], a sheet is content only. The dim backdrop and its
 /// outside-click-to-close behavior are owned by the parent [`crate::AppLayout`].

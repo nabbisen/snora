@@ -22,8 +22,6 @@ contributor-facing documents linked below, not duplicated here.
   some contrast value, that is not a guarantee snora makes; see
   [API governance § Permitted without reopening the gate](../contributing/api-governance.md#permitted-without-reopening-the-gate)
   for the full statement.
-- **Non-colour status encoding.** Toast intents and notice tones are
-  distinguishable by more than colour alone in snora's prefab widgets.
 - **Keyboard reachability inherited from iced.** Native iced controls
   (`button`, `checkbox`, `pick_list`, …) keep iced's own keyboard event
   routing; snora does not intercept it.
@@ -62,6 +60,15 @@ contributor-facing documents linked below, not duplicated here.
 
 ## What snora does not provide
 
+- **No non-colour status encoding, yet.** `Toast` intents
+  (`ToastIntent::Info`/`Success`/`Warning`/`Error`/`Debug`, in
+  `crates/snora/src/toast.rs`'s `toast_style`) and `Notice` tones
+  (`crates/snora-widgets/src/design/notice.rs`) are distinguished only
+  by background/accent colour today — same title and body text
+  regardless of intent, no icon, no textual prefix. This is a WCAG
+  1.4.1 (use of colour) gap, corrected here (F-20, RFC-089) after this
+  page previously overstated it as already solved. Adding a non-colour
+  cue is a behaviour change and belongs in its own RFC, not this one.
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim

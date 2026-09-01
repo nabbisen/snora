@@ -12,6 +12,14 @@ This project is maintained as a labor of love. We welcome community participatio
 
 Thanks for understanding the scope and spirit of the project.
 
+## The contributor handbook
+
+The rest of this file is the short version. The full contributor
+handbook — architecture, design decisions, the RFC/release process,
+accessibility and API-governance checklists, and everything else a
+contributor eventually needs — lives at
+[`docs/src/contributing/`](../docs/src/contributing/README.md).
+
 ## Who commits what
 
 **Nobody commits changes they did not make** — see

@@ -2,13 +2,13 @@
 //!
 //! This module exposes three concerns:
 //!
-//! 1. [`render_toasts`] — internal renderer used by [`crate::render::render`].
+//! 1. `render_toasts` — internal renderer used by [`crate::render::render`].
 //!    Produces a toast stack at the requested [`ToastPosition`], with logical
 //!    Start/End anchoring resolved by [`LayoutDirection`], and the newest
 //!    toast rendered closest to the anchor edge.
-//! 2. [`subscription`] — a public helper that emits ticks for TTL sweep.
+//! 2. `subscription` — a public helper that emits ticks for TTL sweep.
 //!    Applications wire this into their `iced::Application::subscription`.
-//! 3. [`sweep_expired`] — a public helper that drops expired transient
+//! 3. `sweep_expired` — a public helper that drops expired transient
 //!    toasts from the application's toast queue.
 //!
 //! Together, (2) and (3) move toast TTL bookkeeping from application code

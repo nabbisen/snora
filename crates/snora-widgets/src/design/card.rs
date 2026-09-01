@@ -1,7 +1,7 @@
 //! Pilot card helper for Snora Design (RFC-029).
 //!
 //! Provides token-driven wrappers around `iced::widget::container` for the
-//! three semantic card variants: [`surface`], [`raised`], and [`selected`].
+//! three semantic card variants: `surface`, `raised`, and `selected`.
 //!
 //! # Non-interactive cards only
 //!

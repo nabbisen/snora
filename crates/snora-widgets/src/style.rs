@@ -26,8 +26,8 @@ use iced::{
 /// changes. This trades away the old (illegible) hover/press color
 /// differentiation; a future change may reintroduce it via a background
 /// highlight rather than a foreground shade, following the same pattern
-/// [`crate::sidebar::sidebar_button_style`] and
-/// [`crate::crumb::crumb_button_style`] already use for their own hover
+/// `crate::sidebar::sidebar_button_style` and
+/// `crate::crumb::crumb_button_style` already use for their own hover
 /// states — not done here, to keep this fix a re-pairing rather than an
 /// added visual element.
 pub fn menu_button_style(theme: &Theme, _status: button::Status) -> button::Style {
@@ -44,7 +44,7 @@ pub fn menu_button_style(theme: &Theme, _status: button::Status) -> button::Styl
 /// Thin-bordered chrome container used for the app header and footer.
 ///
 /// Radius fixed at `0.0` — today's literal, unchanged. See
-/// [`chrome_container_style_with_radius`] for the `design`-gated styled
+/// `chrome_container_style_with_radius` for the `design`-gated styled
 /// chrome widgets' (RFC-040) token-derived radius.
 pub fn chrome_container_style(theme: &Theme) -> container::Style {
     chrome_container_style_with_radius(theme, 0.0)
@@ -94,7 +94,7 @@ pub(crate) fn chrome_container_style_with_radius(theme: &Theme, radius: f32) -> 
 /// (stock light) / 2.20:1 (stock dark) against the rail's own
 /// background — under the 3.0:1 non-text floor, and this was the
 /// *only* cue an active item had (also a WCAG 1.4.1 use-of-colour
-/// concern, addressed in [`crate::sidebar::sidebar_button_style`]'s own
+/// concern, addressed in `crate::sidebar::sidebar_button_style`'s own
 /// doc comment). `primary.base` came within 0.01 of the floor on stock
 /// Dark (2.99:1) — not a margin to ship on. `primary.strong` clears it
 /// with real margin in every preset and both stock themes.

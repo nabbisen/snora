@@ -1,8 +1,8 @@
 //! Pilot button helper for Snora Design (RFC-028).
 //!
 //! Provides ergonomic, token-driven wrappers around `iced::widget::button`
-//! for the four semantic variants: [`primary`], [`secondary`], [`ghost`], and
-//! [`danger`].
+//! for the four semantic variants: `primary`, `secondary`, `ghost`, and
+//! `danger`.
 //!
 //! # Token cloning
 //!
