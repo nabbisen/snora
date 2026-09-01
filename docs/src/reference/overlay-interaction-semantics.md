@@ -64,8 +64,15 @@ If an overlay is populated but its close sink is `None`, the engine still
 renders the content:
 
 - **Modal overlays** — the dim layer still paints (to signal "this is
-  modal"), but outside clicks are not captured. The application must
-  provide explicit close controls inside the overlay content.
+  modal"), **and still blocks pointer input from reaching content
+  beneath it** (RFC-084) — clicking or scrolling over the dim does
+  nothing rather than reaching whatever is underneath. It just produces
+  no dismiss message, since there is none to produce. The application
+  must provide explicit close controls inside the overlay content.
+  Before 0.41.0, a missing close sink meant the dim did not capture
+  input at all — a click over it fell through to the layer beneath,
+  which contradicted Law 8's own "Pointer blocking — yes" and is what
+  RFC-084 corrected.
 - **Menu overlays** — the transparent outside-click backdrop is omitted;
   the menu still renders.
 
@@ -108,7 +115,7 @@ These are distinct concerns:
 | Concern | Snora provides? |
 |---|:--:|
 | Visual modality (dim layer) | yes |
-| Pointer blocking (backdrop capture) | yes |
+| Pointer blocking (backdrop capture) | yes — the backdrop, the dialog, the sheet, and toasts each capture pointer input over their own bounds, so nothing beneath a modal or a toast is reachable through it (RFC-084; negative assertions in `crates/snora/tests/render_semantics.rs`). Covers both clicks and wheel-scroll. Independent of whether a close sink is provided (Law 5). |
 | Keyboard dismissal (Escape) | no — application-owned (Law 7) |
 | Frame-level zone navigation | **yes (RFC-060)** — `snora_core::focus::next_zone`; **suspended** while a modal is open (it reports this rather than guessing where focus inside the modal should go), unaffected while only a menu is open |
 | Focus trapping *inside* an open modal | no — staged behind a separate decision (RFC-060 Q-1); see [design decisions](../contributing/design-decisions.md#why-focus-trapping-is-deferred-v014) for the constraint it inherits |
