@@ -1,6 +1,8 @@
 # RFC 091 — Trusted Publishing, and a deferral with a date on it
 
-**Status.** Proposed (2026-09-02).
+**Status.** **Archived — superseded by RFC-090, 2026-09-02, the same day it
+was opened.** Never accepted; nothing was deferred in the end.
+See "Why this was archived" below.
 **Tracks.** Release integrity / credentials. **Severity: Medium.**
 **Found by** RFC-090's Q-2, ruled 2026-09-02. Opened at the moment of the
 deferral, not after it.
@@ -96,3 +98,40 @@ without a named condition becomes the default.)
 3. If not adopted: **this RFC is archived with the reason**, not left proposed.
    A permanently open RFC is the same failure as a permanently renewed deferral,
    wearing the other hat.
+
+
+---
+
+## Why this was archived
+
+**RFC-090 re-ruled Q-2 and adopted Trusted Publishing directly.** This RFC
+existed to keep a deferral honest; there is no longer a deferral to keep.
+
+The first Q-2 ruling chose a scoped API token and pushed Trusted Publishing
+here, with a firing condition, so that it could not quietly become permanent —
+the F-39 failure this document was written against. Hours later the owner asked
+why they should configure crates.io twice. They would not have; the two are
+different one-time actions and the second retires the first. But the question
+exposed the real defect: **the ruling had them create a credential we already
+planned to delete**, to spare the implementer an uncertainty that Unit 1 and
+Unit 2 never touch. All three refusals fire before any upload, so no credential
+is needed until the first real publish — by which time `release.yaml` exists and
+the workflow-filename binding this RFC's sequencing worried about is settled.
+
+So the deferral was not made more honest by this document. It was unnecessary,
+and the document made it look considered.
+
+**This is the outcome criterion 3 named** — *"If not adopted: this RFC is
+archived with the reason, not left proposed. A permanently open RFC is the same
+failure as a permanently renewed deferral, wearing the other hat."* Written
+before there was any reason to think it would fire within the day.
+
+### What did not get lost
+
+Q-1 — whether one OIDC exchange authorizes all five uploads of a `cargo publish
+--workspace` call — **remains unanswered and is now RFC-090's**, recorded in its
+Q-2 with the risk explicitly accepted and bounded to the publish step. The
+implementer's research stands: per-crate configuration confirmed, one-token
+coverage not confirmed, and the inference labelled as an inference.
+
+Q-3 is moot: no token is created, so none needs revoking.

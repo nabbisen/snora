@@ -37,14 +37,17 @@ against 67 bare tags, and this trigger would not have fired for it.
 The job checks out the tag and runs `cargo publish --workspace`. **One command,
 five crates, as today** — RFC-090 does not change what is published.
 
-Three refusals, before any upload:
+Two refusals you write, before any upload — they map exactly onto Unit 2's
+three test cases (the first covers two of them):
 
 1. **The tagged commit has no green CI run.** **Q-5 ruled: require the existing
    run; do not re-run the suites.** Re-running is slow and, worse, can pass on a
    commit whose earlier run failed. **Fail closed** — if no run is found, that is
    a refusal, not a pass. This is the whole point of the RFC; get it right.
 2. **The tag does not match `[workspace.package].version` in `Cargo.toml`.**
-3. **Q-2's answer is not configured.** See below.
+A missing credential needs no refusal of yours: with Trusted Publishing the
+auth step fails on its own, before `cargo publish` runs. Do not write a check
+for it.
 
 A clean tree at the tag needs no check — the workflow *is* one. That is the
 mechanism doing the work instead of a sentence asking someone to remember.
@@ -81,31 +84,49 @@ The three prose rules the mechanism replaces get **removed**, not left standing
 beside it. Stale process text is how `release-process.md:53` came to be ignored
 while sitting in the same file as the rule that has never failed.
 
-## Q-2 — ruled: scoped crates.io API token
+## Q-2 — ruled: Trusted Publishing (OIDC). **No API token, ever.**
 
-**Not Trusted Publishing.** The implementer verified as asked and could not
-close whether one OIDC exchange authorizes a five-crate workspace publish. The
-ruling does not depend on it: the credential mechanism is orthogonal to the
-three properties this RFC buys, and an unverified improvement must not gate a
-certain one. Trusted Publishing is **RFC-091**, with its firing condition set to
-the first cut through `release.yaml`.
+*Re-ruled 2026-09-02, same day, replacing an earlier ruling that chose a scoped
+API token. That ruling would have had the owner create a credential we intended
+to delete. It is corrected in RFC-090's Q-2 with the reasoning; read it there
+rather than inferring it from this section.*
 
-The token is scoped, and the scoping is not optional:
+**Units 1 and 2 need no credential at all.** All three refusals fire before any
+upload, so you can write `release.yaml` and produce every piece of Unit 2's
+evidence with nothing configured. **Start now; nothing is waiting on the owner.**
 
-- **crates:** `snora`, `snora-core`, `snora-design`, `snora-style`,
-  `snora-widgets` — nothing else the account owns
-- **endpoints:** `publish-update` only — not `publish-new`, `yank`, or
-  `change-owners`
-- **an expiry**, and the publish job in a protected GitHub environment so the
-  secret is not readable by arbitrary runs
+Order of operations:
 
-**Owner action:** creating that token and adding it as a repo secret. Unit 1 can
-be written before it exists; only the final publish step needs it.
+1. **You:** write `release.yaml`, prove the three refusals against a scratch tag.
+2. **Owner:** configures Trusted Publishing on the five crates, bound to the
+   workflow filename you settled on. One crates.io action, performed once. **Tell
+   them the exact filename** when you get there — the configuration binds to it,
+   and renaming the file later silently breaks publishing.
+3. **First real cut:** publishes over OIDC. No secret is created, so there is
+   nothing to revoke.
 
-**Do not fold the credential into unit 2's evidence.** All three refusals fire
-before any upload, so every piece of unit 2 is producible with no secret
-configured. A test that proves two unrelated things at once proves neither
-cleanly.
+Use `rust-lang/crates-io-auth-action` for the exchange, then `cargo publish
+--workspace`.
+
+### The one unconfirmed thing, and what to do about it
+
+It is **not confirmed** whether a single OIDC exchange authorizes all five
+uploads of one `cargo publish --workspace` call, or whether each crate needs its
+own authenticate-and-publish step. You researched this and could not close it
+from documentation; that finding stands and was not overruled.
+
+**The decision accepts that risk deliberately.** If it turns out to need a
+per-crate loop, what changes is the **publish step** — not the workflow, not the
+refusals, not Unit 2's evidence. Contained.
+
+So: **do not attempt to resolve it before step 3, and do not design around
+both possibilities.** Write the `--workspace` form. If step 3 disproves it,
+reshape the publish step then, with the real error in hand. A workflow written
+to hedge an unanswered question is harder to review than one written to a stated
+assumption that turned out wrong.
+
+Record the answer either way — RFC-090's Q-2 asks for it explicitly, and it is
+the last open fact in this design.
 
 ## Q-6 — housekeeping, owner
 

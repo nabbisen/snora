@@ -8,8 +8,7 @@ Status field is kept consistent with its folder.
 - `proposed/` — open for review; implementer should **not** start.
 - `accepted/` — owner signed off; implementer may start; not yet shipped.
 - `done/` — implemented; historical record of the design.
-- `archive/` — withdrawn or superseded. Created on first use; no RFC
-  has been withdrawn or superseded yet.
+- `archive/` — withdrawn or superseded. Two entries: RFC-078 and RFC-091.
 
 snora uses the lifecycle policy's **five-folder variant** (adopted
 2026-08-19), because here *"the maintainer signed off"* and *"the implementer
@@ -157,7 +156,6 @@ RFC-090 is not from the audit — it comes from the 0.41.1 cut.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 091 | [Trusted Publishing, and a deferral with a date on it](./proposed/091-trusted-publishing.md) | fires at the first cut through `release.yaml` — Medium |
 
 ## Archive
 
@@ -166,6 +164,7 @@ Withdrawn or superseded — see [`archive/README.md`](./archive/README.md).
 | ID | Title | Superseded by |
 |----|-------|---------------|
 | 078 | [Measure what iced's `advanced` feature costs](./archive/078-measure-what-iceds-advanced-feature-costs.md) | The owner's ruling that `advanced` must never be a default, plus the finding that **no consumer ever requested it** — the measurement's only question |
+| 091 | [Trusted Publishing, and a deferral with a date on it](./archive/091-trusted-publishing.md) | **RFC-090**, which adopted Trusted Publishing directly — the deferral this RFC existed to keep honest turned out to be unnecessary |
 
 
 _(none yet)_

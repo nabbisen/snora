@@ -113,11 +113,43 @@ adds a confirmation step but makes the tag no longer sufficient, which splits
 the act of cutting in two. **Suggest tag push**, pattern-restricted to
 `[0-9]+.[0-9]+.[0-9]+`.
 
-**Q-2 — credentials.** Publishing from CI needs a crates.io token as a repo
-secret, or crates.io Trusted Publishing (OIDC, no long-lived token). Trusted
-Publishing is strictly better if it supports this workspace shape; it needs
-checking, not assuming. **This question must be answered before implementation
-starts** — it is the only part with a security consequence.
+**Q-2 — credentials. Ruled 2026-09-02: crates.io Trusted Publishing (OIDC).
+No long-lived token is created at any point.**
+
+*First ruled the other way, and corrected the same day.* The first ruling chose
+a scoped API token to keep an unverified mechanism out of Unit 1, and deferred
+Trusted Publishing to RFC-091. It was wrong in a way worth recording: it bought
+certainty for the implementer by making the owner **create a credential we
+already intended to delete**, and it read "do the setup once, later" as cheaper
+than "do the setup once, now" when both are the same single action on
+crates.io. The owner asked why they were paying twice. They were not paying
+twice, but they were paying for something disposable, which is worse.
+
+**The sequencing objection that produced the first ruling dissolves on
+inspection.** A Trusted Publisher Configuration binds to a workflow *filename*,
+and `release.yaml` does not exist yet — so it looked as though a credential was
+needed before the file could be written. It is not: **Unit 1 and Unit 2 need no
+credential at all.** The three refusals all fire before any upload. Only the
+final publish step authenticates, and by the time it runs, the filename is
+settled and the configuration can point at something real.
+
+Order of operations:
+
+1. Implementer writes `release.yaml`; proves the three refusals (Unit 2). No
+   credential exists.
+2. Filename now fixed. **Owner** configures Trusted Publishing on the five
+   crates against that workflow — the one crates.io action, performed once.
+3. First cut publishes over OIDC. Nothing to revoke afterwards.
+
+**The residual risk is accepted, named, and bounded.** It remains unconfirmed
+whether one OIDC exchange authorizes all five uploads of a `cargo publish
+--workspace` call, or whether each crate needs its own authenticate-and-publish
+step. If it is the latter, the **publish step** is reshaped into a per-crate
+loop — not the workflow, not the refusals, not Unit 2's evidence. That is a
+contained blast radius, and it is hit once, deliberately, at the moment the
+question can actually be answered instead of researched.
+
+Answer it empirically at step 3 and record the result.
 
 **Q-3 — partial publish.** `cargo publish --workspace` uploads five crates in
 dependency order and can fail after two. Today a person sees that and reacts.
