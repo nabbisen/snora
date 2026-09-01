@@ -15,6 +15,23 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.41.1] — 2026-09-02
+
+### Added
+
+- **A troubleshooting guide (`docs/src/guides/troubleshooting.md`).**
+  Five errors this project has actually produced for the people using
+  it, each with the cause and the fix: `E0027` from the exhaustive
+  `Palette`/`Typography` destructuring pattern (RFC-063), `E0638` when
+  that pattern is attempted from outside the defining crate, the `E0433`
+  that appears only when the `widgets` and `design` features are
+  combined (RFC-054/RFC-055), `failed to select a version for the
+  requirement 'snora-core = "^0.NN"'` after a minor bump, and
+  `fatal: no tag message?` when signing a release tag. Linked from the
+  book's guides section.
+
 ### Fixed
 
 - **The accessibility guide claimed toast and notice tone was
@@ -2807,7 +2824,8 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.25.1...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/v0.41.1...HEAD
+[0.41.1]: https://github.com/nabbisen/snora/compare/v0.41.0...v0.41.1
 [0.25.1]: https://github.com/nabbisen/snora/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/nabbisen/snora/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/nabbisen/snora/compare/v0.23.0...v0.24.0

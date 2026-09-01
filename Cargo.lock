@@ -3087,7 +3087,7 @@ dependencies = [
 
 [[package]]
 name = "snora"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "iced_test",
@@ -3100,7 +3100,7 @@ dependencies = [
 
 [[package]]
 name = "snora-book-snippets"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3109,18 +3109,18 @@ dependencies = [
 
 [[package]]
 name = "snora-core"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "lucide-icons",
 ]
 
 [[package]]
 name = "snora-design"
-version = "0.41.0"
+version = "0.41.1"
 
 [[package]]
 name = "snora-example-breadcrumb"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3128,7 +3128,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-context-menu"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3136,7 +3136,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-design-workbench"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3144,7 +3144,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-dialog"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3152,7 +3152,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-header-menu"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3160,7 +3160,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-hello"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3168,7 +3168,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-multi-view"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3176,7 +3176,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-responsive"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3184,7 +3184,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-responsive-body"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3192,7 +3192,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-rtl"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3200,7 +3200,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-sheet"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3208,7 +3208,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-skeleton"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3216,7 +3216,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-starter"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3224,7 +3224,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-tab"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3232,7 +3232,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-toast"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3240,7 +3240,7 @@ dependencies = [
 
 [[package]]
 name = "snora-example-workbench"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3248,7 +3248,7 @@ dependencies = [
 
 [[package]]
 name = "snora-size-probe-design"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3256,7 +3256,7 @@ dependencies = [
 
 [[package]]
 name = "snora-size-probe-design-engine"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3264,7 +3264,7 @@ dependencies = [
 
 [[package]]
 name = "snora-size-probe-engine"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3272,7 +3272,7 @@ dependencies = [
 
 [[package]]
 name = "snora-size-probe-widgets"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora",
@@ -3280,7 +3280,7 @@ dependencies = [
 
 [[package]]
 name = "snora-style"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "snora-design",
@@ -3288,7 +3288,7 @@ dependencies = [
 
 [[package]]
 name = "snora-widgets"
-version = "0.41.0"
+version = "0.41.1"
 dependencies = [
  "iced",
  "lucide-icons",
