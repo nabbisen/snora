@@ -5,8 +5,9 @@
 **Release target.** **Must exist before the 0.42.0 tag is pushed** — that cut is
 the first one it governs. **No crate code.**
 **Implementation units.** Two, plus one that is not yours.
-**Blocked on:** Q-2 below. **Do not start unit 1 until the owner has answered
-it** — it is the only part with a security consequence.
+**Q-2 ruled 2026-09-02 — unit 1 is unblocked.** See
+`.git-exclude/reviewed/090-q2-trusted-publishing-verification/review-result.md`.
+Unit 2 needs no credential at all and may start immediately.
 
 ---
 
@@ -80,16 +81,31 @@ The three prose rules the mechanism replaces get **removed**, not left standing
 beside it. Stale process text is how `release-process.md:53` came to be ignored
 while sitting in the same file as the rule that has never failed.
 
-## Open question for the owner — Q-2, blocking
+## Q-2 — ruled: scoped crates.io API token
 
-Publishing from CI needs credentials: either a crates.io API token as a repo
-secret, or crates.io **Trusted Publishing** (OIDC, no long-lived token).
+**Not Trusted Publishing.** The implementer verified as asked and could not
+close whether one OIDC exchange authorizes a five-crate workspace publish. The
+ruling does not depend on it: the credential mechanism is orthogonal to the
+three properties this RFC buys, and an unverified improvement must not gate a
+certain one. Trusted Publishing is **RFC-091**, with its firing condition set to
+the first cut through `release.yaml`.
 
-Trusted Publishing is the better answer if it supports a five-crate workspace
-publish — **verify that, do not assume it.** Either way the owner creates the
-credential; the implementer cannot.
+The token is scoped, and the scoping is not optional:
 
-**Until this is answered, unit 1 cannot start.**
+- **crates:** `snora`, `snora-core`, `snora-design`, `snora-style`,
+  `snora-widgets` — nothing else the account owns
+- **endpoints:** `publish-update` only — not `publish-new`, `yank`, or
+  `change-owners`
+- **an expiry**, and the publish job in a protected GitHub environment so the
+  secret is not readable by arbitrary runs
+
+**Owner action:** creating that token and adding it as a repo secret. Unit 1 can
+be written before it exists; only the final publish step needs it.
+
+**Do not fold the credential into unit 2's evidence.** All three refusals fire
+before any upload, so every piece of unit 2 is producible with no secret
+configured. A test that proves two unrelated things at once proves neither
+cleanly.
 
 ## Q-6 — housekeeping, owner
 

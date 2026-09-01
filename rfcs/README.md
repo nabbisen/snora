@@ -157,6 +157,7 @@ RFC-090 is not from the audit — it comes from the 0.41.1 cut.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 091 | [Trusted Publishing, and a deferral with a date on it](./proposed/091-trusted-publishing.md) | fires at the first cut through `release.yaml` — Medium |
 
 ## Archive
 
