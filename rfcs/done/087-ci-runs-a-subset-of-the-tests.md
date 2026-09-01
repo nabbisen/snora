@@ -1,7 +1,14 @@
 # RFC 087 — CI runs a subset of the tests, and a conditional deferral has been renewed by habit
 
-**Status.** Accepted (owner, 2026-09-01). Handoff written — see
-[`handoffs/087-…`](../handoffs/087-ci-runs-a-subset-of-the-tests/implementation-handoff.md).
+**Status.** Done — shipped in v0.41.1 (2026-09-02).
+[Handoff](../handoffs/087-ci-runs-a-subset-of-the-tests/implementation-handoff.md).
+**Open defect: D-1** — the migration-guide gate cannot run in CI
+(`actions/checkout` fetches no tags; the script derives its input from
+`git tag --list` and dies under `pipefail` before its first line of output).
+CI has been red since `c651e93`. Reproduction and required fixes in
+`.git-exclude/reviewed/087-ci-runs-a-subset-of-the-tests/review-result.md`.
+**RFC-090 is blocked on this** — a green-CI precondition would block every
+release until D-1 lands.
 **Tracks.** CI / measurement integrity. **Severity: High.**
 **Found by** the external audit, 2026-09-01 (F-29, F-30, F-39).
 **Touches.** `.github/workflows/ci.yaml`,
