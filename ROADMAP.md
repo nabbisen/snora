@@ -135,6 +135,21 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Recently shipped
 
+- **0.41.0** — **Both Criticals from the external audit.** A click on a dialog's
+  own text dismissed it: `render_dialog` wrapped content in `center()` with no
+  `opaque`, while `sheet.rs` did it correctly three files away. Four surfaces
+  had the same omission — the dialog, the no-sink dim, scroll, and the toast
+  stack. **Every render-semantics test before this was positive-only**, which is
+  why a dialog that dismissed itself passed all of them; six negative
+  assertions, derived from Law 8's own table, now exist and **gate 5 is
+  reopened** (eight of ten → seven). Separately, the widget layer paired colours
+  across token families — menu text at **1.89:1**, a sidebar icon at **1.51:1
+  under `high_contrast_dark`**, the preset that exists for low-vision users, now
+  9.96 and the best of the four. **The contrast suite that found them is the
+  first this project has had in `snora-widgets`**, and it states plainly what
+  its own derivation cannot reach.
+
+
 - **Gate 9 split (recorded v0.29.0).** Binary-size trend monitoring is
   **satisfied** — four rows on one runner and methodology, and the series
   tracks real change. Compile-time monitoring stays **open**: the same four

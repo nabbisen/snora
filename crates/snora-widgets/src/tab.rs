@@ -210,11 +210,19 @@ pub(crate) fn tab_bar_container_style(theme: &Theme, border_radius: f32) -> cont
 /// `width: 0.0` and paints nothing) still does, and a decorative
 /// accent line carries no text-contrast requirement the way the label
 /// itself does.
-pub(crate) fn tab_button_style(theme: &Theme, status: button::Status, is_active: bool) -> button::Style {
+pub(crate) fn tab_button_style(
+    theme: &Theme,
+    status: button::Status,
+    is_active: bool,
+) -> button::Style {
     let palette = theme.extended_palette();
 
     let (background, text_color, border_color) = match (is_active, status) {
-        (true, _) => (None, palette.background.base.text, palette.primary.base.color),
+        (true, _) => (
+            None,
+            palette.background.base.text,
+            palette.primary.base.color,
+        ),
         (false, button::Status::Hovered) => (
             Some(Background::Color(palette.background.weak.color)),
             palette.background.base.text,

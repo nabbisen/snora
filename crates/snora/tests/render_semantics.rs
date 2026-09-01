@@ -597,4 +597,3 @@ fn dialog_and_sheet_coexist_sheet_content_reachable() {
         "sheet button click must produce SheetAction in coexistence layout; got {msgs:?}",
     );
 }
-

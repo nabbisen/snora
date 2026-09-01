@@ -133,6 +133,8 @@ Numbers remain stable forever and are never reused.
 | 081 | [The 12-pixel text floor is the one mandatory number nothing asserts](./done/081-the-12px-text-floor-is-asserted-nowhere.md) | v0.39.2 (handoff: [`handoffs/081-…`](./handoffs/081-the-12px-text-floor-is-asserted-nowhere/implementation-handoff.md)) |
 | 082 | [Three keyboard-and-focus statements a reader cannot trust](./done/082-three-keyboard-and-focus-statements-a-reader-cannot-trust.md) | v0.39.2 (handoff: [`handoffs/082-…`](./handoffs/082-three-keyboard-and-focus-statements-a-reader-cannot-trust/implementation-handoff.md)) |
 | 083 | [One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`](./done/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md) | v0.40.0 (handoff: [`handoffs/083-…`](./handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md)) |
+| 084 | [Overlays do not contain pointer events, and the dialog dismisses itself](./done/084-overlays-do-not-contain-pointer-events.md) | v0.41.0 — **Critical** (handoff: [`handoffs/084-…`](./handoffs/084-overlays-do-not-contain-pointer-events/implementation-handoff.md)) |
+| 085 | [The widget layer pairs colours from different families, and no contrast suite can see it](./done/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite.md) | v0.41.0 — **Critical** (handoff: [`handoffs/085-…`](./handoffs/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -150,8 +152,6 @@ release-blocking Criticals, both reproduced by the architect before opening.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 084 | [Overlays do not contain pointer events, and the dialog dismisses itself](./accepted/084-overlays-do-not-contain-pointer-events.md) | **v0.41.0 — Critical.** Reproduced: a click on a dialog's own text emits `on_close_modals` |
-| 085 | [The widget layer pairs colours from different families, and no contrast suite can see it](./accepted/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite.md) | **v0.42.0 — Critical.** Menu text measured at 1.89:1 |
 | 086 | [The engine's toast colours fail their own thresholds](./accepted/086-engine-toast-contrast.md) | v0.41.0 — High |
 | 087 | [CI runs a subset of the tests, and a conditional deferral has been renewed by habit](./accepted/087-ci-runs-a-subset-of-the-tests.md) | v0.40.2 — High |
 | 088 | [The workspace forces three iced features nobody asked for](./accepted/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High |

@@ -293,8 +293,8 @@ fn dim_without_capture<'a, Message>(dim_color: Color) -> Element<'a, Message>
 where
     Message: 'a,
 {
-    use iced::{Background, widget::container::Style};
     use iced::widget::opaque;
+    use iced::{Background, widget::container::Style};
 
     opaque(
         container(space())

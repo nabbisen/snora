@@ -19,5 +19,5 @@ path = "src/main.rs"
 # the comment on workspace.dependencies.snora in the root Cargo.toml,
 # which must be edited alongside this one on every minor bump.
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.40", default-features = false, features = ["design"] }
+snora = { path = "../../crates/snora", version = "0.41", default-features = false, features = ["design"] }
 iced  = { workspace = true }

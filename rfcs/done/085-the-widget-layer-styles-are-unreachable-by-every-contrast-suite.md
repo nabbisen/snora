@@ -1,7 +1,7 @@
 # RFC 085 — The widget layer pairs colours from different families, and no contrast suite can see it
 
-**Status.** Accepted (owner, 2026-09-01). Handoff written — see
-[`handoffs/085-…`](../handoffs/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite/implementation-handoff.md).
+**Status.** Done — shipped in v0.41.0 (2026-09-01).
+[Handoff](../handoffs/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite/implementation-handoff.md).
 **Tracks.** Accessibility / test reach. **Severity: Critical.**
 **Found by** an external architect's audit, 2026-09-01 (F-13, F-14, F-15, F-31).
 **F-13 measured by the architect before opening.**

@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.41.0] — 2026-09-01
+
 ### Fixed
 
 - **Overlays did not contain pointer events — a click inside a dialog

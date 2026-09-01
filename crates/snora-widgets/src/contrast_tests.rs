@@ -141,7 +141,13 @@ fn to_sn(c: Color) -> snora_design::Color {
 /// `assert!` per combination would stop at the first failure and hide
 /// how many others exist, which is exactly the "state every figure"
 /// requirement this suite exists to satisfy.
-fn text_contrast_failure(context: &str, case: &str, status: button::Status, fg: Color, bg: Color) -> Option<String> {
+fn text_contrast_failure(
+    context: &str,
+    case: &str,
+    status: button::Status,
+    fg: Color,
+    bg: Color,
+) -> Option<String> {
     let r = contrast_ratio(to_sn(fg), to_sn(bg));
     (r < AA_TEXT).then(|| {
         format!(
@@ -157,7 +163,12 @@ fn text_contrast_failure(context: &str, case: &str, status: button::Status, fg: 
 /// active-state border and `crumb_button_style`'s border are both
 /// `width: 0.0`, used only to carry a color the shadow/underline effect
 /// borrows, not to paint an actual border).
-fn border_contrast_failure(context: &str, case: &str, border: iced::Border, bg: Color) -> Option<String> {
+fn border_contrast_failure(
+    context: &str,
+    case: &str,
+    border: iced::Border,
+    bg: Color,
+) -> Option<String> {
     if border.width <= 0.0 {
         return None;
     }
@@ -338,7 +349,12 @@ fn tab_button_style_text_meets_aa() {
                     style.text_color,
                     actual_bg,
                 ));
-                failures.extend(border_contrast_failure(context, &case, style.border, actual_bg));
+                failures.extend(border_contrast_failure(
+                    context,
+                    &case,
+                    style.border,
+                    actual_bg,
+                ));
             }
         }
     }
@@ -373,4 +389,3 @@ fn crumb_button_style_text_meets_aa() {
     }
     assert_no_failures(failures);
 }
-

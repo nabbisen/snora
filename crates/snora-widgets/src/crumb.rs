@@ -164,7 +164,11 @@ where
 /// against. Measured: 3.42:1 (stock light), 2.99–2.03:1 (stock dark).
 /// `background.base.text` / `background.weak.text` are iced's own
 /// guaranteed pairings for the two backgrounds this actually paints.
-pub(crate) fn crumb_button_style(theme: &Theme, status: button::Status, radius: f32) -> button::Style {
+pub(crate) fn crumb_button_style(
+    theme: &Theme,
+    status: button::Status,
+    radius: f32,
+) -> button::Style {
     use iced::{Background, Border};
     let palette = theme.extended_palette();
     let (background, text_color) = match status {
