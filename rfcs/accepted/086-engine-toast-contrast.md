@@ -5,7 +5,7 @@
 **Tracks.** Accessibility. **Severity: High.**
 **Found by** the external audit, 2026-09-01 (F-05, F-06).
 **Touches.** `crates/snora/src/toast.rs`.
-**Release target.** 0.41.0 — **minor.** Rendered appearance changes.
+**Release target.** 0.42.0 — **minor.** Rendered appearance changes.
 
 ## The two
 

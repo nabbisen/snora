@@ -2,7 +2,12 @@
 
 **Governing RFC.** [RFC-087](../../accepted/087-ci-runs-a-subset-of-the-tests.md)
 **Status.** Accepted (owner, 2026-09-01). High.
-**Release target.** 0.40.2 — CI and documentation. **No crate code.**
+**Release target.** **0.41.1** — CI and documentation. **No crate code.**
+*(Re-targeted 2026-09-01: this said 0.40.2, which is now in the past — 0.41.0
+shipped first. **The ordering was wrong and the consequence is on the record:**
+this RFC was scheduled to ship before the two Criticals precisely because it is
+what should have caught them, and it did not ship at all. It is now the oldest
+unstarted item from the audit.)*
 **Implementation units.** Three. **Ships first, before the Criticals** — it costs
 nothing and it is what should have caught them.
 

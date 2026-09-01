@@ -115,6 +115,7 @@ RFC-087).
 |---|---|---|
 | **0.40.2** | 087, 089 | **No crate code.** CI coverage, gate-5 correction, documentation sweep. Ships first because it costs nothing and removes noise from the two that matter |
 | **0.41.0** | 084, **085** | **Both Criticals, together.** The plan split them so 085's new contrast suite would not delay 084's validated fix — **the suite was finished before the cut, so the condition ended and the split with it.** Holding 085 for a separate release would have cost a cycle for a reason that no longer applied (RFC-087's own finding, applied to ourselves) |
+| **0.41.1** | 087, 089 | CI coverage and the documentation sweep. **Was 0.40.2 and did not ship** — 087 was scheduled *first* because it is what should have caught both Criticals, and it is now the oldest unstarted item from the audit |
 | **0.42.0** | 086, 088 | Toast contrast and the `iced` feature removal — neither submitted yet, both needing their own measurements |
 
 **Why 084 and 085 ended up in the same release after all.** The split was

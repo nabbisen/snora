@@ -2,8 +2,10 @@
 
 **Governing RFC.** [RFC-089](../../accepted/089-documentation-and-hygiene-sweep.md)
 **Status.** Accepted (owner, 2026-09-01). Medium/Low.
-**Release target.** 0.40.2 — documentation and metadata. **No public API, no
-behaviour.**
+**Release target.** **0.41.1** — documentation and metadata. **No public API,
+no behaviour.**
+*(Re-targeted 2026-09-01: this said 0.40.2, which is in the past. Ships with
+RFC-087; both are documentation-and-CI only.)*
 **Implementation units.** Thirteen, independent. Any order. **Some may be
 dropped — see §4.**
 

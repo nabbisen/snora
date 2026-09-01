@@ -2,7 +2,11 @@
 
 **Governing RFC.** [RFC-086](../../accepted/086-engine-toast-contrast.md)
 **Status.** Accepted (owner, 2026-09-01). High.
-**Release target.** 0.41.0 — **minor.** Rendered appearance changes.
+**Release target.** **0.42.0** — **minor.** Rendered appearance changes.
+*(Re-targeted 2026-09-01: this said 0.41.0, and 0.41.0 shipped without it. The
+release carried RFC-084 and RFC-085 instead, so a guide named
+`migration-0.40-to-0.41.md` already exists and is not yours. Write against
+0.42.0.)*
 **Implementation units.** One. Ships with RFC-084.
 
 ---

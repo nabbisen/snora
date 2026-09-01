@@ -6,7 +6,7 @@
 **Found by** the external audit, 2026-09-01 (F-29, F-30, F-39).
 **Touches.** `.github/workflows/ci.yaml`,
 `docs/src/contributing/api-freeze-review.md`, `scripts/README.md`.
-**Release target.** 0.40.2 — CI and documentation. **No crate code.**
+**Release target.** 0.41.1 — CI and documentation. **No crate code.**
 
 ## F-29 — two crates' suites have never run in CI
 

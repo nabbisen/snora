@@ -5,7 +5,7 @@
 **Tracks.** Documentation / hygiene. **Severity: Medium and Low.**
 **Found by** the external audit, 2026-09-01 (F-07, F-16–F-25, F-28, F-33, F-34,
 F-38).
-**Release target.** 0.40.2 — documentation and non-behavioural. **No public API.**
+**Release target.** 0.41.1 — documentation and non-behavioural. **No public API.**
 
 ## Why one RFC and not twelve
 
