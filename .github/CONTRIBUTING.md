@@ -11,3 +11,9 @@ This project is maintained as a labor of love. We welcome community participatio
 - If you have a different direction in mind, please fork freely, provided proper licensing is respected.
 
 Thanks for understanding the scope and spirit of the project.
+
+## Who commits what
+
+**Nobody commits changes they did not make** — see
+[Release process § Who commits what](../docs/src/contributing/release-process.md#who-commits-what)
+for the rule, its one exception, and the incident that produced it.

@@ -59,6 +59,47 @@ Do not confuse the **CI docs job** (PR gate) with the **Docs workflow**
 (deployment). They run mdBook with the same `^0.5` locked version; keeping
 them in sync is a release-process invariant.
 
+## Who commits what
+
+**Nobody commits changes they did not make.** The rule binds every role
+symmetrically — the architect as much as the dev team.
+
+- **Implementation work is committed by whoever implemented it**, one commit per
+  RFC, when the submission is accepted. They wrote it; they can describe it.
+- **The architect commits** review results, RFCs, handoffs, and the release
+  mechanics — version bump, CHANGELOG roll, RFC folder moves, tag.
+
+**`git add -A` is the instrument that makes the violation possible.** Stage
+explicitly. **If `git status` shows paths you did not touch, stop and say so**
+rather than including them — that moment is the whole control, and it is visible
+in the staging output every time.
+
+**A consequence, and it is intended:** if implementation work is still
+uncommitted at cut time, the release is *blocked* until its author commits it.
+That forces the handover to be explicit instead of implicit, and means a release
+can no longer quietly contain work nobody signed for.
+
+**The one exception, on the record rather than silent.** If an author is
+genuinely unavailable and their work must land, whoever commits it **says so in
+the message** — whose work it is, and why they are committing it.
+
+### The instance this rule exists for
+
+Commit **`df1752d`** (2026-09-01, since split) was titled *"RFC-085 header:
+correct the release target to 0.42.0"* and contained **700 lines implementing
+two Critical RFCs** — `contrast_tests.rs`, the dialog fix, `render.rs`, four
+widget files. The architect ran `git add -A` for a one-line header edit while
+the dev team's accepted-but-uncommitted work sat in the tree.
+
+Nothing was lost and CI stayed green. **The history said something untrue**, and
+it said it because implementation work was waiting in the working tree for
+somebody else to commit it. It was split into three honest commits and
+force-pushed the same day.
+
+Raised as a clarification request by the dev team, who noticed that nothing
+assigned commit responsibility in writing and declined to keep calling the
+observed pattern a rule.
+
 ## Release checklist
 
 **The migration guide is the canonical statement of what a release
@@ -129,6 +170,13 @@ restate the guide's content.
     letter to a team with a known stake may point at it in one line,
     but the guide is what reaches a future adopter who was never
     written to.
+[ ] Has any recorded conditional deferral's ending condition been met
+    (RFC-087)? A deferral must name the condition that ends it; this
+    line is what re-checks it, so it stops being renewed by habit
+    instead. The `check-*` scripts' own manual-to-gate deferral was
+    renewed three times (RFC-073, RFC-074, RFC-079) with its condition
+    ("all three pass on a clean tree") true the whole time, before
+    RFC-087 finally re-checked it.
 [ ] Re-evaluate feature-gating-criteria.md's "Current status" table
     (RFC-062) — the table itself says to do this and nothing pointed at
     it for ten minors, which is why it went stale in the first place.
