@@ -17,9 +17,14 @@ set -euo pipefail
 # close yet, is a check people learn to ignore — and there is no way to
 # notice a check that someone quietly stopped running.
 #
-# Not wired into CI — run manually, same shape as
+# Wired into CI's docs job (RFC-087), alongside
 # scripts/check-version-snippets.sh (RFC-074) and
 # scripts/check-built-links.py (RFC-073).
+#
+# REQUIRES TAGS. Those two read the working tree; this one derives its
+# entire input from `git tag`. `actions/checkout` fetches no tags by
+# default, so the docs job pins `fetch-depth: 0` — see the D-1 note
+# below and .github/workflows/ci.yaml.
 #
 # Usage: scripts/check-migration-guides.sh
 
@@ -28,8 +33,36 @@ cd "$(git rev-parse --show-toplevel)"
 ADOPTION_MINOR=39
 
 # Every distinct X.Y that has at least one git tag X.Y.Z, oldest first.
+#
+# D-1 (2026-09-02): this pipeline used to run unguarded. With no tags
+# visible, `grep` matches nothing and exits 1, `pipefail` makes the
+# pipeline 1, and `set -e` killed the script before its first `echo` —
+# a silent, instant, output-free exit 1. That is how it failed on every
+# CI run from c651e93 to f153a2b without anyone reading it as a gate
+# failure.
+#
+# `|| true` keeps the pipeline from aborting, so the emptiness check
+# below can speak. **An empty tag list is a broken environment, not a
+# clean bill of health**: with no tags this script sees zero minors,
+# finds zero gaps, and would otherwise exit 0 — a green check that
+# verified nothing, which is worse than the crash it replaced.
 minors=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
-  | awk -F. '{print $1"."$2}' | sort -t. -k1,1n -k2,2n -u)
+  | awk -F. '{print $1"."$2}' | sort -t. -k1,1n -k2,2n -u || true)
+
+if [[ -z "$minors" ]]; then
+  echo "FAIL: no release tags visible — this check cannot run." >&2
+  echo >&2
+  echo "  Tags present in this checkout: $(git tag --list | wc -l)" >&2
+  echo "  Expected: tags named X.Y.Z (bare, no 'v' prefix)." >&2
+  echo >&2
+  echo "In CI this means the checkout fetched no tags; the docs job needs" >&2
+  echo "  - uses: actions/checkout@v6" >&2
+  echo "    with:" >&2
+  echo "      fetch-depth: 0" >&2
+  echo >&2
+  echo "Locally, run 'git fetch --tags' first." >&2
+  exit 1
+fi
 
 prev=""
 gaps_total=0
