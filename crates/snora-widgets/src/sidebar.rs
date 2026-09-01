@@ -97,7 +97,7 @@ where
         .into()
 }
 
-fn sidebar_button_style(
+pub(crate) fn sidebar_button_style(
     theme: &iced::Theme,
     status: button::Status,
     is_active: bool,
@@ -115,9 +115,26 @@ fn sidebar_button_style(
         }
     };
 
+    // Corrected (RFC-085 F-14): the active state used
+    // `background.base.text` — calibrated against `background.base`,
+    // not against the highlight it was actually painted on
+    // (`sidebar_active_color`, a `primary` tier). Measured: 2.01:1
+    // (design light), 2.13:1 (design dark), 1.59:1 (high_contrast_light),
+    // **1.51:1 (high_contrast_dark)** — the low-vision preset scoring
+    // worst, on its own a release blocker (RFC-085 Q-4). `primary.strong`
+    // is the tier `sidebar_active_color` now uses; `.text` is iced's own
+    // guaranteed-readable pairing for it. The inactive states are
+    // unaffected — `background.base.text` already clears the floor
+    // against both the page background and `background.weak.color`.
+    let text_color = if is_active {
+        ep.primary.strong.text
+    } else {
+        ep.background.base.text
+    };
+
     button::Style {
         background: base_bg,
-        text_color: ep.background.base.text,
+        text_color,
         border: Border {
             radius: radius.into(),
             width: 0.0,

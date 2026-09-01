@@ -155,15 +155,24 @@ where
 
 /// Plain text-only style for ancestor crumbs. Hover gets a subtle
 /// background to signal interactivity.
-fn crumb_button_style(theme: &Theme, status: button::Status, radius: f32) -> button::Style {
+///
+/// **Corrected (RFC-085, found by the widget-layer suite's own derived
+/// coverage — not one of F-13/F-14/F-15).** `text_color` was always
+/// `primary.base.color`, a **background-tier** family used as a
+/// foreground against `background.weak.color` (hovered/pressed) or the
+/// page background (default) — neither of which it was calibrated
+/// against. Measured: 3.42:1 (stock light), 2.99–2.03:1 (stock dark).
+/// `background.base.text` / `background.weak.text` are iced's own
+/// guaranteed pairings for the two backgrounds this actually paints.
+pub(crate) fn crumb_button_style(theme: &Theme, status: button::Status, radius: f32) -> button::Style {
     use iced::{Background, Border};
     let palette = theme.extended_palette();
     let (background, text_color) = match status {
         button::Status::Hovered | button::Status::Pressed => (
             Some(Background::Color(palette.background.weak.color)),
-            palette.primary.base.color,
+            palette.background.weak.text,
         ),
-        _ => (None, palette.primary.base.color),
+        _ => (None, palette.background.base.text),
     };
     button::Style {
         background,

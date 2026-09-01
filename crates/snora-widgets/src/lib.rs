@@ -41,6 +41,12 @@ mod sidebar;
 pub mod style;
 mod tab;
 
+/// Widget-layer contrast suite (RFC-085). See this module's own doc
+/// comment for what it measures, how the set under test is derived, and
+/// the iced-palette dependency it accepts as a cost.
+#[cfg(all(test, feature = "design"))]
+mod contrast_tests;
+
 /// Prefab design widgets for Snora Design tokens.
 ///
 /// Available when the `design` feature is enabled. Provides the

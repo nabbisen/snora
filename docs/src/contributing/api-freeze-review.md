@@ -3,12 +3,13 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.37.0):** Eight of ten core gates satisfied. Remaining
-blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
-production app). **Gate 9 closed at v0.37.0** — 9a at v0.29.0, 9b on four
-`design_overhead_ratio` rows, the latter with its sensitivity stated in
-the row below rather than ticked clean. Design-track D-gates tracking in
-progress; see table below.
+**Current status (v0.41.0):** Seven of ten core gates satisfied. Remaining
+blockers: gate 1 (iced major upgrade), gate 3 (confirmed third-party
+production app), and gate 5, reopened 2026-09-01 (RFC-084) — see its own
+row for why it was never actually satisfied. **Gate 9 closed at v0.37.0** —
+9a at v0.29.0, 9b on four `design_overhead_ratio` rows, the latter with its
+sensitivity stated in the row below rather than ticked clean. Design-track
+D-gates tracking in progress; see table below.
 
 ## Crate-level surface
 
@@ -99,7 +100,7 @@ Type-names audit: **complete as of v0.17.0.**
 | 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
 | 3. At least one third-party or production-grade app | ⬜ **verdict open; evidence updated v0.33.0.** The v0.18.1 entry (a build-failure report from `nabbisen/logolig`) is superseded. Three integrations now exist: **apimokka** (desktop GUI for apimock-rs, public repository, on 0.29.0, engine + `design`, zero `snora::widget::*` call sites), **arama** (image/video browser, on 0.25.0), and **orbok** (AI-driven document search, on 0.25.1, `widgets` + `design`, the only consumer exercising the prefab widgets and chrome geometry). Between them they have driven RFCs 045–056 across eight releases. What remains a judgement rather than a fact: whether any of these is *third-party* — all three are adjacent projects, not unaffiliated adopters — and whether "production-grade" is met by an application whose own visual-verification pass is still outstanding. Decide those two words before ticking this. |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
-| 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.17 — 10 tests at the time, **11 as of v0.29.0**, including 2 RTL. **Semantic, not pixel** — see the note below. |
+| 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ⬜ **Corrected 2026-09-01 (RFC-084): was marked ✅ at v0.17 and should not have been.** Every render-semantics test before RFC-084 was positive-only — a button inside an overlay is reachable, a corner click dismisses — and none asked whether pointer input that should be *blocked* actually is. It was not, in four places at once (F-01 through F-04, an external architect's audit): a click inside the dialog dismissed it, a modal with no close sink blocked nothing, the dim did not block scrolling, and clicking a toast pressed the widget beneath it. All four fixed and negative assertions added in 0.41.0 — see `crates/snora/tests/render_semantics.rs`'s own module doc for the Law-8 derivation these assertions came from. **Whether the gate re-ticks now that the negative cases are covered is the owner's judgement, not re-derived here.** |
 | 6. Feature-matrix CI stable | ✅ v0.11 |
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
@@ -107,8 +108,9 @@ Type-names audit: **complete as of v0.17.0.**
 | 9b. **Compile-time** trend monitored (≥2 data points) | ✅ **v0.37.0 — closed on four `design_overhead_ratio` rows (0.35.0, 0.36.0, 0.36.1, 0.37.0), and closed with its sensitivity stated rather than ticked clean.** ✅ here means **the ratio only**; the six absolute millisecond columns remain runner-dominated and are raw record, not a trend (RFC-050). **Measured sensitivity: the ratio moved −4.44% across 0.36.0 → 0.36.1, a release that changed doc comments and no executable code at all** — so its noise floor is ~4.4%, which is 79% of the 5.57% total spread observed across the four rows. It detects a regression above roughly 10%; it cannot see a 5% one. Over those same four releases the absolute columns spread 23.3–30.0%, so the ratio is a ~5× improvement on what it replaced. **It is materially weaker than 9a**, and the comparison should not be glossed: 9a's series moved **−0.0008%** across its own documentation-only control, roughly 5,000× less. Closed anyway because **no better number is available** — RFC-050 examined and rejected repeat-runs/median-of-N (CI minutes per release for a signal that fails no build, and it addresses within-runner jitter when the dominant effect is between-runner speed), and nothing else is queued. Holding open would not have been waiting for better data; it would have been declining to decide, on a gate already reopened or clock-reset four times since v0.25.3 (RFC-041, RFC-043, RFC-052, and this RFC-050 methodology change). |
 | 10. No hidden feature-combination failures | ✅ (CI gate) |
 
-**Gates satisfied: 2, 4, 5, 6, 7, 8, 9, 10 = eight of ten** (gate 9
-whole — both 9a and 9b closed, per the table above).
+**Gates satisfied: 2, 4, 6, 7, 8, 9, 10 = seven of ten** (gate 9
+whole — both 9a and 9b closed, per the table above; gate 5 reopened
+2026-09-01, RFC-084 — see its own row for why).
 
 Gate 9 is deliberately recorded as **split** rather than ticked or held
 whole. Its two measurements are in genuinely different conditions, and
@@ -155,9 +157,10 @@ distinction matters because this project has been bitten by the gap between a
 true-sounding claim and its evidence — see gate 9's history below, and
 RFC-041.
 
-Remaining blockers: iced upgrade (gate 1), third-party app (gate 3) —
-see the gate table above for the full status rather than a second,
-separately-maintained list here. The previous "Gate 9 fully satisfied:
+Remaining blockers: iced upgrade (gate 1), third-party app (gate 3),
+render-semantics negative coverage (gate 5, reopened 2026-09-01,
+RFC-084) — see the gate table above for the full status rather than a
+second, separately-maintained list here. The previous "Gate 9 fully satisfied:
 binary-size has three CI data points" claim was wrong on two counts:
 `v0.17.0`'s `runner_os` is `unknown` (not CI), and all three rows are
 `N/A` — so the honest count was never eight of ten. See

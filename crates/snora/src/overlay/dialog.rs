@@ -1,8 +1,10 @@
-//! Dialog — centers content and paints the dim backdrop around it. The
-//! default path draws no card; a token-styled card is available via
-//! [`crate::design::render::render`] (RFC-039).
+//! Dialog — centers content and captures pointer input over it so clicks
+//! and scrolls do not fall through to the dim backdrop beneath (RFC-084);
+//! the dim itself is owned by [`crate::render::render_with_style`], not
+//! this module. The default path draws no card; a token-styled card is
+//! available via [`crate::design::render::render`] (RFC-039).
 
-use iced::widget::container;
+use iced::widget::{container, opaque};
 use iced::{Element, widget::center};
 use snora_core::Dialog;
 
@@ -32,16 +34,18 @@ where
     Message: Clone + 'a,
 {
     match card {
-        None => center(dialog.content).id(crate::identifiers::DIALOG).into(),
+        None => center(opaque(dialog.content))
+            .id(crate::identifiers::DIALOG)
+            .into(),
         Some(card) => {
             let padding = card.padding;
             let style = card.style;
-            center(
+            center(opaque(
                 container(dialog.content)
                     .padding(padding)
                     .style(move |_theme| style)
                     .id(crate::identifiers::DIALOG_CARD),
-            )
+            ))
             .id(crate::identifiers::DIALOG)
             .into()
         }

@@ -21,7 +21,7 @@ use iced::{
     Alignment::Center,
     Background, Border, Color, Element, Length, Shadow, Subscription,
     alignment::{Horizontal, Vertical},
-    widget::{button, column, container, row, text},
+    widget::{button, column, container, opaque, row, text},
 };
 
 use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime, ToastPosition};
@@ -180,12 +180,17 @@ where
         .align_y(Center)
         .spacing(4);
 
-    container(body)
-        .width(Length::Fixed(TOAST_WIDTH))
-        .padding(12)
-        .style(move |theme| toast_style(theme, intent))
-        .id(crate::identifiers::toast_id(toast.id))
-        .into()
+    // Wrapped in `opaque` (RFC-084 F-04): only the `×` button captured
+    // clicks before this, because it is a button — a click anywhere else on
+    // the toast's own surface (its title, message, or padding) fell through
+    // to whatever rendered beneath it.
+    opaque(
+        container(body)
+            .width(Length::Fixed(TOAST_WIDTH))
+            .padding(12)
+            .style(move |theme| toast_style(theme, intent))
+            .id(crate::identifiers::toast_id(toast.id)),
+    )
 }
 
 /// Style a toast surface based on its intent. Colors are pulled from the

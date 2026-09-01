@@ -30,10 +30,20 @@
 //! # Graceful degradation
 //!
 //! When overlay content is present but the matching `on_close_*` handler
-//! is `None`, the engine **still renders the content**. It simply omits
-//! the click-outside backdrop. This lets applications opt into explicit
-//! close buttons instead of click-outside-to-close without silently losing
-//! their overlays.
+//! is `None`, the engine **still renders the content**. What happens to the
+//! backdrop differs by kind:
+//!
+//! * **Menu backdrop** — omitted entirely; no click sink means no
+//!   transparent outside-click layer is installed at all.
+//! * **Modal dim** — never omitted. It still paints and still blocks
+//!   pointer input from reaching content beneath it (RFC-084); with no
+//!   sink it simply produces no dismiss message when clicked or
+//!   scrolled, rather than reaching through to whatever is underneath.
+//!
+//! Either way, this lets applications opt into explicit close buttons
+//! instead of click-outside-to-close without silently losing their
+//! overlays — or, for modals, without silently losing pointer
+//! containment either.
 
 use iced::{
     Color, Element, Length,
@@ -239,6 +249,10 @@ where
 /// menus and below modals so that clicking outside a dialog / sheet
 /// dismisses it and signals "this is modal" by dimming the background
 /// content.
+///
+/// Also captures wheel-scroll input with the same message (RFC-084 F-03):
+/// scrolling over the dim is the same intent as clicking it, and either
+/// should dismiss rather than reach whatever is beneath the modal.
 fn dim_backdrop<'a, Message>(on_press: Message, dim_color: Color) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -253,24 +267,43 @@ where
             background: Some(Background::Color(dim_color)),
             ..Default::default()
         });
-    mouse_area(dim).on_press(on_press).into()
+    let on_scroll = on_press.clone();
+    mouse_area(dim)
+        .on_press(on_press)
+        .on_scroll(move |_delta| on_scroll.clone())
+        .into()
 }
 
 /// Same visual as [`dim_backdrop`] but without the click sink — used when
 /// the application chose not to provide `on_close_modals`.
+///
+/// Wrapped in [`opaque`] (RFC-084 F-02 / Q-1) so it still blocks pointer
+/// input from reaching content beneath it, matching Law 8's unconditional
+/// "Pointer blocking — yes" — blocking must not depend on whether a
+/// dismiss message was provided. This also blocks wheel-scroll (F-03),
+/// measured rather than assumed — `opaque`'s own `update` method only
+/// checks for a mouse button press, but `iced_widget::Stack`'s dispatch
+/// separately consults every layer's `mouse_interaction()` after each
+/// event and stops passing the cursor to layers beneath one that reports
+/// non-`None`, which `opaque` does unconditionally whenever hovered. See
+/// `modal_with_no_close_sink_also_blocks_wheel_scroll` in
+/// `crates/snora/tests/render_semantics.rs` for the measurement, including
+/// the record of the wrong first assumption it corrected.
 fn dim_without_capture<'a, Message>(dim_color: Color) -> Element<'a, Message>
 where
     Message: 'a,
 {
     use iced::{Background, widget::container::Style};
+    use iced::widget::opaque;
 
-    container(space())
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .id(identifiers::MODAL_DIM)
-        .style(move |_theme| Style {
-            background: Some(Background::Color(dim_color)),
-            ..Default::default()
-        })
-        .into()
+    opaque(
+        container(space())
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .id(identifiers::MODAL_DIM)
+            .style(move |_theme| Style {
+                background: Some(Background::Color(dim_color)),
+                ..Default::default()
+            }),
+    )
 }

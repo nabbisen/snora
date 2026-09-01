@@ -15,7 +15,116 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **Overlays did not contain pointer events — a click inside a dialog
+  dismissed it, and three more surfaces had the same omission
+  (RFC-084, Critical, found by an external architect's audit).**
+  `render_dialog` wrapped its content in `center(...)` with no capture,
+  so a click on the dialog's own padding, chrome, or plain text fell
+  through the dialog layer to the modal backdrop beneath it and fired
+  `on_close_modals` — not a corner case, a click anywhere on the
+  dialog's own non-interactive surface dismissed it. `sheet.rs` already
+  did this correctly (`opaque(body_surface)`); the dialog was the only
+  modal surface that didn't. Fixed by wrapping the dialog's inner
+  content in `iced::widget::opaque`, both the default and
+  `design`-styled paths — validated by the architect before the
+  Handoff was written, confirmed independently here: a reproduction
+  test failed exactly as described before the fix (`got [CloseModals]`)
+  and all twelve existing tests, including the untouched
+  `outside_click_on_modal_emits_close_modals`, pass after it. **The
+  same omission, three more times:** a modal shown with no
+  `on_close_modals` handler blocked nothing at all (`dim_without_capture`
+  was a plain, non-capturing container) — fixed by wrapping it in
+  `opaque` too, so it now blocks pointer input while still producing no
+  dismiss message, matching Law 8's unconditional "Pointer blocking —
+  yes" without depending on whether a dismiss message was provided.
+  Clicking a toast's own body (not its `×` button) pressed the widget
+  underneath it — fixed the same way, wrapping each toast's own
+  container in `opaque`. **Wheel-scroll measured separately, not
+  assumed to follow the click fix** — and the first assumption about
+  it was wrong and corrected in the open: reading `opaque`'s own
+  `update` method suggested it would not stop `WheelScrolled` (it only
+  checks for button presses), which would have meant scroll needed a
+  separate, only-partial remedy for the no-sink case. Measuring instead
+  found the opposite: `iced_widget::Stack`'s own dispatch stops passing
+  the cursor to any layer beneath one whose `mouse_interaction()` is
+  non-`None` while hovered, for *any* event, and `opaque` reports
+  exactly that unconditionally — so it blocks scroll too, for both the
+  with-sink and no-sink modal dim. The with-sink dim additionally
+  gained an explicit `on_scroll` handler (mirroring its existing
+  `on_press`) since `mouse_area` does not get the same unconditional
+  treatment `opaque` does. **The test suite itself was the other half
+  of this defect**: every containment test before this fix was
+  positive only (a button inside an overlay is reachable), and none
+  asked whether pointer input that should be blocked actually is. Six
+  negative assertions added, derived explicitly from Law 8's own
+  "Pointer blocking — yes" table row rather than invented independently
+  (stated in `crates/snora/tests/render_semantics.rs`'s own module
+  doc, including which of Law 8's other rows this RFC does *not*
+  touch, and why). `docs/src/reference/overlay-interaction-semantics.md`'s
+  Law 5 corrected — a missing close sink was documented as omitting
+  capture entirely; it now correctly says it omits only the dismiss
+  *message*. **Gate 5 in `api-freeze-review.md`, corrected rather than
+  silently re-ticked**: it was marked satisfied and should not have
+  been, since every test behind it was positive-only; the gate count
+  updated from eight of ten to seven, and whether it re-ticks now that
+  negative coverage exists is left to the owner. **Breaking, with a
+  migration guide**: an application that relied on the old fall-through
+  behavior, deliberately or not, sees a change; no configuration flag
+  restores it, because the old behavior was the bug. `git diff` on
+  `sheet.rs` — the one surface that was already correct — is empty.
+
+- **The widget layer paired colours from different token families, and
+  no contrast suite in the project could see it (RFC-085, Critical,
+  found by an external architect's audit).** Every contrast assertion
+  before this release lived in `snora-design` and tested tokens against
+  roles — correct, and unable to see `snora-widgets`, which invents its
+  own render-time pairings a role-based suite has no way to know exist.
+  **A new suite was built first, in `snora-widgets`, and confirmed
+  failing on every finding before any fix landed** — the acceptance bar
+  the Handoff set. It measures every `button::Style`/`container::Style`
+  this crate produces (found by grepping the crate for the return
+  type, stated as the honest limit of an approach Rust's lack of
+  reflection makes otherwise impossible to fully derive), on the
+  background each is actually painted over, across every
+  `button::Status`, both stock `iced::Theme` variants, and all four
+  `design` presets. **Three named findings, plus two more the suite's
+  own derived reach surfaced beyond them:** `menu_button_style` used a
+  background-tier colour as text (1.89:1 light / 2.20:1 dark at rest,
+  no status reached AA) — now `background.base.text`, the pairing iced
+  itself guarantees. Chrome borders (header, footer, tab bar) used
+  `background.weak.color` (1.02–1.48:1 against the page background,
+  every preset and both stock themes) — now `background.base.text`,
+  the only value derivable from a bare `iced::Theme` that clears the
+  3.0:1 floor reliably (`background.strong`, tried first, measured
+  short at 1.54–1.58:1). The sidebar's active highlight failed **two**
+  ways: the highlight itself measured 1.89:1 (stock light) against the
+  rail — and **1.51:1 under `high_contrast_dark`**, the preset that
+  exists for low-vision users failing worst of all four — now
+  `primary.strong.color`; and the icon/text on it used
+  `background.base.text` (calibrated for the page background, not the
+  highlight) — now `primary.strong.text`, iced's own pairing for the
+  corrected highlight. Not named by the audit, found by the suite's own
+  coverage: the active tab's label (`primary.base.color`, 2.99:1 on
+  stock dark — no shade in the `primary` family reached AA against the
+  page background on either stock theme, so the label now uses
+  `background.base.text`, with the existing underline carrying the
+  active/inactive distinction instead) and breadcrumb text (same
+  pattern, same fix). **`high_contrast_dark` went from the single worst
+  figure in the entire audit (1.51:1) to the best of the four design
+  presets (9.96:1 worst case, versus 6.58:1 for `light` and 8.59:1 for
+  `dark`)** — resolving the release blocker on its own terms. No
+  `snora-design` token value changed and no new `Palette` role was
+  added — `git diff -- crates/snora-design` is empty; every fix is a
+  different choice of which already-correct token the widget layer
+  reads. `render_semantics` unaffected. **Rendered appearance changes
+  on both theme paths**, with a migration guide stating that reference
+  images are invalidated, per 0.34.0's own precedent — and naming, not
+  silently accepting, the visual trade-off of two fixes that had to
+  drop a hover/active colour distinction because no single colour in
+  the relevant family cleared AA against the actual background on both
+  paths at once.
 
 ## [0.40.0] — 2026-08-21
 

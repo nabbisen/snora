@@ -172,14 +172,18 @@ where
 /// Container style for the whole tab bar — provides the bottom border
 /// that sits under the inactive tabs and against which the active
 /// tab's underline reads.
-fn tab_bar_container_style(theme: &Theme, border_radius: f32) -> container::Style {
+pub(crate) fn tab_bar_container_style(theme: &Theme, border_radius: f32) -> container::Style {
     let chrome = chrome_container_style_with_radius(theme, border_radius);
     let palette = theme.extended_palette();
     container::Style {
         // Drop the top/left/right borders; keep only a thin bottom
         // edge that the active-tab underline visually breaks.
+        //
+        // Corrected (RFC-085 F-15), same fix as
+        // `chrome_container_style_with_radius` — see its own comment for
+        // why `background.base.text` and not `background.weak`/`strong`.
         border: Border {
-            color: palette.background.weak.color,
+            color: palette.background.base.text,
             width: 1.0,
             radius: border_radius.into(),
         },
@@ -189,11 +193,28 @@ fn tab_bar_container_style(theme: &Theme, border_radius: f32) -> container::Styl
 
 /// Per-tab button style. Active tabs get a 2 px underline in the
 /// theme's primary color; inactive tabs sit on the chrome surface.
-fn tab_button_style(theme: &Theme, status: button::Status, is_active: bool) -> button::Style {
+///
+/// **Corrected (RFC-085, found by the widget-layer suite's own derived
+/// coverage — not one of F-13/F-14/F-15).** The active tab's label used
+/// `primary.base.color` against the page background — 2.99:1 on stock
+/// Dark, under AA. Tried `primary.strong.color` next: better on the
+/// `design` path (already clears AA there) but still short on **both**
+/// stock themes (3.73:1 light, 3.70:1 dark) — no shade in the `primary`
+/// family reaches AA against an arbitrary page background, because none
+/// of them were calibrated against it (`primary`'s own `.text` fields
+/// are calibrated against `primary`'s own colors, not against
+/// `background`). Settled on `background.base.text`, the same value
+/// inactive tabs already use — the label no longer visually
+/// distinguishes active from inactive by color, but the underline
+/// (drawn via `shadow`, not `border` — `border_color` here has
+/// `width: 0.0` and paints nothing) still does, and a decorative
+/// accent line carries no text-contrast requirement the way the label
+/// itself does.
+pub(crate) fn tab_button_style(theme: &Theme, status: button::Status, is_active: bool) -> button::Style {
     let palette = theme.extended_palette();
 
     let (background, text_color, border_color) = match (is_active, status) {
-        (true, _) => (None, palette.primary.base.color, palette.primary.base.color),
+        (true, _) => (None, palette.background.base.text, palette.primary.base.color),
         (false, button::Status::Hovered) => (
             Some(Background::Color(palette.background.weak.color)),
             palette.background.base.text,
