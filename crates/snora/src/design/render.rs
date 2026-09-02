@@ -62,8 +62,15 @@
 //! same alpha as the unstyled path's `0.4` any more —
 //! [`snora_design::surfaces::DIM_ALPHA`] is `0.44`, repaired because the
 //! `light` preset's dialog card was measured at 2.85:1 against its own
-//! dimmed backdrop, below SC 1.4.11's 3:1 floor, by either signal (border
-//! or fill). The two paths were symmetric at `0.40` by coincidence, not
+//! dimmed backdrop, below SC 1.4.11's 3:1 floor. **That measurement
+//! describes the pre-repair state at alpha `0.40`**, where neither signal
+//! cleared: fill|dim 2.85:1 and border|dim 1.00:1. It is not the claim
+//! the 0.38→0.39 guide withdrew — that one said the border is what
+//! identifies the card against the dim, and it is not; the card is
+//! fill-defined against the dim and border-defined against its own
+//! surface. Reported as a stale withdrawn claim twice (aaai, 2026-08 and
+//! 2026-09) and re-measured both times; the sentence is accurate and the
+//! wording, not the fact, is what was fixed here. The two paths were symmetric at `0.40` by coincidence, not
 //! design; RFC-065 lets them diverge on purpose. See
 //! `crates/snora-design/src/tests.rs` for the either-signal assertion
 //! this repair answers, and `render/tests.rs` for the alpha and pole

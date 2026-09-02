@@ -436,13 +436,34 @@ not trap keyboard focus (Law 8, RFC-011-E).
 **Corrected (RFC-060):** the previous text here said iced 0.14's
 `operate` machinery and `widget::Id` "make programmatic focus queries
 possible" — true, but incomplete in the way that matters. Verified
-against snora's exact feature set (`canvas`, `svg`, `tokio`, no
-`advanced`): *moving* focus (`operation::focus_next()` /
+against snora's exact feature set (as of 0.42.0: `tokio` only — RFC-088
+removed `canvas` and `svg`; no `advanced`): *moving* focus (`operation::focus_next()` /
 `focus_previous()` → `Task`) is reachable today without any new
 feature. *Querying* which widget is focused (`focusable::find_focused()`)
 is reachable only with iced's `advanced` feature, which snora does not
 enable. A reader taking the old sentence at face value would conclude
 the query is free; it is not.
+
+**Corrected again 2026-09-02, by apimokka.** The sentence above is true of
+*snora*, and it was being used for something it does not support. RFC-078 cited
+*"apimokka declined"* as evidence that demand for focus trapping was withdrawn.
+apimokka's decline was based on the constraint in this record — and **the
+constraint does not bind them**: they have declared `iced`'s `advanced` feature
+on their own dependency since before adopting snora, for unrelated reasons, so
+`find_focused` is reachable in their application today (verified here:
+`iced::advanced::widget` re-exports `core::widget::*`, which carries
+`operation::focusable::find_focused`, plus `advanced::widget::operate` to run
+it).
+
+**That makes the demand evidence circular.** Our sentence went into two of their
+documents as *"containment is impossible"*, and their resulting decline came back
+to us as independent evidence that nobody wants it. It was our own claim
+returning with a different name on it.
+
+This does **not** create demand — apimokka is not asking for trapping and has not
+designed one. What changes is the quality of the evidence: a consumer's decline
+is not independent when we supplied the premise. **Ask why a team declined before
+counting the decline.**
 
 **The reconsideration trigger fired, and nothing checked it.** The
 condition was "a concrete downstream app demonstrates the need and iced

@@ -153,6 +153,35 @@ tag inside the range, one worktree, no PRs, and the tree hash identical before a
 after. The two documents citing the old SHAs were updated in the same pass —
 rewriting history invalidates every reference to it, which is its real cost.
 
+## Who cites what
+
+**Built 2026-09-02 from all six teams' answers to a direct question.** Before
+this, "which teams acted on the claim we just withdrew" was guesswork, so
+withdrawals went to everyone or to nobody. orbok asked to be on a list; this is
+the list.
+
+| Team | Cites snora for | Consequence of a withdrawal |
+|---|---|---|
+| **orbok** | A WCAG 2.1 AA conformance record naming snora **19 times**; the *status* of **1.4.3**, **1.4.11**, **2.4.7** and **2.5.8** rests on our documentation | **Highest. Tell them first.** Has already absorbed three withdrawals: `text_muted` (0.34.0), the dialog-card border (0.39.0), and 1.4.1 (0.41.1) |
+| **arama** | **AA contrast**, in RFC 010, RFC 011 and `docs/src/dev/workspace.md` | They asked explicitly: *"the AA contrast claim is a live citation of ours — that is the one to tell us about directly if it ever moves"* |
+| **knotra** | Typography and the six type roles (RFC-056); readability and the **RFC-072 contrast covenant** (RFC-058), quoted as a binding rule in their review process | A covenant change reaches their review process, not just their docs |
+| **tekstide** | Focus-ring documentation only. **Not a snora consumer** — no dependency, none planned | Asked to be dropped from *compatibility* letters; the design correspondence is a separate list and worth keeping |
+| **aaai** | Nothing. No conformance record, no VPAT | None |
+| **apimokka** | Nothing. No conformance record | None |
+
+**Keep this current by asking, not by inferring.** Every entry above came from a
+team answering a direct question; none of it was derivable from our side. Three
+of the six turned out to cite us and three did not, and the split was not the one
+we would have guessed.
+
+**A withdrawal still reaches a team that cites nothing.** aaai cite us nowhere,
+and the 1.4.1 correction still found a real hole on their side — their own
+accessibility audit listed four surfaces as colour-independent and omitted
+toasts, which they raise at ten call sites. knotra and orbok each found an
+untested comment in their own code asserting what ours had asserted. **Send the
+withdrawal to everyone; use this table to decide who to tell first and who needs
+a direct answer.**
+
 ## Claims are checked, not trusted
 
 Sitting beside "Who commits what" because it is the same kind of rule: about how
@@ -236,6 +265,8 @@ restate the guide's content.
     published site whether or not anyone gets a letter. The
     correspondence bar itself is unchanged: broken-now, a withdrawn
     claim a team acted on, or they asked.
+    # "A withdrawn claim a team acted on" is answerable now rather than
+    # guessable — see "Who cites what" below.
 [ ] For any capability that arrived, left, or any governance/policy
     decision that answers a question a consumer would ask: apply
     feature-gating-criteria.md § "Documentation scope when a capability
