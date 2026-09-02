@@ -6,8 +6,12 @@
 **Found by** the external audit, 2026-09-01 (F-26). Usage verified by the
 architect before opening.
 **Touches.** `Cargo.toml` (one line).
-**Release target.** 0.41.0 — **minor.** It changes what a consumer's build
-resolves.
+**Release target.** **0.42.0** — **minor.** It changes what a consumer's build
+resolves. *(Corrected 2026-09-02: this header said 0.41.0, which shipped without
+this RFC, as did 0.41.1. The handoff has said 0.42.0 throughout — the
+implementer flagged the discrepancy rather than picking one silently, and was
+right to build against the handoff. Second time an RFC header has gone stale
+this way; RFC-085's did the same.)*
 
 ## This is RFC-083 again, on the next line of the same file
 
