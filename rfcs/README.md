@@ -155,6 +155,7 @@ Empty — all six audit RFCs and RFC-090 are shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 092 | [Claims about code are not checked the way code is](./proposed/092-claims-about-code-are-not-checked-the-way-code-is.md) | v0.43.0 — High |
 
 ## Archive
 
