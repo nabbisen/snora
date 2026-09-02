@@ -134,8 +134,11 @@ Numbers remain stable forever and are never reused.
 | 083 | [One workspace feature breaks docs.rs, pulls iced into the vocabulary crate, and silently enables `advanced`](./done/083-lucide-drags-iced-advanced-into-the-vocabulary-crate.md) | v0.40.0 (handoff: [`handoffs/083-…`](./handoffs/083-lucide-drags-iced-advanced-into-the-vocabulary-crate/implementation-handoff.md)) |
 | 084 | [Overlays do not contain pointer events, and the dialog dismisses itself](./done/084-overlays-do-not-contain-pointer-events.md) | v0.41.0 — **Critical** (handoff: [`handoffs/084-…`](./handoffs/084-overlays-do-not-contain-pointer-events/implementation-handoff.md)) |
 | 085 | [The widget layer pairs colours from different families, and no contrast suite can see it](./done/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite.md) | v0.41.0 — **Critical** (handoff: [`handoffs/085-…`](./handoffs/085-the-widget-layer-styles-are-unreachable-by-every-contrast-suite/implementation-handoff.md)) |
+| 086 | [The engine's toast colours fail their own thresholds](./done/086-engine-toast-contrast.md) | v0.42.0 — High (handoff: [`handoffs/086-…`](./handoffs/086-engine-toast-contrast/implementation-handoff.md)) |
 | 087 | [CI runs a subset of the tests, and a conditional deferral has been renewed by habit](./done/087-ci-runs-a-subset-of-the-tests.md) | v0.41.1 — High (handoff: [`handoffs/087-…`](./handoffs/087-ci-runs-a-subset-of-the-tests/implementation-handoff.md)) |
+| 088 | [The workspace forces three iced features nobody asked for](./done/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High (handoff: [`handoffs/088-…`](./handoffs/088-the-workspace-forces-three-iced-features-nobody-asked-for/implementation-handoff.md)) |
 | 089 | [Documentation and hygiene sweep from the external audit](./done/089-documentation-and-hygiene-sweep.md) | v0.41.1 — Medium/Low (handoff: [`handoffs/089-…`](./handoffs/089-documentation-and-hygiene-sweep/implementation-handoff.md)) |
+| 090 | [The release rules nothing enforces](./done/090-the-release-rules-nothing-enforces.md) | v0.42.0 — High (handoff: [`handoffs/090-…`](./handoffs/090-the-release-rules-nothing-enforces/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -143,14 +146,10 @@ Design settled, implementation may start, not yet shipped. See
 [`accepted/README.md`](./accepted/README.md). Empty is the normal resting
 state.
 
-Four of the audit's six are shipped; RFC-086 and RFC-088 remain.
-RFC-090 is not from the audit — it comes from the 0.41.1 cut.
+Empty — all six audit RFCs and RFC-090 are shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 086 | [The engine's toast colours fail their own thresholds](./accepted/086-engine-toast-contrast.md) | v0.42.0 — High |
-| 088 | [The workspace forces three iced features nobody asked for](./accepted/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High |
-| 090 | [The release rules nothing enforces](./accepted/090-the-release-rules-nothing-enforces.md) | before the v0.42.0 tag — High |
 
 ## Proposed
 

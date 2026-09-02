@@ -116,7 +116,22 @@ RFC-087).
 | **0.40.2** | 087, 089 | **No crate code.** CI coverage, gate-5 correction, documentation sweep. Ships first because it costs nothing and removes noise from the two that matter |
 | **0.41.0** | 084, **085** | **Both Criticals, together.** The plan split them so 085's new contrast suite would not delay 084's validated fix — **the suite was finished before the cut, so the condition ended and the split with it.** Holding 085 for a separate release would have cost a cycle for a reason that no longer applied (RFC-087's own finding, applied to ourselves) |
 | **0.41.1** | 087, 089 | CI coverage and the documentation sweep. **Was 0.40.2 and did not ship** — 087 was scheduled *first* because it is what should have caught both Criticals, and it is now the oldest unstarted item from the audit |
-| **0.42.0** | 086, 088 | Toast contrast and the `iced` feature removal — neither submitted yet, both needing their own measurements |
+| **0.42.0** | 086, 088, **090** | Toast contrast, the `iced` feature removal, and publishing moving into CI. **Shipped 2026-09-02 — the audit's last two items, plus the RFC the 0.41.1 cut produced** |
+
+**All six audit RFCs are shipped.** 084 and 085 (Criticals) in 0.41.0; 087 and
+089 in 0.41.1, with 087 carrying a post-acceptance defect (D-1) found at the
+0.41.1 cut and fixed the same day; 086 and 088 in 0.42.0.
+
+**RFC-090 is not from the audit.** It came from the 0.41.1 cut, where three
+written release rules were each broken by the person who wrote them — published
+on a red `main`, from a laptop, under a tag first named `v0.41.1`. It moves
+publishing into a tag-triggered workflow so those three stop being remembered
+and start being refused. 0.42.0 is the first release cut through it.
+
+**What 086 found that the audit did not.** The audit named two toast defects.
+Measuring all five intents found a third: `Info` failed AA at 4.43:1 in both
+stock themes, on the default path, because iced's own `primary` derivation had
+never been under a contrast check.
 
 **Why 084 and 085 ended up in the same release after all.** The split was
 right when it was made: 085 needed a contrast suite built in `snora-widgets`,

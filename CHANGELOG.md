@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.42.0] — 2026-09-02
+
 ### Fixed
 
 - **The engine's `Warning` and `Info` toast colours failed their own
@@ -2903,8 +2907,9 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/v0.41.1...HEAD
-[0.41.1]: https://github.com/nabbisen/snora/compare/v0.41.0...v0.41.1
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.42.0...HEAD
+[0.42.0]: https://github.com/nabbisen/snora/compare/0.41.1...0.42.0
+[0.41.1]: https://github.com/nabbisen/snora/compare/0.41.0...0.41.1
 [0.25.1]: https://github.com/nabbisen/snora/compare/v0.25.0...v0.25.1
 [0.25.0]: https://github.com/nabbisen/snora/compare/v0.24.0...v0.25.0
 [0.24.0]: https://github.com/nabbisen/snora/compare/v0.23.0...v0.24.0

@@ -9,7 +9,7 @@ members = [
 # `<field>.workspace = true` so that license, edition, and authorship
 # stay declared in exactly one place.
 [workspace.package]
-version = "0.41.1"
+version = "0.42.0"
 edition = "2024"
 rust-version = "1.88"
 license = "Apache-2.0"
@@ -38,19 +38,19 @@ authors = ["nabbisen"]
 # Including a `version` field (alongside `path`) is required by
 # `cargo publish`, even though examples themselves are
 # `publish = false`.  Cargo validates the workspace as a whole.
-snora = { version = "0.41", path = "crates/snora" }
-snora-core = { version = "0.41", path = "crates/snora-core" }
-snora-widgets = { version = "0.41", path = "crates/snora-widgets" }
+snora = { version = "0.42", path = "crates/snora" }
+snora-core = { version = "0.42", path = "crates/snora-core" }
+snora-widgets = { version = "0.42", path = "crates/snora-widgets" }
 # Iced-free design tokens (Snora Design). Listed here so the `snora` /
 # `snora-widgets` crates can pick it up via workspace inheritance once the
 # `design` feature wiring lands (RFC-021 / RFC-025). It is a workspace member
 # in its own right and has no iced dependency.
-snora-design = { version = "0.41", path = "crates/snora-design" }
+snora-design = { version = "0.42", path = "crates/snora-design" }
 # The iced style bridge for Snora Design tokens (RFC-055). Structurally
 # below the widget layer — snora-widgets depends on it, not the reverse
 # — and depends on nothing but iced and snora-design (in particular not
 # snora-core), the same layering property snora-design itself has.
-snora-style = { version = "0.41", path = "crates/snora-style" }
+snora-style = { version = "0.42", path = "crates/snora-style" }
 
 # Corrected (RFC-088): `canvas` and `svg` removed — `canvas` had zero
 # occurrences anywhere in `crates/`, and `svg` is used only under our

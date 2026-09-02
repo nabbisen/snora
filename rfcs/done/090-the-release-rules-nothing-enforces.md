@@ -1,7 +1,7 @@
 # RFC 090 — The release rules nothing enforces
 
-**Status.** Accepted (owner, 2026-09-02). Handoff written — see
-[`handoffs/090-…`](../handoffs/090-the-release-rules-nothing-enforces/implementation-handoff.md).
+**Status.** Done — shipped in v0.42.0 (2026-09-02).
+[Handoff](../handoffs/090-the-release-rules-nothing-enforces/implementation-handoff.md).
 **Tracks.** Release integrity / process. **Severity: High.**
 **Found by** the 0.41.1 cut, 2026-09-02 — three of this document's own rules
 broken in one release by the person who wrote them.
