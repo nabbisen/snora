@@ -15,7 +15,36 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **The engine's `Warning` and `Info` toast colours failed their own
+  WCAG AA requirement, and the dismiss `×` was invisible on `Debug`
+  (RFC-086, F-05, F-06).** `Warning` (white text on `WARNING_COLOR`)
+  measured 3.18:1, matching the audit; text corrected to black against
+  the unchanged fill — 6.60:1. The dismiss `×` was hard-coded white
+  regardless of intent (1.58:1 for `Debug`'s light-gray fill); it now
+  shares each intent's own text colour, and the hover/rest alpha fade
+  that regressed contrast for four of five intents once the correct
+  colour was substituted in is removed — the mark is fully opaque at
+  every status.
+
+  **`Info` was not one of the audit's named findings.** Measuring all
+  five intents (Q-3) rather than trusting the two reported found `Info`
+  also under AA (4.43:1, both stock themes) — iced's own `primary`
+  derivation, not a snora literal, and never checked before this
+  release. Neither of iced's own paired tiers cleared AA with real
+  margin, so the fill widened to `primary.strong.color` alongside a
+  black text override — 5.64:1.
+
+  This is the engine's first contrast assertion
+  (`crates/snora/src/toast/contrast_tests.rs`), derived from the
+  `ToastIntent` enum exhaustively (RFC-063's pattern) so a sixth intent
+  cannot be added without a stated pairing. No `snora-design` or
+  `snora-style` dependency — the engine stays token-free by design; see
+  RFC-086 for why this is not RFC-085 restated.
+
+  **Rendered appearance change on the default path** — see
+  [`migration-0.41-to-0.42.md`](docs/src/guides/migration-0.41-to-0.42.md).
 
 ## [0.41.1] — 2026-09-02
 

@@ -174,7 +174,7 @@ where
     let close_btn = button(text("×").size(18))
         .on_press(toast.on_dismiss)
         .padding([0, 8])
-        .style(|_theme, status| close_button_style(status));
+        .style(move |theme, status| close_button_style(theme, intent, status));
 
     let body = row![container(text_col).width(Length::Fill), close_btn]
         .align_y(Center)
@@ -193,22 +193,72 @@ where
     )
 }
 
+/// Returns `(background, text_color)` for a toast intent — the single
+/// derivation both [`toast_style`] (the body) and [`close_button_style`]
+/// (the dismiss `×`) share, so a pairing fix only needs to happen once
+/// (RFC-086 Q-2: "the same category error as RFC-085's F-13 — a tier's
+/// `.color` used where its `.text` belongs").
+///
+/// Exhaustive on `intent` on purpose (RFC-063's pattern, applied to this
+/// enum for the first time): a sixth [`ToastIntent`] variant fails to
+/// compile here until it is given a pairing, rather than silently
+/// falling through a wildcard arm untested.
+///
+/// **Corrected 2026-09-02 (RFC-086), all figures re-measured, not
+/// inherited from the audit:**
+///
+/// - `Warning` — F-05. `WARNING_COLOR` vs `Color::WHITE` measured
+///   **3.18:1**, matching the audit. Two repairs were measured, not
+///   assumed: darkening the fill ~20-25% while keeping white text reaches
+///   AA (4.73-5.26:1) but changes the amber's own identity; switching the
+///   text to `Color::BLACK` against the **unchanged** fill measures
+///   **6.60:1** — real margin, and preserves `WARNING_COLOR` exactly.
+///   Chose the text swap: the identity property traded is "how Warning
+///   reads at a glance" (white-on-color to black-on-color), not the
+///   colour itself. `Success` and `Error` both keep white text, so
+///   `Warning`'s black text reads as *more* distinct from them, not a
+///   collision — Q-1 named that as a risk to check, not a certainty.
+/// - `Debug` — unchanged; already the correct pairing (`13.28:1` /
+///   `6.02:1`, light/dark). F-06 was in [`close_button_style`], not here.
+/// - `Info` — **not named by the audit, found by measuring all five
+///   (Q-3).** `primary.base.color`/`.text` measured **4.43:1** in both
+///   stock themes — under AA, and iced's own derivation, not a snora
+///   literal. Neither `primary.base` nor `primary.strong`'s own paired
+///   `.text` clears with real margin (4.43-4.58:1, all within 2% of the
+///   floor) because `primary.base.color`'s luminance sits almost exactly
+///   at the point where black and white text contrast it equally.
+///   `primary.strong.color` paired with `Color::BLACK` measures
+///   **5.64:1** — real margin, still recognizably the same blue family.
+/// - `Success` — unchanged; already passes with margin (`6.61:1` /
+///   `6.91:1`).
+/// - `Error` — unchanged; passes (`4.83:1` both themes) — thinner than
+///   `Success`'s margin but does clear the floor, and Q-3 asked to
+///   report passes, not to re-tune ones that already hold.
+fn intent_colors(theme: &iced::Theme, intent: ToastIntent) -> (Color, Color) {
+    let ep = theme.extended_palette();
+    match intent {
+        ToastIntent::Debug => (ep.background.strong.color, ep.background.strong.text),
+        // Fill widened from `base` to `strong` and text overridden to
+        // black — see this function's doc comment for the measured
+        // figures behind both changes.
+        ToastIntent::Info => (ep.primary.strong.color, Color::BLACK),
+        ToastIntent::Success => (ep.success.base.color, ep.success.base.text),
+        // iced's extended palette has no `warning` semantic pair; use the
+        // private fallback constant. See RFC-014-C and WARNING_COLOR
+        // above. Text corrected white -> black (RFC-086 F-05); fill
+        // unchanged.
+        ToastIntent::Warning => (WARNING_COLOR, Color::BLACK),
+        ToastIntent::Error => (ep.danger.base.color, ep.danger.base.text),
+    }
+}
+
 /// Style a toast surface based on its intent. Colors are pulled from the
 /// theme's extended palette where available, with a hand-picked warning
 /// color (iced's extended palette has no `warning` pair of its own).
 fn toast_style(theme: &iced::Theme, intent: ToastIntent) -> iced::widget::container::Style {
     use iced::widget::container::Style;
 
-    let ep = theme.extended_palette();
-    let (background, text_color) = match intent {
-        ToastIntent::Debug => (ep.background.strong.color, ep.background.strong.text),
-        ToastIntent::Info => (ep.primary.base.color, ep.primary.base.text),
-        ToastIntent::Success => (ep.success.base.color, ep.success.base.text),
-        // iced's extended palette has no `warning` semantic pair; use the
-        // private fallback constant. See RFC-014-C and WARNING_COLOR above.
-        ToastIntent::Warning => (WARNING_COLOR, Color::WHITE),
-        ToastIntent::Error => (ep.danger.base.color, ep.danger.base.text),
-    };
+    let (background, text_color) = intent_colors(theme, intent);
 
     Style {
         background: Some(Background::Color(background)),
@@ -222,17 +272,43 @@ fn toast_style(theme: &iced::Theme, intent: ToastIntent) -> iced::widget::contai
     }
 }
 
-fn close_button_style(status: button::Status) -> button::Style {
-    let alpha = match status {
-        button::Status::Hovered => 1.0,
-        _ => 0.75,
-    };
+/// Style for the toast's dismiss `×`.
+///
+/// **Corrected (RFC-086 F-06, Q-2).** Previously hard-coded
+/// `Color::WHITE` regardless of intent — a pairing fix, not a colour
+/// fix, the same category error as RFC-085's F-13: the mark must use
+/// the *same* text colour [`toast_style`] uses for the body, not a
+/// literal that happened to work for four of five intents and measured
+/// **1.58:1** (invisible) for `Debug`, whose body text is black on a
+/// light-gray fill. Now shares [`intent_colors`] with the body, so the
+/// two can never re-diverge.
+///
+/// The hover/rest alpha fade is **not applied to the dismiss mark's own
+/// colour** (unlike the previous version) — it composites toward the
+/// toast's own background, which regressed contrast on every intent
+/// whose margin was thin (measured: four of five intents' rest-state
+/// dismiss mark dropped under the 3.0 non-text floor once composited at
+/// 0.75 alpha, `Debug`'s worst of all at 1.42:1). The mark is fully
+/// opaque at every status; hover is signalled by underline-free color
+/// alone remaining constant, which is a smaller affordance than before
+/// but does not trade away the floor to get it.
+///
+/// **If hover feedback on this mark is reintroduced later**, it must not
+/// be alpha (or any other channel) applied to the mark's own colour —
+/// that always composites toward the background it sits on, which is
+/// exactly what cost the floor here. A background tint on the button
+/// itself, or a non-colour cue (a size/scale nudge), does not have this
+/// failure mode; re-derive from that rather than reaching for alpha
+/// again.
+fn close_button_style(
+    theme: &iced::Theme,
+    intent: ToastIntent,
+    _status: button::Status,
+) -> button::Style {
+    let (_, text_color) = intent_colors(theme, intent);
     button::Style {
         background: None,
-        text_color: Color {
-            a: alpha,
-            ..Color::WHITE
-        },
+        text_color,
         border: Border::default(),
         shadow: Shadow::default(),
         snap: true,
@@ -305,6 +381,9 @@ where
 pub fn sweep_expired<Message: Clone>(toasts: &mut Vec<Toast<Message>>, now: Instant) {
     toasts.retain(|t| !t.is_expired(now));
 }
+
+#[cfg(test)]
+mod contrast_tests;
 
 #[cfg(test)]
 mod tests {

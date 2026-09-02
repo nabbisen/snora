@@ -10,6 +10,12 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.41 → 0.42](migration-0.41-to-0.42.md) — **rendered appearance
+  change on the default path.** The engine's `Warning` and `Info` toast
+  colours were under WCAG AA (`Info` found only by measuring all five
+  intents, not one the audit named); the dismiss `×` no longer dims at
+  rest / brightens on hover. Reference images of any toast are
+  invalidated.
 - [0.40 → 0.41](migration-0.40-to-0.41.md) — **breaking: a real bug
   fixed.** Overlays did not contain pointer input — a click inside a
   dialog dismissed it, a modal with no close sink blocked nothing, and
