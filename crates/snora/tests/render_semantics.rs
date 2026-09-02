@@ -510,6 +510,53 @@ fn toast_dismiss_reachable_under_rtl() {
     );
 }
 
+/// A click on a toast's own body must not reach content beneath it under
+/// RTL — gate 5's last positive-only dimension.
+///
+/// Mirrors [`toast_body_click_does_not_reach_content_beneath`] exactly,
+/// with `LayoutDirection::Rtl` and `ToastPosition::TopEnd` added so the
+/// toast actually moves to the opposite side. RTL mirrors layout
+/// geometry; the containment wrapper (`opaque`) is itself
+/// direction-agnostic, but the wrapper's *position* is not — every other
+/// containment test in this suite runs LTR, so a containment wrapper
+/// mispositioned only under a mirrored layout would pass all of them.
+/// Both existing RTL tests
+/// ([`sheet_end_edge_reachable_under_rtl`],
+/// [`toast_dismiss_reachable_under_rtl`]) assert only reachability, the
+/// exact shape that let gate 5 stay wrongly ✅ for 24 minors (RFC-084)
+/// before three of its four dimensions gained negative coverage. This is
+/// the fourth.
+#[test]
+fn toast_body_click_does_not_reach_content_beneath_under_rtl() {
+    use snora::{LayoutDirection, ToastPosition};
+    let body: Element<Msg> = mouse_area(space().width(Length::Fill).height(Length::Fill))
+        .on_press(Msg::BodyPressed)
+        .into();
+    let toast = Toast::new(
+        7,
+        ToastIntent::Info,
+        "Saved",
+        "All good.",
+        Msg::DismissToast(7),
+    );
+    let layout = AppLayout::new(body)
+        .toasts(vec![toast])
+        .toast_position(ToastPosition::TopEnd)
+        .direction(LayoutDirection::Rtl);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.click("Saved")
+        .expect("toast title text should be findable under RTL");
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        !msgs.contains(&Msg::BodyPressed),
+        "a click on the toast's own body must not reach content beneath it \
+         under RTL; got {msgs:?}",
+    );
+}
+
 /// Context menu content (layer 3) is findable and interactive.
 ///
 /// Verifies: the `context_menu` field uses a separate code path from
