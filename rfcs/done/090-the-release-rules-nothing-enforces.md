@@ -151,6 +151,17 @@ question can actually be answered instead of researched.
 
 Answer it empirically at step 3 and record the result.
 
+**Answered 2026-09-02, at the 0.42.0 cut — the first release through
+`release.yaml`. One OIDC exchange authorizes all five uploads.** Run
+`33602708189`: a single `Authenticate to crates.io (Trusted Publishing)` step,
+then one `cargo publish --workspace`, and all five crates went to 0.42.0. No
+per-crate re-authentication loop, and the `--workspace` form this RFC's own
+non-goal preserved is intact.
+
+The accepted risk did not materialize. Recording it here so the question is
+closed by evidence rather than by nobody asking again — RFC-091 was archived on
+the reasoning that this was the right moment to answer it, and it was.
+
 **Q-3 — partial publish.** `cargo publish --workspace` uploads five crates in
 dependency order and can fail after two. Today a person sees that and reacts.
 What does the workflow do — fail loudly and leave the rest to a human, or

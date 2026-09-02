@@ -135,3 +135,18 @@ implementer's research stands: per-crate configuration confirmed, one-token
 coverage not confirmed, and the inference labelled as an inference.
 
 Q-3 is moot: no token is created, so none needs revoking.
+
+
+---
+
+## Postscript — Q-1 answered 2026-09-02
+
+The first release through `release.yaml` (0.42.0, run `33602708189`) settled the
+question this RFC was opened to keep alive: **one OIDC exchange authorized all
+five `cargo publish --workspace` uploads.** No per-crate loop. The implementer's
+inference from the shape of `crates-io-auth-action` was correct, and the
+`--workspace` form survived.
+
+Archiving this RFC rather than deferring it was therefore the right call twice
+over: the deferral was unnecessary, and the question it guarded was answered by
+the first real use rather than by more research.
