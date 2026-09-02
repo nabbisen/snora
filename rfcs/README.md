@@ -156,6 +156,7 @@ RFC-092 came out of the 0.41.0–0.42.0 cycle, not the audit.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 093 | [A contrast gate cannot see 1.4.1, and ours never could](./proposed/093-a-contrast-gate-cannot-see-1-4-1.md) | v0.43.0 — High |
 
 ## Archive
 
