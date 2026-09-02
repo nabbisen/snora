@@ -52,7 +52,24 @@ snora-design = { version = "0.41", path = "crates/snora-design" }
 # snora-core), the same layering property snora-design itself has.
 snora-style = { version = "0.41", path = "crates/snora-style" }
 
-iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
+# Corrected (RFC-088): `canvas` and `svg` removed — `canvas` had zero
+# occurrences anywhere in `crates/`, and `svg` is used only under our
+# own `svg-icons` feature, which already declares `"iced/svg"`
+# (`crates/snora/Cargo.toml`, `crates/snora-widgets/Cargo.toml`) — this
+# line was forcing it on every consumer regardless.
+#
+# `tokio` stays, measured rather than assumed: `crates/snora/src/
+# toast.rs`'s `subscription()` (unconditional, no snora feature gate)
+# calls `iced::time::every`, which does not exist at all without an
+# executor feature compiled into `iced` — confirmed by removing this
+# feature and hitting `error[E0425]: cannot find function 'every' in
+# module 'iced::time'`. This is not the same shape as `canvas`/`svg`
+# (an unused capability) — it is a real, unconditional compile-time
+# requirement of `snora`'s own baseline functionality. Gating
+# `subscription()` behind a new opt-in feature would remove the forced
+# choice, but is a bigger API change than "one line," was not asked
+# for, and is not added here without saying so first.
+iced = { version = "0.14", features = ["tokio"] }
 lucide-icons = { version = "1", default-features = false }
 
 [profile.release]

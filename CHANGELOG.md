@@ -49,6 +49,30 @@ are recorded in the per-version migration guides under
   **Rendered appearance change on the default path** — see
   [`migration-0.41-to-0.42.md`](docs/src/guides/migration-0.41-to-0.42.md).
 
+- **The workspace forced three `iced` features nobody asked for —
+  `canvas`, `svg`, and `tokio` — one line below the line RFC-083 fixed
+  in the same file (RFC-088, F-26).** `canvas` had zero occurrences
+  anywhere in `crates/`; `svg` was used only under `snora`'s own
+  `svg-icons` feature, which already declares `iced/svg` independently.
+  Both removed from the workspace line. `tokio` stays: measured, not
+  assumed — `snora::toast::subscription` (unconditional) calls
+  `iced::time::every`, which does not compile at all without an
+  executor feature, confirmed by removing it and reproducing
+  `error[E0425]`. **Re-derived, not quoted:** dependency count (default
+  features) 397 → 354 packages; binary size (stripped
+  `snora-size-probe-engine`) −1,917,568 bytes (−1.83 MiB), matching the
+  external audit's own figure independently. New CI gate
+  (`scripts/check-workspace-iced-features.sh`) asserts every workspace
+  `iced` feature is used, with `tokio`'s structural exemption named in
+  the script rather than silently skipped — proven by perturbation
+  (re-adding `canvas` fails the gate; restoring passes it).
+
+  **Possibly breaking, the same shape as RFC-083, one release ago:** a
+  consumer relying on `iced::widget::canvas` or `iced/tokio` arriving
+  transitively through `snora` stops compiling. `svg-icons` consumers
+  are unaffected. See
+  [`migration-0.41-to-0.42.md`](docs/src/guides/migration-0.41-to-0.42.md).
+
 ## [0.41.1] — 2026-09-02
 
 ### Added

@@ -149,6 +149,13 @@ jobs:
             exit 1
           fi
           echo "RFC-083 pass: no iced in snora-core --all-features dependency tree"
+      - name: Workspace iced features are all used (RFC-088 Q-3)
+        # The general property RFC-083's gates above don't check: not "does
+        # a crate depend on iced" but "does the workspace ask iced for a
+        # feature nothing uses" — the shape that let `canvas` (zero
+        # occurrences) and `svg` (redundant with our own svg-icons feature)
+        # both survive RFC-083 by one line.
+        run: scripts/check-workspace-iced-features.sh
 
   docs:
     name: Docs build

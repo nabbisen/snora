@@ -76,3 +76,97 @@ the same blue.
 
 Read the guides for the jumps in between — several carry real changes,
 and the [migration index](migrations.md) lists them.
+
+---
+
+# Also in 0.42.0 — the workspace no longer forces three iced features nobody asked for (RFC-088)
+
+> **Possibly breaking — a narrow, specific case.** If your application (or
+> a dependency of it) relied on `iced::widget::canvas` or `iced/tokio`
+> arriving *transitively*, through depending on `snora`, that stops
+> working. This is the same shape RFC-083 treated as breaking one
+> release ago, for the same reason: undocumented and unlikely reliance
+> is not reliance that cannot exist.
+
+## Who is affected
+
+Anyone whose own code (or whose other dependencies) uses
+`iced::widget::canvas` without separately declaring `iced`'s `canvas`
+feature themselves, counting on `snora` to have turned it on. The same
+applies to any direct use of `tokio` APIs relying on `snora` having
+enabled `iced`'s `tokio` feature as a side effect.
+
+**`svg-icons` users are unaffected.** `snora`'s own `svg-icons` feature
+already declares `iced/svg` independently (`crates/snora/Cargo.toml`,
+`crates/snora-widgets/Cargo.toml`) — confirmed by building with and
+without `svg-icons` and inspecting the resolved dependency tree both
+ways.
+
+If you don't use `canvas` directly and don't rely on a `tokio`-specific
+API arriving unannounced, nothing changes for you.
+
+## What changed, and why
+
+The workspace's own `[workspace.dependencies]` declaration —
+
+```toml
+iced = { version = "0.14", features = ["canvas", "svg", "tokio"] }
+```
+
+— forced all three features into every consumer's build, regardless of
+whether `snora` (or the consumer) used them:
+
+| Feature | Verified usage | Resolution |
+|---|---|---|
+| `canvas` | **Zero occurrences** anywhere in `crates/` | Removed |
+| `svg` | Only under `snora`'s own `svg-icons` feature, which already declares `iced/svg` independently | Removed from this line — `svg-icons` consumers unaffected |
+| `tokio` | **Structurally required**: `snora::toast::subscription` (unconditional, no feature gate) calls `iced::time::every`, which does not exist at all without an executor feature — confirmed by removing it and reproducing `error[E0425]: cannot find function 'every' in module 'iced::time'` | **Kept** |
+
+**Re-derived, not quoted, per this project's own rule that a figure you
+did not measure is one you cannot defend:**
+
+- Dependency count (`cargo tree --workspace --all-features`, unique
+  packages): **399 → 392** (masked by `--all-features` re-enabling
+  `svg` through `svg-icons`). With **default** features — closer to what
+  a typical consumer's own build resolves — **397 → 354**, a difference
+  of **43 packages**. `Cargo.lock` itself drops exactly the `lyon`
+  tessellation family (6 packages) that backed `canvas`.
+- Binary size (`snora-size-probe-engine`, stripped, `release-baseline`
+  profile): **15,695,200 → 13,777,632 bytes**, a reduction of
+  **1,917,568 bytes (1.83 MiB)**. `snora-size-probe-widgets` and
+  `snora-size-probe-design` both show the same ~1.83 MiB reduction.
+  This matches the external audit's own **−1.83 MiB** figure, measured
+  independently rather than inherited from it.
+
+The audit's crate-count figure was **−34**; ours (default features) is
+**−43**. Both are real reductions measured by different means at
+different times; the discrepancy is not the point — inheriting either
+number without re-deriving it would have been.
+
+## Why `tokio` is not also removed
+
+Unlike `canvas` and `svg`, `tokio` is not an unused capability — it
+supplies iced's async executor, and `snora`'s own baseline toast
+lifecycle support (`subscription()`, used by any application with
+transient toasts) requires one to exist. Gating that function behind a
+new opt-in `snora` feature would remove the forced choice entirely, but
+is a materially larger change than "remove three dead words" and was
+not part of this release.
+
+## The general gate this release adds
+
+`scripts/check-workspace-iced-features.sh`, wired into CI
+(`design-isolation` job): for every feature the workspace's `iced` line
+declares, confirms it is actually used (via
+`iced::widget::<feature>`/`widget::<feature>`), except `tokio` — named
+and commented as a structural exemption, not silently skipped. This is
+the property RFC-083's own gate did not check: not "does a crate depend
+on iced" but "does the workspace ask iced for something nothing uses" —
+exactly the shape that let this survive RFC-083 by one line. Proven by
+perturbation: re-adding `canvas` to the workspace line makes the gate
+fail, naming it; restoring the fix makes it pass again.
+
+## If you are jumping more than one minor
+
+Read the guides for the jumps in between — several carry real changes,
+and the [migration index](migrations.md) lists them.
