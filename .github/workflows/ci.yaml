@@ -176,7 +176,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Check any "Docs-only: yes" commits in this push
+      - name: 'Check any "Docs-only: yes" commits in this push'
         # COMMITS_JSON goes through an env var, not string interpolation
         # into the script body -- a commit message is attacker-
         # controlled text as far as this workflow is concerned, and
