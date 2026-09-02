@@ -131,6 +131,28 @@ own text, and both commits describe their subject honestly. **Splitting history
 twice in one day for one checklist line would cost more than the tidiness is
 worth** — but the rule gained control 2 the same hour.
 
+### The third authorship incident, and the first with a technical cause
+
+`914fe92` through `3efb548` were pushed authored *and* committed as
+`RFC-092 Test <test@example.com>`. The cause was not carelessness about identity:
+a `git config user.email` run inside a **linked worktree** wrote to the shared
+repo-level `.git/config`, because a linked worktree does **not** get its own
+config unless `extensions.worktreeConfig` is enabled. It is not, here.
+
+The worktree was removed; the identity override outlived it, and every commit in
+that checkout for the next twelve minutes carried the fake identity — two the
+implementer's, three the architect's, including the commit fixing an unrelated CI
+break.
+
+**If you need a throwaway identity, use `git -c user.name=… -c user.email=…
+commit`, or a separate clone.** A bare `git config user.*` in a worktree is
+repo-global, and it is silent about that.
+
+Rewritten and force-pushed 2026-09-02 after the owner ruled: five tip commits, no
+tag inside the range, one worktree, no PRs, and the tree hash identical before and
+after. The two documents citing the old SHAs were updated in the same pass —
+rewriting history invalidates every reference to it, which is its real cost.
+
 ## Claims are checked, not trusted
 
 Sitting beside "Who commits what" because it is the same kind of rule: about how

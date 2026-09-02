@@ -1,7 +1,7 @@
 # Developer Handoff — Workflow files are validated by GitHub or by nobody
 
 **Governing document.** Not an RFC — one script and one small workflow. The
-incident is recorded in `bde8f7f`.
+incident is recorded in `0b382a6`.
 **Status.** Approved by the owner, 2026-09-02.
 **Release target.** **0.43.0.** No crate code.
 **Touches.** `scripts/check-workflows.sh` (new),
@@ -11,14 +11,14 @@ incident is recorded in `bde8f7f`.
 
 ## What happened
 
-`4fea777` added a step whose name was an unquoted YAML scalar containing `": "`:
+`183cc70` added a step whose name was an unquoted YAML scalar containing `": "`:
 
     - name: Check any "Docs-only: yes" commits in this push
 
 A plain scalar may not contain `": "` — YAML reads it as a mapping. The whole of
 `.github/workflows/ci.yaml` became unparseable. GitHub created **zero jobs**: the
 run appeared under the file's path rather than under `CI`, concluded `failure`,
-and had nothing in it to inspect. Fixed in `bde8f7f` by quoting.
+and had nothing in it to inspect. Fixed in `0b382a6` by quoting.
 
 Nobody was careless. **RFC-090's own submission had already stated this gap in
 writing** — *"no YAML parser was available in this environment to fully lint it
