@@ -1,0 +1,47 @@
+name: Workflow lint
+
+# Validates every file under .github/workflows/ with actionlint
+# (scripts/check-workflows.sh). This MUST be its own file, not a job
+# inside ci.yaml: a broken workflow file produces zero jobs, not a
+# failing job, so a validator living inside ci.yaml would have been
+# just as absent as everything else during the incident this exists
+# for (`183cc70`, fixed in `0b382a6` — an unquoted step name containing
+# ": " made the entire ci.yaml unparseable, and GitHub reported nothing
+# but a bare "failure" with no jobs to inspect). The validator has to
+# live somewhere the failure it validates cannot also take down.
+#
+# No path filter: a workflow file can be broken by a change anywhere in
+# the directory (a shared anchor, a reusable step), and the job is
+# cheap enough that restricting it buys nothing.
+#
+# The residual limit, stated rather than hidden: if THIS file becomes
+# unparseable, nothing reports that either — there is no escape from
+# that regress, since every validator is itself a file that can break.
+# What this buys is that ci.yaml (edited three times this cycle) is
+# covered by a file that rarely is. Keep this one minimal so that stays
+# true; it should need to change only when the pinned actionlint
+# version in check-workflows.sh does.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Reviewer-required (R-1, 2026-09-02): without this, dispatching the
+  # check against an arbitrary ref (e.g. a scratch branch carrying a
+  # deliberately broken workflow, to prove this job actually refuses)
+  # was impossible -- push/pull_request only fire against main or an
+  # open PR. This is also simply how anyone re-runs this check by hand
+  # on a ref, which is the first thing they'll want when it fires.
+  workflow_dispatch:
+
+concurrency:
+  group: workflow-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: scripts/check-workflows.sh

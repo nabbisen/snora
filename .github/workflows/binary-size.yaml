@@ -96,10 +96,10 @@ jobs:
             echo
             echo "| Probe | Stripped bytes | Approx KB |"
             echo "|---|---:|---:|"
-            echo "| engine-only (`snora-size-probe-engine`) | $engine | $(( engine / 1024 )) |"
-            echo "| widgets (`snora-size-probe-widgets`) | $widgets | $(( widgets / 1024 )) |"
+            echo "| engine-only (\`snora-size-probe-engine\`) | $engine | $(( engine / 1024 )) |"
+            echo "| widgets (\`snora-size-probe-widgets\`) | $widgets | $(( widgets / 1024 )) |"
             echo "| **widgets_diff** | $widgets_diff | $(( widgets_diff / 1024 )) |"
-            echo "| design (`snora-size-probe-design`) | $design | $(( design / 1024 )) |"
+            echo "| design (\`snora-size-probe-design\`) | $design | $(( design / 1024 )) |"
             echo "| **design_diff** | $design_diff | $(( design_diff / 1024 )) |"
             echo
             echo "Rustc: \`$rustc\` · OS: $os · Date: $date."

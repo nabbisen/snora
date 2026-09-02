@@ -39,6 +39,33 @@ are recorded in the per-version migration guides under
   No crate code. `docs/src/contributing/`'s claim rules (Part 2, one
   sentence) are the architect's, not part of this change.
 
+- **Workflow files are now validated before they're pushed, not only
+  by GitHub after.** An unquoted step name containing `": "`
+  (`183cc70`) made the entire `ci.yaml` unparseable — GitHub reported a
+  bare `failure` with zero jobs, because a YAML mapping error leaves
+  nothing to run. `scripts/check-workflows.sh` runs `actionlint`
+  (pinned to an exact version, downloaded and SHA-256-verified if not
+  already on `PATH`) against every file under `.github/workflows/`,
+  locally or in CI. It fails loudly, not silently, when `actionlint`
+  cannot be obtained at all — an unvalidatable tree is exactly the
+  state this exists to end.
+
+  **Wired as its own workflow, `workflow-lint.yaml`, deliberately not a
+  job inside `ci.yaml`**: a broken workflow file produces no jobs, so a
+  validator living inside the file it validates would have been just
+  as absent during the incident above. The residual limit is stated in
+  that file's own header: if it itself becomes unparseable, nothing
+  reports — there is no escape from that regress, only a smaller
+  surface for it (one rarely-edited file covering one edited three
+  times this cycle).
+
+  Found and fixed by the new tool itself, before it ever ran in CI:
+  `binary-size.yaml`'s job-summary step had three unescaped backticks
+  that `actionlint`'s embedded shellcheck reads as command
+  substitution — cosmetic (a blank crate name in the binary-size job
+  summary, not a build failure), but a real defect the project had no
+  way to see before this.
+
 ## [0.42.0] — 2026-09-02
 
 ## [0.42.0] — 2026-09-02
