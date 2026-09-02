@@ -15,7 +15,31 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **"No behaviour change" becomes a checked claim, not a trusted one
+  (RFC-092).** Six claims about code shipped wrong this cycle — four of
+  them the architect's own, none caught by any gate, because no gate
+  reads sentences. `scripts/check-docs-only.sh <rev>` prints every
+  non-comment, non-blank changed line under `crates/` in a revision;
+  empty output is what "documentation only" looks like, non-empty
+  output refutes it — the exact filter that found F-33 and F-34 by
+  hand, after 0.41.1 had already shipped claiming docs-only.
+
+  **Ships as a CI gate, not a manual tool** (Q-1, ruled against the
+  RFC's own suggestion): a commit carrying a `Docs-only: yes` trailer
+  is checked automatically by the new `claims-check` job; no trailer,
+  no check. The same reasoning that kept three other scripts manual for
+  three releases (RFC-087, F-39) was wrong here for the same reason.
+  Demonstrated on RFC-089's own commit (prints both F-33 and F-34), and
+  against three constructed cases in an isolated worktree: a false
+  `Docs-only: yes` claim refused and the offending lines named, a true
+  one passed, and a commit with no trailer left unaffected.
+
+  No crate code. `docs/src/contributing/`'s claim rules (Part 2, one
+  sentence) are the architect's, not part of this change.
+
+## [0.42.0] — 2026-09-02
 
 ## [0.42.0] — 2026-09-02
 

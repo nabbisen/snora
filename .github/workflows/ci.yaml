@@ -157,6 +157,40 @@ jobs:
         # both survive RFC-083 by one line.
         run: scripts/check-workspace-iced-features.sh
 
+  claims-check:
+    # RFC-092 Q-1: ships as a gate, not a manual-only tool -- ruled
+    # against the RFC's own suggestion, for the same reason RFC-087
+    # (F-39) found keeping three other scripts manual for three
+    # releases: "CI cannot know which claims were made" is false once
+    # the claim is written where a machine can read it.
+    #
+    # Scoped to `push` only: `github.event.commits` (the list this job
+    # reads) is populated for push events, not for pull_request. Every
+    # RFC commit this project has produced this cycle has landed via a
+    # direct push to main, not a PR, so this is where the claim
+    # actually needs checking.
+    name: Docs-only commit claims are checked, not trusted
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check any "Docs-only: yes" commits in this push
+        # COMMITS_JSON goes through an env var, not string interpolation
+        # into the script body -- a commit message is attacker-
+        # controlled text as far as this workflow is concerned, and
+        # interpolating `${{ }}` directly into `run:` is the documented
+        # script-injection shape GitHub's own docs warn against.
+        env:
+          COMMITS_JSON: ${{ toJSON(github.event.commits) }}
+        run: |
+          FAILED=0
+          for sha in $(echo "$COMMITS_JSON" | jq -r '.[].id // empty'); do
+            scripts/check-docs-only-claim.sh "$sha" || FAILED=1
+          done
+          exit "$FAILED"
+
   docs:
     name: Docs build
     runs-on: ubuntu-latest
