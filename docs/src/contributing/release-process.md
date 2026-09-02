@@ -131,6 +131,41 @@ own text, and both commits describe their subject honestly. **Splitting history
 twice in one day for one checklist line would cost more than the tidiness is
 worth** — but the rule gained control 2 the same hour.
 
+## Claims are checked, not trusted
+
+Sitting beside "Who commits what" because it is the same kind of rule: about how
+work gets recorded, not about the code itself.
+
+**A claim about what changed or what was measured is either produced by a
+command, or labelled as an inference.** Not "verify everything" — say which kind
+of thing you are saying.
+
+This exists because six such claims shipped wrong in one cycle (RFC-092), none
+caught by a gate, because no gate reads sentences. *"No behaviour change"* over a
+diff with two code changes in it. *"The fade drops four of five intents under the
+floor"* when the measured answer was zero of ten. *"Confirmed passing on a clean
+tree"* for a gate that could not run in CI at all. Three miscounts. **Four were
+the architect's**, and the rule binds review results and release commits exactly
+as it binds implementation.
+
+The reason is cost, not care. **Verifying a summary costs as much as producing
+it** — "no behaviour change" over 29 files is only checkable by reading 29 files
+— so a rule demanding that every time gets skipped precisely when the diff is
+large, which is when it matters.
+
+What that means in practice:
+
+- **"Documentation only" / "no behaviour change"** is `scripts/check-docs-only.sh
+  <rev>`, not a judgement. Add a `Docs-only: yes` trailer and CI checks it for
+  you; no trailer, no check.
+- **Any count** — fences, findings, re-exports, packages — comes from a command
+  quoted alongside it. Three of the six failures were counts made by eye.
+- **A measurement names the tree it was measured on.** RFC-086's numbers were
+  right; it cited a *pre-fix* table to support a *post-fix* claim.
+- **Everything else gets its provenance stated.** The Q-2 research on Trusted
+  Publishing separated what was confirmed from what was inferred, unprompted, and
+  that is why the ruling took one pass instead of three.
+
 ## Release checklist
 
 **The migration guide is the canonical statement of what a release
