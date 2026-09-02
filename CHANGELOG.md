@@ -73,6 +73,29 @@ are recorded in the per-version migration guides under
   are unaffected. See
   [`migration-0.41-to-0.42.md`](docs/src/guides/migration-0.41-to-0.42.md).
 
+### Added
+
+- **Publishing moves into CI (RFC-090).** Three release rules previously
+  enforced only by a person remembering — CI must be green, the tag
+  must match `[workspace.package].version`, publish from a clean tree —
+  had each failed at least once this cycle (main sat red for four
+  commits; `v0.41.1` was tagged with a stray `v` prefix against 67 bare
+  tags). A new `.github/workflows/release.yaml`, triggered only by a
+  tag matching bare `X.Y.Z`, refuses to publish unless the tagged
+  commit has an existing, completed, successful CI run (checked against
+  that run, never a fresh re-run — a re-run can pass on a commit whose
+  earlier run failed for a reason it doesn't reproduce) and unless the
+  tag matches `Cargo.toml`'s version exactly. A dirty tree can no longer
+  exist, structurally — the workflow's own checkout at the tag *is* the
+  clean tree. Both refusal scripts
+  (`scripts/check-commit-ci-green.sh`, `scripts/check-tag-matches-version.sh`)
+  proven failing against real historical commits in this repository's
+  own CI history before being wired in, not synthetic fixtures.
+
+  Publishes via crates.io Trusted Publishing (OIDC) — no long-lived API
+  token in a repo secret. No crate code affected; no version bump of its
+  own.
+
 ## [0.41.1] — 2026-09-02
 
 ### Added
