@@ -1,6 +1,11 @@
 # RFC 093 — A contrast gate cannot see 1.4.1, and ours never could
 
-**Status.** Proposed (2026-09-02).
+**Status.** Accepted (owner, 2026-09-02). Handoff written — see
+[`handoffs/093-…`](../handoffs/093-a-contrast-gate-cannot-see-1-4-1/implementation-handoff.md).
+**Q-1 ruled** — register and document now; the non-colour cue is deferred with a
+firing condition: **a team asking for it after the documentation lands.**
+**Q-2 ruled** — both, code as the source of truth. **Q-3 ruled** — does not reach
+`Emphasis`: nothing consumes it at all, checked.
 **Tracks.** Accessibility / test reach. **Severity: High.**
 **Found by** tekstide and orbok independently, replying to the 0.42.0 letter.
 **Touches.** `crates/snora/src/toast/`, `crates/snora-widgets/src/design/`,
