@@ -68,8 +68,6 @@ are recorded in the per-version migration guides under
 
 ## [0.42.0] — 2026-09-02
 
-## [0.42.0] — 2026-09-02
-
 ### Fixed
 
 - **The engine's `Warning` and `Info` toast colours failed their own
@@ -2961,18 +2959,57 @@ Scope concerns:  none
 [Unreleased]: https://github.com/nabbisen/snora/compare/0.42.0...HEAD
 [0.42.0]: https://github.com/nabbisen/snora/compare/0.41.1...0.42.0
 [0.41.1]: https://github.com/nabbisen/snora/compare/0.41.0...0.41.1
-[0.25.1]: https://github.com/nabbisen/snora/compare/v0.25.0...v0.25.1
-[0.25.0]: https://github.com/nabbisen/snora/compare/v0.24.0...v0.25.0
-[0.24.0]: https://github.com/nabbisen/snora/compare/v0.23.0...v0.24.0
-[0.23.0]: https://github.com/nabbisen/snora/compare/v0.22.0...v0.23.0
-[0.22.0]: https://github.com/nabbisen/snora/compare/v0.21.0...v0.22.0
-[0.21.0]: https://github.com/nabbisen/snora/compare/v0.20.0...v0.21.0
-[0.20.0]: https://github.com/nabbisen/snora/compare/v0.19.1...v0.20.0
-[0.19.1]: https://github.com/nabbisen/snora/compare/v0.19.0...v0.19.1
-[0.19.0]: https://github.com/nabbisen/snora/compare/v0.18.3...v0.19.0
-[0.18.3]: https://github.com/nabbisen/snora/compare/v0.18.2...v0.18.3
-[0.18.2]: https://github.com/nabbisen/snora/compare/v0.10.0...v0.18.2
-[0.10.0]: https://github.com/nabbisen/snora/releases/tag/v0.10.0
-[0.9.0]: https://github.com/nabbisen/snora/releases/tag/v0.9.0
-[0.8.0]: https://github.com/nabbisen/snora/releases/tag/v0.8.0
-[0.7.0]: https://github.com/nabbisen/snora/releases/tag/v0.7.0
+[0.41.0]: https://github.com/nabbisen/snora/compare/0.40.0...0.41.0
+[0.40.0]: https://github.com/nabbisen/snora/compare/0.39.3...0.40.0
+[0.39.3]: https://github.com/nabbisen/snora/compare/0.39.2...0.39.3
+[0.39.2]: https://github.com/nabbisen/snora/compare/0.39.1...0.39.2
+[0.39.1]: https://github.com/nabbisen/snora/compare/0.39.0...0.39.1
+[0.39.0]: https://github.com/nabbisen/snora/compare/0.38.3...0.39.0
+[0.38.3]: https://github.com/nabbisen/snora/compare/0.38.2...0.38.3
+[0.38.2]: https://github.com/nabbisen/snora/compare/0.38.1...0.38.2
+[0.38.1]: https://github.com/nabbisen/snora/compare/0.38.0...0.38.1
+[0.38.0]: https://github.com/nabbisen/snora/compare/0.37.2...0.38.0
+[0.37.2]: https://github.com/nabbisen/snora/compare/0.37.1...0.37.2
+[0.37.1]: https://github.com/nabbisen/snora/compare/0.37.0...0.37.1
+[0.37.0]: https://github.com/nabbisen/snora/compare/0.36.1...0.37.0
+[0.36.1]: https://github.com/nabbisen/snora/compare/0.36.0...0.36.1
+[0.36.0]: https://github.com/nabbisen/snora/compare/0.35.0...0.36.0
+[0.35.0]: https://github.com/nabbisen/snora/compare/0.34.0...0.35.0
+[0.34.0]: https://github.com/nabbisen/snora/compare/0.33.1...0.34.0
+[0.33.1]: https://github.com/nabbisen/snora/compare/0.33.0...0.33.1
+[0.33.0]: https://github.com/nabbisen/snora/compare/0.32.0...0.33.0
+[0.32.0]: https://github.com/nabbisen/snora/compare/0.31.0...0.32.0
+[0.31.0]: https://github.com/nabbisen/snora/compare/0.30.0...0.31.0
+[0.30.0]: https://github.com/nabbisen/snora/compare/0.29.0...0.30.0
+[0.29.0]: https://github.com/nabbisen/snora/compare/0.28.1...0.29.0
+[0.28.1]: https://github.com/nabbisen/snora/compare/0.28.0...0.28.1
+[0.28.0]: https://github.com/nabbisen/snora/compare/0.27.1...0.28.0
+[0.27.1]: https://github.com/nabbisen/snora/compare/0.27.0...0.27.1
+[0.27.0]: https://github.com/nabbisen/snora/compare/0.26.0...0.27.0
+[0.26.0]: https://github.com/nabbisen/snora/compare/0.25.3...0.26.0
+[0.25.3]: https://github.com/nabbisen/snora/compare/0.25.2...0.25.3
+[0.25.2]: https://github.com/nabbisen/snora/compare/0.25.1...0.25.2
+[0.25.1]: https://github.com/nabbisen/snora/compare/0.25.0...0.25.1
+[0.25.0]: https://github.com/nabbisen/snora/compare/0.24.0...0.25.0
+[0.24.0]: https://github.com/nabbisen/snora/compare/0.23.0...0.24.0
+[0.23.0]: https://github.com/nabbisen/snora/compare/0.22.0...0.23.0
+[0.22.0]: https://github.com/nabbisen/snora/compare/0.21.0...0.22.0
+[0.21.0]: https://github.com/nabbisen/snora/compare/0.20.0...0.21.0
+[0.20.0]: https://github.com/nabbisen/snora/compare/0.19.1...0.20.0
+[0.19.1]: https://github.com/nabbisen/snora/compare/0.19.0...0.19.1
+[0.19.0]: https://github.com/nabbisen/snora/compare/0.18.3...0.19.0
+[0.18.3]: https://github.com/nabbisen/snora/compare/0.18.2...0.18.3
+[0.18.2]: https://github.com/nabbisen/snora/compare/0.18.1...0.18.2
+[0.18.1]: https://github.com/nabbisen/snora/compare/0.18.0...0.18.1
+[0.18.0]: https://github.com/nabbisen/snora/compare/0.17.0...0.18.0
+[0.17.0]: https://github.com/nabbisen/snora/compare/0.16.0...0.17.0
+[0.16.0]: https://github.com/nabbisen/snora/compare/0.15.0...0.16.0
+[0.15.0]: https://github.com/nabbisen/snora/compare/0.14.0...0.15.0
+[0.14.0]: https://github.com/nabbisen/snora/compare/0.13.0...0.14.0
+[0.13.0]: https://github.com/nabbisen/snora/compare/0.12.0...0.13.0
+[0.12.0]: https://github.com/nabbisen/snora/compare/0.11.0...0.12.0
+[0.11.0]: https://github.com/nabbisen/snora/compare/0.10.0...0.11.0
+[0.10.0]: https://github.com/nabbisen/snora/compare/0.9.0...0.10.0
+[0.9.0]: https://github.com/nabbisen/snora/compare/0.8.0...0.9.0
+[0.8.0]: https://github.com/nabbisen/snora/compare/0.7.0...0.8.0
+[0.7.0]: https://github.com/nabbisen/snora/releases/tag/0.7.0
