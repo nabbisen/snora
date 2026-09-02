@@ -63,6 +63,25 @@ carries the re-check line, so a team we never wrote to still gets it.
   not when one is sent.
 - **The CHANGELOG does not change.** It is the record of what changed; the guide
   is the record of what to do. Different jobs, both earned.
+
+  **Amended 2026-09-02 (owner-approved), one exception.** When a release
+  **withdraws, narrows, or corrects a claim we published**, the instruction to
+  *re-check* goes wherever that release actually ships — and for a patch, that
+  is the CHANGELOG, because RFC-079 ships migration guides on minors only.
+
+  Without this, the rule above produces silence at the one moment it matters.
+  Someone following it literally on a patch records the correction and omits the
+  re-check, because the rule says instructions belong in a guide that does not
+  exist for that release. **That nearly happened at 0.41.1**: the first draft of
+  the WCAG 1.4.1 withdrawal recorded the correction alone, and a review round
+  added *"if you recorded that snora's prefab toasts distinguish intent by more
+  than colour, that came from us and is wrong — re-check any 1.4.1 claim that
+  relied on it."* Three downstream teams maintain accessibility suites and at
+  least one cites our documentation in a conformance record.
+
+  The division of labour is otherwise unchanged: this is not "instructions may
+  go in the CHANGELOG," it is "a withdrawn claim's re-check must reach the
+  reader, and in a patch the CHANGELOG is the only page that does."
 - **No change to the ROADMAP's entry.** Whether that is also redundant is a
   separate question and is not asked here.
 
