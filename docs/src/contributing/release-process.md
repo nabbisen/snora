@@ -308,6 +308,12 @@ restate the guide's content.
     # If it is not, delete the local tag and re-tag. If you already pushed
     # it, cancel any tag-triggered measurement runs first — otherwise
     # re-pushing the tag appends a SECOND row for the same version.
+    # SAME TRAP FOR TEST TAGS: binary-size.yaml and build-cost.yaml
+    # trigger on ANY tag, so a scratch tag pushed to exercise
+    # release.yaml appends a row named after it to both CSVs. This
+    # happened on 2026-09-02 with a `9.9.9` test tag (RFC-090 Unit 2)
+    # and had to be reverted by hand. Delete the rows AND the tag after
+    # any such test, and check both CSVs, not just the tag list.
 [ ] git push origin main && git push origin X.Y.Z
     # Tags carry no `v` prefix, matching Rust crate convention. This is
     # now ENFORCED, not remembered: release.yaml triggers on
