@@ -146,16 +146,16 @@ Design settled, implementation may start, not yet shipped. See
 [`accepted/README.md`](./accepted/README.md). Empty is the normal resting
 state.
 
-Empty — all six audit RFCs and RFC-090 are shipped.
+RFC-092 came out of the 0.41.0–0.42.0 cycle, not the audit.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 092 | [Claims about code are not checked the way code is](./accepted/092-claims-about-code-are-not-checked-the-way-code-is.md) | v0.43.0 — High |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 092 | [Claims about code are not checked the way code is](./proposed/092-claims-about-code-are-not-checked-the-way-code-is.md) | v0.43.0 — High |
 
 ## Archive
 
