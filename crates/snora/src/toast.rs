@@ -284,22 +284,33 @@ fn toast_style(theme: &iced::Theme, intent: ToastIntent) -> iced::widget::contai
 /// two can never re-diverge.
 ///
 /// The hover/rest alpha fade is **not applied to the dismiss mark's own
-/// colour** (unlike the previous version) — it composites toward the
-/// toast's own background, which regressed contrast on every intent
-/// whose margin was thin (measured: four of five intents' rest-state
-/// dismiss mark dropped under the 3.0 non-text floor once composited at
-/// 0.75 alpha, `Debug`'s worst of all at 1.42:1). The mark is fully
-/// opaque at every status; hover is signalled by underline-free color
-/// alone remaining constant, which is a smaller affordance than before
-/// but does not trade away the floor to get it.
+/// colour** (unlike the previous version). **Correction (R-3, round 2,
+/// 2026-09-02): this is a deliberate margin simplification, not a
+/// floor fix.** The first submission claimed the fade "regressed
+/// contrast... under the 3.0 non-text floor" for four of five intents
+/// — false, and caught only because the reviewer re-measured directly
+/// rather than accepting the claim. With these corrected colours, a
+/// 0.75-alpha fade composited toward each toast's own background
+/// clears the floor at every intent and both stock themes (worst case
+/// `Error` at **3.38:1**) — the cited table was the *pre-fix*
+/// hardcoded-white mark, which cannot support a claim about the fixed
+/// one, and even that table showed two failures, not four. The real
+/// and stated reason for removing the fade: it raises the worst case
+/// from 3.38:1 to **4.83:1** and makes the mark's contrast independent
+/// of interaction state, so no future colour change can reintroduce a
+/// floor risk through this specific channel. The mark is fully opaque
+/// at every status; hover is signalled by underline-free color alone
+/// remaining constant, a smaller affordance than before, traded for
+/// that margin and that independence — not for correctness the fade
+/// never lacked.
 ///
-/// **If hover feedback on this mark is reintroduced later**, it must not
-/// be alpha (or any other channel) applied to the mark's own colour —
-/// that always composites toward the background it sits on, which is
-/// exactly what cost the floor here. A background tint on the button
-/// itself, or a non-colour cue (a size/scale nudge), does not have this
-/// failure mode; re-derive from that rather than reaching for alpha
-/// again.
+/// **If hover feedback on this mark is reintroduced later**, prefer a
+/// background tint on the button itself, or a non-colour cue (a
+/// size/scale nudge), over alpha on the mark's own colour — alpha
+/// compositing toward the background still costs margin even where (as
+/// here) it does not cost the floor, and re-verifying that trade for
+/// every future colour choice is exactly the recurring cost this
+/// version avoids.
 fn close_button_style(
     theme: &iced::Theme,
     intent: ToastIntent,

@@ -70,6 +70,38 @@ fn contrast_ratio(a: Color, b: Color) -> f32 {
     (bright + 0.05) / (dark + 0.05)
 }
 
+/// Alpha-composites `fg` over an opaque `bg`.
+///
+/// **Added 2026-09-02 (R-2, round 2).** `relative_luminance` reads only
+/// `r`/`g`/`b` and never `a` — a `fg` with `a < 1.0` measured directly
+/// against `bg` was contrast-checked as if it were fully opaque, which
+/// is not what actually renders. A reintroduced alpha fade (the one
+/// this suite exists to catch, per `close_button_style`'s own doc
+/// comment) passed this suite undetected before this function existed,
+/// including at `a = 0.0` — a fully invisible mark. Every contrast
+/// check in this module composites through this function first,
+/// including [`toast_body_text_meets_aa_all_intents_both_themes`],
+/// which sets no alpha today but must not silently stop checking it if
+/// that ever changes.
+fn composite_over(fg: Color, bg: Color) -> Color {
+    let a = fg.a;
+    Color {
+        r: fg.r * a + bg.r * (1.0 - a),
+        g: fg.g * a + bg.g * (1.0 - a),
+        b: fg.b * a + bg.b * (1.0 - a),
+        a: 1.0,
+    }
+}
+
+/// Contrast of `fg` against `bg`, compositing `fg`'s own alpha first.
+/// The one path every check in this module goes through — see
+/// [`composite_over`]'s doc comment for why a direct [`contrast_ratio`]
+/// call on a possibly-translucent foreground is the defect this exists
+/// to prevent.
+fn text_contrast(fg: Color, bg: Color) -> f32 {
+    contrast_ratio(composite_over(fg, bg), bg)
+}
+
 /// All five [`ToastIntent`] variants. Hand-listed — see module doc.
 const ALL_INTENTS: [ToastIntent; 5] = [
     ToastIntent::Debug,
@@ -110,6 +142,27 @@ fn contrast_ratio_matches_wcag_reference_identity() {
     );
 }
 
+/// Regression for R-2 (round 2, 2026-09-02): a fully transparent
+/// foreground must measure as indistinguishable from the background
+/// (ratio 1.0), not as if it were fully opaque. Before `composite_over`
+/// existed, `contrast_ratio(black, white)` reported 21.0:1 even at
+/// `black.a = 0.0` — a fully invisible mark passed every check in this
+/// module. This is the exact probe the reviewer ran by hand; kept here
+/// so nobody has to re-derive it.
+#[test]
+fn text_contrast_sees_alpha() {
+    let invisible_black = Color {
+        a: 0.0,
+        ..Color::BLACK
+    };
+    let r = text_contrast(invisible_black, Color::WHITE);
+    assert!(
+        (r - 1.0).abs() < 0.01,
+        "a fully transparent foreground over white should measure 1.0:1 \
+         (indistinguishable from the background), got {r:.3}"
+    );
+}
+
 /// Every intent's body text against its own actual background, both
 /// stock themes. Failures are collected across the full sweep rather
 /// than stopping at the first, so a regression states every affected
@@ -124,7 +177,7 @@ fn toast_body_text_meets_aa_all_intents_both_themes() {
             let fg = style
                 .text_color
                 .expect("toast_style always sets text_color");
-            let r = contrast_ratio(fg, bg);
+            let r = text_contrast(fg, bg);
             if r < AA_TEXT {
                 failures.push(format!(
                     "{theme_name} / {}: body text {r:.3}:1 < {AA_TEXT} (fg {fg:?} bg {bg:?})",
@@ -175,7 +228,7 @@ fn toast_dismiss_mark_meets_non_text_floor_all_intents_both_themes() {
             let bg = toast_background(&theme, intent);
             for status in ALL_STATUSES {
                 let btn = close_button_style(&theme, intent, status);
-                let r = contrast_ratio(btn.text_color, bg);
+                let r = text_contrast(btn.text_color, bg);
                 if r < NON_TEXT_MIN {
                     failures.push(format!(
                         "{theme_name} / {} / {status:?}: dismiss mark {r:.3}:1 < {NON_TEXT_MIN} \

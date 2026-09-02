@@ -23,10 +23,13 @@ are recorded in the per-version migration guides under
   measured 3.18:1, matching the audit; text corrected to black against
   the unchanged fill — 6.60:1. The dismiss `×` was hard-coded white
   regardless of intent (1.58:1 for `Debug`'s light-gray fill); it now
-  shares each intent's own text colour, and the hover/rest alpha fade
-  that regressed contrast for four of five intents once the correct
-  colour was substituted in is removed — the mark is fully opaque at
-  every status.
+  shares each intent's own text colour. **The hover/rest alpha fade is
+  gone — a margin choice, not a floor fix.** With the corrected colours
+  a 0.75-alpha fade clears the 3.0 floor at every intent and both stock
+  themes (worst case, `Error`: 3.38:1). It is removed because doing so
+  raises that worst case to 4.83:1 and makes the mark's contrast
+  independent of interaction state — the mark is fully opaque at every
+  status.
 
   **`Info` was not one of the audit's named findings.** Measuring all
   five intents (Q-3) rather than trusting the two reported found `Info`

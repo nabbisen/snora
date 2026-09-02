@@ -1,12 +1,13 @@
 # Migration 0.41 → 0.42
 
 > **Rendered appearance change on the default path — no feature needed.**
-> The engine's toast colours (`Warning` and `Info`) change, and the
-> dismiss `×` no longer dims on rest / brightens on hover. Every change
-> is a contrast repair: text that failed WCAG AA now clears it. **If you
-> hold reference images or visual-regression baselines that include a
-> toast, they are invalidated** for `Warning` and `Info` intents, and for
-> the dismiss `×` on every intent.
+> The engine's toast colours (`Warning` and `Info`) change — both were
+> text that failed WCAG AA and now clears it. The dismiss `×` also no
+> longer dims on rest / brightens on hover, on every intent — a
+> deliberate margin simplification, not a contrast repair; see below.
+> **If you hold reference images or visual-regression baselines that
+> include a toast, they are invalidated** for `Warning` and `Info`
+> intents, and for the dismiss `×` on every intent.
 
 ## Who is affected
 
@@ -38,13 +39,15 @@ For `Debug` (a light-gray fill with black text) this measured **1.58:1**
 — effectively invisible. The mark now shares the same colour the body
 uses for each intent, so it cannot re-diverge from it.
 
-**The hover/rest fade is gone.** The dismiss `×` previously dimmed to
-75% opacity at rest and brightened to 100% on hover — an alpha fade
-toward the toast's own background, which measured under the WCAG
-non-text floor (3.0:1) for four of five intents once the correct colour
-was substituted in (`Debug`'s worst case: 1.42:1 at rest). The mark is
-now fully opaque at every status. Hover no longer changes its own
-appearance; nothing else about hover/press interaction changed.
+**The hover/rest fade is gone — a margin choice, not a floor fix.** The
+dismiss `×` previously dimmed to 75% opacity at rest and brightened to
+100% on hover. With the corrected colours, a 0.75-alpha fade clears the
+3.0 floor at every intent and both stock themes (worst case, `Error`:
+**3.38:1**). It is removed because doing so raises that worst case to
+**4.83:1** and makes the mark's contrast independent of interaction
+state. The mark is now fully opaque at every status; hover no longer
+changes its own appearance, and nothing else about hover/press
+interaction changed.
 
 **Why `Info`'s fill also changed, not only its text.** Neither of
 iced's own paired tiers for `primary` (`.base.text` at 4.43:1, or
