@@ -46,11 +46,13 @@ files and the exact failure mode of missing one.
 
 ## GitHub Actions workflows
 
-Four workflows run automatically; they have distinct responsibilities:
+Six workflows run automatically; they have distinct responsibilities:
 
 | Workflow | File | Trigger | Responsibility |
 |---|---|---|---|
-| **CI** | `ci.yaml` | PR, push to `main` | Rust quality gate: `rust-quality`, `feature-matrix`, `design-isolation`, `docs` jobs. **No release merges while this is red.** |
+| **CI** | `ci.yaml` | PR, push to `main` | Rust quality gate: `rust-quality`, `feature-matrix`, `design-isolation`, `docs` jobs. A red run now **blocks publishing mechanically** — see Release below. |
+| **Release** | `release.yaml` | push of a bare `X.Y.Z` tag | Publishes the workspace to crates.io over Trusted Publishing (OIDC). Refuses before any upload if the tag disagrees with `[workspace.package].version`, or if the tagged commit has no completed, successful CI run (RFC-090). |
+| **Unpinned build** | `unpinned-build.yaml` | `workflow_dispatch` | Builds against unpinned dependencies; run on `main` before tagging (RFC-041). |
 | **Docs** | `docs.yaml` | Push to `main` | Build and deploy mdBook to GitHub Pages. |
 | **Binary size** | `binary-size.yaml` | PR, push, tags | Measure stripped binary size; append a row to the CSV on release tags. |
 | **Build cost** | `build-cost.yaml` | Push to `main`, tags | Measure compile time; append a row to the CSV on release tags. |
@@ -307,9 +309,12 @@ restate the guide's content.
     # it, cancel any tag-triggered measurement runs first — otherwise
     # re-pushing the tag appends a SECOND row for the same version.
 [ ] git push origin main && git push origin X.Y.Z
-    # tags carry no `v` prefix, matching Rust crate convention
-[ ] Confirm CI workflow green on the tag commit (all four jobs:
-    rust-quality, feature-matrix, design-isolation, docs)
+    # Tags carry no `v` prefix, matching Rust crate convention. This is
+    # now ENFORCED, not remembered: release.yaml triggers on
+    # ['[0-9]+.[0-9]+.[0-9]+'], so a `v`-prefixed tag does not publish
+    # at all. 0.41.1 was first tagged `v0.41.1` against 67 bare tags,
+    # which is why the pattern exists (RFC-090).
+    # Pushing the tag IS the publish. See "Publishing" below.
 [ ] After tag push: confirm a NEW ROW EXISTS for this version in
     docs/src/reference/binary-size-budget/binary-size.csv on main —
     `git show main:docs/src/reference/binary-size-budget/binary-size.csv | tail -1`
@@ -374,29 +379,60 @@ restate the guide's content.
 
 ### Publishing
 
-```bash
-cargo publish --workspace
-```
+**Pushing the tag publishes. There is no command to run here.**
 
-**One command. Do not publish the five crates individually.**
+`release.yaml` triggers on a bare `X.Y.Z` tag, checks out that tag, and runs
+`cargo publish --workspace` — one command, five crates, as before. It
+authenticates with crates.io **Trusted Publishing** (OIDC); there is no
+long-lived token anywhere in this repository.
 
-**Publish from a clean tree at the tag** — not from a working directory
-with other work in flight. `cargo publish` packages the **working
-directory**, not the tagged commit, so uncommitted work from a later
-milestone would be uploaded inside the release. Cargo refuses a dirty tree
-by default, which is the guard; **never pass `--allow-dirty` to get past
-it.**
+Before any upload it refuses if:
 
-If other work is in flight, publish from a throwaway worktree at the tag:
+1. the tag does not match `[workspace.package].version` in `Cargo.toml`, or
+2. the tagged commit has no **completed, successful** CI run — including when
+   it has no run at all, which is a refusal and not a pass.
+
+Watch the run. If it refuses, the message names what disagreed.
+
+#### Why this is not a checklist item any more
+
+This section used to ask three things of whoever was cutting: confirm CI is
+green, publish from a clean tree at the tag, and name the tag `X.Y.Z`. All three
+were rules a person had to remember, and **all three were broken during the
+0.41.1 cut by the person who wrote them** — published on a red `main`, from a
+laptop, under a tag first named `v0.41.1`.
+
+They are now properties of the mechanism instead (RFC-090):
+
+| Was | Is |
+|---|---|
+| Remember to check CI is green | `release.yaml` refuses a commit without a green run |
+| Publish from a clean tree at the tag | The workflow's checkout of the tag *is* the clean tree |
+| Tag `X.Y.Z`, not `vX.Y.Z` | The trigger pattern does not fire on anything else |
+
+The one rule in this section that never failed was the dirty-tree rule, and it
+never failed because **cargo refused** — not because it was written down well.
+That is the whole argument, and it is why the list above is short.
+
+#### Break-glass: publishing by hand
+
+Permitted **only** when `release.yaml` itself is broken, **and** the owner says
+so for that specific release. Not an equal alternative — an exception with a
+named condition, because an exception without one becomes the default:
 
 ```bash
 git worktree add --detach /tmp/publish-X.Y.Z X.Y.Z
 cd /tmp/publish-X.Y.Z && cargo publish --workspace
 ```
 
-This is not hypothetical: 0.27.1 was cut while the 0.28.0 work sat
-uncommitted, and cargo's dirty-tree refusal is what stopped a docs-only
-patch from shipping two unreleased features' source.
+Publish from a throwaway worktree at the tag, never from a working directory
+with other work in flight: `cargo publish` packages the **working directory**,
+not the tagged commit. Cargo refuses a dirty tree by default, which is the
+guard; **never pass `--allow-dirty` to get past it.**
+
+This is not hypothetical: 0.27.1 was cut while the 0.28.0 work sat uncommitted,
+and cargo's dirty-tree refusal is what stopped a docs-only patch from shipping
+two unreleased features' source.
 
 Cargo computes the dependency order from the manifests
 (`snora-core` and `snora-design` have no internal dependencies;
