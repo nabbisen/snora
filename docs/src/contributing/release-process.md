@@ -170,6 +170,14 @@ releases.
 | **Feature-gating indicator 1** | Assessing compile time at all. The table's own threshold is 30,000 ms on a developer machine, cold; the cell reads **Unassessed** because the CI proxy that used to fill it measured a different quantity and was retired (RFC-062) | **A measurement exists.** Not an RFC — RFC-078 was this exact shape, a measurement dressed as a design question, and was archived for it. Someone takes the number on a developer machine and the cell stops lying | **No.** Nothing external is needed; it has simply never been anyone's turn |
 
 
+**When the letter goes.** Both open questions above wait on the same letter, and
+the owner ruled 2026-09-03 that it goes **after RFC-094 and RFC-095's work is
+complete**, not before — so it ships with a release that has its own reason to
+exist rather than as a note about pending questions. Concretely: RFC-094 lands →
+0.44.0 is cut → the letter carries the colour-alone division of labour (RFC-093
+Q-1) *and* the `Emphasis`/`Size` question (RFC-095 Q-1) → answers rule RFC-095's
+Q-1 → 0.45.0 acts on it.
+
 **The last column is the part worth copying.** A condition that depends on someone
 else knowing something is unreachable until we tell them — so a deferral whose
 trigger is "a consumer asks" carries an obligation on *us*, and it belongs in the
