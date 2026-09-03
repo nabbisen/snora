@@ -67,7 +67,7 @@ Type-names audit: **complete as of v0.17.0.**
 | Toast ordering documented and tested | ✅ RFC-011-B |
 | Toast lifecycle helpers documented and tested | ✅ |
 | ABDD checklist adopted | ✅ RFC-012-A |
-| Direction-sensitive integration tests | ✅ RFC-017 — 2 RTL render-semantics tests added |
+| Direction-sensitive integration tests | ✅ RFC-017 — **3** RTL render-semantics tests (`sheet_end_edge_reachable_under_rtl`, `toast_dismiss_reachable_under_rtl`, and `toast_body_click_does_not_reach_content_beneath_under_rtl`, added 0.43.0). **Read the note below this table before treating this tick as re-derived.** |
 | `keyboard::dismiss_on_escape` tested | ✅ 7 unit tests (RFC-014-A) |
 
 ## Documentation review
@@ -98,6 +98,28 @@ Type-names audit: **complete as of v0.17.0.**
 | Gate | Status |
 |---|---|
 | 0. *(Not a gate — a 1.0 decision recorded here so it is not rediscovered)* **`Emphasis` and `Size` have no consumers.** Both shipped in v0.19 (RFC-020…RFC-030) as shared variant vocabulary, are re-exported through `snora::design`, and **nothing reads either** — checked 2026-09-02, not inherited. `Tone` is read by `notice` and `progress` (not buttons or chips, which the old module doc claimed); `Density` is a `Tokens` field. Frozen public surface under RFC-036's additive-only covenant, so they cannot simply be dropped. **The 1.0 question: give them consumers, or remove them in the break.** Recorded in `crates/snora-design/src/variants.rs`'s own module doc. | — |
+> **Open question, recorded 2026-09-03: which other rows were ticked on evidence
+> RFC-084 later proved insufficient?**
+>
+> Gate 5 was ✅ for 24 minors because every render-semantics test behind it was
+> positive-only — reachability, never containment. RFC-084 found that and
+> corrected gate 5. **It corrected gate 5 and stopped there.** At least two other
+> rows rest on the same body of tests and the same era of evidence:
+> *"Z-stack order documented and tested"* (RFC-011-D/E, RFC-012 — ticked roughly
+> thirty minors before any negative assertion existed) and *"Direction-sensitive
+> integration tests"* (two positive-only RTL tests until 0.43.0 added a negative
+> one).
+>
+> Both are **arguably justified today** — gate 5's negative assertions cover
+> z-stack, and 0.43.0's RTL containment test covers direction. But they became
+> justified by work done for a different gate, **accidentally, not because anyone
+> re-checked them.** A tick that is right by luck is indistinguishable from one
+> that is right by evidence, until someone looks.
+>
+> Not re-derived here, and deliberately not re-ticked or un-ticked: that is the
+> owner's judgement, and the sweep is the work. Recorded so the next person does
+> not have to notice it independently.
+
 | 1. One iced major upgrade completed and lived on ≥1 minor | ⬜ |
 | 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
 | 3. At least one third-party or production-grade app | ⬜ **verdict open; evidence updated v0.33.0.** The v0.18.1 entry (a build-failure report from `nabbisen/logolig`) is superseded. Three integrations now exist: **apimokka** (desktop GUI for apimock-rs, public repository, on 0.29.0, engine + `design`, zero `snora::widget::*` call sites), **arama** (image/video browser, on 0.25.0), and **orbok** (AI-driven document search, on 0.25.1, `widgets` + `design`, the only consumer exercising the prefab widgets and chrome geometry). Between them they have driven RFCs 045–056 across eight releases. What remains a judgement rather than a fact: whether any of these is *third-party* — all three are adjacent projects, not unaffiliated adopters — and whether "production-grade" is met by an application whose own visual-verification pass is still outstanding. Decide those two words before ticking this. |
