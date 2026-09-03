@@ -60,15 +60,37 @@ contributor-facing documents linked below, not duplicated here.
 
 ## What snora does not provide
 
-- **No non-colour status encoding, yet.** `Toast` intents
-  (`ToastIntent::Info`/`Success`/`Warning`/`Error`/`Debug`, in
-  `crates/snora/src/toast.rs`'s `toast_style`) and `Notice` tones
-  (`crates/snora-widgets/src/design/notice.rs`) are distinguished only
-  by background/accent colour today — same title and body text
-  regardless of intent, no icon, no textual prefix. This is a WCAG
-  1.4.1 (use of colour) gap, corrected here (F-20, RFC-089) after this
-  page previously overstated it as already solved. Adding a non-colour
-  cue is a behaviour change and belongs in its own RFC, not this one.
+- **snora's prefab surfaces distinguish semantic variants by colour
+  alone.** A consumer relying on them for WCAG 1.4.1 (Use of Colour)
+  must supply a non-colour channel themselves — typically per-variant
+  text, which most applications already do: a notice or a toast
+  written with its own distinct title and body carries the distinction
+  in words no matter what colour it renders in, which is a legitimate
+  division of labour, not a workaround. snora contributes colour; the
+  consumer supplies the words.
+
+  This is asserted by test, not just stated — the same shape
+  [Law 8](../reference/overlay-interaction-semantics.md#law-8--modal-focus-trapping-is-staged-not-shipped)
+  uses for its own boundary. Three surfaces are covered, each exhaustive
+  over its variant enum so a new variant fails to compile without an
+  entry:
+
+  | Surface | Varies by | Register |
+  |---|---|---|
+  | `snora::toast` (`toast_style`, `close_button_style`) | `ToastIntent` (5) | `crates/snora/src/toast/channel_register.rs` |
+  | `snora_widgets::design::notice` | `Tone` (6) | `crates/snora-widgets/src/design/channel_register.rs` |
+  | `snora_widgets::design::progress` | `Tone` (6), via `snora-style` | `crates/snora-widgets/src/design/channel_register.rs` |
+
+  The register does not, and cannot, prove 1.4.1 conformance — that
+  depends on text the application supplies, not on anything snora
+  renders. Its job is narrower: to fail the day a prefab's colour-only
+  claim and its code diverge, in either direction.
+
+  Adding a non-colour cue (an icon, a textual prefix) to these prefabs
+  is a deliberate, deferred decision, not an oversight — see RFC-093.
+  It would be a default-path appearance change, and every adopting team
+  that has checked is already safe without it, for exactly the
+  per-variant-text reason above.
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim

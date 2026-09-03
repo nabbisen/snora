@@ -90,3 +90,10 @@ pub mod progress;
 ///
 /// See the module documentation for the full spacing/radius mapping.
 pub mod widget;
+
+/// RFC-093's channel register: asserts that `notice` and `progress`
+/// vary their tone-dependent style by colour alone, exhaustively over
+/// [`snora_design::Tone`]. Not a 1.4.1 conformance check — see the
+/// module's own documentation for what it does and does not prove.
+#[cfg(test)]
+mod channel_register;

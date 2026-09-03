@@ -37,7 +37,7 @@
 //! ```
 
 use iced::{
-    Border, Element, Length,
+    Border, Color, Element, Length,
     widget::{button, column, container, row, text},
 };
 use snora_design::{Tokens, Tone};
@@ -109,18 +109,10 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
     #[must_use]
     pub fn render(self) -> Element<'a, Message> {
         let t = self.tokens;
-        let p = &t.palette;
 
-        let accent_color = style::color::to_iced_color(match self.tone {
-            Tone::Accent => p.accent,
-            Tone::Success => p.success,
-            Tone::Warning => p.warning,
-            Tone::Danger => p.danger,
-            Tone::Info => p.info,
-            Tone::Neutral => p.border,
-        });
-        let text_color = style::color::to_iced_color(p.text_primary);
-        let surface = style::color::to_iced_color(p.surface);
+        let accent_color = notice_accent_color(t, self.tone);
+        let text_color = style::color::to_iced_color(t.palette.text_primary);
+        let surface = style::color::to_iced_color(t.palette.surface);
 
         // Content: optional title + body
         let mut content_col: Vec<Element<'a, Message>> = Vec::new();
@@ -172,16 +164,11 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         let mut main_row_children: Vec<Element<'a, Message>> = Vec::new();
 
         // Left accent bar
-        let bar_color = accent_color;
         main_row_children.push(
             container(iced::widget::space())
                 .width(4.0)
                 .height(Length::Fill)
-                .style(move |_| iced::widget::container::Style {
-                    background: Some(bar_color.into()),
-                    border: Border::default().rounded(0.0),
-                    ..Default::default()
-                })
+                .style(move |_| notice_accent_bar_style(accent_color))
                 .into(),
         );
 
@@ -206,18 +193,61 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         }
 
         let radius = t.radius.md;
-        let border_color = accent_color;
 
         container(row(main_row_children).height(Length::Shrink))
-            .style(move |_| iced::widget::container::Style {
-                background: Some(surface.into()),
-                border: Border::default()
-                    .rounded(radius)
-                    .color(border_color)
-                    .width(1.0),
-                ..Default::default()
-            })
+            .style(move |_| notice_outer_style(surface, accent_color, radius))
             .into()
+    }
+}
+
+/// Maps a [`Tone`] to the single colour that carries it: the left accent
+/// bar, the outer border, and the action button's label all reuse this
+/// same value. **Colour only** — RFC-093's register for this surface;
+/// see `channel_register.rs`'s test asserting nothing else varies by
+/// tone in [`notice_accent_bar_style`] or [`notice_outer_style`].
+///
+/// Exhaustive on purpose (RFC-063's pattern): a seventh [`Tone`] fails
+/// to compile here until it is given a colour.
+pub(super) fn notice_accent_color(tokens: &Tokens, tone: Tone) -> Color {
+    let p = &tokens.palette;
+    style::color::to_iced_color(match tone {
+        Tone::Accent => p.accent,
+        Tone::Success => p.success,
+        Tone::Warning => p.warning,
+        Tone::Danger => p.danger,
+        Tone::Info => p.info,
+        Tone::Neutral => p.border,
+    })
+}
+
+/// Style of the left accent bar. Only `background` varies with `color`
+/// (which callers derive from [`notice_accent_color`]); everything else
+/// is a fixed literal, checked by `channel_register.rs`.
+pub(super) fn notice_accent_bar_style(color: Color) -> iced::widget::container::Style {
+    iced::widget::container::Style {
+        background: Some(color.into()),
+        border: Border::default().rounded(0.0),
+        ..Default::default()
+    }
+}
+
+/// Style of the notice's outer container. Only `border.color` varies
+/// with the caller-supplied accent colour; `background`, `border.width`,
+/// and `border.radius` are independent of tone (checked by
+/// `channel_register.rs`), though `radius` does vary with the token
+/// bundle's own `radius.md`, unrelated to tone.
+pub(super) fn notice_outer_style(
+    surface: Color,
+    border_color: Color,
+    radius: f32,
+) -> iced::widget::container::Style {
+    iced::widget::container::Style {
+        background: Some(surface.into()),
+        border: Border::default()
+            .rounded(radius)
+            .color(border_color)
+            .width(1.0),
+        ..Default::default()
     }
 }
 

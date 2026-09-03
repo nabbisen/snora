@@ -397,6 +397,9 @@ pub fn sweep_expired<Message: Clone>(toasts: &mut Vec<Toast<Message>>, now: Inst
 mod contrast_tests;
 
 #[cfg(test)]
+mod channel_register;
+
+#[cfg(test)]
 mod tests {
     use super::*;
 

@@ -66,6 +66,33 @@ are recorded in the per-version migration guides under
   summary, not a build failure), but a real defect the project had no
   way to see before this.
 
+- **A channel register states, and a test asserts, that snora's prefab
+  surfaces distinguish semantic variants by colour alone (RFC-093).**
+  `accessibility.md` previously implied `Toast` intents and `Notice`
+  tones carried a non-colour cue; they never did, and no contrast gate
+  could have caught that a colour-pair enumeration is structurally
+  blind to WCAG 1.4.1 regardless of how exhaustive it is. This corrects
+  what a consumer can rely on: `snora::toast`, `snora_widgets::design::
+  notice`, and `snora_widgets::design::progress` all distinguish their
+  variants (`ToastIntent`/`Tone`) through colour only, and a consumer
+  relying on them for 1.4.1 must supply a non-colour channel itself —
+  typically per-variant text, which every adopting team that checked
+  already does.
+
+  The claim is pinned to the code, not just stated: `toast/
+  channel_register.rs` and `design/channel_register.rs` each match
+  exhaustively over their variant enum (a new variant fails to compile
+  without an entry) and assert that nothing but colour differs between
+  variants' style output. Demonstrated failing before being trusted —
+  a scratch per-variant non-colour channel (a widened border) added to
+  each surface in turn, confirmed the register refused and named the
+  surface and variant, then reverted.
+
+  Adding an actual non-colour cue (an icon, a textual prefix) remains
+  deferred, not decided here — every adopting team that has checked is
+  already safe without one, and it would be a default-path appearance
+  change.
+
 ## [0.42.0] — 2026-09-02
 
 ### Fixed
