@@ -69,7 +69,7 @@ use iced::widget::{button, center, container, mouse_area, space, text};
 use iced::{Element, Length, Point};
 use iced_test::simulator;
 
-use snora::{AppLayout, Dialog, Sheet, SheetEdge, Toast, ToastIntent, render};
+use snora::{AppLayout, Dialog, Sheet, SheetEdge, SheetSize, Toast, ToastIntent, render};
 
 // ---------------------------------------------------------------------------
 // Shared message type for all render-semantics tests.
@@ -83,6 +83,7 @@ enum Msg {
     DialogOk,
     SheetAction,
     DismissToast(u64),
+    MenuItem,
 }
 
 // ---------------------------------------------------------------------------
@@ -642,5 +643,112 @@ fn dialog_and_sheet_coexist_sheet_content_reachable() {
     assert!(
         msgs.contains(&Msg::SheetAction),
         "sheet button click must produce SheetAction in coexistence layout; got {msgs:?}",
+    );
+}
+
+/// Dialog (layer 5) and sheet (layer 6) actually overlap here — unlike
+/// [`dialog_and_sheet_coexist_sheet_content_reachable`], whose centered
+/// dialog and bottom-edge sheet never occupy the same screen space and
+/// so cannot distinguish push order between the two (RFC-094 Unit 1's
+/// own finding: that test proves both are reachable, not that layer 6
+/// paints over layer 5).
+///
+/// A near-full-height sheet (`SheetSize::Ratio(1.0)`, `SheetEdge::Bottom`
+/// — the sheet's own `Length::Fill` width plus a spacer portion of 1 vs.
+/// the sheet's 100, see `render.rs`'s `portions`) covers the dialog's
+/// own button location. The sheet's opaque surface, pushed after the
+/// dialog's in `render_with_style`, must intercept a click aimed at the
+/// dialog before it reaches the button beneath it — this is the
+/// **order** claim itself, not a consequence of one, RFC-094's z-stack
+/// row can name again once this exists.
+#[test]
+fn sheet_renders_above_dialog_when_both_overlap() {
+    let dialog: Dialog<Element<Msg>, Msg> = Dialog::new(btn("Dialog btn", Msg::DialogOk));
+    let sheet: Sheet<Element<Msg>, Msg> = Sheet::new(btn("Sheet action", Msg::SheetAction))
+        .at(SheetEdge::Bottom)
+        .with_size(SheetSize::Ratio(1.0));
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .dialog(dialog)
+        .sheet(sheet)
+        .on_close_modals(Msg::CloseModals);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.click("Dialog btn").expect(
+        "dialog button must still be findable in the tree, even though \
+         the overlapping sheet covers it",
+    );
+    let msgs: Vec<Msg> = ui.into_messages().collect();
+
+    assert!(
+        !msgs.contains(&Msg::DialogOk),
+        "a click aimed at the dialog, where an overlapping sheet also \
+         renders, must be captured by the sheet (pushed after the \
+         dialog) rather than reaching the dialog's own button; got {msgs:?}",
+    );
+}
+
+/// A header menu and a modal (dialog) present at the same time —
+/// checked here for the first time (RFC-094 Unit 2's own closing note:
+/// no test in this suite previously constructed the two together at
+/// all, so what was unverified was not their relative order but
+/// whether the combination even works).
+///
+/// Nothing is broken, and this confirms
+/// [Law 2](https://docs.snora.dev/reference/overlay-interaction-semantics.html#law-2--menus-are-lightweight-and-below-modal-state)'s
+/// claim rather than assuming it: *"modal state dominates menus
+/// visually and interactively."* Both render — the menu item and the
+/// dialog button are both findable in the tree — but only the dialog is
+/// interactively reachable: the menu backdrop and content (layers 1–2)
+/// sit beneath the modal dim (layer 4), so a click aimed at the menu
+/// item is captured by the dim instead and produces `CloseModals`
+/// rather than the menu's own message, while the dialog (layer 5, above
+/// the dim) fires normally.
+#[test]
+fn menu_and_modal_together_menu_is_dominated_but_dialog_still_works() {
+    let menu_el: Element<Msg> = btn("File item", Msg::MenuItem);
+    let dialog: Dialog<Element<Msg>, Msg> = Dialog::new(btn("Dialog btn", Msg::DialogOk));
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed))
+        .header_menu(menu_el)
+        .on_close_menus(Msg::CloseMenus)
+        .dialog(dialog)
+        .on_close_modals(Msg::CloseModals);
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.find("File item")
+        .expect("menu item must still render even though a modal is also present");
+    ui.click("File item")
+        .expect("menu item must still be findable in the tree");
+    let menu_click_msgs: Vec<Msg> = ui.into_messages().collect();
+    assert!(
+        !menu_click_msgs.contains(&Msg::MenuItem),
+        "a click aimed at the menu item must be captured by the modal \
+         dim above it (Law 2: modal dominates menus interactively), not \
+         reach the menu's own message; got {menu_click_msgs:?}",
+    );
+    assert!(
+        menu_click_msgs.contains(&Msg::CloseModals),
+        "the intercepted click should land on the modal dim, producing \
+         its own close message; got {menu_click_msgs:?}",
+    );
+
+    // The dialog itself, above the dim, must remain fully interactive —
+    // the menu's mere presence does not also break the modal.
+    let element = render(
+        AppLayout::new(btn("body", Msg::BodyPressed))
+            .header_menu(btn("File item", Msg::MenuItem))
+            .on_close_menus(Msg::CloseMenus)
+            .dialog(Dialog::new(btn("Dialog btn", Msg::DialogOk)))
+            .on_close_modals(Msg::CloseModals),
+    );
+    let mut ui = simulator(element);
+    ui.click("Dialog btn")
+        .expect("dialog content must be clickable while a menu is also present");
+    let dialog_click_msgs: Vec<Msg> = ui.into_messages().collect();
+    assert!(
+        dialog_click_msgs.contains(&Msg::DialogOk),
+        "dialog must remain fully interactive when a menu is also \
+         present; got {dialog_click_msgs:?}",
     );
 }
