@@ -10,6 +10,9 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.43 → 0.44](migration-0.43-to-0.44.md) — **not breaking; no code,
+  appearance, or API change.** Tests and register corrections. Repeats
+  0.43's statement of what snora's prefabs do and do not distinguish.
 - [0.42 → 0.43](migration-0.42-to-0.43.md) — **not breaking; no code,
   appearance, or API change.** Carries the positive statement of what
   snora's prefab toasts and notices do and do not distinguish: colour

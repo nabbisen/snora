@@ -141,6 +141,7 @@ Numbers remain stable forever and are never reused.
 | 090 | [The release rules nothing enforces](./done/090-the-release-rules-nothing-enforces.md) | v0.42.0 — High (handoff: [`handoffs/090-…`](./handoffs/090-the-release-rules-nothing-enforces/implementation-handoff.md)) |
 | 092 | [Claims about code are not checked the way code is](./done/092-claims-about-code-are-not-checked-the-way-code-is.md) | v0.43.0 — High (handoff: [`handoffs/092-…`](./handoffs/092-claims-about-code-are-not-checked-the-way-code-is/implementation-handoff.md)) |
 | 093 | [A contrast gate cannot see 1.4.1, and ours never could](./done/093-a-contrast-gate-cannot-see-1-4-1.md) | v0.43.0 — High (handoff: [`handoffs/093-…`](./handoffs/093-a-contrast-gate-cannot-see-1-4-1/implementation-handoff.md)) |
+| 094 | [The gate register has rows nobody re-derived](./done/094-the-gate-register-has-rows-nobody-re-derived.md) | v0.44.0 — Medium (handoff: [`handoffs/094-…`](./handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -152,7 +153,6 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 094 | [The gate register has rows nobody re-derived](./accepted/094-the-gate-register-has-rows-nobody-re-derived.md) | v0.44.0 — Medium |
 | 095 | [`Emphasis` and `Size` are published vocabulary nothing reads](./accepted/095-emphasis-and-size-are-published-and-unread.md) | v0.45.0 — Medium |
 
 ## Proposed

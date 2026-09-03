@@ -1,9 +1,7 @@
 # RFC 094 — The gate register has rows nobody re-derived
 
-**Status.** Accepted (owner, 2026-09-03). Handoff written — see
-[`handoffs/094-…`](../handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff.md).
-**Q-1 ruled** — test-backed rows only. **Q-2 ruled** — a dated "last re-derived"
-column. **Q-3 ruled** — the architect rules a disputed row, per RFC-087's Q-3.
+**Status.** Done — shipped in v0.44.0 (2026-09-03).
+[Handoff](../handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff.md) (plus [Unit 2](../handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff-unit-2.md) and [Unit 3](../handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff-unit-3.md)).
 **Tracks.** 1.0 readiness / evidence integrity. **Severity: Medium.**
 **Found by** answering "what remains for the next release" against the register
 rather than from memory.

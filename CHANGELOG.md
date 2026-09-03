@@ -17,6 +17,31 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.44.0] — 2026-09-03
+
+### Changed
+
+- **Four claims in the 1.0 readiness register were checked against the
+  code for the first time, and three of them were wrong (RFC-094).**
+  No consumer-observable change — this release is tests, one CI entry,
+  and corrections to `docs/src/contributing/api-freeze-review.md`.
+  *"Feature flags documented and CI-tested"* was reopened:
+  `--no-default-features --features design` is documented as a supported
+  combination and appeared in no CI job. It works — it compiles and its
+  suites pass — so a tenth feature-matrix entry now covers it.
+  *"Toast lifecycle helpers documented and tested"* was reopened as
+  false: it names two helpers and `toast::subscription` had no test at
+  all. It has one now, covering both branches including the two cases a
+  compile-only doctest cannot reach.
+  *"Z-stack order documented and tested"* was narrowed to
+  *"consequences"* and then restored once the evidence existed: the
+  dialog↔sheet boundary is now directly asserted, and swapping the two
+  `layers.push()` calls fails the new test while the older coexistence
+  test still passes.
+  Three further rows were confirmed correct in the same detail as the
+  failures, because a sweep that reports only failures teaches the
+  reader to discount it.
+
 ## [0.43.0] — 2026-09-02
 
 ### Added
@@ -2987,7 +3012,8 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.43.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.44.0...HEAD
+[0.44.0]: https://github.com/nabbisen/snora/compare/0.43.0...0.44.0
 [0.43.0]: https://github.com/nabbisen/snora/compare/0.42.0...0.43.0
 [0.42.0]: https://github.com/nabbisen/snora/compare/0.41.1...0.42.0
 [0.41.1]: https://github.com/nabbisen/snora/compare/0.41.0...0.41.1

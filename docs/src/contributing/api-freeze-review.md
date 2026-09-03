@@ -3,7 +3,7 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.43.0):** Eight of ten core gates satisfied. Remaining
+**Current status (v0.44.0):** Eight of ten core gates satisfied. Remaining
 blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
 production app). **Gate 5 re-ticked 2026-09-02**, having been reopened
 2026-09-01 (RFC-084) — see its own row for why it was wrong for 24 minors and
