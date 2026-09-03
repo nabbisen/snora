@@ -10,6 +10,10 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.42 → 0.43](migration-0.42-to-0.43.md) — **not breaking; no code,
+  appearance, or API change.** Carries the positive statement of what
+  snora's prefab toasts and notices do and do not distinguish: colour
+  alone, with the non-colour channel supplied by your call site.
 - [0.41 → 0.42](migration-0.41-to-0.42.md) — **rendered appearance
   change on the default path.** The engine's `Warning` and `Info` toast
   colours were under WCAG AA (`Info` found only by measuring all five
