@@ -95,6 +95,12 @@ jobs:
           # widgets,design,svg-icons: same for svg-icons.
           - name: widgets-design-svg-icons
             args: "--no-default-features --features widgets,design,svg-icons"
+          # design alone, no widgets (RFC-094 Unit 1/2): Cargo.toml's own
+          # `design` feature doc comment documents this as independent of
+          # `widgets` ("everything else works with `design` alone"), and
+          # it had no CI entry at all until this one.
+          - name: design-only
+            args: "--no-default-features --features design"
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable

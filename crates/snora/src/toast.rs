@@ -510,4 +510,50 @@ mod tests {
             );
         }
     }
+
+    // -----------------------------------------------------------------------
+    // subscription (RFC-094 Unit 2) — had no test at all before this.
+    //
+    // `Subscription` has no `PartialEq`, so the branches can't be compared
+    // directly. `Subscription::units()` (a public count of recipes, via
+    // iced's own re-export of `iced_futures::Subscription`) distinguishes
+    // them: `Subscription::none()` has zero, a live `iced::time::every`
+    // subscription has one. Two of the four cases below are the negative
+    // half a doctest can't reach: no subscription when nothing needs
+    // sweeping.
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn subscription_units_reflect_whether_sweeping_is_needed() {
+        let empty: Vec<Toast<()>> = Vec::new();
+        assert_eq!(
+            subscription(&empty, || ()).units(),
+            0,
+            "an empty queue must not subscribe",
+        );
+
+        let persistent_only = vec![Toast::new(1, ToastIntent::Info, "a", "b", ()).persistent()];
+        assert_eq!(
+            subscription(&persistent_only, || ()).units(),
+            0,
+            "an all-persistent queue must not subscribe",
+        );
+
+        let one_transient = vec![Toast::new(2, ToastIntent::Info, "a", "b", ())];
+        assert_eq!(
+            subscription(&one_transient, || ()).units(),
+            1,
+            "a transient toast must subscribe",
+        );
+
+        let mixed = vec![
+            Toast::new(3, ToastIntent::Info, "a", "b", ()),
+            Toast::new(4, ToastIntent::Info, "a", "b", ()).persistent(),
+        ];
+        assert_eq!(
+            subscription(&mixed, || ()).units(),
+            1,
+            "any transient toast in the queue must subscribe, even alongside a persistent one",
+        );
+    }
 }
