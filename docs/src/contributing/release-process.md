@@ -168,6 +168,8 @@ releases.
 |---|---|---|---|
 | **RFC-093 Q-1** *(obligation met 2026-09-02, ahead of the cut)* | Adding a non-colour cue (icon or textual prefix) to toast intents and notice tones | **A consumer asks for it, having been told the prefabs distinguish by colour alone.** Before that, silence is not evidence — nobody asks for a channel they believe already exists, which is exactly how RFC-078 came to count apimokka's decline as demand data | **Yes.** The 0.43.0 migration guide and its letter must carry the colour-alone statement. `accessibility.md` already says it, but consumers read guides and letters, not the reference pages. ~~If 0.43.0 ships without it, this condition can never fire~~ — **done**: `docs/src/guides/migration-0.42-to-0.43.md` carries the statement and an explicit invitation to ask. Written before the cut rather than during it, because `check-migration-guides.sh` derives its pairs from `git tag` and so cannot flag a missing guide until after the tag exists. **No 0.43.0 letter was sent** (owner, 2026-09-03): the release changed nothing anyone compiles against, so it did not clear the correspondence bar, and a letter about a release with no changes is the note tekstide asked us to stop sending. **The condition is still reachable** — every team reads the 0.42→0.43 guide when they pass it, on their own upgrade schedule rather than ours. The colour-alone paragraph is written and goes in the next letter that has its own reason to exist. |
 | **Feature-gating indicator 1** | Assessing compile time at all. The table's own threshold is 30,000 ms on a developer machine, cold; the cell reads **Unassessed** because the CI proxy that used to fill it measured a different quantity and was retired (RFC-062) | **A measurement exists.** Not an RFC — RFC-078 was this exact shape, a measurement dressed as a design question, and was archived for it. Someone takes the number on a developer machine and the cell stops lying | **No.** Nothing external is needed; it has simply never been anyone's turn |
+| **0.44.0's tag** | Tagging and publishing 0.44.0. The release commit `11aae49` is on `main`; only the tag is held | **`unpinned-build` goes green.** It is red on an upstream break — `tinyvec 1.13.0`, published 2026-09-03, does not compile. Our pinned build is unaffected (CI green on 1.11.0), but libraries do not ship `Cargo.lock`, so a fresh `cargo add snora` resolves the broken version | **No.** Nothing on our side to fix; re-dispatch `unpinned-build` on `main` and tag when it passes. 0.44.0 has no consumer-visible change, so holding costs nobody anything |
+
 
 
 **When the letter goes.** Both open questions above wait on the same letter, and
@@ -407,6 +409,21 @@ restate the guide's content.
     # Do NOT package the five crates individually (see "Publishing").
 [ ] Merge to main, then dispatch the `unpinned-build` workflow on main and
     confirm a green run BEFORE tagging.
+    # WHEN IT IS RED FOR SOMEONE ELSE'S REASON: still hold. 2026-09-03,
+    # cutting 0.44.0, this fired for the first time and caught an
+    # upstream break, not ours — tinyvec 1.13.0, published that day and
+    # not yanked, does not compile (`cannot find macro 'vec'`).
+    # Our lockfile pinned 1.11.0, so CI was green and the tagged tree
+    # was sound.
+    # "It is not our bug" is the argument that would tag past this
+    # check every time it ever fires, since a pinned-green/unpinned-red
+    # split is almost always upstream. It is not the right question.
+    # The right question is whether tagging makes anything better:
+    # 0.44.0 had no consumer-visible change, so waiting cost nobody
+    # anything and the check went green on its own once upstream moved.
+    # If a release DOES carry something consumers need, weigh that
+    # against shipping into a window where a fresh `cargo add` fails —
+    # and record which way you went and why.
     # `workflow_dispatch` only works for workflows already on the default
     # branch, so this cannot be verified from a feature branch. A workflow
     # that has never executed is exactly the failure RFC-041 was raised to
