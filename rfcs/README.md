@@ -152,13 +152,13 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 094 | [The gate register has rows nobody re-derived](./accepted/094-the-gate-register-has-rows-nobody-re-derived.md) | v0.44.0 — Medium |
+| 095 | [`Emphasis` and `Size` are published vocabulary nothing reads](./accepted/095-emphasis-and-size-are-published-and-unread.md) | v0.45.0 — Medium |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 094 | [The gate register has rows nobody re-derived](./proposed/094-the-gate-register-has-rows-nobody-re-derived.md) | v0.44.0 — Medium |
-| 095 | [`Emphasis` and `Size` are published vocabulary nothing reads](./proposed/095-emphasis-and-size-are-published-and-unread.md) | v0.45.0 — Medium |
 
 ## Archive
 

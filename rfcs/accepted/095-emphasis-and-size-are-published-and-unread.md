@@ -1,6 +1,11 @@
 # RFC 095 — `Emphasis` and `Size` are published vocabulary nothing reads
 
-**Status.** Proposed (2026-09-03).
+**Status.** Accepted (owner, 2026-09-03). Handoff written — see
+[`handoffs/095-…`](../handoffs/095-emphasis-and-size-are-published-and-unread/implementation-handoff.md).
+**Q-1 open and blocking** — the adopting teams are asked first, in the letter that
+also carries RFC-093's Q-1 obligation. **Q-2 ruled** — if `Size` survives, it is
+renamed in the same break. **Q-3 ruled** — the wider unread-surface sweep is not
+in this RFC.
 **Tracks.** Public API / 1.0 readiness. **Severity: Medium.**
 **Found by** RFC-093's Q-3, which asked whether the channel register reaches
 `Emphasis` and got a more interesting answer than expected.
