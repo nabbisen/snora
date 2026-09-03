@@ -139,6 +139,8 @@ Numbers remain stable forever and are never reused.
 | 088 | [The workspace forces three iced features nobody asked for](./done/088-the-workspace-forces-three-iced-features-nobody-asked-for.md) | v0.42.0 — High (handoff: [`handoffs/088-…`](./handoffs/088-the-workspace-forces-three-iced-features-nobody-asked-for/implementation-handoff.md)) |
 | 089 | [Documentation and hygiene sweep from the external audit](./done/089-documentation-and-hygiene-sweep.md) | v0.41.1 — Medium/Low (handoff: [`handoffs/089-…`](./handoffs/089-documentation-and-hygiene-sweep/implementation-handoff.md)) |
 | 090 | [The release rules nothing enforces](./done/090-the-release-rules-nothing-enforces.md) | v0.42.0 — High (handoff: [`handoffs/090-…`](./handoffs/090-the-release-rules-nothing-enforces/implementation-handoff.md)) |
+| 092 | [Claims about code are not checked the way code is](./done/092-claims-about-code-are-not-checked-the-way-code-is.md) | v0.43.0 — High (handoff: [`handoffs/092-…`](./handoffs/092-claims-about-code-are-not-checked-the-way-code-is/implementation-handoff.md)) |
+| 093 | [A contrast gate cannot see 1.4.1, and ours never could](./done/093-a-contrast-gate-cannot-see-1-4-1.md) | v0.43.0 — High (handoff: [`handoffs/093-…`](./handoffs/093-a-contrast-gate-cannot-see-1-4-1/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -146,12 +148,10 @@ Design settled, implementation may start, not yet shipped. See
 [`accepted/README.md`](./accepted/README.md). Empty is the normal resting
 state.
 
-RFC-092 came out of the 0.41.0–0.42.0 cycle, not the audit.
+Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 093 | [A contrast gate cannot see 1.4.1, and ours never could](./accepted/093-a-contrast-gate-cannot-see-1-4-1.md) | v0.43.0 — High |
-| 092 | [Claims about code are not checked the way code is](./accepted/092-claims-about-code-are-not-checked-the-way-code-is.md) | v0.43.0 — High |
 
 ## Proposed
 

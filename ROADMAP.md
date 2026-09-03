@@ -118,6 +118,8 @@ RFC-087).
 | **0.41.1** | 087, 089 | CI coverage and the documentation sweep. **Was 0.40.2 and did not ship** — 087 was scheduled *first* because it is what should have caught both Criticals, and it is now the oldest unstarted item from the audit |
 | **0.42.0** | 086, 088, **090** | Toast contrast, the `iced` feature removal, and publishing moving into CI. **Shipped 2026-09-02 — the audit's last two items, plus the RFC the 0.41.1 cut produced** |
 
+| **0.43.0** | 092, 093, plus gate 5's RTL containment test and a workflow linter | **No consumer-visible change at all** — tests, gates, and one documentation correction. Shipped 2026-09-02. The first release cut through `release.yaml` end to end with nothing at stake if it misbehaved |
+
 **All six audit RFCs are shipped.** 084 and 085 (Criticals) in 0.41.0; 087 and
 089 in 0.41.1, with 087 carrying a post-acceptance defect (D-1) found at the
 0.41.1 cut and fixed the same day; 086 and 088 in 0.42.0.

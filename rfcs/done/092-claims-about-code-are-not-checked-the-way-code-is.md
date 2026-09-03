@@ -1,13 +1,7 @@
 # RFC 092 — Claims about code are not checked the way code is
 
-**Status.** Accepted (owner, 2026-09-02). Handoff written — see
-[`handoffs/092-…`](../handoffs/092-claims-about-code-are-not-checked-the-way-code-is/implementation-handoff.md).
-**Q-1 ruled** — the script ships as a **gate**, keyed on a `Docs-only: yes`
-commit trailer, *against this RFC's own suggestion*: "CI cannot know which
-claims were made" is false if the claim is written where a machine reads it, and
-that reasoning is what kept three scripts manual for three releases (RFC-087,
-F-39). **Q-2 ruled** — both parts adopted, Part 2 as one sentence in existing
-documentation. **Q-3 ruled** — it binds the architect's review results too.
+**Status.** Done — shipped in v0.43.0 (2026-09-02).
+[Handoff](../handoffs/092-claims-about-code-are-not-checked-the-way-code-is/implementation-handoff.md).
 **Tracks.** Review integrity. **Severity: High.**
 **Found by** the 0.41.0–0.42.0 cycle. Six instances, four of them the
 architect's own.

@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.43.0] — 2026-09-02
+
 ### Added
 
 - **"No behaviour change" becomes a checked claim, not a trusted one
@@ -2983,7 +2987,8 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.42.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.43.0...HEAD
+[0.43.0]: https://github.com/nabbisen/snora/compare/0.42.0...0.43.0
 [0.42.0]: https://github.com/nabbisen/snora/compare/0.41.1...0.42.0
 [0.41.1]: https://github.com/nabbisen/snora/compare/0.41.0...0.41.1
 [0.41.0]: https://github.com/nabbisen/snora/compare/0.40.0...0.41.0
