@@ -6,8 +6,10 @@
 `Emphasis` and got a more interesting answer than expected.
 **Touches.** `crates/snora-design/src/variants.rs`, `crates/snora/src/design.rs`,
 `docs/src/contributing/api-freeze-review.md`.
-**Release target.** **1.0**, or the release that decides it. Not 0.44.0 — see
-"Why this cannot just be fixed".
+**Release target.** **0.45.0**, with the decision taken at 0.44.0 — see "What
+removal actually costs". *(First drafted as "1.0, not sooner" on the belief that
+the covenant forbade removal in a minor. It does not; it prices it. Corrected
+2026-09-03 after the owner asked why not 0.45.0.)*
 
 ## The finding
 
@@ -44,15 +46,44 @@ reads as *"some prefab honours emphasis"*. Nothing does. That is the same class
 of defect as the withdrawn 1.4.1 claim: not broken code, but a statement about
 the code that a consumer could act on and be wrong.
 
-## Why this cannot just be fixed
+## What removal actually costs
 
-**RFC-036's additive-only covenant freezes the design surface.** Both enums are
-public, re-exported through the facade, and inside the freeze. Removing either is
-a breaking change and cannot ship in a minor.
+**RFC-036 names both enums in the frozen surface** (RFC-036:111, alongside
+`Density`; `variants.rs` is in the frozen file list at :77). Removing either is a
+forbidden change.
 
-So the options are genuinely: **give them consumers, or remove them in the 1.0
-break.** There is no third path that ships sooner, which is why this RFC targets
-the decision rather than a release.
+**Forbidden is not prohibited — it is priced.** The covenant's own reopening
+condition:
+
+> If work requires any forbidden change, the implementing RFC must say so
+> explicitly and **reset D-3 and D-4 to open** in the same change. It must not
+> proceed and rationalise afterwards. The gate's value is entirely in its being
+> expensive to reverse.
+
+So the price of removal is exact and payable: **D-3** (token model stable ≥2
+consecutive minors) and **D-4** (style bridge stable ≥2 consecutive minors) go
+back to ⬜, and are re-earned over the two minors that follow — 0.47.0 at the
+earliest.
+
+**That price is smaller than it looks, and paying it now is cheaper than later:**
+
+- The design track already carries D-1 and D-2 open, coupled to gate 1's iced
+  major upgrade. Resetting D-3/D-4 blocks nothing that is not already blocked.
+- snora is pre-1.0, and 0.41.0 and 0.42.0 both shipped breaking changes in
+  minors. Consumers are upgrading through breaks already.
+- **After 1.0 this needs a 2.0.** Carrying a public name that shadows
+  `iced::Size` past the 1.0 line converts a cheap correction into an expensive
+  one, permanently.
+
+**The real question is not mechanical.** It is whether spending the covenant's
+reopening on two inert enums cheapens it. The argument that it does not: the
+covenant exists to stop churn in a surface under active design, and nothing is
+under design here — nothing reads either enum, so no consumer's code changes and
+no appearance moves. The argument that it does: covenants die by exception, and
+"this one is harmless" is how every exception introduces itself.
+
+**The owner's call, and this RFC asks for it explicitly rather than assuming
+either way.**
 
 ## Non-goals
 
@@ -71,7 +102,10 @@ of no demand, from a vocabulary crate whose own doc says these must "stay small"
 But **absence of demand is not evidence here** — nobody asks for an enum they
 did not know was inert, which is the exact reasoning error RFC-078 made with
 apimokka's decline. **Suggest: ask the adopting teams once**, in the next letter
-that has its own reason to exist, and let the answer decide.
+that has its own reason to exist, and let the answer decide. **That letter now
+exists**: RFC-093's Q-1 obligation is waiting for the same one — the colour-alone
+paragraph — so a single letter carries both questions and neither costs a relay
+of its own.
 
 **Q-2 — is `Size`'s name a problem independent of its use?** If it gains
 consumers, it still shadows `iced::Size` in every consumer's import list.
