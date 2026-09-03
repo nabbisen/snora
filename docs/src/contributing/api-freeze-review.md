@@ -19,7 +19,7 @@ D-gates tracking in progress; see table below.
 | `snora-core` has no iced dependency | ✅ verified every release |
 | `snora-widgets` depends on core + iced, not on `snora` | ✅ |
 | `snora` re-exports intended vocabulary and widgets | ✅ |
-| Feature flags documented and CI-tested | ✅ RFC-011-A, RFC-014-D |
+| Feature flags documented and CI-tested | ⬜ **Reopened 2026-09-03 (RFC-094): the claim is not true of one documented combination.** The feature matrix covers nine combinations, all with `widgets` or none. `crates/snora/Cargo.toml` documents `design` as *independent of `widgets`* — *"everything else works with `design` alone"* — and `--no-default-features --features design` appears in **no CI job**. It is not broken: it compiles and its suites pass (42/17/7, checked). So this is one missing matrix entry, not a defect hunt, and the row re-ticks when the entry exists. *(re-derived 2026-09-03, RFC-094)* |
 | Engine-only build (`--no-default-features`) supported | ✅ |
 
 ## Type names and enum variants (audit v0.17.0)
@@ -62,13 +62,13 @@ Type-names audit: **complete as of v0.17.0.**
 
 | Item | Status |
 |---|---|
-| Z-stack order documented and tested | ✅ RFC-011-D/E, RFC-012 |
+| Z-stack **consequences** documented and tested | ✅ RFC-011-D/E, RFC-012 — **narrowed 2026-09-03 (RFC-094): the row said "order" and the tests do not check order.** `modal_with_no_close_sink_still_blocks_pointer_at_dim` and `modal_dim_with_close_sink_blocks_wheel_scroll` (RFC-084) assert pairwise consequences of the layer sequence, not the sequence itself; **swapping layers 5 and 6 in `render()` would fail no test in the tree.** These are also gate 5's own z-stack evidence, so this row was never independently derived. `dialog_and_sheet_coexist_sheet_content_reachable` is weaker than it looks: its dialog and sheet do not spatially overlap, so it proves both are reachable, not that 6 paints over 5. *(re-derived 2026-09-03, RFC-094)* |
 | Overlay interaction semantics documented | ✅ RFC-011-E |
-| Toast ordering documented and tested | ✅ RFC-011-B |
-| Toast lifecycle helpers documented and tested | ✅ |
+| Toast ordering documented and tested | ✅ RFC-011-B — holds. `top_positions_render_reverse_chronological` and `bottom_positions_render_chronological` assert `render_order_for` by equality across every `ToastPosition`, which is the complete shape for a value claim; **the absence of a negative assertion here is not gate 5's defect**, because ordering has nothing to block. Narrow gap recorded rather than treated as one: `render_toasts`'s two match arms are not independently tested, so swapping them would fail nothing. *(re-derived 2026-09-03, RFC-094)* |
+| Toast lifecycle helpers documented and tested | ⬜ **Reopened 2026-09-03 (RFC-094): false as written.** The row covers two helpers. `sweep_expired` is genuinely tested — `sweep_drops_only_expired_transient` asserts both that live and persistent toasts remain and that a dead transient is removed. **`subscription` has no test at all**: nothing in any `#[test]` calls it, and its only other appearances are `rust,no_run` doctests, which check that the example compiles rather than that an empty or all-persistent queue yields `Subscription::none()`. *(re-derived 2026-09-03, RFC-094)* |
 | ABDD checklist adopted | ✅ RFC-012-A |
-| Direction-sensitive integration tests | ✅ RFC-017 — **3** RTL render-semantics tests (`sheet_end_edge_reachable_under_rtl`, `toast_dismiss_reachable_under_rtl`, and `toast_body_click_does_not_reach_content_beneath_under_rtl`, added 0.43.0). **Read the note below this table before treating this tick as re-derived.** |
-| `keyboard::dismiss_on_escape` tested | ✅ 7 unit tests (RFC-014-A) |
+| Direction-sensitive integration tests | ✅ RFC-017 — **3** RTL render-semantics tests (`sheet_end_edge_reachable_under_rtl`, `toast_dismiss_reachable_under_rtl`, and `toast_body_click_does_not_reach_content_beneath_under_rtl`, added 0.43.0). **Justified, and the row now carries the ratio it was missing:** three RTL tests exist against **roughly fifteen LTR scenarios** in `render_semantics.rs`, so this is coverage, not parity. Dialog-dismissal blocking, wheel-scroll blocking, no-close-sink degradation, menu-backdrop dismissal and dialog+sheet coexistence have **no RTL variant** — if mirroring broke one of those alone, nothing would catch it. The row read as parity because it stated a count and not a denominator. *(re-derived 2026-09-03, RFC-094)* |
+| `keyboard::dismiss_on_escape` tested | ✅ 7 unit tests (RFC-014-A) — **holds, re-counted independently.** `keyboard.rs` has 11 `#[test]` functions: 7 call `dismiss_on_escape`, 4 call `cycle_zones`. Four of the seven assert `None`, so this row is justified by evidence rather than by luck. *(re-derived 2026-09-03, RFC-094)* |
 
 ## Documentation review
 
@@ -91,15 +91,26 @@ Type-names audit: **complete as of v0.17.0.**
 | Binary-size first data point recorded | ⬜ every row through 0.25.2 is `N/A` or a non-CI sandbox run; the tag-automation bug (RFC-041) meant CI never populated real values as this row assumed |
 | Compile-time first data point recorded | ⬜ same as above; see RFC-041 |
 | CI passes on clean branch | ✅ RFC-011-A |
-| mdBook build and test green | ✅ RFC-012-D |
+| mdBook build and test green | ✅ RFC-012-D — holds, and is the most continuously re-derived row here: `ci.yaml`'s `docs` job runs `mdbook build` **and** `mdbook test` on every PR and push. Note it is `ci.yaml`'s copy that runs `mdbook test`, not `docs.yaml`'s, which only builds and deploys. *(re-derived 2026-09-03, RFC-094)* |
 
 ## 1.0 gates (current status)
 
 | Gate | Status |
 |---|---|
 | 0. *(Not a gate — a 1.0 decision recorded here so it is not rediscovered)* **`Emphasis` and `Size` have no consumers.** Both shipped in v0.19 (RFC-020…RFC-030) as shared variant vocabulary, are re-exported through `snora::design`, and **nothing reads either** — checked 2026-09-02, not inherited. `Tone` is read by `notice` and `progress` (not buttons or chips, which the old module doc claimed); `Density` is a `Tokens` field. Frozen public surface under RFC-036's additive-only covenant, so they cannot simply be dropped. **The 1.0 question: give them consumers, or remove them in the break.** Recorded in `crates/snora-design/src/variants.rs`'s own module doc. | — |
-> **Open question, recorded 2026-09-03: which other rows were ticked on evidence
-> RFC-084 later proved insufficient?**
+> **Rows carry the date they were last re-derived (RFC-094, Q-2).** A row with no
+> date has **never** been re-derived since it was first ticked — which is the
+> useful signal, and why the marker is inline rather than a column: 33 blank
+> cells would have been noise, while 33 undated rows are a statement. *(Q-2 said
+> "a dated column"; the column was my guess at the mechanism and the date is the
+> mechanism. Recorded as a deviation rather than pretending it was the plan.)*
+>
+> **Swept 2026-09-03 (RFC-094): seven test-backed rows.** Two were wrong, one
+> overstated, one under-described, three held. The remaining 33 ✅ rows are
+> listed in RFC-094's own report and were deliberately not swept — a sweep that
+> tries to cover everything does not finish.
+>
+> **The finding that started it:**
 >
 > Gate 5 was ✅ for 24 minors because every render-semantics test behind it was
 > positive-only — reachability, never containment. RFC-084 found that and
@@ -125,7 +136,7 @@ Type-names audit: **complete as of v0.17.0.**
 | 3. At least one third-party or production-grade app | ⬜ **verdict open; evidence updated v0.33.0.** The v0.18.1 entry (a build-failure report from `nabbisen/logolig`) is superseded. Three integrations now exist: **apimokka** (desktop GUI for apimock-rs, public repository, on 0.29.0, engine + `design`, zero `snora::widget::*` call sites), **arama** (image/video browser, on 0.25.0), and **orbok** (AI-driven document search, on 0.25.1, `widgets` + `design`, the only consumer exercising the prefab widgets and chrome geometry). Between them they have driven RFCs 045–056 across eight releases. What remains a judgement rather than a fact: whether any of these is *third-party* — all three are adjacent projects, not unaffiliated adopters — and whether "production-grade" is met by an application whose own visual-verification pass is still outstanding. Decide those two words before ticking this. |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
 | 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.43.0 — **re-ticked 2026-09-02, on evidence rather than on the fix.** Was marked ✅ at v0.17 and should not have been; corrected 2026-09-01 (RFC-084). Every render-semantics test before RFC-084 was positive-only — a button inside an overlay is reachable, a corner click dismisses — and none asked whether pointer input that should be *blocked* actually is. It was not, in four places at once (F-01 through F-04, an external architect's audit): a click inside the dialog dismissed it, a modal with no close sink blocked nothing, the dim did not block scrolling, and clicking a toast pressed the widget beneath it. All four fixed and negative assertions added in 0.41.0 — see `crates/snora/tests/render_semantics.rs`'s own module doc for the Law-8 derivation these assertions came from. **The owner ruled on 2026-09-02 that this gate holds ⬜ until RTL has a negative assertion** — three of its four dimensions had one; RTL had only reachability tests, the same positive-only shape that made the original tick wrong, surviving in the one dimension nobody revisited. **`914fe92` closed it**, adding `toast_body_click_does_not_reach_content_beneath_under_rtl`. All four dimensions now assert that something is blocked, not only that something is reachable: z-stack (`modal_with_no_close_sink_still_blocks_pointer_at_dim`, `modal_dim_with_close_sink_blocks_wheel_scroll`), dismissal (`dialog_click_does_not_dismiss_modal`, `no_close_sink_means_no_dismiss_but_content_renders`), toast (`toast_body_click_does_not_reach_content_beneath`), RTL (the new one). Each was verified by removing the mechanism it guards and confirming it fails — this gate is ticked on tests that have been seen to fail, which is the distinction its own history is about. |
-| 6. Feature-matrix CI stable | ✅ v0.11 |
+| 6. Feature-matrix CI stable | ✅ v0.11 — **not re-derived, and adjacent to a row that was reopened 2026-09-03.** This gate claims the matrix job is *stable*, which it is; the review-table row *"Feature flags documented and CI-tested"* claims *coverage*, and was reopened because `--features design` alone has none. Different claims, so this gate is untouched — but they share a mechanism, and RFC-094's whole finding is that rows sharing a mechanism get re-derived together or not at all. Out of RFC-094's scope (Q-1); named here so the adjacency is on the record. |
 | 7. Public API freeze review completed | ✅ v0.18 — all sections green; API declared ready pending gates 1, 3, 9 |
 | 8. Showcase/workbench example exercises all major surfaces | ✅ v0.12 |
 | 9a. **Binary-size** trend monitored (≥2 data points) | ✅ v0.29.0 — four post-fix rows on one runner and methodology (0.27.0, 0.27.1, 0.28.0, 0.28.1, all `ubuntu-latest`, same rustc). The series tracks real change: `widgets_diff_bytes` 44,928 → 45,056 → 46,592 → 46,720. Across the documentation-only 0.28.1, engine size moved **−0.0008%** — signal dominates noise. |
