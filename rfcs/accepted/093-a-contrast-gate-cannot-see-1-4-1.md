@@ -4,6 +4,10 @@
 [`handoffs/093-…`](../handoffs/093-a-contrast-gate-cannot-see-1-4-1/implementation-handoff.md).
 **Q-1 ruled** — register and document now; the non-colour cue is deferred with a
 firing condition: **a team asking for it after the documentation lands.**
+Recorded in `release-process.md`'s "Deferrals waiting on a condition", with the
+obligation the condition depends on: **0.43.0's migration guide and letter must
+carry the colour-alone statement, or no consumer can learn it and the condition
+can never fire.**
 **Q-2 ruled** — both, code as the source of truth. **Q-3 ruled** — does not reach
 `Emphasis`: nothing consumes it at all, checked.
 **Tracks.** Accessibility / test reach. **Severity: High.**

@@ -153,6 +153,26 @@ tag inside the range, one worktree, no PRs, and the tree hash identical before a
 after. The two documents citing the old SHAs were updated in the same pass —
 rewriting history invalidates every reference to it, which is its real cost.
 
+## Deferrals waiting on a condition
+
+The checklist step *"Has any recorded conditional deferral's ending condition
+been met"* has existed since RFC-087 and had **nothing to read**. Answering it
+meant recalling which deferrals were open, which is the memory-based control this
+project keeps proving does not hold. This is the list it points at.
+
+**Add a row whenever a deferral is made.** A deferral with no row here is one
+nobody will re-check, which is the failure RFC-087 documented across three
+releases.
+
+| Deferral | What is deferred | Ends when | Blocked on us first? |
+|---|---|---|---|
+| **RFC-093 Q-1** | Adding a non-colour cue (icon or textual prefix) to toast intents and notice tones | **A consumer asks for it, having been told the prefabs distinguish by colour alone.** Before that, silence is not evidence — nobody asks for a channel they believe already exists, which is exactly how RFC-078 came to count apimokka's decline as demand data | **Yes.** The 0.43.0 migration guide and its letter must carry the colour-alone statement. `accessibility.md` already says it, but consumers read guides and letters, not the reference pages. **If 0.43.0 ships without it, this condition can never fire** and the deferral becomes permanent by construction |
+
+**The last column is the part worth copying.** A condition that depends on someone
+else knowing something is unreachable until we tell them — so a deferral whose
+trigger is "a consumer asks" carries an obligation on *us*, and it belongs in the
+row rather than in whoever wrote it.
+
 ## Who cites what
 
 **Built 2026-09-02 from all six teams' answers to a direct question.** Before
@@ -290,9 +310,10 @@ restate the guide's content.
     but the guide is what reaches a future adopter who was never
     written to.
 [ ] Has any recorded conditional deferral's ending condition been met
-    (RFC-087)? A deferral must name the condition that ends it; this
-    line is what re-checks it, so it stops being renewed by habit
-    instead. The `check-*` scripts' own manual-to-gate deferral was
+    (RFC-087)? **The open ones are listed under "Deferrals waiting on a
+    condition" below — read that table, do not rely on recalling them.**
+    A deferral must name the condition that ends it; this line is what
+    re-checks it, so it stops being renewed by habit instead. The `check-*` scripts' own manual-to-gate deferral was
     renewed three times (RFC-073, RFC-074, RFC-079) with its condition
     ("all three pass on a clean tree") true the whole time, before
     RFC-087 finally re-checked it.
