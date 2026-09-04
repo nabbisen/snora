@@ -457,6 +457,19 @@ restate the guide's content.
     # at all. 0.41.1 was first tagged `v0.41.1` against 67 bare tags,
     # which is why the pattern exists (RFC-090).
     # Pushing the tag IS the publish. See "Publishing" below.
+[ ] Confirm CI is green ON THE COMMIT YOU ARE ABOUT TO TAG, matched by SHA:
+    bash scripts/check-commit-ci-green.sh HEAD
+    # Do NOT use `gh run list --workflow CI --limit 1` for this. Right
+    # after a push, the newest registered run is still the PREVIOUS
+    # commit's, so `--limit 1` returns a green result for the wrong
+    # commit and `gh run watch` exits 0 immediately on it.
+    # That happened cutting 0.44.0 (2026-09-04): the tag was pushed on a
+    # commit whose own CI was still in_progress, and release.yaml
+    # refused at its second gate — correctly, and against a reviewer who
+    # believed he had checked. The script above queries by head_sha and
+    # cannot make that mistake.
+    # Recovery if you tag early: wait for that commit's CI, then re-run
+    # the failed Release run. The tag does not need deleting or moving.
 [ ] After tag push: confirm a NEW ROW EXISTS for this version in
     docs/src/reference/binary-size-budget/binary-size.csv on main —
     `git show main:docs/src/reference/binary-size-budget/binary-size.csv | tail -1`

@@ -288,7 +288,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.43.0, re-derived 2026-09-03 post-tag, RFC-062)
+## Current status (snora 0.44.0, re-derived 2026-09-04 post-tag, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -298,7 +298,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **50,304 B (~49 KB)** — `binary-size.csv`'s 0.43.0 row, same compiler since 0.39.2. **Identical to 0.42.0's 50,304 B, to the byte.** 0.43.0 changed no crate code, so a zero delta is the expected result and this row is the cleanest available check that the measurement is stable rather than drifting — the ±256 B floor was derived from exactly this kind of release. **34% of a 150 KB bar** | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **51,072 B (~50 KB)** — `binary-size.csv`'s 0.44.0 row. **+768 B on 0.43.0, and the number is not comparable: the compiler changed.** Every row from 0.39.2 to 0.43.0 was `rustc 1.98.0`; this one is `rustc 1.98.1`. The ±256 B noise floor was derived within a single toolchain and does not apply across a compiler bump, so this delta is neither explained nor alarming — it is unmeasured. **0.45.0 on 1.98.1 is the first row that can be compared to this one.** 0.44.0 shipped no crate code beyond two test files, which is the strongest available reason to attribute the move to the toolchain rather than to us. **34% of a 150 KB bar** | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
