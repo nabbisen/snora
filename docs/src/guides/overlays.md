@@ -53,6 +53,33 @@ unstyled centered content is easy to lose. See [Token-derived engine
 surfaces](../design/engine-surfaces.md) for the mapping and how to opt
 in.
 
+### The token card only helps if you let it draw
+
+**If your own dialog content is a styled container, snora's card is
+behind yours and its border never renders.** On the default path snora
+draws no card at all; on `snora::design::render` it draws one, and your
+own container is drawn inside it — so a content container with its own
+fill and radius overpaints the card whose border the tokens supply.
+
+This is worth knowing because **the `palette.border` repair in v0.34.0
+does not reach you in that case, in any preset.** It landed for
+consumers who let the token card draw its own chrome; if you paint your
+own, you are supplying the card's separation yourself and the token's
+contrast guarantee is not the one in effect.
+
+Reported by a consumer who measured it: scanning across their card's
+edge at v0.28.0 and v0.42.0 — spanning the repair — produced
+byte-identical pixels, because the falloff they were looking at was
+their own shadow and there was no border pixel at all.
+
+**Two things follow if you paint your own card.** Separation over the
+dim comes from your fill, which is usually fine — that is the same
+mechanism the 0.38→0.39 correction identified as what actually defines
+the card. But **where there is no dim**, a card that separates only by
+shadow can vanish: shadows carry almost no information in the
+high-contrast presets, which is why the token card is border-defined
+against its own surface rather than shadow-defined.
+
 ## Sheet
 
 A modal panel anchored to one of the four window edges, occupying a

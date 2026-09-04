@@ -166,6 +166,27 @@ committed as of 0.25.3 itself (RFC-042), so resolution *is* pinned for
 0.25.3 and every release after it — this caveat does not apply going
 forward.
 
+### What these numbers mean for your application
+
+**`widgets_diff_bytes` is the cost of *using* the feature, not of enabling it.**
+
+The probes are built so the measured feature is actually called — see RFC-043,
+and the module docs in `examples/size_probe_widgets`. That is deliberate, and it
+makes the number an upper bound for a typical adopter rather than a floor.
+
+**Enabling an optional feature you do not call costs approximately nothing**,
+because the linker eliminates code that is compiled but never reached. Confirmed
+independently by a consumer (apimokka, 2026-09-04) who ran
+`default-features = false, features = ["design"]` and compared against the same
+build with `widgets` enabled: **17,899,656 bytes either way — byte-identical.**
+They reported the zero plainly, which is the right thing to do with a null
+result, and it is the same effect RFC-043 found from the other direction when
+byte-identical probes made the diffs meaningless.
+
+So: if you are weighing whether to turn a feature on, the honest answer is that
+the cost arrives when you *call* it. The figure in this budget tells you what it
+costs once you do.
+
 ### Data integrity note (RFC-043)
 
 The 0.25.3 row is doubly transitional: it is simultaneously the **first**
