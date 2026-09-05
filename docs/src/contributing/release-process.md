@@ -169,6 +169,28 @@ releases.
 | **RFC-093 Q-1** *(asked 2026-09-04; open, and now on evidence rather than on silence)* | Adding a non-colour cue to toast intents and notice tones | **Still: a consumer asks for it.** All six teams were asked and none wants it — but **four of the six qualified their answer as not demand evidence, unprompted.** apimokka and tekstide asked to be recorded as **absent, not "no"**: apimokka compiles without `snora-widgets`, so the prefabs are unavailable rather than unused, and tekstide is not a consumer at all. *"A team that cannot use a surface is not a team that has weighed it and declined."* arama: *"a 'no need', not a 'no' — do not count us as demand."* **orbok's is the one that is genuine evidence, and they proved it rather than asserting it:** their per-variant `title()`/`body()` dates to that file's first commit, `67c4378`, 2026-06-17 — three months before our withdrawal — so their independence is not an echo of what we published. | **No.** If it ever fires: **opt-in, not default-on.** orbok asked for a builder method explicitly (*"default-on would change our rendered appearance… duplicates information our text already carries"*), knotra prefers to keep supplying the wording, and aaai would rather we shipped it than protected their appearance. Nobody argued for a default-path change |
 | **Feature-gating indicator 1** | Assessing compile time at all. The table's own threshold is 30,000 ms on a developer machine, cold; the cell reads **Unassessed** because the CI proxy that used to fill it measured a different quantity and was retired (RFC-062) | **A measurement exists.** Not an RFC — RFC-078 was this exact shape, a measurement dressed as a design question, and was archived for it. Someone takes the number on a developer machine and the cell stops lying | **No.** Nothing external is needed; it has simply never been anyone's turn |
 | ~~**0.44.0's tag**~~ **— discharged 2026-09-04** | Tagging and publishing 0.44.0 | **Fired.** `tinyvec` shipped 1.13.1 and then 1.13.2; a fresh resolution now builds. Verified locally (`cargo update -p tinyvec` → 1.13.2, workspace checks clean) and by re-dispatching `unpinned-build` on `main`, green. **Note 1.13.0 was never yanked**, so a consumer whose own lockfile pinned it stays broken until they update — the fix was a new version, not a withdrawal | No — held one day, cost nobody anything, and the check went green on its own exactly as the hold assumed |
+| **Multi-platform CI** | Extending CI beyond `ubuntu-latest`. Every job runs Linux, and arama's 2026-09-05 report — a Windows-only resolution failure after 0.42.0 shrank their lockfile — was invisible to us by construction | **The 0.46.0 cut.** Owner ruled 2026-09-06 to revisit then rather than now: nothing is owed on it, and the guide already tells consumers their own CI is the only thing that will see this class of problem | **No.** The analysis is done and recorded below so the revisit does not redo it |
+
+**The analysis behind that row, so it is not re-derived.** Two facts decide it,
+and both point away from the obvious answer:
+
+1. **Extending `ci.yaml` would not have caught arama's bug.** Our CI builds from
+   the committed `Cargo.lock`; their failure was a *re-resolution*, cargo picking
+   `gpu-allocator`'s `windows` dependency down to 0.56 once their graph shrank.
+   A Windows job on our pinned graph resolves what we already test and passes.
+   **`unpinned-build` is the only job that runs `cargo update`**, so it is the
+   only one that could ever see it.
+2. **snora has no platform-specific code.** Zero `cfg(target_os)`,
+   `cfg(windows)`, `cfg(unix)` or `cfg(target_family)` anywhere in `crates/`
+   (checked 2026-09-06). A per-push Windows matrix would test *upstream's*
+   platform code against a graph we already pinned, at the cost of multiplying a
+   ten-combination matrix by three on every push.
+
+So the targeted change, if it is made: **add Windows and macOS to
+`unpinned-build` only.** It runs weekly on cron plus dispatch, so that is three
+jobs a week instead of one, and it covers the secondary case for free — if a
+pinned graph ever stops compiling on Windows, the weekly run says so.
+
 
 
 
