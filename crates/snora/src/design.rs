@@ -1,7 +1,6 @@
 // Token types (enumerated, not glob).
 pub use snora_design::{
-    Color, Density, Emphasis, FocusTokens, Palette, Radius, Size, Spacing, TextRole, Tokens, Tone,
-    Typography,
+    Color, Density, FocusTokens, Palette, Radius, Spacing, TextRole, Tokens, Tone, Typography,
 };
 
 /// Pure-Rust WCAG contrast utilities, re-exported from `snora-design`.

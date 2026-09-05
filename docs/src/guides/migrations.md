@@ -10,6 +10,12 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.44 → 0.45](migration-0.44-to-0.45.md) — **breaking, but narrow:**
+  `snora_design::{Emphasis, Size}` removed — read by nothing for 24
+  minors, confirmed by all six adopting teams rather than assumed.
+  Pays RFC-036's covenant reopening cost explicitly (D-3/D-4 reset).
+  `cargo build` names the type directly if you are affected; almost
+  nobody is.
 - [0.43 → 0.44](migration-0.43-to-0.44.md) — **not breaking; no code,
   appearance, or API change.** Tests and register corrections. Repeats
   0.43's statement of what snora's prefabs do and do not distinguish.

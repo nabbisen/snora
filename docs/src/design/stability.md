@@ -5,7 +5,7 @@ page answers the question directly: **does it churn?**
 
 **No.** The token surface — `Tokens`, `Palette` and its 18 role fields,
 `Color`, `Spacing`, `Typography`/`TextRole`, `Radius`, `FocusTokens`,
-`Tone`/`Emphasis`/`Size`/`Density`, and the three contrast functions
+`Tone`/`Density`, and the three contrast functions
 (`relative_luminance`, `contrast_ratio`, `composite_over`) — is under a
 contractual additive-only covenant. It cannot be removed, renamed, or
 retyped without an explicit, recorded process failure on our side: reopening
@@ -21,7 +21,7 @@ freezes two surfaces by name:
 - **The token surface** — `Tokens` and its four constructors (`light`,
   `dark`, `high_contrast_light`, `high_contrast_dark`), `Palette` and its 18
   role fields, `Color`, `Spacing`, `Typography`/`TextRole`, `Radius`,
-  `FocusTokens`, `Tone`/`Emphasis`/`Size`/`Density`, and — named
+  `FocusTokens`, `Tone`/`Density`, and — named
   individually — the `contrast` module's `relative_luminance`,
   `contrast_ratio`, `composite_over`.
 - **The style-bridge surface** — every public function of `snora_style`
@@ -39,7 +39,18 @@ explicitly. New items — new token fields on the `#[non_exhaustive]` types,
 new presets, new style-bridge functions — can be added freely; that is what
 "additive-only" permits.
 
-One narrow exception exists, and it is the only one: a value **inside** a
+**The reopening path has been used once, at 0.45.0** — not a hypothetical.
+`Emphasis` and `Size`, two variant enums, were removed after 24 minors in
+which nothing read either, confirmed by every adopting team rather than
+inferred from their silence. Gates D-3 and D-4 (`api-freeze-review.md`)
+reset to open in that same change, per the covenant's own condition, and
+are re-earned no sooner than 0.47.0. See
+[migration 0.44 → 0.45](../guides/migration-0.44-to-0.45.md) for what that
+means for your own code — for nearly everyone, nothing, since nothing read
+either type.
+
+One narrow exception exists for preset **values** specifically, and it is
+the only one that does not require reopening a gate: a value **inside** a
 preset (a specific `Color`, not a type or field) may change where a
 contrast test proves the change fixes an accessibility defect, recorded as
 **Fixed** in the CHANGELOG. This is not a loophole in the freeze — it is

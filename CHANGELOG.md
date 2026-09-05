@@ -15,7 +15,35 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Removed
+
+- **`snora_design::{Emphasis, Size}` removed — read by nothing for 24
+  minors, confirmed rather than assumed (RFC-095).** Both shipped in
+  v0.19 (RFC-020…RFC-030) as shared variant vocabulary; no widget or
+  style function in the workspace has ever varied anything by either.
+  `Size` also shadowed `iced::Size`, a type the engine uses heavily
+  (`responsive.rs`, `design/render.rs`), with no compiler error to warn
+  a consumer who reached for the wrong one.
+
+  Checked 2026-09-02 against the source, then asked of all six adopting
+  teams in a 2026-09-04 letter rather than inferred from their silence
+  — the reasoning error RFC-078 made once already. All six confirmed
+  neither type appears anywhere in their trees; three answered by
+  enumerating their entire `snora::design` surface rather than
+  grepping the two names.
+
+  **This is a `#[non_exhaustive]`-covenant exception, taken explicitly,
+  not smuggled into a minor.** `variants.rs` is part of RFC-036's frozen
+  token surface; removing an item from it is a forbidden change under
+  the additive-only covenant, permitted only through the covenant's own
+  reopening condition. In this same change: gates **D-3** (token model
+  stable ≥2 consecutive minors) and **D-4** (style bridge stable ≥2
+  consecutive minors) reset to open in
+  `docs/src/contributing/api-freeze-review.md`, re-earned no sooner
+  than 0.47.0. `Tone` and `Density` — the two enums in `variants.rs`
+  that are actually read — are untouched.
+
+  See [migration 0.44 → 0.45](docs/src/guides/migration-0.44-to-0.45.md).
 
 ## [0.44.0] — 2026-09-03
 

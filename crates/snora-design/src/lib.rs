@@ -67,7 +67,7 @@ pub mod surfaces;
 pub mod tokens;
 /// Text role and [`Typography`] scale (size + line-height).
 pub mod typography;
-/// Shared semantic variant vocabulary ([`Tone`], [`Emphasis`], [`Size`], [`Density`]).
+/// Shared semantic variant vocabulary ([`Tone`], [`Density`]).
 pub mod variants;
 
 pub use color::Color;
@@ -77,7 +77,7 @@ pub use radius::Radius;
 pub use spacing::Spacing;
 pub use tokens::Tokens;
 pub use typography::{TextRole, Typography};
-pub use variants::{Density, Emphasis, Size, Tone};
+pub use variants::{Density, Tone};
 
 #[cfg(test)]
 mod tests;

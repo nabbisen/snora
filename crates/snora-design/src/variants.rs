@@ -13,14 +13,17 @@
 //! |---|---|
 //! | [`Tone`] | `snora_widgets::design::notice`, and `progress` via `snora_style::progress::toned`. **Not** buttons or chips — neither takes it. |
 //! | [`Density`] | [`crate::Tokens`] carries it as a field; the presets set it. |
-//! | [`Emphasis`] | **Nothing.** Published and re-exported through `snora::design`; no widget or style function varies anything by it. |
-//! | [`Size`] | **Nothing.** Same. Note it is unrelated to `iced::Size`, a different type used widely in the engine — not linked here, because this crate is iced-free by CI gate (RFC-083) and an intra-doc link would not resolve. |
 //!
-//! `Emphasis` and `Size` have been reserved vocabulary since they shipped in
-//! v0.19 (RFC-020…RFC-030). They are frozen public surface under RFC-036's
-//! additive-only covenant, so they cannot simply be dropped; whether they get
-//! consumers or get removed is a 1.0 question, tracked against the API freeze
-//! review rather than left to be rediscovered.
+//! **`Emphasis` and `Size` were removed in 0.45.0 (RFC-095).** Both shipped
+//! in v0.19 (RFC-020…RFC-030) and were read by nothing for 24 minors —
+//! confirmed unread by all six adopting teams, not inferred from silence
+//! (RFC-078's error was trusting silence; this asked and got six positive
+//! checks). `Size` additionally shadowed `iced::Size`, a type the engine
+//! uses heavily, with no compiler error to warn a consumer who reached for
+//! the wrong one. Removing a frozen-surface item is forbidden under
+//! RFC-036's additive-only covenant except through its own reopening
+//! condition; this RFC paid that price explicitly — see
+//! `docs/src/contributing/api-freeze-review.md`'s D-3/D-4 rows.
 
 /// Semantic intent of a styled element.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -37,30 +40,6 @@ pub enum Tone {
     Danger,
     /// Informational state.
     Info,
-}
-
-/// Visual weight of a styled element.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Emphasis {
-    /// Solid fill.
-    Solid,
-    /// Soft / tinted fill.
-    Soft,
-    /// Outline only.
-    Outline,
-    /// Ghost (no fill or border until interaction).
-    Ghost,
-}
-
-/// Control size step.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Size {
-    /// Small.
-    Small,
-    /// Medium (default).
-    Medium,
-    /// Large.
-    Large,
 }
 
 /// UI density. In v0.20 the field exists and all presets are

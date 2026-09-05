@@ -160,7 +160,11 @@ it.
 - `Typography` and `TextRole`.
 - `Radius`.
 - `FocusTokens`.
-- `Tone`, `Emphasis`, `Size`, `Density`.
+- `Tone`, `Density`. (`Emphasis` and `Size` were part of this surface
+  and were removed at 0.45.0, RFC-095 — read by nothing for 24 minors,
+  confirmed by all six adopting teams. Removal is itself the forbidden
+  change the reopening obligation below exists for; see
+  `api-freeze-review.md`'s D-3/D-4 rows for the reset this triggered.)
 - The `contrast` module's three functions: `relative_luminance`,
   `contrast_ratio`, `composite_over`.
 

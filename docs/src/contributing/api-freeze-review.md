@@ -97,7 +97,7 @@ Type-names audit: **complete as of v0.17.0.**
 
 | Gate | Status |
 |---|---|
-| 0. *(Not a gate — a 1.0 decision recorded here so it is not rediscovered)* **`Emphasis` and `Size` have no consumers.** Both shipped in v0.19 (RFC-020…RFC-030) as shared variant vocabulary, are re-exported through `snora::design`, and **nothing reads either** — checked 2026-09-02, not inherited. `Tone` is read by `notice` and `progress` (not buttons or chips, which the old module doc claimed); `Density` is a `Tokens` field. Frozen public surface under RFC-036's additive-only covenant, so they cannot simply be dropped. **The 1.0 question: give them consumers, or remove them in the break.** Recorded in `crates/snora-design/src/variants.rs`'s own module doc. | — |
+| 0. *(Not a gate — a 1.0 decision recorded here so it is not rediscovered)* **`Emphasis` and `Size` removed at 0.45.0 (RFC-095).** Both shipped in v0.19 (RFC-020…RFC-030) as shared variant vocabulary and were read by nothing for 24 minors — checked 2026-09-02, then asked of all six adopting teams (2026-09-04 letter) rather than inferred from silence (RFC-078's error), and all six confirmed neither is referenced anywhere in their trees. `Size` also shadowed `iced::Size` with no compiler error to warn a consumer who reached for the wrong one. Removal is a forbidden change under RFC-036's additive-only covenant, paid explicitly via its own reopening condition — see the D-3/D-4 rows below. `Tone` (read by `notice` and `progress`) and `Density` (a `Tokens` field) are untouched. | — |
 > **Rows carry the date they were last re-derived (RFC-094, Q-2).** A row with no
 > date has **never** been re-derived since it was first ticked — which is the
 > useful signal, and why the marker is inline rather than a column: 33 blank
@@ -227,28 +227,43 @@ gates; they do not block snora core's 1.0 release.
 |---|---|
 | D-1. One iced major upgrade survived with design feature enabled | ⬜ (coupled to core Gate 1) |
 | D-2. Minimal path clean after iced upgrade | ⬜ (coupled to core Gate 1) |
-| D-3. Token model stable for ≥2 consecutive minors | ✅ v0.20–v0.25 (token model unchanged across six consecutive minors; freeze review RFC-036) |
-| D-4. Style bridge stable for ≥2 consecutive minors | ✅ v0.20–v0.25 (style bridge additive-only across six consecutive minors; freeze review RFC-036) |
+| D-3. Token model stable for ≥2 consecutive minors | ⬜ **Reset 2026-09-06 (RFC-095).** `Emphasis` and `Size` removed from `crates/snora-design/src/variants.rs` — a forbidden change under RFC-036's additive-only covenant, taken deliberately via the covenant's own reopening condition, not smuggled in. Re-earned by two consecutive stable minors, **0.47.0 at the earliest**. |
+| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ **Reset 2026-09-06 (RFC-095), same change as D-3.** The style bridge itself did not change, but the covenant's reopening condition resets both gates together — it does not distinguish which frozen item moved. Re-earned by **0.47.0 at the earliest**. |
 | D-5. ≥1 real app in serious production use of design tokens | ⬜ (coupled to core Gate 3) |
 | D-6. Promotion process used at least once with evidence | ⬜ (recipes published v0.23; no promotion yet) |
 | D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor — clean through v0.24) |
 | D-8. `snora-design` published (`publish = false` flipped) | ✅ v0.20.0 |
 
-The D-3/D-4 closure is **qualified**, not an unbroken surface: across
-v0.20.0 → v0.25.2, `crates/snora-design/src/palette.rs` narrowed
-`Palette::roles()` from `pub` to `#[cfg(test)] pub(crate)` (DEC-12 — a
-removal from the public API, deliberate SemVer hardening against a future
-breaking change on role addition to `#[non_exhaustive] Palette`), and
+**D-3 and D-4 are reopened as of 0.45.0 (RFC-095) — the first time either has
+been.** From v0.20.0 through v0.44.0 the closure held, and was itself
+**qualified**, not an unbroken surface: across v0.20.0 → v0.25.2,
+`crates/snora-design/src/palette.rs` narrowed `Palette::roles()` from `pub`
+to `#[cfg(test)] pub(crate)` (DEC-12 — a removal from the public API,
+deliberate SemVer hardening against a future breaking change on role
+addition to `#[non_exhaustive] Palette`), and
 `crates/snora-design/src/contrast.rs`'s `composite_over` gained a
 debug-only precondition (`debug_assert!(bg.is_opaque())`) with no signature
-change. Both changes were deliberate hardening, and neither altered the
-token *model* (all 18 `Palette` role fields, `Tokens`, and every preset are
+change. Both were deliberate hardening, and neither altered the token
+*model* (all 18 `Palette` role fields, `Tokens`, and every preset were
 byte-for-byte unchanged) or the style bridge (which changed by addition
-only — `style::progress::toned`, v0.21). D-3 and D-4 ask whether the token
-model and style bridge are stable, not whether the surface is frozen solid;
-they are. See RFC-036 §Evidence for the full `git diff` record and the
-additive-only covenant (`api-governance.md`) that now governs what may
-change next.
+only — `style::progress::toned`, v0.21). See RFC-036 §Evidence for the
+full `git diff` record from that period.
+
+**What actually reopened it:** `Emphasis` and `Size`, two of the four
+enums in `variants.rs`, were read by nothing for 24 minors — confirmed by
+all six adopting teams, not inferred from their silence — and `Size`
+additionally shadowed `iced::Size` with no compiler error to warn a
+consumer. Removing either is a forbidden change under the additive-only
+covenant (`api-governance.md`); RFC-095 paid that price explicitly rather
+than treating "nothing reads them" as license to remove them quietly. The
+covenant's own condition is that a forbidden change **must** reset D-3 and
+D-4 in the same change, regardless of which frozen item moved or whether
+the style bridge itself was touched — the gate's value is in being
+expensive to reverse, not in precisely scoping the blast radius. `Tone`
+and `Density` are unaffected; the token model is otherwise unchanged.
+
+D-3 and D-4 are re-earned the same way they were the first time: by
+holding stable across two consecutive minors, no sooner than **0.47.0**.
 
 See `docs/src/contributing/api-governance.md` for the full promotion,
 deprecation, and release-review governance process.
