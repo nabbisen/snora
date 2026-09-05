@@ -122,6 +122,8 @@ RFC-087).
 
 | **0.44.0** | 094 | **No consumer-visible change.** Four claims in the 1.0 readiness register checked against the code for the first time; three were wrong. Shipped 2026-09-03 |
 
+| **0.45.0** | 095 | **Breaking, narrowly.** `Emphasis` and `Size` removed after six teams confirmed neither is referenced. The first use of RFC-036's reopening condition: D-3 and D-4 reset in the same change. Shipped 2026-09-06 |
+
 **All six audit RFCs are shipped.** 084 and 085 (Criticals) in 0.41.0; 087 and
 089 in 0.41.1, with 087 carrying a post-acceptance defect (D-1) found at the
 0.41.1 cut and fixed the same day; 086 and 088 in 0.42.0.

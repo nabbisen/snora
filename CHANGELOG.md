@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.45.0] — 2026-09-06
+
 ### Removed
 
 - **`snora_design::{Emphasis, Size}` removed — read by nothing for 24
@@ -3040,7 +3044,8 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.44.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.45.0...HEAD
+[0.45.0]: https://github.com/nabbisen/snora/compare/0.44.0...0.45.0
 [0.44.0]: https://github.com/nabbisen/snora/compare/0.43.0...0.44.0
 [0.43.0]: https://github.com/nabbisen/snora/compare/0.42.0...0.43.0
 [0.42.0]: https://github.com/nabbisen/snora/compare/0.41.1...0.42.0

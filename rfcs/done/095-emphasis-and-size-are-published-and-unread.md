@@ -1,11 +1,9 @@
 # RFC 095 — `Emphasis` and `Size` are published vocabulary nothing reads
 
-**Status.** Accepted (owner, 2026-09-03). Handoff written — see
-[`handoffs/095-…`](../handoffs/095-emphasis-and-size-are-published-and-unread/implementation-handoff.md).
-**Q-1 ANSWERED 2026-09-05 — remove.** All six teams replied and all six
-reference neither enum. Unblocked; the implementer may start. **Q-2 ruled** — if `Size` survives, it is
-renamed in the same break. **Q-3 ruled** — the wider unread-surface sweep is not
-in this RFC.
+**Status.** Done — shipped in v0.45.0 (2026-09-06).
+[Handoff](../handoffs/095-emphasis-and-size-are-published-and-unread/implementation-handoff.md).
+**The first use of RFC-036's reopening condition.** D-3 and D-4 were reset to
+open in the same change, per the covenant's own requirement.
 **Tracks.** Public API / 1.0 readiness. **Severity: Medium.**
 **Found by** RFC-093's Q-3, which asked whether the channel register reaches
 `Emphasis` and got a more interesting answer than expected.
