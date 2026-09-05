@@ -20,7 +20,7 @@
 //! ```
 //!
 //! This order is part of the framework contract. See the
-//! [overlay interaction semantics](https://docs.snora.dev/reference/overlay-interaction-semantics.html)
+//! [overlay interaction semantics](https://nabbisen.github.io/snora/reference/overlay-interaction-semantics.html)
 //! reference page for the normative behavioral rules.
 //!
 //! Layers 1–6 are conditional on the corresponding `AppLayout` fields

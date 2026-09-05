@@ -35,7 +35,7 @@
 //! the shape of bug this crate had four instances of at once.
 //!
 //! The negative assertions added here are derived from [Law
-//! 8](https://docs.snora.dev/reference/overlay-interaction-semantics.html#law-8--modal-focus-trapping-is-staged-not-shipped)'s
+//! 8](https://nabbisen.github.io/snora/reference/overlay-interaction-semantics.html#law-8--modal-focus-trapping-is-staged-not-shipped)'s
 //! own table, specifically its unconditional *"Pointer blocking (backdrop
 //! capture) — yes"* row, rather than invented independently — so the suite
 //! and the law describe the same claim and cannot drift apart. At minimum,
@@ -695,7 +695,7 @@ fn sheet_renders_above_dialog_when_both_overlap() {
 /// whether the combination even works).
 ///
 /// Nothing is broken, and this confirms
-/// [Law 2](https://docs.snora.dev/reference/overlay-interaction-semantics.html#law-2--menus-are-lightweight-and-below-modal-state)'s
+/// [Law 2](https://nabbisen.github.io/snora/reference/overlay-interaction-semantics.html#law-2--menus-are-lightweight-and-below-modal-state)'s
 /// claim rather than assuming it: *"modal state dominates menus
 /// visually and interactively."* Both render — the menu item and the
 /// dialog button are both findable in the tree — but only the dialog is

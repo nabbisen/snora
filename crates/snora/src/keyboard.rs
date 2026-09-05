@@ -4,7 +4,7 @@
 //! small helpers for the two patterns every multi-region application
 //! needs: pressing `Escape` to close menus or modals, and cycling
 //! between frame-level zones. See
-//! [overlay interaction semantics](https://docs.snora.dev/reference/overlay-interaction-semantics.html)
+//! [overlay interaction semantics](https://nabbisen.github.io/snora/reference/overlay-interaction-semantics.html)
 //! Laws 7 and 8 for the normative policy.
 
 use iced::keyboard::{Key, Modifiers, key::Named};
