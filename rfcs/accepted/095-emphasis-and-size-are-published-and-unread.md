@@ -2,8 +2,8 @@
 
 **Status.** Accepted (owner, 2026-09-03). Handoff written — see
 [`handoffs/095-…`](../handoffs/095-emphasis-and-size-are-published-and-unread/implementation-handoff.md).
-**Q-1 open and blocking** — the adopting teams are asked first, in the letter that
-also carries RFC-093's Q-1 obligation. **Q-2 ruled** — if `Size` survives, it is
+**Q-1 ANSWERED 2026-09-05 — remove.** All six teams replied and all six
+reference neither enum. Unblocked; the implementer may start. **Q-2 ruled** — if `Size` survives, it is
 renamed in the same break. **Q-3 ruled** — the wider unread-surface sweep is not
 in this RFC.
 **Tracks.** Public API / 1.0 readiness. **Severity: Medium.**
@@ -99,6 +99,40 @@ either way.**
   backwards. If emphasis variants are worth having, they are worth having on
   their own argument.
 - **Not touching `Tone` or `Density`.** Both are read and both are fine.
+
+## Q-1's answer, and how it was reached
+
+**Asked of all six teams in the 2026-09-04 letter. All six answered, and all six
+reference neither `Emphasis` nor `Size`** — not as an imported type, not as a
+pass-through, not in a match.
+
+**Three of them answered by enumerating what they *do* use, rather than by
+grepping the two names and reporting a null**, which is the stronger method and
+was not asked for:
+
+- **apimokka** listed their entire snora surface: ten paths, all under
+  `snora::design::*`. *"This doubles as an answer to any future 'does anyone use
+  X' question about our side."*
+- **knotra** enumerated every import from `snora::design` — `Color`,
+  `FocusTokens`, `Tokens`, `Tone`, `notice::Notice`, `card::raised`,
+  `style::text::*`, `contrast::contrast_ratio` — explicitly *"rather than
+  grepping the two names and trusting a null result"*. Every `Size` in their tree
+  is `iced::Size`.
+- **orbok** grepped all twelve of their crates and listed their whole surface
+  besides.
+
+**Nobody wants them wired up either.** arama: *"we have never reached for an
+emphasis distinction… if we did we would raise it as a request rather than as a
+reason to keep an inert enum."* apimokka: no view, because they build their own
+chrome and style it from tokens directly.
+
+**The `Size`/`iced::Size` shadowing was confirmed as real but unhit** — knotra
+and aaai both said they would not have noticed it because they never reach for
+either name. That is consistent with removal rather than rename: a collision
+nobody hits is still a collision the next reader hits.
+
+**Ruling: remove both at 0.45.0**, paying RFC-036's reopening cost — D-3 and D-4
+reset to ⬜ in the same change, per the covenant's own condition.
 
 ## Open questions
 

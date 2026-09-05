@@ -7,24 +7,20 @@
 
 ---
 
-## Why there is nothing for you to do yet
+## Q-1 is answered: remove. You may start.
 
-**Q-1 — consumers or removal — cannot be ruled from inside this repository.**
+**All six adopting teams replied and all six reference neither enum.** Three
+answered by enumerating what they *do* use rather than grepping the two names —
+the stronger method, and not one we asked for. Nobody wants them wired up.
 
-The default answer is removal: 24 minors, two public enums, nothing reads either.
-But **absence of demand is not evidence here.** Nobody asks for an enum they did
-not know was inert, and this project has made that exact error already: RFC-078
-counted apimokka's decline as evidence against focus trapping, when the decline
-was an echo of a constraint we had published (`design-decisions.md`, corrected
-2026-09-02).
+Full answer and method in RFC-095's own "Q-1's answer" section; the review record
+is `.git-exclude/reviewed/` alongside the reply letters.
 
-So the teams get asked once, in the next letter that has its own reason to exist
-— which now exists, because RFC-093's Q-1 obligation is waiting for the same
-letter. **That letter is the architect's.** When answers come back, Q-1 is ruled
-and this handoff gains a Unit 1.
-
-Nothing here is yours until then. This document exists so the dependency is
-written down rather than remembered.
+**One caution carried over from how the question was asked.** It was put to them
+because *absence of demand is not evidence when nobody knew the enums were
+inert* — the RFC-078/apimokka error. Six teams checking their trees and reporting
+zero **is** evidence. The distinction matters if anyone reopens this later: this
+removal rests on six positive checks, not on silence.
 
 ## Rulings that do not wait
 
@@ -59,12 +55,24 @@ that has quietly stopped existing.
 
 ## Acceptance criteria
 
-Deferred with Q-1. They will name whichever of these applies:
+1. **Both enums removed** from `crates/snora-design/src/variants.rs`, and the
+   re-exports updated in `snora-design/src/lib.rs` and `crates/snora/src/design.rs`.
+   `Tone` and `Density` stay — both are read.
+2. **`variants.rs`'s module doc updated.** Its table currently says which enums
+   are read by what; after this it describes two, not four.
+3. **D-3 and D-4 reset to ⬜ in the same change**, in
+   `docs/src/contributing/api-freeze-review.md`. Not afterwards, not in a
+   follow-up. RFC-036's reopening condition is explicit that the covenant's value
+   is *"entirely in its being expensive to reverse"*, and a reopening that skips
+   the reset is a covenant that has quietly stopped existing. **State in the same
+   commit message that this is a forbidden change taken deliberately.**
+4. **CHANGELOG entry naming the covenant exception**, not implying it.
+5. **A migration guide entry** — this one is genuinely breaking, unlike 0.43.0
+   and 0.44.0. It should say what we know: six teams checked and none referenced
+   either, so the expected impact is nil, and `cargo build` will name the type if
+   we were wrong about a seventh.
+6. Do not touch `Tone`, `Density`, or anything else in the frozen surface.
 
-- **If removal:** both enums gone, the facade re-export updated, D-3 and D-4
-  reset to ⬜ **in the same change**, the covenant exception stated in the
-  CHANGELOG rather than implied, and a migration guide entry — this one is
-  genuinely breaking, unlike 0.43.0.
-- **If retention:** the consumer that justifies each exists, or
-  `variants.rs`'s module doc says plainly that they are reserved vocabulary and
-  why that is worth a public name. `Size` is renamed either way.
+**If removal turns out to be harder than deleting two enums** — if something in
+the workspace or an example does reference them after all — stop and report it.
+That would mean our own check was wrong, which is worth more than the removal.
