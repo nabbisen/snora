@@ -1,6 +1,10 @@
 # RFC 096 — The overlay laws are cited, not checked
 
-**Status.** Proposed (2026-09-06).
+**Status.** Accepted (owner, 2026-09-06). Handoff written — see
+[`handoffs/096-…`](../handoffs/096-the-overlay-laws-are-cited-not-checked/implementation-handoff.md).
+**Q-1 ruled** — "uncited but covered" and "uncovered" are different findings.
+**Q-2 ruled** — normalize Law 1's heading; nothing links to its anchor, checked.
+**Q-3 ruled** — the answer lives in each law's own text.
 **Tracks.** Contract integrity. **Severity: Medium.**
 **Found by** RFC-094's Unit 3, which added the first test confirming the engine
 obeys Law 2 — and by then measuring what the other laws actually have.
