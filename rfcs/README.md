@@ -159,6 +159,7 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 096 | [The overlay laws are cited, not checked](./proposed/096-the-overlay-laws-are-cited-not-checked.md) | v0.46.0 — Medium |
 
 ## Archive
 
