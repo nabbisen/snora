@@ -179,6 +179,11 @@ because the linker eliminates code that is compiled but never reached. Confirmed
 independently by a consumer (apimokka, 2026-09-04) who ran
 `default-features = false, features = ["design"]` and compared against the same
 build with `widgets` enabled: **17,899,656 bytes either way — byte-identical.**
+*(A second consumer, arama, has run that same configuration since 2026-08-16 —
+three weeks earlier — and reported no size change worth recording at the time.
+We described apimokka as "the first consumer we know of" in a letter and were
+wrong; the correction is theirs. Two independent observations, one measured and
+one an absence of surprise.)*
 They reported the zero plainly, which is the right thing to do with a null
 result, and it is the same effect RFC-043 found from the other direction when
 byte-identical probes made the diffs meaningless.

@@ -166,6 +166,35 @@ exactly the shape that let this survive RFC-083 by one line. Proven by
 perturbation: re-adding `canvas` to the workspace line makes the gate
 fail, naming it; restoring the fix makes it pass again.
 
+## If your lockfile shrinks, re-resolve before you trust it
+
+**Reported by a consumer, 2026-09-05, and verified here.** Removing `canvas` and
+`svg` shrank one adopter's lockfile by 26 packages — and the smaller graph let
+cargo re-resolve a transitive dependency *downward*:
+
+- `gpu-allocator 0.27.0` declares `windows = ">=0.53,<=0.58"` — a loose range
+  with an upper bound (confirmed in the published manifest).
+- With the other requirements that had been holding it at `0.58` gone, it
+  resolved to `0.56` while `wgpu-hal` stayed on `0.58`.
+- Two incompatible `ID3D12Heap` types, **ten compile errors, Windows only.**
+
+One command fixes it:
+
+```bash
+cargo update -p gpu-allocator
+```
+
+**Nothing here is snora's bug** — it is a loose version range in someone else's
+crate meeting a smaller graph. But our change is what made the graph smaller, so
+any consumer whose lockfile shrinks across this release could hit the same shape
+with a different crate.
+
+**And we could not have caught it.** Every snora CI job runs `ubuntu-latest`, and
+this failure lives inside a `cfg(windows)` dependency. The reporting team's
+Windows job went red while every other gate — theirs and ours — stayed green.
+**If you ship for Windows or macOS, your own CI is the only thing that will see
+this class of problem.**
+
 ## If you are jumping more than one minor
 
 Read the guides for the jumps in between — several carry real changes,
