@@ -613,6 +613,26 @@ fn outside_click_on_menu_emits_close_menus() {
     );
 }
 
+/// A header menu with no `on_close_menus` sink still renders and is
+/// findable — Law 5's menu-side claim: the transparent outside-click
+/// backdrop is omitted, but the menu content is not.
+///
+/// The modal-side version of this exact claim was a shipped Critical
+/// (RFC-084 F-02: a modal shown with no `on_close_modals` handler
+/// blocked nothing at all). Checked here for the first time on the menu
+/// side (RFC-096), which had never been constructed in any test.
+#[test]
+fn menu_with_no_close_sink_still_renders() {
+    let menu_el: Element<Msg> = btn("File item", Msg::MenuItem);
+    let layout = AppLayout::new(btn("body", Msg::BodyPressed)).header_menu(menu_el);
+    // on_close_menus intentionally absent.
+    let element = render(layout);
+
+    let mut ui = simulator(element);
+    ui.find("File item")
+        .expect("menu content should still render with no close sink");
+}
+
 /// When both dialog and sheet are present, both render and both contain
 /// interactive content.
 ///
