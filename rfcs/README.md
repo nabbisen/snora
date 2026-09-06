@@ -143,6 +143,7 @@ Numbers remain stable forever and are never reused.
 | 093 | [A contrast gate cannot see 1.4.1, and ours never could](./done/093-a-contrast-gate-cannot-see-1-4-1.md) | v0.43.0 — High (handoff: [`handoffs/093-…`](./handoffs/093-a-contrast-gate-cannot-see-1-4-1/implementation-handoff.md)) |
 | 094 | [The gate register has rows nobody re-derived](./done/094-the-gate-register-has-rows-nobody-re-derived.md) | v0.44.0 — Medium (handoff: [`handoffs/094-…`](./handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff.md)) |
 | 095 | [`Emphasis` and `Size` are published vocabulary nothing reads](./done/095-emphasis-and-size-are-published-and-unread.md) | v0.45.0 — Medium (handoff: [`handoffs/095-…`](./handoffs/095-emphasis-and-size-are-published-and-unread/implementation-handoff.md)) |
+| 096 | [The overlay laws are cited, not checked](./done/096-the-overlay-laws-are-cited-not-checked.md) | v0.46.0 — Medium (handoff: [`handoffs/096-…`](./handoffs/096-the-overlay-laws-are-cited-not-checked/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -154,7 +155,6 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 096 | [The overlay laws are cited, not checked](./accepted/096-the-overlay-laws-are-cited-not-checked.md) | v0.46.0 — Medium |
 
 ## Proposed
 

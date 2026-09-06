@@ -1,10 +1,10 @@
 # RFC 096 — The overlay laws are cited, not checked
 
-**Status.** Accepted (owner, 2026-09-06). Handoff written — see
-[`handoffs/096-…`](../handoffs/096-the-overlay-laws-are-cited-not-checked/implementation-handoff.md).
-**Q-1 ruled** — "uncited but covered" and "uncovered" are different findings.
-**Q-2 ruled** — normalize Law 1's heading; nothing links to its anchor, checked.
-**Q-3 ruled** — the answer lives in each law's own text.
+**Status.** Done — shipped in v0.46.0 (2026-09-06).
+[Handoff](../handoffs/096-the-overlay-laws-are-cited-not-checked/implementation-handoff.md).
+**Outcome:** six laws guarded, two recording deliberate absences, one gap found
+and closed in the same cycle. **Zero instances of the gate-5 shape** — unlike
+RFC-094's sweep of `api-freeze-review.md`, which found two rows wrong.
 **Tracks.** Contract integrity. **Severity: Medium.**
 **Found by** RFC-094's Unit 3, which added the first test confirming the engine
 obeys Law 2 — and by then measuring what the other laws actually have.

@@ -17,6 +17,36 @@ are recorded in the per-version migration guides under
 
 Nothing yet.
 
+## [0.46.0] — 2026-09-06
+
+### Fixed
+
+- **Four doc links in published rustdoc pointed at a domain that does
+  not exist.** `crates/snora/src/render.rs` and
+  `crates/snora/src/keyboard.rs` linked the overlay-interaction-semantics
+  reference at `docs.snora.dev`, which does not resolve; the book is
+  published at `nabbisen.github.io/snora`. Anyone following those links
+  from docs.rs got nothing. Repointed.
+
+  Worth stating because it is the only consumer-observable change here:
+  nothing gates absolute external URLs. `check-built-links.py` reads the
+  built book's internal links and `check-repo-links.py` reads relative
+  `.md` links, so these four could have rotted indefinitely without
+  anything saying so. Found while checking whether a heading rename
+  would break an anchor.
+
+### Changed
+
+- **The eight overlay laws now carry their own evidence (RFC-096).**
+  `docs/src/reference/overlay-interaction-semantics.md` states the
+  engine's behavioural contract; each law now records whether a test
+  would fail if the engine stopped obeying it, naming the test where one
+  exists. Six are guarded, two state deliberate absences with nothing to
+  assert, and one gap found during the sweep — a menu with no close sink
+  had never been constructed in any test — is closed by
+  `menu_with_no_close_sink_still_renders`. No behaviour changed; this is
+  the contract document becoming checkable rather than merely stated.
+
 ## [0.45.0] — 2026-09-06
 
 ### Removed
@@ -3044,7 +3074,8 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.45.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.46.0...HEAD
+[0.46.0]: https://github.com/nabbisen/snora/compare/0.45.0...0.46.0
 [0.45.0]: https://github.com/nabbisen/snora/compare/0.44.0...0.45.0
 [0.44.0]: https://github.com/nabbisen/snora/compare/0.43.0...0.44.0
 [0.43.0]: https://github.com/nabbisen/snora/compare/0.42.0...0.43.0
