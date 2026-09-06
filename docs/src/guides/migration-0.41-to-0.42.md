@@ -184,10 +184,36 @@ One command fixes it:
 cargo update -p gpu-allocator
 ```
 
-**Nothing here is snora's bug** — it is a loose version range in someone else's
-crate meeting a smaller graph. But our change is what made the graph smaller, so
-any consumer whose lockfile shrinks across this release could hit the same shape
-with a different crate.
+**A shrinking lockfile is necessary but not sufficient — do not read this as
+"if your lockfile shrinks, expect this".** A second consumer crossed the same
+range (0.39.3 → 0.42.0), saw their lockfile shrink 706 → 676 packages, and the
+pair did *not* split: `gpu-allocator` and `wgpu-hal` both resolved to `windows
+0.58.0`, and their Windows CI stayed green throughout. Two consumers, same
+trigger, one failure.
+
+**The diagnostic is disagreement, not count.** Checked against snora's own tree:
+
+```bash
+cargo tree --target all -i windows@0.58.0
+```
+
+Ask whether `gpu-allocator` and `wgpu-hal` resolve to the **same** `windows`. Do
+not ask how many `windows` versions your lockfile contains — **several is normal
+in an `iced` tree** and counting them produces a false positive. snora's own
+lockfile carries two, from unrelated branches:
+
+- `windows 0.58.0` ← `gpu-allocator` ← `wgpu-hal` ← `wgpu` ← `iced_wgpu`
+- `windows 0.62.2` ← `mundy` ← `iced_winit` ← `iced` — system theme detection,
+  a different branch entirely
+
+**Use `--target all`.** `--target x86_64-pc-windows-msvc` alone returns *"nothing
+to print"* for the `mundy` branch, which is what separates the two and is not
+obvious. Confirmed here.
+
+**Nothing in any of this is snora's bug** — it is a loose version range in someone
+else's crate meeting a smaller graph. But our change is what made the graph
+smaller, so a consumer whose lockfile shrinks across this release is worth one
+check.
 
 **And we could not have caught it.** Every snora CI job runs `ubuntu-latest`, and
 this failure lives inside a `cfg(windows)` dependency. The reporting team's

@@ -192,6 +192,28 @@ So: if you are weighing whether to turn a feature on, the honest answer is that
 the cost arrives when you *call* it. The figure in this budget tells you what it
 costs once you do.
 
+### Two consumer confirmations, and one methodology note worth copying
+
+**apimokka, 2026-09-04** — measured the `widgets` delta at exactly zero,
+byte-identical binaries either way, which is what produced the "cost of *using*,
+not of enabling" clarification above.
+
+**orbok, 2026-09-07** — built their own application against 0.42.0 and 0.46.0 and
+found `target/release/orbok` **byte-identical at 29,792,272 B across four minors,
+including a breaking one.** Lockfile packages 676 → 676; `cargo tree --edges
+normal` 1,431 → 1,431. That is a consumer confirming from the outside what four
+releases of ours claimed: no behaviour change means no size change either.
+
+**The methodology note is theirs and it is the transferable part.** Both of their
+figures come from real builds of the same tree — stash the version bump, build,
+measure, restore, rebuild — rather than from quoting an earlier number. As they
+put it, their own 0.42.0 measurement differed from *our* published figure for the
+same release purely by build profile, so quoting would have made a difference
+look like an error.
+
+**A number measured on a different profile is not a number you can compare.**
+That applies to this document's own rows as much as to a consumer's.
+
 ### Data integrity note (RFC-043)
 
 The 0.25.3 row is doubly transitional: it is simultaneously the **first**
