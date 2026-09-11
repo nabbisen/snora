@@ -1,4 +1,11 @@
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/nabbisen/snora/main/docs/src/assets/snora-eyecatch.png"
+     alt="Snora" width="220" height="220">
+
 # Snora
+
+</div>
 
 [![documentation](https://img.shields.io/badge/docs-github_pages-brightgreen)](https://nabbisen.github.io/snora/)
 [![License](https://img.shields.io/github/license/nabbisen/snora)](https://github.com/nabbisen/snora/blob/main/LICENSE)

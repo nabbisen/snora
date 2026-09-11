@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/snora-eyecatch.png" alt="Snora" width="200" height="200">
+</div>
+
 # Snora documentation
 
 Welcome. This directory holds long-form documentation for snora —
