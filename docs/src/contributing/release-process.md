@@ -312,8 +312,15 @@ restate the guide's content.
 [ ] If minor: write docs/guides/migration-X.Y-to-X.Z.md. **Unconditional
     — no exceptions for "nothing broke."** A guide for a minor that
     changed nothing required says so in a sentence (RFC-079); it is
-    never skipped. Run scripts/check-migration-guides.sh to confirm
-    every released minor has one.
+    never skipped.
+    # CHECK IT WITH THE VERSION YOU ARE ABOUT TO TAG, not bare:
+    #     scripts/check-migration-guides.sh X.Y.Z
+    # Bare, the script only knows the minors that are ALREADY tagged, so
+    # the pair you are cutting does not exist yet and it passes. That is
+    # how 0.46.0 shipped with no 0.45->0.46 guide: the gate went red on
+    # the next commit instead, and main stayed red for four commits over
+    # six days before anyone looked. Passing the pending version is what
+    # makes this catch the omission during the cut rather than after it.
 [ ] After the guide is written, decide correspondence (RFC-080): which
     teams have something **specific to them** that the guide does not
     already cover for everyone? Write only to those teams, and write

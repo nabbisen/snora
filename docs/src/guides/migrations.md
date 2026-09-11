@@ -10,6 +10,9 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.45 → 0.46](migration-0.45-to-0.46.md) — **not breaking; no code,
+  appearance, or API change.** The eight overlay laws now name the tests
+  that guard them. Four published doc links repointed off a dead domain.
 - [0.44 → 0.45](migration-0.44-to-0.45.md) — **breaking, but narrow:**
   `snora_design::{Emphasis, Size}` removed — read by nothing for 24
   minors, confirmed by all six adopting teams rather than assumed.

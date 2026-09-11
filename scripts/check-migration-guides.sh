@@ -26,7 +26,20 @@ set -euo pipefail
 # default, so the docs job pins `fetch-depth: 0` — see the D-1 note
 # below and .github/workflows/ci.yaml.
 #
-# Usage: scripts/check-migration-guides.sh
+# Usage: scripts/check-migration-guides.sh [X.Y.Z]
+#
+# With no argument it checks the minors that are already tagged. Pass the
+# version you are ABOUT to tag and it checks that pair too.
+#
+# Why that argument exists (2026-09-12). This gate derives its input from
+# `git tag`, so the pair `A -> B` does not exist until `B` is tagged --
+# which means the gate fires on the push AFTER the cut, never during it.
+# 0.46.0 shipped with no 0.45->0.46 guide; the gate went red on the next
+# commit and main stayed red for four commits across six days. The guide
+# for 0.42->0.43 carries a note predicting exactly this, written by the
+# same person who then did it. A gate that can only fail after the
+# mistake is shipped is half a gate; passing the pending version is the
+# other half, and the release checklist calls it before tagging.
 
 cd "$(git rev-parse --show-toplevel)"
 
@@ -46,8 +59,19 @@ ADOPTION_MINOR=39
 # clean bill of health**: with no tags this script sees zero minors,
 # finds zero gaps, and would otherwise exit 0 — a green check that
 # verified nothing, which is worse than the crash it replaced.
-minors=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+PENDING="${1:-}"
+if [[ -n "$PENDING" ]] && ! [[ "$PENDING" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "usage: $(basename "$0") [X.Y.Z]   (got '$PENDING')" >&2
+  exit 1
+fi
+
+minors=$( { git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true; \
+            [[ -n "$PENDING" ]] && echo "$PENDING"; } \
   | awk -F. '{print $1"."$2}' | sort -t. -k1,1n -k2,2n -u || true)
+
+if [[ -n "$PENDING" ]]; then
+  echo "Including the pending, untagged version: $PENDING"
+fi
 
 if [[ -z "$minors" ]]; then
   echo "FAIL: no release tags visible — this check cannot run." >&2
