@@ -95,6 +95,73 @@ Future design work is governed by
 [`api-governance.md`](docs/src/contributing/api-governance.md) and the
 D-gates.
 
+## Scheduled — the 2026-09-12 internal audit
+
+A project-wide audit by the snora architect across requirements, security and
+threat model, external design, documentation, codebase, tests, examples and
+schedule. **Ten findings, every one verified against the tree** rather than taken
+from memory; the full record with the commands run is in
+`.git-exclude/reviewed/audit-2026-09-12/`.
+
+**The shape of it:** snora gates compilation, clippy, rustdoc, feature
+combinations, iced-freedom, workflow syntax, doc links, version snippets,
+migration guides, docs-only claims, and whether upstream still compiles after a
+fresh resolve. **Seven workflows, and not one of them is about security.** Four of
+the ten findings are the same defect this project has spent RFC-090 to RFC-096
+naming: a property that holds by habit rather than by mechanism.
+
+### 0.47.0 — the mechanisms that are free
+
+Every item here is small, and each replaces a habit with something that refuses.
+
+| Finding | Work | Owner |
+|---|---|---|
+| Zero `unsafe` across 13,331 lines, enforced by nothing | `#![forbid(unsafe_code)]` in all five crates — the property is already true, so adopting it cannot regress and can never be lost | dev team |
+| *"independent, iced-free leaves"* — iced-freedom gated twice, independence not at all | A `design-isolation` step asserting `snora-core` and `snora-design` do not depend on each other. Mirrors the two RFC-083 gates beside it | dev team |
+| MSRV `1.88` published, verified only weekly against a graph we do not ship, plus a manual release step | An MSRV job against the **committed** lockfile. Conformance holds today (0 deps demand higher, checked); the gate is what is missing | dev team |
+| WCAG floors in up to four copies, guarded by a comment that says *"check all three"* and has already failed once (`1.3` drifted from `3.0`, RFC-071) | A `scripts/check-*.sh` in the family that exists, asserting the copies agree | dev team |
+| 1.0 status header precise for the 8-of-10 track, vague for the 1-of-8 track | State both fractions. RFC-062's own condemned shape, in the document that answers *"is snora ready for 1.0"* | architect |
+| `Icon::Svg` parses a file at render time with no stated trust boundary | One paragraph in `guides/icons.md`. *"Your own assets"* is a heading, not a contract | architect |
+| 21 example crates, 16 in the acceptance matrix, exclusion unstated | One sentence naming the size probes and book snippets as infrastructure | architect |
+
+**0.47.0 is also the earliest D-3 and D-4 can be re-earned**, having been reset at
+0.45.0 under RFC-036's reopening condition. That is coincidence, not design, but
+it makes 0.47.0 the release where the design track stops shrinking.
+
+### 0.48.0 — the one that needs a design, not a fix
+
+**snora has no threat model.** `SECURITY.md` covers reporting and nothing else —
+and asks reporters for *"scripted server responses"*, boilerplate from a project
+with a network surface, which snora does not have. The one piece of real
+threat-model content in the repository is inside `migration-0.40-to-0.41.md`,
+where RFC-084's containment fix is correctly framed as UI integrity — unfindable
+by anyone not upgrading across that exact boundary.
+
+**And nothing scans 310 dependency packages for known vulnerabilities.** No
+`cargo-audit`, no `cargo-deny`, no advisory database, across five crates
+published to crates.io.
+
+These are one piece of work in the right order — **the model first, the mechanism
+second** — because a gate adopted without a model saying what it defends is a
+gate nobody can scope. The model also has to answer what snora explicitly does
+*not* defend, which is the half that stops the scope growing forever.
+
+### Not scheduled, and why
+
+**The remaining 33 unswept rows of `api-freeze-review.md`.** RFC-094 swept the
+seven test-backed rows and deliberately left the rest (Q-1). This audit found one
+of them — *"Type-names audit: complete as of v0.17.0"* — is **29 minors stale**,
+in the register that governs 1.0, across which the public type surface
+demonstrably changed. That single row gets re-derived with the header fix above;
+the other 32 become a deferral-register row with a condition rather than a
+standing intention.
+
+**Coverage tooling.** There is none, and it is deliberately not proposed. Checked
+against the project's actual recent gaps: menu-plus-modal had every line covered
+and coverage is blind to combinations; `--features design` alone was a
+feature-matrix gap. Both would have been invisible to a coverage report. Recorded
+so the reflex is not acted on later without this check being redone.
+
 ## Scheduled — the 2026-09-01 external audit
 
 An external architect audited both the specification and the codebase.

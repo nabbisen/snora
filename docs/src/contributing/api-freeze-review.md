@@ -5,12 +5,23 @@ alongside the codebase: update it in any PR that changes a checked item.
 
 **Current status (v0.46.0):** Eight of ten core gates satisfied. Remaining
 blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
-production app). **Gate 5 re-ticked 2026-09-02**, having been reopened
-2026-09-01 (RFC-084) — see its own row for why it was wrong for 24 minors and
-what closed it. **Gate 9 closed at v0.37.0** —
-9a at v0.29.0, 9b on four `design_overhead_ratio` rows, the latter with its
-sensitivity stated in the row below rather than ticked clean. Design-track
-D-gates tracking in progress; see table below.
+production app). **Design-track D-gates: one of eight satisfied** — D-1, D-2,
+D-3, D-4, D-5, D-6 and D-7 are all open, and D-3/D-4 were **reset at 0.45.0**
+under RFC-036's reopening condition, re-earnable no sooner than 0.47.0.
+
+**Both fractions are stated on purpose (audit 2026-09-12).** This header
+previously gave a precise number for the core track and the phrase *"D-gates
+tracking in progress"* for the design track — precise where the news was good and
+vague where it was not. Vagueness also cannot register change: 0.45.0 took the
+design track from three closed to one and the sentence did not move, because it
+was equally true before and after. That is the shape RFC-062 was raised to
+eliminate — *"a prose verdict alone is what let 'Within budget' sit beside a
+3.2×-over-threshold figure for ten minors."*
+
+**Gate 5 re-ticked 2026-09-02**, having been reopened 2026-09-01 (RFC-084) — see
+its own row for why it was wrong for 24 minors and what closed it. **Gate 9
+closed at v0.37.0** — 9a at v0.29.0, 9b on four `design_overhead_ratio` rows, the
+latter with its sensitivity stated in the row below rather than ticked clean.
 
 ## Crate-level surface
 
@@ -39,7 +50,7 @@ Types audited: `AppLayout`, `LayoutDirection`, `Edge`, `Dialog`, `Sheet`,
 | `PartialEq` on value types | ✅ `LayoutDirection`, `Edge`, `SheetEdge`, `ToastIntent`, `ToastPosition`, `ToastLifetime`, `TabAction`, `BreadcrumbAction`, `MenuAction` — all ✅. `Icon` gets `PartialEq` in v0.17.0. `Dialog`/`Sheet`/`AppLayout` contain `Node` (cannot derive without bound — correct). |
 | `SheetSize` missing `Eq` | ✅ intentional — `Ratio(f32)` / `Pixels(f32)` contain `f32` |
 
-Type-names audit: **complete as of v0.17.0.**
+Type-names audit: **complete as of v0.17.0 — and not re-derived since (audit 2026-09-12).** Twenty-nine minors have passed and the public type surface has demonstrably moved: 0.45.0 removed `Emphasis` and `Size` under a covenant exception, and RFC-055/056 relocated the style bridge between crates. Whether the audit still holds is **unknown**, not assumed. This row is one of the 33 that RFC-094 deliberately left unswept (its Q-1 ruled test-backed rows only); it is dated here per RFC-094's Q-2 convention, where a row carrying no date has never been re-derived at all.
 
 ## Builder method review
 

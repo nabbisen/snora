@@ -63,6 +63,24 @@ let i = Icon::Svg(std::path::PathBuf::from("assets/logo.svg"));
 The engine reads the file at render time using iced's SVG widget.
 Pixel size is the same default as the other variants.
 
+### The path is yours to trust
+
+**snora does not validate the path or the file.** `Icon::Svg` hands the path to
+iced, which reads it from disk at render time and parses it as SVG. That is a
+filesystem read and an XML parser, on whatever path your application supplies.
+
+For the ordinary case — an `assets/` directory you ship — that is exactly what
+you want and there is nothing to think about.
+
+**If the path or the file can come from somewhere you do not control** — a plugin
+directory, a theme a user installs, anything downloaded — then the trust boundary
+is yours, not ours. snora adds no sandbox, no path restriction, and no size or
+complexity limit beyond whatever the SVG renderer imposes. Validate before you
+construct the `Icon`.
+
+We state this because *"your own assets"* above is a heading, not a guarantee,
+and nothing in the type signature says which of the two situations you are in.
+
 ## Sizing
 
 The default size is 14 px to match the default body text. To override:

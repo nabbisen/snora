@@ -12,6 +12,13 @@ The following examples collectively form the release acceptance matrix. Every
 example in this table must compile (`cargo check --workspace --all-features`)
 before a release is tagged.
 
+**The table lists 16 of the 21 crates in this directory, and the difference is
+deliberate.** `snora-book-snippets` and the four `snora-size-probe-*` crates are
+infrastructure — the first compiles the book's code fences, the others exist only
+to be measured by `scripts/measure-binary-size.sh`. None demonstrates a surface
+to a reader, so none belongs in an acceptance matrix. All 21 compile in CI
+regardless, since `examples/*` are workspace members.
+
 | Crate | Purpose | Surface demonstrated |
 |---|---|---|
 | `snora-example-hello` | Minimal app | `AppLayout::new(body)` + `render` — smallest working Snora app |
