@@ -148,6 +148,39 @@ Helpers:
 - `Crumb::ancestor(id, label)` — clickable ancestor.
 - `Crumb::leaf(id, label)` — current (last) entry, plain text.
 
+## Zone navigation
+
+```rust,ignore
+pub enum FocusZone { Header, SideBar, Body, Footer }
+pub enum Cycle     { Forward, Backward }
+
+pub struct ZonePresence { header: bool, side_bar: bool, footer: bool }
+```
+
+`FocusZone` names the four skeleton slots in **logical** cycle order —
+`Header → SideBar → Body → Footer`, wrapping. The order needs no
+direction-dependent mirroring: under RTL the sidebar renders on the
+opposite physical edge but is still the start-edge rail following the
+header, so unlike `ToastPosition` there is no RTL variant of this
+sequence.
+
+`Cycle` is the direction to move in — `Forward`/`Backward`, not
+next/previous *physical* position, for the same reason.
+
+`ZonePresence` says which optional slots the current layout populated,
+so `focus::next_zone` can skip absent ones. `body` has no field: it is
+required by `AppLayout` and cannot be absent. `ZonePresence::none()` is
+the body-only case every `AppLayout::new` application starts from;
+`::all()` is the full skeleton.
+
+`Tab` and `Crumb` are **not** zones — they are content an application
+places *inside* a zone.
+
+See [`keyboard::cycle_zones`](../guides/accessibility.md) for the key
+binding that produces a `Cycle`, and the
+[0.38 → 0.39 migration guide](../guides/migration-0.38-to-0.39.md) for
+why this vocabulary arrived (RFC-060).
+
 ## Defaults at a glance
 
 ```text

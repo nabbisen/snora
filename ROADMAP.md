@@ -623,6 +623,20 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Longer-term: 1.0
 
+> **The critical path to 1.0 is mostly not ours.** Of the open gates,
+> **core gate 1** (an iced major upgrade) waits on upstream, **core gate 3**
+> and **D-5** wait on an adopter reaching production, **D-1/D-2** are coupled
+> to gate 1, and **D-6** needs recipe-usage evidence no consumer has yet
+> produced. That is five of six open gates resting on two external events.
+>
+> **The controllable part is finished.** The 2026-09-12 register sweep
+> re-earned D-3 and D-4 and closed D-7, taking the design track to four of
+> eight; the core track has stood at eight of ten since v0.37.0. There is no
+> queue of snora-side work standing between here and 1.0 — which is why this
+> section says so at the top. Read as a work queue, the list below invites
+> the wrong question ("when will you finish?"); the honest one is "what has
+> to happen elsewhere?"
+
 Snora hits 1.0 when the API surface has been stable across a few
 releases and we are confident it will not need a wholesale redesign.
 
@@ -633,6 +647,8 @@ The full readiness checklist is in
 
 1. One iced major upgrade completed and lived on ≥1 minor. ⬜
 2. Two consecutive minors without vocabulary churn. ✅ v0.13–v0.16
+   (core vocabulary; the design surface has its own D-3/D-4 — scope
+   written down 2026-09-12, having been undefined until then)
 3. At least one third-party or production-grade app. ⬜
 4. AppLayout construction policy decided. ✅ v0.11
 5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.17

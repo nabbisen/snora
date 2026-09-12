@@ -3,11 +3,18 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.46.0):** Eight of ten core gates satisfied. Remaining
+**Current status (v0.47.0):** Eight of ten core gates satisfied. Remaining
 blockers: gate 1 (iced major upgrade) and gate 3 (confirmed third-party
-production app). **Design-track D-gates: one of eight satisfied** — D-1, D-2,
-D-3, D-4, D-5, D-6 and D-7 are all open, and D-3/D-4 were **reset at 0.45.0**
-under RFC-036's reopening condition, re-earnable no sooner than 0.47.0.
+production app). **Design-track D-gates: four of eight satisfied** — D-3 and
+D-4 **re-earned at 0.47.0** after their 0.45.0 reset, and D-7 closed by the
+scope review recorded in its own row. D-1, D-2, D-5 and D-6 remain open.
+
+**All four remaining D-gates depend on something outside this project** —
+D-1/D-2 on an upstream iced major, D-5 on an adopter reaching production, and
+D-6 on consumer usage evidence a recipe has not yet accumulated (see its row).
+The controllable part of the design track is now finished. The same is true of
+the core track's two blockers, and `ROADMAP.md` says so at the top rather than
+leaving 1.0 to read as a work queue.
 
 **Both fractions are stated on purpose (audit 2026-09-12).** This header
 previously gave a precise number for the core track and the phrase *"D-gates
@@ -27,13 +34,13 @@ latter with its sensitivity stated in the row below rather than ticked clean.
 
 | Item | Status |
 |---|---|
-| `snora-core` has no iced dependency | ✅ verified every release |
-| `snora-widgets` depends on core + iced, not on `snora` | ✅ |
-| `snora` re-exports intended vocabulary and widgets | ✅ |
-| Feature flags documented and CI-tested | ⬜ **Reopened 2026-09-03 (RFC-094): the claim is not true of one documented combination.** The feature matrix covers nine combinations, all with `widgets` or none. `crates/snora/Cargo.toml` documents `design` as *independent of `widgets`* — *"everything else works with `design` alone"* — and `--no-default-features --features design` appears in **no CI job**. It is not broken: it compiles and its suites pass (42/17/7, checked). So this is one missing matrix entry, not a defect hunt, and the row re-ticks when the entry exists. *(re-derived 2026-09-03, RFC-094)* |
-| Engine-only build (`--no-default-features`) supported | ✅ |
+| `snora-core` has no iced dependency | ✅ **Continuously enforced, not periodically verified.** `ci.yaml`'s `design-isolation` job fails if `cargo tree -p snora-core --all-features` contains `iced`, and since 0.47.0 a second step in the same job asserts `snora-core` and `snora-design` do not depend on each other in either direction. Re-confirmed by hand 2026-09-12 (0 iced edges). *(re-derived 2026-09-12)* |
+| `snora-widgets` depends on core + iced, not on `snora` | ✅ `cargo tree -p snora-widgets --all-features` contains no `snora` edge — checked directly rather than inherited. Nothing gates this one: the `design-isolation` job covers the two leaves and iced-freedom, not this direction. Recorded as verified-by-hand so the difference from the row above is visible. *(re-derived 2026-09-12)* |
+| `snora` re-exports intended vocabulary and widgets | ✅ **Re-derived 2026-09-12 against the 25-type surface**, not the 22-type one this row predates: 22 names are re-exported flat and the three zone-navigation types arrive via `pub use snora_core::focus` — a module rather than flat names, ruled deliberately by RFC-076 Q-1 so `keyboard::cycle_zones`'s return type is nameable from `snora` alone. Every public `snora-core` type is reachable without depending on `snora-core`. *(re-derived 2026-09-12)* |
+| Feature flags documented and CI-tested | ✅ **Re-ticked 2026-09-12.** Reopened 2026-09-03 (RFC-094) because `crates/snora/Cargo.toml` documented `design` as independent of `widgets` while `--no-default-features --features design` appeared in no CI job. **The entry now exists** — `design-only` is one of ten feature-matrix combinations, and it ran green on this commit. The row closes the way RFC-094 said it would: when the entry exists, not when the claim is softened. *(re-derived 2026-09-12)* |
+| Engine-only build (`--no-default-features`) supported | ✅ **Gated**: `no-default-features` is one of the ten feature-matrix entries, plus a standalone `cargo check -p snora --no-default-features` step. *(re-derived 2026-09-12)* |
 
-## Type names and enum variants (audit v0.17.0)
+## Type names and enum variants (audited v0.17.0, **re-derived 2026-09-12 at v0.47.0**)
 
 Types audited: `AppLayout`, `LayoutDirection`, `Edge`, `Dialog`, `Sheet`,
 `SheetEdge`, `SheetSize`, `Toast`, `ToastIntent`, `ToastLifetime`,
@@ -50,13 +57,50 @@ Types audited: `AppLayout`, `LayoutDirection`, `Edge`, `Dialog`, `Sheet`,
 | `PartialEq` on value types | ✅ `LayoutDirection`, `Edge`, `SheetEdge`, `ToastIntent`, `ToastPosition`, `ToastLifetime`, `TabAction`, `BreadcrumbAction`, `MenuAction` — all ✅. `Icon` gets `PartialEq` in v0.17.0. `Dialog`/`Sheet`/`AppLayout` contain `Node` (cannot derive without bound — correct). |
 | `SheetSize` missing `Eq` | ✅ intentional — `Ratio(f32)` / `Pixels(f32)` contain `f32` |
 
-Type-names audit: **complete as of v0.17.0 — and not re-derived since (audit 2026-09-12).** Twenty-nine minors have passed and the public type surface has demonstrably moved: 0.45.0 removed `Emphasis` and `Size` under a covenant exception, and RFC-055/056 relocated the style bridge between crates. Whether the audit still holds is **unknown**, not assumed. This row is one of the 33 that RFC-094 deliberately left unswept (its Q-1 ruled test-backed rows only); it is dated here per RFC-094's Q-2 convention, where a row carrying no date has never been re-derived at all.
+### Re-derivation, 2026-09-12 — the audit held, and was three types short
+
+This row was the first of the two stale instances that fired the unswept-rows
+deferral. It read *"complete as of v0.17.0"* for twenty-nine minors. Re-derived
+now by enumerating the public surface rather than re-reading the old list.
+
+**All 22 originally audited types are still present under their audited names.**
+No renames, no removals from `snora-core`.
+
+**Three public types in `snora-core` were never covered by the audit**, all
+from RFC-060's zone navigation (0.39.0): `FocusZone`, `Cycle`, and
+`ZonePresence`. Put through the same seven questions:
+
+| Question | `FocusZone` / `Cycle` / `ZonePresence` |
+|---|---|
+| Names clear, stable, LTR-assumption-free | ✅ `FocusZone` names slots (`Header`, `SideBar`, `Body`, `Footer`), never physical sides |
+| Variants use logical concepts | ✅ `Cycle::{Forward, Backward}` — **not** `Left`/`Right`, which is the trap this question exists to catch |
+| Defaults sensible under LTR and RTL | ✅ `ZonePresence::default()` is all-optional-slots-absent, the body-only case, and is direction-free. `FocusZone`/`Cycle` have no `Default`, correctly — neither has a defensible one |
+| No variant too app-specific | ✅ all four zones are `AppLayout` slots; `Tab` and `Crumb` are deliberately *not* zones |
+| `Debug`, `Clone` present | ✅ all three also derive `Copy`, `PartialEq`, `Eq`, `Hash` |
+| `PartialEq` on value types | ✅ all three |
+| Cycle order needs no RTL mirroring | ✅ the order is logical (`Header → SideBar → Body → Footer`); under RTL the sidebar moves physically but remains the start-edge rail after the header — stated in the type's own rustdoc as a deliberate ABDD decision |
+
+**They pass.** The audit's criteria were sound enough that types added
+twenty-two minors later satisfy them without amendment — which is the useful
+finding, more than the tick.
+
+**One real gap fell out of the re-derivation, and is fixed in the same change.**
+`reference/vocabulary.md` opens *"Every public enum in snora-core"* and did not
+list `FocusZone` or `Cycle`; the page carried a completeness claim about itself
+that was false since 0.39.0. A **Zone navigation** section now covers all three
+types. The Documentation-review row below is re-derived accordingly.
+
+**Design-track vocabulary is governed separately** (D-3/D-4, the additive-only
+covenant) and is not audited here. For the record at 0.47.0 it is ten types —
+`Color`, `Density`, `FocusTokens`, `Palette`, `Radius`, `Spacing`, `TextRole`,
+`Tokens`, `Tone`, `Typography` — with `Emphasis` and `Size` confirmed gone from
+every crate (0.45.0, RFC-095). `snora-style` exposes no public struct or enum.
 
 ## Builder method review
 
 | Item | Status |
 |---|---|
-| Every public field has a `#[must_use]` builder | ✅ RFC-011-C audit |
+| Every public field has a `#[must_use]` builder | ✅ **Re-derived mechanically 2026-09-12**: `snora-core` has **20** `pub fn …(mut self, …)` builders and **20** are preceded by `#[must_use]` — no gap. A builder that silently discards its receiver is the defect this row guards, and the count is now a command rather than an audit memory. *(re-derived 2026-09-12)* |
 | Builder names are consistent | ✅ |
 | `AppLayout` construction policy decided | ✅ RFC-011-C |
 
@@ -65,9 +109,9 @@ Type-names audit: **complete as of v0.17.0 — and not re-derived since (audit 2
 | Item | Status |
 |---|---|
 | `widgets` is the coarse default feature | ✅ |
-| `lucide-icons` / `svg-icons` behavior documented | ✅ RFC-014-D, icons.md |
-| Feature matrix CI covers supported combinations | ✅ RFC-011-A |
-| Per-widget feature gates unjustified (or intentionally added) | ✅ |
+| `lucide-icons` / `svg-icons` behavior documented | ✅ `guides/icons.md` covers both, and its per-feature install snippets are machine-checked by `scripts/check-version-snippets.sh` — so the *version* half of this page cannot go stale silently, though the *behaviour* half still relies on review. *(re-derived 2026-09-12)* |
+| Feature matrix CI covers supported combinations | ✅ **Ten entries as of 0.47.0** — default, no-default-features, widgets, widgets+lucide, widgets+svg, widgets+design, widgets+design+lucide, widgets+design+svg, design-only, all-features. `design-only` was the gap RFC-094 reopened the crate-level row for; it exists now. *(re-derived 2026-09-12)* |
+| Per-widget feature gates unjustified (or intentionally added) | ✅ **Re-derived 2026-09-12 against a measurement, for the first time.** `feature-gating-criteria.md`'s five indicators are all *not met*, and indicator 1 — the only one that could still have gone either way — was measured that day: **~0.2 s marginal, roughly 150× under its 30 000 ms threshold.** The trigger needs two or more indicators met; it has none. Previously this row was a bare tick. *(re-derived 2026-09-12)* |
 
 ## Semantic contract review
 
@@ -86,11 +130,11 @@ Type-names audit: **complete as of v0.17.0 — and not re-derived since (audit 2
 | Item | Status |
 |---|---|
 | README one-liner is accurate | ✅ |
-| Getting started path is current | ✅ v0.15 — version updated to 0.14 |
-| Reference vocabulary matches source | ✅ audited v0.18 — all 22 core types present, all 13 widget functions covered, all 4 defaults correct |
-| Migration guides cover breaking pre-1.0 changes | ✅ 0.10→0.11 guide + template |
+| Getting started path is current | ✅ **Now machine-checked, which is a stronger state than this row previously recorded.** `scripts/check-version-snippets.sh` (RFC-074) derives the expected minor from `Cargo.toml` and fails on any stale snippet in `getting-started/`; it is a CI gate and passed on this commit. The prose path still relies on review. *(re-derived 2026-09-12)* |
+| Reference vocabulary matches source | ✅ **Re-derived 2026-09-12, after being found false.** The row claimed *all 22 core types present*; the surface is **25**, and `reference/vocabulary.md` — which opens *"Every public enum in snora-core"* — omitted `FocusZone`, `Cycle` and `ZonePresence` from 0.39.0 onward. A **Zone navigation** section was added in the same change, so the page's own completeness claim is true again. The three types were never undocumented in rustdoc (`missing_docs` is enforced) nor in the 0.38 → 0.39 guide; what was missing was the reference enumeration this row audits. *(re-derived 2026-09-12)* |
+| Migration guides cover breaking pre-1.0 changes | ✅ **Now gated, not merely present.** `scripts/check-migration-guides.sh` fails on any minor from 0.39 onward lacking a guide, and the release checklist runs it **with the pending version** — the argument that makes it catch an omission during the cut rather than after, which is exactly how 0.46.0 shipped without one. *(re-derived 2026-09-12)* |
 | Docs distinguish ABDD from full i18n/accessibility | ✅ Laws 7–8, overlays.md, direction guide |
-| docs.rs feature annotations | ✅ RFC-015-B — `snora` has `[package.metadata.docs.rs]` |
+| docs.rs feature annotations | ✅ Confirmed present: `all-features = true` and `rustdoc-args = ["--cfg", "docsrs"]`, so docs.rs renders the full gated surface rather than the default one. *(re-derived 2026-09-12)* |
 | Versioning policy documented | ✅ RFC-015-A |
 
 ## Release hygiene review
@@ -99,8 +143,8 @@ Type-names audit: **complete as of v0.17.0 — and not re-derived since (audit 2
 |---|---|
 | CHANGELOG is complete | ✅ |
 | ROADMAP is current | ✅ |
-| Binary-size first data point recorded | ⬜ every row through 0.25.2 is `N/A` or a non-CI sandbox run; the tag-automation bug (RFC-041) meant CI never populated real values as this row assumed |
-| Compile-time first data point recorded | ⬜ same as above; see RFC-041 |
+| Binary-size first data point recorded | ✅ **Closed 2026-09-12.** The row was opened because every value through 0.25.2 was `N/A` or a sandbox run — RFC-041's tag-automation bug meant CI never populated real ones. It has since been fixed: `binary-size.csv` now carries **36 rows with real CI values**, `runner_os = ubuntu-latest`, the newest appended by the `binary-size` workflow on the 0.47.0 tag. *(re-derived 2026-09-12)* |
+| Compile-time first data point recorded | ✅ **Closed 2026-09-12**, same fix and same evidence shape as the row above: `compile-time.csv` carries **38 rows with real CI values**. Read the `design_overhead_ratio` column rather than the millisecond columns — the absolute figures vary 36–60% between identical-runner releases (RFC-050), which is why gate 9b was closed on the ratio. *(re-derived 2026-09-12)* |
 | CI passes on clean branch | ✅ RFC-011-A |
 | mdBook build and test green | ✅ RFC-012-D — holds, and is the most continuously re-derived row here: `ci.yaml`'s `docs` job runs `mdbook build` **and** `mdbook test` on every PR and push. Note it is `ci.yaml`'s copy that runs `mdbook test`, not `docs.yaml`'s, which only builds and deploys. *(re-derived 2026-09-03, RFC-094)* |
 
@@ -143,7 +187,7 @@ Type-names audit: **complete as of v0.17.0 — and not re-derived since (audit 2
 > not have to notice it independently.
 
 | 1. One iced major upgrade completed and lived on ≥1 minor | ⬜ |
-| 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 |
+| 2. Two consecutive minors without vocabulary churn | ✅ v0.13–v0.16 — **scope stated 2026-09-12, having previously been undefined.** This gate covers the **core** vocabulary (`snora-core`); the design vocabulary has its own stability gates (D-3/D-4) and its own covenant, which is why 0.45.0's removal of `Emphasis`/`Size` reset those two and not this one. Under that reading the gate is undisturbed: no `snora-core` type has been renamed or removed since the audit, and the only movement is additive (three zone-navigation types at 0.39.0). The tick was never wrong — it was unfalsifiable, because nobody had written down which vocabulary it meant. *(re-derived 2026-09-12)* |
 | 3. At least one third-party or production-grade app | ⬜ **verdict open; evidence updated v0.33.0.** The v0.18.1 entry (a build-failure report from `nabbisen/logolig`) is superseded. Three integrations now exist: **apimokka** (desktop GUI for apimock-rs, public repository, on 0.29.0, engine + `design`, zero `snora::widget::*` call sites), **arama** (image/video browser, on 0.25.0), and **orbok** (AI-driven document search, on 0.25.1, `widgets` + `design`, the only consumer exercising the prefab widgets and chrome geometry). Between them they have driven RFCs 045–056 across eight releases. What remains a judgement rather than a fact: whether any of these is *third-party* — all three are adjacent projects, not unaffiliated adopters — and whether "production-grade" is met by an application whose own visual-verification pass is still outstanding. Decide those two words before ticking this. |
 | 4. AppLayout construction policy decided | ✅ v0.11 |
 | 5. Render-semantics tests cover z-stack, dismissal, toast, RTL | ✅ v0.43.0 — **re-ticked 2026-09-02, on evidence rather than on the fix.** Was marked ✅ at v0.17 and should not have been; corrected 2026-09-01 (RFC-084). Every render-semantics test before RFC-084 was positive-only — a button inside an overlay is reachable, a corner click dismisses — and none asked whether pointer input that should be *blocked* actually is. It was not, in four places at once (F-01 through F-04, an external architect's audit): a click inside the dialog dismissed it, a modal with no close sink blocked nothing, the dim did not block scrolling, and clicking a toast pressed the widget beneath it. All four fixed and negative assertions added in 0.41.0 — see `crates/snora/tests/render_semantics.rs`'s own module doc for the Law-8 derivation these assertions came from. **The owner ruled on 2026-09-02 that this gate holds ⬜ until RTL has a negative assertion** — three of its four dimensions had one; RTL had only reachability tests, the same positive-only shape that made the original tick wrong, surviving in the one dimension nobody revisited. **`914fe92` closed it**, adding `toast_body_click_does_not_reach_content_beneath_under_rtl`. All four dimensions now assert that something is blocked, not only that something is reachable: z-stack (`modal_with_no_close_sink_still_blocks_pointer_at_dim`, `modal_dim_with_close_sink_blocks_wheel_scroll`), dismissal (`dialog_click_does_not_dismiss_modal`, `no_close_sink_means_no_dismiss_but_content_renders`), toast (`toast_body_click_does_not_reach_content_beneath`), RTL (the new one). Each was verified by removing the mechanism it guards and confirming it fails — this gate is ticked on tests that have been seen to fail, which is the distinction its own history is about. |
@@ -219,6 +263,48 @@ support the claim; 9b was closed with its real noise floor stated
 (~4.4%, see the table row above) rather than glossed over, which is how
 this project avoided a quieter instance of the same mistake.
 
+## Sweep record — 2026-09-12
+
+RFC-094 swept the seven test-backed rows (its Q-1) and left the rest listed but
+unswept, with a deferral whose condition was **a second row found stale by other
+work**. That condition fired: the 2026-09-12 audit found the type-names row 29
+minors stale, and re-deriving D-7 found its stated per-minor scope review had
+not run since v0.24 — 23 minors during which `snora-widgets/src` moved
++1,897/−788 across 28 files. Two instances is the pattern the deferral was
+waiting for, so this is that sweep.
+
+**What it changed.** Nineteen rows now carry a re-derivation date. Four gates
+moved: **D-3** and **D-4** re-earned, **D-7** closed on a review actually
+performed, and the crate-level feature-flag row re-ticked because the
+`design-only` matrix entry RFC-094 demanded now exists. Two release-hygiene
+rows closed on evidence that accumulated after they were opened — 36 and 38
+rows of real CI measurements where RFC-041's bug had left `N/A`.
+
+**What it found.** The type-names audit **held** — types added twenty-two
+minors after it was written satisfy its criteria without amendment — but it was
+**three types short**, and chasing that turned up a real defect:
+`reference/vocabulary.md` claimed to list *"every public enum in snora-core"*
+and had omitted `FocusZone` and `Cycle` since 0.39.0. Fixed in the same change.
+Gate 2's tick turned out not to be wrong but **unfalsifiable**, because nobody
+had recorded which vocabulary it governed; its scope is now written down.
+
+**What it deliberately did not do.** Rows resting on judgement rather than on a
+command — *"README one-liner is accurate"*, *"Docs distinguish ABDD from full
+i18n/accessibility"*, *"ABDD checklist adopted"*, *"CHANGELOG is complete"*,
+*"Builder names are consistent"* and the like — **were left undated on purpose.**
+Dating them would assert a re-derivation that did not happen, and under RFC-094's
+Q-2 convention an undated row already says the true thing: nobody has re-derived
+it. A sweep that dated every row to look complete would destroy the one signal
+this register has.
+
+**The mechanism worth noting.** Several rows did not need re-deriving so much as
+**reclassifying**: `snora-core` has no iced dependency, the engine-only build, the
+feature matrix, the getting-started path and the migration guides are now all
+enforced by CI gates that did not exist when their rows were written. Those rows
+moved from *verified once* to *cannot silently become false* — which is the
+distinction this project has spent RFC-090 to RFC-097 building, arriving in its
+own 1.0 register.
+
 ## How to use this document
 
 - Open this file in any PR that changes a public type, feature flag,
@@ -238,11 +324,11 @@ gates; they do not block snora core's 1.0 release.
 |---|---|
 | D-1. One iced major upgrade survived with design feature enabled | ⬜ (coupled to core Gate 1) |
 | D-2. Minimal path clean after iced upgrade | ⬜ (coupled to core Gate 1) |
-| D-3. Token model stable for ≥2 consecutive minors | ⬜ **Reset 2026-09-06 (RFC-095).** `Emphasis` and `Size` removed from `crates/snora-design/src/variants.rs` — a forbidden change under RFC-036's additive-only covenant, taken deliberately via the covenant's own reopening condition, not smuggled in. Re-earned by two consecutive stable minors, **0.47.0 at the earliest**. |
-| D-4. Style bridge stable for ≥2 consecutive minors | ⬜ **Reset 2026-09-06 (RFC-095), same change as D-3.** The style bridge itself did not change, but the covenant's reopening condition resets both gates together — it does not distinguish which frozen item moved. Re-earned by **0.47.0 at the earliest**. |
+| D-3. Token model stable for ≥2 consecutive minors | ✅ **Re-earned 0.47.0**, having been reset 2026-09-06 (RFC-095) when `Emphasis` and `Size` were removed under RFC-036's reopening condition. Two consecutive stable minors, **verified mechanically rather than asserted**: `crates/snora-design/src/variants.rs` and `tokens.rs` are byte-unchanged since the 0.45.0 tag, and the only diff to `snora-design` across 0.46.0 → 0.47.0 is `#![forbid(unsafe_code)]` plus doc comments in a `#[cfg(test)]` module — neither a surface change. *(re-derived 2026-09-12)*
+| D-4. Style bridge stable for ≥2 consecutive minors | ✅ **Re-earned 0.47.0**, same two minors as D-3. The bridge never moved even at the reset — the covenant resets both gates together regardless of which frozen item changed — and `crates/snora-style/src` carries the same single `#![forbid(unsafe_code)]` line as its only diff across 0.46.0 → 0.47.0. `snora-style` exposes no public struct or enum at all, which is why its surface is stable by construction rather than by discipline. *(re-derived 2026-09-12)*
 | D-5. ≥1 real app in serious production use of design tokens | ⬜ (coupled to core Gate 3) |
-| D-6. Promotion process used at least once with evidence | ⬜ (recipes published v0.23; no promotion yet) |
-| D-7. No component catalog creep (scope review complete) | ⬜ (review at each minor — clean through v0.24) |
+| D-6. Promotion process used at least once with evidence | ⬜ **Open, and externally gated — re-derived 2026-09-12.** All four published recipes (empty state, background task, error recovery, result card) are still status *Recipe*; none has even reached *Candidate*. That is not neglect of the process: `api-governance.md`'s promotion criterion 1 requires **use in two real applications, or one strong dogfood app plus one documented external request**, and no consumer has reported using a recipe. **Promoting something to close this gate would prove the opposite of what the gate tests**, so nothing has been promoted. This gate therefore belongs with D-5 and gate 3 as adoption-dependent, not with the controllable work. |
+| D-7. No component catalog creep (scope review complete) | ✅ **Review performed 2026-09-12 — the first since v0.24**, 23 minors during which `snora-widgets/src` moved +1,897/−788 across 28 files, so the row's stated per-minor cadence had silently lapsed and the row was one of the two stale instances that fired the unswept-rows deferral. **Reviewed against `api-governance.md`'s permanent scope boundary** (*helpers ship only if direction-aware and semantics-light; forms, data grids, charts, routing, workflow engines and domain-specific cards are outside scope forever*). Full catalog enumerated: five `app_*` chrome prefabs (header, side_bar, footer, tab_bar, breadcrumb), `render_menu`, the design helpers (card, notice tones, button variants, chips, progress), three direction helpers (`row`, `row_dir`, `row_dir_three`) and the style hooks. **No form, data grid, chart, router, workflow engine or domain-specific card is present**; `card` is a generic surface container, which is the boundary's own distinction. Clean. *(re-derived 2026-09-12)* |
 | D-8. `snora-design` published (`publish = false` flipped) | ✅ v0.20.0 |
 
 **D-3 and D-4 are reopened as of 0.45.0 (RFC-095) — the first time either has
