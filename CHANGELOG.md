@@ -15,7 +15,53 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **The advisory gate was blind to an entire class, and three
+  advisories were in it (RFC-098).** Since 0.47.0, when advisory
+  scanning was adopted, `scripts/check-advisories.sh` had reported
+  `advisories ok` on every run. It could not report an `unsound`
+  advisory at all.
+
+  `cargo-deny`'s `[advisories] unsound` key takes a **scope** —
+  `"all"` / `"workspace"` / `"transitive"` / `"none"` — not a lint
+  level, and **its default excludes transitive dependencies.** snora
+  declares five direct dependencies and resolves 394; every package the
+  gate exists to watch is transitive, so the default excluded all of
+  them. Setting `unsound = "all"` turned `advisories ok` into three
+  errors.
+
+  **Found by tekstide, externally.** Not by us, and not by the gate —
+  which is the part worth stating: the mechanism adopted to answer "is
+  anything in our graph known vulnerable" answered "no" for two
+  releases without being able to see the question.
+
+  **Two were cleared** — `RUSTSEC-2026-0186` (`memmap2` 0.9.10,
+  unchecked pointer offset) and `RUSTSEC-2026-0221` (`event-listener`
+  5.4.1, `!Send` tags crossing thread boundaries), both by
+  `cargo update -p memmap2 -p event-listener` to their patched
+  versions. Two packages moved and nothing else.
+
+  **One is accepted, and it is not the same kind of acceptance as the
+  other three.** `RUSTSEC-2026-0253` — `lru` 0.16.4, use-after-free /
+  double-free in `LruCache::pop()` when a stored key's `Drop` panics —
+  is **memory corruption on the default runtime path**, reached via
+  `cryoglyph`'s glyph cache under the wgpu renderer, not an unmaintained
+  crate. It is genuinely unfixable here, verified four ways rather than
+  from the advisory's own remedy line: `cargo update` on `lru`, on its
+  parent `cryoglyph`, and on its grandparent `iced_wgpu` each lock 0
+  packages; a full fresh resolve moves neither crate;
+  `--ignore-rust-version` also locks 0, so the MSRV is not the blocker;
+  and `cryoglyph` 0.1.0, its only published release, declares
+  `lru ^0.16`, which cannot admit the patched 0.18.2. It retires when a
+  `cryoglyph` release takes `lru >= 0.18.2`, and the gate will say so
+  the moment that lands.
+
+  **The gate now also refuses to run against a configuration that does
+  not set every advisory class explicitly.** The failure here was never
+  a wrong value — it was an absent key behaving as a permissive default,
+  which is invisible in a config file. Checking values would not have
+  caught it; checking presence does.
 
 ## [0.48.0] — 2026-09-12
 

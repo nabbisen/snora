@@ -1,6 +1,6 @@
 # cargo-deny configuration — RFC-097 Unit 2.
 #
-# snora resolves 310 packages under --all-features across five published
+# snora resolves 394 packages under --all-features across five published
 # crates, and until this file existed nothing in the repository checked
 # any of them against a vulnerability database. `unpinned-build` watches
 # upstream *movement* (does it still compile after a fresh resolve); it
@@ -11,7 +11,8 @@
 #
 # Q-1 ruled `cargo-deny` over `cargo-audit` because it answers two of the
 # audit's findings with one mechanism: advisories, and the separately
-# flagged "licence compatibility across 310 packages is unverified".
+# flagged "licence compatibility across 310 packages is unverified" (394
+# as of 0.49.0).
 #
 # Only ONE of the four checks is fatal here:
 #
@@ -30,21 +31,68 @@
 
 [graph]
 # Match the graph the rest of CI checks. `cargo check --workspace
-# --all-features` is what `rust-quality` runs, and the audit's 310-package
-# figure is the --all-features one; scanning a smaller graph than we build
-# would report clean about packages we ship.
+# --all-features` is what `rust-quality` runs, and the audit's package
+# figure is the --all-features one (394 at 0.49.0); scanning a smaller
+# graph than we build would report clean about packages we ship.
 all-features = true
 
 [advisories]
-# Every advisory against the resolved graph fails, except the three
-# recorded below with reasons.
+# Every advisory against the resolved graph fails, except those
+# recorded in `ignore` below with reasons.
 #
-# The first scan this project ever ran (2026-09-12) found **five**
-# advisories. Two were fixed rather than accepted; three are accepted
-# below, and none of the three is a vulnerability.
+# ## `unsound` is a SCOPE, not a lint level — read this before editing
 #
-# **Fixed, not ignored** — `RUSTSEC-2026-0194` and `RUSTSEC-2026-0195`
-# (quick-xml 0.39.4, two denial-of-service vulnerabilities). Both were
+# `unsound`, like `unmaintained`, takes one of
+# `["all", "workspace", "transitive", "none"]`. It does **not** take
+# `"deny"`/`"warn"`/`"allow"`. If you "tidy" it to a lint level you get
+# `error[unexpected-value]` — a good failure, but this comment exists so
+# you never try.
+#
+# **The default excludes transitive dependencies, which means it
+# excludes every package snora has.** We declare five direct
+# dependencies and resolve 394; none of the five is ever the one an
+# advisory lands on. So leaving this key unset does not mean "warn
+# instead of fail" — it means the entire population this gate exists to
+# watch is out of scope.
+#
+# That is not a hypothesis. It cost this project three unreported
+# advisories between 0.47.0 (when the gate was adopted) and 0.49.0, one
+# of them memory corruption on the default runtime path, while the gate
+# printed `advisories ok`. Found by **tekstide**, externally, not by us
+# (RFC-098).
+#
+# `unmaintained`'s own default already covers the transitive graph —
+# which is exactly why three unmaintained advisories *were* reported and
+# the gate looked like it worked.
+unsound = "all"
+
+# Explicit even though `"all"` is already this key's default, and
+# `"deny"` already `yanked`'s. `scripts/check-advisories.sh` refuses if
+# any advisory class is left unset, precisely because an absent key
+# reads as "off" while behaving as a default nobody chose — which is the
+# whole of RFC-098. Setting a default on purpose and inheriting it by
+# omission look identical in a config file and are not the same act.
+#
+# `unmaintained` is a scope like `unsound`; `yanked` is a lint level.
+# `notice` is not set because it no longer exists — removed upstream
+# (cargo-deny PR 611), and setting it is an error.
+unmaintained = "all"
+yanked = "deny"
+
+# ## History of what this gate has found
+#
+# The first scan this project ever ran (2026-09-12, 0.47.0) found five
+# advisories: two fixed, three accepted. It then reported `advisories
+# ok` for two releases while blind to the class above.
+#
+# Setting `unsound = "all"` at 0.49.0 surfaced three more. Two were
+# cleared the same way the first two were — `cargo update -p memmap2 -p
+# event-listener`, the patched versions for `RUSTSEC-2026-0186` and
+# `RUSTSEC-2026-0221`. One could not be, and is the fourth `ignore`
+# entry below.
+#
+# **Fixed at 0.47.0, not ignored** — `RUSTSEC-2026-0194` and
+# `RUSTSEC-2026-0195` (quick-xml 0.39.4, two DoS). Both were
 # first written off as upstream-blocked, by implementer and reviewer
 # alike, because the advisories' own suggested remedy reports nothing to
 # do:
@@ -63,9 +111,18 @@ all-features = true
 # same mistake: a remedy suggestion is not a reachability finding.
 # Check the parent before recording an advisory as upstream-blocked.**
 #
-# **Accepted below** — three unmaintained-crate advisories, each with no
-# safe upgrade published. Every entry states its reachability, why it is
-# accepted, and the concrete condition that retires it.
+# **Accepted below** — four advisories, each with no safe upgrade
+# published. Every entry states its reachability, why it is accepted,
+# and the concrete condition that retires it.
+#
+# **One of the four is not like the other three, and the difference is
+# deliberate rather than incidental.** `RUSTSEC-2026-0253` (`lru`) is
+# **memory corruption on the default runtime path** — a use-after-free,
+# not an unmaintained crate. Accepting it is a materially different act
+# from accepting `paste`, and it is the only one of the four named
+# explicitly in the threat model for that reason (RFC-098, owner's
+# ruling on Q-1). If it ever reads as routine in this list, that is the
+# list flattening a distinction that matters.
 #
 # The acceptance cannot outlive its reason by inattention:
 # `scripts/check-advisories.sh` runs with `--deny advisory-not-detected`,
@@ -84,6 +141,7 @@ ignore = [
     { id = "RUSTSEC-2024-0436", reason = "paste 1.0.15, unmaintained. Build-time proc-macro, and macOS-only: absent from the Linux graph entirely (reached via metal -> wgpu-hal, --target all). No runtime presence on any consumer, none at all on Linux. No safe upgrade published. Retires when wgpu-hal's macOS path drops paste, which --deny advisory-not-detected will report the moment it happens." },
     { id = "RUSTSEC-2026-0206", reason = "rustybuzz 0.20.1, unmaintained (not a vulnerability). Runtime, via usvg -> resvg -> iced_tiny_skia: the SVG path the threat model already names as a consumer-owned trust boundary. No safe upgrade published. Retires when resvg's usvg drops or replaces rustybuzz." },
     { id = "RUSTSEC-2026-0192", reason = "ttf-parser 0.25.1, unmaintained (not a vulnerability). Runtime font parsing on the DEFAULT path, reached three ways: fontdb -> cosmic-text (text rendering), owned_ttf_parser -> ab_glyph -> sctk-adwaita (window decorations), and rustybuzz -> usvg. Wider than the SVG path alone. No safe upgrade published. Retires when iced's text stack moves off it." },
+    { id = "RUSTSEC-2026-0253", reason = "lru 0.16.4, use-after-free / double-free in LruCache::pop() (CWE-416, CWE-415). NOT AN UNMAINTAINED-CRATE ADVISORY -- this is memory corruption on the DEFAULT runtime path: lru -> cryoglyph (glyph cache) -> iced_wgpu -> iced_renderer -> iced, i.e. every application using the default wgpu renderer. Triggered when a stored key's Drop panics during pop(), skipping detach() and leaving a dangling pointer that a later eviction writes through; snora stores no keys in that cache itself, the cache and its key types belong to cryoglyph. Accepted only because it is genuinely unreachable to fix, verified four ways rather than from the advisory's own Solution line: cargo update -p lru, -p cryoglyph and -p iced_wgpu each lock 0 packages; a full fresh resolve does not move either crate; --ignore-rust-version also locks 0, so MSRV is not the blocker; and cryoglyph 0.1.0 -- its only published release -- declares lru ^0.16, which cannot admit the patched 0.18.2. Retires when a cryoglyph release takes lru >= 0.18.2, which --deny advisory-not-detected will report the moment it lands." },
 ]
 
 [licenses]

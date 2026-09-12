@@ -157,6 +157,76 @@ echo "Using cargo-deny: $CARGO_DENY_BIN ($("$CARGO_DENY_BIN" --version 2>&1 | he
 echo
 
 # ---------------------------------------------------------------------
+# Configuration check: every advisory class must be set explicitly.
+#
+# This exists because the gate spent two releases reporting `advisories
+# ok` while blind to an entire class. `[advisories] unsound` takes a
+# SCOPE, not a lint level, and its default excludes transitive
+# dependencies -- which is every package snora has. Three advisories
+# went unreported, one of them memory corruption on the default runtime
+# path, and a downstream team found it rather than us (RFC-098).
+#
+# The failure mode was not a wrong value. It was an ABSENT key behaving
+# as a permissive default. So checking values would not have caught it;
+# only checking presence does.
+#
+# Q-2 ruled: hardcode the class list rather than discovering it from
+# vendor output, which would make this gate depend on output
+# formatting. A dated duplicate beats an undated blind spot, and the
+# version pin below is what makes the duplicate checkable.
+#
+# CLASS LIST READ FROM cargo-deny 0.20.2. If CARGO_DENY_VERSION above
+# changes, re-read the [advisories] table's keys and update this list in
+# the same change. `notice` is deliberately absent: it was removed
+# upstream (cargo-deny PR 611) and setting it is now an error.
+#
+# Presence only, not value: what each class is set to is a policy
+# decision recorded in deny.toml, and asserting values here would make
+# this script the policy instead of the guard.
+# ---------------------------------------------------------------------
+REQUIRED_ADVISORY_CLASSES=(unsound unmaintained yanked)
+
+# Scoped to the [advisories] table rather than the whole file. A key of
+# the same name under another table would otherwise satisfy this check
+# without configuring anything -- a check that cannot fail, which is the
+# defect class this whole unit exists to close.
+advisories_section=$(awk '/^\[advisories\]/{f=1;next} /^\[/{f=0} f' deny.toml || true)
+if [[ -z "$advisories_section" ]]; then
+  echo "REFUSED: deny.toml has no [advisories] table to check." >&2
+  exit 1
+fi
+
+missing_classes=()
+for class in "${REQUIRED_ADVISORY_CLASSES[@]}"; do
+  # `|| true` is load-bearing: a grep that legitimately matches nothing
+  # exits 1, and under `set -e` that kills the script before the
+  # emptiness check below can report anything. This project has hit that
+  # trap six times, twice in this script's own family
+  # (check-workspace-iced-features.sh, check-commit-ci-green.sh) and
+  # once in the MSRV extraction in ci.yaml/unpinned-build.yaml. Assign
+  # with `|| true`, then test emptiness yourself -- the shape
+  # check-wcag-floors.sh already uses.
+  found=$(echo "$advisories_section" | grep -E "^[[:space:]]*${class}[[:space:]]*=" || true)
+  if [[ -z "$found" ]]; then
+    missing_classes+=("$class")
+  fi
+done
+
+if [[ ${#missing_classes[@]} -gt 0 ]]; then
+  echo "REFUSED: deny.toml does not set these advisory class(es): ${missing_classes[*]}" >&2
+  echo "" >&2
+  echo "An unset advisory class is not 'off' -- it is that class's own default," >&2
+  echo "and at least one of those defaults (unsound) excludes transitive" >&2
+  echo "dependencies, i.e. every package snora has. That is how this gate" >&2
+  echo "reported 'advisories ok' for two releases while three advisories went" >&2
+  echo "unreported (RFC-098). Set each class explicitly in deny.toml's" >&2
+  echo "[advisories] table, even where the value you want is the default." >&2
+  exit 1
+fi
+echo "Advisory classes set explicitly in deny.toml: ${REQUIRED_ADVISORY_CLASSES[*]}"
+echo
+
+# ---------------------------------------------------------------------
 # Non-fatal group first, so its output is visible even when the fatal
 # group below fails the job. `|| true` is load-bearing under `set -e`:
 # without it these checks would abort the script and the advisories
