@@ -128,7 +128,15 @@ Every item here is small, and each replaces a habit with something that refuses.
 0.45.0 under RFC-036's reopening condition. That is coincidence, not design, but
 it makes 0.47.0 the release where the design track stops shrinking.
 
-### 0.48.0 — the one that needs a design, not a fix
+### Shipped in 0.47.0, not 0.48.0 — the one that needed a design, not a fix
+
+**Both halves landed early.** RFC-097 was scheduled for 0.48.0 and was written,
+accepted, implemented and reviewed while 0.47.0's own work was still in review,
+so both reached `main` before either was tagged. A release contains what is on
+`main`; the schedule compressed, and this record says so rather than leaving a
+0.48.0 heading that nothing will ever fill. The section below is kept as written
+because it is the statement of the problem, and the problem is what the release
+notes should be read against.
 
 **snora has no threat model.** `SECURITY.md` covers reporting and nothing else —
 and asks reporters for *"scripted server responses"*, boilerplate from a project

@@ -15,10 +15,24 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.47.0] — 2026-09-12
+
 ### Added
 
-- **Dependency advisory scanning — snora's first security gate
-  (RFC-097).** A weekly `supply-chain` workflow runs `cargo-deny`
+- **`#![forbid(unsafe_code)]` in all five published crates.** snora's own
+  source has always contained zero `unsafe` — across 13,331 lines — but
+  that held by habit, and a habit cannot be relied on by anyone outside
+  the project. It is now a compiler-enforced property of every crate you
+  depend on: an `unsafe` block anywhere in snora's own source fails to
+  compile rather than passing review unnoticed. Nothing about the current
+  code changes; what changes is that the property can no longer be lost
+  quietly. Our dependencies are unaffected and still contain a great deal
+  of `unsafe`, as any GPU-backed renderer must.
+
+- **Dependency advisory scanning — the first mechanism watching snora's
+  dependency graph (RFC-097).** A weekly `supply-chain` workflow runs `cargo-deny`
   (pinned, checksum-verified) over the resolved `--all-features` graph:
   advisories are fatal, licences/bans/sources are reported but do not
   fail. Before this, seven workflows gated compilation, lints, feature

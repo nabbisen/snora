@@ -10,6 +10,12 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.46 → 0.47](migration-0.46-to-0.47.md) — **not breaking; no code,
+  appearance, API, or MSRV change.** `#![forbid(unsafe_code)]` now
+  enforced in all five crates, and dependency advisory scanning adopted —
+  including what its first run found: two vulnerabilities fixed (no
+  consumer exposure), three unmaintained-crate advisories accepted and
+  named. The release to re-read if you keep an assurance record.
 - [0.45 → 0.46](migration-0.45-to-0.46.md) — **not breaking; no code,
   appearance, or API change.** The eight overlay laws now name the tests
   that guard them. Four published doc links repointed off a dead domain.

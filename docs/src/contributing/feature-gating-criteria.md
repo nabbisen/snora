@@ -109,9 +109,13 @@ original two-binary approach measured **0** bytes, because the
 the whole unused feature). `widgets_diff_bytes` is recorded per release
 in
 [`reference/binary-size-budget/binary-size.csv`](../reference/binary-size-budget/binary-size.csv),
-appended by the `binary-size` GitHub Actions workflow. **Current status:
-49,280 B (~48 KB) as of 0.41.0 — comfortably under the 150 KB
-threshold, not met.**
+appended by the `binary-size` GitHub Actions workflow. **The measured
+value lives in [the status table](#current-status-snora-0470-re-derived-2026-09-12-rfc-062)
+at the end of this page and is not repeated here** — it was repeated
+here once, and the copy went five minors stale (`49,280 B ... as of
+0.41.0`) while the table said `50,944 B` as of 0.46.0. One document
+stating one number two ways is the hand-maintained-duplicate shape this
+project keeps replacing with a single source.
 
 ### 3. A widget gains a heavy optional dependency
 
@@ -288,7 +292,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.46.0, re-derived 2026-09-06 post-tag, RFC-062)
+## Current status (snora 0.47.0, re-derived 2026-09-12, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -298,9 +302,9 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **50,944 B (~50 KB)** — `binary-size.csv`'s 0.46.0 row. **Byte-identical to 0.45.0**, same toolchain, which is the correct result: 0.46.0 changed one test file and four doc comments, no crate code. A zero delta here is the strongest confirmation available that the probes measure code rather than noise — the same reasoning as 0.43.0's identical row, and the second time it has held. `design_diff_bytes` moved 4,608 → 4,480 (−128 B), inside the ±256 B floor. **34% of a 150 KB bar** | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **50,944 B (~50 KB)** — `binary-size.csv`'s 0.46.0 row, still the newest at the 0.47.0 cut: the `binary-size` workflow appends a row **on the tag**, so 0.47.0's own row does not exist until this release is tagged. Stated as the last measured value rather than predicted. **Byte-identical to 0.45.0**, same toolchain, which is the correct result: 0.46.0 changed one test file and four doc comments, no crate code. A zero delta here is the strongest confirmation available that the probes measure code rather than noise — the same reasoning as 0.43.0's identical row, and the second time it has held. `design_diff_bytes` moved 4,608 → 4,480 (−128 B), inside the ±256 B floor. **34% of a 150 KB bar** | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
-| 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3 | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3, re-run for 0.47.0: `snora-widgets`'s dependency list is unchanged from 0.46.0 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
 **At most one indicator could be met** (indicator 1, if a
