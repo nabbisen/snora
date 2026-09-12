@@ -110,6 +110,7 @@
 //! [`snora-widgets`]: https://docs.rs/snora-widgets
 
 #![warn(missing_docs)]
+#![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 // ---- Re-export the vocabulary from snora-core --------------------------

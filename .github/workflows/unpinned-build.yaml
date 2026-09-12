@@ -50,7 +50,16 @@ jobs:
       - name: Determine the declared MSRV
         id: msrv
         run: |
-          MSRV=$(grep -m1 -oP '^rust-version\s*=\s*"\K[0-9.]+' Cargo.toml)
+          # `|| true` is load-bearing. GitHub runs `run:` steps under
+          # `bash --noprofile --norc -eo pipefail`, so without it a
+          # missing `rust-version` makes grep exit 1, `-e` kills the step
+          # at this assignment, and the `::error::` line below never
+          # prints -- an unexplained failure at a grep instead of the
+          # sentence written to explain it. Fourth occurrence of this
+          # trap in this repository (RFC-087 D-1, RFC-088 R-1,
+          # pre-empted in RFC-090, found here by the 0.47.0 audit
+          # review).
+          MSRV=$(grep -m1 -oP '^rust-version\s*=\s*"\K[0-9.]+' Cargo.toml || true)
           if [[ -z "$MSRV" ]]; then
             echo "::error::No rust-version declared in [workspace.package]; cannot verify the MSRV floor."
             exit 1

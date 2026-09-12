@@ -37,15 +37,27 @@ use snora_core::ToastIntent;
 
 use super::{close_button_style, toast_style};
 
-/// WCAG 2.1 SC 1.4.3 normal-text minimum. Sibling constants of the same
-/// name/value exist in `snora-design/src/tests.rs` and
-/// `snora-widgets/src/contrast_tests.rs`; this one cannot share either
-/// (the engine depends on neither crate, by design). Check all three if
-/// this value ever changes.
+/// WCAG 2.1 SC 1.4.3 normal-text minimum. Three copies of this name
+/// exist — this one, `snora-design/src/tests.rs`, and
+/// `snora-widgets/src/contrast_tests.rs` — and cannot be shared (the
+/// engine depends on neither crate, by design). **Enforced by
+/// `scripts/check-wcag-floors.sh`, not by this comment**: the count and
+/// the value across all copies are both checked in CI. This comment
+/// used to be the only guard, said "check all three," and was wrong
+/// about [`NON_TEXT_MIN`]'s own count below (audit 2026-09-12, C-1) —
+/// read that constant's own doc rather than assuming the two share a
+/// sibling set just because they share this file.
 const AA_TEXT: f32 = 4.5;
 
-/// WCAG 2.1 SC 1.4.11 non-text minimum. Same sibling-constant caveat as
-/// [`AA_TEXT`].
+/// WCAG 2.1 SC 1.4.11 non-text minimum. **Four** copies of this name
+/// exist — this one, `snora-design/src/tests.rs`,
+/// `snora-widgets/src/contrast_tests.rs`, and
+/// `snora/src/design/render/tests.rs` (that fourth one is easy to miss;
+/// it was, once — see its own doc comment for the RFC-071 drift this
+/// caused). Not the same sibling set as [`AA_TEXT`] above, which has
+/// three — **enforced by `scripts/check-wcag-floors.sh`**, which checks
+/// each name's own count and value independently rather than assuming
+/// two constants declared near each other share a sibling list.
 const NON_TEXT_MIN: f32 = 3.0;
 
 fn linearize_srgb_channel(c: f32) -> f32 {

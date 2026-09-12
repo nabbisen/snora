@@ -83,15 +83,20 @@ use crate::sidebar::sidebar_button_style;
 use crate::style::{chrome_container_style_with_radius, menu_button_style, sidebar_active_color};
 use crate::tab::{tab_bar_container_style, tab_button_style};
 
-/// WCAG 2.1 SC 1.4.3 normal-text minimum. A sibling constant of the same
-/// name and value exists in `crates/snora-design/src/tests.rs`; it cannot
-/// be shared directly (that one lives in a `#[cfg(test)]` module in a
-/// crate this one merely depends on, and is not exported). If you change
-/// one, check the other.
+/// WCAG 2.1 SC 1.4.3 normal-text minimum. Three copies of this name
+/// exist (this one, `snora-design/src/tests.rs`, and
+/// `snora/src/toast/contrast_tests.rs`); none can be shared directly.
+/// **Enforced by `scripts/check-wcag-floors.sh`**, not by hand — see
+/// that script's own header for why a comment was not enough (audit
+/// 2026-09-12, C-1).
 const AA_TEXT: f32 = 4.5;
 
 /// WCAG 2.1 SC 1.4.11 non-text minimum, for borders that identify a
-/// component boundary. Same sibling-constant caveat as [`AA_TEXT`].
+/// component boundary. **Four** copies of this name exist — this one,
+/// `snora-design/src/tests.rs`, `snora/src/toast/contrast_tests.rs`,
+/// and `snora/src/design/render/tests.rs` (not the same sibling set as
+/// [`AA_TEXT`] above, which has three). Enforced by
+/// `scripts/check-wcag-floors.sh`.
 const NON_TEXT_MIN: f32 = 3.0;
 
 /// Every [`button::Status`] variant, derived from the enum rather than

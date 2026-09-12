@@ -24,6 +24,14 @@ jobs:
         # tree for several releases while release-process.md still listed it
         # as a checklist item. A gate nothing runs is not a gate.
         run: cargo fmt --all --check
+      - name: WCAG floor constants agree across their duplicated copies (audit 2026-09-12, C-1)
+        # Cheap, source-only, no build required — runs early alongside
+        # Formatting. AA_TEXT/NON_TEXT_MIN/FOCUS_MIN/TEXT_SIZE_MIN are
+        # deliberately duplicated per crate; this replaces the
+        # hand-maintained comment that used to be the only guard against
+        # them drifting apart, and that comment was itself already wrong
+        # about its own scope.
+        run: scripts/check-wcag-floors.sh
       - name: Check workspace
         run: cargo check --workspace --all-features
       - name: Clippy
@@ -162,6 +170,70 @@ jobs:
         # occurrences) and `svg` (redundant with our own svg-icons feature)
         # both survive RFC-083 by one line.
         run: scripts/check-workspace-iced-features.sh
+      - name: snora-core and snora-design stay independent leaves (audit 2026-09-12, D-1)
+        # `reference/architecture.md` states the two are "independent,
+        # iced-free leaves". The two gates above check iced-freedom, twice
+        # — nothing checked independence from each other, in either
+        # direction. Not hypothetical: a v0.25.1 handoff once asserted a
+        # snora-design -> snora-core edge that did not exist, and nothing
+        # in this repository would have settled it either way.
+        run: |
+          CORE_TREE=$(cargo tree -p snora-core --all-features --prefix none)
+          if echo "$CORE_TREE" | grep -q "^snora-design "; then
+            echo "ERROR: snora-core depends on snora-design — leaf independence violated"
+            echo "$CORE_TREE"
+            exit 1
+          fi
+          DESIGN_TREE=$(cargo tree -p snora-design --all-features --prefix none)
+          if echo "$DESIGN_TREE" | grep -q "^snora-core "; then
+            echo "ERROR: snora-design depends on snora-core — leaf independence violated"
+            echo "$DESIGN_TREE"
+            exit 1
+          fi
+          echo "D-1 pass: snora-core and snora-design depend on neither each other"
+
+  msrv:
+    # Audit 2026-09-12 (R-1): `rust-version` is a published contract every
+    # consumer resolves against, and nothing between releases verified it
+    # against the graph we actually ship. `unpinned-build.yaml` checks the
+    # MSRV weekly, but deliberately against a freshly `cargo update`d
+    # graph — a different one than the committed `Cargo.lock` consumers
+    # get. `release-process.md`'s MSRV step was manual, the control class
+    # this project's own argument says fails.
+    #
+    # `--locked` is the point of this job: without it, cargo may
+    # re-resolve on a toolchain change and this becomes a second copy of
+    # `unpinned-build`'s weekly check on a different schedule instead of a
+    # check of the graph we ship.
+    name: MSRV holds against the committed lockfile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Determine the declared MSRV
+        # Deliberately the same extraction as `unpinned-build.yaml`
+        # rather than a hardcoded `1.88`: one declaration of where the
+        # MSRV comes from, shared by both jobs that need it.
+        #
+        # `|| true` is load-bearing here for the same reason it is
+        # there. GitHub runs `run:` steps under `bash --noprofile --norc
+        # -eo pipefail`, so without it a missing `rust-version` makes
+        # grep exit 1, `-e` kills the step at this assignment, and the
+        # `::error::` line below never prints. Both copies had the bug
+        # until the 0.47.0 audit review caught it; both are fixed.
+        id: msrv
+        run: |
+          MSRV=$(grep -m1 -oP '^rust-version\s*=\s*"\K[0-9.]+' Cargo.toml || true)
+          if [[ -z "$MSRV" ]]; then
+            echo "::error::No rust-version declared in [workspace.package]; cannot verify the MSRV floor."
+            exit 1
+          fi
+          echo "msrv=$MSRV" >> "$GITHUB_OUTPUT"
+          echo "Declared MSRV: $MSRV"
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ steps.msrv.outputs.msrv }}
+      - name: Check workspace against the committed lockfile at the declared MSRV
+        run: cargo "+${{ steps.msrv.outputs.msrv }}" check --workspace --all-features --locked
 
   claims-check:
     # RFC-092 Q-1: ships as a gate, not a manual-only tool -- ruled

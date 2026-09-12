@@ -21,8 +21,29 @@ use crate::surfaces::modal_dim;
 use crate::typography::{TextRole, Typography};
 use crate::{Palette, Tokens};
 
+/// WCAG 2.1 SC 1.4.3 normal-text minimum. Three copies of this name
+/// exist — this one, `snora-widgets/src/contrast_tests.rs`, and
+/// `snora/src/toast/contrast_tests.rs` — none shareable across the
+/// crate boundaries involved. **Enforced by
+/// `scripts/check-wcag-floors.sh`**, added after audit 2026-09-12 (C-1)
+/// found the hand-maintained sibling comments in the other three
+/// *files* carrying these constants had drifted out of sync with each
+/// other about which constant has how many siblings.
 const AA_TEXT: f32 = 4.5;
+/// WCAG 2.1 SC 1.4.11 focus-indicator minimum. `3.0` today, same value
+/// as [`NON_TEXT_MIN`] but a deliberately separate constant (see module
+/// doc) — the only copy of this name under `crates/`, so it is not part
+/// of the duplication `NON_TEXT_MIN` and `AA_TEXT` have; still checked
+/// by `scripts/check-wcag-floors.sh` for symmetry, where it will only
+/// ever report one copy.
 const FOCUS_MIN: f32 = 3.0;
+/// WCAG 2.1 SC 1.4.11 non-text minimum. **Four** copies of this name
+/// exist — this one, `snora-widgets/src/contrast_tests.rs`,
+/// `snora/src/toast/contrast_tests.rs`, and
+/// `snora/src/design/render/tests.rs` (that fourth one drifted once
+/// already — `1.3` instead of `3.0`, RFC-071 review round 1 — see its
+/// own doc comment). Not the same sibling set as [`AA_TEXT`] above,
+/// which has three. **Enforced by `scripts/check-wcag-floors.sh`.**
 const NON_TEXT_MIN: f32 = 3.0;
 
 fn all_presets() -> [(&'static str, Tokens); 4] {
@@ -366,6 +387,12 @@ fn pointer_target_height_meets_24px_for_every_role_and_padding_step() {
 /// `docs/src/guides/readability.md` for the floor's own rationale
 /// (including the remediation cost an earlier, less precise wording of
 /// it already caused one consumer).
+///
+/// The only copy of this name under `crates/`, so it has none of the
+/// duplication `AA_TEXT` and `NON_TEXT_MIN` carry — still pinned at one
+/// copy by `scripts/check-wcag-floors.sh`, for the same reason
+/// [`FOCUS_MIN`] is: a second copy appearing is a fact somebody should
+/// have decided.
 const TEXT_SIZE_MIN: f32 = 12.0;
 
 /// Every `TextRole` in a bundle, paired with its name, **derived by

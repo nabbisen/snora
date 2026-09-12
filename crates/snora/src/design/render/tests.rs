@@ -73,14 +73,23 @@ enum Msg {
 /// future preset value fails this floor, that is a finding to report,
 /// not a threshold to relax.
 ///
-/// **A sibling constant of the same name and value exists in
-/// `crates/snora-design/src/tests.rs`** (`NON_TEXT_MIN: f32 = 3.0`,
-/// RFC-058). It cannot be shared directly — that one lives in a
-/// `#[cfg(test)]` module, unreachable from this crate, and exporting it
-/// would add a public item to a covenant-frozen crate just to serve a
-/// test. If you change one, check the other: nothing links them beyond
-/// this comment, which is exactly the gap that let `1.3` drift from
-/// `3.0` unnoticed here in the first place (RFC-071 review, round 1).
+/// **Three sibling constants of the same name and value exist**: in
+/// `crates/snora-design/src/tests.rs` (RFC-058),
+/// `crates/snora-widgets/src/contrast_tests.rs`, and
+/// `crates/snora/src/toast/contrast_tests.rs`. None can be shared
+/// directly — each lives in a `#[cfg(test)]` module in a different
+/// crate, and exporting one would add a public item to a
+/// covenant-frozen crate just to serve a test.
+///
+/// **This is the copy that drifted once** (`1.3` instead of `3.0`,
+/// RFC-071 review round 1) and the one whose existence the *other*
+/// three constants' own comments did not name until audit 2026-09-12
+/// (C-1) — the guard was "check the other" by hand, and hand-checking
+/// four copies from three different comments, each naming a different
+/// subset, is exactly how one gets missed. **Enforced by
+/// `scripts/check-wcag-floors.sh` now**: it checks this name's count
+/// and value against all four copies directly, which is what "check
+/// the other" was standing in for.
 const NON_TEXT_MIN: f32 = 3.0;
 
 fn named_presets() -> [(&'static str, Tokens); 4] {
