@@ -160,6 +160,7 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 097 | [snora has no threat model, and nothing watches 310 dependencies](./proposed/097-snora-has-no-threat-model-and-no-supply-chain-gate.md) | v0.48.0 — High |
 
 ## Archive
 
