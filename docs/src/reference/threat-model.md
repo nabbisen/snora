@@ -85,11 +85,12 @@ We do not audit those by hand, and a page claiming we did would be worth
 nothing. What we do is stated in
 [the supply-chain section](#supply-chain-and-release) below.
 
-**Zero `unsafe`.** snora's own five crates contain no `unsafe` code —
-verified 2026-09-12 across 13,331 lines. **Today that holds by habit and
-not by mechanism**; `#![forbid(unsafe_code)]` is scheduled for 0.47.0,
-after which it cannot be lost silently. Our dependencies contain a great
-deal of `unsafe`, as any GPU-backed renderer must.
+**Zero `unsafe`.** snora's own five crates contain no `unsafe` code, and
+every one of them carries `#![forbid(unsafe_code)]` — so this holds
+**by mechanism, not by habit**: an `unsafe` block anywhere in
+snora's own source fails to compile, rather than passing review unnoticed.
+Our dependencies contain a great deal of `unsafe`, as any GPU-backed
+renderer must.
 
 ## 4. Supply chain and release
 
@@ -102,15 +103,55 @@ Before any upload the workflow refuses if the tag disagrees with
 `[workspace.package].version`, or if the tagged commit has no completed,
 successful CI run. Both refusals have been demonstrated firing.
 
-**Advisory scanning:** as of this writing, **there is none.** Nothing in
-this repository checks the resolved graph against a vulnerability
-database — that gap is what RFC-097 was raised for, and the mechanism is
-scheduled for 0.48.0. Said plainly here rather than omitted, because an
-absent section in a threat model reads as a solved problem.
+**Advisory scanning:** the `supply-chain` workflow runs `cargo-deny`
+weekly over the resolved `--all-features` graph — the same graph the
+rest of CI builds. Advisories are fatal; licences, bans and
+sources are reported without failing. The scanner is pinned to an exact
+version and checksum-verified before it runs, and it **refuses rather
+than reporting clean** when it cannot be obtained or when the advisory
+database cannot be fetched: an unscanned graph is not a clean one.
 
-What does exist is `unpinned-build`, a weekly job that re-resolves the
-graph and fails if it stops compiling. That watches upstream *movement*,
-not upstream *vulnerability*, and the difference is the point.
+It is scheduled rather than per-push, and it is not a refusal in
+`release.yaml`. Both are deliberate. Nothing reaches a consumer on a
+push, so blocking pushes would cost real work for no protection; and an
+advisory sometimes has no fixed version, so a workflow step that cannot
+weigh severity or reachability would make snora unreleasable through no
+fault of its own, and would be routed around the first time it was
+wrong. The release-time decision is a human one, taken with the advisory
+in front of the person taking it.
+
+**What the first scan found, and what it says about the older gap.** It
+found five advisories. Two were vulnerabilities in `quick-xml`, reached
+only through `wayland-scanner` — a build-time proc-macro parsing the
+Wayland protocol XML that ships with the build, so neither was present
+at run time. Both were fixed by updating the parent package, and snora's
+lockfile now carries the patched version. Consumers resolving snora
+fresh were never on the unpatched one.
+
+The remaining three are **unmaintained-crate advisories, not
+vulnerabilities**: `paste` (a build-time proc-macro, macOS-only, absent
+from the Linux graph entirely), `rustybuzz` (run time, on the SVG path
+this document already names as a consumer-owned boundary) and
+`ttf-parser` (run time, font parsing on the default text path). None has
+a published upgrade. Each carries an `ignore` entry in `deny.toml`
+stating its reachability, why it is accepted, and the condition that
+retires it — and the gate is run with `--deny advisory-not-detected`, so
+an entry that stops matching the graph **fails the job and names itself
+for deletion**. An accepted risk here cannot outlive its own reason
+through inattention.
+
+`unpinned-build`, the weekly job that re-resolves the graph and fails if
+it stops compiling, is the older mechanism and is not a substitute. It
+watches upstream *movement*, not upstream *vulnerability*, and the same
+five advisories are the proof. The two `quick-xml` advisories were
+published 2026-06-29. The parent release carrying the fix,
+`wayland-scanner 0.31.11`, was published 2026-07-22. `unpinned-build`
+re-resolves every Monday, so it spent roughly three weeks resolving the
+**vulnerable** version and then roughly seven weeks resolving the
+**fixed** one — and reported green for all ten, because both compile.
+It could see neither the vulnerability nor the fix, and it was never
+built to.
+
 ## What snora does not defend
 
 Stated so this document has a boundary, and so nobody reads an omission as

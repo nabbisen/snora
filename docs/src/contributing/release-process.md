@@ -212,6 +212,32 @@ else knowing something is unreachable until we tell them — so a deferral whose
 trigger is "a consumer asks" carries an obligation on *us*, and it belongs in the
 row rather than in whoever wrote it.
 
+### Workflow hygiene: action pinning and `permissions:` — deferred together
+
+**Opened 2026-09-12. Condition: either item needing a change for its own sake,
+or a third joining them.**
+
+Two small findings surfaced in the same week, from two different reviews, and
+neither is worth a unit alone:
+
+| Finding | State today | Why deferred |
+|---|---|---|
+| Third-party actions resolve by **moving ref** — `dtolnay/rust-toolchain@master` (×2) and `@stable` (×9), plus `actions/*@vN` | Consistent across all workflows; no exceptions to sweep | A tag or branch can be repointed at new code. SHA-pinning is the fix, but it is all-or-nothing to be worth anything, and it adds an upgrade chore to every action bump |
+| Four workflows declare no `permissions:` block — `ci`, `unpinned-build`, `workflow-lint`, `supply-chain` | Also consistent: every one is a read-only job on the default token | Adding it to one is cosmetic; the value is in the sweep, and in writing down that read-only jobs get `contents: read` |
+
+**They are recorded as one row on purpose.** Each is individually below the bar
+for a release unit, and each would stay below it indefinitely — the shape where
+a small thing is never wrong enough to fix and never small enough to ignore.
+Bundled, they clear the bar together.
+
+**What would move this:** a workflow needing elevated permissions for its own
+reasons (write the `permissions:` block then, and sweep the rest in the same
+change), an action publishing a breaking change under a moving ref (pin
+everything then), or a third hygiene item arriving.
+
+**What does not move it:** noticing it again. It has been noticed; that is what
+this row is.
+
 ## Who cites what
 
 **Built 2026-09-02 from all six teams' answers to a direct question.** Before
@@ -406,6 +432,36 @@ restate the guide's content.
     # at release time is a claim, not a fact
 [ ] Confirm no resolved dependency declares a higher rust-version than the
     declared MSRV: cargo metadata --format-version 1 --all-features
+[ ] Run the advisory gate and decide, in person, what it found:
+    scripts/check-advisories.sh   (or the supply-chain workflow via
+    workflow_dispatch — same code either way)
+    # This step is a human decision, deliberately. It is NOT a refusal in
+    # release.yaml: an advisory sometimes has no fixed version, and a
+    # workflow step cannot weigh severity, reachability, or whether a fix
+    # exists. A hard refusal that cannot would make snora unreleasable
+    # through no fault of ours, and would be routed around the first time
+    # it was wrong. So the gate reports and a person rules.
+    #
+    # GREEN is not "nothing to do": green includes the advisories accepted
+    # in deny.toml's `ignore` list. Read their reasons at least once per
+    # minor and confirm each still describes the graph.
+    #
+    # RED means one of two things. A NEW advisory: clear it if a fix
+    # exists, otherwise weigh it and either add an `ignore` entry with
+    # reachability, reasoning and a retirement condition, or hold the
+    # release. An `advisory-not-detected` ERROR: an accepted advisory has
+    # stopped matching the graph — upstream fixed it. Delete that entry;
+    # that error is the mechanism working, not a problem.
+    #
+    # BEFORE recording anything as upstream-blocked, CHECK THE PARENT.
+    # `cargo update -p <vulnerable-crate>` reporting "Locking 0 packages"
+    # does NOT mean there is no fix — it means the fix is outside the
+    # range the crate's *parent* declares. Try `cargo update -p <parent>`.
+    # This is not hypothetical: on 2026-09-12 the implementer, the
+    # reviewer, and the advisory's own Solution: line all named the
+    # command that locks 0 packages, and two real vulnerabilities were
+    # written off as unfixable for half a day. Updating the parent fixed
+    # both inside MSRV. A remedy suggestion is not a reachability finding.
 [ ] cargo fmt --all --check
     # Note --all: a bare `cargo fmt --check` misses the example crates,
     # where most drift accumulates. CI enforces this on every PR and push
