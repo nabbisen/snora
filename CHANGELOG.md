@@ -15,7 +15,19 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- **The non-colour cue question is ruled, not pending (RFC-093 Q-1).**
+  snora's prefab toasts and notices distinguish their semantic variants
+  by colour alone, and a consumer relying on them for WCAG 1.4.1 supplies
+  the non-colour channel themselves — that division of labour is now the
+  **final** answer rather than a deferred one. `accessibility.md` said
+  "deferred decision"; it now says which way it went and why, and adding
+  a cue later stays additive if a requirement ever arrives.
+
+  **If you expected the prefabs to carry a non-colour channel, that is
+  the one report that reopens this** — it would mean our documentation
+  reached you too late, which matters more to us than the feature.
 
 ## [0.47.0] — 2026-09-12
 

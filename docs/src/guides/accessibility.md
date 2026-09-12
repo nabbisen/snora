@@ -87,10 +87,17 @@ contributor-facing documents linked below, not duplicated here.
   claim and its code diverge, in either direction.
 
   Adding a non-colour cue (an icon, a textual prefix) to these prefabs
-  is a deliberate, deferred decision, not an oversight — see RFC-093.
-  It would be a default-path appearance change, and every adopting team
-  that has checked is already safe without it, for exactly the
-  per-variant-text reason above.
+  was **ruled against on 2026-09-12, not left open** — see RFC-093's
+  Q-1 ruling for the reasoning. In short: the division of labour above
+  is the answer, it is asserted by test rather than merely stated, and
+  every adopting team that has checked is already safe without a cue.
+  Adding one later stays additive if a requirement ever arrives, so
+  nothing here is foreclosed.
+
+  **If you expected these prefabs to carry a non-colour channel, tell
+  us.** That is the one report that would reopen the decision, and it
+  would mean this page failed to reach you in time — which is worth
+  more to us than the feature request.
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim

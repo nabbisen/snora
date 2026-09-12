@@ -69,14 +69,78 @@ trustworthy. **The proxy was always measuring something else; RFC-043
 only made the mismatch visible** by removing the warm-cache artifact
 that had coincidentally kept early readings looking plausible.
 
-**How indicator 1 is actually assessed:** run
-`cargo build -p snora-widgets --release` from a `cargo clean -p
-snora-widgets` state, timed, on a machine matching the threshold's own
-description. **Current status: unassessed.** No such run has been
-recorded as of 2026-08-18 (RFC-062). This is stated as a fact, not
-softened — an indicator can be honestly *unassessed*, and that is a
-better state than one silently assessed by a proxy measuring a different
-quantity.
+**How indicator 1 is assessed — corrected 2026-09-12, because the
+procedure printed here measured nothing.** It used to read: *run `cargo
+build -p snora-widgets --release` from a `cargo clean -p snora-widgets`
+state.* **`cargo clean -p <pkg>` only reaches the dev profile** — the
+release artifacts survive it, so the timed release build finds its own
+output already there and returns immediately. Run as written, it reports
+**393 ms**, and anyone following it would have recorded that against a
+30 000 ms threshold and concluded "comfortably not met" from a number
+that measured a no-op.
+
+This is RFC-052's defect exactly, in the procedure for assessing an
+indicator, six minors after RFC-052 fixed the same mistake in
+`measure-compile-time.sh` — which is why that script cleans all three
+profiles unconditionally. The corrected command adds the profile:
+
+```bash
+cargo clean -p snora-widgets --release
+cargo build -p snora-widgets --release   # timed
+```
+
+**Confirmed the correction actually measures something** rather than
+trusting the flag: the `.rlib` disappears on the clean and is rebuilt at
+158,610 B, so a rebuild genuinely happens.
+
+### The measurement, and why it does not settle the indicator
+
+Taken 2026-09-12 on a **16-core / 32-thread desktop, 60 GB RAM, NVMe** —
+which is *not* this threshold's reference machine (an 8-core laptop with
+16 GB), and that matters below.
+
+| What was measured | Value | Against the 30 000 ms threshold |
+|---|---|---|
+| The procedure as previously written | 393 ms | Meaningless — a no-op |
+| **Marginal**: `snora-widgets` alone, dependency closure warm | **~0.2 s** (181–222 ms over four runs) | ~150× under |
+| **Cold closure**: release profile fully cleaned first | **29 523 ms** | Essentially *at* it, on a machine far faster than the reference one |
+
+**How much the machine matters, quantified rather than asserted:** the
+`build-cost` workflow measured the same cold-closure quantity for 0.47.0
+on CI's 2-core shared runner at **93 214 ms**, the same week, against
+29 523 ms here — a **3.2× spread between two machines running identical
+code**. That is the whole reason this threshold names a reference
+machine, and the reason a cold-closure reading taken anywhere else
+cannot be compared to it directly.
+
+**The two readings disagree about whether the indicator fires, and the
+threshold does not say which one it means.** Its magnitude (30 000 ms)
+only makes sense against the cold-closure quantity — the marginal one is
+150× smaller, and nobody writes a 30-second bar for a 0.2-second
+operation. But the assessment command is package-scoped, which is the
+marginal quantity. The threshold and its own procedure describe
+different things.
+
+**On the merits, the marginal reading is the one this indicator needs,
+and it is decisively not met.** The indicator exists to decide whether
+the coarse `widgets` feature should be split per widget. Per-widget
+gating can only reduce what compiling `snora-widgets` itself costs —
+that is the ~0.2 s. It cannot touch the closure, because `snora` depends
+on `iced` whether or not any widget is enabled; the 29.5 s is paid by
+every snora consumer alike and no amount of gating removes it. **Sizing
+a gating trigger against a cost that gating cannot reduce is the same
+category error RFC-062 corrected**, where CI time stood in for developer
+time.
+
+So: **not met**, by roughly 150×, and robustly — the machine mismatch
+that would matter for a borderline number is irrelevant at that margin.
+
+**What is left for the owner, and deliberately not decided here:**
+the 30 000 ms threshold should be restated against the quantity the
+command measures, or the command changed to match the threshold.
+Rewriting a threshold is a design decision, not a measurement, so this
+page records both numbers and the argument rather than quietly picking
+one.
 
 `build_widgets_ms` stays tracked in
 [`reference/build-cost-budget/compile-time.csv`](../reference/build-cost-budget/compile-time.csv)
@@ -301,15 +365,16 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
-| 1. Compile time | 30 000 ms, developer machine, cold | **Unassessed** — see indicator 1 above; the CI proxy previously cited here measured a different quantity and has been retired | Unknown |
+| 1. Compile time | 30 000 ms, developer machine, cold | **Measured 2026-09-12, no longer unassessed.** **~0.2 s marginal** (`snora-widgets` alone, closure warm; 181–222 ms over four runs on a 16-core desktop) — **~150× under**. The cold-closure reading is 29 523 ms on the same machine, but that cost is `iced`'s and is paid by every snora consumer whether or not a widget is enabled, so per-widget gating cannot reduce it; the marginal number is the one this indicator's own purpose needs. **The procedure printed here until today measured a no-op** (393 ms — `cargo clean -p <pkg>` does not reach the release profile); corrected above. The threshold's magnitude fits the cold-closure quantity rather than the marginal one — flagged for the owner, not silently rewritten | **No** |
 | 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **50,304 B (~49 KB)** — `binary-size.csv`'s 0.47.0 row, appended by the workflow on the tag and read back here rather than predicted before it. **33% of a 150 KB bar.** Moved **−640 B** from 0.46.0's 50,944 B, and that is not explained by anything snora changed: the only edits to `snora-widgets` this release were a lint attribute and `#[cfg(test)]` comments, neither of which generates code, and `engine_bytes` is byte-identical across the same pair. The one non-snora input that moved is the lockfile, by two packages (`quick-xml`, `wayland-scanner` — the latter a proc-macro that generates protocol bindings). **Recorded as the only changed input, not as a cause:** −640 B is outside the ±256 B noise floor, so it is signal rather than jitter, but attributing it would need a bisect nobody has run. `design_diff_bytes` held at 4,480 B. | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
 | 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3, re-run for 0.47.0: `snora-widgets`'s dependency list is unchanged from 0.46.0 | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
-**At most one indicator could be met** (indicator 1, if a
-developer-machine measurement were taken and found over threshold) —
-short of the "two or more" the trigger requires. See
+**No indicator is met, and that is now measured rather than open.**
+Indicator 1 was the one that could still have gone either way; it was
+measured on 2026-09-12 and came back ~150× under on the quantity gating
+could actually change. The trigger needs two or more; it has none. See
 [design decisions § coarse `widgets` feature gate](design-decisions.md#why-widget-feature-gating-is-coarse-not-per-widget)
 for the full not-fired statement.
 

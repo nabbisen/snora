@@ -130,3 +130,78 @@ but it was not checked, and saying so is cheaper than assuming.
    prefabs carry a non-colour channel.
 4. Whatever Q-1 rules, the RFC's own text records which way and why.
 5. CHANGELOG entry, or one line saying why not.
+
+---
+
+## Q-1 ruled, 2026-09-12 — no cue, and the condition that was waiting on one is withdrawn
+
+Criterion 4 requires this RFC to record which way Q-1 went and why. It went
+**no**, and the more useful half of the answer is why the deferral that carried
+it was never going to fire.
+
+### The condition could not see the evidence that mattered
+
+Q-1 was deferred on *"a consumer asks for it."* All six teams were asked and
+none did. But **orbok had already built one** — per-variant `title()`/`body()`
+in their own code, dating to that file's first commit (`67c4378`, 2026-06-17),
+three months before we withdrew the 1.4.1 claim, so their solution is
+independent of anything we published rather than an echo of it.
+
+**A consumer who built the channel themselves is stronger evidence of need than
+one who asks for it, and the condition counted it as silence.** That is this
+project's recurring defect in its native habitat: a rule with nothing to fire
+it, where the case that should fire it is the case it is blind to. Two more of
+the six (apimokka, tekstide) asked to be recorded as **absent, not "no"** —
+apimokka compiles without `snora-widgets`, so the prefabs are unavailable to
+them rather than declined; tekstide is not a consumer. A condition polling six
+teams, four of whom said their answer was not demand evidence, was measuring
+its own reachability.
+
+### Ruling anyway, rather than restating the condition and waiting again
+
+The condition was wrong, so the honest move is to decide on the merits now —
+not to replace it with a better condition and defer a third time. Renewing a
+deferral because its condition was poorly drawn is how the `check-*` scripts'
+manual-to-gate deferral survived three renewals with its condition true the
+whole time (RFC-087).
+
+**On the merits: no cue.** The reasoning is not "nobody asked":
+
+- **The gap Q-1 would close is already closed, by division of labour rather
+  than by API.** `accessibility.md` states that snora's prefabs distinguish
+  variants by colour alone and that a consumer relying on them for 1.4.1 must
+  supply the non-colour channel — and that statement is asserted by the channel
+  register's test, exhaustive over each variant enum, so it fails the day the
+  claim and the code diverge in either direction. The consumer is told, and the
+  telling is checked.
+- **The beneficiary of a built-in cue is a future adopter who has not arrived.**
+  Every present team either supplies its own channel or cannot use the prefabs.
+  Shipping an opt-in API that every current consumer would ignore is building
+  for nobody — and the pre-ruled shape (**opt-in, not default-on**, which
+  stands) guarantees nobody is moved onto it by default either.
+- **The honest form of the cue is not obvious, and that is a reason to wait for
+  a real requirement rather than guess at one.** A textual prefix is not ours to
+  localise — we do not know the application's language. An icon per intent
+  drags an icon source onto a default path that is deliberately free of one.
+  Shape or border differentiation avoids both but needs evidence it is
+  perceivable, which we do not have. **Three plausible designs, no requirement
+  to choose between them**, is the RFC-078 shape: a design question with no
+  forcing case.
+
+### What replaces the deferral
+
+Nothing, as an open question. **Q-1 is closed, not deferred**, and its register
+row is discharged.
+
+The residual risk is not "consumers lack a non-colour channel" — it is **"a
+future adopter assumes the prefab carries one."** That is a documentation
+failure, not an API gap, and it has a different tell: somebody reporting that
+they expected the prefab to carry the channel. If that ever arrives it reopens
+this on its own terms, with a real requirement attached and a named surface
+that failed to communicate — which is exactly what the three candidate designs
+above are missing today.
+
+**Reversibility is cheap and is part of the ruling.** Adding a cue later is
+additive under RFC-036; nothing here forecloses it. Shipping one now, and
+discovering the wrong form was chosen, would not be — removal is the priced
+direction.
