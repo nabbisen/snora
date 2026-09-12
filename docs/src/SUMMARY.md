@@ -83,6 +83,7 @@
 - [Vocabulary cheatsheet](reference/vocabulary.md)
 - [Built-in widgets](reference/widgets.md)
 - [Overlay interaction semantics](reference/overlay-interaction-semantics.md)
+- [Threat model](reference/threat-model.md)
 - [Rendered surface identifiers](reference/rendered-surface-identifiers.md)
 - [Binary size budget](reference/binary-size-budget.md)
 - [Build cost budget](reference/build-cost-budget.md)

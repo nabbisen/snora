@@ -1,4 +1,10 @@
-## 🛡️ Security Policy
+# 🛡️ Security Policy
+
+**What snora's attack surface is** — and what it is not — is documented in the
+[threat model](https://nabbisen.github.io/snora/reference/threat-model.html).
+Reading it first may save you time: snora is a library with no network, storage
+or privilege boundary, and the one category where a snora defect becomes an
+application's vulnerability is overlay input containment.
 
 ## Reporting a vulnerability
 
@@ -11,7 +17,7 @@ Please include:
 
 - A description of the issue and the affected crate(s).
 - The version, commit hash, or branch the report applies to.
-- A reproducer if at all possible: minimal code, scripted server responses, or a `cargo test` invocation that demonstrates the issue.
+- A reproducer if at all possible: a minimal application, a `cargo test` invocation, or the sequence of interactions that demonstrates the issue.
 - Your assessment of the impact.
 
 We aim to acknowledge any report within seven days, and to publish a

@@ -1,6 +1,12 @@
 # RFC 097 — snora has no threat model, and nothing watches 310 dependencies
 
-**Status.** Proposed (2026-09-12).
+**Status.** Accepted (owner, 2026-09-12). Handoff written — see
+[`handoffs/097-…`](../handoffs/097-snora-has-no-threat-model-and-no-supply-chain-gate/implementation-handoff.md).
+**Unit 1 (the threat model) is shipped** — `docs/src/reference/threat-model.md`.
+**Q-1 ruled** — `cargo-deny`. **Q-2 ruled, and against my own lean's first form** —
+scheduled job, plus a release-checklist decision point rather than a hard refusal;
+see the question's own text. **Q-3 ruled** — the book, under `reference/`.
+**Q-4 ruled** — fixed here.
 **Tracks.** Security. **Severity: High.**
 **Found by** the 2026-09-12 internal audit (findings S-1 and S-2).
 **Touches.** `docs/src/reference/` (new page), `.github/SECURITY.md`,
@@ -117,12 +123,24 @@ as `tinyvec 1.13.0`, which went red on `unpinned-build` and held the 0.44.0 tag
 for a day. That was correct behaviour for a release gate and would be
 intolerable on every push, where it would block work unrelated to the advisory.
 
-**Suggest: a scheduled job beside `unpinned-build`, failing loudly**, plus a
-release-checklist line so a cut cannot proceed over an open advisory. That keeps
-an external event out of the per-push path while still blocking the thing that
-ships. **Ruling wanted** — the alternative reading, that a known-vulnerable
-dependency should stop all work immediately, is defensible and I do not want to
-settle it by suggestion.
+**Ruled 2026-09-12: a scheduled job beside `unpinned-build`, failing loudly,
+plus a release-checklist decision point — and deliberately NOT a hard refusal in
+`release.yaml`.**
+
+The decisive question is what blocking a push actually prevents. **Nothing
+reaches a consumer on a push.** Consumers get crates from a release. So a
+per-push failure costs real blocked work for zero consumer protection, and the
+gate that matters is the one at the cut. That is the same reasoning that put
+`unpinned-build` on a schedule and the three refusals in `release.yaml`.
+
+**The release side is a checklist line and not a `release.yaml` refusal, which
+is a change from my own first form of this suggestion.** Advisories sometimes
+have no fixed version. A hard refusal would make snora unreleasable through no
+fault of ours and with no remedy available — the `tinyvec 1.13.0` situation,
+except that one was fixed in a day and some are not. A human holding the release
+with the advisory in front of them can weigh severity, reachability and whether a
+fix exists. A workflow step cannot, and would be routed around the first time it
+was wrong, which is worse than not having it.
 
 **Q-3 — where does the model live?** `SECURITY.md` is in `.github/` and is not
 part of the published book, so nothing in the documentation a consumer reads
