@@ -21,15 +21,28 @@ certainly needs (dialog, bottom sheet, context menu, toasts) — and
 then steps back. Every slot accepts any `iced::Element`, so your UI
 code stays your UI code.
 
-### Crates
+## Features
 
-| Crate | Purpose | Version | Docs | Dependencies |
-|---|---|---|---|---|
-| [`snora`](https://crates.io/crates/snora) | The engine — the only crate applications depend on | [![snora](https://img.shields.io/crates/v/snora?label=snora)](https://crates.io/crates/snora) | [![snora Docs](https://docs.rs/snora/badge.svg?version=latest)](https://docs.rs/snora) | [![snora Deps Status](https://deps.rs/crate/snora/latest/status.svg)](https://deps.rs/crate/snora) |
-| [`snora-core`](https://crates.io/crates/snora-core) | Iced-free vocabulary and contract | [![snora-core](https://img.shields.io/crates/v/snora-core?label=snora-core)](https://crates.io/crates/snora-core) | [![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core) | [![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core) |
-| [`snora-design`](https://crates.io/crates/snora-design) | Iced-free design tokens (opt-in) | [![snora-design](https://img.shields.io/crates/v/snora-design?label=snora-design)](https://crates.io/crates/snora-design) | [![snora-design Docs](https://docs.rs/snora-design/badge.svg?version=latest)](https://docs.rs/snora-design) | [![snora-design Deps Status](https://deps.rs/crate/snora-design/latest/status.svg)](https://deps.rs/crate/snora-design) |
-| [`snora-style`](https://crates.io/crates/snora-style) | Iced style bridge for those tokens (opt-in) | [![snora-style](https://img.shields.io/crates/v/snora-style?label=snora-style)](https://crates.io/crates/snora-style) | [![snora-style Docs](https://docs.rs/snora-style/badge.svg?version=latest)](https://docs.rs/snora-style) | [![snora-style Deps Status](https://deps.rs/crate/snora-style/latest/status.svg)](https://deps.rs/crate/snora-style) |
-| [`snora-widgets`](https://crates.io/crates/snora-widgets) | Prefab UI parts — header, footer, sidebar, menu, icon (optional) | [![snora-widgets](https://img.shields.io/crates/v/snora-widgets?label=snora-widgets)](https://crates.io/crates/snora-widgets) | [![snora-widgets Docs](https://docs.rs/snora-widgets/badge.svg?version=latest)](https://docs.rs/snora-widgets) | [![snora-widgets Deps Status](https://deps.rs/crate/snora-widgets/latest/status.svg)](https://deps.rs/crate/snora-widgets) |
+- **Skeleton + injected slots.** `AppLayout::new(body).header(h).side_bar(s).footer(f)`.
+  Each slot is any `iced::Element`. No trait to implement, no
+  dispatcher enum to write.
+- **Framework-managed toasts.** `Vec<Toast<Message>>` on your state,
+  two one-liners (`subscription` + `sweep_expired`) for lifetime,
+  intent → theme color, six anchor positions including RTL-aware ones.
+- **One close sink per channel.** `on_close_modals` for dialogs and
+  sheets, `on_close_menus` for header / context menus. Wired once.
+- **Vocabulary instead of magic numbers.** `SheetSize::Half`,
+  `SheetEdge::Start`, `ToastPosition::TopEnd`,
+  `LayoutDirection::Rtl`, `Edge::Start` — explicit choices, not
+  hardcoded constants.
+- **Navigation widgets out of the box.** `app_header`, `app_side_bar`,
+  `app_tab_bar`, `app_breadcrumb`, plus dropdown menus and context
+  menus — direction-aware, theme-aware, and entirely opt-in.
+- **Five crates, one umbrella.** `snora-core` is the iced-free
+  vocabulary, `snora-design` is the iced-free (opt-in) token system,
+  `snora-style` is the opt-in iced style bridge, `snora-widgets` is the
+  optional prefab UI parts, and `snora` is the engine — applications
+  only depend on `snora`.
 
 ## When to use it
 
@@ -94,29 +107,6 @@ sheet, toasts, tabs, breadcrumb, and live LTR↔RTL toggle). Single-surface
 demos are in the
 [examples directory](https://github.com/nabbisen/snora/tree/main/examples).
 
-## Features
-
-- **Skeleton + injected slots.** `AppLayout::new(body).header(h).side_bar(s).footer(f)`.
-  Each slot is any `iced::Element`. No trait to implement, no
-  dispatcher enum to write.
-- **Framework-managed toasts.** `Vec<Toast<Message>>` on your state,
-  two one-liners (`subscription` + `sweep_expired`) for lifetime,
-  intent → theme color, six anchor positions including RTL-aware ones.
-- **One close sink per channel.** `on_close_modals` for dialogs and
-  sheets, `on_close_menus` for header / context menus. Wired once.
-- **Vocabulary instead of magic numbers.** `SheetSize::Half`,
-  `SheetEdge::Start`, `ToastPosition::TopEnd`,
-  `LayoutDirection::Rtl`, `Edge::Start` — explicit choices, not
-  hardcoded constants.
-- **Navigation widgets out of the box.** `app_header`, `app_side_bar`,
-  `app_tab_bar`, `app_breadcrumb`, plus dropdown menus and context
-  menus — direction-aware, theme-aware, and entirely opt-in.
-- **Five crates, one umbrella.** `snora-core` is the iced-free
-  vocabulary, `snora-design` is the iced-free (opt-in) token system,
-  `snora-style` is the opt-in iced style bridge, `snora-widgets` is the
-  optional prefab UI parts, and `snora` is the engine — applications
-  only depend on `snora`.
-
 ## Design notes
 
 - *Accessible by Default and by Design.* Layout is described in
@@ -133,6 +123,16 @@ demos are in the
   line-height) for your own text — that also supplies, incrementally
   (chrome colours as of v0.26), a coherent default for snora's own
   rendered surfaces, not only the primitives you build.
+
+## Crates
+
+| Crate | Purpose | Version | Docs | Dependencies |
+|---|---|---|---|---|
+| [`snora`](https://crates.io/crates/snora) | The engine — the only crate applications depend on | [![snora](https://img.shields.io/crates/v/snora?label=snora)](https://crates.io/crates/snora) | [![snora Docs](https://docs.rs/snora/badge.svg?version=latest)](https://docs.rs/snora) | [![snora Deps Status](https://deps.rs/crate/snora/latest/status.svg)](https://deps.rs/crate/snora) |
+| [`snora-core`](https://crates.io/crates/snora-core) | Iced-free vocabulary and contract | [![snora-core](https://img.shields.io/crates/v/snora-core?label=snora-core)](https://crates.io/crates/snora-core) | [![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core) | [![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core) |
+| [`snora-design`](https://crates.io/crates/snora-design) | Iced-free design tokens (opt-in) | [![snora-design](https://img.shields.io/crates/v/snora-design?label=snora-design)](https://crates.io/crates/snora-design) | [![snora-design Docs](https://docs.rs/snora-design/badge.svg?version=latest)](https://docs.rs/snora-design) | [![snora-design Deps Status](https://deps.rs/crate/snora-design/latest/status.svg)](https://deps.rs/crate/snora-design) |
+| [`snora-style`](https://crates.io/crates/snora-style) | Iced style bridge for those tokens (opt-in) | [![snora-style](https://img.shields.io/crates/v/snora-style?label=snora-style)](https://crates.io/crates/snora-style) | [![snora-style Docs](https://docs.rs/snora-style/badge.svg?version=latest)](https://docs.rs/snora-style) | [![snora-style Deps Status](https://deps.rs/crate/snora-style/latest/status.svg)](https://deps.rs/crate/snora-style) |
+| [`snora-widgets`](https://crates.io/crates/snora-widgets) | Prefab UI parts — header, footer, sidebar, menu, icon (optional) | [![snora-widgets](https://img.shields.io/crates/v/snora-widgets?label=snora-widgets)](https://crates.io/crates/snora-widgets) | [![snora-widgets Docs](https://docs.rs/snora-widgets/badge.svg?version=latest)](https://docs.rs/snora-widgets) | [![snora-widgets Deps Status](https://deps.rs/crate/snora-widgets/latest/status.svg)](https://deps.rs/crate/snora-widgets) |
 
 ## Read more
 
