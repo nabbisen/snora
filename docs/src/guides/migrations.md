@@ -10,6 +10,11 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.47 → 0.48](migration-0.47-to-0.48.md) — **not breaking; no code in
+  the release at all.** The non-colour cue decision is final rather than
+  deferred — supply your own channel, nothing is coming to plan around.
+  The 1.0 register was swept and the roadmap now states that its critical
+  path is mostly external.
 - [0.46 → 0.47](migration-0.46-to-0.47.md) — **not breaking; no code,
   appearance, API, or MSRV change.** `#![forbid(unsafe_code)]` now
   enforced in all five crates, and dependency advisory scanning adopted —

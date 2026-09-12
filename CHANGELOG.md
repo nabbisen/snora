@@ -15,7 +15,28 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.48.0] — 2026-09-12
+
 ### Changed
+
+- **The 1.0 readiness register was swept, and four gates moved.** The
+  design track goes from **one of eight** satisfied to **four of eight**:
+  D-3 (token model stable) and D-4 (style bridge stable) re-earned after
+  their 0.45.0 reset, and D-7 (no component catalog creep) closed on a
+  scope review that had not actually been performed since v0.24. The core
+  track stands unchanged at eight of ten.
+
+  **`ROADMAP.md` now states at the top that the critical path to 1.0 is
+  mostly not ours** — five of six open gates wait on an upstream iced
+  major or on an adopter reaching production, and the snora-side work is
+  finished. Read as a work queue the gate list invited the wrong question.
+
+  Also fixed, found by the sweep: `reference/vocabulary.md` opens *"Every
+  public enum in snora-core"* and had omitted `FocusZone` and `Cycle`
+  since 0.39.0. A **Zone navigation** section covers all three RFC-060
+  types, so the page's claim about itself is true again.
 
 - **The non-colour cue question is ruled, not pending (RFC-093 Q-1).**
   snora's prefab toasts and notices distinguish their semantic variants

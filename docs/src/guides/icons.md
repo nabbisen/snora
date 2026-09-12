@@ -35,7 +35,7 @@ every platform that iced supports.
 
 ```toml
 [dependencies]
-snora = { version = "0.47", features = ["lucide-icons"] }
+snora = { version = "0.48", features = ["lucide-icons"] }
 ```
 
 ```rust,ignore
@@ -53,7 +53,7 @@ does not pull `lucide::Settings` into the binary.
 ## `Icon::Svg` — your own assets
 
 ```toml
-snora = { version = "0.47", features = ["svg-icons"] }
+snora = { version = "0.48", features = ["svg-icons"] }
 ```
 
 ```rust,ignore
@@ -122,19 +122,19 @@ independently.
 
 ```toml
 # Default (includes widgets + text icons):
-snora = { version = "0.47" }
+snora = { version = "0.48" }
 
 # Engine only — no widget re-exports, no icon packs:
-snora = { version = "0.47", default-features = false }
+snora = { version = "0.48", default-features = false }
 
 # Widgets + Lucide icon constants:
-snora = { version = "0.47", features = ["widgets", "lucide-icons"] }
+snora = { version = "0.48", features = ["widgets", "lucide-icons"] }
 
 # Widgets + SVG icon support:
-snora = { version = "0.47", features = ["widgets", "svg-icons"] }
+snora = { version = "0.48", features = ["widgets", "svg-icons"] }
 
 # Widgets + both icon sources:
-snora = { version = "0.47", features = ["widgets", "lucide-icons", "svg-icons"] }
+snora = { version = "0.48", features = ["widgets", "lucide-icons", "svg-icons"] }
 ```
 
 `lucide-icons` and `svg-icons` are **subordinate** to `widgets`: they
