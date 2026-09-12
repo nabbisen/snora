@@ -1,0 +1,139 @@
+# cargo-deny configuration — RFC-097 Unit 2.
+#
+# snora resolves 310 packages under --all-features across five published
+# crates, and until this file existed nothing in the repository checked
+# any of them against a vulnerability database. `unpinned-build` watches
+# upstream *movement* (does it still compile after a fresh resolve); it
+# has never watched upstream *vulnerability*. That difference is the gap
+# this configuration closes.
+#
+# ## The permissive start is deliberate, not accidental
+#
+# Q-1 ruled `cargo-deny` over `cargo-audit` because it answers two of the
+# audit's findings with one mechanism: advisories, and the separately
+# flagged "licence compatibility across 310 packages is unverified".
+#
+# Only ONE of the four checks is fatal here:
+#
+#   * advisories  — DENIED. A vulnerability or unmaintained-crate
+#                   advisory against the resolved graph fails the job.
+#   * licenses    — recorded, not enforced (see [licenses] below).
+#   * bans        — warn.
+#   * sources     — warn.
+#
+# The three non-fatal checks are invoked separately by
+# `scripts/check-advisories.sh`, which does not propagate their exit
+# status. Tightening any of them is a later decision to be taken with
+# evidence in hand; blocking the adoption of advisory scanning on a
+# licence-policy debate would be exactly the deferral shape this project
+# keeps closing.
+
+[graph]
+# Match the graph the rest of CI checks. `cargo check --workspace
+# --all-features` is what `rust-quality` runs, and the audit's 310-package
+# figure is the --all-features one; scanning a smaller graph than we build
+# would report clean about packages we ship.
+all-features = true
+
+[advisories]
+# Every advisory against the resolved graph fails, except the three
+# recorded below with reasons.
+#
+# The first scan this project ever ran (2026-09-12) found **five**
+# advisories. Two were fixed rather than accepted; three are accepted
+# below, and none of the three is a vulnerability.
+#
+# **Fixed, not ignored** — `RUSTSEC-2026-0194` and `RUSTSEC-2026-0195`
+# (quick-xml 0.39.4, two denial-of-service vulnerabilities). Both were
+# first written off as upstream-blocked, by implementer and reviewer
+# alike, because the advisories' own suggested remedy reports nothing to
+# do:
+#
+#     cargo update -p quick-xml        ->  Locking 0 packages
+#     cargo update -p wayland-scanner  ->  quick-xml       0.39.4 -> 0.41.0
+#                                          wayland-scanner 0.31.10 -> 0.31.11
+#
+# cargo will not lift a transitive dependency whose parent pins it; the
+# parent had to be named. `wayland-scanner 0.31.11` already declared
+# `quick-xml ^0.41`, so nothing upstream was pending and a full fresh
+# resolve had been landing on the patched pair all along — which is why
+# `unpinned-build` stepped over the fix weekly and reported green. It
+# watches whether upstream still *compiles*, not whether it is
+# *vulnerable*. **The lesson, recorded because it cost two people the
+# same mistake: a remedy suggestion is not a reachability finding.
+# Check the parent before recording an advisory as upstream-blocked.**
+#
+# **Accepted below** — three unmaintained-crate advisories, each with no
+# safe upgrade published. Every entry states its reachability, why it is
+# accepted, and the concrete condition that retires it.
+#
+# The acceptance cannot outlive its reason by inattention:
+# `scripts/check-advisories.sh` runs with `--deny advisory-not-detected`,
+# so the moment an ignored advisory stops matching the graph, the gate
+# goes red and names the entry to delete. There is no dated-expiry
+# alternative at this pin — cargo-deny 0.20.2's ignore schema is exactly
+# `["id", "reason"]`.
+#
+# Note for a future reader who spots an apparent contradiction in the
+# `paste` entry ("absent from the Linux graph" yet listed here): this
+# file sets no `targets` key, so cargo-deny scans **all** targets. That
+# is why a macOS-only crate is detected at all, and why
+# `--deny advisory-not-detected` does not false-positive on it from
+# Linux CI.
+ignore = [
+    { id = "RUSTSEC-2024-0436", reason = "paste 1.0.15, unmaintained. Build-time proc-macro, and macOS-only: absent from the Linux graph entirely (reached via metal -> wgpu-hal, --target all). No runtime presence on any consumer, none at all on Linux. No safe upgrade published. Retires when wgpu-hal's macOS path drops paste, which --deny advisory-not-detected will report the moment it happens." },
+    { id = "RUSTSEC-2026-0206", reason = "rustybuzz 0.20.1, unmaintained (not a vulnerability). Runtime, via usvg -> resvg -> iced_tiny_skia: the SVG path the threat model already names as a consumer-owned trust boundary. No safe upgrade published. Retires when resvg's usvg drops or replaces rustybuzz." },
+    { id = "RUSTSEC-2026-0192", reason = "ttf-parser 0.25.1, unmaintained (not a vulnerability). Runtime font parsing on the DEFAULT path, reached three ways: fontdb -> cosmic-text (text rendering), owned_ttf_parser -> ab_glyph -> sctk-adwaita (window decorations), and rustybuzz -> usvg. Wider than the SVG path alone. No safe upgrade published. Retires when iced's text stack moves off it." },
+]
+
+[licenses]
+# **Recorded, not enforced.** This list is a description of the licences
+# already present in a graph that has shipped for 46 minor releases, not
+# a policy about which licences snora accepts — that policy is a separate
+# decision, and the licences check is invoked non-fatally precisely so
+# this file does not quietly become one.
+#
+# Enumerated from `cargo deny list --layout license` on 2026-09-12. Every
+# licence in the graph is permissive or dual-licensed with a permissive
+# option:
+#
+#   Apache-2.0 (291), MIT (343), Zlib (22), BSD-3-Clause (4),
+#   Unlicense (4), BSD-2-Clause (3), BSL-1.0 (2), CC0-1.0 (1),
+#   ISC (1), Unicode-3.0 (1)
+#
+# Two copyleft identifiers also appear, and both are the *other* half of
+# a dual licence whose permissive side is already allowed above:
+# `self_cell` is Apache-2.0 OR GPL-2.0-only, and `r-efi` is Apache-2.0
+# OR LGPL-2.1-or-later. Neither is listed here — allowing them would be
+# a policy claim, and omitting them lets cargo-deny resolve each to its
+# permissive side, which is what snora actually relies on. If either
+# crate ever drops its permissive option, this check reports it.
+allow = [
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "CC0-1.0",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+confidence-threshold = 0.8
+
+[bans]
+# Warn only. snora carries duplicate versions today (multiple `bitflags`,
+# `hashbrown`, `windows-sys`, `rustix` majors, all pulled by iced's own
+# graph rather than by anything snora declares), and failing on them
+# would fail on upstream's resolution choices rather than on ours.
+multiple-versions = "warn"
+wildcards = "warn"
+
+[sources]
+# Warn only. Everything currently resolves from crates.io; this exists so
+# a git or alternate-registry dependency appearing later is visible
+# rather than silent.
+unknown-registry = "warn"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

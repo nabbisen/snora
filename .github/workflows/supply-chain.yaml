@@ -1,0 +1,59 @@
+name: Supply chain
+
+on:
+  schedule:
+    # Weekly, Tuesday 03:00 UTC — deliberately a day off `unpinned-build`
+    # (Monday 03:00) so two independent upstream-watching jobs do not
+    # report on the same morning and get read as one signal.
+    - cron: '0 3 * * 2'
+  workflow_dispatch:
+
+# Scans the resolved dependency graph against the RustSec advisory
+# database (RFC-097 Unit 2). Until this existed, seven workflows gated
+# compilation, lints, feature combinations, workflow syntax, doc links
+# and upstream compilability — and nothing gated whether any of 310
+# resolved packages was known vulnerable.
+#
+# ## Why scheduled, and not per-push (Q-2, ruled 2026-09-12)
+#
+# A new advisory lands against a pinned dependency without any change of
+# ours — the `tinyvec 1.13.0` shape, which went red on `unpinned-build`
+# and held the 0.44.0 tag for a day. The decisive question is what
+# blocking a push actually prevents: **nothing reaches a consumer on a
+# push.** Consumers get crates from a release. A per-push failure would
+# cost real blocked work for zero consumer protection, which is the same
+# reasoning that put `unpinned-build` on a schedule.
+#
+# ## Why this is not a refusal in release.yaml either
+#
+# Also ruled, and also counter-intuitive: advisories sometimes have no
+# fixed version. A workflow step cannot weigh severity, reachability, or
+# whether a fix exists — and a hard refusal that cannot would make snora
+# unreleasable through no fault of ours, and would be routed around the
+# first time it was wrong. The release side is a human decision point on
+# the checklist, with the advisory in front of them.
+#
+# `workflow_dispatch` is here so that decision point can invoke this job
+# on demand during a cut rather than waiting for Tuesday.
+
+jobs:
+  advisories:
+    name: cargo-deny (advisories fatal; licences, bans, sources reported)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      # The scan reads the committed Cargo.lock — the graph consumers
+      # actually resolve against. No `cargo update` here: re-resolving
+      # would make this a second copy of `unpinned-build` on a different
+      # schedule, scanning a graph nobody ships.
+      - name: Scan the resolved graph
+        # The pinning, checksum verification and the refusal-when-
+        # unobtainable all live in the script, so that a local run and
+        # this job exercise the same code rather than two transcriptions
+        # of it.
+        run: scripts/check-advisories.sh

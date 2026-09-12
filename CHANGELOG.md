@@ -15,7 +15,60 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Dependency advisory scanning — snora's first security gate
+  (RFC-097).** A weekly `supply-chain` workflow runs `cargo-deny`
+  (pinned, checksum-verified) over the resolved `--all-features` graph:
+  advisories are fatal, licences/bans/sources are reported but do not
+  fail. Before this, seven workflows gated compilation, lints, feature
+  combinations, workflow syntax, doc links and whether upstream still
+  compiles — and **nothing** gated whether any of 310 resolved packages
+  was known vulnerable.
+
+  **No API or behaviour change, and an entry anyway**, on the same
+  reasoning as 0.44.0's: it changes what the project can honestly say
+  about itself, and a team evaluating snora's assurance posture cannot
+  read a workflow file they do not know exists. The one thing that did
+  move is the committed `Cargo.lock`, by two packages — see below.
+
+  **What the first scan found, disclosed rather than absorbed: five
+  advisories — two fixed, three accepted.**
+
+  *Fixed:* `RUSTSEC-2026-0194` and `RUSTSEC-2026-0195` (quick-xml
+  0.39.4, two denial-of-service vulnerabilities), by bumping
+  `wayland-scanner` 0.31.10 → 0.31.11, which lifts quick-xml to 0.41.0.
+  **This was not consumer exposure.** `wayland-scanner`'s own `^0.31`
+  requirement already admitted the patched release, so anyone resolving
+  snora fresh has been getting it; what was behind was snora's own
+  committed `Cargo.lock`. In this graph quick-xml is also reached only
+  through a **build-time proc-macro** — it parses the Wayland protocol
+  XML that ships with the build, never anything at run time.
+
+  *Accepted:* three **unmaintained-crate advisories, none of them
+  vulnerabilities** — `paste` (macOS-only, build-time), `rustybuzz` and
+  `ttf-parser` (both runtime, no safe upgrade published). Each is
+  recorded in `deny.toml` with its reachability, why it is accepted, and
+  the condition that retires it — and the acceptance cannot outlive that
+  condition quietly: the job runs with `--deny advisory-not-detected`,
+  so it goes red and names the entry the moment an ignored advisory
+  stops matching the graph.
+
+  The licence question the same tool answers is cleaner: every licence
+  in the graph is permissive or dual-licensed with a permissive option.
+
+  **Why a compile-only watchdog was not enough**, stated because this
+  release is the demonstration: `unpinned-build` re-resolves the graph
+  weekly, and had therefore been landing on the *patched* quick-xml
+  every Monday — and reporting green, because it checks whether upstream
+  still compiles, not whether it is vulnerable. It stepped over the fix
+  for weeks without being able to see it.
+
+  Scheduled rather than per-push deliberately: nothing reaches a
+  consumer on a push, so a per-push failure would cost blocked work for
+  no consumer protection. The release-time decision point is a human
+  one, because a workflow step cannot weigh severity, reachability, or
+  whether a fix exists.
 
 ## [0.46.0] — 2026-09-06
 
