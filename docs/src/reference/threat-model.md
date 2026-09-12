@@ -111,21 +111,25 @@ version and checksum-verified before it runs, and it refuses rather
 than reporting clean when it cannot be obtained or when the advisory
 database cannot be fetched: an unscanned graph is not a clean one.
 
-> **Correction, 2026-09-12: this gate has been reporting clean over a
-> class of advisory it could not see, and that is being fixed
-> (RFC-098).** cargo-deny's `unsound` setting is a *scope* rather than a
-> lint level, and its default excludes transitive dependencies — which
-> is every package snora has. So from 0.47.0, when this mechanism
-> shipped, until RFC-098 lands, `advisories ok` has meant *"no
-> vulnerability and no unmaintained-crate advisory"* and **not** *"no
-> unsoundness"*.
+> **Correction, 0.49.0: for two releases this gate reported clean over a
+> class of advisory it could not see (RFC-098).** cargo-deny's `unsound`
+> setting is a *scope* rather than a lint level, and its default
+> excludes transitive dependencies — which is every package snora has.
+> So from 0.47.0, when this mechanism shipped, to 0.48.0,
+> `advisories ok` meant *"no vulnerability and no unmaintained-crate
+> advisory"* and **not** *"no unsoundness"*. Fixed in 0.49.0 by setting
+> the scope explicitly — **and the gate now refuses to run at all
+> against a configuration that leaves any advisory class unset**, because
+> the failure was never a wrong value but an absent key behaving as a
+> permissive default.
 >
-> **It was hiding three**, in `lru`, `memmap2` and `event-listener`. Two
-> have published fixes and are being taken. The third —
+> **It was hiding three**, in `lru`, `memmap2` and `event-listener`.
+> `memmap2` and `event-listener` had published fixes and were taken in
+> 0.49.0. The third —
 > `RUSTSEC-2026-0253`, a use-after-free in `lru`'s `LruCache::pop()`
 > when a stored key's `Drop` panics — is **not fixable by us**:
-> `cryoglyph` holds `lru` below the patched version and has no release
-> that lifts it. It is reached at run time through
+> `cryoglyph` 0.1.0, its only published release, declares `lru ^0.16`,
+> which cannot admit the patched 0.18.2. It is reached at run time through
 > `cryoglyph → iced_wgpu → iced_renderer → iced`, and unlike the three
 > accepted advisories below it is **memory-corruption on the default
 > rendering path, not an unmaintained crate** — which is why it is named

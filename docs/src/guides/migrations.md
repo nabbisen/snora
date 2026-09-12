@@ -10,6 +10,11 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.48 → 0.49](migration-0.48-to-0.49.md) — **not breaking, but read it.**
+  Our advisory gate was blind to `unsound` advisories for two releases and
+  hid three; two are fixed here, one is accepted and named in the threat
+  model. **Contains one thing to check in your own `cargo-deny` config.**
+  Found externally, by a non-consumer.
 - [0.47 → 0.48](migration-0.47-to-0.48.md) — **not breaking; no code in
   the release at all.** The non-colour cue decision is final rather than
   deferred — supply your own channel, nothing is coming to plan around.

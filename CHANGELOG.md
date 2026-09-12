@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.49.0] — 2026-09-12
+
 ### Fixed
 
 - **The advisory gate was blind to an entire class, and three

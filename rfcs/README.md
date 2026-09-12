@@ -156,7 +156,7 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 | ID | Title | Target |
 |----|-------|--------|
 | 097 | [snora has no threat model, and nothing watches 310 dependencies](./done/097-snora-has-no-threat-model-and-no-supply-chain-gate.md) | **v0.47.0** — High (scheduled v0.48.0; landed early). Unit 1 threat model + Unit 2 supply-chain gate (handoff: [`handoffs/097-…`](./handoffs/097-snora-has-no-threat-model-and-no-supply-chain-gate/implementation-handoff.md)) |
-| 098 | [The advisory gate is blind to an entire advisory class](./accepted/098-the-advisory-gate-is-blind-to-unsoundness.md) | **accepted** v0.49.0 — High. `unsound` is a *scope* key whose default excludes transitive deps, i.e. all of ours; three advisories hidden, two fixable today. Found by tekstide |
+| 098 | [The advisory gate is blind to an entire advisory class](./done/098-the-advisory-gate-is-blind-to-unsoundness.md) | **v0.49.0** — High (handoff: [`handoffs/098-…`](./handoffs/098-the-advisory-gate-is-blind-to-unsoundness/implementation-handoff.md)). `unsound` is a *scope* key whose default excludes transitive deps, i.e. all of ours; three advisories hidden, two fixable today. Found by tekstide |
 
 ## Proposed
 

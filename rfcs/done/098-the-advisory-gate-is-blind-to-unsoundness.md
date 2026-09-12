@@ -1,6 +1,6 @@
 # RFC-098 — The advisory gate is blind to an entire advisory class
 
-**Status.** Accepted 2026-09-12.
+**Status.** Done — shipped v0.49.0.
 **Raised.** 2026-09-12, architect.
 **Release target.** 0.49.0 — and one part of it is not releasable work at all
 (see *Correspondence*, which is owed now rather than at a release).
