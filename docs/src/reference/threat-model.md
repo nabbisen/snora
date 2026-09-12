@@ -107,9 +107,36 @@ successful CI run. Both refusals have been demonstrated firing.
 weekly over the resolved `--all-features` graph — the same graph the
 rest of CI builds. Advisories are fatal; licences, bans and
 sources are reported without failing. The scanner is pinned to an exact
-version and checksum-verified before it runs, and it **refuses rather
-than reporting clean** when it cannot be obtained or when the advisory
+version and checksum-verified before it runs, and it refuses rather
+than reporting clean when it cannot be obtained or when the advisory
 database cannot be fetched: an unscanned graph is not a clean one.
+
+> **Correction, 2026-09-12: this gate has been reporting clean over a
+> class of advisory it could not see, and that is being fixed
+> (RFC-098).** cargo-deny's `unsound` setting is a *scope* rather than a
+> lint level, and its default excludes transitive dependencies — which
+> is every package snora has. So from 0.47.0, when this mechanism
+> shipped, until RFC-098 lands, `advisories ok` has meant *"no
+> vulnerability and no unmaintained-crate advisory"* and **not** *"no
+> unsoundness"*.
+>
+> **It was hiding three**, in `lru`, `memmap2` and `event-listener`. Two
+> have published fixes and are being taken. The third —
+> `RUSTSEC-2026-0253`, a use-after-free in `lru`'s `LruCache::pop()`
+> when a stored key's `Drop` panics — is **not fixable by us**:
+> `cryoglyph` holds `lru` below the patched version and has no release
+> that lifts it. It is reached at run time through
+> `cryoglyph → iced_wgpu → iced_renderer → iced`, and unlike the three
+> accepted advisories below it is **memory-corruption on the default
+> rendering path, not an unmaintained crate** — which is why it is named
+> here rather than only recorded in `deny.toml`.
+>
+> **This was found by a downstream team reading our own disclosure, not
+> by us.** The paragraph below describes what the first scan found; it
+> was accurate about what the gate reported and incomplete about what
+> the gate could report. Both halves are left standing rather than
+> rewritten, because a threat model that quietly corrects itself is
+> worth less than one that shows where it was wrong.
 
 It is scheduled rather than per-push, and it is not a refusal in
 `release.yaml`. Both are deliberate. Nothing reaches a consumer on a
