@@ -142,6 +142,25 @@ database cannot be fetched: an unscanned graph is not a clean one.
 > rewritten, because a threat model that quietly corrects itself is
 > worth less than one that shows where it was wrong.
 
+**What the gate scans, and what it therefore cannot tell you.**
+`cargo-deny` scans the **resolved dependency graph**, not `Cargo.lock`.
+Those differ: a lockfile carries entries for dependencies that no target
+we build ever compiles. `anyhow` is one — it sits in snora's lockfile
+via the `wit-bindgen`/`wasm-metadata` component-model stack, and
+`cargo tree -i anyhow --target all` prints *nothing to print*, so the
+graph scan correctly excludes it. **A lockfile-based scanner such as
+`cargo audit` will report it, and will report advisories against snora's
+graph that this document does not list.** That is not a disagreement
+between the tools; it is the difference between *"is this compiled into
+anything we ship"* and *"is this named in the lockfile"*. Both questions
+are legitimate. Ours is the first, and every count in this section is
+scoped to it.
+
+*(Reported by apimokka, 2026-09-12, who run `cargo audit` and so saw
+`RUSTSEC-2026-0190` against `anyhow` where our own gate reports nothing.
+Recorded because a consumer meeting an advisory we never mention should
+be able to find out why here rather than by asking.)*
+
 It is scheduled rather than per-push, and it is not a refusal in
 `release.yaml`. Both are deliberate. Nothing reaches a consumer on a
 push, so blocking pushes would cost real work for no protection; and an
