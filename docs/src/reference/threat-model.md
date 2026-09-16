@@ -161,6 +161,32 @@ scoped to it.
 Recorded because a consumer meeting an advisory we never mention should
 be able to find out why here rather than by asking.)*
 
+**Your graph is a superset of ours, so this list can never be complete
+for you.** Two independent reasons, and both were found by consumers
+rather than by us:
+
+- **Feature selection.** snora declares `iced` with `features =
+  ["tokio"]`. A consumer enabling more of iced's features resolves
+  packages we never see. knotra enables `["tokio", "image", "svg",
+  "advanced"]` and so carries `crossbeam-epoch` — via `image → exr →
+  rayon-core → crossbeam-deque` — which is **not in snora's lockfile at
+  all**, and whose advisory is a *vulnerability* rather than
+  unsoundness or unmaintainedness. No list we publish could have
+  contained it.
+- **Your own direct dependencies.** A crate that reaches snora only
+  through a path we do not compile may be a first-class dependency of
+  yours. `anyhow` is exactly that: unreachable in our graph, and
+  declared directly by all three of aaai's crates and two of knotra's,
+  where it compiles into everything they ship.
+
+**So treat what follows as a description of snora's graph and not as a
+bound on yours.** The reliable act is running a scanner against your own
+graph; the reachability judgement that makes an advisory urgent or
+negligible is a property of *that* graph, not of this page. We took
+`anyhow` 1.0.104 ourselves on the same reasoning aaai gave for taking
+it: the patch was free, and *"we do not call it today"* is a weaker
+guarantee than *"it is not there"*.
+
 It is scheduled rather than per-push, and it is not a refusal in
 `release.yaml`. Both are deliberate. Nothing reaches a consumer on a
 push, so blocking pushes would cost real work for no protection; and an
