@@ -39,7 +39,7 @@
 //! | footer | `pad_y` | 6 | `Spacing::sm` | **no** | 6 has no clean token; `sm` chosen for cross-bar rhythm with header |
 //! | footer | `radius` | 0 | `Radius::sm` | **no** | same as header |
 //! | sidebar | `gap` | 16 | `Spacing::md` | **no** | reclassified: sibling icon buttons in one list read as "ordinary component gap", not "section spacing" — deliberately not reproducing 16 |
-//! | sidebar | `padding` | 16 | `Spacing::lg` | yes | rail's outer edge padding, same role as header/footer `pad_x` |
+//! | sidebar | `vertical_padding` | 16 | `Spacing::lg` | yes | rail's padding above the first and below the last button. Horizontal padding is **not** token-mapped — see below |
 //! | sidebar | `button_radius` | 6 | `Radius::md` | yes | `Radius::md` is documented "buttons, chips, notices" |
 //! | tab | `bar_gap` | 2 | `Spacing::xs` | **no** | no clean equivalent; `xs` is the smallest available |
 //! | tab | `bar_pad_x` | 12 | `Spacing::md` | yes | ordinary component padding |
@@ -54,6 +54,17 @@
 //! | crumb | `btn_pad_y` | 2 | `Spacing::xs` | **no** | no token smaller than `xs`; used as the floor |
 //! | crumb | `btn_radius` | 3 | `Radius::sm` | **no** | `sm` is the smallest radius available |
 //! | menu | `gap` | 6 | `Spacing::sm` | **no** | shared inline-gap rhythm (see below) |
+//!
+//! **The sidebar's horizontal padding is derived, not mapped (RFC-099).**
+//! RFC-040 mapped the rail's padding to `Spacing::lg` on all four sides.
+//! Horizontally that left 32px for a 48px button, and iced rendered the
+//! button 32px wide in every preset — a real defect that
+//! `side_bar_geometry_matches_mapping_all_presets` could not see, because it
+//! asserted token wiring rather than fit. Horizontal padding is now
+//! `(RAIL_WIDTH - BUTTON_SIZE) / 2` in `crate::sidebar`, the same in both
+//! variants, and deliberately absent from this table: it is what is left
+//! over once the button is centred, not a spacing choice. This is a stated
+//! departure from RFC-040's all-token framing (RFC-099, Q-1 (a)).
 //!
 //! **Shared inline-gap rhythm.** Tab's icon-to-label gap, crumb's
 //! item-to-separator gap, and menu's icon-to-label gap were all
@@ -192,7 +203,7 @@ where
 fn side_bar_geometry(tokens: &Tokens) -> SideBarGeometry {
     SideBarGeometry {
         gap: tokens.spacing.md,
-        padding: tokens.spacing.lg,
+        vertical_padding: tokens.spacing.lg,
         button_radius: tokens.radius.md,
     }
 }

@@ -15,7 +15,45 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **The sidebar rail was narrower than its buttons, and the icon was
+  not centred in them (RFC-099).** The rail is 64px wide and its buttons
+  are meant to be 48px square, but the rail padded all four sides by
+  16px, leaving a 32px content box. iced resolved that by rendering each
+  button **32 × 48 instead of 48 × 48.** Separately, the icon had no
+  centring container, so the glyph was drawn at the top-left of the
+  button's content area — measured about 10px left of and 10px above
+  the button's centre.
+
+  **Both the unstyled and styled variants, in every preset, since at
+  least 0.10.0.** The unstyled rail used the literal `16`, and every
+  built-in preset's `Spacing::lg` is `16`, so nothing fit anywhere.
+
+  **Found by orbok** — their owner noticed the rail looked wrong, and
+  they traced it to source.
+
+  The rail's horizontal padding is now derived from the rail and button
+  sizes (`(64 − 48) / 2 = 8`) rather than taken from spacing; vertical
+  padding and the inter-button gap keep their sources (literals
+  unstyled, `Spacing` tokens styled). The icon is centred on both axes
+  in a container, and the button's own padding is zeroed so the
+  container spans the full 48 × 48. `Spacing` is unchanged.
+
+  - **This is a rendered-appearance change on the default path.** Visual
+    baselines that include a sidebar are invalidated.
+  - **Rail width is unchanged**, so body content does not reflow.
+  - **The pointer target is now 48 × 48** (was 32 × 48). Both sizes
+    clear WCAG 2.5.8's 24 × 24 minimum; no conformance claim moves.
+
+  The existing `side_bar_geometry_matches_mapping_all_presets` test
+  passed on every one of those releases: it asserted that each geometry
+  field was wired to the right token, not that the result fit. The new
+  tests in `crates/snora/tests/side_bar_fit.rs` measure rendered layout
+  instead — clicking just inside both edges of the intended button, and
+  comparing the icon's rendered box with its natural size and the
+  button's centre — for the unstyled variant and all four styled
+  presets.
 
 ## [0.49.0] — 2026-09-12
 

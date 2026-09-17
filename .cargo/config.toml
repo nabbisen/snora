@@ -1,0 +1,28 @@
+# Workspace-wide cargo configuration.
+
+[env]
+# Render `iced_test` simulators with tiny-skia, never wgpu (RFC-099 R-1).
+#
+# Why: `iced_test` builds a headless renderer per simulator, trying wgpu first.
+# wgpu's headless constructor constructs a `wgpu::Instance`, which calls into
+# the system Vulkan loader. Several simulators doing that at once — as parallel
+# `cargo test` does — was observed to crash the whole test binary with SIGSEGV
+# inside `vkEnumerateInstanceExtensionProperties`, reached from
+# `wgpu_hal::vulkan::Instance::init_with_callback`. A crash is not a test
+# result, and cargo reports it with the same exit code as an assertion failure.
+#
+# How this prevents it: `iced_test` reads `ICED_TEST_BACKEND` and passes it to
+# the renderer as a backend hint. wgpu's headless constructor returns before
+# constructing its `Instance` when the hint is not "wgpu", so the Vulkan loader
+# is never called and the renderer falls back to tiny-skia. Text shaping is
+# cosmic-text under both renderers, so layout measurements are unchanged.
+#
+# Scope: only `iced_test` reads this variable. `iced`, `iced_winit`,
+# `iced_renderer`, `iced_wgpu`, `iced_tiny_skia`, `iced_graphics` and
+# `iced_runtime` do not, so `cargo run` of an example keeps its default
+# renderer. It affects tests only.
+#
+# DEPENDS ON iced_test 0.14 BEHAVIOUR. If a future iced renames this variable
+# or reorders the renderer fallback, this line silently stops working and the
+# crash can return. Re-check it at the next iced major (core gate 1).
+ICED_TEST_BACKEND = "tiny-skia"

@@ -55,7 +55,7 @@ fn footer_unstyled_matches_literal_inventory() {
 fn sidebar_unstyled_matches_literal_inventory() {
     let g = SideBarGeometry::unstyled();
     assert_eq!(g.gap, 16.0);
-    assert_eq!(g.padding, 16.0);
+    assert_eq!(g.vertical_padding, 16.0);
     assert_eq!(g.button_radius, 6.0);
 }
 
@@ -138,6 +138,14 @@ fn footer_geometry_matches_mapping_all_presets() {
     }
 }
 
+/// Asserts **token wiring** for the sidebar dimensions that remain
+/// token-mapped. It does not — and cannot — assert that the rendered rail
+/// fits: this test passed on every release while the buttons rendered 32px
+/// wide instead of 48 (RFC-099). Fit is asserted by measuring rendered
+/// layout in `crates/snora/tests/side_bar_fit.rs`.
+///
+/// Horizontal padding has no row here because it is not token-mapped; it
+/// is derived from the rail and button sizes in `crate::sidebar`.
 #[test]
 fn side_bar_geometry_matches_mapping_all_presets() {
     for (name, t) in named_presets() {
@@ -147,8 +155,8 @@ fn side_bar_geometry_matches_mapping_all_presets() {
             "{name}: sidebar gap should map to Spacing::md"
         );
         assert_eq!(
-            g.padding, t.spacing.lg,
-            "{name}: sidebar padding should map to Spacing::lg"
+            g.vertical_padding, t.spacing.lg,
+            "{name}: sidebar vertical_padding should map to Spacing::lg"
         );
         assert_eq!(
             g.button_radius, t.radius.md,
