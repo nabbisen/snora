@@ -15,6 +15,10 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.50.0] — 2026-09-17
+
 ### Fixed
 
 - **The sidebar rail was narrower than its buttons, and the icon was
@@ -54,6 +58,30 @@ are recorded in the per-version migration guides under
   comparing the icon's rendered box with its natural size and the
   button's centre — for the unstyled variant and all four styled
   presets.
+
+### Changed
+
+- **Two documentation claims you may have relied on were wrong, and are
+  corrected.**
+  - `guides/testing.md` described `iced_test` as *"a CPU-only headless
+    renderer."* **It tries wgpu first.** With several simulators starting
+    at once, as a parallel `cargo test` does, that was observed to crash
+    the test binary with SIGSEGV inside the system Vulkan loader. Cargo
+    reports that with the same exit code as a failing assertion. snora's
+    own suite now sets `ICED_TEST_BACKEND = "tiny-skia"` in
+    `.cargo/config.toml`, and the guide explains the line — and its two
+    caveats — for anyone writing simulator tests of their own.
+  - `reference/threat-model.md` now states that snora's advisory
+    disclosures describe **snora's resolved graph, not yours.** Your graph
+    is a superset: enabling more of iced's features, or declaring a crate
+    directly that reaches snora only through an uncompiled path, puts
+    advisories in your graph that no list of ours can contain. It also
+    explains why a lockfile scanner (`cargo audit`) reports entries a graph
+    scanner (`cargo-deny`) does not.
+- `anyhow` 1.0.102 → 1.0.104 in snora's lockfile (`RUSTSEC-2026-0190`,
+  unsound). It is unreachable in snora's graph, and a library's lockfile
+  does not reach yours — check your own with `cargo tree -i anyhow
+  --target all`.
 
 ## [0.49.0] — 2026-09-12
 

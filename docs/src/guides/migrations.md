@@ -10,6 +10,12 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.49 → 0.50](migration-0.49-to-0.50.md) — **no API change, but a
+  rendered-appearance change on the default path.** Sidebar buttons now
+  render 48 × 48 (were 32 × 48) with a centred icon; rail width is unchanged,
+  so nothing else moves. **Visual baselines that include a sidebar are
+  invalidated.** Also: `iced_test` is not CPU-only, and a crash fix for
+  simulator tests.
 - [0.48 → 0.49](migration-0.48-to-0.49.md) — **not breaking, but read it.**
   Our advisory gate was blind to `unsound` advisories for two releases and
   hid three; two are fixed here, one is accepted and named in the threat

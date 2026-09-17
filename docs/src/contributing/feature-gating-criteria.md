@@ -356,7 +356,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.49.0, re-derived 2026-09-12, RFC-062)
+## Current status (snora 0.50.0, re-derived 2026-09-17, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -368,7 +368,7 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | 1. Compile time | 30 000 ms, developer machine, cold | **Measured 2026-09-12, no longer unassessed.** **~0.2 s marginal** (`snora-widgets` alone, closure warm; 181–222 ms over four runs on a 16-core desktop) — **~150× under**. The cold-closure reading is 29 523 ms on the same machine, but that cost is `iced`'s and is paid by every snora consumer whether or not a widget is enabled, so per-widget gating cannot reduce it; the marginal number is the one this indicator's own purpose needs. **The procedure printed here until today measured a no-op** (393 ms — `cargo clean -p <pkg>` does not reach the release profile); corrected above. The threshold's magnitude fits the cold-closure quantity rather than the marginal one — flagged for the owner, not silently rewritten | **No** |
 | 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **50,304 B (~49 KB)** — `binary-size.csv`'s 0.49.0 row, read back after the tag. **34% of a 150 KB bar.** Moved **−128 B** from 0.48.0, inside the ±256 B floor, and back to exactly 0.47.0's figure. **`engine_bytes` moved +1792 B, and that one is outside the floor with a named cause:** 0.49.0 bumped two transitive packages (`memmap2` 0.9.11, `event-listener` 5.4.2), so real dependency code changed — the first release in this series where a measurement move has an identified source. It sharpens the 0.47.0 anomaly rather than excusing it: that release's unexplained −640 B had **no** lockfile change behind it, and this one shows what a move with a cause looks like. Still unattributed; still needs a bisect nobody has run. | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
-| 4. Platform-specific dep | Any system library not already required | None — same manifest check as indicator 3, re-run for 0.49.0: `snora-widgets`'s dependency list is unchanged. Two transitive packages moved (`memmap2`, `event-listener`), neither a system library and neither declared by us | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — manifest check re-run for 0.50.0: no `Cargo.toml` changed since 0.49.0, and the one lockfile move (`anyhow`) is a pure-Rust crate unreachable in snora's graph. `.cargo/config.toml` is new but sets a test-only environment variable and links nothing | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
 **No indicator is met, and that is now measured rather than open.**

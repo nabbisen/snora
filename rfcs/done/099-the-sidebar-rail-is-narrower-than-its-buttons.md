@@ -1,6 +1,6 @@
 # RFC-099 — The sidebar rail is narrower than its buttons
 
-**Status.** Accepted 2026-09-17. Q-1 = (a), Q-2 = leave it.
+**Status.** Done — shipped v0.50.0. Q-1 = (a), Q-2 = leave it.
 **Raised.** 2026-09-17, architect, on a report from **orbok**.
 **Release target.** 0.50.0.
 **Found by.** orbok's owner, who noticed the sidebar icons looked off-centre;
