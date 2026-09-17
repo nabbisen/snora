@@ -176,9 +176,11 @@ we would want.
 ## What Snora tests internally
 
 Snora uses [`iced_test`](https://crates.io/crates/iced_test) — a
-CPU-only headless renderer — to verify the engine's own behavioral
-contract. These tests live in `crates/snora/tests/render_semantics.rs`
-and cover:
+headless renderer — to verify the engine's own behavioral contract. The
+engine's tests live in `crates/snora/tests/render_semantics.rs`, and
+the sidebar's rendered geometry is measured in
+`crates/snora/tests/side_bar_fit.rs` (RFC-099). `render_semantics.rs`
+covers:
 
 - skeleton body is reachable (layer 0 renders and handles clicks);
 - outside-click on a modal emits `on_close_modals` (layer 4 backdrop);
@@ -191,6 +193,43 @@ and cover:
 
 `iced_test` is a `[dev-dependencies]` entry only — it does not affect
 the public API, feature flags, or binary size.
+
+### `iced_test` is not CPU-only by default — and parallel tests can crash
+
+This page used to describe `iced_test` as *"a CPU-only headless
+renderer."* **That was wrong.** Each simulator builds a renderer that
+tries **wgpu first**, and wgpu's constructor calls into the system Vulkan
+loader. With several simulators starting at once — which is what a
+parallel `cargo test` does — that was observed to crash the whole test
+binary with **SIGSEGV** inside the loader (RFC-099). Cargo reports that
+crash with the same exit code as a failing assertion, so read the output
+for `signal: 11` rather than trusting the exit code.
+
+**snora's own suite renders with tiny-skia**, set in the workspace's
+`.cargo/config.toml`:
+
+```toml
+[env]
+ICED_TEST_BACKEND = "tiny-skia"
+```
+
+`iced_test` reads that variable and passes it on as a backend hint, and
+wgpu steps aside before it ever touches the Vulkan loader. Only
+`iced_test` reads it, so `cargo run` of an application is unaffected.
+
+**If you write `iced_test` tests of your own, you likely want the same
+line.** Two caveats worth knowing before you rely on it:
+
+- **A value already set in your shell wins.** Cargo's `[env]` does not
+  override an exported variable unless the key uses `force = true`. If
+  you export `ICED_TEST_BACKEND` in a shell profile, you have silently
+  replaced this protection. Leaving it unforced is deliberate here: it is
+  how to test under wgpu on purpose, e.g. `ICED_TEST_BACKEND=wgpu cargo
+  test`.
+- **It depends on `iced_test` 0.14.** If a future iced renames the
+  variable or changes the renderer fallback, the line stops working
+  without an error, and the crash can return. snora re-checks it at its
+  next iced major.
 
 **Applications should not depend on these internals.** The contract you
 can rely on is the public API: `AppLayout`, `render`, `Dialog`, `Sheet`,

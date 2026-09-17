@@ -191,13 +191,32 @@ mode RFC-058/059/060 each hit once this cycle.
 
 A control's target **width** is `content_advance +
 2 × horizontal_padding`, and `content_advance` depends on the rendered
-string, the font, and the shaping engine — snora cannot compute it
-without a renderer, and `render_semantics` asserts composition, not
-pixel geometry. **The width axis is review-only, not asserted, and this
-is a limitation to work around at review time, not a solved problem.**
-A primitive with a short, narrow label (an icon-only or single-glyph
-button, in particular) needs its width checked by hand or by a rendered
-probe — see the checklist item below.
+string, the font, and the shaping engine, so it cannot be derived from
+token values the way height can. **Width is not asserted suite-wide**, and
+that remains a limitation to work around at review time rather than a
+solved problem — but it is narrower than this section used to claim, in
+two ways RFC-099 established:
+
+- **Fixed-size controls have computable width, and must be asserted.**
+  A control sized by constants rather than by its content — `app_side_bar`'s
+  icon buttons are the case that shipped wrong — has a width that is pure
+  arithmetic, with no text involved. This section once put *"an icon-only
+  button, in particular"* in the review-only bucket; that is exactly the
+  kind of control that did not belong there. `app_side_bar` rendered its
+  48 px buttons 32 px wide for at least forty minors because its width was
+  treated as unmeasurable when it was not (RFC-099).
+- **Content-sized width can be measured with a rendered probe, and the
+  harness exists.** `iced_test`'s `Simulator` lays out real text:
+  `find(..).visible_bounds()` returns a glyph's actual box, and a
+  coordinate click (`point_at` + `click()`) tests where a control really
+  answers. `crates/snora/tests/side_bar_fit.rs` does both. What such a probe
+  measures is width **against the fallback font the harness renders with**,
+  not against an application's own font. Treat it as evidence for the
+  shipped defaults, not as a bound on every consumer.
+
+A primitive with a short, narrow label still needs its width checked, by a
+rendered probe where one is practical and by hand where it is not — see
+the checklist item below.
 
 ```text
 [ ] Height clears 24 logical pixels (mandatory) — verified by
