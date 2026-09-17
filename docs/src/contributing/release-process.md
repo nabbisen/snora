@@ -333,6 +333,18 @@ restate the guide's content.
     (this has already happened once, on the 0.26.0 bump). Grep for the
     old minor across all `Cargo.toml` files before assuming the
     workspace table alone is sufficient.
+[ ] Before committing the release, confirm the INDEX holds the release:
+    `git diff --cached --stat` must show Cargo.toml's version bump and
+    the CHANGELOG roll. Chain the staging and the commit so a failed
+    step stops the script (`set -euo pipefail`, or `&&`).
+    # 0.50.0's first commit, d524406, carried only an RFC file move and was
+    # pushed titled "0.50.0". `git add` had failed with a pathspec error --
+    # it named a path `git mv` had already staged away -- and a pathspec
+    # error stages NOTHING. The status printed straight afterwards showed
+    # every file unstaged, and the next command committed anyway. No tag,
+    # so nothing published; f7d6870 carries the release. The tag check
+    # would have caught a tag on the wrong commit. Nothing caught the
+    # commit.
 [ ] Move the [Unreleased] section in CHANGELOG.md to the new version,
     and reset [Unreleased] to "Nothing yet."
 [ ] If minor: write docs/guides/migration-X.Y-to-X.Z.md. **Unconditional
