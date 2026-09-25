@@ -10,6 +10,10 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.50 → 0.51](migration-0.50-to-0.51.md) — **no breaking API change;
+  rendered appearance changes** (tab bar edges, sidebar tooltip body, toast close
+  target, lucide close glyphs). **Fixes accessibility defects a conformance record
+  may cite**, one of them renderer-dependent: read §4.
 - [0.49 → 0.50](migration-0.49-to-0.50.md) — **no API change, but a
   rendered-appearance change on the default path.** Sidebar buttons now
   render 48 × 48 (were 32 × 48) with a centred icon; rail width is unchanged,

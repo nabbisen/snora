@@ -189,6 +189,17 @@ a prefab control actually uses — enumerating "the ones a control uses"
 would re-derive a hand-maintained list of call sites, the same failure
 mode RFC-058/059/060 each hit once this cycle.
 
+**That assertion covers token-derived controls, and only those (RFC-101).**
+A control whose size comes from literals rather than from a `TextRole`
+and a `Spacing` step falls outside it, whatever it measures. The engine's
+toast close button did: `text("×").size(18)` with zero vertical padding
+rendered **25.00 × 23.40**, 0.6 px under the floor, for as long as the
+toast has existed, while this section truthfully said height was
+asserted. **A snora-owned control with literal sizing must carry its own
+rendered target test.** The toast close button now has one
+(`crates/snora/tests/toast_close_button.rs`), which asserts its target
+**equals** a named 24 px floor, so padding cannot creep back unnoticed.
+
 A control's target **width** is `content_advance +
 2 × horizontal_padding`, and `content_advance` depends on the rendered
 string, the font, and the shaping engine, so it cannot be derived from

@@ -1,6 +1,6 @@
 # RFC-101 — The toast close button is under the target floor, and still a text glyph
 
-**Status.** Accepted 2026-09-17. Q-1 = (a), Q-2 = (a), Q-3 = test-local constant (see Rulings).
+**Status.** Done — shipped v0.51.0. Q-1 = (a), Q-2 = (a), Q-3 = test-local constant (see Rulings).
 **Raised.** 2026-09-17, architect. **Opened on the owner's instruction**, from an
 observation in RFC-100's review: the dev team noticed the engine's toast close
 button is also a text "×".

@@ -153,7 +153,7 @@ actually painted over, on both theme paths.
 >   wgpu renderer the shadow draws only outside the button, so the label was on
 >   the page as this row says. Fixed at 0.51.0 by removing the shadow.
 >
-> See the 0.50 → 0.51 migration guide for what to
+> See the [0.50 → 0.51 guide](migration-0.50-to-0.51.md) for what to
 > re-check.
 | Breadcrumb text | `primary.base.color` | 2.03–3.42:1, stock themes | `background.base.text` / `background.weak.text`, matched to the actual background |
 

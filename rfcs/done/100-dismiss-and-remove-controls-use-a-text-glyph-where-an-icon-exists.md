@@ -1,6 +1,6 @@
 # RFC-100 — Dismiss and remove controls use a text glyph where an icon exists
 
-**Status.** Accepted 2026-09-17. Q-1 = both, Q-2 = (a), Q-3 = label size.
+**Status.** Done — shipped v0.51.0. Q-1 = both, Q-2 = (a), Q-3 = label size.
 **Raised.** 2026-09-17, architect, on a request from **orbok**.
 **Release target.** 0.51.0.
 **Priority.** Low. orbok's own words: *"No hurry. It is cosmetic, and the control

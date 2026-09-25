@@ -15,6 +15,11 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.51.0] — 2026-09-26
+
+
 ### Added
 
 - **`Notice::dismiss_tooltip` and `chip::removable_with_tooltip`

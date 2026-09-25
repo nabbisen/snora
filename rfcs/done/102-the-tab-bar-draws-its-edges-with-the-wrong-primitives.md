@@ -1,6 +1,6 @@
 # RFC-102 — The tab bar draws its edges with the wrong primitives, and its state indicator is under the floor
 
-**Status.** Accepted 2026-09-25. Q-1 = (a), Q-2 = (a), Q-3 = 0.51.0.
+**Status.** Done — shipped v0.51.0. Q-1 = (a), Q-2 = (a), Q-3 = 0.51.0.
 **Raised.** 2026-09-25, architect, on a report from **orbok** (four visual
 defects, with screenshots). **Item 5 below was found by the architect while
 verifying them.**
