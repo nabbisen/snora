@@ -209,3 +209,37 @@ than the unstyled one's: a rounded outline becomes a bottom rule. **The field is
 retired rather than left in place**, because a geometry field that configures
 nothing is a dead setting that its mapping test would keep "verifying". The
 migration guide states the styled variant's change separately.
+
+---
+
+## Post-review, 2026-09-26: the defect depended on the renderer
+
+Implementation found that the active tab was **a filled `primary.base` block**,
+with the label drawn on it, which put the label under AA in five of six themes.
+orbok's real-application screenshot of the same 0.50.0 code shows only a thin
+underline. **Both are right, on different renderers**, and the architect and the
+dev team each confirmed this in the iced 0.14 sources:
+
+- **wgpu** (`iced_wgpu-0.14.0/src/shader/quad/solid.wgsl:98`):
+  `mix(quad_color, shadow_color, (1.0 - quad_alpha) * shadow_alpha)`, where
+  `quad_alpha` is geometric coverage. The shadow never shows inside the quad's
+  shape, so the result was a curled 1.5 px underline with the label on the page.
+- **tiny-skia** (`iced_tiny_skia-0.14.0/src/engine.rs:90–124`): the shadow
+  shape is filled before the quad and nothing excludes the interior, so behind
+  a transparent button it filled the whole tab.
+
+| Renderer | Reached by | Active tab | Label |
+|---|---|---|---|
+| wgpu | default with a working GPU | curled underline | on the page |
+| tiny-skia | iced's fallback when wgpu cannot start, or `ICED_BACKEND` | solid `primary.base` | **under AA in 5 of 6 themes** |
+
+**The indicator finding (item 5) holds on both renderers**, since it is a colour
+pairing and 2.99:1 on stock Dark whether drawn as a band or a block. **The label
+finding holds on tiny-skia only.** The root cause lies one level below both:
+snora relied on a primitive the two renderers draw differently. The fix removes
+the shadow, and `tab::tests::tab_button_style_draws_no_shadow` keeps it removed.
+
+**Consequence for this project's evidence:** the test harness pins tiny-skia
+(RFC-099), so pixel evidence describes the fallback path. `guides/testing.md`
+now says so.
+

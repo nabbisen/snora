@@ -237,6 +237,31 @@ and `Toast` behave as documented. Snora does not ship a public
 `snora-test` crate; the current "pub fields + pure update" approach
 covers the common application-testing cases, as shown in this guide.
 
+
+### What rendered evidence from this harness does and does not show
+
+Because snora's suite pins `ICED_TEST_BACKEND = "tiny-skia"`, **every pixel a
+snora test reads comes from tiny-skia**, iced's software renderer, and not from
+wgpu, which is what an application with a working GPU uses. **The two renderers
+are proven to draw some primitives differently.** A shadow behind a transparent
+quad is the known case: wgpu draws it only *outside* the quad's shape, and
+tiny-skia fills its whole shape. At 0.50.0 that made the active tab a filled
+block under tiny-skia and a thin underline under wgpu, from the same code
+(RFC-102).
+
+So:
+
+- **Layout agrees across renderers.** Bounds, positions and hit-testing come
+  from iced's layout pass, and text is shaped by cosmic-text under both. The
+  rendered-bounds and click-probe tests (`side_bar_fit.rs`,
+  `dismiss_remove_controls.rs`, `tab_bar_edges.rs`) measure properties that do
+  not depend on the renderer.
+- **Pixels need not agree.** Frame-hash and pixel-sample evidence describes
+  tiny-skia. Treat it as evidence for the software-fallback path, and check a
+  pixel-level conclusion against a real wgpu render before generalising it.
+- **The safer fix is to stop depending on a primitive the renderers disagree
+  on**, rather than asserting what one of them draws. snora no longer uses a
+  shadow for anything a user must see.
 ## Widget identifiers for external observation (RFC-047)
 
 snora attaches a stable `iced::widget::Id` to every surface it renders

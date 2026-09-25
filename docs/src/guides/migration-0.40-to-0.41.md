@@ -134,6 +134,27 @@ actually painted over, on both theme paths.
 | Sidebar active item's icon/text | `background.base.text` — calibrated for the page background, not the highlight | 1.51–2.13:1 across presets | `primary.strong.text` — iced's own calibrated pairing for the new highlight |
 | Chrome border (header/footer/tab bar) | `background.weak.color` | 1.02–1.48:1, every preset and both stock themes | `background.base.text` — clears the 3.0:1 floor everywhere |
 | Active tab label | `primary.base.color` | 2.99:1 (stock dark) | `background.base.text` — the active/inactive underline (unchanged) now carries the state distinction instead of label colour |
+
+> **Corrected at 0.51.0 (RFC-102).** Two things this row and the trade-off
+> section below got wrong, left standing and annotated rather than rewritten:
+>
+> - **The underline that became the state indicator was itself under the
+>   floor.** It stayed on `primary.base`, the colour this row measured at
+>   2.99:1 on stock Dark, and as a *non-text* indicator it needs 3.0:1. Nobody
+>   measured it as one, because the widget contrast suite skipped it: it was
+>   drawn as a shadow. All four design presets cleared (6.70–11.75:1). Fixed
+>   at 0.51.0 with `primary.strong` (3.70:1 or better everywhere).
+> - **Under iced's tiny-skia renderer, the active label was not on the page at
+>   all.** The underline was a shadow, and tiny-skia fills a shadow's whole
+>   shape behind a transparent button, so the active tab was a solid
+>   `primary.base` block with the label on it. That pairing is under AA in five
+>   of the six themes. tiny-skia is iced's software fallback, used when the GPU
+>   renderer cannot start, or when `ICED_BACKEND` selects it. Under the default
+>   wgpu renderer the shadow draws only outside the button, so the label was on
+>   the page as this row says. Fixed at 0.51.0 by removing the shadow.
+>
+> See the 0.50 → 0.51 migration guide for what to
+> re-check.
 | Breadcrumb text | `primary.base.color` | 2.03–3.42:1, stock themes | `background.base.text` / `background.weak.text`, matched to the actual background |
 
 **The `high_contrast_dark` preset — the one that exists specifically for
@@ -167,6 +188,11 @@ against the actual background on **both** theme paths at once:
 - **The active tab's label** is now the same color as an inactive one;
   the underline (unchanged, still the theme's primary color) is the
   state indicator.
+  *(Corrected at 0.51.0: **this was never true.** Inactive labels were, and
+  are, a muted mix of the text colour toward the page, measured at 1.77–2.71:1
+  apart from the active label. That residual difference is a colour cue and
+  too faint to rely on, so the conclusion stands: the underline is the state
+  indicator. The sentence describing the colours was wrong when published.)*
 
 Both are candidates for a follow-up that reintroduces the distinction
 via a **background** change on hover/press (the pattern the sidebar and
