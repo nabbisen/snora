@@ -12,10 +12,13 @@
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
 //! - Focus rings follow the iced 0.14 limitation (no `Focused` status on
 //!   `button::Status`); documented, not a regression.
-//! - The dismiss button uses `"×"` as its visible label. iced 0.14 does not
-//!   expose a separate accessible label for buttons. If a more descriptive
-//!   label is needed for assistive technology, this is a future customization
-//!   point (e.g. `.dismiss_label(msg, label)`).
+//! - The dismiss button shows lucide `X` under the `lucide-icons` feature and
+//!   `"×"` otherwise, the same glyph as the removable chip (RFC-100).
+//!   [`Notice::dismiss_tooltip`](crate::design::notice::Notice::dismiss_tooltip)
+//!   adds a short hover text such as `"Dismiss"`. **It is a visual tooltip
+//!   only and is not exposed to assistive technology:** iced 0.14 has no
+//!   accessible-name API for buttons, and snora has no accessibility tree.
+//!   Do not rely on it as the dismiss control's accessible name.
 //!
 //! # Usage
 //!
@@ -44,6 +47,8 @@ use snora_design::{Tokens, Tone};
 
 use snora_style as style;
 
+use super::chip::{close_glyph, with_close_tooltip};
+
 // ---------------------------------------------------------------------------
 // Internal action type
 // ---------------------------------------------------------------------------
@@ -65,6 +70,7 @@ pub struct Notice<'a, Message> {
     body: String,
     action: Option<NoticeAction<Message>>,
     dismiss: Option<Message>,
+    dismiss_tooltip: Option<String>,
 }
 
 impl<'a, Message: Clone + 'a> Notice<'a, Message> {
@@ -78,6 +84,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             body: body.into(),
             action: None,
             dismiss: None,
+            dismiss_tooltip: None,
         }
     }
 
@@ -98,10 +105,23 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         self
     }
 
-    /// Adds a dismiss (×) button.
+    /// Adds a dismiss button: lucide `X` under the `lucide-icons` feature,
+    /// `"×"` otherwise.
     #[must_use]
     pub fn dismiss(mut self, on_press: Message) -> Self {
         self.dismiss = Some(on_press);
+        self
+    }
+
+    /// Shows `tooltip` above the dismiss button while the pointer hovers it
+    /// — for example `"Dismiss"`. Has no effect without [`Notice::dismiss`].
+    ///
+    /// **This is a visual tooltip, not an accessible name.** It is not
+    /// exposed to assistive technology: iced 0.14 has no accessible-name API
+    /// for buttons, and snora has no accessibility tree.
+    #[must_use]
+    pub fn dismiss_tooltip(mut self, tooltip: impl Into<String>) -> Self {
+        self.dismiss_tooltip = Some(tooltip.into());
         self
     }
 
@@ -150,12 +170,11 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         // Optional dismiss button
         if let Some(on_dismiss) = self.dismiss {
             let tok = t.clone();
-            controls.push(
-                button(text("×").size(style::text::label_size(t)).color(text_color))
-                    .on_press(on_dismiss)
-                    .style(move |_theme, status| style::button::ghost(&tok, status))
-                    .into(),
-            );
+            let dismiss_btn = button(close_glyph(t, Some(text_color)))
+                .on_press(on_dismiss)
+                .style(move |_theme, status| style::button::ghost(&tok, status))
+                .into();
+            controls.push(with_close_tooltip(t, dismiss_btn, self.dismiss_tooltip));
         }
 
         // Main row: colored left accent bar + content + controls

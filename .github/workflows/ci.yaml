@@ -56,6 +56,13 @@ jobs:
         # behind widgets/design/lucide-icons/svg-icons — 10 additional
         # unit tests and 2 additional doc-tests, counted 2026-09-01.
         run: cargo test -p snora --all-features
+      - name: Test engine, design without lucide-icons (RFC-100)
+        # The feature matrix below only runs `cargo check`, which does not
+        # build integration tests, and the two steps above cover default
+        # features (no `design`) and `--all-features` (lucide on) — so a
+        # test gated on `not(feature = "lucide-icons")` would otherwise
+        # never run anywhere in CI.
+        run: cargo test -p snora --no-default-features --features widgets,design
       - name: Test widgets, all features (RFC-087)
         # snora-widgets had no test step in CI at all before this — not a
         # feature gap, an entire crate. 28 unit tests + 6 doc-tests

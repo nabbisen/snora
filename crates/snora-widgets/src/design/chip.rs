@@ -25,13 +25,18 @@
 //! No custom focus ring — `button::Status` has no `Focused` variant.
 //! Documented limitation, not a regression (RFC-025, RFC-027).
 //!
-//! # iced 0.14 accessible label limitation
+//! # The remove glyph, and what a tooltip is not
 //!
-//! The dismiss/remove button uses the "×" glyph as its visible label. iced
-//! 0.14 does not expose a separate accessible label for buttons. If the
-//! application requires a more descriptive label for assistive technology,
-//! pass a string such as `"Dismiss"` or `"Remove <tag>"` as a `text`
-//! element instead of `"×"` — this is a future customization point.
+//! The remove button shows lucide `X` when the `lucide-icons` feature is
+//! enabled, and the text glyph `"×"` otherwise (RFC-100). The notice's
+//! dismiss button shares the same glyph.
+//!
+//! [`removable_with_tooltip`](crate::design::chip::removable_with_tooltip)
+//! adds a short text shown when the pointer hovers the remove button, such
+//! as `"Remove tag"`. **It is a visual tooltip only. It is not exposed to
+//! assistive technology:** iced 0.14 has no accessible-name API for buttons,
+//! and snora has no accessibility tree. Do not rely on it as the remove
+//! control's accessible name.
 //!
 //! # Usage
 //!
@@ -58,7 +63,7 @@
 
 use iced::{
     Border, Color, Element,
-    widget::{button, container, row, text},
+    widget::{button, container, row, text, tooltip},
 };
 use snora_design::Tokens;
 
@@ -84,6 +89,85 @@ fn darken(color: Color, amount: f32) -> Color {
 /// rather than hard-coding a second "24".
 fn remove_btn_target_size(tokens: &Tokens) -> f32 {
     tokens.typography.label.size * tokens.typography.label.line_height + 2.0 * tokens.spacing.xs
+}
+
+/// The close glyph shared by the removable chip's remove control and the
+/// notice's dismiss control (RFC-100), sized to the label text.
+///
+/// One function, so the two controls cannot drift apart and the
+/// `lucide-icons` `cfg` lives in one place. Lucide `X` under that feature;
+/// text `"×"` otherwise, exactly as before.
+///
+/// `color` of `None` inherits the enclosing button's text colour. Under
+/// `lucide-icons` the glyph comes from [`crate::icon::icon_element_sized`],
+/// which returns an [`Element`] that cannot be recoloured afterwards, so the
+/// colour is applied through a container's default text colour instead —
+/// otherwise the notice's glyph would silently take its ghost button's
+/// `accent` colour in place of `text_primary`.
+pub(super) fn close_glyph<'a, Message: 'a>(
+    tokens: &Tokens,
+    color: Option<Color>,
+) -> Element<'a, Message> {
+    let size = style::text::label_size(tokens);
+
+    #[cfg(feature = "lucide-icons")]
+    {
+        let glyph = crate::icon::icon_element_sized(
+            &snora_core::Icon::Lucide(lucide_icons::Icon::X),
+            size.0,
+        );
+        container(glyph)
+            .style(move |_| container::Style {
+                text_color: color,
+                ..container::Style::default()
+            })
+            .into()
+    }
+
+    #[cfg(not(feature = "lucide-icons"))]
+    {
+        let glyph = text("×").size(size);
+        match color {
+            Some(color) => glyph.color(color).into(),
+            None => glyph.into(),
+        }
+    }
+}
+
+/// Wraps a close control in a visual tooltip, or returns it unchanged when
+/// there is none (RFC-100).
+///
+/// **Above the control** (`Position::Top`). Neither primitive knows the
+/// layout direction, so `Left`/`Right` would be wrong under one direction or
+/// the other. Of the two vertical positions, `Top` is iced's default, and it
+/// keeps the text clear of the mouse pointer, whose arrow extends downward
+/// from the hotspot and would cover part of a tooltip placed below.
+///
+/// The body is [`style::container::card_raised`], the popover style: its
+/// `text_primary` on `surface_raised` is an existing, contrast-tested
+/// palette pairing.
+///
+/// **Not an accessible name.** iced 0.14 has no accessible-name API for
+/// buttons and snora has no accessibility tree; assistive technology does
+/// not see this text.
+pub(super) fn with_close_tooltip<'a, Message: 'a>(
+    tokens: &Tokens,
+    control: Element<'a, Message>,
+    tip: Option<String>,
+) -> Element<'a, Message> {
+    let Some(tip) = tip else {
+        return control;
+    };
+    let t = tokens.clone();
+    tooltip(
+        control,
+        container(text(tip).size(style::text::label_size(tokens)))
+            .padding([tokens.spacing.xs, tokens.spacing.sm])
+            .style(move |_| style::container::card_raised(&t)),
+        tooltip::Position::Top,
+    )
+    .gap(tokens.spacing.xs)
+    .into()
 }
 
 /// Selected chip style: solid accent background + accent_text foreground.
@@ -164,10 +248,14 @@ pub fn filter<'a, Message: Clone + 'a>(
         .into()
 }
 
-/// A chip with a separate remove (×) button.
+/// A chip with a separate remove button.
 ///
-/// The chip label toggles via `on_toggle`; the × button emits `on_remove`.
-/// Both controls are `iced::widget::button` and are keyboard-reachable.
+/// The chip label toggles via `on_toggle`; the remove button emits
+/// `on_remove`. Both controls are `iced::widget::button` and are
+/// keyboard-reachable. The remove button shows lucide `X` under the
+/// `lucide-icons` feature and `"×"` otherwise.
+///
+/// To show a tooltip on the remove button, use [`removable_with_tooltip`].
 #[must_use]
 pub fn removable<'a, Message: Clone + 'a>(
     tokens: &Tokens,
@@ -175,6 +263,46 @@ pub fn removable<'a, Message: Clone + 'a>(
     selected: bool,
     on_toggle: impl Into<Option<Message>>,
     on_remove: impl Into<Option<Message>>,
+) -> Element<'a, Message> {
+    build_removable(tokens, label, selected, on_toggle, on_remove, None)
+}
+
+/// [`removable`], with a tooltip on the remove button.
+///
+/// `tooltip` is shown above the remove button while the pointer hovers it
+/// — for example `"Remove tag"`.
+///
+/// **This is a visual tooltip, not an accessible name.** It is not exposed
+/// to assistive technology: iced 0.14 has no accessible-name API for
+/// buttons, and snora has no accessibility tree.
+#[must_use]
+pub fn removable_with_tooltip<'a, Message: Clone + 'a>(
+    tokens: &Tokens,
+    label: impl Into<String>,
+    selected: bool,
+    on_toggle: impl Into<Option<Message>>,
+    on_remove: impl Into<Option<Message>>,
+    tooltip: impl Into<String>,
+) -> Element<'a, Message> {
+    build_removable(
+        tokens,
+        label,
+        selected,
+        on_toggle,
+        on_remove,
+        Some(tooltip.into()),
+    )
+}
+
+/// The one implementation behind [`removable`] and
+/// [`removable_with_tooltip`].
+fn build_removable<'a, Message: Clone + 'a>(
+    tokens: &Tokens,
+    label: impl Into<String>,
+    selected: bool,
+    on_toggle: impl Into<Option<Message>>,
+    on_remove: impl Into<Option<Message>>,
+    tip: Option<String>,
 ) -> Element<'a, Message> {
     let t_label = tokens.clone();
     let t_remove = tokens.clone();
@@ -191,10 +319,11 @@ pub fn removable<'a, Message: Clone + 'a>(
             .style(move |_theme, status| style_fn(&t_label, status))
             .into();
 
-    // Pointer-target size (RFC-061): the "×" glyph's own advance width is
+    // Pointer-target size (RFC-061): the glyph's own advance width is
     // not token-derivable (font/shaping-dependent — measured at 15.0px
     // total for the shipped fallback font at the current tokens, well
-    // under the 24px WCAG 2.5.8 floor). Padding alone cannot fix this
+    // under the 24px WCAG 2.5.8 floor; lucide `X` is 1em wide, also short).
+    // Padding alone cannot fix this
     // reliably: even bumping to `spacing.sm` only reaches 23.0px on that
     // same font, still short. Instead, the *content* box inside the
     // button is forced to a computed width and its text centered within
@@ -204,11 +333,12 @@ pub fn removable<'a, Message: Clone + 'a>(
     let target_size = remove_btn_target_size(tokens);
     let content_width = target_size - 2.0 * tokens.spacing.xs;
     let remove_btn: Element<'a, Message> =
-        button(container(text("×").size(style::text::label_size(tokens))).center_x(content_width))
+        button(container(close_glyph(tokens, None)).center_x(content_width))
             .on_press_maybe(on_remove.into())
             .padding([tokens.spacing.xs, tokens.spacing.xs])
             .style(move |_theme, status| style_fn(&t_remove, status))
             .into();
+    let remove_btn = with_close_tooltip(tokens, remove_btn, tip);
 
     row![label_btn, remove_btn].spacing(0).into()
 }

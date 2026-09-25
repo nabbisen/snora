@@ -15,7 +15,37 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`Notice::dismiss_tooltip` and `chip::removable_with_tooltip`
+  (RFC-100).** Each shows a short text, such as `"Dismiss"` or
+  `"Remove tag"`, above the close control while the pointer hovers it.
+  Above rather than beside, because neither primitive knows the layout
+  direction.
+
+  **These are visual tooltips, not accessible names.** The text is not
+  exposed to assistive technology: iced 0.14 has no accessible-name API
+  for buttons, and snora has no accessibility tree. Do not cite either
+  as the control's accessible name in a WCAG record.
+
+  `chip::removable` is unchanged and still attaches no tooltip;
+  `removable_with_tooltip` is the additive form of it, and both share
+  one implementation. Requested by **orbok**.
+
+### Changed
+
+- **Under `design` + `lucide-icons` only, the notice dismiss control and
+  the removable chip's remove control render lucide `X` instead of the
+  text glyph `"×"` (RFC-100).** Both controls share one glyph, sized to
+  the label text; the notice's glyph keeps its `text_primary` colour.
+  **Visual baselines that include either control are invalidated, for
+  applications with `lucide-icons` enabled only.** Without
+  `lucide-icons`, both controls render `"×"` exactly as before.
+
+  Pointer targets still clear WCAG 2.5.8's 24 × 24 minimum. Measured:
+  the notice dismiss button is 27 × 28.2 with `"×"` and 34 × 28.2 with
+  lucide `X`; the chip remove button is 24.8 × 26.2 in both, through
+  RFC-061's existing width mechanism. Raised by **orbok**.
 
 ## [0.50.0] — 2026-09-17
 

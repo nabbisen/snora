@@ -137,7 +137,7 @@ pub mod notice {
 /// `widgets`-gated (RFC-055).
 #[cfg(feature = "widgets")]
 pub mod chip {
-    pub use snora_widgets::design::chip::{filter, removable};
+    pub use snora_widgets::design::chip::{filter, removable, removable_with_tooltip};
 }
 
 /// Progress row and card primitives (RFC-032).
