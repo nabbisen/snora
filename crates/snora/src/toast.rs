@@ -31,6 +31,19 @@ use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime, ToastPositi
 /// 14pt text at default font sizes.
 const TOAST_WIDTH: f32 = 340.0;
 
+/// The close button's minimum pointer target, both axes.
+///
+/// WCAG 2.5.8's floor, and the one snora's accessibility checklist
+/// mandates. It is reached with a centring container at this size rather
+/// than with vertical padding (RFC-101 Q-2 (a)): the button's height was
+/// the glyph's line box — 18 x 1.3 = 23.4 — because `padding([0, 8])` adds
+/// nothing vertically, and padding tuned against iced's line height would
+/// go back under the floor the moment either changed.
+const CLOSE_TARGET_MIN: f32 = 24.0;
+
+/// The size the close glyph is drawn at.
+const CLOSE_GLYPH_SIZE: f32 = 18.0;
+
 /// Default sweep interval. Half-second resolution is imperceptible to users
 /// and keeps idle wakeups low.
 const SWEEP_INTERVAL: Duration = Duration::from_millis(500);
@@ -171,9 +184,49 @@ where
 
     let text_col = column![text(toast.title).size(16), text(toast.message).size(14),].spacing(4);
 
-    let close_btn = button(text("×").size(18))
+    // The close glyph. **Two sites must agree on it**: this one and
+    // `snora_widgets::icon::icon_element_sized`, which renders
+    // `Icon::Lucide` for the widget layer. The engine cannot call that
+    // one — it does not depend on `snora-widgets` — so it repeats the
+    // construction: the codepoint from `char::from`, drawn in the lucide
+    // font. `toast_close_button.rs`'s
+    // `engine_and_widgets_draw_the_same_lucide_glyph` fails if either site
+    // changes codepoint, or if what either draws is not a lucide glyph
+    // (RFC-101 Q-1 (a)). Dropping the `.font(..)` below is not among them:
+    // with the font loaded, cosmic-text resolves this codepoint by coverage
+    // and draws the same glyph either way — measured, not assumed.
+    //
+    // **The call still earns its place.** Coverage-based fallback picks
+    // whichever loaded font covers the codepoint, and U+E1B2 is in the
+    // private use area: an application that also loads another PUA icon
+    // font covering it could get that font's glyph instead. Naming the
+    // font here settles it. The harness loads lucide alone, so no test can
+    // see that case.
+    #[cfg(feature = "lucide-icons")]
+    let close_glyph = text(char::from(lucide_icons::Icon::X).to_string())
+        .size(CLOSE_GLYPH_SIZE)
+        .font(iced::Font::with_name("lucide"));
+    #[cfg(not(feature = "lucide-icons"))]
+    let close_glyph = text("×").size(CLOSE_GLYPH_SIZE);
+
+    // Centred in a box at the target floor, rather than padded out to it
+    // (RFC-101 Q-2 (a)). The container passes *loose* limits to the glyph,
+    // so the glyph keeps its natural size and is placed at the centre; a
+    // fixed-size box that handed it fixed limits would leave the text box
+    // filling the button with the glyph drawn at its top-left (RFC-099).
+    //
+    // No explicit colour: the glyph inherits the button's `text_color`
+    // from `close_button_style`, which is where a toast's intent colour is
+    // resolved.
+    // No padding: the centring box *is* the target now. The `[0, 8]` this
+    // replaces existed to widen a glyph-sized button, and keeping it would
+    // have made the button 40 x 24 — over the floor, but 15px of it stolen
+    // from the message column, which is what a fixed-width toast has to
+    // spare. At zero the button is exactly 24 x 24 by construction, and the
+    // message column is 288px against 0.50.0's 287.
+    let close_btn = button(container(close_glyph).center(Length::Fixed(CLOSE_TARGET_MIN)))
         .on_press(toast.on_dismiss)
-        .padding([0, 8])
+        .padding(0)
         .style(move |theme, status| close_button_style(theme, intent, status));
 
     let body = row![container(text_col).width(Length::Fill), close_btn]

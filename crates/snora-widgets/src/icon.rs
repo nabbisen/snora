@@ -16,6 +16,13 @@ where
 }
 
 /// Render an icon at a custom pixel size.
+///
+/// **`snora::toast` repeats this construction** for the toast close
+/// button's lucide `X`: the engine does not depend on this crate, so it
+/// builds its own `text(char::from(..)).font(Font::with_name("lucide"))`.
+/// The two sites must agree, and
+/// `crates/snora/tests/toast_close_button.rs` fails if either changes
+/// codepoint or loses the font (RFC-101 Q-1 (a)).
 pub fn icon_element_sized<'a, Message>(icon: &Icon, size: f32) -> Element<'a, Message>
 where
     Message: 'a,

@@ -127,6 +127,42 @@ are recorded in the per-version migration guides under
   invalidated.** The bar is 1px taller — the height of its new rule —
   and tab labels do not move.
 
+- **The toast close button's pointer target was 25.00 × 23.40, under the
+  24 × 24 minimum snora mandates (RFC-101).** It is now **24.00 × 24.00**,
+  reached by centring the glyph in a box at that floor rather than by
+  padding tuned against iced's line height.
+
+  The button was `button(text("×").size(18)).padding([0, 8])`, whose
+  vertical padding is zero, so its height was the glyph's line box —
+  18 × 1.3 = 23.4. **snora's height assertions covered token-derived
+  controls, and this control derives from neither tokens nor a shared
+  style**: it is the only interactive control the engine renders itself.
+
+  **No published claim covered it.** Whether a given application failed
+  WCAG 2.5.8 depends on its own layout, because the success criterion's
+  spacing exception can be met by the space around a control rather than
+  by the control itself — so this is stated as a measured fact about
+  snora's own geometry, not as a conformance verdict on anyone's
+  application.
+
+  The toast's own size is unchanged at 340 × 67, and the message column
+  is **288px against 0.50.0's 287**, so no message wraps earlier than it
+  did and nothing reflows. Toast visual baselines are invalidated: the
+  button is 1px narrower and 0.6px taller.
+
+- **Under `lucide-icons`, the toast close button renders lucide `X`
+  (RFC-101),** matching the notice and chip controls RFC-100 moved.
+  Without the feature it renders `"×"` exactly as before. Before this,
+  the engine drew `"×"` whichever features were on — measured: the two
+  feature states produced identical frames.
+
+  The engine builds the glyph itself, because it does not depend on
+  `snora-widgets`; the two sites carry comments pointing at each other,
+  and a test asserts they draw the same codepoint as a lucide glyph.
+
+  Opened from RFC-100's review on the owner's instruction; the
+  observation came from the dev team.
+
 ## [0.50.0] — 2026-09-17
 
 ### Fixed

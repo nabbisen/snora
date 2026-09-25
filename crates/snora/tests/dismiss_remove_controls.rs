@@ -34,26 +34,17 @@
 
 #![cfg(all(feature = "widgets", feature = "design"))]
 
-use std::path::Path;
-
-use iced::{Element, Event, Point, Rectangle, mouse, widget::text};
+use iced::{Element, Event, Rectangle, mouse, widget::text};
 use iced_test::Simulator;
 use iced_test::selector::Candidate;
 
+mod common;
+#[cfg(feature = "lucide-icons")]
+use common::assert_lucide_font_loaded;
+use common::{MIN_TARGET, TOLERANCE, frame_hash, pointer_target, simulator as ui};
+
 use snora::design::style::text::label_size;
 use snora::design::{Tokens, Tone, chip, notice::Notice};
-
-/// WCAG 2.5.8 minimum pointer target, in both dimensions.
-const MIN_TARGET: f32 = 24.0;
-
-/// Allowed difference, in logical pixels, between two positions or sizes
-/// that should coincide. Layout is float arithmetic on exact inputs; half a
-/// pixel absorbs sub-pixel rounding and is far smaller than any misplacement
-/// worth catching (RFC-099's uncentred glyph was ~10px off).
-const TOLERANCE: f32 = 0.5;
-
-/// How far inside a candidate rectangle's corners the click probes land.
-const CORNER_INSET: f32 = 0.5;
 
 /// The glyph the controls must render in this feature state, and the one
 /// they must not.
@@ -140,20 +131,6 @@ fn presets() -> [(&'static str, Tokens); 4] {
     ]
 }
 
-/// Builds a simulator. Under `lucide-icons` it loads the lucide font; see
-/// the module doc for why every simulator in this file must come from here.
-fn ui<'a>(element: impl Into<Element<'a, Msg>>) -> Simulator<'a, Msg> {
-    #[cfg(feature = "lucide-icons")]
-    let settings = iced::Settings {
-        fonts: vec![lucide_icons::LUCIDE_FONT_BYTES.into()],
-        ..iced::Settings::default()
-    };
-    #[cfg(not(feature = "lucide-icons"))]
-    let settings = iced::Settings::default();
-
-    Simulator::with_settings(settings, element)
-}
-
 /// The glyph rendered alone at the given size, in the font this feature
 /// state uses — built independently of the production helper, so a wrong
 /// glyph or font there cannot also be the reference.
@@ -171,49 +148,21 @@ fn glyph_bounds(ui: &mut Simulator<'_, Msg>, label: &str) -> Rectangle {
         .unwrap_or_else(|| panic!("{label}: glyph {GLYPH:?} is not visible"))
 }
 
-/// Whether a click at `point` produces the control's message.
-fn click_reaches(control: Control, tokens: &Tokens, point: Point) -> bool {
-    let mut ui = ui(control.render(tokens));
-    ui.point_at(point);
-    let _ = ui.simulate(iced_test::simulator::click());
-    ui.into_messages().any(|m| m == control.message())
-}
-
-/// The control's pointer target, measured rather than assumed.
-///
-/// Collects every container-like widget whose bounds contain the glyph's
-/// centre (iced's button reports itself as one), then returns the
-/// **largest** whose four corners all produce the control's message when
-/// clicked. Larger enclosing containers fail the corner test (their
-/// corners are padding or a neighbouring button); smaller ones inside the
-/// button pass it but are not the whole target.
-fn pointer_target(control: Control, tokens: &Tokens, label: &str) -> Rectangle {
-    let mut ui = ui(control.render(tokens));
-    let centre = glyph_bounds(&mut ui, label).center();
-
-    let mut containing: Vec<Rectangle> = Vec::new();
-    let _ = ui.find(|candidate: Candidate<'_>| {
-        if matches!(candidate, Candidate::Container { .. }) && candidate.bounds().contains(centre) {
-            containing.push(candidate.bounds());
-        }
-        None::<()>
-    });
-    containing.sort_by(|a, b| (b.width * b.height).total_cmp(&(a.width * a.height)));
-
-    containing
-        .into_iter()
-        .find(|r| {
-            let corners = [
-                Point::new(r.x + CORNER_INSET, r.y + CORNER_INSET),
-                Point::new(r.x + r.width - CORNER_INSET, r.y + CORNER_INSET),
-                Point::new(r.x + CORNER_INSET, r.y + r.height - CORNER_INSET),
-                Point::new(r.x + r.width - CORNER_INSET, r.y + r.height - CORNER_INSET),
-            ];
-            corners
-                .into_iter()
-                .all(|p| click_reaches(control, tokens, p))
-        })
-        .unwrap_or_else(|| panic!("{label}: no clickable region around the glyph"))
+/// [`common::pointer_target`] for one of these controls: the glyph's
+/// centre is a point known to be inside it, and the control's own message
+/// is what a click on it must produce.
+fn control_target(control: Control, tokens: &Tokens, label: &str) -> Rectangle {
+    let inside = {
+        let mut ui = ui(control.render(tokens));
+        glyph_bounds(&mut ui, label).center()
+    };
+    let message = control.message();
+    pointer_target(
+        label,
+        || control.render(tokens),
+        inside,
+        |m: &Msg| *m == message,
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -247,7 +196,7 @@ fn controls_clear_the_24px_pointer_target() {
     for control in Control::ALL {
         for (preset, tokens) in presets() {
             let label = format!("{control:?} / {preset}");
-            let target = pointer_target(control, &tokens, &label);
+            let target = control_target(control, &tokens, &label);
             assert!(
                 target.width >= MIN_TARGET && target.height >= MIN_TARGET,
                 "{label}: pointer target is {}x{}, below the {MIN_TARGET}x{MIN_TARGET} floor",
@@ -276,7 +225,7 @@ fn glyph_is_natural_size_and_centred_in_its_target() {
                 let mut reference = ui(reference_glyph(label_size(&tokens)));
                 glyph_bounds(&mut reference, &label).size()
             };
-            let target = pointer_target(control, &tokens, &label);
+            let target = control_target(control, &tokens, &label);
             let glyph = {
                 let mut ui = ui(control.render(&tokens));
                 glyph_bounds(&mut ui, &label)
@@ -309,27 +258,14 @@ fn glyph_is_natural_size_and_centred_in_its_target() {
 mod lucide {
     use super::*;
 
-    /// Fails if the lucide font was not loaded.
-    ///
-    /// Lucide glyphs have a square 1em advance: rendered at size `s`, the
-    /// `X` box is exactly `s` wide. Unloaded, the codepoint falls back to a
-    /// glyph of a different width — measured 7.2px at size 12, where the
-    /// loaded glyph measures 12. This checks a property of the glyph
-    /// itself, so it holds regardless of which test in this process loaded
-    /// the font first (see the module doc).
+    /// Fails if the lucide font was not loaded, at each preset's label
+    /// size. The check itself is [`common::assert_lucide_font_loaded`];
+    /// see its documentation for why it measures a 1em advance rather
+    /// than comparing a loaded glyph with an unloaded one.
     #[test]
     fn font_is_loaded() {
         for (preset, tokens) in presets() {
-            let size = label_size(&tokens);
-            let mut reference = ui(reference_glyph(size));
-            let width = glyph_bounds(&mut reference, preset).width;
-            assert!(
-                (width - size.0).abs() <= 0.01,
-                "{preset}: lucide X is {width}px wide at size {}; a loaded lucide glyph is \
-                 exactly 1em wide — the lucide font did not load, and every lucide measurement \
-                 in this file is of a fallback glyph",
-                size.0,
-            );
+            assert_lucide_font_loaded(preset, label_size(&tokens).0);
         }
     }
 }
@@ -341,35 +277,6 @@ mod lucide {
 const TOOLTIP: &str = "Remove this";
 const OTHER_TOOLTIP: &str = "Close";
 
-/// Hash of the frame the simulator renders now, under the preset's theme.
-///
-/// `iced_test` exposes rendered pixels only through `Snapshot::matches_hash`,
-/// which writes the hash to a file when none exists. Each call gets its own
-/// fresh directory, so the file written is this frame's hash.
-fn frame_hash(ui: &mut Simulator<'_, Msg>, tokens: &Tokens, name: &str) -> String {
-    let dir = Path::new(env!("CARGO_TARGET_TMPDIR"))
-        .join("dismiss_remove_controls")
-        .join(name);
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).expect("create frame hash directory");
-
-    let snapshot = ui
-        .snapshot(&snora::design::theme(tokens))
-        .expect("render a frame");
-    assert!(
-        snapshot
-            .matches_hash(dir.join("frame"))
-            .expect("write frame hash")
-    );
-
-    let mut files = std::fs::read_dir(&dir).expect("read frame hash directory");
-    let file = files
-        .next()
-        .expect("frame hash written")
-        .expect("directory entry");
-    std::fs::read_to_string(file.path()).expect("read frame hash")
-}
-
 /// Renders the control, optionally hovers its pointer target, and hashes
 /// the resulting frame.
 fn frame(
@@ -380,7 +287,7 @@ fn frame(
     hover: bool,
 ) -> String {
     let label = format!("{control:?} / {preset}");
-    let target = pointer_target(control, tokens, &label);
+    let target = control_target(control, tokens, &label);
 
     let mut ui = ui(control.render_with_tooltip(tokens, tooltip));
     if hover {
@@ -393,7 +300,7 @@ fn frame(
         tooltip.unwrap_or("none").replace(' ', "_"),
         if hover { "hover" } else { "idle" },
     );
-    frame_hash(&mut ui, tokens, &name)
+    frame_hash(&mut ui, &snora::design::theme(tokens), &name)
 }
 
 /// A tooltip draws nothing until the control is hovered, draws something
@@ -458,7 +365,7 @@ fn no_tooltip_is_attached_when_none_is_given() {
     for control in Control::ALL {
         for (preset, tokens) in presets() {
             let label = format!("{control:?} / {preset}");
-            let target = pointer_target(control, &tokens, &label);
+            let target = control_target(control, &tokens, &label);
             let without = containers_at(control, &tokens, None, target);
             let with = containers_at(control, &tokens, Some(TOOLTIP), target);
             assert_eq!(
