@@ -30,13 +30,21 @@
 //! reflection over functions or impls. The six functions tested below
 //! (`menu_button_style`, `chrome_container_style_with_radius`,
 //! `sidebar_button_style`, `tab_bar_container_style`, `tab_button_style`,
-//! `crumb_button_style`) were found by grepping this crate's source for
+//! `crumb_button_style`), plus the three RFC-102 added
+//! (`tab_indicator_style`, `tab_bar_rule_style`,
+//! `unstyled_tooltip_body_style`), were found by grepping this crate's source for
 //! every `-> button::Style` / `-> container::Style` return type — a
 //! search anyone can re-run to check this list is still complete, but
 //! not a compiler-enforced one. **If a new widget style function is
 //! added and not added here, this suite will not catch it.** That is the
 //! honest limit of this approach, named rather than hidden behind a
 //! test count that looks complete.
+//!
+//! `tab_bar_container_style` is the one name on that list with nothing
+//! to assert here since RFC-102: it paints no border and no background
+//! at all, so it has no colour pairing. That it stays that way — an
+//! all-sided border is what outlined the whole bar — is asserted by
+//! `crate::tab::tests::tab_bar_container_style_paints_no_border`.
 //!
 //! For each function, the background it is *actually* painted over is
 //! also not derivable from its own signature — several of them return
@@ -79,9 +87,9 @@ use snora_design::Tokens;
 use snora_design::contrast::contrast_ratio;
 
 use crate::crumb::crumb_button_style;
-use crate::sidebar::sidebar_button_style;
+use crate::sidebar::{sidebar_button_style, unstyled_tooltip_body_style};
 use crate::style::{chrome_container_style_with_radius, menu_button_style, sidebar_active_color};
-use crate::tab::{tab_bar_container_style, tab_button_style};
+use crate::tab::{tab_bar_rule_style, tab_button_style, tab_indicator_style};
 
 /// WCAG 2.1 SC 1.4.3 normal-text minimum. Three copies of this name
 /// exist (this one, `snora-design/src/tests.rs`, and
@@ -164,10 +172,11 @@ fn text_contrast_failure(
 
 /// Same shape as [`text_contrast_failure`], against [`NON_TEXT_MIN`].
 /// Skips borders with `width == 0.0` — an invisible border has no
-/// contrast requirement because it renders nothing (`tab_button_style`'s
-/// active-state border and `crumb_button_style`'s border are both
-/// `width: 0.0`, used only to carry a color the shadow/underline effect
-/// borrows, not to paint an actual border).
+/// contrast requirement because it renders nothing (`crumb_button_style`'s
+/// border is `width: 0.0`; so is `tab_button_style`'s, which since
+/// RFC-102 carries no colour either, the underline being its own element
+/// with its own asserted colour — see
+/// [`tab_indicator_meets_non_text_floor`]).
 fn border_contrast_failure(
     context: &str,
     case: &str,
@@ -304,23 +313,154 @@ fn sidebar_button_style_text_meets_aa() {
     assert_no_failures(failures);
 }
 
+/// The solid colour a container style paints, or a panic naming the
+/// style that stopped painting one.
+fn background_color(style: &iced::widget::container::Style, what: &str) -> Color {
+    match style.background {
+        Some(iced::Background::Color(color)) => color,
+        other => panic!("{what}: expected a solid background colour, found {other:?}"),
+    }
+}
+
 // ---------------------------------------------------------------------
-// tab_bar_container_style — same shape as F-15, checked separately since
-// it is a distinct function even though its border currently comes from
-// the same source color as chrome_container_style's.
+// The tab bar's bottom rule — RFC-085 F-15's guarantee, moved.
+//
+// This was `tab_bar_container_style_border_meets_non_text_floor`: the
+// same assertion against the bar container's 1 px border. RFC-102
+// replaced that border with a rule element, because iced 0.14 borders
+// are all-sided and the bar was never meant to be outlined. The colour
+// is unchanged (`background.base.text`), so F-15's guarantee moves here
+// rather than disappearing — and the container is asserted to paint no
+// border at all in `crate::tab::tests`.
 // ---------------------------------------------------------------------
 #[test]
-fn tab_bar_container_style_border_meets_non_text_floor() {
+fn tab_bar_bottom_rule_meets_non_text_floor() {
     let mut failures = Vec::new();
     for (context, theme) in theme_contexts() {
         let ep = theme.extended_palette();
-        let style = tab_bar_container_style(&theme, 0.0);
+        let rule = background_color(&tab_bar_rule_style(&theme), "tab_bar_rule_style");
+        let r = contrast_ratio(to_sn(rule), to_sn(ep.background.base.color));
+        if r < NON_TEXT_MIN {
+            failures.push(format!(
+                "{context}: tab bar bottom rule non-text contrast {r:.2} < {NON_TEXT_MIN} \
+                 (rule {rule:?} vs page background {:?})",
+                ep.background.base.color,
+            ));
+        }
+    }
+    assert_no_failures(failures);
+}
+
+// ---------------------------------------------------------------------
+// Sidebar tooltip body (RFC-102 R-4) — the tooltip used to be bare text
+// over the page, so its contrast was whatever the application rendered
+// underneath. Now it has a body, and the pairing that matters is the
+// text against **that body**, not against the page.
+// ---------------------------------------------------------------------
+#[test]
+fn unstyled_tooltip_body_text_meets_aa_and_its_border_meets_non_text_floor() {
+    let mut failures = Vec::new();
+    for (context, theme) in theme_contexts() {
+        let ep = theme.extended_palette();
+        let style = unstyled_tooltip_body_style(&theme);
+        let body = background_color(&style, "unstyled_tooltip_body_style");
+        let text = style
+            .text_color
+            .expect("the tooltip body sets its own text colour");
+
+        let r = contrast_ratio(to_sn(text), to_sn(body));
+        if r < AA_TEXT {
+            failures.push(format!(
+                "{context}: unstyled tooltip text contrast {r:.2} < {AA_TEXT} \
+                 (text {text:?} vs its own body {body:?})",
+            ));
+        }
+        // The body must also be visible as an object against the page it
+        // floats over, or it cannot separate its text from that page.
         failures.extend(border_contrast_failure(
             context,
-            "tab_bar_container_style",
+            "unstyled tooltip body",
             style.border,
             ep.background.base.color,
         ));
+    }
+    assert_no_failures(failures);
+}
+
+/// The styled body is `card_raised(tokens)` (RFC-102 Q-2 (a)), which
+/// takes a `Tokens` bundle rather than a `Theme`, so it has no
+/// counterpart in the two stock contexts: a styled sidebar cannot be
+/// built without tokens. The four bundles below are exactly the ones the
+/// four `design` entries of [`theme_contexts`] are derived from, so
+/// between the two tests every context a tooltip can render in is
+/// covered.
+#[test]
+fn styled_tooltip_body_text_meets_aa_and_its_border_meets_non_text_floor() {
+    let mut failures = Vec::new();
+    for (name, tokens) in [
+        ("design light", Tokens::light()),
+        ("design dark", Tokens::dark()),
+        ("design high_contrast_light", Tokens::high_contrast_light()),
+        ("design high_contrast_dark", Tokens::high_contrast_dark()),
+    ] {
+        let style = snora_style::container::card_raised(&tokens);
+        let body = background_color(&style, "card_raised");
+        let text = style
+            .text_color
+            .expect("card_raised sets its own text colour");
+        let page = snora_style::color::to_iced_color(tokens.palette.background);
+
+        let r = contrast_ratio(to_sn(text), to_sn(body));
+        if r < AA_TEXT {
+            failures.push(format!(
+                "{name}: styled tooltip text contrast {r:.2} < {AA_TEXT} \
+                 (text {text:?} vs its own body {body:?})",
+            ));
+        }
+        failures.extend(border_contrast_failure(
+            name,
+            "styled tooltip body",
+            style.border,
+            page,
+        ));
+    }
+    assert_no_failures(failures);
+}
+
+// ---------------------------------------------------------------------
+// tab indicator (RFC-102 R-3) — the active tab's underline is the state
+// indicator (WCAG 1.4.11, "visual information required to identify
+// states"), so it carries the non-text floor against the page it is
+// drawn on. Before RFC-102 the underline was a `Shadow` on the tab
+// button, which this suite skipped as decorative; it is now its own
+// element with its own style function, and asserted here.
+// ---------------------------------------------------------------------
+
+/// The colour the active tab's indicator is drawn in.
+///
+/// RFC-102 moved this from `tab_button_style`'s shadow to
+/// [`tab_indicator_style`]'s background. Asserted against today's
+/// shadow colour before that change, it failed on stock Dark at 2.99 —
+/// which is the defect the RFC was raised for.
+fn indicator_color(theme: &Theme) -> Color {
+    background_color(&tab_indicator_style(theme), "tab_indicator_style")
+}
+
+#[test]
+fn tab_indicator_meets_non_text_floor() {
+    let mut failures = Vec::new();
+    for (context, theme) in theme_contexts() {
+        let ep = theme.extended_palette();
+        let indicator = indicator_color(&theme);
+        let r = contrast_ratio(to_sn(indicator), to_sn(ep.background.base.color));
+        if r < NON_TEXT_MIN {
+            failures.push(format!(
+                "{context}: tab indicator non-text contrast {r:.2} < {NON_TEXT_MIN} \
+                 (indicator {indicator:?} vs page background {:?}) — the active tab's \
+                 underline is its state indicator (WCAG 1.4.11)",
+                ep.background.base.color,
+            ));
+        }
     }
     assert_no_failures(failures);
 }
@@ -329,9 +469,15 @@ fn tab_bar_container_style_border_meets_non_text_floor() {
 // tab_button_style — not one of F-13/F-14/F-15, found by this suite's
 // own derived coverage rather than named in the audit. Background:
 // `None` (page background) when active or inactive-not-hovered,
-// `background.weak.color` when inactive-and-hovered. The active state's
-// border carries a color but `width: 0.0` (the underline is drawn via
-// `shadow` instead) — skipped by `assert_border_contrast`.
+// `background.weak.color` when inactive-and-hovered.
+//
+// This is the label's test. The active tab's *indicator* is no longer
+// part of this style at all: RFC-102 made it an element, and
+// `tab_indicator_meets_non_text_floor` above asserts its colour. The
+// comment that used to stand here said the underline was "drawn via
+// `shadow` instead — skipped by `assert_border_contrast`", which is how
+// an indicator sat 0.01 under the non-text floor on stock Dark through
+// every release since 0.10.0 with a full contrast suite in place.
 // ---------------------------------------------------------------------
 #[test]
 fn tab_button_style_text_meets_aa() {

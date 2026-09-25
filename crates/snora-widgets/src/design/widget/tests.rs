@@ -67,7 +67,8 @@ fn tab_unstyled_matches_literal_inventory() {
     assert_eq!(g.content_gap, 6.0);
     assert_eq!(g.tab_pad_x, 12.0);
     assert_eq!(g.tab_pad_y, 8.0);
-    assert_eq!(g.bar_border_radius, 0.0);
+    // `bar_border_radius` (unstyled `0.0`) was retired by RFC-102 with
+    // the container border that was the only thing it rounded.
 }
 
 #[test]
@@ -189,10 +190,10 @@ fn tab_geometry_matches_mapping_all_presets() {
             g.tab_pad_y, t.spacing.sm,
             "{name}: tab tab_pad_y should map to Spacing::sm"
         );
-        assert_eq!(
-            g.bar_border_radius, t.radius.sm,
-            "{name}: tab bar_border_radius should map to Radius::sm"
-        );
+        // No `bar_border_radius` row: RFC-102 retired the field. The bar
+        // has `background: None`, so its radius was visible only through
+        // the container border, and that border is now a rule element
+        // with no corners to round.
     }
 }
 
@@ -228,20 +229,28 @@ fn breadcrumb_geometry_matches_mapping_all_presets() {
 }
 
 // ---------------------------------------------------------------------------
-// Chrome-radius rhythm: header, footer, and the tab bar share one radius
-// role (Radius::sm), the fix for RFC-040's stated "flat and dated" defect.
+// Chrome-radius rhythm: header and footer share one radius role
+// (Radius::sm), the fix for RFC-040's stated "flat and dated" defect.
+//
+// **The tab bar was the third member of this rhythm until RFC-102.** The
+// assertion below used to read `tab_geometry(&t).bar_border_radius` as a
+// third element of the same tuple, checking that all three chrome
+// surfaces took their corner radius from one shared role rather than
+// each picking its own literal. RFC-102 retired the field: the bar's
+// radius was only ever visible through its container border, and that
+// border is now a bottom rule element, which has no corners. Header and
+// footer keep the rhythm; the tab bar no longer has a radius to share.
 // ---------------------------------------------------------------------------
 
 #[test]
-fn chrome_radius_is_shared_across_header_footer_and_tab_bar() {
+fn chrome_radius_is_shared_across_header_and_footer() {
     for (name, t) in named_presets() {
         let header_radius = header_geometry(&t).radius;
         let footer_radius = footer_geometry(&t).radius;
-        let tab_radius = tab_geometry(&t).bar_border_radius;
         assert_eq!(
-            (header_radius, footer_radius, tab_radius),
-            (t.radius.sm, t.radius.sm, t.radius.sm),
-            "{name}: header/footer/tab-bar radius must share one role (Radius::sm)"
+            (header_radius, footer_radius),
+            (t.radius.sm, t.radius.sm),
+            "{name}: header/footer radius must share one role (Radius::sm)"
         );
         assert_ne!(
             header_radius, 0.0,

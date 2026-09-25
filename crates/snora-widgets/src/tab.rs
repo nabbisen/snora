@@ -17,15 +17,21 @@ use std::fmt::Debug;
 
 use iced::{
     Alignment::Center,
-    Background, Border, Color, Element, Length, Padding, Theme,
-    widget::{button, container, row, space, text},
+    Background, Border, Color, Element, Length, Padding, Shadow, Theme,
+    widget::{button, column, container, row, space, stack, text},
 };
 
 use snora_core::{LayoutDirection, TabAction, TabBar};
 
 use crate::direction::row_dir;
 use crate::icon::icon_element;
-use crate::style::chrome_container_style_with_radius;
+
+/// Height of the active tab's underline (RFC-102 R-1).
+const INDICATOR_HEIGHT: f32 = 2.0;
+
+/// Height of the bar's bottom rule (RFC-102 R-2). One pixel, the width
+/// the container border it replaces had.
+const BAR_RULE_HEIGHT: f32 = 1.0;
 
 /// Geometry parameters [`build_tab_bar`] takes, letting [`app_tab_bar`]
 /// (unstyled) and the `design`-gated styled variant (RFC-040) share one
@@ -44,9 +50,13 @@ pub(crate) struct TabGeometry {
     pub(crate) tab_pad_x: f32,
     /// Per-tab button vertical padding.
     pub(crate) tab_pad_y: f32,
-    /// Bar's own corner radius.
-    pub(crate) bar_border_radius: f32,
 }
+
+// `bar_border_radius` was retired by RFC-102. The bar had
+// `background: None`, so its radius was only ever visible through the
+// container border — and that border is now a rule element, which has
+// no corners to round. A geometry field that configures nothing is a
+// dead setting whose mapping test would go on "verifying" it.
 
 impl TabGeometry {
     /// Today's literals, unmodified.
@@ -57,7 +67,6 @@ impl TabGeometry {
             content_gap: 6.0,
             tab_pad_x: 12.0,
             tab_pad_y: 8.0,
-            bar_border_radius: 0.0,
         }
     }
 }
@@ -129,16 +138,26 @@ where
     // without stretching tabs.
     let body = row_dir(direction, tab_row, space().width(Length::Fill));
 
-    let bar_border_radius = geometry.bar_border_radius;
-    container(body)
-        .style(move |theme| tab_bar_container_style(theme, bar_border_radius))
+    // The bar's horizontal padding belongs to the row of tabs, not to the
+    // bar: the rule below is the bar's bottom *edge*, so it spans the
+    // whole width, as the container border it replaces did.
+    let tabs = container(body)
         .width(Length::Fill)
-        .padding(Padding::from([0.0, geometry.bar_pad_x]))
+        .padding(Padding::from([0.0, geometry.bar_pad_x]));
+
+    let bottom_rule = container(space())
+        .width(Length::Fill)
+        .height(BAR_RULE_HEIGHT)
+        .style(tab_bar_rule_style);
+
+    container(column![tabs, bottom_rule])
+        .style(tab_bar_container_style)
+        .width(Length::Fill)
         .into()
 }
 
-/// Render a single tab. Active tabs get an underline; inactive tabs
-/// look like flat text buttons.
+/// Render a single tab. The active tab gets an underline element along
+/// its bottom edge; inactive tabs look like flat text buttons.
 fn render_tab<'a, Message, TabId, F>(
     tab: snora_core::Tab<TabId>,
     is_active: bool,
@@ -164,50 +183,120 @@ where
         .padding(Padding::from([tab_pad_y, tab_pad_x]))
         .style(move |theme: &Theme, status| tab_button_style(theme, status, is_active));
 
-    pressable.into()
+    if !is_active {
+        return pressable.into();
+    }
+
+    // The underline is its own element (RFC-102 R-1), laid over the
+    // bottom of the tab's own box in a `stack`.
+    //
+    // **Why a stack rather than a column.** A column of
+    // `[button, underline]` is the obvious shape, but the underline has
+    // to span the tab, and a tab's width is its content's. `Length::Fill`
+    // is the only way to say "as wide as the tab" — and width is a row's
+    // *main* axis, so a Fill-width tab claims an equal share of the bar
+    // instead: measured at 511px per tab against a 58px button. A stack
+    // lays its upper layers out within the base layer's size, so Fill
+    // there means exactly the button's width. It also means the tab's
+    // height does not depend on whether it is active, so labels cannot
+    // shift when the active tab changes.
+    let indicator = container(space())
+        .width(Length::Fill)
+        .height(INDICATOR_HEIGHT)
+        .style(tab_indicator_style);
+
+    stack![pressable, container(indicator).align_bottom(Length::Fill)].into()
 }
 
-/// Container style for the whole tab bar — provides the bottom border
-/// that sits under the inactive tabs and against which the active
-/// tab's underline reads.
-pub(crate) fn tab_bar_container_style(theme: &Theme, border_radius: f32) -> container::Style {
-    let chrome = chrome_container_style_with_radius(theme, border_radius);
-    let palette = theme.extended_palette();
+/// Container style for the whole tab bar.
+///
+/// **Paints no border (RFC-102 R-2).** It used to set
+/// `Border { width: 1.0, .. }` under a comment claiming to "drop the
+/// top/left/right borders; keep only a thin bottom edge" — but iced 0.14
+/// borders are all-sided, so that outlined the whole bar. The bottom
+/// edge is [`tab_bar_rule_style`]'s element instead, which is also what
+/// makes a hovered tab's fill unable to paint over it: the rule is
+/// outside every tab's box.
+pub(crate) fn tab_bar_container_style(theme: &Theme) -> container::Style {
+    let ep = theme.extended_palette();
     container::Style {
-        // Drop the top/left/right borders; keep only a thin bottom
-        // edge that the active-tab underline visually breaks.
-        //
-        // Corrected (RFC-085 F-15), same fix as
-        // `chrome_container_style_with_radius` — see its own comment for
-        // why `background.base.text` and not `background.weak`/`strong`.
-        border: Border {
-            color: palette.background.base.text,
-            width: 1.0,
-            radius: border_radius.into(),
-        },
-        ..chrome
+        text_color: Some(ep.background.base.text),
+        background: None,
+        border: Border::default(),
+        shadow: Shadow::default(),
+        snap: true,
     }
 }
 
-/// Per-tab button style. Active tabs get a 2 px underline in the
-/// theme's primary color; inactive tabs sit on the chrome surface.
+/// The bar's bottom edge: a 1 px rule spanning the bar's full width.
 ///
-/// **Corrected (RFC-085, found by the widget-layer suite's own derived
-/// coverage — not one of F-13/F-14/F-15).** The active tab's label used
-/// `primary.base.color` against the page background — 2.99:1 on stock
-/// Dark, under AA. Tried `primary.strong.color` next: better on the
-/// `design` path (already clears AA there) but still short on **both**
-/// stock themes (3.73:1 light, 3.70:1 dark) — no shade in the `primary`
-/// family reaches AA against an arbitrary page background, because none
-/// of them were calibrated against it (`primary`'s own `.text` fields
-/// are calibrated against `primary`'s own colors, not against
-/// `background`). Settled on `background.base.text`, the same value
-/// inactive tabs already use — the label no longer visually
-/// distinguishes active from inactive by color, but the underline
-/// (drawn via `shadow`, not `border` — `border_color` here has
-/// `width: 0.0` and paints nothing) still does, and a decorative
-/// accent line carries no text-contrast requirement the way the label
-/// itself does.
+/// Keeps RFC-085 F-15's measured colour, `background.base.text` — the
+/// only value derivable from `Theme::extended_palette()` alone that iced
+/// itself guarantees against `background.base.color`, which is what this
+/// rule is drawn over. F-15's contrast guarantee moved here with it, and
+/// is asserted by `contrast_tests::tab_bar_bottom_rule_meets_non_text_floor`.
+pub(crate) fn tab_bar_rule_style(theme: &Theme) -> container::Style {
+    let ep = theme.extended_palette();
+    container::Style {
+        background: Some(Background::Color(ep.background.base.text)),
+        ..container::Style::default()
+    }
+}
+
+/// The active tab's underline: a straight, square 2 px line.
+///
+/// **`primary.strong`, not `primary.base` (RFC-102 R-3).** The underline
+/// is the active tab's state indicator, so it carries WCAG 1.4.11's
+/// 3.0:1 non-text floor against the page it is drawn on. `primary.base`
+/// measured **2.99:1 on stock `Theme::Dark`** — under the floor, by 0.01,
+/// for as long as the widget has existed. `primary.strong` measures
+/// 3.70:1 there and 3.73:1 on stock Light, its two worst cases, and
+/// 10.00–17.70:1 across the four design presets. It is also the shade
+/// `crate::style::sidebar_active_color` moved to in RFC-085, so snora's
+/// two navigation widgets now share one indicator colour.
+///
+/// Asserted in all six theme contexts by
+/// `contrast_tests::tab_indicator_meets_non_text_floor`.
+pub(crate) fn tab_indicator_style(theme: &Theme) -> container::Style {
+    let ep = theme.extended_palette();
+    container::Style {
+        background: Some(Background::Color(ep.primary.strong.color)),
+        ..container::Style::default()
+    }
+}
+
+/// Per-tab button style. The active tab is distinguished by the
+/// underline element [`tab_indicator_style`] draws, not by anything
+/// here; this function styles the label and the hover fill.
+///
+/// **No shadow, and no corner radius (RFC-102 R-1, R-5).** The underline
+/// used to be faked with a solid `Shadow` offset 1.5 px down, under a
+/// button with `radius: 4.0`. A shadow takes the corner radius it is cast
+/// from, so the "underline" curled upward at both ends; the code's own
+/// comment claimed it was "visually indistinguishable from a
+/// border-bottom in normal use", and orbok's 4.5x crop showed that it is
+/// not. The radius is gone with it, so the hover fill is a square block
+/// within the tab (Q-1 (a)) rather than a rounded pill sitting on a
+/// straight rule.
+///
+/// **Label colours (RFC-085).** The active label had been
+/// `primary.base.color`, measured 2.99:1 on stock Dark as text, under AA.
+/// Trying `primary.strong.color` was better on the `design` path but
+/// still short on both stock themes (3.73:1 light, 3.70:1 dark): no shade
+/// in the `primary` family reaches AA against an arbitrary page
+/// background, because none of them is calibrated against it. The active
+/// label is therefore `background.base.text`, iced's own guaranteed
+/// pairing for the page background.
+///
+/// Inactive labels are `mix(background.base.text, background.base.color,
+/// 0.3)`, slightly muted, as they have been since at least 0.10.0.
+/// **They are not the same value as the active label** — RFC-085's own
+/// docstring here said they were, and the 0.40 -> 0.41 migration guide
+/// repeated it; both were wrong when written (RFC-102 names this, and
+/// the guide's correction is the architect's R-6). The error is in the
+/// harmless direction: a small colour distinction was described as
+/// removed, and was not. The reliable distinction is the underline,
+/// which RFC-102 put above the non-text floor in every theme.
 pub(crate) fn tab_button_style(
     theme: &Theme,
     status: button::Status,
@@ -215,16 +304,11 @@ pub(crate) fn tab_button_style(
 ) -> button::Style {
     let palette = theme.extended_palette();
 
-    let (background, text_color, border_color) = match (is_active, status) {
-        (true, _) => (
-            None,
-            palette.background.base.text,
-            palette.primary.base.color,
-        ),
+    let (background, text_color) = match (is_active, status) {
+        (true, _) => (None, palette.background.base.text),
         (false, button::Status::Hovered) => (
             Some(Background::Color(palette.background.weak.color)),
             palette.background.base.text,
-            Color::TRANSPARENT,
         ),
         (false, _) => (
             None,
@@ -234,33 +318,14 @@ pub(crate) fn tab_button_style(
                 palette.background.base.color,
                 0.3,
             ),
-            Color::TRANSPARENT,
         ),
     };
 
     button::Style {
         background,
         text_color,
-        border: Border {
-            color: border_color,
-            width: 0.0,
-            radius: 4.0.into(),
-        },
-        // The "underline" is a 2 px bottom border drawn via the
-        // shadow's offset — iced 0.14 doesn't expose per-side border
-        // widths on `button::Style`, so for the active state we fake
-        // the bar with a solid colored shadow flush against the
-        // bottom edge. This is visually indistinguishable from a
-        // border-bottom in normal use.
-        shadow: if is_active {
-            iced::Shadow {
-                color: palette.primary.base.color,
-                offset: iced::Vector::new(0.0, 1.5),
-                blur_radius: 0.0,
-            }
-        } else {
-            iced::Shadow::default()
-        },
+        border: Border::default(),
+        shadow: Shadow::default(),
         ..button::Style::default()
     }
 }
@@ -276,3 +341,6 @@ fn mix(a: Color, b: Color, t: f32) -> Color {
         a: a.a * (1.0 - t) + b.a * t,
     }
 }
+
+#[cfg(test)]
+mod tests;

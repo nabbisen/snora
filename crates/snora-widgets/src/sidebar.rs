@@ -6,8 +6,10 @@
 //! Tooltip side is direction-aware: it appears on the end side of the rail
 //! so it never overlaps the main content.
 
+use std::rc::Rc;
+
 use iced::{
-    Alignment, Length, Padding,
+    Alignment, Background, Border, Length, Padding, Shadow, Theme,
     widget::{button, column, container, text, tooltip},
 };
 
@@ -42,6 +44,108 @@ const _: () = assert!(
     BUTTON_SIZE <= RAIL_WIDTH,
     "sidebar BUTTON_SIZE exceeds RAIL_WIDTH"
 );
+
+/// The unstyled tooltip body's corner radius: the rail's own button
+/// radius literal, so the tooltip is shaped like the buttons it belongs
+/// to.
+const UNSTYLED_TOOLTIP_RADIUS: f32 = 6.0;
+
+/// The unstyled tooltip body's padding and its gap from the rail.
+///
+/// Derived from the rail's one spacing literal, `16` (the inter-button
+/// gap and the vertical padding are both `16`): half of it horizontally,
+/// a quarter of it vertically and for the gap. That lands on `[4, 8]`
+/// with a gap of `4`, which is also what the styled body's `[xs, sm]`
+/// and `xs` resolve to in all four shipped presets — so the two variants
+/// are the same shape without either one reading the other's source
+/// (RFC-102 Q-2 (a)).
+const UNSTYLED_TOOLTIP_PADDING: Padding = Padding {
+    top: 4.0,
+    right: 8.0,
+    bottom: 4.0,
+    left: 8.0,
+};
+const UNSTYLED_TOOLTIP_GAP: f32 = 4.0;
+
+/// How a variant draws the body behind its tooltips (RFC-102 R-4).
+///
+/// **Why this is a parameter and not a [`SideBarGeometry`] field.**
+/// `build_side_bar` is shared, and only the styled caller has tokens, so
+/// the body has to be carried in from the caller either way. It is a
+/// style, not geometry: `SideBarGeometry` holds four numbers and derives
+/// `Debug`/`PartialEq` for the tests that compare them field by field,
+/// and a style function is neither comparable nor printable. Keeping it
+/// separate leaves the geometry struct exactly as it was.
+///
+/// No public API: both constructors are crate-internal, and applications
+/// reach them only through `app_side_bar`'s two variants.
+#[derive(Clone)]
+pub(crate) struct TooltipBody {
+    /// Container style for the body. `Rc` because one body is shared by
+    /// every item in the rail, and each item's closure needs its own
+    /// handle.
+    style: Rc<dyn Fn(&Theme) -> container::Style>,
+    /// Padding between the body's edge and its text.
+    padding: Padding,
+    /// Gap between the rail button and the body.
+    gap: f32,
+    /// Text size, or `None` to keep iced's default.
+    text_size: Option<f32>,
+}
+
+impl TooltipBody {
+    pub(crate) fn new(
+        style: Rc<dyn Fn(&Theme) -> container::Style>,
+        padding: Padding,
+        gap: f32,
+        text_size: Option<f32>,
+    ) -> Self {
+        Self {
+            style,
+            padding,
+            gap,
+            text_size,
+        }
+    }
+
+    /// The unstyled variant's body: the theme's own page background, the
+    /// chrome border, and the text colour iced guarantees against that
+    /// background (RFC-102 Q-2 (a)).
+    pub(crate) fn unstyled() -> Self {
+        Self::new(
+            Rc::new(unstyled_tooltip_body_style),
+            UNSTYLED_TOOLTIP_PADDING,
+            UNSTYLED_TOOLTIP_GAP,
+            None,
+        )
+    }
+}
+
+/// Style of the unstyled variant's tooltip body.
+///
+/// Before RFC-102 the sidebar drew `tooltip(btn, text(..), ..)` with no
+/// body at all, so the glyphs landed on whatever the application had
+/// rendered beside the rail and their contrast was the page's business,
+/// not snora's. `background.base.color` under
+/// `background.base.text` is iced's own guaranteed-readable pairing, and
+/// the 1 px `background.base.text` border is the same value the chrome
+/// containers use (RFC-085 F-15), so the body is visible against the page
+/// as well as legible on itself. Both are asserted in all six theme
+/// contexts by `contrast_tests`.
+pub(crate) fn unstyled_tooltip_body_style(theme: &Theme) -> container::Style {
+    let ep = theme.extended_palette();
+    container::Style {
+        text_color: Some(ep.background.base.text),
+        background: Some(Background::Color(ep.background.base.color)),
+        border: Border {
+            color: ep.background.base.text,
+            width: 1.0,
+            radius: UNSTYLED_TOOLTIP_RADIUS.into(),
+        },
+        shadow: Shadow::default(),
+        snap: true,
+    }
+}
 
 /// Geometry parameters [`build_side_bar`] takes, letting [`app_side_bar`]
 /// (unstyled) and the `design`-gated styled variant (RFC-040) share one
@@ -84,13 +188,19 @@ where
     Message: Clone + 'a,
     ViewId: Clone + PartialEq + 'a,
 {
-    build_side_bar(side_bar, direction, SideBarGeometry::unstyled())
+    build_side_bar(
+        side_bar,
+        direction,
+        SideBarGeometry::unstyled(),
+        TooltipBody::unstyled(),
+    )
 }
 
 pub(crate) fn build_side_bar<'a, Message, ViewId>(
     side_bar: SideBar<Message, ViewId>,
     direction: LayoutDirection,
     geometry: SideBarGeometry,
+    tooltip_body: TooltipBody,
 ) -> iced::Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -133,7 +243,18 @@ where
                 sidebar_button_style(theme, status, is_active, button_radius)
             });
 
-        let with_tip = tooltip(btn, text(item.tooltip), tooltip_position);
+        // The tooltip gets a body of its own (RFC-102 R-4): bare text
+        // over the page is legible only by luck.
+        let mut label = text(item.tooltip);
+        if let Some(size) = tooltip_body.text_size {
+            label = label.size(size);
+        }
+        let body_style = Rc::clone(&tooltip_body.style);
+        let body = container(label)
+            .padding(tooltip_body.padding)
+            .style(move |theme: &Theme| body_style(theme));
+
+        let with_tip = tooltip(btn, body, tooltip_position).gap(tooltip_body.gap);
         col = col.push(with_tip);
     }
 

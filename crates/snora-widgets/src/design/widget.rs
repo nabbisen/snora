@@ -46,7 +46,6 @@
 //! | tab | `content_gap` | 6 | `Spacing::sm` | **no** | shared "icon-label inline gap" rhythm with menu/crumb, below |
 //! | tab | `tab_pad_x` | 12 | `Spacing::md` | yes | button horizontal padding |
 //! | tab | `tab_pad_y` | 8 | `Spacing::sm` | yes | button vertical padding, smaller than horizontal |
-//! | tab | `bar_border_radius` | 0 | `Radius::sm` | **no** | RFC-040's stated target |
 //! | crumb | `gap` | 6 | `Spacing::sm` | **no** | shared inline-gap rhythm (see below) |
 //! | crumb | `row_pad_x` | 12 | `Spacing::md` | yes | trail's horizontal padding |
 //! | crumb | `row_pad_y` | 4 | `Spacing::xs` | yes | trail's shallow vertical padding |
@@ -76,21 +75,32 @@
 //! instead of an accidentally-identical-but-unrelated `6` — which is the
 //! whole point of a token scale, per RFC-040's own framing.
 //!
-//! **Chrome radius.** `header`, `footer`, and the tab bar's own border
-//! all hardcode `radius: 0.0` — square corners — which RFC-040 names
-//! directly as "a large part of why stock snora chrome reads as flat and
-//! dated". All three map to `Radius::sm` (4): the smallest available
-//! radius, a modest rounding appropriate for a full-width chrome strip
-//! rather than the more pronounced rounding `Radius::lg` (cards) or
-//! `Radius::md` (buttons) would give.
+//! **Chrome radius.** `header` and `footer` hardcoded `radius: 0.0` —
+//! square corners — which RFC-040 names directly as "a large part of why
+//! stock snora chrome reads as flat and dated". Both map to `Radius::sm`
+//! (4): the smallest available radius, a modest rounding appropriate for
+//! a full-width chrome strip rather than the more pronounced rounding
+//! `Radius::lg` (cards) or `Radius::md` (buttons) would give.
+//!
+//! **The tab bar left this rhythm in RFC-102.** It was the third member:
+//! `bar_border_radius` mapped to `Radius::sm` as well. The bar has
+//! `background: None`, so that radius was only ever visible through the
+//! container border — and RFC-102 replaced that border with a bottom
+//! rule element, because iced 0.14 borders are all-sided and the bar was
+//! never meant to be outlined. A rule has no corners, so the field
+//! configured nothing and was retired rather than left for its mapping
+//! test to keep "verifying". The styled bar's appearance therefore
+//! changes more than the unstyled one's: a rounded outline becomes a
+//! bottom rule.
 //!
 //! **Unmapped literals** (no `Spacing`/`Radius` equivalent, left as
 //! literal constants, identical in both the unstyled and styled paths):
 //! sidebar's and crumb's button border *widths* (`0.0` — "no border" is
-//! not expressible on either scale); the tab bar container's border
-//! *width* (`1.0` — border widths aren't part of either scale, same as
-//! `style.rs`'s own `chrome_container_style` border width); the tab
-//! bar's vertical padding (`0.0` — structural: tabs supply their own
+//! not expressible on either scale); the header's and footer's border
+//! *width* (`1.0` — border widths aren't part of either scale); the tab
+//! bar's bottom rule and active-tab underline *heights* (`1.0` and `2.0`
+//! — the same, and both structural to RFC-102's two edge elements); the
+//! tab bar's vertical padding (`0.0` — structural: tabs supply their own
 //! vertical padding, this is an absence of a value, not a design
 //! literal).
 //!
@@ -114,7 +124,7 @@
 //! [`Spacing`]: snora_design::Spacing
 //! [`Radius`]: snora_design::Radius
 
-use iced::Element;
+use iced::{Element, Padding};
 use snora_core::{
     BreadcrumbAction, Crumb, LayoutDirection, Menu, MenuAction, SideBar, TabAction, TabBar,
 };
@@ -124,7 +134,7 @@ use std::fmt::Debug;
 use crate::crumb::{CrumbGeometry, build_breadcrumb};
 use crate::footer::{FooterGeometry, build_footer};
 use crate::header::{HeaderGeometry, build_header};
-use crate::sidebar::{SideBarGeometry, build_side_bar};
+use crate::sidebar::{SideBarGeometry, TooltipBody, build_side_bar};
 use crate::tab::{TabGeometry, build_tab_bar};
 
 /// Token-derived styled variant of [`crate::app_header`] (RFC-040).
@@ -197,7 +207,32 @@ where
     Message: Clone + 'a,
     ViewId: Clone + PartialEq + 'a,
 {
-    build_side_bar(side_bar, direction, side_bar_geometry(tokens))
+    build_side_bar(
+        side_bar,
+        direction,
+        side_bar_geometry(tokens),
+        side_bar_tooltip_body(tokens),
+    )
+}
+
+/// The styled variant's tooltip body (RFC-102 Q-2 (a)).
+///
+/// `card_raised` is the popover style, and these four values —
+/// `card_raised(tokens)`, padding `[xs, sm]`, label-size text, gap `xs` —
+/// are the same four RFC-100's `design::chip::with_close_tooltip` gives
+/// the notice and chip tooltips, so a design application's tooltips all
+/// look alike. **The two sites are deliberately kept in step**: that
+/// helper is `pub(super)` within `design::chip` and cannot be called from
+/// here, so the values are reproduced. If either set changes, change
+/// both.
+fn side_bar_tooltip_body(tokens: &Tokens) -> TooltipBody {
+    let for_style = tokens.clone();
+    TooltipBody::new(
+        std::rc::Rc::new(move |_theme| snora_style::container::card_raised(&for_style)),
+        Padding::from([tokens.spacing.xs, tokens.spacing.sm]),
+        tokens.spacing.xs,
+        Some(snora_style::text::label_size(tokens).0),
+    )
 }
 
 fn side_bar_geometry(tokens: &Tokens) -> SideBarGeometry {
@@ -230,7 +265,6 @@ fn tab_geometry(tokens: &Tokens) -> TabGeometry {
         content_gap: tokens.spacing.sm,
         tab_pad_x: tokens.spacing.md,
         tab_pad_y: tokens.spacing.sm,
-        bar_border_radius: tokens.radius.sm,
     }
 }
 

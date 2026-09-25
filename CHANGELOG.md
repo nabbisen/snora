@@ -47,6 +47,86 @@ are recorded in the per-version migration guides under
   lucide `X`; the chip remove button is 24.8 × 26.2 in both, through
   RFC-061's existing width mechanism. Raised by **orbok**.
 
+### Fixed
+
+- **The tab bar drew both of its edges with the wrong primitives
+  (RFC-102).** Four defects, all present since at least 0.10.0, all
+  **reported by orbok**:
+
+  - **The active tab's "underline" was a `Shadow`**, offset 1.5px down
+    under a button with `radius: 4.0`, so it took the button's rounded
+    corners and curled upward at both ends. It is now a 2px element with
+    square corners, spanning the tab.
+  - **The bar's "bottom edge" was an all-sided `Border`.** iced 0.14 has
+    no per-side border width, so the whole bar was outlined — the code's
+    own comment claimed it kept "only a thin bottom edge". The bar now
+    has no border, and its bottom edge is a 1px rule element spanning
+    its width.
+  - **An inactive tab's hover fill painted over that outline.** The fill
+    is now square and within the tab, and the bar's rule is outside
+    every tab's box, so no tab's fill can reach it.
+  - **The sidebar's tooltip had no body**, so its text landed on
+    whatever the application rendered beside the rail and its contrast
+    was the page's business, not snora's. It now has a body: the page
+    background with the chrome border unstyled, `card_raised` styled —
+    the same body RFC-100 gave the notice and chip tooltips. Text
+    contrast against that body, and the body's border against the page,
+    are asserted in every theme.
+
+- **The active-tab indicator was 2.99:1 on stock `Theme::Dark`
+  (RFC-102),** under snora's 3.0:1 non-text floor for the visual
+  information that identifies a state (WCAG 1.4.11). It was
+  `primary.base`; it is now `primary.strong`, measured at **3.70:1 on
+  stock Dark and 3.73:1 on stock Light**, its two worst cases, and
+  10.00–17.70:1 across the four design presets. As a colour pairing, all
+  four design presets were already clear of the floor (6.70–11.75:1);
+  **stock Dark was the only one under it.** On stock Light the indicator
+  goes from 4.61:1 to 3.73:1, which still clears the floor.
+
+  The widget contrast suite could not see it: the underline was drawn as
+  a shadow, and the suite skipped it as decorative. The indicator is now
+  an element with its own style function, asserted in all six theme
+  contexts.
+
+- **On the software renderer, the active tab was a filled block and its
+  label was under WCAG AA (RFC-102).** Found while implementing, and not
+  part of the original report. **This one depends on which renderer the
+  application runs**, because iced 0.14's two renderers draw a shadow
+  behind a transparent background differently:
+
+  - Under **tiny-skia** — the software renderer iced falls back to when
+    its GPU renderer cannot start (virtual machines, remote desktops,
+    missing GPU drivers), or when `ICED_BACKEND` selects it — the shadow
+    filled the whole tab, because nothing excluded the quad's interior
+    and the active tab's background is `None`. The label was therefore
+    drawn on `primary.base`, and that pairing is **under AA (4.5:1) in
+    five of the six themes**: 3.67:1 stock Dark, 2.66:1 design light,
+    2.49:1 design dark, 2.05:1 design high-contrast light, 1.79:1 design
+    high-contrast dark. Only stock Light cleared, at 4.56:1.
+  - Under **wgpu**, the default whenever a GPU backend starts, the
+    shadow was drawn only outside the button's shape, so the label sat
+    on the page background at the ratios the contrast suite reported,
+    and the visible defect was the curled underline orbok reported.
+
+  The contrast suite read the active tab's background from the style
+  struct, where it is `None`, and so measured the label against the page
+  in both cases — right for wgpu, wrong for tiny-skia.
+
+  **This is fixed by the same change**, which removes the shadow
+  entirely, so neither renderer draws anything behind the label. snora no
+  longer uses a shadow as a visual element, and a test now asserts that
+  no tab style draws one in any state.
+
+- **`TabGeometry::bar_border_radius` is retired (RFC-102).** The bar has
+  no background, so its radius was only ever visible through the border
+  that RFC-102 removed; the field configured nothing. **For the styled
+  variant this is the larger visual change: a rounded outline becomes a
+  bottom rule.** The unstyled bar was already square.
+
+  **Visual baselines that include a tab bar or a sidebar tooltip are
+  invalidated.** The bar is 1px taller — the height of its new rule —
+  and tab labels do not move.
+
 ## [0.50.0] — 2026-09-17
 
 ### Fixed
