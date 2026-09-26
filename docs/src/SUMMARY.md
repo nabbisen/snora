@@ -112,4 +112,5 @@
 - [Adding a new overlay kind](contributing/adding-an-overlay.md)
 - [Feature-gating criteria](contributing/feature-gating-criteria.md)
 - [Feedback and scope](contributing/feedback-and-scope.md)
+- [Consumer requirements](contributing/consumer-requirements.md)
 - [Release process](contributing/release-process.md)

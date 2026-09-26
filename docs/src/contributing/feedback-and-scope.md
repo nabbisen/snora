@@ -51,6 +51,10 @@ template to share your experience.
 
 ## How evidence affects the roadmap
 
+Requirements a team states in writing are recorded in the
+[consumer requirements register](consumer-requirements.md), with their status
+and evidence, until an RFC decides them.
+
 Concrete app stories are the strongest signal for changing Snora's scope.
 They carry more weight than:
 - abstract feature requests ("what if Snora had X");
