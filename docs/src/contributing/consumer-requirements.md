@@ -54,6 +54,12 @@ would have to be true for adoption, as *"requirements, not requests"*.
   styled path; an explicit input or an accepted default on the unstyled path,
   since iced 0.14 sizes are absolute), and the toast's colours from the theme.
   *(Theme A.)*
+- **tekstide, second letter:** this is *"the single item that would keep us out
+  regardless of the others"*. The shape that worked for them: *"no component reads
+  a size or a colour directly — every one takes them from a theme value the host
+  supplies"*, plus **a scan that fails the build on a literal size in a surface
+  file**, which is *"what keeps the rule true a year later"*. That fits snora's
+  existing `scripts/check-*.sh` family.
 
 ### REQ-003 — Display text rendered verbatim
 
@@ -68,6 +74,15 @@ would have to be true for adoption, as *"requirements, not requests"*.
 - **Satisfied by:** caller text shown whole (breaking inside a word when it must),
   and a test that renders escaped markers and finds each by **exact** content.
   *(Theme E.)*
+- **tekstide's acceptance criterion** (second letter, 2026-09-26): *"a fixture
+  string containing a bidi override, a newline and a control character, passed in
+  and read back from what the component draws."*
+- **Mechanism note, measured.** A clipped text is **not** detectable by
+  `visible_bounds() ≠ bounds()`. The unbroken string measured 288.0 × 18.2 for
+  both, because the text widget's box is its constrained layout and the glyphs
+  overflow inside it. What detects it is comparing the string's natural
+  (unconstrained) size with its rendered box, the natural-size technique the
+  RFC-099/100 tests already use.
 
 ### REQ-004 — Never colour alone
 
@@ -101,9 +116,23 @@ would have to be true for adoption, as *"requirements, not requests"*.
 > *"Our file explorer caps a directory at 256 drawn entries and must not stall on
 > a 100,000-entry one."*
 
-- **Status: met by inspection.** `performance-envelope.md` commits to linear
-  rendering and no hidden work. Prefabs render every item the caller passes, and
-  capping is the caller's job; virtualised lists are out of scope. Nothing
-  asserts linearity at scale.
-- **Satisfied by:** a scale smoke test that would fail on superlinear behaviour.
-  *(Theme E.)*
+- **Status: met by inspection, and now measured.** `performance-envelope.md`
+  commits to linear rendering and no hidden work. Prefabs render every item the
+  caller passes, and capping is the caller's job; virtualised lists are out of
+  scope. **Measured 2026-09-26** (toasts, release build, tiny-skia simulator,
+  architect's machine): layout **0.6 / 5.9 / 62.9 / 656 ms** for **100 / 1,000 /
+  10,000 / 100,000** toasts, which is linear. Nothing asserts it yet.
+- **tekstide's acceptance criterion:** *"one input far past any plausible use …
+  with the number written down, not the word 'fast'."*
+- **Satisfied by:** that measurement recorded in `performance-envelope.md`, plus
+  a ratio assertion (e.g. 10× input costs well under 100× time), which stays
+  machine-independent. *(Theme E.)*
+
+### From tekstide's second letter — substrate note, not a requirement
+
+tekstide pointed at iced 0.14's `iced_selector` (`id`, `is_focused`,
+`Target::bounds`, `visible_bounds`). **snora already uses it:** `iced_test`
+re-exports it as `iced_test::selector`, and the rendered tests (sidebar fit,
+close controls, toast target, tab bar edges) are built on those calls. **The part
+not yet used is `is_focused()`**, which could assert keyboard-focus reachability.
+
