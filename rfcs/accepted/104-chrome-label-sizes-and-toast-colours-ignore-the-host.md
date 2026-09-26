@@ -1,6 +1,6 @@
 # RFC-104 — Chrome label sizes and toast colours ignore the host
 
-**Status.** Proposed.
+**Status.** Accepted 2026-09-26; every open question ruled as suggested.
 **Raised.** 2026-09-26, architect. Source: REQ-002 (tekstide: *"the single item
 that would keep us out regardless of the others"*). It is also a defect for
 current consumers.
@@ -117,3 +117,24 @@ numbers anywhere.
    default size) changes, **shown failing** against today's literals.
 6. Migration guide: the appearance change, including how to restore the old
    sizes.
+
+---
+
+## Rulings, 2026-09-26
+
+**Q-1 (a):** unstyled labels drop their literals and inherit the application's
+`default_text_size`. **Q-2:** styled labels map to `Typography` roles, and the
+handoff fixes the table. **Q-4:** the scan's allow-list takes named constants
+only, each with a stated reason.
+
+**Q-3, resolved by measurement before the handoff, no owner ruling needed.** The
+theme's warning clears the toast's text on both paths: stock `palette.warning`
+against black measures **6.05:1** (Light) and **12.99:1** (Dark), and against
+iced's own `warning.base.text` **6.05 / 8.12:1**; the design tokens' `warning`
+against `warning_text` measures **5.43–14.85:1** across the four presets. The
+literal `WARNING_COLOR` can go.
+
+**Found before the handoff:** the engine's design path (`design::render`) passes
+a `ChromeStyle` that carries only the dim colour and the dialog card, and
+`render_toasts` receives no style at all. R-3 therefore extends `ChromeStyle` to
+reach the toast.

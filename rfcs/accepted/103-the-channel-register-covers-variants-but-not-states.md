@@ -1,6 +1,6 @@
 # RFC-103 — The channel register covers variants, not states
 
-**Status.** Proposed.
+**Status.** Accepted 2026-09-26; every open question ruled as suggested.
 **Raised.** 2026-09-26, architect. Source: REQ-004 in
 `contributing/consumer-requirements.md` (tekstide: *"every state that matters
 also carries a word or shape"*).
@@ -91,3 +91,13 @@ separately.
 3. The chip decision as ruled in Q-1, documented in `accessibility.md`.
 4. RFC-045's phrase corrected (architect's).
 5. No change to `snora-design` / `snora-style` (quote the diff).
+
+---
+
+## Rulings, 2026-09-26
+
+**Q-1 (a):** assert the chip's selected/unselected fill difference at ≥ 3.0:1,
+and document the caller's mark. (c) stays on record as the path if a caller
+asks. **Q-2:** disabled is a state that matters and is registered and asserted;
+hover and pressed are not. **Q-3:** the breadcrumb leaf is registered as
+`Position`; link affordance is a separate question.

@@ -1,6 +1,6 @@
 # RFC-105 — Caller text is silently clipped, and two properties are unasserted
 
-**Status.** Proposed.
+**Status.** Accepted 2026-09-26; every open question ruled as suggested.
 **Raised.** 2026-09-26, architect. Sources: REQ-003 and REQ-006. The clipping
 was found by measurement while assessing them.
 **Release target.** 0.52.0. **Priority.** Third: small, and it fixes a real
@@ -87,3 +87,15 @@ as a cheap companion if the handoff finds a stable proxy.
    with its machine and build profile.
 4. The migration guide states the wrapping change: long unbroken text now wraps
    instead of being cut off, and the heights of affected surfaces can grow.
+
+---
+
+## Rulings, 2026-09-26
+
+**Q-1:** `WordOrGlyph` on fixed-width, multi-line surfaces, each confirmed by
+measurement. **Q-2 (a):** a timing-ratio assertion, `#[ignore]`d, and run in
+release by one CI step.
+
+**Sequencing:** RFC-104 and RFC-105 both change `crates/snora/src/toast.rs` and
+`CHANGELOG.md`. **RFC-105 starts after RFC-104 is committed.** RFC-103 is
+independent.
