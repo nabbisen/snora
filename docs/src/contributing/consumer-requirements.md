@@ -39,6 +39,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 ### REQ-002 — Nothing hardcoded that users configure
 
+*Proposed as **RFC-104** (2026-09-26).*
+
 > *"Font size, font family and every theme colour come from the host."*
 
 - **Status: not met.** Chrome label sizes are literals **in both the unstyled and
@@ -63,6 +65,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 ### REQ-003 — Display text rendered verbatim
 
+*Proposed as **RFC-105** (2026-09-26).*
+
 > *"A component must not re-escape, re-wrap or re-interpret them."*
 
 - **Status: partly.** No caller string is transformed (no trim, truncate,
@@ -85,6 +89,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
   RFC-099/100 tests already use.
 
 ### REQ-004 — Never colour alone
+
+*Proposed as **RFC-103** (2026-09-26).*
 
 > *"Every state that matters also carries a word or shape."*
 
@@ -112,6 +118,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
   rendered suite running on both renderers in CI. *(Theme C.)*
 
 ### REQ-006 — Bounded work on hostile input
+
+*Proposed as **RFC-105** (2026-09-26).*
 
 > *"Our file explorer caps a directory at 256 drawn entries and must not stall on
 > a 100,000-entry one."*
