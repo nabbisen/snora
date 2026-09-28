@@ -164,6 +164,7 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 | 103 | [The channel register covers variants, not states](./accepted/103-the-channel-register-covers-variants-but-not-states.md) | **accepted** v0.52.0 — REQ-004 (tekstide); chip selected is colour-only; RFC-045 phrase overstates (handoff: [`handoffs/103-…`](./handoffs/103-the-channel-register-covers-variants-but-not-states/implementation-handoff.md)) |
 | 104 | [Chrome label sizes and toast colours ignore the host](./accepted/104-chrome-label-sizes-and-toast-colours-ignore-the-host.md) | **accepted** v0.52.0 — REQ-002 (tekstide); literal sizes in both variants; plus a build-failing literal-size scan (handoff: [`handoffs/104-…`](./handoffs/104-chrome-label-sizes-and-toast-colours-ignore-the-host/implementation-handoff.md)) |
 | 105 | [Caller text is silently clipped, and two properties are unasserted](./accepted/105-caller-text-is-silently-clipped-and-two-properties-are-unasserted.md) | **accepted** v0.52.0 — REQ-003/006 (tekstide); unbroken text clipped at 288 px; verbatim and bounded work unasserted (handoff: [`handoffs/105-…`](./handoffs/105-caller-text-is-silently-clipped-and-two-properties-are-unasserted/implementation-handoff.md)) |
+| 106 | [A disabled unselected chip looks enabled](./proposed/106-a-disabled-unselected-chip-looks-enabled.md) | **proposed** v0.52.0 — found by RFC-103's register; 1.00–1.05:1 today, 3.18–6.03:1 with the label dimmed at 0.45 |
 
 ## Proposed
 
