@@ -1,6 +1,6 @@
 # RFC-106 — A disabled unselected chip looks enabled
 
-**Status.** Proposed.
+**Status.** Accepted 2026-09-29. Q-1 = 0.45, Q-2 = yes, Q-3 = 0.52.0 before the cut.
 **Raised.** 2026-09-29, architect. Found by RFC-103's state register, which
 records it as `Cue::Missing` and **pins** the gap, so a test fails when it is
 closed.
@@ -82,3 +82,15 @@ re-measures the selected-disabled floor, which can only rise.
 3. The selected chip as ruled in Q-2, with its floor re-measured.
 4. `snora-design` and `snora-style` unchanged (quote the diff). CHANGELOG under
    Fixed, naming it as found by RFC-103's register.
+
+---
+
+## Rulings, 2026-09-29
+
+**Q-1:** alpha **0.45**. **Q-2:** the selected chip's label and border are dimmed
+by the same factor. **Q-3:** 0.52.0, before the cut.
+
+**Found before the handoff:** `snora_style::button`'s `disabled_alpha` (×0.45)
+is **private** to a frozen crate. The chip reproduces the factor as a named
+constant, with a comment pointing at `disabled_alpha`, rather than widening
+`snora-style`'s public surface for one value.
