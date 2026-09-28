@@ -39,6 +39,7 @@
 //!         .render();
 //! ```
 
+use iced::widget::text::Wrapping;
 use iced::{
     Border, Color, Element, Length,
     widget::{button, column, container, row, text},
@@ -135,12 +136,21 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         let surface = style::color::to_iced_color(t.palette.surface);
 
         // Content: optional title + body
+        // `WordOrGlyph` (RFC-105): a notice is as wide as its parent
+        // gives it, and caller text with no spaces — a file name, a path,
+        // a URL, a hash — used to be cut off at that width with no sign
+        // that anything was missing. Measured in a 340px parent: 400
+        // unbroken characters rendered 312.0 wide against a natural
+        // 3046.4, one line. iced's default `Word` breaks at spaces only,
+        // so it does nothing for a string that has none; ordinary prose
+        // is unaffected either way.
         let mut content_col: Vec<Element<'a, Message>> = Vec::new();
         if let Some(title) = self.title {
             content_col.push(
                 text(title)
                     .size(style::text::label_size(t))
                     .color(text_color)
+                    .wrapping(Wrapping::WordOrGlyph)
                     .into(),
             );
         }
@@ -148,6 +158,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             text(self.body)
                 .size(style::text::body_size(t))
                 .color(text_color)
+                .wrapping(Wrapping::WordOrGlyph)
                 .into(),
         );
 

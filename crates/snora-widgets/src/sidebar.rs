@@ -8,6 +8,7 @@
 
 use std::rc::Rc;
 
+use iced::widget::text::Wrapping;
 use iced::{
     Alignment, Background, Border, Length, Padding, Shadow, Theme,
     widget::{button, column, container, text, tooltip},
@@ -245,12 +246,22 @@ where
 
         // The tooltip gets a body of its own (RFC-102 R-4): bare text
         // over the page is legible only by luck.
-        let mut label = text(item.tooltip);
+        //
+        // Bounded and wrapped (RFC-105 R-1). A tooltip is content-sized,
+        // so a long label had nothing to wrap against but the viewport
+        // and was cut off inside the overlay — measured by frame
+        // comparison, since tooltip text is invisible to
+        // `Simulator::find`. `max_width` gives it a line to wrap at, and
+        // `WordOrGlyph` breaks text that has no spaces to break at.
+        // Both variants share this: the styled one differs only in the
+        // body's style, padding, gap and text size.
+        let mut label = text(item.tooltip).wrapping(Wrapping::WordOrGlyph);
         if let Some(size) = tooltip_body.text_size {
             label = label.size(size);
         }
         let body_style = Rc::clone(&tooltip_body.style);
         let body = container(label)
+            .max_width(crate::style::TOOLTIP_MAX_WIDTH)
             .padding(tooltip_body.padding)
             .style(move |theme: &Theme| body_style(theme));
 

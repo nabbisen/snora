@@ -61,6 +61,7 @@
 //! );
 //! ```
 
+use iced::widget::text::Wrapping;
 use iced::{
     Border, Color, Element,
     widget::{button, container, row, text, tooltip},
@@ -161,9 +162,18 @@ pub(super) fn with_close_tooltip<'a, Message: 'a>(
     let t = tokens.clone();
     tooltip(
         control,
-        container(text(tip).size(style::text::label_size(tokens)))
-            .padding([tokens.spacing.xs, tokens.spacing.sm])
-            .style(move |_| style::container::card_raised(&t)),
+        // Bounded and wrapped (RFC-105 R-1), the same treatment the
+        // sidebar's tooltips get and through the same constant: a
+        // content-sized tooltip has nothing to wrap against but the
+        // viewport, so long caller text was cut off inside the overlay.
+        container(
+            text(tip)
+                .size(style::text::label_size(tokens))
+                .wrapping(Wrapping::WordOrGlyph),
+        )
+        .max_width(crate::style::TOOLTIP_MAX_WIDTH)
+        .padding([tokens.spacing.xs, tokens.spacing.sm])
+        .style(move |_| style::container::card_raised(&t)),
         tooltip::Position::Top,
     )
     .gap(tokens.spacing.xs)

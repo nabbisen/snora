@@ -17,6 +17,16 @@ are recorded in the per-version migration guides under
 
 ### Added
 
+- **Verbatim and bounded-work assertions (RFC-105).** A fixture
+  containing a bidi override, a newline and a control character is
+  passed through every caller-text surface in scope and found by exact
+  content, which shows snora hands the string to iced unmodified — it
+  says nothing about which glyphs iced then draws. And an `#[ignore]`d
+  timing test, run in release by one CI step, asserts that laying out
+  ten times as many toasts takes less than thirty times as long;
+  measured 11.6–12.0 on a Ryzen 9 9950X, against 92 with a deliberate
+  quadratic in place. REQ-003 and REQ-006, stated by **tekstide**.
+
 - **An open menu's dropdown is asserted (RFC-103).** Nothing covered it:
   the menu tests in `render_semantics.rs` exercise the engine's menu
   layers, which is a different code path from `snora-widgets`'
@@ -24,6 +34,30 @@ are recorded in the per-version migration guides under
   an open menu draws its items and a closed one does not.
 
 ### Fixed
+
+- **Long unbroken text was silently cut off (RFC-105).** A file name, a
+  path, a URL or a hash — anything without spaces — was truncated at the
+  column with nothing to say so. Measured: 400 unbroken characters in a
+  toast rendered 288.0px wide against a natural 3481.6px, on one line,
+  with about 48 characters visible. iced's default wrapping breaks at
+  spaces only, so it could not help a string that has none.
+
+  **Toast titles and messages, and notice titles and bodies, now wrap
+  between glyphs when a word cannot fit.** Ordinary prose is unaffected
+  — measured identical before and after — but **a surface carrying such
+  a string grows taller**, which changes the layout around it.
+  REQ-003, stated by **tekstide**, and a defect for current consumers
+  too.
+
+  **Tooltips were cut off in the same way, and are fixed too** — the
+  sidebar's on both variants, and the notice's and chip's close
+  controls. A tooltip is sized by its content, so long text had nothing
+  to wrap against but the window; each tooltip body now has a maximum
+  width of 320px and wraps inside it. Measured by frame comparison,
+  since tooltip text cannot be inspected directly: at 400 characters an
+  extra character at the end used to make no difference to what was
+  drawn, and now does. Short tooltips render byte-identically to
+  before.
 
 - **Chrome labels ignored the host's text size, on both paths
   (RFC-104).** The tab bar and breadcrumb drew their labels at 13, menus

@@ -71,6 +71,13 @@ jobs:
         # test gated on `not(feature = "lucide-icons")` would otherwise
         # never run anywhere in CI.
         run: cargo test -p snora --no-default-features --features widgets,design
+      - name: Bounded work — toast layout stays linear (RFC-105)
+        # A timing ratio, so it is `#[ignore]`d and run here on its own,
+        # in release: ten times the toasts must lay out in less than
+        # thirty times the time. Linear is about 10, and a deliberate
+        # quadratic measured 92 — the bound is set to catch a change in
+        # complexity, not to police absolute time.
+        run: cargo test --release -p snora --test bounded_work -- --ignored
       - name: Test widgets, all features (RFC-087)
         # snora-widgets had no test step in CI at all before this — not a
         # feature gap, an entire crate. 28 unit tests + 6 doc-tests

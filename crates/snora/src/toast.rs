@@ -17,6 +17,7 @@
 
 use std::time::{Duration, Instant};
 
+use iced::widget::text::Wrapping;
 use iced::{
     Alignment::Center,
     Background, Border, Color, Element, Length, Shadow, Subscription,
@@ -225,11 +226,20 @@ where
 
     // No literal sizes (RFC-104): each inherits the host's
     // `default_text_size` unless the caller's style maps it to a role.
-    let mut title = text(toast.title);
+    //
+    // `WordOrGlyph` (RFC-105): a toast is a fixed 340px, so caller text
+    // with no spaces in it — a file name, a path, a URL, a hash — used to
+    // be cut off at the column with no sign that anything was missing.
+    // Measured: 400 unbroken characters rendered 288.0 x 20.8 against a
+    // natural 3481.6 x 20.8, one line, about 48 characters visible.
+    // iced's default is `Word`, which breaks at spaces only and so does
+    // nothing for a string that has none; `WordOrGlyph` breaks between
+    // glyphs when a word cannot fit, and leaves ordinary prose alone.
+    let mut title = text(toast.title).wrapping(Wrapping::WordOrGlyph);
     if let Some(size) = style.title_size {
         title = title.size(size);
     }
-    let mut message = text(toast.message);
+    let mut message = text(toast.message).wrapping(Wrapping::WordOrGlyph);
     if let Some(size) = style.message_size {
         message = message.size(size);
     }

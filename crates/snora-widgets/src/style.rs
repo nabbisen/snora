@@ -13,6 +13,19 @@ use iced::{
     widget::{button, container},
 };
 
+/// The widest a tooltip body may be (RFC-105 R-1).
+///
+/// A tooltip is content-sized, so long caller text has nothing to wrap
+/// against but the viewport — measured before this, a 400-character
+/// tooltip was cut off inside the overlay, and wrapping alone would have
+/// turned it into a window-wide block instead. This bounds it at a
+/// readable line, in the scale of the toast's fixed 340.
+///
+/// A width, not a text size, so `scripts/check-literal-sizes.sh` does not
+/// see it; it is a named constant anyway, because one shared value for
+/// every tooltip in the crate is the point.
+pub(crate) const TOOLTIP_MAX_WIDTH: f32 = 320.0;
+
 /// Neutral text-only button used for menu entries.
 ///
 /// **Corrected (RFC-085 F-13).** Every status previously used a shade
