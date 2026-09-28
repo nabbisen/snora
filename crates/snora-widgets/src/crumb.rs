@@ -40,6 +40,10 @@ pub(crate) struct CrumbGeometry {
     pub(crate) btn_pad_y: f32,
     /// Per-crumb button corner radius.
     pub(crate) btn_radius: f32,
+    /// Crumb and separator label size, or `None` to inherit the host's
+    /// `default_text_size` (RFC-104). The unstyled path inherits; the
+    /// styled path maps it to `Typography::label`.
+    pub(crate) label_size: Option<f32>,
 }
 
 impl CrumbGeometry {
@@ -52,6 +56,7 @@ impl CrumbGeometry {
             btn_pad_x: 4.0,
             btn_pad_y: 2.0,
             btn_radius: 3.0,
+            label_size: None,
         }
     }
 }
@@ -112,13 +117,17 @@ where
             geometry.btn_pad_x,
             geometry.btn_pad_y,
             geometry.btn_radius,
+            geometry.label_size,
         ));
         if i < last {
-            trail = trail.push(text(separator).size(13).style(|theme: &Theme| {
-                iced::widget::text::Style {
-                    color: Some(separator_color(theme)),
-                }
-            }));
+            // The separator follows the crumbs' own size (RFC-104).
+            let mut glyph = text(separator).style(|theme: &Theme| iced::widget::text::Style {
+                color: Some(separator_color(theme)),
+            });
+            if let Some(size) = geometry.label_size {
+                glyph = glyph.size(size);
+            }
+            trail = trail.push(glyph);
         }
     }
 
@@ -134,18 +143,24 @@ fn render_crumb<'a, Message, CrumbId, F>(
     btn_pad_x: f32,
     btn_pad_y: f32,
     btn_radius: f32,
+    label_size: Option<f32>,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
     CrumbId: Clone + Debug + 'a,
     F: Fn(BreadcrumbAction<CrumbId>) -> Message + 'a,
 {
+    let mut label = text(crumb.label);
+    if let Some(size) = label_size {
+        label = label.size(size);
+    }
+
     if crumb.is_leaf {
         // Plain text — the user is here.
-        text(crumb.label).size(13).into()
+        label.into()
     } else {
         let id_for_msg = crumb.id.clone();
-        button(text(crumb.label).size(13))
+        button(label)
             .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
             .padding(Padding::from([btn_pad_y, btn_pad_x]))
             .style(move |theme, status| crumb_button_style(theme, status, btn_radius))

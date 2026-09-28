@@ -24,12 +24,19 @@ use crate::style::menu_button_style;
 pub(crate) struct MenuGeometry {
     /// Gap between a menu/item's icon and its label.
     pub(crate) gap: f32,
+    /// Trigger and item label size, or `None` to inherit the host's
+    /// `default_text_size` (RFC-104). The unstyled path inherits; the
+    /// styled path maps it to `Typography::label`.
+    pub(crate) label_size: Option<f32>,
 }
 
 impl MenuGeometry {
     /// Today's literal, unmodified.
     pub(crate) const fn unstyled() -> Self {
-        Self { gap: 6.0 }
+        Self {
+            gap: 6.0,
+            label_size: None,
+        }
     }
 }
 
@@ -70,7 +77,12 @@ where
     if let Some(ref ic) = menu.icon {
         header_content = header_content.push(icon_element(ic));
     }
-    header_content = header_content.push(text(menu.label).size(14));
+    // No literal size (RFC-104): inherited unless the geometry maps it.
+    let mut trigger_label = text(menu.label);
+    if let Some(size) = geometry.label_size {
+        trigger_label = trigger_label.size(size);
+    }
+    header_content = header_content.push(trigger_label);
 
     let trigger_msg = on_action(MenuAction::MenuPressed(menu.id.clone()));
 
@@ -91,7 +103,11 @@ where
         if let Some(ref ic) = item.icon {
             btn_content = btn_content.push(icon_element(ic));
         }
-        btn_content = btn_content.push(text(item.label).size(14));
+        let mut item_label = text(item.label);
+        if let Some(size) = geometry.label_size {
+            item_label = item_label.size(size);
+        }
+        btn_content = btn_content.push(item_label);
 
         let msg = on_action(MenuAction::MenuItemPressed {
             menu_id: item.menu_id.clone(),

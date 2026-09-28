@@ -15,7 +15,63 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **Chrome labels ignored the host's text size, on both paths
+  (RFC-104).** The tab bar and breadcrumb drew their labels at 13, menus
+  at 14, the header title at 16, and toasts at 16/14 — literals, so an
+  application that set iced's `default_text_size`, or that shipped its
+  own `Typography`, got snora's numbers anyway. Every one of those now
+  comes from the host: `default_text_size` on the unstyled path, a
+  `Typography` role on the styled one (tab, breadcrumb and menu labels
+  → `label`; the header title and toast title → `title`; the toast
+  message → `body`). REQ-002, stated by **tekstide**, and a defect for
+  current consumers too.
+
+  A new `scripts/check-literal-sizes.sh`, wired into CI, fails on a
+  numeric `.size(..)` in non-test source and on an upper-case constant
+  that is not allow-listed — so a `const` cannot quietly put one back.
+
+- **The toast's Warning fill was a private constant (RFC-104).** It is
+  now the theme's `warning` pair, fill and text together. The comment
+  justifying the constant said iced's extended palette had no `warning`
+  semantic; iced 0.14's does. Measured, the fill moves from
+  `rgb(0.851, 0.467, 0.024)` to `rgb(0.718, 0.494, 0.200)` on stock
+  Light and `rgb(1.000, 0.757, 0.306)` on stock Dark, and every intent's
+  text clears AA against its own fill on both paths.
+
+- **The `design` path could not reach toasts at all (RFC-104).**
+  `ChromeStyle` carried only the modal dim and the dialog card, and the
+  toast renderer took no style, so a design application's toasts used
+  literal sizes and colours derived from the `iced::Theme` rather than
+  from its own `Tokens`. `ChromeStyle` now carries the toast's sizes and
+  its per-intent colours, which come from the token palette's status
+  pairs (`info`, `success`, `warning`, `danger` with their `*_text`;
+  `Debug` has no status token and maps to the neutral
+  `surface_raised`/`text_primary` pairing).
+
+### Changed
+
+- **Unstyled chrome and toast label sizes now follow
+  `default_text_size` (RFC-104),** which is 16 unless the application
+  sets it. Measured at that default: tab and breadcrumb labels go 13 →
+  16, menu labels 14 → 16, the toast message 14 → 16; the header title
+  and toast title were already 16 and do not move. The rows they sit in
+  grow with them — the tab bar 33.9 → 37.8, the breadcrumb row 28.9 →
+  32.8, an open menu 56.4 → 61.6, and the toast surface 67.0 → 69.6.
+  **Visual baselines that include any chrome are invalidated.**
+
+  **To restore the old sizes**, set `default_text_size` to the old
+  value — but note what that does: it applies to **all** text that
+  inherits, including the application's own, and it cannot reproduce
+  the old mix, which was four different literals (13 tab/crumb, 14
+  menu/toast-message, 16 header/toast-title). An application that wants
+  per-surface sizes back should use the `design` path and set the
+  `Typography` roles, which is what they are for. On the styled path the
+  sizes now follow those roles: at the shipped presets, tab and crumb
+  labels are 14, the header and toast titles 18, and the toast message
+  16.
+
 
 ## [0.51.0] — 2026-09-26
 

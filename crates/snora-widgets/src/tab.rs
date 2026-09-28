@@ -50,6 +50,10 @@ pub(crate) struct TabGeometry {
     pub(crate) tab_pad_x: f32,
     /// Per-tab button vertical padding.
     pub(crate) tab_pad_y: f32,
+    /// Tab label size, or `None` to inherit the host's
+    /// `default_text_size` (RFC-104). The unstyled path inherits; the
+    /// styled path maps it to `Typography::label`.
+    pub(crate) label_size: Option<f32>,
 }
 
 // `bar_border_radius` was retired by RFC-102. The bar had
@@ -67,6 +71,7 @@ impl TabGeometry {
             content_gap: 6.0,
             tab_pad_x: 12.0,
             tab_pad_y: 8.0,
+            label_size: None,
         }
     }
 }
@@ -131,6 +136,7 @@ where
             geometry.content_gap,
             geometry.tab_pad_x,
             geometry.tab_pad_y,
+            geometry.label_size,
         ));
     }
 
@@ -165,6 +171,7 @@ fn render_tab<'a, Message, TabId, F>(
     content_gap: f32,
     tab_pad_x: f32,
     tab_pad_y: f32,
+    label_size: Option<f32>,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -175,7 +182,13 @@ where
     if let Some(icon) = &tab.icon {
         content = content.push(icon_element::<Message>(icon));
     }
-    content = content.push(text(tab.label).size(13));
+    // No literal size: the label inherits the host's `default_text_size`
+    // unless the caller's geometry maps it to a token role (RFC-104).
+    let mut label = text(tab.label);
+    if let Some(size) = label_size {
+        label = label.size(size);
+    }
+    content = content.push(label);
 
     let id_for_msg = tab.id.clone();
     let pressable = button(content)

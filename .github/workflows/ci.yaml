@@ -32,6 +32,14 @@ jobs:
         # them drifting apart, and that comment was itself already wrong
         # about its own scope.
         run: scripts/check-wcag-floors.sh
+      - name: Check for literal text sizes (RFC-104)
+        # Chrome and toast labels take their size from the host: iced's
+        # `default_text_size` on the unstyled path, a `Typography` role on
+        # the styled one. This fails on a numeric `.size(..)` in non-test
+        # source, and on an upper-case constant that is not allow-listed,
+        # so that a `const` cannot quietly reintroduce what RFC-104
+        # removed.
+        run: scripts/check-literal-sizes.sh
       - name: Check workspace
         run: cargo check --workspace --all-features
       - name: Clippy

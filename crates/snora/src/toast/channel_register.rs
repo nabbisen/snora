@@ -118,11 +118,16 @@ fn canonicalize_button(style: button::Style) -> button::Style {
 }
 
 fn canonical_toast_style(theme: &Theme, intent: ToastIntent) -> container::Style {
-    canonicalize_container(toast_style(theme, intent))
+    canonicalize_container(toast_style(theme, intent, None))
 }
 
 fn canonical_close_button_style(theme: &Theme, intent: ToastIntent) -> button::Style {
-    canonicalize_button(close_button_style(theme, intent, button::Status::Active))
+    canonicalize_button(close_button_style(
+        theme,
+        intent,
+        button::Status::Active,
+        None,
+    ))
 }
 
 /// Asserts that `canonicalize(theme, intent)` produces the same struct

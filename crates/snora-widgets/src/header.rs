@@ -40,6 +40,14 @@ pub(crate) struct HeaderGeometry {
     pub(crate) pad_y: f32,
     /// Chrome container corner radius.
     pub(crate) radius: f32,
+    /// Title size, or `None` to inherit the host's `default_text_size`
+    /// (RFC-104). The unstyled path inherits; the styled path maps it to
+    /// `Typography::title`. The title's **bold weight is not a size** and
+    /// is unchanged either way.
+    pub(crate) title_size: Option<f32>,
+    /// The size the header's menus label themselves with, mirrored into
+    /// [`MenuGeometry`] the same way `menu_gap` is.
+    pub(crate) menu_label_size: Option<f32>,
     /// Forwarded to each rendered [`Menu`]'s icon-label gap.
     pub(crate) menu_gap: f32,
 }
@@ -52,7 +60,9 @@ impl HeaderGeometry {
             pad_x: 16.0,
             pad_y: 8.0,
             radius: 0.0,
+            title_size: None,
             menu_gap: MenuGeometry::unstyled().gap,
+            menu_label_size: MenuGeometry::unstyled().label_size,
         }
     }
 }
@@ -111,17 +121,20 @@ where
     F: Fn(MenuAction<MenuId, MenuItemId>) -> Message + 'a,
 {
     // Start group: [title, gap, menus...].
-    let mut start_group = iced::widget::row![
-        text(title)
-            .font(iced::Font {
-                weight: iced::font::Weight::Bold,
-                ..Default::default()
-            })
-            .size(16),
-        container(space()).width(Length::Fixed(20.0)),
-    ]
-    .align_y(Center)
-    .spacing(geometry.gap);
+    // The weight stays; the size does not (RFC-104). Without a mapped
+    // size the title inherits the host's `default_text_size`.
+    let mut title_text = text(title).font(iced::Font {
+        weight: iced::font::Weight::Bold,
+        ..Default::default()
+    });
+    if let Some(size) = geometry.title_size {
+        title_text = title_text.size(size);
+    }
+
+    let mut start_group =
+        iced::widget::row![title_text, container(space()).width(Length::Fixed(20.0)),]
+            .align_y(Center)
+            .spacing(geometry.gap);
 
     for menu in menus {
         let is_active = active_menu_id == Some(&menu.id);
@@ -131,6 +144,7 @@ where
             is_active,
             MenuGeometry {
                 gap: geometry.menu_gap,
+                label_size: geometry.menu_label_size,
             },
         ));
     }

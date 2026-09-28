@@ -87,6 +87,7 @@ use snora_style::color::to_iced_color;
 
 use crate::overlay::dialog::DialogCardStyle;
 use crate::render::{ChromeStyle, render_with_style};
+use crate::toast::{ToastIntentColors, ToastStyle};
 
 /// Derives a complete, token-styled render from an [`AppLayout`]: the
 /// dialog gets a real card (fill, border, radius, padding), and the
@@ -182,6 +183,53 @@ fn chrome_style(tokens: &Tokens) -> ChromeStyle {
     ChromeStyle {
         dim_color: dim_color(tokens),
         dialog_card: Some(dialog_card_style(tokens)),
+        toast: toast_style(tokens),
+    }
+}
+
+/// The toast layer's sizes and colours, from the tokens (RFC-104).
+///
+/// **Before this, the `design` path could not reach toasts at all.**
+/// `ChromeStyle` carried the dim and the dialog card, and `render_toasts`
+/// took no style, so a design application's toasts used literal text
+/// sizes and colours derived from the `iced::Theme` — not from its own
+/// `Tokens`.
+///
+/// Sizes map to the roles the equivalent text uses elsewhere: the title
+/// to `Typography::title`, as the header's does, and the message to
+/// `Typography::body`, the role documented as "ordinary explanatory
+/// text", which is what a toast message is.
+fn toast_style(tokens: &Tokens) -> ToastStyle {
+    ToastStyle {
+        title_size: Some(snora_style::text::title_size(tokens).0),
+        message_size: Some(snora_style::text::body_size(tokens).0),
+        intents: Some(toast_intent_colors(tokens)),
+    }
+}
+
+/// Each toast intent's `(fill, text)` pair, from the token palette's own
+/// status colours (RFC-104).
+///
+/// Four of the five are direct: `info`, `success`, `warning` and
+/// `danger`, each with the `*_text` the palette pairs it with and
+/// contrast-tests against (`Palette::usages`).
+///
+/// **`Debug` has no status token**, because it is not a status: it is
+/// diagnostic noise the application wants visually separable from real
+/// intents. It maps to `surface_raised` with `text_primary` — the
+/// neutral raised-surface pairing, which is the same one
+/// `container::card_raised` uses and is contrast-tested with the rest.
+/// That keeps it reading as "not a status" while staying legible, which
+/// is what the theme path's `background.strong` did.
+pub(crate) fn toast_intent_colors(tokens: &Tokens) -> ToastIntentColors {
+    let p = &tokens.palette;
+    let pair = |fill, text| (to_iced_color(fill), to_iced_color(text));
+    ToastIntentColors {
+        debug: pair(p.surface_raised, p.text_primary),
+        info: pair(p.info, p.info_text),
+        success: pair(p.success, p.success_text),
+        warning: pair(p.warning, p.warning_text),
+        error: pair(p.danger, p.danger_text),
     }
 }
 

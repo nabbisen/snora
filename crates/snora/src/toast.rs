@@ -26,6 +26,52 @@ use iced::{
 
 use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime, ToastPosition};
 
+/// How a toast is sized and coloured (RFC-104).
+///
+/// The engine renders toasts on both paths, and before this the sizes
+/// were literals and the colours came from the `iced::Theme` alone — so
+/// a `design` application's toasts ignored its `Tokens` entirely, and no
+/// application's toast text followed its `default_text_size`.
+///
+/// `None` everywhere is the default path: inherit the host's text size,
+/// and derive colours from the theme.
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct ToastStyle {
+    /// Title size, or `None` to inherit `default_text_size`.
+    pub(crate) title_size: Option<f32>,
+    /// Message size, or `None` to inherit `default_text_size`.
+    pub(crate) message_size: Option<f32>,
+    /// Intent colours, or `None` to derive them from the theme.
+    pub(crate) intents: Option<ToastIntentColors>,
+}
+
+/// The `(fill, text)` pair each intent paints with, supplied by the
+/// `design` path from the token palette's status colours.
+///
+/// Exhaustive on [`ToastIntent`] in [`ToastIntentColors::pair`], so a
+/// sixth intent fails to compile here until it is given a pair
+/// (RFC-063's pattern).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) struct ToastIntentColors {
+    pub(crate) debug: (Color, Color),
+    pub(crate) info: (Color, Color),
+    pub(crate) success: (Color, Color),
+    pub(crate) warning: (Color, Color),
+    pub(crate) error: (Color, Color),
+}
+
+impl ToastIntentColors {
+    pub(crate) fn pair(&self, intent: ToastIntent) -> (Color, Color) {
+        match intent {
+            ToastIntent::Debug => self.debug,
+            ToastIntent::Info => self.info,
+            ToastIntent::Success => self.success,
+            ToastIntent::Warning => self.warning,
+            ToastIntent::Error => self.error,
+        }
+    }
+}
+
 /// Fixed toast width so stacked toast edges align cleanly regardless of
 /// content length. The value is chosen to comfortably hold two lines of
 /// 14pt text at default font sizes.
@@ -47,16 +93,6 @@ const CLOSE_GLYPH_SIZE: f32 = 18.0;
 /// Default sweep interval. Half-second resolution is imperceptible to users
 /// and keeps idle wakeups low.
 const SWEEP_INTERVAL: Duration = Duration::from_millis(500);
-
-/// Fallback color for [`ToastIntent::Warning`].
-///
-/// iced's extended palette has no `warning` semantic pair (unlike `primary`,
-/// `success`, and `danger`). This stable amber/orange is chosen to remain
-/// readable against both light and dark iced themes. It is a Snora
-/// implementation detail — applications cannot configure it through the
-/// theme API, and it may change when iced eventually adds a warning
-/// semantic. See RFC-014-C.
-const WARNING_COLOR: Color = Color::from_rgb(0.851, 0.467, 0.024);
 
 // =========================================================================
 // Render-order policy
@@ -114,6 +150,7 @@ pub(crate) fn render_toasts<'a, Message>(
     toasts: Vec<Toast<Message>>,
     position: ToastPosition,
     direction: LayoutDirection,
+    style: ToastStyle,
 ) -> Option<Element<'a, Message>>
 where
     Message: Clone + 'a,
@@ -128,14 +165,14 @@ where
         // so iterate in reverse — newest (back of queue) is pushed first.
         ToastRenderOrder::ReverseChronological => {
             for toast in toasts.into_iter().rev() {
-                stack_col = stack_col.push(render_single_toast(toast));
+                stack_col = stack_col.push(render_single_toast(toast, style));
             }
         }
         // Bottom anchors: newest must be at the bottom of the column (last child),
         // so iterate in chronological order — newest (back of queue) is pushed last.
         ToastRenderOrder::Chronological => {
             for toast in toasts {
-                stack_col = stack_col.push(render_single_toast(toast));
+                stack_col = stack_col.push(render_single_toast(toast, style));
             }
         }
     }
@@ -176,13 +213,27 @@ fn horizontal_align(position: ToastPosition, direction: LayoutDirection) -> Hori
     }
 }
 
-fn render_single_toast<'a, Message>(toast: Toast<Message>) -> Element<'a, Message>
+fn render_single_toast<'a, Message>(
+    toast: Toast<Message>,
+    style: ToastStyle,
+) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
     let intent = toast.intent;
+    let intents = style.intents;
 
-    let text_col = column![text(toast.title).size(16), text(toast.message).size(14),].spacing(4);
+    // No literal sizes (RFC-104): each inherits the host's
+    // `default_text_size` unless the caller's style maps it to a role.
+    let mut title = text(toast.title);
+    if let Some(size) = style.title_size {
+        title = title.size(size);
+    }
+    let mut message = text(toast.message);
+    if let Some(size) = style.message_size {
+        message = message.size(size);
+    }
+    let text_col = column![title, message].spacing(4);
 
     // The close glyph. **Two sites must agree on it**: this one and
     // `snora_widgets::icon::icon_element_sized`, which renders
@@ -227,7 +278,7 @@ where
     let close_btn = button(container(close_glyph).center(Length::Fixed(CLOSE_TARGET_MIN)))
         .on_press(toast.on_dismiss)
         .padding(0)
-        .style(move |theme, status| close_button_style(theme, intent, status));
+        .style(move |theme, status| close_button_style(theme, intent, status, intents));
 
     let body = row![container(text_col).width(Length::Fill), close_btn]
         .align_y(Center)
@@ -241,7 +292,7 @@ where
         container(body)
             .width(Length::Fixed(TOAST_WIDTH))
             .padding(12)
-            .style(move |theme| toast_style(theme, intent))
+            .style(move |theme| toast_style(theme, intent, intents))
             .id(crate::identifiers::toast_id(toast.id)),
     )
 }
@@ -260,12 +311,16 @@ where
 /// **Corrected 2026-09-02 (RFC-086), all figures re-measured, not
 /// inherited from the audit:**
 ///
-/// - `Warning` — F-05. `WARNING_COLOR` vs `Color::WHITE` measured
-///   **3.18:1**, matching the audit. Two repairs were measured, not
-///   assumed: darkening the fill ~20-25% while keeping white text reaches
-///   AA (4.73-5.26:1) but changes the amber's own identity; switching the
-///   text to `Color::BLACK` against the **unchanged** fill measures
-///   **6.60:1** — real margin, and preserves `WARNING_COLOR` exactly.
+/// - `Warning` — F-05. The private amber constant this used to carry vs
+///   `Color::WHITE` measured **3.18:1**, matching the audit. Two repairs
+///   were measured, not assumed: darkening the fill ~20-25% while keeping
+///   white text reaches AA (4.73-5.26:1) but changes the amber's own
+///   identity; switching the text to `Color::BLACK` against the
+///   **unchanged** fill measures **6.60:1** — real margin, and preserved
+///   the amber exactly. **RFC-104 then retired the constant**: iced
+///   0.14's extended palette does carry a `warning` pair, so the fill and
+///   its text now come from the theme like every other intent, and a host
+///   that themes its warning colour finally gets it.
 ///   Chose the text swap: the identity property traded is "how Warning
 ///   reads at a glance" (white-on-color to black-on-color), not the
 ///   colour itself. `Success` and `Error` both keep white text, so
@@ -287,7 +342,17 @@ where
 /// - `Error` — unchanged; passes (`4.83:1` both themes) — thinner than
 ///   `Success`'s margin but does clear the floor, and Q-3 asked to
 ///   report passes, not to re-tune ones that already hold.
-fn intent_colors(theme: &iced::Theme, intent: ToastIntent) -> (Color, Color) {
+fn intent_colors(
+    theme: &iced::Theme,
+    intent: ToastIntent,
+    overrides: Option<ToastIntentColors>,
+) -> (Color, Color) {
+    // The `design` path supplies the token palette's own status pairs
+    // (RFC-104); without them the pairs are derived from the theme.
+    if let Some(overrides) = overrides {
+        return overrides.pair(intent);
+    }
+
     let ep = theme.extended_palette();
     match intent {
         ToastIntent::Debug => (ep.background.strong.color, ep.background.strong.text),
@@ -296,11 +361,12 @@ fn intent_colors(theme: &iced::Theme, intent: ToastIntent) -> (Color, Color) {
         // figures behind both changes.
         ToastIntent::Info => (ep.primary.strong.color, Color::BLACK),
         ToastIntent::Success => (ep.success.base.color, ep.success.base.text),
-        // iced's extended palette has no `warning` semantic pair; use the
-        // private fallback constant. See RFC-014-C and WARNING_COLOR
-        // above. Text corrected white -> black (RFC-086 F-05); fill
-        // unchanged.
-        ToastIntent::Warning => (WARNING_COLOR, Color::BLACK),
+        // From the theme, not from a literal (RFC-104). iced 0.14's
+        // extended palette does carry a `warning` pair — the comment
+        // that said it does not predates it — so a host that themes its
+        // warning colour now gets it here, and the paired `.text` comes
+        // with it instead of a hardcoded black.
+        ToastIntent::Warning => (ep.warning.base.color, ep.warning.base.text),
         ToastIntent::Error => (ep.danger.base.color, ep.danger.base.text),
     }
 }
@@ -308,10 +374,14 @@ fn intent_colors(theme: &iced::Theme, intent: ToastIntent) -> (Color, Color) {
 /// Style a toast surface based on its intent. Colors are pulled from the
 /// theme's extended palette where available, with a hand-picked warning
 /// color (iced's extended palette has no `warning` pair of its own).
-fn toast_style(theme: &iced::Theme, intent: ToastIntent) -> iced::widget::container::Style {
+fn toast_style(
+    theme: &iced::Theme,
+    intent: ToastIntent,
+    overrides: Option<ToastIntentColors>,
+) -> iced::widget::container::Style {
     use iced::widget::container::Style;
 
-    let (background, text_color) = intent_colors(theme, intent);
+    let (background, text_color) = intent_colors(theme, intent, overrides);
 
     Style {
         background: Some(Background::Color(background)),
@@ -368,8 +438,9 @@ fn close_button_style(
     theme: &iced::Theme,
     intent: ToastIntent,
     _status: button::Status,
+    overrides: Option<ToastIntentColors>,
 ) -> button::Style {
-    let (_, text_color) = intent_colors(theme, intent);
+    let (_, text_color) = intent_colors(theme, intent, overrides);
     button::Style {
         background: None,
         text_color,

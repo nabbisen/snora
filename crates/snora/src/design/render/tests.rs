@@ -378,3 +378,49 @@ fn responsive_render_keeps_the_design_chrome() {
          which is exactly the RFC-053 defect this test exists to catch",
     );
 }
+
+// ---------------------------------------------------------------------
+// The toast layer's style reaches the toast (RFC-104)
+// ---------------------------------------------------------------------
+
+/// `chrome_style` carries the toast's sizes and colours.
+///
+/// **Why this is structural rather than rendered.** The sizes are
+/// covered end to end by `crates/snora/tests/host_text_sizes.rs`, which
+/// measures a rendered toast against the token role's size. The colours
+/// cannot be: a fill is not visible to `Simulator::find`, and a
+/// frame-hash comparison cannot separate the two sources either, because
+/// `snora_style::theme::theme` derives its `warning` tier from the same
+/// `palette.warning` / `palette.warning_text` the design path reads —
+/// change either and both paths move. What is left to assert is the
+/// wiring itself, which is what this does: without it, `ChromeStyle`
+/// could carry sizes and silently keep deriving colours from the theme,
+/// and `design_path_intents_use_the_token_palette` would not notice,
+/// since it builds the pairs itself.
+#[test]
+fn chrome_style_carries_the_toast_sizes_and_colours() {
+    for (name, tokens) in [
+        ("light", Tokens::light()),
+        ("dark", Tokens::dark()),
+        ("high_contrast_light", Tokens::high_contrast_light()),
+        ("high_contrast_dark", Tokens::high_contrast_dark()),
+    ] {
+        let toast = chrome_style(&tokens).toast;
+        assert_eq!(
+            toast.title_size,
+            Some(snora_style::text::title_size(&tokens).0),
+            "{name}: the toast title's size does not reach the toast layer",
+        );
+        assert_eq!(
+            toast.message_size,
+            Some(snora_style::text::body_size(&tokens).0),
+            "{name}: the toast message's size does not reach the toast layer",
+        );
+        assert_eq!(
+            toast.intents,
+            Some(toast_intent_colors(&tokens)),
+            "{name}: the token palette's intent colours do not reach the toast layer, so its \
+             toasts are still coloured from the iced theme",
+        );
+    }
+}

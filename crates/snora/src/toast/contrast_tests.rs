@@ -139,9 +139,119 @@ fn theme_contexts() -> [(&'static str, Theme); 2] {
 }
 
 fn toast_background(theme: &Theme, intent: ToastIntent) -> Color {
-    match toast_style(theme, intent).background {
+    match toast_style(theme, intent, None).background {
         Some(iced::Background::Color(c)) => c,
         other => panic!("toast_style background changed shape: {other:?}"),
+    }
+}
+
+/// The Warning fill comes from the theme, not from a literal (RFC-104).
+///
+/// It used to be `WARNING_COLOR`, a private constant, under a comment
+/// saying iced's extended palette had no `warning` pair. iced 0.14's
+/// does. A host that themes its warning colour now gets it, and the
+/// text is the `.text` iced pairs with that fill rather than a
+/// hardcoded black.
+#[test]
+fn warning_fill_and_text_come_from_the_theme() {
+    for (theme_name, theme) in theme_contexts() {
+        let ep = theme.extended_palette();
+        let style = toast_style(&theme, ToastIntent::Warning, None);
+        assert_eq!(
+            toast_background(&theme, ToastIntent::Warning),
+            ep.warning.base.color,
+            "{theme_name}: the Warning toast's fill is not the theme's warning colour",
+        );
+        assert_eq!(
+            style.text_color,
+            Some(ep.warning.base.text),
+            "{theme_name}: the Warning toast's text is not the theme's paired warning text",
+        );
+    }
+}
+
+/// Every intent's text clears AA against its own fill, on the `design`
+/// path — where the pairs come from the token palette rather than the
+/// theme (RFC-104).
+///
+/// The default path's equivalent is
+/// [`toast_body_text_meets_aa_all_intents_both_themes`] above; between
+/// them, every intent is asserted on both paths.
+#[cfg(feature = "design")]
+#[test]
+fn design_path_toast_text_meets_aa_all_intents_all_presets() {
+    use snora_design::Tokens;
+
+    let mut failures = Vec::new();
+    for (preset, tokens) in [
+        ("light", Tokens::light()),
+        ("dark", Tokens::dark()),
+        ("high_contrast_light", Tokens::high_contrast_light()),
+        ("high_contrast_dark", Tokens::high_contrast_dark()),
+    ] {
+        let overrides = crate::design::render::toast_intent_colors(&tokens);
+        let theme = snora_style::theme::theme(&tokens);
+        for intent in ALL_INTENTS {
+            let style = toast_style(&theme, intent, Some(overrides));
+            let bg = match style.background {
+                Some(iced::Background::Color(c)) => c,
+                other => panic!("toast_style background changed shape: {other:?}"),
+            };
+            let fg = style
+                .text_color
+                .expect("toast_style always sets text_color");
+            let r = text_contrast(fg, bg);
+            if r < AA_TEXT {
+                failures.push(format!(
+                    "{preset} / {}: body text {r:.3}:1 < {AA_TEXT} (fg {fg:?} bg {bg:?})",
+                    intent_label(intent),
+                ));
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} failing combination(s):\n{}",
+        failures.len(),
+        failures.join("\n"),
+    );
+}
+
+/// The `design` path's fills are the token palette's own status
+/// colours, not the theme's (RFC-104).
+///
+/// Without this, the path could carry sizes and silently keep deriving
+/// its colours from the `iced::Theme`, which is the defect.
+#[cfg(feature = "design")]
+#[test]
+fn design_path_intents_use_the_token_palette() {
+    use snora_design::Tokens;
+    use snora_style::color::to_iced_color;
+
+    for (preset, tokens) in [("light", Tokens::light()), ("dark", Tokens::dark())] {
+        let overrides = crate::design::render::toast_intent_colors(&tokens);
+        let theme = snora_style::theme::theme(&tokens);
+        let p = &tokens.palette;
+        for (intent, fill, text) in [
+            (ToastIntent::Info, p.info, p.info_text),
+            (ToastIntent::Success, p.success, p.success_text),
+            (ToastIntent::Warning, p.warning, p.warning_text),
+            (ToastIntent::Error, p.danger, p.danger_text),
+        ] {
+            let style = toast_style(&theme, intent, Some(overrides));
+            assert_eq!(
+                style.background,
+                Some(iced::Background::Color(to_iced_color(fill))),
+                "{preset} / {}: the design path's fill is not the token palette's",
+                intent_label(intent),
+            );
+            assert_eq!(
+                style.text_color,
+                Some(to_iced_color(text)),
+                "{preset} / {}: the design path's text is not the token palette's pair",
+                intent_label(intent),
+            );
+        }
     }
 }
 
@@ -184,7 +294,7 @@ fn toast_body_text_meets_aa_all_intents_both_themes() {
     let mut failures = Vec::new();
     for (theme_name, theme) in theme_contexts() {
         for intent in ALL_INTENTS {
-            let style = toast_style(&theme, intent);
+            let style = toast_style(&theme, intent, None);
             let bg = toast_background(&theme, intent);
             let fg = style
                 .text_color
@@ -239,7 +349,7 @@ fn toast_dismiss_mark_meets_non_text_floor_all_intents_both_themes() {
         for intent in ALL_INTENTS {
             let bg = toast_background(&theme, intent);
             for status in ALL_STATUSES {
-                let btn = close_button_style(&theme, intent, status);
+                let btn = close_button_style(&theme, intent, status, None);
                 let r = text_contrast(btn.text_color, bg);
                 if r < NON_TEXT_MIN {
                     failures.push(format!(

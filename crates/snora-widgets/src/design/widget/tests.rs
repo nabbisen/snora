@@ -36,6 +36,10 @@ fn named_presets() -> [(&'static str, Tokens); 4] {
 #[test]
 fn header_unstyled_matches_literal_inventory() {
     let g = HeaderGeometry::unstyled();
+    // RFC-104: no literal size — the title inherits the host's
+    // `default_text_size`, as do the header's menus.
+    assert_eq!(g.title_size, None);
+    assert_eq!(g.menu_label_size, None);
     assert_eq!(g.gap, 12.0);
     assert_eq!(g.pad_x, 16.0);
     assert_eq!(g.pad_y, 8.0);
@@ -62,6 +66,10 @@ fn sidebar_unstyled_matches_literal_inventory() {
 #[test]
 fn tab_unstyled_matches_literal_inventory() {
     let g = TabGeometry::unstyled();
+    assert_eq!(
+        g.label_size, None,
+        "RFC-104: the unstyled tab label inherits"
+    );
     assert_eq!(g.bar_gap, 2.0);
     assert_eq!(g.bar_pad_x, 12.0);
     assert_eq!(g.content_gap, 6.0);
@@ -74,6 +82,10 @@ fn tab_unstyled_matches_literal_inventory() {
 #[test]
 fn crumb_unstyled_matches_literal_inventory() {
     let g = CrumbGeometry::unstyled();
+    assert_eq!(
+        g.label_size, None,
+        "RFC-104: the unstyled crumb label inherits"
+    );
     assert_eq!(g.gap, 6.0);
     assert_eq!(g.row_pad_x, 12.0);
     assert_eq!(g.row_pad_y, 4.0);
@@ -85,6 +97,10 @@ fn crumb_unstyled_matches_literal_inventory() {
 #[test]
 fn menu_unstyled_matches_literal_inventory() {
     let g = crate::menu::MenuGeometry::unstyled();
+    assert_eq!(
+        g.label_size, None,
+        "RFC-104: the unstyled menu label inherits"
+    );
     assert_eq!(g.gap, 6.0);
 }
 
@@ -116,6 +132,16 @@ fn header_geometry_matches_mapping_all_presets() {
         assert_eq!(
             g.menu_gap, t.spacing.sm,
             "{name}: header menu_gap should map to Spacing::sm"
+        );
+        assert_eq!(
+            g.title_size,
+            Some(snora_style::text::title_size(&t).0),
+            "{name}: header title_size should map to Typography::title (RFC-104)"
+        );
+        assert_eq!(
+            g.menu_label_size,
+            Some(snora_style::text::label_size(&t).0),
+            "{name}: the header's menu labels should map to Typography::label (RFC-104)"
         );
     }
 }
@@ -190,6 +216,11 @@ fn tab_geometry_matches_mapping_all_presets() {
             g.tab_pad_y, t.spacing.sm,
             "{name}: tab tab_pad_y should map to Spacing::sm"
         );
+        assert_eq!(
+            g.label_size,
+            Some(snora_style::text::label_size(&t).0),
+            "{name}: tab label_size should map to Typography::label (RFC-104)"
+        );
         // No `bar_border_radius` row: RFC-102 retired the field. The bar
         // has `background: None`, so its radius was visible only through
         // the container border, and that border is now a rule element
@@ -224,6 +255,11 @@ fn breadcrumb_geometry_matches_mapping_all_presets() {
         assert_eq!(
             g.btn_radius, t.radius.sm,
             "{name}: crumb btn_radius should map to Radius::sm"
+        );
+        assert_eq!(
+            g.label_size,
+            Some(snora_style::text::label_size(&t).0),
+            "{name}: crumb label_size should map to Typography::label (RFC-104)"
         );
     }
 }

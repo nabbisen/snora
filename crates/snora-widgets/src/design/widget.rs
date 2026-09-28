@@ -46,12 +46,16 @@
 //! | tab | `content_gap` | 6 | `Spacing::sm` | **no** | shared "icon-label inline gap" rhythm with menu/crumb, below |
 //! | tab | `tab_pad_x` | 12 | `Spacing::md` | yes | button horizontal padding |
 //! | tab | `tab_pad_y` | 8 | `Spacing::sm` | yes | button vertical padding, smaller than horizontal |
+//! | tab | `label_size` | 13 | `Typography::label` | **no** | 13 has no role; `label` is the role for a control's own text (RFC-104) |
 //! | crumb | `gap` | 6 | `Spacing::sm` | **no** | shared inline-gap rhythm (see below) |
 //! | crumb | `row_pad_x` | 12 | `Spacing::md` | yes | trail's horizontal padding |
 //! | crumb | `row_pad_y` | 4 | `Spacing::xs` | yes | trail's shallow vertical padding |
 //! | crumb | `btn_pad_x` | 4 | `Spacing::xs` | yes | per-crumb button horizontal padding |
 //! | crumb | `btn_pad_y` | 2 | `Spacing::xs` | **no** | no token smaller than `xs`; used as the floor |
 //! | crumb | `btn_radius` | 3 | `Radius::sm` | **no** | `sm` is the smallest radius available |
+//! | crumb | `label_size` | 13 | `Typography::label` | **no** | same role as the tab's, and the separator follows the crumbs (RFC-104) |
+//! | menu | `label_size` | 14 | `Typography::label` | **no** | trigger and items are controls; 14 has no role (RFC-104) |
+//! | header | `title_size` | 16 | `Typography::title` | yes | `title` is documented "card / dialog / notice title"; the header's is the page's (RFC-104) |
 //! | menu | `gap` | 6 | `Spacing::sm` | **no** | shared inline-gap rhythm (see below) |
 //!
 //! **The sidebar's horizontal padding is derived, not mapped (RFC-099).**
@@ -174,7 +178,9 @@ fn header_geometry(tokens: &Tokens) -> HeaderGeometry {
         pad_x: tokens.spacing.lg,
         pad_y: tokens.spacing.sm,
         radius: tokens.radius.sm,
+        title_size: Some(snora_style::text::title_size(tokens).0),
         menu_gap: tokens.spacing.sm,
+        menu_label_size: Some(snora_style::text::label_size(tokens).0),
     }
 }
 
@@ -265,6 +271,7 @@ fn tab_geometry(tokens: &Tokens) -> TabGeometry {
         content_gap: tokens.spacing.sm,
         tab_pad_x: tokens.spacing.md,
         tab_pad_y: tokens.spacing.sm,
+        label_size: Some(snora_style::text::label_size(tokens).0),
     }
 }
 
@@ -291,6 +298,7 @@ fn breadcrumb_geometry(tokens: &Tokens) -> CrumbGeometry {
         btn_pad_x: tokens.spacing.xs,
         btn_pad_y: tokens.spacing.xs,
         btn_radius: tokens.radius.sm,
+        label_size: Some(snora_style::text::label_size(tokens).0),
     }
 }
 

@@ -55,7 +55,7 @@ use snora_core::{AppLayout, LayoutDirection};
 use crate::identifiers;
 use crate::overlay::dialog::DialogCardStyle;
 use crate::overlay::{dialog::render_dialog, sheet::render_sheet};
-use crate::toast::render_toasts;
+use crate::toast::{ToastStyle, render_toasts};
 
 /// Style parameters [`render_with_style`] composes into the layer stack,
 /// letting [`render`] (unstyled) and [`crate::design::render::render`]
@@ -67,6 +67,11 @@ pub(crate) struct ChromeStyle {
     /// Card wrapper for the dialog layer (layer 5). `None` renders
     /// `dialog.content` centered with no card at all.
     pub(crate) dialog_card: Option<DialogCardStyle>,
+    /// How the toast layer (layer 7) sizes and colours itself
+    /// (RFC-104). The engine renders toasts itself, so without this the
+    /// `design` path could not reach them at all: `ChromeStyle` carried
+    /// only the dim and the dialog card.
+    pub(crate) toast: ToastStyle,
 }
 
 impl ChromeStyle {
@@ -77,6 +82,8 @@ impl ChromeStyle {
         Self {
             dim_color: Color::from_rgba(0.0, 0.0, 0.0, 0.4),
             dialog_card: None,
+            // Inherit the host's text size; derive colours from the theme.
+            toast: ToastStyle::default(),
         }
     }
 }
@@ -160,8 +167,12 @@ where
     // -----------------------------------------------------------------
     // Layer 7 — toasts.
     // -----------------------------------------------------------------
-    if let Some(toast_layer) = render_toasts(layout.toasts, layout.toast_position, layout.direction)
-    {
+    if let Some(toast_layer) = render_toasts(
+        layout.toasts,
+        layout.toast_position,
+        layout.direction,
+        style.toast,
+    ) {
         layers = layers.push(toast_layer);
     }
 
