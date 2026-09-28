@@ -15,6 +15,14 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+### Added
+
+- **An open menu's dropdown is asserted (RFC-103).** Nothing covered it:
+  the menu tests in `render_semantics.rs` exercise the engine's menu
+  layers, which is a different code path from `snora-widgets`'
+  `render_menu`. `crates/snora/tests/menu_dropdown.rs` now asserts that
+  an open menu draws its items and a closed one does not.
+
 ### Fixed
 
 - **Chrome labels ignored the host's text size, on both paths
@@ -51,6 +59,31 @@ are recorded in the per-version migration guides under
   `surface_raised`/`text_primary` pairing).
 
 ### Changed
+
+- **The channel register now covers states, not only variants
+  (RFC-103).** A test and documentation change; no behaviour changes.
+  RFC-093's register asserts that a `Tone` varies a style by colour
+  alone. The new state register asserts the opposite property for the
+  states a user must be able to identify: that something other than hue
+  distinguishes them (WCAG 1.4.1). It covers the active tab, the active
+  sidebar item, an open menu, the breadcrumb leaf, a selected chip, a
+  disabled chip and a disabled prefab button, with a compile error if a
+  state is added without deciding what tells a user it is on.
+
+  Newly asserted, in all four presets: **a selected chip differs from an
+  unselected one by ≥ 3.0:1** (measured 6.19–11.75), and **a disabled
+  selected chip differs from an enabled one by ≥ 2.6:1** (measured
+  2.64–3.59), as does a disabled prefab button on the channel its family
+  uses — fill for `primary` and `danger`, label for `secondary` and
+  `ghost` — at ≥ 2.9:1 (measured 2.92–4.05).
+
+  **One gap is recorded rather than closed**, because closing it is a
+  design change: **a disabled *unselected* chip is indistinguishable
+  from an enabled one.** Measured 1.00–1.05:1, with its text colour and
+  border unchanged. The register pins this, so closing it fails the test
+  and forces the record to be updated.
+
+  REQ-004 in the consumer requirements register, stated by **tekstide**.
 
 - **Unstyled chrome and toast label sizes now follow
   `default_text_size` (RFC-104),** which is 16 unless the application

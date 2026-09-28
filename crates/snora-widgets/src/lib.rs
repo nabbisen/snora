@@ -48,6 +48,9 @@ mod tab;
 #[cfg(all(test, feature = "design"))]
 mod contrast_tests;
 
+#[cfg(all(test, feature = "design"))]
+mod state_register;
+
 /// Prefab design widgets for Snora Design tokens.
 ///
 /// Available when the `design` feature is enabled. Provides the

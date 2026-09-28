@@ -176,7 +176,7 @@ pub(super) fn with_close_tooltip<'a, Message: 'a>(
 /// WCAG AA (4.5:1) at hovered (α=0.22) and pressed (α=0.30) states after
 /// compositing over the surface. Solid background + paired foreground role
 /// yields ≥6.7:1 across all four built-in presets.
-fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
+pub(crate) fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
     let accent = style::color::to_iced_color(tokens.palette.accent);
     let accent_text = style::color::to_iced_color(tokens.palette.accent_text);
     let bg = match status {
@@ -197,7 +197,7 @@ fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style
     }
 }
 
-fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> button::Style {
+pub(crate) fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> button::Style {
     let border_col = style::color::to_iced_color(tokens.palette.border);
     let text_col = style::color::to_iced_color(tokens.palette.text_secondary);
     let surface = style::color::to_iced_color(tokens.palette.surface);
