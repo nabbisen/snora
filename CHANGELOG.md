@@ -15,6 +15,28 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+### Fixed
+
+- **A disabled unselected chip looked enabled (RFC-106).** Both disabled
+  chip states dimmed only their fill, and an unselected chip's fill is
+  `surface` at half alpha over a page that is nearly `surface` —
+  measured **1.00–1.05:1** against the enabled fill, with its label and
+  border unchanged. There was nothing to tell the two apart.
+
+  **A disabled chip's label and border are now dimmed to 45% opacity**,
+  the same factor a disabled button uses, so the two read alike. The
+  unselected chip's label measures **3.84 / 3.18 / 6.03 / 4.50** across
+  the four presets against its enabled state, clearing the 3.0 non-text
+  floor in every one. The selected chip's fill remains its cue
+  (2.64–3.59, unchanged), and its label and border dim for consistency.
+  Fills are untouched.
+
+  A disabled chip's label sits below AA against its own fill by design:
+  WCAG 1.4.3 exempts inactive components, and the cue is that it dimmed.
+
+  **Found by RFC-103's state register**, which recorded the gap rather
+  than closing it, with a test that failed the moment it was closed.
+
 ### Added
 
 - **Verbatim and bounded-work assertions (RFC-105).** A fixture

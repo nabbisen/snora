@@ -74,6 +74,27 @@ use snora_style as style;
 // Private helpers
 // ---------------------------------------------------------------------------
 
+/// How much of its opacity a disabled chip's label and border keep
+/// (RFC-106).
+///
+/// The same factor `snora_style::button::disabled_alpha` applies to a
+/// disabled button, so the two read alike — **reproduced rather than
+/// shared** because that function is private to `snora-style`, and
+/// widening a frozen crate's public surface for one number is the worse
+/// trade. If one moves, move both.
+///
+/// The fill's own half alpha is unchanged: it is the selected chip's
+/// existing cue, and nothing measured asks for it to move.
+const CHIP_DISABLED_ALPHA: f32 = 0.45;
+
+/// Dims a colour to [`CHIP_DISABLED_ALPHA`] of its opacity.
+fn dimmed(color: Color) -> Color {
+    Color {
+        a: color.a * CHIP_DISABLED_ALPHA,
+        ..color
+    }
+}
+
 /// Blends a color toward black by `amount`. Used for hover/press states.
 fn darken(color: Color, amount: f32) -> Color {
     Color {
@@ -189,18 +210,26 @@ pub(super) fn with_close_tooltip<'a, Message: 'a>(
 pub(crate) fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
     let accent = style::color::to_iced_color(tokens.palette.accent);
     let accent_text = style::color::to_iced_color(tokens.palette.accent_text);
+    let disabled = status == button::Status::Disabled;
     let bg = match status {
         button::Status::Active => accent,
         button::Status::Hovered => darken(accent, 0.06),
         button::Status::Pressed => darken(accent, 0.12),
         button::Status::Disabled => Color { a: 0.5, ..accent },
     };
+    // The label and border dim with the fill (RFC-106 Q-2), so the two
+    // chip states' disabled treatment reads alike.
+    let (text_color, border_color) = if disabled {
+        (dimmed(accent_text), dimmed(accent))
+    } else {
+        (accent_text, accent)
+    };
     button::Style {
         background: Some(bg.into()),
-        text_color: accent_text,
+        text_color,
         border: Border::default()
             .rounded(tokens.radius.pill)
-            .color(accent)
+            .color(border_color)
             .width(1.0),
         shadow: iced::Shadow::default(),
         snap: true,
@@ -211,18 +240,29 @@ pub(crate) fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> 
     let border_col = style::color::to_iced_color(tokens.palette.border);
     let text_col = style::color::to_iced_color(tokens.palette.text_secondary);
     let surface = style::color::to_iced_color(tokens.palette.surface);
+    let disabled = status == button::Status::Disabled;
     let bg = match status {
         button::Status::Active => surface,
         button::Status::Hovered => darken(surface, 0.04),
         button::Status::Pressed => darken(surface, 0.08),
         button::Status::Disabled => Color { a: 0.5, ..surface },
     };
+    // **This chip's fill cannot carry its disabled cue** (RFC-106): it is
+    // `surface` at half alpha over a page that is nearly `surface`, which
+    // measured 1.00-1.05:1 against the enabled fill — a disabled
+    // unselected chip was indistinguishable from an enabled one. The
+    // label and border carry it instead.
+    let (text_color, border_color) = if disabled {
+        (dimmed(text_col), dimmed(border_col))
+    } else {
+        (text_col, border_col)
+    };
     button::Style {
         background: Some(bg.into()),
-        text_color: text_col,
+        text_color,
         border: Border::default()
             .rounded(tokens.radius.pill)
-            .color(border_col)
+            .color(border_color)
             .width(1.0),
         shadow: iced::Shadow::default(),
         snap: true,

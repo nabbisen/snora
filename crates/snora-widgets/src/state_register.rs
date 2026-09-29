@@ -121,14 +121,43 @@ pub(crate) enum Cue {
         asserted_by: Option<(&'static str, &'static str)>,
     },
     /// The state's own surface differs in luminance from the surface it
-    /// is read against, by at least `min`:1.
-    Luminance { min: f32 },
+    /// is read against, by at least `min`:1, **in a named channel**.
+    ///
+    /// The channel is part of the register because "whichever channel
+    /// differs" would pass a cue that moved somewhere a user does not
+    /// look — RFC-103's reason for naming it per family for the prefab
+    /// button, applied to the data rather than left in one test.
+    Luminance { min: f32, channel: Channel },
     /// The state is carried by where the element sits, not by how it is
     /// painted.
     Position,
-    /// **Snora draws nothing.** `measured` is the ratio that ought to be
-    /// a cue and is not.
+    /// **Snora draws nothing.** `measured_at_most` is the ratio that
+    /// ought to be a cue and is not.
+    ///
+    /// **No state carries this today** — RFC-106 closed the last one, a
+    /// disabled unselected chip. It stays, unconstructed, because
+    /// [`states_without_a_cue`] is what forces the next gap to be
+    /// recorded here rather than discovered by a consumer, and a variant
+    /// that has to be re-invented under deadline will not be.
+    #[allow(dead_code, reason = "kept so the next gap has somewhere honest to go")]
     Missing { measured_at_most: f32 },
+}
+
+/// Which part of a control carries its luminance cue.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Channel {
+    /// The control's own fill.
+    Fill,
+    /// The control's label. The cue for a control whose fill cannot
+    /// carry one — an unselected chip's fill is `surface` over a page
+    /// that is nearly `surface`, so dimming it changes nothing a user
+    /// can see (RFC-106).
+    Label,
+    /// The channel differs by style family, and the assertion names each
+    /// one: `primary` and `danger` fill their button, so their cue is the
+    /// fill; `secondary` and `ghost` are transparent in both states, so
+    /// theirs is the label.
+    PerFamily,
 }
 
 /// The register itself. Exhaustive on purpose: a new [`State`] cannot be
@@ -144,15 +173,34 @@ pub(crate) const fn cue(state: State) -> Cue {
         State::MenuOpen => Cue::Shape {
             asserted_by: Some(("an_open_menu_draws_its_dropdown", MENU_DROPDOWN_SRC)),
         },
-        State::SidebarItemActive => Cue::Luminance { min: 3.0 },
-        State::ChipSelected => Cue::Luminance { min: 3.0 },
+        State::SidebarItemActive => Cue::Luminance {
+            min: 3.0,
+            channel: Channel::Fill,
+        },
+        State::ChipSelected => Cue::Luminance {
+            min: 3.0,
+            channel: Channel::Fill,
+        },
         // Measured 2.64 (dark) .. 3.59 (hc_light); floor is the minimum
-        // rounded down to one decimal.
-        State::ChipSelectedDisabled => Cue::Luminance { min: 2.6 },
+        // rounded down to one decimal. RFC-106 dimmed this chip's label
+        // and border too; the fill remains the registered cue, and the
+        // label's own numbers are in the assertion's comment.
+        State::ChipSelectedDisabled => Cue::Luminance {
+            min: 2.6,
+            channel: Channel::Fill,
+        },
         // Measured 2.92 (danger, light) .. 4.05; same rule.
-        State::DesignButtonDisabled => Cue::Luminance { min: 2.9 },
-        State::ChipUnselectedDisabled => Cue::Missing {
-            measured_at_most: 1.1,
+        State::DesignButtonDisabled => Cue::Luminance {
+            min: 2.9,
+            channel: Channel::PerFamily,
+        },
+        // RFC-106. Its fill cannot carry a cue — `surface` at half alpha
+        // over a page that is nearly `surface` measured 1.00-1.05:1 — so
+        // the cue is the label, dimmed by the same factor disabled
+        // buttons use. Floor is the measured minimum rounded down.
+        State::ChipUnselectedDisabled => Cue::Luminance {
+            min: 3.0,
+            channel: Channel::Label,
         },
         State::BreadcrumbLeaf => Cue::Position,
     }
@@ -195,11 +243,46 @@ fn ratio_over_page(a: Color, b: Color, tokens: &Tokens) -> f32 {
     contrast::contrast_ratio(over_page(a, tokens), over_page(b, tokens))
 }
 
+/// How different a control's **label** looks between two styles, each
+/// read on the fill it is actually drawn on.
+///
+/// Compositing a label over the *page* is wrong wherever the control has
+/// a fill of its own: a selected chip's label is white on a strong
+/// accent, and white at 45% over a white page is still white, which
+/// measures 1.00:1 and reports "no cue" where a user plainly sees one.
+/// Each label is composited over its own style's fill, and that over the
+/// page.
+fn label_ratio_on_own_fill(
+    enabled: &button::Style,
+    disabled: &button::Style,
+    tokens: &Tokens,
+) -> f32 {
+    let on = |style: &button::Style| {
+        contrast::composite_over(
+            sn(style.text_color),
+            contrast::composite_over(
+                sn(fill(style)),
+                sn(to_iced_color(tokens.palette.background)),
+            ),
+        )
+    };
+    contrast::contrast_ratio(on(enabled), on(disabled))
+}
+
 /// The floor a [`Cue::Luminance`] entry carries, for the states this
 /// module asserts itself.
 fn luminance_min(state: State) -> f32 {
     match cue(state) {
-        Cue::Luminance { min } => min,
+        Cue::Luminance { min, .. } => min,
+        other => panic!("{state:?} is registered as {other:?}, not a luminance cue"),
+    }
+}
+
+/// The channel a state's luminance cue is registered on, so an
+/// assertion reads the register rather than repeating it.
+fn luminance_channel(state: State) -> Channel {
+    match cue(state) {
+        Cue::Luminance { channel, .. } => channel,
         other => panic!("{state:?} is registered as {other:?}, not a luminance cue"),
     }
 }
@@ -220,11 +303,11 @@ fn states_without_a_cue() {
         .into_iter()
         .filter(|s| matches!(cue(*s), Cue::Missing { .. }))
         .collect();
-    assert_eq!(
-        missing,
-        vec![State::ChipUnselectedDisabled],
-        "the set of states with no cue changed; update the register and its \
-         module documentation, and tell the architect either way",
+    assert!(
+        missing.is_empty(),
+        "these states have no cue at all: {missing:?}. Record each one here and in the module \
+         documentation, and tell the architect — a register that lists only the states with \
+         cues is a list of good news",
     );
 
     let unasserted_shapes: Vec<State> = State::ALL
@@ -288,6 +371,14 @@ fn chip_selected_differs_from_unselected_by_luminance() {
 /// 2.82 (light) / 2.64 (dark) / 3.59 (hc_light) / 3.48 (hc_dark). The
 /// floor is the minimum rounded down, so it holds the measured margin
 /// without pinning it to one preset's exact value.
+///
+/// **The fill stays the registered channel after RFC-106**, which dimmed
+/// this chip's label and border too. Re-measured, the label on its own
+/// fill moves only **1.56 / 1.59 / 1.70 / 1.72**: the disabled fill
+/// lightens at the same time as the label, so the two move together and
+/// the pair is a weaker cue than the fill alone. The dimmed label is
+/// there to make both chip states read alike, not to carry this one's
+/// cue.
 #[test]
 fn chip_selected_disabled_differs_from_enabled() {
     let min = luminance_min(State::ChipSelectedDisabled);
@@ -303,38 +394,37 @@ fn chip_selected_disabled_differs_from_enabled() {
     }
 }
 
-/// The gap, pinned: a disabled **unselected** chip is indistinguishable
-/// from an enabled one.
+/// A disabled **unselected** chip differs from an enabled one — in its
+/// label, because its fill cannot carry the cue (RFC-106).
 ///
-/// Measured 1.04 / 1.05 / 1.00 / 1.00 — its fill is `surface` at half
-/// alpha over a page that is nearly `surface`, and neither its text
-/// colour nor its border changes at all. This asserts the gap is still
-/// there, so that closing it fails here and the register gets updated.
-/// It is not an assertion that the gap is acceptable.
+/// Its fill is `surface` at half alpha over a page that is nearly
+/// `surface`, which measured **1.00-1.05:1** and is why this state was
+/// registered as having no cue at all until RFC-106. The label is dimmed
+/// by `CHIP_DISABLED_ALPHA` instead, and measures **3.84 / 3.18 / 6.03 /
+/// 4.50** across the four presets, each label read on the fill it is
+/// drawn on. The floor is 3.0, the non-text floor, which the lowest
+/// preset clears with room.
+///
+/// **The disabled label's own contrast against its fill is not asserted
+/// here**, and is below AA in some presets: WCAG 1.4.3 exempts inactive
+/// components, and the cue is that it dimmed.
 #[test]
-fn chip_unselected_disabled_has_no_cue() {
-    let Cue::Missing { measured_at_most } = cue(State::ChipUnselectedDisabled) else {
-        panic!("ChipUnselectedDisabled is no longer registered as a missing cue");
-    };
+fn chip_unselected_disabled_differs_from_enabled() {
+    let min = luminance_min(State::ChipUnselectedDisabled);
+    assert_eq!(
+        luminance_channel(State::ChipUnselectedDisabled),
+        Channel::Label,
+        "this state's cue is registered on a channel this test does not measure",
+    );
     for (name, tokens) in presets() {
         let enabled = chip_style_unselected(&tokens, Status::Active);
         let disabled = chip_style_unselected(&tokens, Status::Disabled);
-        let ratio = ratio_over_page(fill(&enabled), fill(&disabled), &tokens);
+        let ratio = label_ratio_on_own_fill(&enabled, &disabled, &tokens);
         assert!(
-            ratio <= measured_at_most,
-            "{name}: a disabled unselected chip now differs from an enabled one by {ratio:.2}:1 \
-             — the gap this register recorded has been closed. Move the state off \
-             Cue::Missing, give it a measured floor, and update the module documentation",
-        );
-        assert_eq!(
-            enabled.text_color, disabled.text_color,
-            "{name}: the text colour now changes when an unselected chip is disabled; the \
-             register says nothing does",
-        );
-        assert_eq!(
-            enabled.border, disabled.border,
-            "{name}: the border now changes when an unselected chip is disabled; the register \
-             says nothing does",
+            ratio >= min,
+            "{name}: a disabled unselected chip's label differs from an enabled one by \
+             {ratio:.2}:1, under the {min}:1 floor — and its fill cannot carry the cue, so a \
+             user has nothing to tell the two apart by",
         );
     }
 }

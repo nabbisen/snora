@@ -168,3 +168,64 @@ fn all_statuses() -> [Status; 4] {
         Status::Disabled,
     ]
 }
+
+// ---------------------------------------------------------------------------
+// Disabled treatment (RFC-106 Q-2)
+// ---------------------------------------------------------------------------
+
+/// Both chip states dim their label and border when disabled, by
+/// exactly [`CHIP_DISABLED_ALPHA`].
+///
+/// **Why this is structural and not a contrast floor.** The register
+/// asserts each state's *cue*: the unselected chip's is its label, which
+/// measures 3.18-6.03 disabled against enabled, and the selected chip's
+/// is its fill at 2.64-3.59. The selected chip's label moves only
+/// 1.56-1.72, because its fill lightens at the same time — too little to
+/// be a floor, and not what tells a user the chip is disabled.
+///
+/// It is still ruled (Q-2) that both states dim alike, so that the two
+/// read as one treatment. Nothing else asserts that: with the selected
+/// chip's dim removed, every cue assertion still passes. This is what
+/// would notice.
+#[test]
+fn both_disabled_arms_dim_their_label_and_border() {
+    for (name, t) in named_presets() {
+        for (state, enabled, disabled) in [
+            (
+                "selected",
+                chip_style_selected(&t, Status::Active),
+                chip_style_selected(&t, Status::Disabled),
+            ),
+            (
+                "unselected",
+                chip_style_unselected(&t, Status::Active),
+                chip_style_unselected(&t, Status::Disabled),
+            ),
+        ] {
+            let expected = enabled.text_color.a * super::CHIP_DISABLED_ALPHA;
+            assert!(
+                (disabled.text_color.a - expected).abs() < 1e-6,
+                "{name}/{state}: the disabled label's alpha is {} against the expected {expected} \
+                 — both chip states must dim alike (RFC-106 Q-2)",
+                disabled.text_color.a,
+            );
+            let expected = enabled.border.color.a * super::CHIP_DISABLED_ALPHA;
+            assert!(
+                (disabled.border.color.a - expected).abs() < 1e-6,
+                "{name}/{state}: the disabled border's alpha is {} against the expected \
+                 {expected}",
+                disabled.border.color.a,
+            );
+            // The fill is not part of this: it is the selected chip's own
+            // cue and keeps its half alpha.
+            assert_eq!(
+                match disabled.background {
+                    Some(iced::Background::Color(c)) => c.a,
+                    other => panic!("{name}/{state}: background changed shape: {other:?}"),
+                },
+                0.5,
+                "{name}/{state}: the disabled fill's alpha moved; RFC-106 left it at 0.5",
+            );
+        }
+    }
+}
