@@ -14,8 +14,15 @@ and from the CI acceptance criteria.
 
 > **snora will integrate an accessibility tree when iced exposes one.**
 > Until then, ABDD means layout-direction correctness and visual
-> accessibility — contrast, logical edges, non-colour status encoding — and
-> snora states that boundary plainly rather than implying more.
+> accessibility — contrast, logical edges, and an asserted non-colour cue
+> for every state snora draws itself — and snora states that boundary
+> plainly rather than implying more.
+>
+> *(Corrected at 0.52.0, RFC-103. This line used to say "non-colour status
+> encoding". That overstated it: for semantic **variants** (toast intent,
+> notice and progress tone) snora contributes colour and the caller supplies
+> the words, by ruling (RFC-093). What snora guarantees is a cue for the
+> **states** it draws — see [the accessibility guide](../guides/accessibility.md#what-snora-does-not-provide).)*
 >
 > snora will **not** build a parallel accessibility abstraction of its own
 > in the interim.

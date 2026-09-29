@@ -1,6 +1,6 @@
 # RFC-103 — The channel register covers variants, not states
 
-**Status.** Accepted 2026-09-26; every open question ruled as suggested.
+**Status.** Done — shipped v0.52.0. Every open question ruled as suggested.
 **Raised.** 2026-09-26, architect. Source: REQ-004 in
 `contributing/consumer-requirements.md` (tekstide: *"every state that matters
 also carries a word or shape"*).

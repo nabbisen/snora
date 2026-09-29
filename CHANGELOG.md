@@ -15,6 +15,77 @@ are recorded in the per-version migration guides under
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.52.0] — 2026-09-29
+
+
+
+### Added
+
+- **Verbatim and bounded-work assertions (RFC-105).** A fixture
+  containing a bidi override, a newline and a control character is
+  passed through every caller-text surface in scope and found by exact
+  content, which shows snora hands the string to iced unmodified — it
+  says nothing about which glyphs iced then draws. And an `#[ignore]`d
+  timing test, run in release by one CI step, asserts that laying out
+  ten times as many toasts takes less than thirty times as long;
+  measured 11.6–12.0 on a Ryzen 9 9950X, against 92 with a deliberate
+  quadratic in place. REQ-003 and REQ-006, stated by **tekstide**.
+
+- **An open menu's dropdown is asserted (RFC-103).** Nothing covered it:
+  the menu tests in `render_semantics.rs` exercise the engine's menu
+  layers, which is a different code path from `snora-widgets`'
+  `render_menu`. `crates/snora/tests/menu_dropdown.rs` now asserts that
+  an open menu draws its items and a closed one does not.
+
+### Changed
+
+- **The channel register now covers states, not only variants
+  (RFC-103).** A test and documentation change; no behaviour changes.
+  RFC-093's register asserts that a `Tone` varies a style by colour
+  alone. The new state register asserts the opposite property for the
+  states a user must be able to identify: that something other than hue
+  distinguishes them (WCAG 1.4.1). It covers the active tab, the active
+  sidebar item, an open menu, the breadcrumb leaf, a selected chip, a
+  disabled chip and a disabled prefab button, with a compile error if a
+  state is added without deciding what tells a user it is on.
+
+  Newly asserted, in all four presets: **a selected chip differs from an
+  unselected one by ≥ 3.0:1** (measured 6.19–11.75), and **a disabled
+  selected chip differs from an enabled one by ≥ 2.6:1** (measured
+  2.64–3.59), as does a disabled prefab button on the channel its family
+  uses — fill for `primary` and `danger`, label for `secondary` and
+  `ghost` — at ≥ 2.9:1 (measured 2.92–4.05).
+
+  **One gap is recorded rather than closed**, because closing it is a
+  design change: **a disabled *unselected* chip is indistinguishable
+  from an enabled one.** Measured 1.00–1.05:1, with its text colour and
+  border unchanged. The register pins this, so closing it fails the test
+  and forces the record to be updated.
+
+  REQ-004 in the consumer requirements register, stated by **tekstide**.
+
+- **Unstyled chrome and toast label sizes now follow
+  `default_text_size` (RFC-104),** which is 16 unless the application
+  sets it. Measured at that default: tab and breadcrumb labels go 13 →
+  16, menu labels 14 → 16, the toast message 14 → 16; the header title
+  and toast title were already 16 and do not move. The rows they sit in
+  grow with them — the tab bar 33.9 → 37.8, the breadcrumb row 28.9 →
+  32.8, an open menu 56.4 → 61.6, and the toast surface 67.0 → 69.6.
+  **Visual baselines that include any chrome are invalidated.**
+
+  **To restore the old sizes**, set `default_text_size` to the old
+  value — but note what that does: it applies to **all** text that
+  inherits, including the application's own, and it cannot reproduce
+  the old mix, which was four different literals (13 tab/crumb, 14
+  menu/toast-message, 16 header/toast-title). An application that wants
+  per-surface sizes back should use the `design` path and set the
+  `Typography` roles, which is what they are for. On the styled path the
+  sizes now follow those roles: at the shipped presets, tab and crumb
+  labels are 14, the header and toast titles 18, and the toast message
+  16.
+
 ### Fixed
 
 - **A disabled unselected chip looked enabled (RFC-106).** Both disabled
@@ -36,26 +107,6 @@ are recorded in the per-version migration guides under
 
   **Found by RFC-103's state register**, which recorded the gap rather
   than closing it, with a test that failed the moment it was closed.
-
-### Added
-
-- **Verbatim and bounded-work assertions (RFC-105).** A fixture
-  containing a bidi override, a newline and a control character is
-  passed through every caller-text surface in scope and found by exact
-  content, which shows snora hands the string to iced unmodified — it
-  says nothing about which glyphs iced then draws. And an `#[ignore]`d
-  timing test, run in release by one CI step, asserts that laying out
-  ten times as many toasts takes less than thirty times as long;
-  measured 11.6–12.0 on a Ryzen 9 9950X, against 92 with a deliberate
-  quadratic in place. REQ-003 and REQ-006, stated by **tekstide**.
-
-- **An open menu's dropdown is asserted (RFC-103).** Nothing covered it:
-  the menu tests in `render_semantics.rs` exercise the engine's menu
-  layers, which is a different code path from `snora-widgets`'
-  `render_menu`. `crates/snora/tests/menu_dropdown.rs` now asserts that
-  an open menu draws its items and a closed one does not.
-
-### Fixed
 
 - **Long unbroken text was silently cut off (RFC-105).** A file name, a
   path, a URL or a hash — anything without spaces — was truncated at the
@@ -113,54 +164,6 @@ are recorded in the per-version migration guides under
   pairs (`info`, `success`, `warning`, `danger` with their `*_text`;
   `Debug` has no status token and maps to the neutral
   `surface_raised`/`text_primary` pairing).
-
-### Changed
-
-- **The channel register now covers states, not only variants
-  (RFC-103).** A test and documentation change; no behaviour changes.
-  RFC-093's register asserts that a `Tone` varies a style by colour
-  alone. The new state register asserts the opposite property for the
-  states a user must be able to identify: that something other than hue
-  distinguishes them (WCAG 1.4.1). It covers the active tab, the active
-  sidebar item, an open menu, the breadcrumb leaf, a selected chip, a
-  disabled chip and a disabled prefab button, with a compile error if a
-  state is added without deciding what tells a user it is on.
-
-  Newly asserted, in all four presets: **a selected chip differs from an
-  unselected one by ≥ 3.0:1** (measured 6.19–11.75), and **a disabled
-  selected chip differs from an enabled one by ≥ 2.6:1** (measured
-  2.64–3.59), as does a disabled prefab button on the channel its family
-  uses — fill for `primary` and `danger`, label for `secondary` and
-  `ghost` — at ≥ 2.9:1 (measured 2.92–4.05).
-
-  **One gap is recorded rather than closed**, because closing it is a
-  design change: **a disabled *unselected* chip is indistinguishable
-  from an enabled one.** Measured 1.00–1.05:1, with its text colour and
-  border unchanged. The register pins this, so closing it fails the test
-  and forces the record to be updated.
-
-  REQ-004 in the consumer requirements register, stated by **tekstide**.
-
-- **Unstyled chrome and toast label sizes now follow
-  `default_text_size` (RFC-104),** which is 16 unless the application
-  sets it. Measured at that default: tab and breadcrumb labels go 13 →
-  16, menu labels 14 → 16, the toast message 14 → 16; the header title
-  and toast title were already 16 and do not move. The rows they sit in
-  grow with them — the tab bar 33.9 → 37.8, the breadcrumb row 28.9 →
-  32.8, an open menu 56.4 → 61.6, and the toast surface 67.0 → 69.6.
-  **Visual baselines that include any chrome are invalidated.**
-
-  **To restore the old sizes**, set `default_text_size` to the old
-  value — but note what that does: it applies to **all** text that
-  inherits, including the application's own, and it cannot reproduce
-  the old mix, which was four different literals (13 tab/crumb, 14
-  menu/toast-message, 16 header/toast-title). An application that wants
-  per-surface sizes back should use the `design` path and set the
-  `Typography` roles, which is what they are for. On the styled path the
-  sizes now follow those roles: at the shipped presets, tab and crumb
-  labels are 14, the header and toast titles 18, and the toast message
-  16.
-
 
 ## [0.51.0] — 2026-09-26
 

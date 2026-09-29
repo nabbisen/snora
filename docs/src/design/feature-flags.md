@@ -75,19 +75,19 @@ additive.
 
 ```toml
 # Minimal (engine only)
-snora = { version = "0.51", default-features = false }
+snora = { version = "0.52", default-features = false }
 
 # Default (layout + prefab widgets)
-snora = { version = "0.51" }
+snora = { version = "0.52" }
 
 # Design tokens + helpers, no prefab widgets (RFC-055 — new)
-snora = { version = "0.51", default-features = false, features = ["design"] }
+snora = { version = "0.52", default-features = false, features = ["design"] }
 
 # Widgets + design tokens
-snora = { version = "0.51", features = ["widgets", "design"] }
+snora = { version = "0.52", features = ["widgets", "design"] }
 
 # Widgets + design + Lucide icons
-snora = { version = "0.51", features = ["widgets", "design", "lucide-icons"] }
+snora = { version = "0.52", features = ["widgets", "design", "lucide-icons"] }
 ```
 
 ## Token-only use (no iced dependency in your crate)
@@ -96,7 +96,7 @@ Use `snora-design` directly for a pure-Rust token library with no iced
 dependency:
 
 ```toml
-snora-design = { version = "0.51" }
+snora-design = { version = "0.52" }
 ```
 
 This is useful for testing token values, computing contrast in a CLI tool,

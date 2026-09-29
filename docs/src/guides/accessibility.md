@@ -98,6 +98,31 @@ contributor-facing documents linked below, not duplicated here.
   us.** That is the one report that would reopen the decision, and it
   would mean this page failed to reach you in time — which is worth
   more to us than the feature request.
+- **States snora draws itself each carry an asserted non-colour cue
+  (RFC-103, RFC-106).** Variants are the caller's to put into words (above).
+  States are different: the caller's words do not change when a tab becomes
+  active or a chip is selected, so snora supplies the cue, and a state
+  register (`crates/snora-widgets/src/state_register.rs`) makes a new state
+  without one fail to compile:
+
+  | State | Cue | Asserted |
+  |---|---|---|
+  | Active tab | shape — a 2 px underline | rendered bounds |
+  | Sidebar active item | fill | ≥ 3.0:1 against the rail |
+  | Chip selected | fill luminance | ≥ 3.0:1 against unselected (measured 6.19–11.75:1) |
+  | Chip disabled, selected | fill | ≥ 2.6:1 against enabled |
+  | Chip disabled, unselected | dimmed label | ≥ 3.0:1 against enabled |
+  | Design button disabled | fill or label, by family | ≥ 2.9:1 against enabled |
+  | Menu open | shape — the dropdown | rendered |
+  | Breadcrumb leaf | position — last, plain text | documented |
+
+  **One qualification, stated so a record does not overclaim.** A selected
+  chip's cue is a luminance difference, not a word or a shape. If your
+  conformance record needs a word or shape for it, **put a mark in the
+  chip's label** (a ✓, for instance), as orbok does. snora does not add one,
+  because a default-on mark would double theirs (RFC-103 Q-1). Disabled
+  labels are dimmed below 4.5:1 by design; WCAG 1.4.3 exempts inactive
+  controls.
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim

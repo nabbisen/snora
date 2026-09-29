@@ -1,6 +1,6 @@
 # RFC-105 — Caller text is silently clipped, and two properties are unasserted
 
-**Status.** Accepted 2026-09-26; every open question ruled as suggested.
+**Status.** Done — shipped v0.52.0. Every open question ruled as suggested.
 **Raised.** 2026-09-26, architect. Sources: REQ-003 and REQ-006. The clipping
 was found by measurement while assessing them.
 **Release target.** 0.52.0. **Priority.** Third: small, and it fixes a real

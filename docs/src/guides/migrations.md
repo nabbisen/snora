@@ -10,6 +10,10 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.51 → 0.52](migration-0.51-to-0.52.md) — **no breaking API change;
+  appearance changes on the default path.** Labels follow the host's text size,
+  long unbroken text wraps instead of being cut off, and disabled chips dim.
+  **Narrows one published accessibility claim**: read §5.
 - [0.50 → 0.51](migration-0.50-to-0.51.md) — **no breaking API change;
   rendered appearance changes** (tab bar edges, sidebar tooltip body, toast close
   target, lucide close glyphs). **Fixes accessibility defects a conformance record

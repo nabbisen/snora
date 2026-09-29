@@ -10,7 +10,7 @@ assessed against, the evidence, and what would satisfy it. When an RFC acts on
 one, the entry links to it. When the status changes, the entry is updated in the
 same change.
 
-*Status terms:* **met** (true, and asserted by a test) · **met by inspection**
+*Status terms* (entries keep their original status line, with later statuses added beneath it, so the history stays visible): **met** (true, and asserted by a test) · **met by inspection**
 (true, but nothing would fail if it stopped being true) · **partly** · **not
 met** · **blocked** (snora cannot act alone).
 
@@ -41,6 +41,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 *Proposed as **RFC-104** (2026-09-26).*
 
+**Status at 0.52.0: met (RFC-104).** Every chrome label size comes from the host: `default_text_size` on the unstyled path, and `Typography` roles on the styled path (tab, crumb and menu labels → `label`; header and toast title → `title`; toast message → `body`). The toast's Warning fill comes from the theme or tokens, with contrast asserted for every intent on both paths. **`scripts/check-literal-sizes.sh` fails the build on a literal text size** in any non-test source file. It allow-lists one named constant, `CLOSE_GLYPH_SIZE`, with its reason, and rejects path-qualified wrappers such as `iced::Pixels(13.0)`. This is the scan tekstide described.
+
 > *"Font size, font family and every theme colour come from the host."*
 
 - **Status: not met.** Chrome label sizes are literals **in both the unstyled and
@@ -67,6 +69,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 *Proposed as **RFC-105** (2026-09-26).*
 
+**Status at 0.52.0: met (RFC-105).** Caller text wraps inside a word when it must (`Wrapping::WordOrGlyph`) on the toast title and message, the notice title and body, and every tooltip, which now has a shared 320 px maximum width. That was measured on each surface, and asserted by a rendered-area check, since `visible_bounds()` cannot see the clip. **Verbatim** is asserted with tekstide's fixture (a bidi override, a newline and a control character), which is found by exact content in every caller-text surface. **Not asserted:** the glyphs drawn for those characters, which are iced's and cosmic-text's; the harness exposes frame hashes, not pixel reads.
+
 > *"A component must not re-escape, re-wrap or re-interpret them."*
 
 - **Status: partly.** No caller string is transformed (no trim, truncate,
@@ -91,6 +95,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 ### REQ-004 — Never colour alone
 
 *Proposed as **RFC-103** (2026-09-26).*
+
+**Status at 0.52.0: met by snora's rule, with one qualification (RFC-103, RFC-106).** Every state snora draws carries an asserted cue, held by a state register that fails to compile without one (see the accessibility guide's table), and the disabled unselected chip, which looked enabled, is fixed. **Qualification:** a selected chip's cue is luminance (≥ 3.0:1, measured 6.19–11.75:1), not a word or shape. tekstide's word-or-shape bar is met for chips by the caller putting a mark in the label, which is documented. Variants remain the caller's to put into words, by ruling (RFC-093).
 
 > *"Every state that matters also carries a word or shape."*
 
@@ -120,6 +126,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 ### REQ-006 — Bounded work on hostile input
 
 *Proposed as **RFC-105** (2026-09-26).*
+
+**Status at 0.52.0: met (RFC-105).** Asserted by `bounded_work.rs` in release in CI: 10× the toasts must cost under 30× the layout time. It measured 11.63–11.96, and 92.18 against a deliberate quadratic edit. The numbers are recorded in `performance-envelope.md`: 656 ms layout at 100,000 toasts on the reference machine.
 
 > *"Our file explorer caps a directory at 256 drawn entries and must not stall on
 > a 100,000-entry one."*

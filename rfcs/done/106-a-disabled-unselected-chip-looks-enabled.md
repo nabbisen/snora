@@ -1,6 +1,6 @@
 # RFC-106 — A disabled unselected chip looks enabled
 
-**Status.** Accepted 2026-09-29. Q-1 = 0.45, Q-2 = yes, Q-3 = 0.52.0 before the cut.
+**Status.** Done — shipped v0.52.0. Q-1 = 0.45, Q-2 = yes, Q-3 = 0.52.0 before the cut.
 **Raised.** 2026-09-29, architect. Found by RFC-103's state register, which
 records it as `Cue::Missing` and **pins** the gap, so a test fails when it is
 closed.

@@ -1,6 +1,6 @@
 # RFC-104 — Chrome label sizes and toast colours ignore the host
 
-**Status.** Accepted 2026-09-26; every open question ruled as suggested.
+**Status.** Done — shipped v0.52.0. Every open question ruled as suggested.
 **Raised.** 2026-09-26, architect. Source: REQ-002 (tekstide: *"the single item
 that would keep us out regardless of the others"*). It is also a defect for
 current consumers.
