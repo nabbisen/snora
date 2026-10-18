@@ -170,6 +170,7 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 107 | [Release notes do not say what an upgrade means, and nothing checks them](./proposed/107-release-notes-do-not-say-what-an-upgrade-means-and-nothing-checks-them.md) | **proposed** v0.53.0 — owner-requested changelog audit; no impact lead, compare links stale for six releases (fixed in `1b58f13`), three entries rewritten after tag; a lead, a frozen-entry rule, `check-changelog.sh`, GitHub Releases |
 
 ## Archive
 
