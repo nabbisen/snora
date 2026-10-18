@@ -30,15 +30,20 @@ concurrency:
   # needs a human's judgement, not an interrupted one).
   cancel-in-progress: false
 
+# The floor, so that no job inherits more than it asks for. Each job
+# states what it needs (RFC-107): only `publish` gets `id-token`, and
+# only `github-release` gets write access to contents.
 permissions:
   contents: read
-  actions: read    # required to read this commit's CI run status
-  id-token: write  # required for crates.io Trusted Publishing (OIDC)
 
 jobs:
   publish:
     name: Publish to crates.io
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read    # required to read this commit's CI run status
+      id-token: write  # required for crates.io Trusted Publishing (OIDC)
     steps:
       - name: Checkout the tag
         uses: actions/checkout@v6
@@ -67,3 +72,51 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
         run: cargo publish --workspace
+
+  github-release:
+    name: Publish the GitHub Release
+    runs-on: ubuntu-latest
+    # Only after crates.io has accepted the upload: the Release is the
+    # announcement of a published version, and announcing one that does
+    # not exist is worse than announcing it late.
+    needs: publish
+    permissions:
+      # The only job that writes anything. No `id-token`: this job must
+      # not be able to speak to crates.io at all.
+      contents: write
+    steps:
+      - name: Checkout the tag
+        uses: actions/checkout@v6
+        with:
+          # This is the one job that holds `contents: write`, and it
+          # runs repository scripts. Nothing here pushes — `gh` reads
+          # `GH_TOKEN` from the environment — so the token has no reason
+          # to sit in `.git/config` while those scripts run.
+          persist-credentials: false
+
+      - name: Build the release notes from the changelog entry
+        # Through `env`, not interpolated into `run:`. The tag filter
+        # admits nothing injectable today; this is the same pattern the
+        # next step already uses, and it stays safe if the filter ever
+        # widens.
+        env:
+          TAG: ${{ github.ref_name }}
+        run: scripts/extract-release-notes.sh "$TAG" > notes.md
+
+      - name: Create or update the GitHub Release
+        # A failure here cannot affect the crates: `publish` has already
+        # finished, and nothing in this job touches crates.io. The
+        # release notes are the only thing at stake, and they can be
+        # re-run — "Re-run failed jobs" on this run, which is why there
+        # is no `workflow_dispatch` trigger. One would let `publish`
+        # start from an untagged ref.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; updating its notes (this is a re-run)."
+            gh release edit "$TAG" --notes-file notes.md
+          else
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notes.md
+          fi

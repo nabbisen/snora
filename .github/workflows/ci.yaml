@@ -77,7 +77,7 @@ jobs:
         # thirty times the time. Linear is about 10, and a deliberate
         # quadratic measured 92 — the bound is set to catch a change in
         # complexity, not to police absolute time.
-        run: cargo test --release -p snora --test bounded_work -- --ignored
+        run: cargo test --release -p snora --test bounded_work -- --ignored --nocapture
       - name: Test widgets, all features (RFC-087)
         # snora-widgets had no test step in CI at all before this — not a
         # feature gap, an entire crate. 28 unit tests + 6 doc-tests
@@ -300,8 +300,10 @@ jobs:
           # check-migration-guides.sh derives every minor pair it checks
           # from `git tag`. The default checkout fetches no tags, which
           # made that gate fail silently on every run from c651e93 to
-          # f153a2b (D-1 against RFC-087). The other two doc gates read
-          # the working tree and do not need this.
+          # f153a2b (D-1 against RFC-087). check-changelog.sh needs them
+          # too, and refuses to run without them rather than repeating
+          # that silence (RFC-107). The link and snippet gates read the
+          # working tree and do not need this.
           fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
       - name: Install mdBook
@@ -322,4 +324,11 @@ jobs:
         run: scripts/check-version-snippets.sh
       - name: Migration guide exists for every adopted minor pair (RFC-079 / RFC-087)
         run: scripts/check-migration-guides.sh
+      - name: Changelog is well-formed (RFC-107)
+        # Seven rules, including that a released entry still says what
+        # it said at its own tag. That one compares against `git show
+        # <tag>:...`, so it needs the tags this job already fetches —
+        # and the script refuses to run without them rather than
+        # passing vacuously.
+        run: scripts/check-changelog.sh
 
