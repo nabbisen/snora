@@ -19,7 +19,7 @@ Nothing yet.
 
 ## [0.52.0] — 2026-09-29
 
-
+**Upgrading from 0.51:** read the [0.51 → 0.52 migration guide](docs/src/guides/migration-0.51-to-0.52.md).
 
 ### Added
 
@@ -167,6 +167,7 @@ Nothing yet.
 
 ## [0.51.0] — 2026-09-26
 
+**Upgrading from 0.50:** read the [0.50 → 0.51 migration guide](docs/src/guides/migration-0.50-to-0.51.md).
 
 ### Added
 
@@ -318,6 +319,8 @@ Nothing yet.
 
 ## [0.50.0] — 2026-09-17
 
+**Upgrading from 0.49:** read the [0.49 → 0.50 migration guide](docs/src/guides/migration-0.49-to-0.50.md).
+
 ### Fixed
 
 - **The sidebar rail was narrower than its buttons, and the icon was
@@ -384,6 +387,8 @@ Nothing yet.
 
 ## [0.49.0] — 2026-09-12
 
+**Upgrading from 0.48:** read the [0.48 → 0.49 migration guide](docs/src/guides/migration-0.48-to-0.49.md).
+
 ### Fixed
 
 - **The advisory gate was blind to an entire class, and three
@@ -434,6 +439,8 @@ Nothing yet.
 
 ## [0.48.0] — 2026-09-12
 
+**Upgrading from 0.47:** read the [0.47 → 0.48 migration guide](docs/src/guides/migration-0.47-to-0.48.md).
+
 ### Changed
 
 - **The 1.0 readiness register was swept, and four gates moved.** The
@@ -466,6 +473,8 @@ Nothing yet.
   reached you too late, which matters more to us than the feature.
 
 ## [0.47.0] — 2026-09-12
+
+**Upgrading from 0.46:** read the [0.46 → 0.47 migration guide](docs/src/guides/migration-0.46-to-0.47.md).
 
 ### Added
 
@@ -534,6 +543,8 @@ Nothing yet.
 
 ## [0.46.0] — 2026-09-06
 
+**Upgrading from 0.45:** read the [0.45 → 0.46 migration guide](docs/src/guides/migration-0.45-to-0.46.md).
+
 ### Fixed
 
 - **Four doc links in published rustdoc pointed at a domain that does
@@ -563,6 +574,8 @@ Nothing yet.
   the contract document becoming checkable rather than merely stated.
 
 ## [0.45.0] — 2026-09-06
+
+**Upgrading from 0.44:** read the [0.44 → 0.45 migration guide](docs/src/guides/migration-0.44-to-0.45.md).
 
 ### Removed
 
@@ -596,6 +609,8 @@ Nothing yet.
 
 ## [0.44.0] — 2026-09-03
 
+**Upgrading from 0.43:** read the [0.43 → 0.44 migration guide](docs/src/guides/migration-0.43-to-0.44.md).
+
 ### Changed
 
 - **Four claims in the 1.0 readiness register were checked against the
@@ -620,6 +635,8 @@ Nothing yet.
   reader to discount it.
 
 ## [0.43.0] — 2026-09-02
+
+**Upgrading from 0.42:** read the [0.42 → 0.43 migration guide](docs/src/guides/migration-0.42-to-0.43.md).
 
 ### Added
 
@@ -700,6 +717,8 @@ Nothing yet.
   change.
 
 ## [0.42.0] — 2026-09-02
+
+**Upgrading from 0.41:** read the [0.41 → 0.42 migration guide](docs/src/guides/migration-0.41-to-0.42.md).
 
 ### Fixed
 
@@ -819,6 +838,8 @@ Nothing yet.
 
 ## [0.41.0] — 2026-09-01
 
+**Upgrading from 0.40:** read the [0.40 → 0.41 migration guide](docs/src/guides/migration-0.40-to-0.41.md).
+
 ### Fixed
 
 - **Overlays did not contain pointer events — a click inside a dialog
@@ -931,6 +952,8 @@ Nothing yet.
   paths at once.
 
 ## [0.40.0] — 2026-08-21
+
+**Upgrading from 0.39:** read the [0.39 → 0.40 migration guide](docs/src/guides/migration-0.39-to-0.40.md).
 
 ### Fixed
 
@@ -1121,6 +1144,8 @@ Nothing yet.
   or altered.
 
 ## [0.39.0] — 2026-08-20
+
+**Upgrading from 0.38:** read the [0.38 → 0.39 migration guide](docs/src/guides/migration-0.38-to-0.39.md).
 
 ### Added
 
@@ -3589,7 +3614,13 @@ Scope concerns:  none
 
 - 17 unit tests in `snora-core` (12 inherited from 0.6 + 2 tab + 3 crumb).
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.46.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.52.0...HEAD
+[0.52.0]: https://github.com/nabbisen/snora/compare/0.51.0...0.52.0
+[0.51.0]: https://github.com/nabbisen/snora/compare/0.50.0...0.51.0
+[0.50.0]: https://github.com/nabbisen/snora/compare/0.49.0...0.50.0
+[0.49.0]: https://github.com/nabbisen/snora/compare/0.48.0...0.49.0
+[0.48.0]: https://github.com/nabbisen/snora/compare/0.47.0...0.48.0
+[0.47.0]: https://github.com/nabbisen/snora/compare/0.46.0...0.47.0
 [0.46.0]: https://github.com/nabbisen/snora/compare/0.45.0...0.46.0
 [0.45.0]: https://github.com/nabbisen/snora/compare/0.44.0...0.45.0
 [0.44.0]: https://github.com/nabbisen/snora/compare/0.43.0...0.44.0
