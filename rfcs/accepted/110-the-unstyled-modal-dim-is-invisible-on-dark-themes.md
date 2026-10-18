@@ -1,6 +1,6 @@
 # RFC-110 — The unstyled modal dim is invisible on dark themes, and a published guarantee is false
 
-**Status.** Proposed.
+**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
 **Raised.** 2026-10-19, architect. Source: the rest of REQ-002 (tekstide: "every
 theme colour comes from the host"), whose 0.52.0 status names this dim as the last
 literal colour on the default path. Measuring it found a defect, and a published
@@ -123,3 +123,22 @@ a migration-guide item. Light-theme users get a dim slightly darker (0.40 → 0.
    quote the diff.
 5. CHANGELOG under Fixed (the dim) and Changed (the guarantee restated), and the
    migration guide carries both.
+
+---
+
+## Rulings, 2026-10-19
+
+**Q-1:** alpha 0.44. **Q-2:** dimmed vs undimmed page ≥ 3.0:1, with the guide saying
+it is snora's floor, not a WCAG requirement on dims. **Q-3:** 0.53.0, together with R-0.
+
+**R-0's docs part, done by the architect, 2026-10-19:**
+- `docs/src/design/overview.md` restates the promise as composition (asserted)
+  plus RFC-named appearance changes, with a correction note.
+- `docs/src/design/engine-surfaces.md` does the same at l.18. Its `WARNING_COLOR`
+  paragraph is marked superseded by RFC-104.
+- `docs/src/guides/migration-0.25-to-0.26.md`, being historical, keeps its text and
+  gains a correction note.
+
+**The `render.rs` comment** ("the gating invariant depends on this value never
+changing") is code, and is in the handoff. Correspondence for the withdrawn claim
+is decided at the 0.53.0 cut.

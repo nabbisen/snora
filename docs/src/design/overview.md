@@ -26,10 +26,19 @@ Elevation remains out of scope: `Tokens` carries no shadow or elevation
 scale, and adding one is a frozen-surface change (RFC-036) no RFC in
 this milestone made.
 
-**Compatibility promise.** With `design` inactive, snora's rendered output
-is unchanged from v0.25 — this is a guarantee, not an aspiration. The
-skeleton remains the default; the coherent appearance above is what
-activating the feature buys.
+**Compatibility promise, as asserted.** `design` changes nothing unless you
+call it. Without it, snora's **composition** is unchanged: layer order,
+which surfaces materialise, how they dismiss, and how they mirror. That is
+asserted by `render_semantics.rs`, which must pass unmodified. Default-path
+**appearance** does change, but only by an accepted RFC that the minor's
+migration guide names (0.42's toast colours and 0.52's label sizes, for
+example). The skeleton remains the default; the coherent appearance above is
+what activating the feature buys.
+
+*(Corrected 2026-10-19, RFC-110. This said snora's rendered output is "unchanged
+from v0.25" with `design` inactive, as "a guarantee, not an aspiration". It has
+not been true since at least 0.42.0, when the toast colours changed on the default
+path, and no release amended it until this correction.)*
 
 Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 

@@ -9,6 +9,12 @@ behind the opt-in `design` feature. If your application does not enable
 `design`, **snora's rendered output is unchanged from v0.25** — that is a
 compatibility promise, not an aspiration.
 
+> *Corrected 2026-10-19 (RFC-110): this promise has not held since at least
+> 0.42.0. What holds is narrower: without `design`, snora's
+> **composition** is unchanged (asserted by `render_semantics.rs`), and its
+> default-path **appearance** changes only by an accepted RFC that the minor's
+> migration guide names. See [the design overview](../design/overview.md).*
+
 ## What changed
 
 ### `snora::design::theme(&Tokens) -> iced::Theme` (new)

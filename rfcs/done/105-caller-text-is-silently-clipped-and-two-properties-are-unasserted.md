@@ -49,6 +49,9 @@ Combine that with R-2's natural-size check.
 **What this cannot assert, stated rather than implied:** the drawn *glyphs*.
 The harness exposes frame hashes, not pixel reads, in its public API. How iced
 and cosmic-text render a bidi override is iced's behaviour, not snora's.
+*(Corrected 2026-10-19, RFC-108: pixels are readable. `Snapshot::matches_image`
+writes the frame as a lossless RGBA PNG named after its renderer. The glyph
+reason stands.)*
 
 **R-4 — assert bounded work, machine-independently.** A ratio assertion (10×
 input costs well under 100× layout time) at sizes large enough to be stable. The

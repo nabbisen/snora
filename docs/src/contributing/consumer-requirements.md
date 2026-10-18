@@ -69,7 +69,7 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 *Proposed as **RFC-105** (2026-09-26).*
 
-**Status at 0.52.0: met (RFC-105).** Caller text wraps inside a word when it must (`Wrapping::WordOrGlyph`) on the toast title and message, the notice title and body, and every tooltip, which now has a shared 320 px maximum width. That was measured on each surface, and asserted by a rendered-area check, since `visible_bounds()` cannot see the clip. **Verbatim** is asserted with tekstide's fixture (a bidi override, a newline and a control character), which is found by exact content in every caller-text surface. **Not asserted:** the glyphs drawn for those characters, which are iced's and cosmic-text's; the harness exposes frame hashes, not pixel reads.
+**Status at 0.52.0: met (RFC-105).** Caller text wraps inside a word when it must (`Wrapping::WordOrGlyph`) on the toast title and message, the notice title and body, and every tooltip, which now has a shared 320 px maximum width. That was measured on each surface, and asserted by a rendered-area check, since `visible_bounds()` cannot see the clip. **Verbatim** is asserted with tekstide's fixture (a bidi override, a newline and a control character), which is found by exact content in every caller-text surface. **Not asserted:** the glyphs drawn for those characters, which are iced's and cosmic-text's; the harness exposes frame hashes, not pixel reads. *(Corrected 2026-10-19, RFC-108: pixels are readable. `Snapshot::matches_image` writes the frame as a lossless PNG named after its renderer. The glyphs remain unasserted because they are iced's and cosmic-text's, not because pixels cannot be read.)*
 
 > *"A component must not re-escape, re-wrap or re-interpret them."*
 

@@ -1,6 +1,6 @@
 # RFC-108 — The default renderer is never tested, and contrast is never read from pixels
 
-**Status.** Proposed.
+**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
 **Raised.** 2026-10-19, architect. Source: REQ-005 (tekstide: *"We ship where the
 GPU path may not start, so a figure from one renderer does not transfer"*), Theme C.
 **Release target.** Q-5. **Priority.** First of three opened together (RFC-108–110).
@@ -131,3 +131,20 @@ the release after Unit 0 rules, so 0.53.0 is not held for a CI experiment.
 4. If R-3 lands: the wgpu job's log shows the renderer assertion passing, not just
    tests passing.
 5. R-4 is shown failing on a reintroduced RFC-102 fill (one renderer only).
+
+---
+
+## Rulings, 2026-10-19
+
+**Q-1:** if wgpu cannot run in CI, ship R-1, R-2 and R-4 against tiny-skia, and run
+the wgpu suite locally at each cut as a checklist step, with its output kept. REQ-005
+is then "partly, by procedure". **Q-2:** whichever driver Unit 0 shows produces
+`wgpu` without flake, with Vulkan (lavapipe) preferred. **Q-3:** Unit 0 measures the
+`iced_test::screenshot` route to scale 1. If it fails, peak coverage at scale 2 is
+the bound, written down. **Q-4:** a pixel floor failing where the style floor passes
+is a defect, fixed by geometry, and the floor is never relaxed. **Q-5:** Unit 0, R-1
+and R-2 in 0.53.0; R-3 and R-4 after Unit 0 rules.
+
+**Done by the architect, 2026-10-19:** the "frame hashes, not pixel reads" statement
+is corrected in REQ-003's status line and in RFC-105, each with a dated note. The third,
+`tests/common/mod.rs`, is code and is in the handoff.

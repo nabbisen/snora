@@ -1,6 +1,6 @@
 # RFC-109 — Ancestor breadcrumbs look exactly like the current page
 
-**Status.** Proposed.
+**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
 **Raised.** 2026-10-19, architect. **Owed:** RFC-103 Q-3 was ruled as suggested,
 "register the leaf as `Position`, and file the link-affordance question
 separately", and it was never filed. Found while listing open themes.
@@ -89,3 +89,10 @@ path: a migration-guide item, and a baseline change for orbok, which renders cru
    height before and after.
 3. The pointer target is unchanged or larger, checked with `pointer_target`.
 4. CHANGELOG under Changed, and the migration guide notes the appearance change.
+
+---
+
+## Rulings, 2026-10-19
+
+**Q-1:** an underline. **Q-2:** a rule element under the label, inside the button,
+snapped to whole pixels. **Q-3:** no opt-out. **Q-4:** 0.53.0.

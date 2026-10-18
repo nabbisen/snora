@@ -15,11 +15,16 @@ let tokens = Tokens::light();
 let element = render(layout, &tokens);
 ```
 
-Snora never calls this function on the application's behalf. Nothing
-changes for applications that keep calling `snora::render` — that
-function's output is byte-for-byte unchanged with `design` inactive
-(RFC-037's gating invariant), proven by `crates/snora/tests/
-render_semantics.rs` passing without modification.
+Snora never calls this function on the application's behalf.
+Applications that keep calling `snora::render` keep its **composition**:
+`crates/snora/tests/render_semantics.rs` passes without modification.
+Default-path **appearance** changes only by an accepted RFC named in a
+migration guide.
+
+*(Corrected 2026-10-19, RFC-110. This said `snora::render`'s output was "byte-for-byte
+unchanged" with `design` inactive (RFC-037's gating invariant). It has
+not been true since at least 0.42.0, when the toast colours changed on the default
+path, and no release amended it until this correction.)*
 
 ## Why a sibling function, not a field on `AppLayout`
 
@@ -271,3 +276,7 @@ edge-aware rounding and is not visually broken the way the dialog was.
 `WARNING_COLOR` (toasts) is unchanged: toasts render on the
 design-*inactive* path too, so changing them there would break the
 gating invariant.
+
+*(Superseded at 0.52.0: RFC-104 removed `WARNING_COLOR`, and toasts now take
+their colours from the theme, or from the tokens on the design path. The
+invariant this paragraph relied on is restated above; see RFC-110.)*
