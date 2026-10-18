@@ -423,6 +423,11 @@ disposition (keep as a documented intentional fallback, or migrate to
 `Extended::warning`) is deferred to RFC-038 Q-2; the constant is not
 changed by this correction.
 
+*(Resolved at 0.52.0, RFC-104: `WARNING_COLOR` was removed, and the toast's
+Warning fill and text now come from the theme's `warning` pair on the default
+path and from the tokens on the design path, with contrast asserted for every
+intent. The paragraph above is kept as the record of the deferral.)*
+
 Style review checklist for future changes: (1) Does the change add a
 public color/token type? If so, reject or escalate. (2) Does it derive
 from iced `Theme` where possible? (3) Does it add a dependency? Evaluate
