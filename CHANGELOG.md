@@ -25,7 +25,23 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- **Release history is filed by series of ten minors (RFC-107).** This file
+  now holds 0.50 onward. Earlier entries moved, unchanged, to
+  `changelog/0.0x.md` … `changelog/0.4x.md`, linked from the table at the top.
+  Every minor from 0.39 links its migration guide, and the compare links run
+  through 0.52.0 again (they had stopped at 0.46.0).
+- **Three entries revised after their release now say so.** 0.19.1, 0.20.0
+  and 0.25.2 each carry a `*Corrected*` line naming the commit that changed
+  them. From now on a released entry changes only that way, and CI checks it.
+
+### Added
+
+- **A GitHub Release for each version, from 0.53.0 (RFC-107).** Its notes are
+  the changelog entry, with links pointing at the tagged files. Each entry
+  from 0.53.0 opens with four lines: what changed, whether your code must
+  change, whether appearance changes, and whether there is a security item.
 
 ## [0.52.0] — 2026-09-29
 
