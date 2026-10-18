@@ -160,6 +160,24 @@ Use these headers, consistent with Keep a Changelog:
 - **Deprecated** — items that will be removed in a future release.
 - **Removed** — items removed after their deprecation window.
 - **Fixed** — bug fixes; behavior brought back into line with docs.
+- **Security** — advisories that affect snora or reach consumers through
+  it, and what a consumer must do (RFC-107).
+
+**These six are the only headings** from 0.53.0 (RFC-107). Older entries
+keep the headings they shipped with, because released text is not rewritten.
 
 Do not put breaking changes under **Fixed**. Breaking changes go under
 **Changed** even if they are improvements.
+
+**Every entry opens with a four-label lead** (RFC-107): **In short**, **Code**,
+**Appearance** and **Security**, each always present. A minor's entry is
+preceded by one navigation line to its migration guide.
+
+**A released entry is frozen at its tag.** The only later edits are the
+navigation line, blank lines, and a correction **appended** beneath the entry
+as a line beginning `*Corrected YYYY-MM-DD:*`, which says what was wrong and
+leaves the original text in place.
+
+**History is filed by series of ten minors.** `CHANGELOG.md` holds the
+current series; each closed series lives in `changelog/0.Nx.md` and does not
+change.

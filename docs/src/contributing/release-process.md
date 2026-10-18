@@ -346,7 +346,24 @@ restate the guide's content.
     # would have caught a tag on the wrong commit. Nothing caught the
     # commit.
 [ ] Move the [Unreleased] section in CHANGELOG.md to the new version,
-    and reset [Unreleased] to "Nothing yet."
+    and reset [Unreleased] to "Nothing yet." Then, per RFC-107:
+    - under the header, the navigation line (minors only):
+      **Upgrading from 0.X:** read the [0.X → 0.Y migration guide](...)
+    - the four-label lead: **In short:** / **Code:** / **Appearance:** /
+      **Security:**, each filled in ("none" and "unchanged" are values);
+    - headings only from Added, Changed, Deprecated, Removed, Fixed,
+      Security, with measurement left to the RFC each bullet names;
+    - the version's compare link at the bottom, and [Unreleased]
+      repointed to compare the new tag ...HEAD;
+    - run scripts/check-changelog.sh (once RFC-107's script lands).
+[ ] If the version is 0.X0.0 (a new series): move the closed series
+    (0.(X-1)0 – 0.(X-1)9) out of CHANGELOG.md into
+    changelog/0.(X-1)x.md, with its compare links, rebasing relative
+    links by ../, and add its row to CHANGELOG.md's series table. Copy
+    the header of an existing changelog/*.md file. Entry text does not
+    change; verify it entry by entry against the tag.
+    # RFC-107: series, not size. A reader on 0.27 knows the entry is in
+    # changelog/0.2x.md without looking, and a closed file never moves.
 [ ] If minor: write docs/guides/migration-X.Y-to-X.Z.md. **Unconditional
     — no exceptions for "nothing broke."** A guide for a minor that
     changed nothing required says so in a sentence (RFC-079); it is

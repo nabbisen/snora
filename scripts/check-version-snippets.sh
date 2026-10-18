@@ -54,6 +54,8 @@ while IFS= read -r -d '' file; do
     docs/src/guides/migration-*.md) continue ;;
     # CHANGELOG.md — same: a historical record, not current guidance.
     CHANGELOG.md) continue ;;
+    # changelog/*.md — closed changelog series (RFC-107), equally historical.
+    changelog/*.md) continue ;;
   esac
 
   while IFS=: read -r lineno match; do

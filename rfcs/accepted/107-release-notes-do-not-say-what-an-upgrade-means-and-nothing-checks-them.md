@@ -1,6 +1,7 @@
 # RFC-107 — Release notes do not say what an upgrade means, and nothing checks them
 
-**Status.** Proposed.
+**Status.** Accepted 2026-10-18. Q-1–Q-4 and Q-6 ruled as suggested; Q-5 revised to
+split by series (see Rulings).
 **Raised.** 2026-10-18, architect, from an owner-requested audit of `CHANGELOG.md`
 for readability (long-time and new users) and for long-term management.
 **Release target.** 0.53.0 (Q-6). **Priority.** Medium: no defect reaches code,
@@ -105,12 +106,19 @@ skips**, if no tags are visible. It checks:
 
 1. every `## [x.y.z]` header has a link reference, every link endpoint is an
    existing tag, and `[Unreleased]` compares the newest tag `...HEAD`;
-2. every repo-relative link in the file resolves;
+2. every repo-relative link in `CHANGELOG.md` and `changelog/*.md` resolves
+   (`check-repo-links.py` checks only links beginning with `.`);
 3. every minor from 0.39 has the navigation line, pointing at its guide;
 4. entries from 0.53.0 use only R-2's headings and carry R-1's four labels;
-5. each released entry, after dropping blank lines, the navigation line and
-   `*Corrected …*` lines, equals its text at its own tag. The exception is the
-   Q-3 list, which is keyed by version and the rewriting commit.
+5. each released entry, **found in whichever file holds it now**, equals its
+   text at its own tag, after dropping blank lines, link-reference lines, the
+   navigation line and `*Corrected …*` lines, and after undoing the `../`
+   rebase of links in `changelog/*.md`. The exception list is keyed by version
+   and the rewriting commit (see Rulings);
+6. each `changelog/0.Nx.md` holds only versions 0.N0–0.N9 (0.0x: 0.7–0.9),
+   `CHANGELOG.md` holds only the current series and `[Unreleased]`, and no
+   version appears twice;
+7. **warning only:** any one file larger than 256 KB.
 
 The script is in the `check-*.sh` family. **Each rule is shown failing first**
 on a deliberate breakage, then restored.
@@ -154,7 +162,7 @@ records a real change the tagged entry omitted: 0.25.2's own `Cargo.toml` has
 releases would carry today's date, not the release date. The changelog and the
 tags already cover the past.
 
-**Q-5 — the 0.x archive.** **Suggest deferring, with a recorded trigger: the
+**Q-5 — the 0.x archive.** *(Revised; see Rulings.)* **Suggest deferring, with a recorded trigger: the
 1.0.0 cut.** At that point, move 0.x history to `CHANGELOG-0.x.md` and link it
 from the top. Nothing needs to move before then.
 
@@ -190,3 +198,52 @@ the first one published as a GitHub Release.
    R-6's step.
 6. The three grandfathered entries carry their `*Corrected …*` line (if Q-3 is
    ruled as suggested).
+
+---
+
+## Rulings, 2026-10-18
+
+**Q-1, Q-2, Q-3, Q-4, Q-6:** as suggested.
+
+**Q-5, revised twice.** The owner rejected "at the 1.0.0 cut": no 1.0 is
+planned, so that trigger would never fire. A size trigger (archive past 256 KB)
+was then put forward and also rejected, because it answers a question about
+the file, not the reader's question: where is the entry for my version? **Ruled:
+split mechanically by series of ten minors.**
+
+**R-7 — history is filed by series.** `CHANGELOG.md` holds `[Unreleased]` and
+the current series (0.50 onward). Each closed series lives in
+`changelog/0.Nx.md` (0.0x is 0.7–0.9), with its own compare links, and does not
+change. At each 0.X0.0 cut, the previous series moves, as a release-checklist
+step. Measured, the largest closed series is 0.3x at 64 KB.
+
+## Done by the architect, 2026-10-18
+
+These are docs and need no handoff:
+
+- **The split.** It produced `changelog/0.0x.md` … `0.4x.md` (3 / 14 / 15 / 20 / 11
+  entries), and `CHANGELOG.md` fell from 197 KB to 21 KB, with a series table in
+  its header. Verified entry by entry: all 67 entries are identical after
+  normalisation, and all 67 compare links are preserved. In the moved files the
+  35 `](docs/` links were rebased to `](../docs/`, and `check-repo-links.py` now
+  checks them (420 links, 0 broken).
+- **Q-3's correction lines**, under 0.19.1 (`bd215f8`), 0.20.0 (`d8d3f9d`) and
+  0.25.2 (`6642b94`).
+- **`versioning-policy.md`:** the six headings, the lead, the freeze rule and the
+  series rule. **`release-process.md`:** R-6's checklist step and the series-move
+  step.
+- **`scripts/check-version-snippets.sh`:** skips `changelog/*.md`, as it already
+  skips `CHANGELOG.md`. This was needed for the split to leave CI green.
+
+**The exception list for R-4 rule 5** is five entries, found by comparing each
+tagged entry with `main` under rule 5's normalisation:
+
+| Version | Commit(s) | What changed | Corrected line |
+|---|---|---|---|
+| 0.7.0 | `0a26eb8`, `1c52464` | link paths repaired (`docs/…` → `docs/src/…`) | no, link repair |
+| 0.8.0 | `1c52464` | file layout: 0.7.0 text that sat inside 0.8.0's section moved out | no, layout repair |
+| 0.19.1 | `bd215f8` | binary-size bullet replaced | yes |
+| 0.20.0 | `d8d3f9d` | an overclaim about `design` measurements corrected | yes |
+| 0.25.2 | `6642b94` | Changed section added to an entry that was empty | yes |
+
+The handoff carries the dev team's part: R-4, R-5 and rule 7.

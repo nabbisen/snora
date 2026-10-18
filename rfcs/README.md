@@ -144,17 +144,6 @@ Numbers remain stable forever and are never reused.
 | 094 | [The gate register has rows nobody re-derived](./done/094-the-gate-register-has-rows-nobody-re-derived.md) | v0.44.0 — Medium (handoff: [`handoffs/094-…`](./handoffs/094-the-gate-register-has-rows-nobody-re-derived/implementation-handoff.md)) |
 | 095 | [`Emphasis` and `Size` are published vocabulary nothing reads](./done/095-emphasis-and-size-are-published-and-unread.md) | v0.45.0 — Medium (handoff: [`handoffs/095-…`](./handoffs/095-emphasis-and-size-are-published-and-unread/implementation-handoff.md)) |
 | 096 | [The overlay laws are cited, not checked](./done/096-the-overlay-laws-are-cited-not-checked.md) | v0.46.0 — Medium (handoff: [`handoffs/096-…`](./handoffs/096-the-overlay-laws-are-cited-not-checked/implementation-handoff.md)) |
-
-## Accepted
-
-Design settled, implementation may start, not yet shipped. See
-[`accepted/README.md`](./accepted/README.md). Empty is the normal resting
-state.
-
-Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
-
-| ID | Title | Target |
-|----|-------|--------|
 | 097 | [snora has no threat model, and nothing watches 310 dependencies](./done/097-snora-has-no-threat-model-and-no-supply-chain-gate.md) | **v0.47.0** — High (scheduled v0.48.0; landed early). Unit 1 threat model + Unit 2 supply-chain gate (handoff: [`handoffs/097-…`](./handoffs/097-snora-has-no-threat-model-and-no-supply-chain-gate/implementation-handoff.md)) |
 | 098 | [The advisory gate is blind to an entire advisory class](./done/098-the-advisory-gate-is-blind-to-unsoundness.md) | **v0.49.0** — High (handoff: [`handoffs/098-…`](./handoffs/098-the-advisory-gate-is-blind-to-unsoundness/implementation-handoff.md)). `unsound` is a *scope* key whose default excludes transitive deps, i.e. all of ours; three advisories hidden, two fixable today. Found by tekstide |
 | 099 | [The sidebar rail is narrower than its buttons](./done/099-the-sidebar-rail-is-narrower-than-its-buttons.md) | **v0.50.0** — Medium. 64 px rail with 16 px uniform padding lays 48 px buttons out 32 wide, icon uncentred; every preset, both variants, ≥ 40 minors. Q-1 (a) derive horizontal padding. Found by orbok (handoff: [`handoffs/099-…`](./handoffs/099-the-sidebar-rail-is-narrower-than-its-buttons/implementation-handoff.md)) |
@@ -166,11 +155,20 @@ Empty — the audit's six, RFC-090, RFC-092 and RFC-093 are all shipped.
 | 105 | [Caller text is silently clipped, and two properties are unasserted](./done/105-caller-text-is-silently-clipped-and-two-properties-are-unasserted.md) | **v0.52.0** — REQ-003/006 (tekstide); unbroken text clipped at 288 px; verbatim and bounded work unasserted (handoff: [`handoffs/105-…`](./handoffs/105-caller-text-is-silently-clipped-and-two-properties-are-unasserted/implementation-handoff.md)) |
 | 106 | [A disabled unselected chip looks enabled](./done/106-a-disabled-unselected-chip-looks-enabled.md) | **v0.52.0** — found by RFC-103's register; 1.00–1.05:1 today, 3.18–6.03:1 with the label dimmed at 0.45 (handoff: [`handoffs/106-…`](./handoffs/106-a-disabled-unselected-chip-looks-enabled/implementation-handoff.md)) |
 
+## Accepted
+
+Design settled, implementation may start, not yet shipped. See
+[`accepted/README.md`](./accepted/README.md). Empty is the normal resting
+state.
+
+| ID | Title | Target |
+|----|-------|--------|
+| 107 | [Release notes do not say what an upgrade means, and nothing checks them](./accepted/107-release-notes-do-not-say-what-an-upgrade-means-and-nothing-checks-them.md) | v0.53.0 — changelog audit; a four-label lead, frozen entries, history filed by series of ten minors (split done), `check-changelog.sh`, GitHub Releases (handoff: [`handoffs/107-…`](./handoffs/107-release-notes-do-not-say-what-an-upgrade-means-and-nothing-checks-them/implementation-handoff.md)) |
+
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 107 | [Release notes do not say what an upgrade means, and nothing checks them](./proposed/107-release-notes-do-not-say-what-an-upgrade-means-and-nothing-checks-them.md) | **proposed** v0.53.0 — owner-requested changelog audit; no impact lead, compare links stale for six releases (fixed in `1b58f13`), three entries rewritten after tag; a lead, a frozen-entry rule, `check-changelog.sh`, GitHub Releases |
 
 ## Archive
 
