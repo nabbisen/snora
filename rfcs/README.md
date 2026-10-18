@@ -169,6 +169,9 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 108 | [The default renderer is never tested, and contrast is never read from pixels](./proposed/108-the-default-renderer-is-never-tested-and-contrast-is-never-read-from-pixels.md) | **proposed** v0.53.0 (Units 0–R-2) — REQ-005 / Theme C; CI renders tiny-skia only; the tab bar's 1 px rule differs by renderer; pixels are readable after all; wgpu falls back silently |
+| 109 | [Ancestor breadcrumbs look exactly like the current page](./proposed/109-ancestor-breadcrumbs-look-exactly-like-the-current-page.md) | **proposed** v0.53.0 — owed from RFC-103 Q-3; ancestors and the leaf share `background.base.text` at rest; suggests a snapped underline |
+| 110 | [The unstyled modal dim is invisible on dark themes, and a published guarantee is false](./proposed/110-the-unstyled-modal-dim-is-invisible-on-dark-themes.md) | **proposed** v0.53.0 — rest of REQ-002; 1.02–1.33:1 on all 14 dark built-in themes; RFC-037's "unchanged from v0.25" false since at least 0.42.0 |
 
 ## Archive
 
