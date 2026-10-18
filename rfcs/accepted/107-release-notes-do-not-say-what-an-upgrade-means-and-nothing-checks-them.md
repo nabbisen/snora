@@ -244,6 +244,6 @@ tagged entry with `main` under rule 5's normalisation:
 | 0.8.0 | `1c52464` | file layout: 0.7.0 text that sat inside 0.8.0's section moved out | no, layout repair |
 | 0.19.1 | `bd215f8` | binary-size bullet replaced | yes |
 | 0.20.0 | `d8d3f9d` | an overclaim about `design` measurements corrected | yes |
-| 0.25.2 | `6642b94` | Changed section added to an entry that was empty | yes |
+| 0.25.2 | `6642b94` | the whole entry added: at the tag there was none *(corrected 2026-10-18 from "an entry that was empty", found by the dev team)* | yes |
 
 The handoff carries the dev team's part: R-4, R-5 and rule 7.
