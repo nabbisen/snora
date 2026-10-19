@@ -73,6 +73,27 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   default renderer sees slightly crisper chrome, and one rendering with
   tiny-skia sees no change at all. No colour moves either way.
 
+### Fixed
+
+- **The modal dim did almost nothing on a dark theme (RFC-110).** The
+  unstyled dim was black at 40% alpha, a literal, under a comment claiming
+  "the gating invariant depends on this value never changing" — and nothing
+  asserted it. Black over a nearly-black page barely changes it: measured
+  against the undimmed page, **1.02–1.33:1 across iced's 16 dark themes**,
+  under the 3.0:1 non-text floor, so a modal did not read as modal at all.
+  The 6 light themes were short too, at 2.70–2.85.
+
+  The unstyled dim now follows the theme, picking the pole opposite the page
+  — white over a dark background, black over a light one — at alpha 0.44.
+  That is the rule the `design` path has used since RFC-065, and the two now
+  agree. Measured after: **3.74–4.36 on the 16 dark themes and 3.05–3.24 on
+  the 6 light ones**, every one of the 22 clearing the floor.
+
+  **The design path is unchanged**, value and rule both. What binds the
+  unstyled dim is composition — which layer it occupies, what it blocks,
+  what dismisses it — and that is asserted by `render_semantics.rs`, which
+  passes unmodified.
+
 ## [0.52.0] — 2026-09-29
 
 **Upgrading from 0.51:** read the [0.51 → 0.52 migration guide](docs/src/guides/migration-0.51-to-0.52.md).

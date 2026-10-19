@@ -181,7 +181,7 @@ where
 
 fn chrome_style(tokens: &Tokens) -> ChromeStyle {
     ChromeStyle {
-        dim_color: dim_color(tokens),
+        dim: crate::render::DimFill::Fixed(dim_color(tokens)),
         dialog_card: Some(dialog_card_style(tokens)),
         toast: toast_style(tokens),
     }

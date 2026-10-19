@@ -46,7 +46,7 @@
 //! containment either.
 
 use iced::{
-    Color, Element, Length,
+    Color, Element, Length, Theme,
     widget::{column, container, mouse_area, row, space, stack},
 };
 
@@ -63,7 +63,7 @@ use crate::toast::{ToastStyle, render_toasts};
 /// that could drift.
 pub(crate) struct ChromeStyle {
     /// Fill for the modal-backdrop layer (layer 4). Includes alpha.
-    pub(crate) dim_color: Color,
+    pub(crate) dim: DimFill,
     /// Card wrapper for the dialog layer (layer 5). `None` renders
     /// `dialog.content` centered with no card at all.
     pub(crate) dialog_card: Option<DialogCardStyle>,
@@ -74,13 +74,80 @@ pub(crate) struct ChromeStyle {
     pub(crate) toast: ToastStyle,
 }
 
+/// Alpha for the unstyled modal dim.
+///
+/// The same number as [`snora_design::surfaces::DIM_ALPHA`], which the
+/// `design` path uses, and deliberately **not** shared with it:
+/// `snora-design` is an optional dependency of this crate, so the
+/// unstyled path cannot reach it, and that crate's surface is frozen
+/// (RFC-036) so widening it for one constant is the worse trade. This
+/// is RFC-106's `CHIP_DISABLED_ALPHA` pattern — reproduce the value
+/// with a comment naming its twin, rather than couple two crates for a
+/// float.
+pub(crate) const UNSTYLED_DIM_ALPHA: f32 = 0.44;
+
+/// How the modal backdrop decides its colour.
+///
+/// The `design` path knows its colour before anything is drawn: it
+/// derives it from the token palette. The unstyled path cannot, because
+/// it has no tokens — only the `iced::Theme` the application supplies,
+/// which it does not see until paint time. The backdrop's style closure
+/// already receives that theme, so this enum defers the decision to it
+/// rather than adding a parameter to carry a theme that is already
+/// there.
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum DimFill {
+    /// A colour fixed in advance, as `design` supplies from its tokens.
+    Fixed(Color),
+    /// Derived from the theme at paint time: the pole opposite the
+    /// page, at [`UNSTYLED_DIM_ALPHA`].
+    FromTheme,
+}
+
+impl DimFill {
+    /// The colour to paint on `theme`.
+    pub(crate) fn resolve(&self, theme: &Theme) -> Color {
+        match self {
+            DimFill::Fixed(color) => *color,
+            // The pole opposite the page, which is the only choice
+            // that dims both a white page and a near-black one. iced's
+            // `is_dark` is the same OKLCH-lightness classification
+            // `snora_design::surfaces::is_dark` reimplements, so the
+            // two paths agree on every background.
+            DimFill::FromTheme => {
+                let base = if theme.extended_palette().is_dark {
+                    Color::WHITE
+                } else {
+                    Color::BLACK
+                };
+                Color {
+                    a: UNSTYLED_DIM_ALPHA,
+                    ..base
+                }
+            }
+        }
+    }
+}
+
 impl ChromeStyle {
-    /// Today's literal, unmodified: opaque black at 40% alpha, no card.
-    /// This is [`render`]'s exact pre-RFC-039 behavior — the gating
-    /// invariant depends on this value never changing.
+    /// No card, and a dim that follows the theme (RFC-110).
+    ///
+    /// **The dim is no longer a literal.** It was `rgba(0, 0, 0, 0.4)`
+    /// under a comment saying "the gating invariant depends on this
+    /// value never changing", and that comment was false: no test
+    /// pinned the value, and on a dark theme black over a nearly-black
+    /// page measured 1.02–1.33:1 against the undimmed page — a dim that
+    /// did not dim. The unstyled path now picks the pole opposite the
+    /// page, the same rule `snora_design::surfaces::modal_dim` has used
+    /// since RFC-065.
+    ///
+    /// The invariant that does still bind is **composition** — which
+    /// layer the backdrop occupies, what it blocks, and what dismisses
+    /// it — and that is asserted by `tests/render_semantics.rs`, not by
+    /// any particular colour.
     fn unstyled() -> Self {
         Self {
-            dim_color: Color::from_rgba(0.0, 0.0, 0.0, 0.4),
+            dim: DimFill::FromTheme,
             dialog_card: None,
             // Inherit the host's text size; derive colours from the theme.
             toast: ToastStyle::default(),
@@ -149,11 +216,11 @@ where
 
     if has_modal {
         if let Some(on_close) = layout.on_close_modals {
-            layers = layers.push(dim_backdrop(on_close, style.dim_color));
+            layers = layers.push(dim_backdrop(on_close, style.dim));
         } else {
             // No click-to-close requested — still paint the dim to signal
             // "this is modal", but don't capture clicks.
-            layers = layers.push(dim_without_capture(style.dim_color));
+            layers = layers.push(dim_without_capture(style.dim));
         }
 
         if let Some(dialog) = layout.dialog {
@@ -264,7 +331,7 @@ where
 /// Also captures wheel-scroll input with the same message (RFC-084 F-03):
 /// scrolling over the dim is the same intent as clicking it, and either
 /// should dismiss rather than reach whatever is beneath the modal.
-fn dim_backdrop<'a, Message>(on_press: Message, dim_color: Color) -> Element<'a, Message>
+fn dim_backdrop<'a, Message>(on_press: Message, fill: DimFill) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
@@ -274,8 +341,8 @@ where
         .width(Length::Fill)
         .height(Length::Fill)
         .id(identifiers::MODAL_DIM)
-        .style(move |_theme| Style {
-            background: Some(Background::Color(dim_color)),
+        .style(move |theme| Style {
+            background: Some(Background::Color(fill.resolve(theme))),
             ..Default::default()
         });
     let on_scroll = on_press.clone();
@@ -300,7 +367,7 @@ where
 /// `modal_with_no_close_sink_also_blocks_wheel_scroll` in
 /// `crates/snora/tests/render_semantics.rs` for the measurement, including
 /// the record of the wrong first assumption it corrected.
-fn dim_without_capture<'a, Message>(dim_color: Color) -> Element<'a, Message>
+fn dim_without_capture<'a, Message>(fill: DimFill) -> Element<'a, Message>
 where
     Message: 'a,
 {
@@ -312,9 +379,12 @@ where
             .width(Length::Fill)
             .height(Length::Fill)
             .id(identifiers::MODAL_DIM)
-            .style(move |_theme| Style {
-                background: Some(Background::Color(dim_color)),
+            .style(move |theme| Style {
+                background: Some(Background::Color(fill.resolve(theme))),
                 ..Default::default()
             }),
     )
 }
+
+#[cfg(test)]
+mod tests;

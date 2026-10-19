@@ -943,6 +943,80 @@ fn chip_fills_meet_their_register_floors_as_drawn() {
     assert_no_failures(failures);
 }
 
+// ---------------------------------------------------------------------
+// The unstyled modal dim, as drawn (RFC-110's optional check, which
+// RFC-108 R-1 made possible)
+// ---------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq)]
+enum DimMsg {
+    Body,
+    Ok,
+}
+
+fn dim_page(dialog: bool) -> Element<'static, DimMsg> {
+    let body: Element<'static, DimMsg> = iced::widget::button(iced::widget::text("body"))
+        .on_press(DimMsg::Body)
+        .into();
+    let layout = snora::AppLayout::new(body);
+    if dialog {
+        let content: Element<'static, DimMsg> = iced::widget::button(iced::widget::text("OK"))
+            .on_press(DimMsg::Ok)
+            .into();
+        snora::render(layout.dialog(snora::Dialog::new(content)))
+    } else {
+        snora::render(layout)
+    }
+}
+
+/// The dim's derivation reaches the screen.
+///
+/// `render.rs`'s own unit tests assert the rule and the ratio from the
+/// colour the style produces. This asserts the separate thing a style
+/// test cannot: that the colour is actually painted over the page. The
+/// dim is translucent, so what is measured is the page with the dim on
+/// it against the same page without — which is the pairing RFC-110 is
+/// about, and the only one a user ever sees.
+#[test]
+fn the_unstyled_dim_is_drawn_over_the_page() {
+    let mut failures = Vec::new();
+    for (context, theme) in stock_themes() {
+        // A corner, far from the centred dialog card.
+        let corner = Rectangle {
+            x: 8.0,
+            y: 700.0,
+            width: 60.0,
+            height: 40.0,
+        };
+
+        let mut plain = simulator(dim_page(false));
+        let undimmed = colour_of(
+            frame_pixels(&mut plain, &theme, &format!("dim-plain-{context}")).modal_colour(corner),
+        );
+
+        let mut modal = simulator(dim_page(true));
+        let dimmed = colour_of(
+            frame_pixels(&mut modal, &theme, &format!("dim-modal-{context}")).modal_colour(corner),
+        );
+
+        let r = contrast_ratio(dimmed, undimmed);
+        report(
+            context,
+            "modal dim, page vs dimmed page",
+            r,
+            NON_TEXT_MIN,
+            &format!("{undimmed:?} -> {dimmed:?}"),
+        );
+        if r < NON_TEXT_MIN {
+            failures.push(format!(
+                "{context}: the drawn dim separates the page from itself by only {r:.2} \
+                 < {NON_TEXT_MIN} ({undimmed:?} -> {dimmed:?})",
+            ));
+        }
+    }
+    assert_no_failures(failures);
+}
+
 /// The coverage profile of the two thin tab elements, row by row.
 ///
 /// Both ask for `snap`, and whether that is honoured depends on the
