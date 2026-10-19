@@ -35,8 +35,10 @@ engine-surfaces, the 0.25→0.26 guide); see the RFC's Rulings.
 
   | Themes | Black at 0.40 (today) | Pole at 0.44 |
   |---|---|---|
-  | 14 dark | 1.02–1.33 | 3.74–4.36 |
-  | 8 light | 2.70–2.85 | 3.05–3.24 (minimum: Tokyo Night Light) |
+  | 16 dark | 1.02–1.33 | 3.74–4.36 |
+  | 6 light | 2.70–2.85 | 3.05–3.24 (minimum: Tokyo Night Light) |
+
+  *(Corrected 2026-10-19: the split is **16 dark / 6 light**, not 14 / 8 as first written. The ranges were right; the counts were the architect's miscount. Found by the dev team in RFC-110's review.)*
 
 - **iced's `extended_palette().is_dark`** is the classification
   `snora_design::surfaces::is_dark` reimplements, so the two paths agree on every
@@ -75,7 +77,7 @@ Back up to named files with `cp`, break, run, restore, then `sha256sum -c`. Neve
 | Assertion | Breakage |
 |---|---|
 | ≥ 3.0 over `Theme::ALL` | restore the literal (Unit 1 already shows this) |
-| ≥ 3.0 over `Theme::ALL` | alpha 0.40, which must fail on the 8 light themes |
+| ≥ 3.0 over `Theme::ALL` | alpha 0.40, which must fail on the 6 light themes |
 | pole | force the pole to black |
 
 ## Acceptance criteria

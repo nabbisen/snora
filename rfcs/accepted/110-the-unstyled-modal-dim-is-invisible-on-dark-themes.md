@@ -25,8 +25,10 @@ between the page and the dimmed page:
 
 | | Today: black at 0.40 | Pole at 0.40 | **Pole at 0.44** (the design path) |
 |---|---|---|---|
-| 14 dark themes | **1.02 – 1.33** | 3.36 – 3.83 | **3.74 – 4.36** |
-| 8 light themes | 2.70 – 2.85 | 2.70 – 2.85 | **3.05 – 3.24** |
+| 16 dark themes | **1.02 – 1.33** | 3.36 – 3.83 | **3.74 – 4.36** |
+| 6 light themes | 2.70 – 2.85 | 2.70 – 2.85 | **3.05 – 3.24** |
+
+*(Corrected 2026-10-19: the split is **16 dark / 6 light**, not 14 / 8 as first written. The ranges were right; the counts were the architect's miscount. Found by the dev team in RFC-110's review.)*
 
 - **Moonfly is 1.02:1.** On Dark, which is iced's own dark theme, it is 1.25:1.
 - **On Dark, no alpha of black can work.** The page's luminance is 0.026, so black
@@ -114,8 +116,8 @@ a migration-guide item. Light-theme users get a dim slightly darker (0.40 → 0.
 
 ## Acceptance criteria
 
-1. R-2's assertion over `Theme::ALL` is **shown failing** on today's literal (14
-   dark themes below 3.0, and 8 light), then passing.
+1. R-2's assertion over `Theme::ALL` is **shown failing** on today's literal (16
+   dark themes below 3.0, and 6 light), then passing.
 2. The pole test is shown failing with the pole forced to black.
 3. `render_semantics.rs` passes **unmodified**. Composition is unchanged, which is
    the part of the invariant that is true.
