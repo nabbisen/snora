@@ -60,6 +60,14 @@ exactly the colour specified, `(51, 102, 153)`, on both. Three places say otherw
 renderer **falls back to tiny-skia silently** when wgpu cannot start. A "wgpu" CI job
 on a runner with no usable adapter would pass, rendering tiny-skia throughout.
 
+*(Corrected 2026-10-20, from R-3's Row A and the source: only partly true. With **no**
+backend hint, iced's fallback renderer tries wgpu and silently takes tiny-skia. With
+`ICED_TEST_BACKEND=wgpu`, tiny-skia's headless constructor refuses any hint that is not
+`tiny-skia` (`iced_tiny_skia-0.14.0/src/lib.rs:441`), so construction fails and the
+simulator panics. That is a loud failure. CI sets the hint, so R-1's renderer
+assertion is a second guard there, not the only one. It remains the only one for a
+run with no hint. Found by the dev team.)*
+
 ## Proposal
 
 **Unit 0 — feasibility, measured before anything is built.** On a branch,
