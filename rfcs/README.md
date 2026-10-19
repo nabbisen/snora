@@ -167,12 +167,12 @@ state.
 | 108 | [The default renderer is never tested, and contrast is never read from pixels](./accepted/108-the-default-renderer-is-never-tested-and-contrast-is-never-read-from-pixels.md) | v0.53.0 (Unit 0, R-1, R-2), then R-3/R-4 — REQ-005 / Theme C; the tab bar's 1 px rule differs by renderer; pixels are readable; wgpu falls back silently (handoff: [`handoffs/108-…`](./handoffs/108-the-default-renderer-is-never-tested-and-contrast-is-never-read-from-pixels/implementation-handoff.md)) |
 | 109 | [Ancestor breadcrumbs look exactly like the current page](./accepted/109-ancestor-breadcrumbs-look-exactly-like-the-current-page.md) | v0.53.0 — owed from RFC-103 Q-3; a snapped underline under ancestor crumbs, registered as a shape cue (handoff: [`handoffs/109-…`](./handoffs/109-ancestor-breadcrumbs-look-exactly-like-the-current-page/implementation-handoff.md)) |
 | 110 | [The unstyled modal dim is invisible on dark themes, and a published guarantee is false](./accepted/110-the-unstyled-modal-dim-is-invisible-on-dark-themes.md) | v0.53.0 — 1.02–1.33:1 on 16 dark themes, to the opposite pole at 0.44; RFC-037's guarantee restated (docs done) (handoff: [`handoffs/110-…`](./handoffs/110-the-unstyled-modal-dim-is-invisible-on-dark-themes/implementation-handoff.md)) |
+| 111 | [The unstyled toast misses AA on six of iced's built-in themes](./accepted/111-the-unstyled-toast-misses-aa-on-six-built-in-themes.md) | v0.53.0 — found in RFC-108's review; keep the pair where it clears AA, else the stronger pole (≥ 4.58 by construction); asserted over `Theme::ALL` (handoff: [`handoffs/111-…`](./handoffs/111-the-unstyled-toast-misses-aa-on-six-built-in-themes/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 111 | [The unstyled toast misses AA on six of iced's built-in themes](./proposed/111-the-unstyled-toast-misses-aa-on-six-built-in-themes.md) | **proposed** v0.53.0 — found in RFC-108's review; the suite asserted Light/Dark only; Kanagawa Dragon Info 2.42 (literal black); fall back to the stronger pole, ≥ 4.58 by construction |
 
 ## Archive
 

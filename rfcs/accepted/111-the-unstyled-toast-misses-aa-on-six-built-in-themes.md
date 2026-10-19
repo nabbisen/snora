@@ -1,6 +1,6 @@
 # RFC-111 — The unstyled toast misses AA on six of iced's built-in themes
 
-**Status.** Proposed.
+**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
 **Raised.** 2026-10-19, architect, from RFC-108's review. The dev team reported one
 case as unasserted, without claiming a defect: the Info toast at 1.40–1.66:1 when an
 application renders through `snora::render` under `snora::design::theme(tokens)`. The
@@ -113,3 +113,15 @@ text colour. It is a migration-guide line, and no stock-theme baseline changes.
 3. The drawn check on Kanagawa Dragon / Info, ≥ 4.5:1.
 4. CHANGELOG under Fixed, with the six themes named. The migration guide notes which
    themes' toasts change.
+
+---
+
+## Rulings, 2026-10-19
+
+**Q-1:** Info takes the better of its pair and the stronger pole, so stock Light and
+Dark keep black (5.63). **Q-2:** the design path is unchanged, but included in R-2's
+sweep. **Q-3:** 0.53.0.
+
+**R-3's architect part** (the `*Corrected*` line under 0.52.0) waits until the dev
+team's uncommitted `CHANGELOG.md` hunks for RFC-108 to 110 are committed, so the two
+roles never share a file in one working tree.
