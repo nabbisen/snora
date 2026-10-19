@@ -18,7 +18,7 @@ use std::fmt::Debug;
 use iced::{
     Alignment::Center,
     Color, Element, Length, Padding, Theme,
-    widget::{button, container, row, text},
+    widget::{button, column, container, row, space, text},
 };
 
 use snora_core::{BreadcrumbAction, Crumb, LayoutDirection};
@@ -137,6 +137,57 @@ where
         .into()
 }
 
+/// Height of an ancestor's underline, in logical pixels (RFC-109).
+///
+/// One pixel is the minimum that can be drawn at all; the rule is a
+/// mark, not a weight, so it takes the minimum.
+pub(crate) const RULE_HEIGHT: f32 = 1.0;
+
+/// The ancestor's underline (RFC-109 Q-1/Q-2).
+///
+/// **`snap: true` is honoured by wgpu and ignored by tiny-skia.** The
+/// flag reaches the quad (`iced_widget::container` forwards it to
+/// `renderer::Quad::snap`), but in iced 0.14 only `iced_wgpu` reads it
+/// — `iced_tiny_skia` has no snapping at all. snora's harness is
+/// pinned to tiny-skia, so **no test here can observe it**: measured
+/// with and without the flag under tiny-skia, the drawn rows are
+/// byte-identical. Measured under wgpu, on the tab bar's equivalent
+/// rule, it removes the smear completely (RFC-108 Unit 0).
+///
+/// The offset is fractional either way and cannot be made whole in
+/// layout: it includes the label's height, which is the host's
+/// `default_text_size` times the line height — 26.8 at the default
+/// size, 26.2 on the design path. Snapping at draw time is the only
+/// place it can be fixed, which is why the flag is set even though
+/// nothing here can check it.
+///
+/// **The colour is the resting label colour, `background.base.text`,
+/// in every status.** A container's style closure receives the theme
+/// and nothing else — it cannot see whether the button above it is
+/// hovered — so the rule cannot follow `crumb_button_style`'s hovered
+/// arm (`background.weak.text`). On the four design presets and on 14
+/// of iced's 22 stock themes those two colours are the same value, so
+/// the rule matches the label exactly; on the other 8 the hovered
+/// label shifts by one tier while the rule holds.
+///
+/// **On hover the rule is drawn over `background.weak.color`, and
+/// `base.text` is not iced's pairing for that tier** — it is the
+/// pairing for `base.color`. So nothing guarantees it, and it is
+/// asserted instead:
+/// `contrast_tests::crumb_rule_stays_visible_on_the_hover_fill`
+/// measures it over all 22 stock themes and all four presets. Lowest
+/// is Kanagawa Lotus at 4.51:1, against a 3.0 floor.
+pub(crate) fn crumb_rule_style(theme: &Theme) -> container::Style {
+    use iced::Background;
+    container::Style {
+        background: Some(Background::Color(
+            theme.extended_palette().background.base.text,
+        )),
+        snap: true,
+        ..container::Style::default()
+    }
+}
+
 fn render_crumb<'a, Message, CrumbId, F>(
     crumb: Crumb<CrumbId>,
     on_action: &'a F,
@@ -156,11 +207,25 @@ where
     }
 
     if crumb.is_leaf {
-        // Plain text — the user is here.
+        // Plain text — the user is here, and the absence of the rule
+        // below is what says so (RFC-109).
         label.into()
     } else {
         let id_for_msg = crumb.id.clone();
-        button(label)
+        // The rule goes inside the button, under the label and spanning
+        // it: inside, so the whole mark is part of the same pointer
+        // target and moves with it; `Length::Fill` inside a column that
+        // shrinks to its content, so it takes the label's width rather
+        // than a width this function would have to guess.
+        let underlined = column![
+            label,
+            container(space())
+                .width(Length::Fill)
+                .height(RULE_HEIGHT)
+                .style(crumb_rule_style),
+        ]
+        .width(Length::Shrink);
+        button(underlined)
             .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
             .padding(Padding::from([btn_pad_y, btn_pad_x]))
             .style(move |theme, status| crumb_button_style(theme, status, btn_radius))

@@ -85,6 +85,7 @@ pub(crate) enum State {
     SidebarItemActive,
     MenuOpen,
     BreadcrumbLeaf,
+    BreadcrumbAncestor,
     ChipSelected,
     ChipSelectedDisabled,
     ChipUnselectedDisabled,
@@ -96,11 +97,12 @@ impl State {
     /// What *is* compiler-enforced is [`cue`]: it matches without a
     /// wildcard arm, so a new variant fails to compile until it is given
     /// a cue (RFC-063's pattern).
-    const ALL: [State; 8] = [
+    const ALL: [State; 9] = [
         State::TabActive,
         State::SidebarItemActive,
         State::MenuOpen,
         State::BreadcrumbLeaf,
+        State::BreadcrumbAncestor,
         State::ChipSelected,
         State::ChipSelectedDisabled,
         State::ChipUnselectedDisabled,
@@ -203,6 +205,21 @@ pub(crate) const fn cue(state: State) -> Cue {
             channel: Channel::Label,
         },
         State::BreadcrumbLeaf => Cue::Position,
+        // RFC-109. `Position` was the leaf's cue and, by omission, the
+        // ancestor's too: being last meant "you are here", being
+        // earlier meant "you can go there", and nothing was drawn
+        // either way. Position alone is not a cue a user can read
+        // without already knowing the convention, and the two were the
+        // same colour by construction — an ancestor's resting
+        // `text_color` is `background.base.text`, and the leaf's plain
+        // text inherits the same value. The ancestor now carries an
+        // underline, so the difference is something drawn.
+        State::BreadcrumbAncestor => Cue::Shape {
+            asserted_by: Some((
+                "every_ancestor_has_a_rule_under_its_label",
+                BREADCRUMB_ANCESTOR_RULE_SRC,
+            )),
+        },
     }
 }
 
@@ -211,6 +228,8 @@ pub(crate) const fn cue(state: State) -> Cue {
 /// register entry pointing at nothing.
 const TAB_BAR_EDGES_SRC: &str = include_str!("../../snora/tests/tab_bar_edges.rs");
 const MENU_DROPDOWN_SRC: &str = include_str!("../../snora/tests/menu_dropdown.rs");
+const BREADCRUMB_ANCESTOR_RULE_SRC: &str =
+    include_str!("../../snora/tests/breadcrumb_ancestor_rule.rs");
 
 fn presets() -> [(&'static str, Tokens); 4] {
     [

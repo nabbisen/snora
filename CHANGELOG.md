@@ -36,6 +36,29 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   and 0.25.2 each carry a `*Corrected*` line naming the commit that changed
   them. From now on a released entry changes only that way, and CI checks it.
 
+- **An ancestor breadcrumb is underlined (RFC-109).** An ancestor and the
+  current page were the same colour by construction — an ancestor's resting
+  `text_color` is `background.base.text`, and the leaf's plain text inherits
+  the same value — so the only thing separating "you can click this" from
+  "you are here" was word order. Ancestors now carry a 1px rule under the
+  label, inside the button and spanning the label's width; the leaf has
+  none, and that absence is now the cue.
+
+  **This changes appearance on the default path**, with no opt-out (Q-3).
+  The breadcrumb row grows by the rule's height: measured **32.80 → 33.80**
+  at `default_text_size` 16, with the label itself unchanged at 20.80.
+  Visual baselines that include a breadcrumb are invalidated.
+
+  The rule's layout offset is fractional (26.80 at the default size), because
+  it sits below a label whose height follows `default_text_size`. It asks to
+  be snapped to the pixel grid, and **that takes effect on wgpu, the default
+  renderer**, where it removes the smear a thin element otherwise gets;
+  `iced_tiny_skia` ignores the request in iced 0.14, so a tiny-skia host sees
+  no difference. Measured on tiny-skia, the rule's strongest row carries the
+  full colour in every context — 21.00:1 on stock Light, 11.05 on stock Dark,
+  16.89–21.00 across the four design presets — which is the peak row any 1px
+  rule at a fractional offset has, not an effect of snapping.
+
 ### Added
 
 - **A GitHub Release for each version, from 0.53.0 (RFC-107).** Its notes are

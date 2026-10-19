@@ -540,3 +540,58 @@ fn crumb_button_style_text_meets_aa() {
     }
     assert_no_failures(failures);
 }
+
+// ---------------------------------------------------------------------
+// The breadcrumb ancestor's rule, on the hover fill (RFC-109 R-1)
+// ---------------------------------------------------------------------
+
+/// The rule under an ancestor crumb is `background.base.text`, in every
+/// status, because a container's style closure cannot see the button's
+/// hover state. At rest it is drawn over the page, which is the pairing
+/// iced guarantees. **On hover it is drawn over `background.weak.color`,
+/// and nothing guarantees that pairing** — `base.text` is iced's pairing
+/// for `base.color`, not for `weak.color`.
+///
+/// Measured rather than assumed, which is what this asserts. Unlike the
+/// rest of this suite it sweeps every `Theme::ALL` variant and not only
+/// the two stock ones, because the pairing is iced's to vary and there
+/// are 22 of them.
+#[test]
+fn crumb_rule_stays_visible_on_the_hover_fill() {
+    let mut failures = Vec::new();
+    let mut lowest = f32::MAX;
+    let mut lowest_context = String::new();
+
+    let contexts = Theme::ALL
+        .iter()
+        .map(|theme| (theme.to_string(), theme.clone()))
+        .chain(
+            [
+                ("design light", Tokens::light()),
+                ("design dark", Tokens::dark()),
+                ("design high_contrast_light", Tokens::high_contrast_light()),
+                ("design high_contrast_dark", Tokens::high_contrast_dark()),
+            ]
+            .into_iter()
+            .map(|(name, tokens)| (name.to_owned(), snora_style::theme::theme(&tokens))),
+        );
+
+    for (context, theme) in contexts {
+        let ep = theme.extended_palette();
+        let rule = background_color(&crate::crumb::crumb_rule_style(&theme), "crumb_rule_style");
+        let hover_fill = ep.background.weak.color;
+        let r = contrast_ratio(to_sn(rule), to_sn(hover_fill));
+        if r < lowest {
+            lowest = r;
+            lowest_context = context.clone();
+        }
+        if r < NON_TEXT_MIN {
+            failures.push(format!(
+                "{context}: the ancestor rule on the hover fill is {r:.2} < {NON_TEXT_MIN} \
+                 (rule {rule:?} vs hover fill {hover_fill:?})",
+            ));
+        }
+    }
+    println!("crumb-rule-on-hover | lowest {lowest:.2} at {lowest_context}");
+    assert_no_failures(failures);
+}
