@@ -87,6 +87,19 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   fallback cannot be reported as a pass. This does not yet make REQ-005 met;
   the default renderer is still untested in CI, which is a separate question.
 
+  **CI now runs the rendered tests on wgpu as well**, on lavapipe, beside the
+  tiny-skia run — so the renderer applications actually get is tested rather
+  than assumed, and both jobs print which one drew. A third job compares what
+  the two painted across 92 elements: the same set, the same core colour, and
+  bounds within one physical pixel. Edge pixels are excluded, because
+  tiny-skia spreads a thin element over partial rows and wgpu does not, which
+  is antialiasing rather than a difference in colour.
+
+  A thin mark's core is the pixel covered fully; a surface's is the mode over
+  its interior. Reading a surface the first way returns its label, and would
+  miss a renderer painting the surface itself differently — which is exactly
+  the shape of the defect RFC-102 fixed.
+
   **The tab bar's rule and the active tab's underline are now snapped to the
   pixel grid.** Both are thin elements at fractional offsets, and on the
   default renderer that cost them their edges: measured on stock Light, the

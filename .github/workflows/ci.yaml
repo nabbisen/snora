@@ -332,3 +332,102 @@ jobs:
         # passing vacuously.
         run: scripts/check-changelog.sh
 
+
+  rendered-wgpu:
+    name: Rendered tests on wgpu
+    runs-on: ubuntu-latest
+    # Parallel with every other job. RFC-108 Unit 0 measured the suite
+    # at 194-293s on wgpu against tiny-skia's 23-35s, so this is the
+    # longest job here and sets the floor on the run's wall time.
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Install lavapipe (Mesa's software Vulkan)
+        # The default runner has no GPU. lavapipe rasterises in
+        # software, which is slow but is the real wgpu pipeline — and
+        # it is the pipeline applications get, which tiny-skia is not.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers
+      - name: Rendered tests on wgpu
+        # `--tests` and not the whole target set: the doctests include
+        # two illustrative fragments in `keyboard.rs` that are
+        # `#[ignore]`d because they do not compile, and running them
+        # here fails for a reason that has nothing to do with the
+        # renderer (RFC-108 Unit 0's first attempt).
+        #
+        # `--test-threads=1`: RFC-099's SIGSEGV was several simulators
+        # building wgpu instances at once.
+        #
+        # No bounded-work step. Its ratio means something different on
+        # wgpu — 3.91 against tiny-skia's 10.77 — because the per-frame
+        # constant cost dominates there, so the bound would be
+        # measuring something other than the complexity it exists to
+        # catch. The tiny-skia job keeps it.
+        env:
+          ICED_TEST_BACKEND: wgpu
+          # Absolute: cargo runs a test binary with the package
+          # root as its working directory, not the workspace root, so a
+          # relative path lands in `crates/snora/` and the upload finds
+          # nothing.
+          SNORA_PARITY_OUT: ${{ github.workspace }}/parity-wgpu.tsv
+        run: cargo test -p snora --all-features --tests -- --test-threads=1 --nocapture
+      - name: Say which renderer drew
+        # `frame_pixels` already fails if the renderer is not the one
+        # asked for, so a pass is proof. This prints it anyway: a
+        # reader of the log should see the evidence rather than have to
+        # know that a passing test implies it.
+        run: |
+          # Field 3 is the renderer; field 2 is the row's kind.
+          cut -f3 parity-wgpu.tsv | sort -u | sed 's/^/renderer=/'
+          test "$(cut -f3 parity-wgpu.tsv | sort -u)" = "wgpu"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-wgpu
+          path: parity-wgpu.tsv
+
+  rendered-tiny-skia:
+    name: Rendered tests on tiny-skia
+    runs-on: ubuntu-latest
+    # The same tests on the renderer the harness pins by default, so
+    # that `renderer-parity` has two files to compare. Everything else
+    # in CI already runs on tiny-skia; this job exists for its parity
+    # output.
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Rendered tests on tiny-skia
+        env:
+          ICED_TEST_BACKEND: tiny-skia
+          # Absolute: cargo runs a test binary with the package
+          # root as its working directory, not the workspace root, so a
+          # relative path lands in `crates/snora/` and the upload finds
+          # nothing.
+          SNORA_PARITY_OUT: ${{ github.workspace }}/parity-tiny-skia.tsv
+        run: cargo test -p snora --all-features --tests -- --test-threads=1 --nocapture
+      - name: Say which renderer drew
+        run: |
+          # Field 3 is the renderer; field 2 is the row's kind.
+          cut -f3 parity-tiny-skia.tsv | sort -u | sed 's/^/renderer=/'
+          test "$(cut -f3 parity-tiny-skia.tsv | sort -u)" = "tiny-skia"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-tiny-skia
+          path: parity-tiny-skia.tsv
+
+  renderer-parity:
+    name: The two renderers draw the same elements
+    runs-on: ubuntu-latest
+    needs: [rendered-wgpu, rendered-tiny-skia]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: parity-wgpu
+      - uses: actions/download-artifact@v4
+        with:
+          name: parity-tiny-skia
+      - name: Compare the two renderers' drawn elements (RFC-108 R-4)
+        run: scripts/check-renderer-parity.py parity-wgpu.tsv parity-tiny-skia.tsv

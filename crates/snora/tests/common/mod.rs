@@ -441,3 +441,132 @@ pub fn peak_row(frame: &Frame, region: Rectangle, against: iced::Color) -> (u32,
         .max_by(|a, b| a.2.total_cmp(&b.2))
         .expect("the region has rows")
 }
+
+// ---------------------------------------------------------------------
+// Cross-renderer parity output (RFC-108 R-4)
+// ---------------------------------------------------------------------
+
+/// Records one element's core colour and bounds, when
+/// `SNORA_PARITY_OUT` names a file.
+///
+/// **The two renderers cannot be compared inside one process.**
+/// `iced_test` fixes the backend from `ICED_TEST_BACKEND` when the
+/// first simulator is built, and reaching for `std::env::set_var` to
+/// get around that is both unsound in a threaded test binary and a lie
+/// about what was measured. So each rendered job writes its own file
+/// and `scripts/check-renderer-parity.py` compares them across jobs.
+///
+/// The **core** colour is [`peak_colour`] against `reference` — the
+/// pixel the renderer covered fully — and not the region's mode. The
+/// mode is what differs between renderers by design: tiny-skia spreads
+/// a thin element over partial rows and wgpu does not, so a region
+/// average encodes the antialiasing rather than the colour. The fully
+/// covered pixel carries the style's own colour on both, which is the
+/// thing parity is actually about (RFC-108 Unit 0 measured identical
+/// cores and different edges).
+///
+/// Bounds are rounded to whole physical pixels, which is the
+/// resolution a 1 px difference is allowed at.
+/// Which statistic is an element's core colour.
+///
+/// **A mark and a fill need different statistics, and using one for
+/// the other is how RFC-108's Row B first failed to reproduce.** A
+/// thin mark is a few pixels on a background, so its colour is the
+/// pixel the renderer covered fully; the mode over its region would be
+/// the background. A filled box is mostly its fill with a label on
+/// top, so its colour is the mode — the *most-contrasting* pixel of a
+/// tab is its label, which is what made a tab's fill look unchanged
+/// while the two renderers were in fact painting it differently.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Core {
+    /// A thin element: the fully covered pixel.
+    Mark,
+    /// A surface: the mode over its interior.
+    Fill,
+}
+
+impl Core {
+    fn name(self) -> &'static str {
+        match self {
+            Core::Mark => "mark",
+            Core::Fill => "fill",
+        }
+    }
+}
+
+/// A thin element's core: the fully covered pixel, against `reference`.
+pub fn record_mark(element: &str, frame: &Frame, region: Rectangle, reference: iced::Color) {
+    record_parity(element, Core::Mark, frame, region, Some(reference));
+}
+
+/// A surface's core: the mode over its interior.
+pub fn record_fill(element: &str, frame: &Frame, region: Rectangle) {
+    record_parity(element, Core::Fill, frame, region, None);
+}
+
+fn record_parity(
+    element: &str,
+    kind: Core,
+    frame: &Frame,
+    region: Rectangle,
+    reference: Option<iced::Color>,
+) {
+    let Ok(path) = std::env::var("SNORA_PARITY_OUT") else {
+        return;
+    };
+
+    // **Excluding the edge pixels**, which is the whole reason this can
+    // compare two renderers at all. An element's outermost physical row
+    // is partly covered, and what a renderer does with partial coverage
+    // is exactly where the two differ: measured, the tab underline's
+    // bottom row is the pure colour on wgpu and a blend with the black
+    // rule beneath it on tiny-skia. Reading the region whole reports
+    // that blend as the element's colour and fails parity on a
+    // difference that is antialiasing, not colour — which is what
+    // happened on the first CI run of this check.
+    let inset = Rectangle {
+        x: region.x + 1.0 / Frame::SCALE,
+        y: region.y + 1.0 / Frame::SCALE,
+        width: (region.width - 2.0 / Frame::SCALE).max(0.0),
+        height: (region.height - 2.0 / Frame::SCALE).max(0.0),
+    };
+    // A 1-logical-pixel element is two physical rows, and insetting
+    // leaves nothing; fall back to the region itself, where both
+    // renderers put a fully covered row anyway.
+    let core_region = if inset.width > 0.0 && inset.height > 0.0 {
+        inset
+    } else {
+        region
+    };
+
+    let core = match kind {
+        Core::Mark => peak_colour(
+            frame,
+            core_region,
+            reference.expect("a mark row needs the colour it is read against"),
+        ),
+        Core::Fill => colour_of(frame.modal_colour(core_region)),
+    };
+
+    let line = format!(
+        "{element}\t{}\t{}\t#{:02x}{:02x}{:02x}\t{} {} {} {}\n",
+        kind.name(),
+        frame.renderer,
+        (core.r * 255.0).round() as u8,
+        (core.g * 255.0).round() as u8,
+        (core.b * 255.0).round() as u8,
+        (region.x * Frame::SCALE).round() as i64,
+        (region.y * Frame::SCALE).round() as i64,
+        (region.width * Frame::SCALE).round() as i64,
+        (region.height * Frame::SCALE).round() as i64,
+    );
+
+    use std::io::Write;
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .unwrap_or_else(|e| panic!("open {path} for parity output: {e}"));
+    file.write_all(line.as_bytes())
+        .unwrap_or_else(|e| panic!("write parity output to {path}: {e}"));
+}

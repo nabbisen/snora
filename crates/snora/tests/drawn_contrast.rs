@@ -49,7 +49,7 @@ use iced::{Color, Element, Length, Point, Rectangle, Theme};
 mod common;
 use common::{
     AA_TEXT, Frame, NON_TEXT_MIN, colour_of, containers, contrast_ratio, frame_pixels, peak_colour,
-    peak_row, pointer_target, simulator,
+    peak_row, pointer_target, record_fill, record_mark, simulator,
 };
 
 #[test]
@@ -168,6 +168,7 @@ fn tab_bar_bottom_rule_meets_non_text_floor_as_drawn() {
         let frame = frame_pixels(&mut ui, &theme, &format!("tab-rule-{context}"));
         let page = colour_of(frame.modal_colour(PAGE_PATCH));
 
+        record_mark(&format!("tab-bar-rule/{context}"), &frame, rule, page);
         let drawn = colour_of(frame.modal_colour(rule));
         let r = contrast_ratio(drawn, page);
         report(
@@ -216,6 +217,36 @@ fn tab_indicator_meets_non_text_floor_as_drawn() {
 
         let frame = frame_pixels(&mut ui, &theme, &format!("tab-indicator-{context}"));
         let page = colour_of(frame.modal_colour(PAGE_PATCH));
+
+        record_mark(&format!("tab-underline/{context}"), &frame, indicator, page);
+
+        // The tab boxes themselves, as `fill` rows. They carry no
+        // contrast assertion here — a tab's label floor is
+        // `tab_button_style`'s, and the active state's cue is the
+        // underline above — but they are the surface RFC-102's defect
+        // lived on: a shadow behind a transparent quad, which
+        // tiny-skia filled and wgpu did not. Nothing else recorded
+        // would notice that coming back.
+        for (label, id) in [("active", ACTIVE_TAB), ("inactive", 0)] {
+            let box_ = pointer_target(
+                context,
+                tab_bar_page,
+                Point::new(indicator.x + indicator.width / 2.0, indicator.y - 8.0),
+                move |m: &TabMsg| *m == TabMsg::Tab(snora::TabAction::Pressed(ACTIVE_TAB)),
+            );
+            let box_ = if id == ACTIVE_TAB {
+                box_
+            } else {
+                // The first tab's own box, found the same way.
+                pointer_target(
+                    context,
+                    tab_bar_page,
+                    Point::new(box_.x - box_.width / 2.0, box_.y + box_.height / 2.0),
+                    move |m: &TabMsg| *m == TabMsg::Tab(snora::TabAction::Pressed(0)),
+                )
+            };
+            record_fill(&format!("tab-{label}-box/{context}"), &frame, box_);
+        }
 
         let drawn = colour_of(frame.modal_colour(indicator));
         let r = contrast_ratio(drawn, page);
@@ -318,6 +349,7 @@ fn sidebar_active_highlight_meets_non_text_floor_against_rail_as_drawn() {
 
         // The highlight, read from the button's own box. Its modal
         // colour is the fill: the glyph covers a small fraction of it.
+        record_fill(&format!("sidebar-active-box/{context}"), &frame, button);
         let fill = colour_of(frame.modal_colour(button));
         let r = contrast_ratio(fill, rail);
         report(
@@ -403,6 +435,7 @@ fn chrome_container_border_meets_non_text_floor_as_drawn() {
             height: 1.0,
         };
 
+        record_mark(&format!("chrome-border/{context}"), &frame, border, page);
         let drawn = colour_of(frame.modal_colour(border));
         let r = contrast_ratio(drawn, page);
         report(
@@ -570,6 +603,7 @@ fn assert_tooltip_border(
         height: (fill_top - top_row) as f32 / Frame::SCALE,
     };
 
+    record_mark(&format!("tooltip-border/{context}"), &hovered, top, page);
     let (peak_y, drawn, _) = peak_row(&hovered, top, page);
     let r = contrast_ratio(drawn, page);
     report(
@@ -760,6 +794,8 @@ fn assert_toast_contrast(
     // cover a small fraction of a 340px-wide card.
     let fill = colour_of(frame.modal_colour(surface));
 
+    record_mark(&format!("toast-title/{context}"), &frame, title, fill);
+    record_fill(&format!("toast-surface/{context}"), &frame, surface);
     // The text: the fully-covered core of the title's own glyphs.
     let text = peak_colour(&frame, title, fill);
 
@@ -885,6 +921,7 @@ fn chip_fill(
     let mut ui = simulator(chip_page(tokens, selected, enabled));
     let chip = chip_box(&mut ui);
     let frame = frame_pixels(&mut ui, theme, name);
+    record_fill(&format!("chip-box/{name}"), &frame, chip);
     colour_of(frame.modal_colour(Rectangle {
         x: chip.x + 1.0,
         y: chip.y + chip.height / 2.0 - 2.0,
