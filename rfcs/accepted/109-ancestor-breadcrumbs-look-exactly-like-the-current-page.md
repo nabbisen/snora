@@ -96,3 +96,19 @@ path: a migration-guide item, and a baseline change for orbok, which renders cru
 
 **Q-1:** an underline. **Q-2:** a rule element under the label, inside the button,
 snapped to whole pixels. **Q-3:** no opt-out. **Q-4:** 0.53.0.
+
+**Rulings during review, 2026-10-19:**
+
+- **"Snapped to whole pixels" is met by `container::Style::snap`, not by layout.**
+  The rule's offset includes the label height, `default_text_size × 1.3`, which the
+  host owns (RFC-104), so no padding can make it whole in advance. Snapping happens
+  at draw time instead, where the physical grid is known. Measured drawn, the rule
+  reaches its exact style colour in a fully covered row in all six contexts
+  (11.05–21.00:1).
+- **The rule keeps its resting colour on hover.** A container's style closure sees
+  only the theme, so it cannot follow the button's status in iced 0.14. The handoff's
+  "matches the label in both states" was not achievable. On hover the rule
+  (`background.base.text`) is drawn over the hover fill (`background.weak.color`).
+  The architect measured that pairing at **≥ 4.51:1 on all 26 contexts** (22 stock
+  themes and 4 presets; lowest Kanagawa Lotus), and it is asserted as part of
+  acceptance.
