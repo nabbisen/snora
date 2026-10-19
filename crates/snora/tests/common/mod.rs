@@ -11,9 +11,13 @@
 //!   [`assert_lucide_font_loaded`] fails if it did not. iced's font system
 //!   is process-global, so a "with the font versus without it" comparison
 //!   inside one binary measures whichever test ran first (RFC-100 §3).
-//! - [`frame_hash`] is the only way to read rendered pixels through
-//!   `iced_test`, which exposes them solely as a hash it will write to a
-//!   file.
+//! - [`frame_hash`] reads a frame as a SHA-256 digest, which answers
+//!   "did this frame change?" and nothing else.
+//! - [`frame_pixels`] reads the frame itself (RFC-108 R-1), by taking the
+//!   lossless PNG `iced_test` writes and decoding it. It also reports
+//!   **which renderer drew**, and fails if that is not the one asked for
+//!   — a silent fallback to tiny-skia would otherwise make a wgpu run
+//!   look like a pass.
 //!
 //! Moved here from `dismiss_remove_controls.rs` by RFC-101, which reuses
 //! the first two.
@@ -165,10 +169,12 @@ where
 
 /// Hash of the frame the simulator renders now.
 ///
-/// `iced_test` exposes rendered pixels only through
-/// `Snapshot::matches_hash`, which writes the hash to a file when none
-/// exists. Each call gets its own fresh directory under
-/// `CARGO_TARGET_TMPDIR`, so the file written is this frame's hash.
+/// `Snapshot::matches_hash` writes the hash to a file when none exists.
+/// Each call gets its own fresh directory under `CARGO_TARGET_TMPDIR`, so
+/// the file written is this frame's hash.
+///
+/// A hash answers only "did this frame change?". To read the pixels
+/// themselves — a drawn colour, a rule's coverage — use [`frame_pixels`].
 pub fn frame_hash<Message>(ui: &mut Simulator<'_, Message>, theme: &Theme, name: &str) -> String {
     let directory = Path::new(env!("CARGO_TARGET_TMPDIR"))
         .join("frames")
@@ -189,4 +195,249 @@ pub fn frame_hash<Message>(ui: &mut Simulator<'_, Message>, theme: &Theme, name:
         .expect("a frame hash was written")
         .expect("directory entry");
     std::fs::read_to_string(written.path()).expect("read frame hash")
+}
+
+/// One rendered frame: the renderer that drew it, its physical size, and
+/// its pixels as RGBA.
+#[derive(Debug, Clone)]
+pub struct Frame {
+    /// The renderer that actually drew, read from the file name
+    /// `iced_test` chose — not from what was requested.
+    pub renderer: String,
+    /// Physical width. `Simulator::snapshot` fixes the scale factor at
+    /// 2.0, so this is twice the logical width.
+    pub width: u32,
+    /// Physical height, likewise twice the logical height.
+    pub height: u32,
+    /// Row-major RGBA, four bytes per pixel.
+    pub rgba: Vec<u8>,
+}
+
+impl Frame {
+    /// The scale factor `Simulator::snapshot` fixes (`simulator.rs:221`).
+    /// Logical coordinates from `visible_bounds` are multiplied by this
+    /// to index into [`Frame::rgba`].
+    pub const SCALE: f32 = 2.0;
+
+    /// The RGBA at a physical pixel, or `None` outside the frame.
+    pub fn pixel(&self, x: u32, y: u32) -> Option<[u8; 4]> {
+        if x >= self.width || y >= self.height {
+            return None;
+        }
+        let i = ((y * self.width + x) * 4) as usize;
+        Some([
+            self.rgba[i],
+            self.rgba[i + 1],
+            self.rgba[i + 2],
+            self.rgba[i + 3],
+        ])
+    }
+
+    /// Every pixel of `region`, which is in **logical** coordinates and is
+    /// scaled by [`Frame::SCALE`] and clipped to the frame.
+    pub fn pixels_in(&self, region: Rectangle) -> Vec<[u8; 4]> {
+        let x0 = (region.x * Self::SCALE).round().max(0.0) as u32;
+        let y0 = (region.y * Self::SCALE).round().max(0.0) as u32;
+        let x1 = ((region.x + region.width) * Self::SCALE).round().max(0.0) as u32;
+        let y1 = ((region.y + region.height) * Self::SCALE).round().max(0.0) as u32;
+
+        let mut out = Vec::new();
+        for y in y0..y1.min(self.height) {
+            for x in x0..x1.min(self.width) {
+                if let Some(p) = self.pixel(x, y) {
+                    out.push(p);
+                }
+            }
+        }
+        out
+    }
+
+    /// The most common colour in `region` — what the element reads as.
+    ///
+    /// The mode, not the mean: averaging an element against its
+    /// background invents a colour that was never drawn, and an
+    /// antialiased edge would drag it. The mode is a colour actually on
+    /// screen.
+    pub fn modal_colour(&self, region: Rectangle) -> [u8; 4] {
+        let pixels = self.pixels_in(region);
+        assert!(
+            !pixels.is_empty(),
+            "no pixels in {region:?}; the frame is {}x{} physical",
+            self.width,
+            self.height
+        );
+
+        let mut counts: std::collections::HashMap<[u8; 4], usize> =
+            std::collections::HashMap::new();
+        for p in pixels {
+            *counts.entry(p).or_default() += 1;
+        }
+        // Ties broken by the colour's own bytes, so the answer does not
+        // depend on hash iteration order.
+        counts
+            .into_iter()
+            .max_by_key(|&(colour, count)| (count, colour))
+            .map(|(colour, _)| colour)
+            .expect("a non-empty region has a modal colour")
+    }
+
+    /// The modal colour of each physical row of `region`, top to bottom.
+    ///
+    /// For an element under 2 logical pixels, the interesting number is
+    /// the strongest row, not the region's mode: at scale 2 a 1px rule is
+    /// two physical rows, and a fractional offset smears it across three
+    /// at partial coverage (RFC-108's tab-rule measurement).
+    pub fn row_modes(&self, region: Rectangle) -> Vec<(u32, [u8; 4])> {
+        let y0 = (region.y * Self::SCALE).round().max(0.0) as u32;
+        let y1 = ((region.y + region.height) * Self::SCALE).round().max(0.0) as u32;
+
+        (y0..y1.min(self.height))
+            .map(|y| {
+                let row = Rectangle {
+                    y: y as f32 / Self::SCALE,
+                    height: 1.0 / Self::SCALE,
+                    ..region
+                };
+                (y, self.modal_colour(row))
+            })
+            .collect()
+    }
+}
+
+/// The frame the simulator renders now, as pixels.
+///
+/// `iced_test` exposes the rendered buffer only by writing it somewhere:
+/// `matches_hash` writes a digest, `matches_image` writes a lossless RGBA
+/// PNG. This takes the second route and decodes the file, which is the
+/// only way to read a drawn colour (RFC-108 R-1).
+///
+/// The file `iced_test` writes is named `<stem>-<renderer>.png`, where
+/// `<renderer>` is what actually drew, delegated through the fallback
+/// renderer (`iced_renderer-0.14.0/src/fallback.rs:701`). So the name is
+/// evidence, and this asserts it matches `ICED_TEST_BACKEND` (default
+/// `tiny-skia`, pinned in `.cargo/config.toml`). **Without that check a
+/// wgpu run that silently fell back would report tiny-skia's pixels as
+/// wgpu's** — which is the whole question RFC-108 Unit 0 asks.
+pub fn frame_pixels<Message>(ui: &mut Simulator<'_, Message>, theme: &Theme, name: &str) -> Frame {
+    let directory = Path::new(env!("CARGO_TARGET_TMPDIR"))
+        .join("frame-pixels")
+        .join(name);
+    let _ = std::fs::remove_dir_all(&directory);
+    std::fs::create_dir_all(&directory).expect("create frame pixel directory");
+
+    let snapshot = ui.snapshot(theme).expect("render a frame");
+    assert!(
+        snapshot
+            .matches_image(directory.join("frame"))
+            .expect("write frame image")
+    );
+
+    let written = std::fs::read_dir(&directory)
+        .expect("read frame pixel directory")
+        .next()
+        .expect("a frame image was written")
+        .expect("directory entry")
+        .path();
+
+    let renderer = written
+        .file_stem()
+        .expect("the written file has a stem")
+        .to_string_lossy()
+        .strip_prefix("frame-")
+        .expect("iced_test names the file <stem>-<renderer>.png")
+        .to_owned();
+
+    let requested = std::env::var("ICED_TEST_BACKEND").unwrap_or_else(|_| "tiny-skia".to_owned());
+    assert_eq!(
+        renderer, requested,
+        "{name}: asked for the {requested} renderer and {renderer} drew. iced_test falls back \
+         silently when a backend cannot start, so these pixels are not the ones under test",
+    );
+
+    let file = std::fs::File::open(&written).expect("open the written frame");
+    let decoder = png::Decoder::new(std::io::BufReader::new(file));
+    let mut reader = decoder.read_info().expect("read PNG header");
+    let mut rgba = vec![0; reader.output_buffer_size().expect("frame fits in memory")];
+    let info = reader.next_frame(&mut rgba).expect("decode the frame");
+    rgba.truncate(info.buffer_size());
+
+    assert_eq!(
+        info.color_type,
+        png::ColorType::Rgba,
+        "{name}: iced_test writes RGBA; got {:?}",
+        info.color_type
+    );
+
+    Frame {
+        renderer,
+        width: info.width,
+        height: info.height,
+        rgba,
+    }
+}
+
+// ---------------------------------------------------------------------
+// Contrast, on drawn pixels (RFC-108 R-2)
+// ---------------------------------------------------------------------
+
+/// WCAG 1.4.11's non-text floor, and 1.4.3's AA floor for body text.
+///
+/// One copy for every test binary that includes this module, rather
+/// than one per file; `scripts/check-wcag-floors.sh` pins how many
+/// copies exist under `crates/` and fails if two disagree.
+pub const NON_TEXT_MIN: f32 = 3.0;
+pub const AA_TEXT: f32 = 4.5;
+
+/// A drawn pixel as a colour. The frame is opaque, so there is no alpha
+/// left to composite: whatever translucency an element had is already
+/// in these bytes, which is the point of reading them.
+pub fn colour_of(pixel: [u8; 4]) -> iced::Color {
+    iced::Color::from_rgba8(pixel[0], pixel[1], pixel[2], 1.0)
+}
+
+fn linearize(c: f32) -> f32 {
+    if c <= 0.04045 {
+        c / 12.92
+    } else {
+        ((c + 0.055) / 1.055).powf(2.4)
+    }
+}
+
+/// WCAG relative luminance.
+pub fn relative_luminance(c: iced::Color) -> f32 {
+    0.2126 * linearize(c.r) + 0.7152 * linearize(c.g) + 0.0722 * linearize(c.b)
+}
+
+/// WCAG contrast ratio. Checked against the reference identity by
+/// every suite that uses it.
+pub fn contrast_ratio(a: iced::Color, b: iced::Color) -> f32 {
+    let (la, lb) = (relative_luminance(a), relative_luminance(b));
+    (la.max(lb) + 0.05) / (la.min(lb) + 0.05)
+}
+
+/// The colour in `region` furthest in luminance from `against` — the
+/// peak-coverage pixel. For a thin or antialiased mark this is a pixel
+/// the renderer covered fully, which carries the style's own colour;
+/// every blended neighbour is weaker.
+pub fn peak_colour(frame: &Frame, region: Rectangle, against: iced::Color) -> iced::Color {
+    frame
+        .pixels_in(region)
+        .into_iter()
+        .map(colour_of)
+        .max_by(|a, b| contrast_ratio(*a, against).total_cmp(&contrast_ratio(*b, against)))
+        .expect("the region has pixels")
+}
+
+/// The strongest physical row of `region` against `against`, as
+/// `(physical row, colour, ratio)`.
+pub fn peak_row(frame: &Frame, region: Rectangle, against: iced::Color) -> (u32, iced::Color, f32) {
+    frame
+        .row_modes(region)
+        .into_iter()
+        .map(|(y, pixel)| {
+            let colour = colour_of(pixel);
+            (y, colour, contrast_ratio(colour, against))
+        })
+        .max_by(|a, b| a.2.total_cmp(&b.2))
+        .expect("the region has rows")
 }

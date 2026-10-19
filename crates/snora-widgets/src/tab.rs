@@ -252,6 +252,24 @@ pub(crate) fn tab_bar_rule_style(theme: &Theme) -> container::Style {
     let ep = theme.extended_palette();
     container::Style {
         background: Some(Background::Color(ep.background.base.text)),
+        // Snapped to the pixel grid (RFC-108). The rule is one logical
+        // pixel at y = 36.8 — a fractional offset, because the bar's
+        // height follows the host's `default_text_size`.
+        //
+        // **This is honoured by wgpu and ignored by tiny-skia.** In
+        // iced 0.14 `Quad::snap` is read by `iced_wgpu` only, and
+        // snora's harness is pinned to tiny-skia, so no test in this
+        // repository can see the difference. Measured on both, same
+        // frame, stock Light (RFC-108 Unit 0):
+        //
+        //   wgpu       rows 73:255  74:0  75:0    — two solid rows
+        //   tiny-skia  rows 73:128  74:0  75:127  — smeared over three
+        //
+        // So on the renderer applications actually run, this is the
+        // difference between a clean 1px rule and a grey-black-grey
+        // band. Verified, not assumed — and not verifiable by any gate
+        // this repository runs today.
+        snap: true,
         ..container::Style::default()
     }
 }
@@ -274,6 +292,11 @@ pub(crate) fn tab_indicator_style(theme: &Theme) -> container::Style {
     let ep = theme.extended_palette();
     container::Style {
         background: Some(Background::Color(ep.primary.strong.color)),
+        // Same as the bar's rule (RFC-108): two logical pixels at
+        // y = 34.8 is still a fractional offset. Measured on the same
+        // frame — wgpu draws rows 70-73 solid, tiny-skia adds partial
+        // rows at 69 and 73. wgpu only; see `tab_bar_rule_style`.
+        snap: true,
         ..container::Style::default()
     }
 }

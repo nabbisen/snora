@@ -43,6 +43,36 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   from 0.53.0 opens with four lines: what changed, whether your code must
   change, whether appearance changes, and whether there is a security item.
 
+- **Contrast is read from the pixels that were drawn (RFC-108).** Every
+  contrast assertion before this one read a style function's return value,
+  which answers "is the colour we intend sufficient?" and not "is the colour
+  that reached the screen sufficient?". Eight element groups are now measured
+  from the rendered frame instead — the tab bar's bottom rule and the active
+  tab's underline, the sidebar's active fill against its rail, the chrome
+  container's border, the tooltip body's border on both paths, every toast
+  intent's fill on both paths, and the chip's selected and disabled fills —
+  each against the same floor its style test already used.
+
+  Elements under two logical pixels are asserted twice: on the region's
+  modal colour and on its strongest row, because a 1px rule at a fractional
+  offset is spread across three physical rows at partial coverage. The tab
+  bar's rule is exactly that case, and reads 4.00:1 as a region against
+  21.00:1 at its core.
+
+  `common::frame_pixels` is the instrument: it decodes the lossless PNG
+  `iced_test` writes and **asserts which renderer drew it**, so a silent
+  fallback cannot be reported as a pass. This does not yet make REQ-005 met;
+  the default renderer is still untested in CI, which is a separate question.
+
+  **The tab bar's rule and the active tab's underline are now snapped to the
+  pixel grid.** Both are thin elements at fractional offsets, and on the
+  default renderer that cost them their edges: measured on stock Light, the
+  1px rule drew as a grey-black-grey band over three physical rows. With
+  `snap` it draws as two solid rows. **The change is visible on wgpu only** —
+  `iced_tiny_skia` ignores the flag in iced 0.14 — so an application using the
+  default renderer sees slightly crisper chrome, and one rendering with
+  tiny-skia sees no change at all. No colour moves either way.
+
 ## [0.52.0] — 2026-09-29
 
 **Upgrading from 0.51:** read the [0.51 → 0.52 migration guide](docs/src/guides/migration-0.51-to-0.52.md).

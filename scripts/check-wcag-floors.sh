@@ -36,9 +36,15 @@ cd "$(git rev-parse --show-toplevel)"
 # only ever notices a *value* mismatch, which would have caught the
 # 1.3-drift incident but not the uncounted-fourth-copy one, and this
 # audit found both are real failure modes for the same set of constants.
+#
+# 2026-10-19 (RFC-108): AA_TEXT 3 -> 4 and NON_TEXT_MIN 4 -> 5. The new
+# copies are both in `crates/snora/tests/common/mod.rs` — one copy of
+# each, shared by every rendered test binary that reads contrast from
+# drawn pixels, rather than one per file. Counted and pinned here
+# deliberately, which is what this script asks for.
 declare -A EXPECTED_COUNT=(
-  [AA_TEXT]=3
-  [NON_TEXT_MIN]=4
+  [AA_TEXT]=4
+  [NON_TEXT_MIN]=5
   [FOCUS_MIN]=1
   [TEXT_SIZE_MIN]=1
 )

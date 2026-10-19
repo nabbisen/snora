@@ -74,3 +74,7 @@ lucide-icons = { workspace = true, optional = true }
 # Headless test harness for render-semantics tests (RFC-011-D).
 # Dev-only: no impact on binary size or public feature surface.
 iced_test = "0.14"
+# Decodes the PNG `iced_test` writes, which is the only route to the
+# rendered pixels themselves (RFC-108 R-1). Already in the lockfile:
+# `iced_test` encodes with the same crate at the same version.
+png = "0.18"

@@ -3031,6 +3031,7 @@ dependencies = [
  "iced",
  "iced_test",
  "lucide-icons",
+ "png 0.18.1",
  "snora-core",
  "snora-design",
  "snora-style",
