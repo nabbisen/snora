@@ -312,6 +312,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   `Debug` has no status token and maps to the neutral
   `surface_raised`/`text_primary` pairing).
 
+*Corrected 2026-10-20:* the Fixed bullet on the toast's Warning fill says "every intent's text clears AA against its own fill on both paths". That was asserted on iced's two stock themes and the four design presets only. Over all 22 built-in themes the unstyled toast missed AA on six, worst Kanagawa Dragon / Info at 2.42:1, and under a token-derived theme on the unstyled path Info measured 1.40–1.66:1. Fixed in RFC-111, released in 0.53.0.
+
 ## [0.51.0] — 2026-09-26
 
 **Upgrading from 0.50:** read the [0.50 → 0.51 migration guide](docs/src/guides/migration-0.50-to-0.51.md).
