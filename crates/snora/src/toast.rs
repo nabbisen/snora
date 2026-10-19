@@ -307,6 +307,69 @@ where
     )
 }
 
+/// WCAG relative luminance, at runtime.
+///
+/// The twin of `contrast_tests::relative_luminance`, which is checked
+/// against the reference identity. Duplicated rather than shared
+/// because that module is `#[cfg(test)]` and this is not; the pair is
+/// small enough to read side by side, and
+/// `toast_fallback_matches_the_tests_contrast` asserts the two agree.
+fn relative_luminance(c: Color) -> f32 {
+    fn channel(c: f32) -> f32 {
+        if c <= 0.04045 {
+            c / 12.92
+        } else {
+            ((c + 0.055) / 1.055).powf(2.4)
+        }
+    }
+    0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
+}
+
+/// WCAG contrast ratio between two opaque colours.
+fn contrast_ratio(a: Color, b: Color) -> f32 {
+    let (la, lb) = (relative_luminance(a), relative_luminance(b));
+    (la.max(lb) + 0.05) / (la.min(lb) + 0.05)
+}
+
+/// Black or white, whichever contrasts more with `fill` (RFC-111).
+///
+/// **This always clears AA.** For any opaque colour with luminance `L`,
+/// black contrasts at `(L + 0.05) / 0.05` and white at
+/// `1.05 / (L + 0.05)`; the two are equal at `L = √(0.05 × 1.05) −
+/// 0.05`, where both are `√(1.05 / 0.05) ≈ 4.583:1`. Every other
+/// luminance makes one of them larger. So the worse case of the better
+/// choice is 4.583, above the 4.5 floor, for every fill a theme can
+/// produce.
+fn stronger_pole(fill: Color) -> Color {
+    if contrast_ratio(Color::BLACK, fill) >= contrast_ratio(Color::WHITE, fill) {
+        Color::BLACK
+    } else {
+        Color::WHITE
+    }
+}
+
+/// The theme's own paired text when it clears AA against the fill, and
+/// the stronger pole when it does not (RFC-111).
+///
+/// iced derives each pair from whatever palette the application set,
+/// and six of its 22 built-in themes produce a pair under 4.5:1 — worst
+/// 2.42 on Kanagawa Dragon. The theme's choice is kept wherever it
+/// holds, because it is the one that looks deliberate; the fallback
+/// only replaces a pairing that fails.
+fn readable_text(fill: Color, paired: Color) -> Color {
+    if contrast_ratio(paired, fill) >= AA_TEXT {
+        paired
+    } else {
+        stronger_pole(fill)
+    }
+}
+
+/// WCAG 1.4.3 AA for body text. A fifth in-crate copy of the same
+/// number, pinned by `scripts/check-wcag-floors.sh`; this one is
+/// runtime rather than test-only, because the fallback has to make the
+/// same judgement the tests do.
+const AA_TEXT: f32 = 4.5;
+
 /// Returns `(background, text_color)` for a toast intent — the single
 /// derivation both [`toast_style`] (the body) and [`close_button_style`]
 /// (the dismiss `×`) share, so a pairing fix only needs to happen once
@@ -339,14 +402,20 @@ where
 /// - `Debug` — unchanged; already the correct pairing (`13.28:1` /
 ///   `6.02:1`, light/dark). F-06 was in [`close_button_style`], not here.
 /// - `Info` — **not named by the audit, found by measuring all five
-///   (Q-3).** `primary.base.color`/`.text` measured **4.43:1** in both
-///   stock themes — under AA, and iced's own derivation, not a snora
-///   literal. Neither `primary.base` nor `primary.strong`'s own paired
-///   `.text` clears with real margin (4.43-4.58:1, all within 2% of the
-///   floor) because `primary.base.color`'s luminance sits almost exactly
-///   at the point where black and white text contrast it equally.
-///   `primary.strong.color` paired with `Color::BLACK` measures
-///   **5.64:1** — real margin, still recognizably the same blue family.
+///   (Q-3).** `primary.base.color`/`.text` measured **4.43:1 on the two
+///   stock themes** — under AA, and iced's own derivation, not a snora
+///   literal. On those two themes neither `primary.base` nor
+///   `primary.strong`'s own paired `.text` clears with real margin
+///   (4.43-4.58:1) because `primary.base.color`'s luminance there sits
+///   almost exactly where black and white contrast it equally;
+///   `primary.strong.color` with `Color::BLACK` measures **5.64:1**.
+///
+///   **Every number in this bullet is a stock-theme number, and the
+///   literal black that came out of it was wrong on the other twenty
+///   (RFC-111).** iced derives `primary.strong` from whatever palette
+///   the application sets, and on Kanagawa Dragon that is a mid-blue
+///   where black measures 2.42:1. Info now takes the better of its own
+///   pair and the stronger pole, which is still black on stock.
 /// - `Success` — unchanged; already passes with margin (`6.61:1` /
 ///   `6.91:1`).
 /// - `Error` — unchanged; passes (`4.83:1` both themes) — thinner than
@@ -358,32 +427,63 @@ fn intent_colors(
     overrides: Option<ToastIntentColors>,
 ) -> (Color, Color) {
     // The `design` path supplies the token palette's own status pairs
-    // (RFC-104); without them the pairs are derived from the theme.
+    // (RFC-104); without them the pairs are derived from the theme, and
+    // the theme's pair is kept only where it clears AA (RFC-111).
     if let Some(overrides) = overrides {
         return overrides.pair(intent);
     }
 
     let ep = theme.extended_palette();
     match intent {
-        ToastIntent::Debug => (ep.background.strong.color, ep.background.strong.text),
-        // Fill widened from `base` to `strong` and text overridden to
-        // black — see this function's doc comment for the measured
-        // figures behind both changes.
-        ToastIntent::Info => (ep.primary.strong.color, Color::BLACK),
-        ToastIntent::Success => (ep.success.base.color, ep.success.base.text),
+        ToastIntent::Debug => {
+            let fill = ep.background.strong.color;
+            (fill, readable_text(fill, ep.background.strong.text))
+        }
+        // Info takes the better of its pair and the stronger pole
+        // (RFC-111 Q-1), rather than the unconditional `Color::BLACK`
+        // this used to carry. That literal was measured on the two
+        // stock themes, where black is the better choice at 5.63 — and
+        // it stayed black on the other twenty, which is how Kanagawa
+        // Dragon drew black on a mid-blue at 2.42, and how an
+        // application rendering a token-derived theme through the
+        // unstyled path drew 1.40-1.66.
+        ToastIntent::Info => {
+            let fill = ep.primary.strong.color;
+            let paired = ep.primary.strong.text;
+            let pole = stronger_pole(fill);
+            let text = if contrast_ratio(paired, fill) >= contrast_ratio(pole, fill) {
+                paired
+            } else {
+                pole
+            };
+            (fill, text)
+        }
+        ToastIntent::Success => {
+            let fill = ep.success.base.color;
+            (fill, readable_text(fill, ep.success.base.text))
+        }
         // From the theme, not from a literal (RFC-104). iced 0.14's
         // extended palette does carry a `warning` pair — the comment
         // that said it does not predates it — so a host that themes its
         // warning colour now gets it here, and the paired `.text` comes
         // with it instead of a hardcoded black.
-        ToastIntent::Warning => (ep.warning.base.color, ep.warning.base.text),
-        ToastIntent::Error => (ep.danger.base.color, ep.danger.base.text),
+        ToastIntent::Warning => {
+            let fill = ep.warning.base.color;
+            (fill, readable_text(fill, ep.warning.base.text))
+        }
+        ToastIntent::Error => {
+            let fill = ep.danger.base.color;
+            (fill, readable_text(fill, ep.danger.base.text))
+        }
     }
 }
 
 /// Style a toast surface based on its intent. Colors are pulled from the
-/// theme's extended palette where available, with a hand-picked warning
-/// color (iced's extended palette has no `warning` pair of its own).
+/// theme's extended palette, including its `warning` pair — iced 0.14
+/// carries one, and RFC-104 retired the hand-picked constant that this
+/// comment used to describe. The text is the palette's own paired
+/// value wherever that clears AA against the fill, and the stronger of
+/// black and white where it does not (RFC-111).
 fn toast_style(
     theme: &iced::Theme,
     intent: ToastIntent,

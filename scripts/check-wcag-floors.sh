@@ -44,8 +44,14 @@ cd "$(git rev-parse --show-toplevel)"
 # `crates/snora/src/render/tests.rs` (NON_TEXT_MIN, for the unstyled
 # modal dim). Counted and pinned here deliberately, which is what this
 # script asks for.
+#
+# 2026-10-19 (RFC-111): AA_TEXT 4 -> 5. The new copy is in
+# `crates/snora/src/toast.rs`, and it is the first that is **not**
+# test-only: the toast's text now falls back to the stronger pole where
+# the theme's own pair misses AA, so the floor has to be readable at
+# runtime and not just by the suite that checks it.
 declare -A EXPECTED_COUNT=(
-  [AA_TEXT]=4
+  [AA_TEXT]=5
   [NON_TEXT_MIN]=6
   [FOCUS_MIN]=1
   [TEXT_SIZE_MIN]=1

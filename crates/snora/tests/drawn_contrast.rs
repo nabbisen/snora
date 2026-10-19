@@ -1052,3 +1052,28 @@ fn report_thin_element_coverage() {
         );
     }
 }
+
+/// The toast that RFC-111 was raised for, read from the frame.
+///
+/// Kanagawa Dragon / Info is the worst case the sweep found: the theme
+/// derives a mid-blue `primary.strong`, and the unstyled path used to
+/// draw an unconditional `Color::BLACK` on it at 2.42:1. The style
+/// suite asserts the pairing; this asserts that what reaches the screen
+/// is that pairing and not something else.
+#[test]
+fn the_worst_case_toast_clears_aa_as_drawn() {
+    let theme = Theme::ALL
+        .iter()
+        .find(|t| t.to_string() == "Kanagawa Dragon")
+        .expect("iced ships Kanagawa Dragon")
+        .clone();
+
+    let mut failures = Vec::new();
+    assert_toast_contrast(
+        &mut failures,
+        "Kanagawa Dragon / info",
+        toast_page(snora::ToastIntent::Info),
+        &theme,
+    );
+    assert_no_failures(failures);
+}

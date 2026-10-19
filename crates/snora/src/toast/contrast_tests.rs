@@ -134,8 +134,44 @@ fn intent_label(intent: ToastIntent) -> &'static str {
     }
 }
 
-fn theme_contexts() -> [(&'static str, Theme); 2] {
-    [("stock Light", Theme::Light), ("stock Dark", Theme::Dark)]
+/// Every theme a toast can be drawn on through the unstyled path.
+///
+/// **Was `theme_contexts()`, and was stock Light and Dark only.** That
+/// is what let RFC-111's defect through: iced ships 22 built-in themes
+/// and derives each intent's pair from whichever one the application
+/// sets, so two of them say nothing about the other twenty. Measured
+/// over all of them, six pairs sat under AA, the worst at 2.42.
+///
+/// The four `design` presets are here too, rendered on the **unstyled**
+/// path — `snora::design::theme(&tokens)` produces an `iced::Theme`,
+/// and an application is free to hand that to `snora::render`. That
+/// combination is where the dev team first found this (RFC-108's
+/// review), and it is the one iced's own 22 do not cover.
+fn unstyled_theme_contexts() -> Vec<(String, Theme)> {
+    let mut contexts: Vec<(String, Theme)> = Theme::ALL
+        .iter()
+        .map(|theme| (theme.to_string(), theme.clone()))
+        .collect();
+
+    #[cfg(feature = "design")]
+    contexts.extend(
+        [
+            ("token theme: light", snora_design::Tokens::light()),
+            ("token theme: dark", snora_design::Tokens::dark()),
+            (
+                "token theme: high_contrast_light",
+                snora_design::Tokens::high_contrast_light(),
+            ),
+            (
+                "token theme: high_contrast_dark",
+                snora_design::Tokens::high_contrast_dark(),
+            ),
+        ]
+        .into_iter()
+        .map(|(name, tokens)| (name.to_owned(), snora_style::theme::theme(&tokens))),
+    );
+
+    contexts
 }
 
 fn toast_background(theme: &Theme, intent: ToastIntent) -> Color {
@@ -154,7 +190,7 @@ fn toast_background(theme: &Theme, intent: ToastIntent) -> Color {
 /// hardcoded black.
 #[test]
 fn warning_fill_and_text_come_from_the_theme() {
-    for (theme_name, theme) in theme_contexts() {
+    for (theme_name, theme) in unstyled_theme_contexts() {
         let ep = theme.extended_palette();
         let style = toast_style(&theme, ToastIntent::Warning, None);
         assert_eq!(
@@ -290,9 +326,9 @@ fn text_contrast_sees_alpha() {
 /// than stopping at the first, so a regression states every affected
 /// combination at once.
 #[test]
-fn toast_body_text_meets_aa_all_intents_both_themes() {
+fn toast_body_text_meets_aa_every_intent_every_unstyled_theme() {
     let mut failures = Vec::new();
-    for (theme_name, theme) in theme_contexts() {
+    for (theme_name, theme) in unstyled_theme_contexts() {
         for intent in ALL_INTENTS {
             let style = toast_style(&theme, intent, None);
             let bg = toast_background(&theme, intent);
@@ -336,7 +372,7 @@ fn toast_body_text_meets_aa_all_intents_both_themes() {
 /// the release process. Checking only `Active` would not have caught a
 /// reintroduced hover-only fade; checking all four does.
 #[test]
-fn toast_dismiss_mark_meets_non_text_floor_all_intents_both_themes() {
+fn toast_dismiss_mark_meets_non_text_floor_every_intent_every_unstyled_theme() {
     const ALL_STATUSES: [button::Status; 4] = [
         button::Status::Active,
         button::Status::Hovered,
@@ -345,7 +381,7 @@ fn toast_dismiss_mark_meets_non_text_floor_all_intents_both_themes() {
     ];
 
     let mut failures = Vec::new();
-    for (theme_name, theme) in theme_contexts() {
+    for (theme_name, theme) in unstyled_theme_contexts() {
         for intent in ALL_INTENTS {
             let bg = toast_background(&theme, intent);
             for status in ALL_STATUSES {
@@ -365,6 +401,158 @@ fn toast_dismiss_mark_meets_non_text_floor_all_intents_both_themes() {
     assert!(
         failures.is_empty(),
         "{} failing combination(s):\n{}",
+        failures.len(),
+        failures.join("\n"),
+    );
+}
+
+/// The two stock themes' ten ratios, pinned (RFC-111 acceptance 2).
+///
+/// RFC-111 changes what the unstyled path does on **twenty** of iced's
+/// themes and must change nothing on the two most applications start
+/// on. A sweep that only asserts a floor cannot say that: every one of
+/// these already cleared 4.5, so they would pass before and after
+/// whatever the fallback did to them. These are the measured values
+/// from before the change, to two decimals, and the test fails if any
+/// of them moves.
+///
+/// Two decimals rather than exact equality because the figures are the
+/// ones quoted in the CHANGELOG and the RFC; a change too small to show
+/// there is not what this is guarding against.
+#[test]
+fn stock_theme_ratios_are_unchanged_by_the_fallback() {
+    const PINNED: [(&str, ToastIntent, f32); 10] = [
+        ("stock Light", ToastIntent::Debug, 13.28),
+        ("stock Light", ToastIntent::Info, 5.63),
+        ("stock Light", ToastIntent::Success, 6.61),
+        ("stock Light", ToastIntent::Warning, 6.05),
+        ("stock Light", ToastIntent::Error, 4.83),
+        ("stock Dark", ToastIntent::Debug, 6.02),
+        ("stock Dark", ToastIntent::Info, 5.63),
+        ("stock Dark", ToastIntent::Success, 6.91),
+        ("stock Dark", ToastIntent::Warning, 8.12),
+        ("stock Dark", ToastIntent::Error, 4.83),
+    ];
+
+    let mut failures = Vec::new();
+    for (theme_name, intent, expected) in PINNED {
+        let theme = match theme_name {
+            "stock Light" => Theme::Light,
+            _ => Theme::Dark,
+        };
+        let style = toast_style(&theme, intent, None);
+        let bg = toast_background(&theme, intent);
+        let fg = style
+            .text_color
+            .expect("toast_style always sets text_color");
+        let actual = text_contrast(fg, bg);
+        if (actual - expected).abs() > 0.005 {
+            failures.push(format!(
+                "{theme_name} / {}: {actual:.3} where {expected:.2} was pinned",
+                intent_label(intent),
+            ));
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "the fallback moved a stock-theme ratio, which it must not:\n{}",
+        failures.join("\n"),
+    );
+}
+
+/// The runtime fallback and this suite compute the same number.
+///
+/// `toast.rs` carries its own `contrast_ratio`, because this module is
+/// `#[cfg(test)]` and the fallback has to run in a release build. Two
+/// copies of a formula drift; this asserts they have not.
+#[test]
+fn toast_fallback_matches_the_tests_contrast() {
+    let samples = [
+        (Color::BLACK, Color::WHITE),
+        (Color::WHITE, Color::BLACK),
+        (
+            Color::from_rgb(0.188, 0.298, 0.457),
+            Color::from_rgb(0.0, 0.0, 0.0),
+        ),
+        (
+            Color::from_rgb(0.86, 0.196, 0.184),
+            Color::from_rgb(0.99, 0.98, 0.98),
+        ),
+    ];
+    for (a, b) in samples {
+        let ours = contrast_ratio(a, b);
+        let theirs = super::contrast_ratio(a, b);
+        assert!(
+            (ours - theirs).abs() < 1e-6,
+            "the toast's runtime contrast ({theirs}) disagrees with this suite's ({ours}) \
+             for {a:?} on {b:?}",
+        );
+    }
+}
+
+/// `stronger_pole` picks the better pole, and the better pole always
+/// clears AA.
+///
+/// **The handoff's breakage for this could not fail, so this replaces
+/// it.** It asked for `stronger_pole` to be forced to black and
+/// Kanagawa Dragon to fail; forced to black, the whole suite still
+/// passes. The reason is that no theme needing the fallback today has
+/// a fill light enough to require white — Info prefers its own pair
+/// where that is better, and every other intent that misses AA happens
+/// to miss it on a dark-enough fill. So the sweep cannot distinguish
+/// "picks the better pole" from "always returns black", and the
+/// helper's actual contract was unasserted.
+///
+/// This asserts the contract directly, over every fill the built-in
+/// themes produce **and** a grey ramp that reaches the light end the
+/// themes do not. Forced to either pole, it fails on the other half of
+/// the ramp.
+#[test]
+fn stronger_pole_is_the_better_pole_and_always_clears_aa() {
+    /// The algebraic worst case: black and white contrast a fill
+    /// equally at `sqrt(1.05 / 0.05)`, and every other luminance makes
+    /// one of them larger.
+    const WORST_CASE: f32 = 4.582_576;
+
+    let mut fills: Vec<(String, Color)> = Vec::new();
+    for theme in Theme::ALL {
+        for intent in ALL_INTENTS {
+            fills.push((
+                format!("{theme} / {}", intent_label(intent)),
+                toast_background(theme, intent),
+            ));
+        }
+    }
+    // 0.00 to 1.00 in 1/32 steps, so both sides of the crossover are
+    // covered whatever the themes happen to contain.
+    for i in 0..=32u8 {
+        let v = f32::from(i) / 32.0;
+        fills.push((format!("grey {v:.3}"), Color::from_rgb(v, v, v)));
+    }
+
+    let mut failures = Vec::new();
+    for (name, fill) in fills {
+        let chosen = super::stronger_pole(fill);
+        let black = contrast_ratio(Color::BLACK, fill);
+        let white = contrast_ratio(Color::WHITE, fill);
+        let got = contrast_ratio(chosen, fill);
+
+        if got < black.max(white) - 1e-4 {
+            failures.push(format!(
+                "{name}: chose the weaker pole, {got:.3} against the better {:.3}",
+                black.max(white),
+            ));
+        }
+        if got < WORST_CASE - 1e-3 {
+            failures.push(format!(
+                "{name}: the better pole is only {got:.3}, under the {WORST_CASE:.3} \
+                 that the algebra guarantees",
+            ));
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} pole failure(s):\n{}",
         failures.len(),
         failures.join("\n"),
     );

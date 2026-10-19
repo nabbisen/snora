@@ -98,6 +98,40 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
+- **A toast's text missed AA on six built-in themes (RFC-111).** iced derives
+  each intent's fill and paired text from whatever palette the application
+  sets, and snora's contrast suite only ever checked two of its 22 themes. On
+  the other twenty, six pairs sat under the 4.5:1 floor:
+
+  | Theme | Intent | Before | After |
+  |---|---|---|---|
+  | Kanagawa Dragon | Info | 2.42 | **8.69** |
+  | Nord | Error | 4.25 | **5.13** |
+  | Oxocarbon | Error | 4.36 | **5.30** |
+  | Kanagawa Lotus | Success | 4.40 | **5.36** |
+  | Solarized Light | Error | 4.44 | **4.63** |
+  | Solarized Dark | Error | 4.44 | **4.63** |
+
+  Kanagawa Dragon was the worst because `Info`'s text was the literal
+  `Color::BLACK`, chosen against the two stock themes and then applied to
+  every other one — on that theme a mid-blue fill.
+
+  **The same literal reached applications that derive their theme from
+  tokens.** An application that passes `snora::design::theme(&tokens)` to the
+  unstyled `snora::render` drew Info at **1.40–1.66:1**; it is now 12.64 and
+  15.03 on the two affected presets.
+
+  **The unstyled toast now keeps the theme's own paired text wherever it
+  clears AA, and falls back to whichever of black and white contrasts the
+  fill more where it does not.** That fallback cannot itself fail: for any
+  opaque colour the better pole contrasts at ≥ 4.583:1. `Info` takes the
+  better of its pair and that pole, which on the stock themes is still black.
+
+  **No change on stock Light or stock Dark** — all ten of their ratios are
+  unchanged and are now pinned by a test, since a floor alone would not have
+  noticed them moving. **The `design` path is unchanged**, value and rule
+  both; it supplies its own status pairs and is swept rather than altered.
+
 - **The modal dim did almost nothing on a dark theme (RFC-110).** The
   unstyled dim was black at 40% alpha, a literal, under a comment claiming
   "the gating invariant depends on this value never changing" — and nothing
