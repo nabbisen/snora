@@ -154,3 +154,10 @@ and R-2 in 0.53.0; R-3 and R-4 after Unit 0 rules.
 **Done by the architect, 2026-10-19:** the "frame hashes, not pixel reads" statement
 is corrected in REQ-003's status line and in RFC-105, each with a dated note. The third,
 `tests/common/mod.rs`, is code and is in the handoff.
+
+**Unit 0 ruled, 2026-10-19: feasible.** On lavapipe there were 5/5 green runs, with
+no crashes, flakes or wgpu-only failures. The suite takes 194–293 s against
+tiny-skia's 23–35 s. **R-3 and R-4 proceed:**
+[`implementation-handoff-r3-r4.md`](../handoffs/108-the-default-renderer-is-never-tested-and-contrast-is-never-read-from-pixels/implementation-handoff-r3-r4.md).
+**`snap` is wgpu-only** (`iced_tiny_skia` 0.14.0 has no snapping). On wgpu, it
+removes the tab rule's and underline's smear, so both now set it.
