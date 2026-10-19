@@ -39,6 +39,12 @@ coverage is below 100%, so a colour asserted at, say, 3.0:1 is drawn below it.
 `iced_test`'s `Simulator::snapshot` hard-codes `scale_factor = 2.0`
 (`simulator.rs:221`), so no test has ever rendered at scale 1.
 
+*(Corrected 2026-10-19, from Unit 0's Q-3 measurement: the scale-1 prediction above
+did not hold for the tab rule. Rendered at scale 1 through `iced_test::screenshot`
+on tiny-skia, it is **one solid black row** (y = 37), not a partial one. The
+prediction was the architect's, made without a measurement. Peak-coverage
+assertions at scale 2 remain, as R-2 specifies.)*
+
 **One earlier statement was wrong: pixels *are* readable.**
 `Snapshot::matches_image(path)` writes the frame as a lossless RGBA PNG when the
 file does not exist, named `<stem>-<renderer>.png` from `renderer.name()`. Verified:

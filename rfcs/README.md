@@ -172,6 +172,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 111 | [The unstyled toast misses AA on six of iced's built-in themes](./proposed/111-the-unstyled-toast-misses-aa-on-six-built-in-themes.md) | **proposed** v0.53.0 — found in RFC-108's review; the suite asserted Light/Dark only; Kanagawa Dragon Info 2.42 (literal black); fall back to the stronger pole, ≥ 4.58 by construction |
 
 ## Archive
 

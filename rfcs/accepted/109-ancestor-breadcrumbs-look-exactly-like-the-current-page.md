@@ -112,3 +112,13 @@ snapped to whole pixels. **Q-3:** no opt-out. **Q-4:** 0.53.0.
   The architect measured that pairing at **≥ 4.51:1 on all 26 contexts** (22 stock
   themes and 4 presets; lowest Kanagawa Lotus), and it is asserted as part of
   acceptance.
+
+*(Corrected 2026-10-19, round 2: the first ruling above is wrong in its reason.
+`snap` does **not** make the rule land on whole pixels in anything snora tests. In
+iced 0.14, `container::Style::snap` reaches `renderer::Quad::snap`, which
+`iced_wgpu` reads and `iced_tiny_skia` 0.14.0 ignores. The test harness is
+tiny-skia, where the rule's drawn rows are byte-identical with and without the
+flag. "A fully covered row in all six contexts" is the peak row that any 1 px rule
+at a fractional offset has. On wgpu, measured in RFC-108's Unit 0, snapping does
+remove the smear. The flag stays, for that reason. Found by the dev team, who had
+made the original claim and withdrew it.)*
