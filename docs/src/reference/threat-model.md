@@ -216,6 +216,13 @@ an entry that stops matching the graph **fails the job and names itself
 for deletion**. An accepted risk here cannot outlive its own reason
 through inattention.
 
+**Added at 0.53.0:** three more unmaintained-crate advisories, `zvariant`,
+`zbus_names` and `zvariant_derive` (`RUSTSEC-2026-0370` to `-0372`). They reach the
+graph on Linux only, through iced's default `linux-theme-detection` (`iced_winit` →
+`mundy` → `zbus` 5). They are run-time D-Bus calls for the desktop colour scheme, and
+absent on Windows and macOS. They are accepted on the same terms as the three above,
+each with its retirement condition in `deny.toml`.
+
 `unpinned-build`, the weekly job that re-resolves the graph and fails if
 it stops compiling, is the older mechanism and is not a substitute. It
 watches upstream *movement*, not upstream *vulnerability*, and the same

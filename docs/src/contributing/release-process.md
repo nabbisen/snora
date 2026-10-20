@@ -351,6 +351,8 @@ restate the guide's content.
       **Upgrading from 0.X:** read the [0.X → 0.Y migration guide](...)
     - the four-label lead: **In short:** / **Code:** / **Appearance:** /
       **Security:**, each filled in ("none" and "unchanged" are values);
+      write it as a blockquote with a blank `>` line between labels,
+      or Markdown merges the four into one paragraph (0.53.0's first draft did);
     - headings only from Added, Changed, Deprecated, Removed, Fixed,
       Security, with measurement left to the RFC each bullet names;
     - the version's compare link at the bottom, and [Unreleased]

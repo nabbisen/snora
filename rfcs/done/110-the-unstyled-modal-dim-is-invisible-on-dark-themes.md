@@ -1,6 +1,6 @@
 # RFC-110 — The unstyled modal dim is invisible on dark themes, and a published guarantee is false
 
-**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
+**Status.** Done — shipped v0.53.0. Every open question ruled as suggested (see Rulings).
 **Raised.** 2026-10-19, architect. Source: the rest of REQ-002 (tekstide: "every
 theme colour comes from the host"), whose 0.52.0 status names this dim as the last
 literal colour on the default path. Measuring it found a defect, and a published

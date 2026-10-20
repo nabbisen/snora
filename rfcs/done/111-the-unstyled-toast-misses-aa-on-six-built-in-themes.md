@@ -1,6 +1,6 @@
 # RFC-111 — The unstyled toast misses AA on six of iced's built-in themes
 
-**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
+**Status.** Done — shipped v0.53.0. Every open question ruled as suggested (see Rulings).
 **Raised.** 2026-10-19, architect, from RFC-108's review. The dev team reported one
 case as unasserted, without claiming a defect: the Info toast at 1.40–1.66:1 when an
 application renders through `snora::render` under `snora::design::theme(tokens)`. The

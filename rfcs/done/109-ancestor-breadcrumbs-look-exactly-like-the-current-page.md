@@ -1,6 +1,6 @@
 # RFC-109 — Ancestor breadcrumbs look exactly like the current page
 
-**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
+**Status.** Done — shipped v0.53.0. Every open question ruled as suggested (see Rulings).
 **Raised.** 2026-10-19, architect. **Owed:** RFC-103 Q-3 was ruled as suggested,
 "register the leaf as `Position`, and file the link-affordance question
 separately", and it was never filed. Found while listing open themes.
@@ -120,5 +120,7 @@ iced 0.14, `container::Style::snap` reaches `renderer::Quad::snap`, which
 tiny-skia, where the rule's drawn rows are byte-identical with and without the
 flag. "A fully covered row in all six contexts" is the peak row that any 1 px rule
 at a fractional offset has. On wgpu, measured in RFC-108's Unit 0, snapping does
-remove the smear. The flag stays, for that reason. Found by the dev team, who had
+remove the smear. The flag stays, for that reason.
+*That sentence is itself wrong: see the 2026-10-20 correction in RFC-108. On wgpu,
+snapping changed no drawn pixel.* Found by the dev team, who had
 made the original claim and withdrew it.)*

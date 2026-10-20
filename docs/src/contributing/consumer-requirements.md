@@ -41,6 +41,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 *Proposed as **RFC-104** (2026-09-26).*
 
+**Status at 0.53.0: met (RFC-104, RFC-110, RFC-111).** The last host-independent colours are gone. The unstyled modal dim takes the pole opposite the theme's page (RFC-110), and the toast's Info text, a literal `Color::BLACK`, now follows the theme with a fallback (RFC-111). The only colour literals left in non-test source are black and white chosen *against* the theme's own colour (the dim's pole and the toast's fallback), and `TRANSPARENT`. Toast text is asserted ≥ 4.5:1 for every intent over all 22 built-in iced themes and the four presets' themes on the unstyled path, not only the stock two.
+
 **Status at 0.52.0: met for sizes and toast colours, with one colour left (RFC-104).** Every chrome label size comes from the host: `default_text_size` on the unstyled path, and `Typography` roles on the styled path (tab, crumb and menu labels → `label`; header and toast title → `title`; toast message → `body`). The toast's Warning fill comes from the theme or tokens, with contrast asserted for every intent on both paths. *(Corrected 2026-10-19: asserted on the two stock themes and the four presets only. Measured over all 22 built-in iced themes, the unstyled toast misses AA on six of them, at worst Info on Kanagawa Dragon, 2.42:1, whose text is a literal `Color::BLACK`. See RFC-111.)* **`scripts/check-literal-sizes.sh` fails the build on a literal text size** in any non-test source file. It allow-lists one named constant, `CLOSE_GLYPH_SIZE`, with its reason, and rejects path-qualified wrappers such as `iced::Pixels(13.0)`. This is the scan tekstide described. **Not met: the unstyled modal dim** is still a literal 40 % black (`crates/snora/src/render.rs`); the design path derives it from tokens. RFC-104 listed it in its finding but its proposal did not cover it, and the 0.52.0 status line first said "met" without it (corrected the same day).
 
 > *"Font size, font family and every theme colour come from the host."*
@@ -96,6 +98,8 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 *Proposed as **RFC-103** (2026-09-26).*
 
+**Status at 0.53.0: met by snora's rule, with the same qualification (RFC-109).** Ancestor breadcrumbs now carry a drawn cue, an underline, asserted by rendered bounds. Until now the leaf's `Position` was, by omission, the ancestors' only cue too. The selected chip's luminance cue and its documented label-mark remedy are unchanged.
+
 **Status at 0.52.0: met by snora's rule, with one qualification (RFC-103, RFC-106).** Every state snora draws carries an asserted cue, held by a state register that fails to compile without one (see the accessibility guide's table), and the disabled unselected chip, which looked enabled, is fixed. **Qualification:** a selected chip's cue is luminance (≥ 3.0:1, measured 6.19–11.75:1), not a word or shape. tekstide's word-or-shape bar is met for chips by the caller putting a mark in the label, which is documented. Variants remain the caller's to put into words, by ruling (RFC-093).
 
 > *"Every state that matters also carries a word or shape."*
@@ -114,6 +118,19 @@ would have to be true for adoption, as *"requirements, not requests"*.
 
 > *"We ship where the GPU path may not start, so a figure from one renderer does
 > not transfer."*
+
+**Status at 0.53.0: met for what CI renders, with its limits stated (RFC-108).**
+- **Both renderers:** CI runs the rendered suite on wgpu, on lavapipe (a software
+  Vulkan driver), and on tiny-skia. Each test asserts which renderer drew its frame,
+  from the frame's own file name.
+- **Contrast from pixels:** eight element groups are measured from the drawn frame
+  against the floors their style tests use.
+- **A guard against divergent primitives:** a third job compares 92 elements across
+  the two renderers (core colour and bounds, edge pixels excluded). It was shown to
+  fail on a reintroduced RFC-102 defect.
+- **Not covered:** hardware GPU drivers, where three stock-dark marks differ by one
+  level from lavapipe; scale factors other than 2, since the simulator renders only
+  that; and text glyphs, whose floors are asserted on the style colour.
 
 - **Status: partly.** Contrast is asserted on style functions, which does not
   depend on the renderer, provided no primitive the renderers draw differently

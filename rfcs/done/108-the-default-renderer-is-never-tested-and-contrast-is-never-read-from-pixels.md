@@ -1,6 +1,6 @@
 # RFC-108 — The default renderer is never tested, and contrast is never read from pixels
 
-**Status.** Accepted 2026-10-19. Every open question ruled as suggested.
+**Status.** Done — shipped v0.53.0. Every open question ruled as suggested (see Rulings).
 **Raised.** 2026-10-19, architect. Source: REQ-005 (tekstide: *"We ship where the
 GPU path may not start, so a figure from one renderer does not transfer"*), Theme C.
 **Release target.** Q-5. **Priority.** First of three opened together (RFC-108–110).
@@ -169,3 +169,12 @@ tiny-skia's 23–35 s. **R-3 and R-4 proceed:**
 [`implementation-handoff-r3-r4.md`](../handoffs/108-the-default-renderer-is-never-tested-and-contrast-is-never-read-from-pixels/implementation-handoff-r3-r4.md).
 **`snap` is wgpu-only** (`iced_tiny_skia` 0.14.0 has no snapping). On wgpu, it
 removes the tab rule's and underline's smear, so both now set it.
+
+*(Corrected 2026-10-20, at the 0.53.0 cut: the claim that `snap` removes the smear on
+wgpu is wrong. The architect compared wgpu's tab bar from 0.52.0 (unsnapped) with
+0.53.0's (snapped), on one machine, stock Light and Dark, and found **0 differing
+pixels**. wgpu already drew these elements as solid rows. The smear is
+tiny-skia's, and tiny-skia ignores `snap`. Unit 0's table compared wgpu-with-snap
+with tiny-skia, never with wgpu-without-snap, and the architect accepted it despite
+holding 0.52.0 wgpu data that already showed solid rows. The flag stays, with no
+measured effect at the scale tests render.)*

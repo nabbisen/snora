@@ -1,7 +1,6 @@
 # RFC-107 — Release notes do not say what an upgrade means, and nothing checks them
 
-**Status.** Accepted 2026-10-18. Q-1–Q-4 and Q-6 ruled as suggested; Q-5 revised to
-split by series (see Rulings).
+**Status.** Done — shipped v0.53.0. Q-1 to Q-4 and Q-6 ruled as suggested; Q-5 revised to a split by series (see Rulings).
 **Raised.** 2026-10-18, architect, from an owner-requested audit of `CHANGELOG.md`
 for readability (long-time and new users) and for long-term management.
 **Release target.** 0.53.0 (Q-6). **Priority.** Medium: no defect reaches code,

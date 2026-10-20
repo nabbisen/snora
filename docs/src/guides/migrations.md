@@ -10,6 +10,10 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.52 → 0.53](migration-0.52-to-0.53.md) — **no API change; appearance
+  changes on the default path**: the modal dim on dark themes, underlined
+  ancestor breadcrumbs, and toast text on six non-stock themes. **Corrects a
+  published guarantee** ("unchanged from v0.25"): read §4.
 - [0.51 → 0.52](migration-0.51-to-0.52.md) — **no breaking API change;
   appearance changes on the default path.** Labels follow the host's text size,
   long unbroken text wraps instead of being cut off, and disabled chips dim.

@@ -25,39 +25,32 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-### Changed
+Nothing yet.
 
-- **Release history is filed by series of ten minors (RFC-107).** This file
-  now holds 0.50 onward. Earlier entries moved, unchanged, to
-  `changelog/0.0x.md` … `changelog/0.4x.md`, linked from the table at the top.
-  Every minor from 0.39 links its migration guide, and the compare links run
-  through 0.52.0 again (they had stopped at 0.46.0).
-- **Three entries revised after their release now say so.** 0.19.1, 0.20.0
-  and 0.25.2 each carry a `*Corrected*` line naming the commit that changed
-  them. From now on a released entry changes only that way, and CI checks it.
+## [0.53.0] — 2026-10-20
 
-- **An ancestor breadcrumb is underlined (RFC-109).** An ancestor and the
-  current page were the same colour by construction — an ancestor's resting
-  `text_color` is `background.base.text`, and the leaf's plain text inherits
-  the same value — so the only thing separating "you can click this" from
-  "you are here" was word order. Ancestors now carry a 1px rule under the
-  label, inside the button and spanning the label's width; the leaf has
-  none, and that absence is now the cue.
+**Upgrading from 0.52:** read the [0.52 → 0.53 migration guide](docs/src/guides/migration-0.52-to-0.53.md).
 
-  **This changes appearance on the default path**, with no opt-out (Q-3).
-  The breadcrumb row grows by the rule's height: measured **32.80 → 33.80**
-  at `default_text_size` 16, with the label itself unchanged at 20.80.
-  Visual baselines that include a breadcrumb are invalidated.
-
-  The rule's layout offset is fractional (26.80 at the default size), because
-  it sits below a label whose height follows `default_text_size`. It asks to
-  be snapped to the pixel grid, and **that takes effect on wgpu, the default
-  renderer**, where it removes the smear a thin element otherwise gets;
-  `iced_tiny_skia` ignores the request in iced 0.14, so a tiny-skia host sees
-  no difference. Measured on tiny-skia, the rule's strongest row carries the
-  full colour in every context — 21.00:1 on stock Light, 11.05 on stock Dark,
-  16.89–21.00 across the four design presets — which is the peak row any 1px
-  rule at a fractional offset has, not an effect of snapping.
+> **In short:** contrast is now read from the pixels each renderer drew, and CI
+> tests both of iced's renderers. Three defects on the default path are fixed: a
+> modal dim that did nothing on dark themes, toast text under AA on six built-in
+> themes, and ancestor breadcrumbs that looked like the current page. The release
+> history is now filed by series, and each version gets a GitHub Release.
+>
+> **Code:** no change needed.
+>
+> **Appearance:** changes on the default path:
+>
+> - dark-theme modals get a light veil;
+> - light-theme modals dim slightly more;
+> - ancestor breadcrumbs are underlined, so the row is 1 px taller;
+> - six non-stock themes change toast text colour.
+>
+> Stock Light and Dark toasts are unchanged.
+>
+> **Security:** three new unmaintained-crate advisories, accepted. They are not
+> vulnerabilities, they are Linux-only via iced's theme detection, and you do not
+> need to act.
 
 ### Added
 
@@ -84,8 +77,7 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
   `common::frame_pixels` is the instrument: it decodes the lossless PNG
   `iced_test` writes and **asserts which renderer drew it**, so a silent
-  fallback cannot be reported as a pass. This does not yet make REQ-005 met;
-  the default renderer is still untested in CI, which is a separate question.
+  fallback cannot be reported as a pass.
 
   **CI now runs the rendered tests on wgpu as well**, on lavapipe, beside the
   tiny-skia run — so the renderer applications actually get is tested rather
@@ -100,14 +92,45 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   miss a renderer painting the surface itself differently — which is exactly
   the shape of the defect RFC-102 fixed.
 
-  **The tab bar's rule and the active tab's underline are now snapped to the
-  pixel grid.** Both are thin elements at fractional offsets, and on the
-  default renderer that cost them their edges: measured on stock Light, the
-  1px rule drew as a grey-black-grey band over three physical rows. With
-  `snap` it draws as two solid rows. **The change is visible on wgpu only** —
-  `iced_tiny_skia` ignores the flag in iced 0.14 — so an application using the
-  default renderer sees slightly crisper chrome, and one rendering with
-  tiny-skia sees no change at all. No colour moves either way.
+  **What the two renderers draw differently, measured:** a thin element at a
+  fractional offset, such as the tab bar's 1px rule, is drawn by wgpu as solid
+  rows and by tiny-skia spread over three partial ones (grey-black-grey on
+  stock Light). The tab rule, the tab underline and the new breadcrumb rule now
+  ask iced to snap them to the pixel grid. **That changes no drawn pixel in
+  either renderer at the scale the tests render:** tiny-skia ignores the
+  request in iced 0.14, and wgpu already drew these elements solid. On wgpu,
+  0.52.0's unsnapped tab bar and 0.53.0's snapped one compare identical,
+  pixel for pixel. No colour moves.
+
+### Changed
+
+- **Release history is filed by series of ten minors (RFC-107).** This file
+  now holds 0.50 onward. Earlier entries moved, unchanged, to
+  `changelog/0.0x.md` … `changelog/0.4x.md`, linked from the table at the top.
+  Every minor from 0.39 links its migration guide, and the compare links run
+  through 0.52.0 again (they had stopped at 0.46.0).
+- **Three entries revised after their release now say so.** 0.19.1, 0.20.0
+  and 0.25.2 each carry a `*Corrected*` line naming the commit that changed
+  them. From now on a released entry changes only that way, and CI checks it.
+
+- **An ancestor breadcrumb is underlined (RFC-109).** An ancestor and the
+  current page were the same colour by construction — an ancestor's resting
+  `text_color` is `background.base.text`, and the leaf's plain text inherits
+  the same value — so the only thing separating "you can click this" from
+  "you are here" was word order. Ancestors now carry a 1px rule under the
+  label, inside the button and spanning the label's width; the leaf has
+  none, and that absence is now the cue.
+
+  **This changes appearance on the default path**, with no opt-out (Q-3).
+  The breadcrumb row grows by the rule's height: measured **32.80 → 33.80**
+  at `default_text_size` 16, with the label itself unchanged at 20.80.
+  Visual baselines that include a breadcrumb are invalidated.
+
+  The rule's layout offset is fractional (26.80 at the default size), because
+  it sits below a label whose height follows `default_text_size`. Measured on
+  tiny-skia, its strongest row carries the full colour in every context:
+  21.00:1 on stock Light, 11.05 on stock Dark, and 16.89–21.00 across the four
+  design presets.
 
 ### Fixed
 
@@ -163,6 +186,21 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   unstyled dim is composition — which layer it occupies, what it blocks,
   what dismisses it — and that is asserted by `render_semantics.rs`, which
   passes unmodified.
+
+### Security
+
+- **Three unmaintained-crate advisories, accepted.** `RUSTSEC-2026-0370`
+  (`zvariant`), `RUSTSEC-2026-0371` (`zbus_names`) and `RUSTSEC-2026-0372`
+  (`zvariant_derive`) were published after 0.52.0. The crates were merged into
+  `zbus` 6 and are no longer maintained standalone. **They are not
+  vulnerabilities.** They reach snora's graph on Linux only, through iced's
+  default `linux-theme-detection` feature (`iced_winit` → `mundy` → `zbus` 5),
+  which reads the desktop's colour scheme over D-Bus. They are absent on
+  Windows and macOS. No upgrade clears them: every `zbus` 5 release depends on
+  them, and `mundy` 0.2 requires `zbus` 5. Each has a `deny.toml` entry stating
+  the condition that retires it. **Nothing for you to do**, unless your own
+  advisory scan denies unmaintained crates, in which case accept the same three
+  IDs.
 
 ## [0.52.0] — 2026-09-29
 
@@ -534,7 +572,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.52.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.53.0...HEAD
+[0.53.0]: https://github.com/nabbisen/snora/compare/0.52.0...0.53.0
 [0.52.0]: https://github.com/nabbisen/snora/compare/0.51.0...0.52.0
 [0.51.0]: https://github.com/nabbisen/snora/compare/0.50.0...0.51.0
 [0.50.0]: https://github.com/nabbisen/snora/compare/0.49.0...0.50.0

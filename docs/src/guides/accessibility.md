@@ -114,6 +114,7 @@ contributor-facing documents linked below, not duplicated here.
   | Chip disabled, unselected | dimmed label | ≥ 3.0:1 against enabled |
   | Design button disabled | fill or label, by family | ≥ 2.9:1 against enabled |
   | Menu open | shape — the dropdown | rendered |
+  | Breadcrumb ancestor | shape — a 1 px underline (RFC-109) | rendered bounds |
   | Breadcrumb leaf | position — last, plain text | documented |
 
   **One qualification, stated so a record does not overclaim.** A selected
