@@ -127,7 +127,12 @@ would have to be true for adoption, as *"requirements, not requests"*.
   against the floors their style tests use.
 - **A guard against divergent primitives:** a third job compares 92 elements across
   the two renderers (core colour and bounds, edge pixels excluded). It was shown to
-  fail on a reintroduced RFC-102 defect.
+  fail on a reintroduced RFC-102 defect. **It answers "do the two renderers draw
+  this the same?", never "which one changed?".** A parity failure says they
+  differ, not which one moved or why. A before-and-after claim needs one renderer
+  compared with its own earlier output. Reading a cross-renderer table as
+  before-and-after produced two wrong claims about `snap` during 0.53.0, both
+  corrected (RFC-108).
 - **Not covered:** hardware GPU drivers, where three stock-dark marks differ by one
   level from lavapipe; scale factors other than 2, since the simulator renders only
   that; and text glyphs, whose floors are asserted on the style colour.
