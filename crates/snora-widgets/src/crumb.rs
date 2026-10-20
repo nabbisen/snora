@@ -145,21 +145,26 @@ pub(crate) const RULE_HEIGHT: f32 = 1.0;
 
 /// The ancestor's underline (RFC-109 Q-1/Q-2).
 ///
-/// **`snap: true` is honoured by wgpu and ignored by tiny-skia.** The
-/// flag reaches the quad (`iced_widget::container` forwards it to
-/// `renderer::Quad::snap`), but in iced 0.14 only `iced_wgpu` reads it
-/// — `iced_tiny_skia` has no snapping at all. snora's harness is
-/// pinned to tiny-skia, so **no test here can observe it**: measured
-/// with and without the flag under tiny-skia, the drawn rows are
-/// byte-identical. Measured under wgpu, on the tab bar's equivalent
-/// rule, it removes the smear completely (RFC-108 Unit 0).
+/// **`snap: true` changes nothing that has been measured, and is kept
+/// anyway.** The flag reaches the quad (`iced_widget::container`
+/// forwards it to `renderer::Quad::snap`), but in iced 0.14 only
+/// `iced_wgpu` reads it — `iced_tiny_skia` has no snapping at all, so
+/// the harness, pinned to tiny-skia, cannot observe it: with and
+/// without the flag the drawn rows are byte-identical. **And on wgpu
+/// they are byte-identical too**, measured on this rule at the
+/// simulator's scale 2: wgpu already draws it as two solid rows.
+///
+/// An earlier version of this comment said snapping removed a smear on
+/// wgpu, citing RFC-108's Unit 0. That table compared wgpu against
+/// tiny-skia rather than snapped against unsnapped, and tiny-skia
+/// ignores the flag, so it could not have shown that.
 ///
 /// The offset is fractional either way and cannot be made whole in
 /// layout: it includes the label's height, which is the host's
 /// `default_text_size` times the line height — 26.8 at the default
-/// size, 26.2 on the design path. Snapping at draw time is the only
-/// place it can be fixed, which is why the flag is set even though
-/// nothing here can check it.
+/// size, 26.2 on the design path. The flag stays because it is iced's
+/// documented instruction for aligning a quad to the grid, and because
+/// only scale 2 has been measured.
 ///
 /// **The colour is the resting label colour, `background.base.text`,
 /// in every status.** A container's style closure receives the theme

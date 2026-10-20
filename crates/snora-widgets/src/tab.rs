@@ -252,23 +252,26 @@ pub(crate) fn tab_bar_rule_style(theme: &Theme) -> container::Style {
     let ep = theme.extended_palette();
     container::Style {
         background: Some(Background::Color(ep.background.base.text)),
-        // Snapped to the pixel grid (RFC-108). The rule is one logical
-        // pixel at y = 36.8 — a fractional offset, because the bar's
-        // height follows the host's `default_text_size`.
+        // Asks iced to align the quad to the pixel grid. The rule is
+        // one logical pixel at y = 36.8, a fractional offset, because
+        // the bar's height follows the host's `default_text_size`.
         //
-        // **This is honoured by wgpu and ignored by tiny-skia.** In
-        // iced 0.14 `Quad::snap` is read by `iced_wgpu` only, and
-        // snora's harness is pinned to tiny-skia, so no test in this
-        // repository can see the difference. Measured on both, same
-        // frame, stock Light (RFC-108 Unit 0):
+        // **It changes nothing that has been measured, and is kept
+        // anyway.** `Quad::snap` is read by `iced_wgpu` only —
+        // `iced_tiny_skia` 0.14.0 has no snapping — so the harness,
+        // pinned to tiny-skia, cannot see it at all. And on wgpu it
+        // makes no difference either: rendering the tab bar with and
+        // without the flag, stock Light and Dark at the simulator's
+        // scale 2, gives **identical pixels**. wgpu already draws this
+        // rule as two solid rows (74-75).
         //
-        //   wgpu       rows 73:255  74:0  75:0    — two solid rows
-        //   tiny-skia  rows 73:128  74:0  75:127  — smeared over three
+        // An earlier comment here claimed it removed a smear on wgpu.
+        // That was wgpu compared against tiny-skia, not snapped
+        // against unsnapped, and tiny-skia ignores the flag — so the
+        // comparison could not have shown what it was read as showing.
         //
-        // So on the renderer applications actually run, this is the
-        // difference between a clean 1px rule and a grey-black-grey
-        // band. Verified, not assumed — and not verifiable by any gate
-        // this repository runs today.
+        // Kept because it is iced's documented instruction for this,
+        // and because only scale 2 has been measured.
         snap: true,
         ..container::Style::default()
     }
@@ -292,10 +295,10 @@ pub(crate) fn tab_indicator_style(theme: &Theme) -> container::Style {
     let ep = theme.extended_palette();
     container::Style {
         background: Some(Background::Color(ep.primary.strong.color)),
-        // Same as the bar's rule (RFC-108): two logical pixels at
-        // y = 34.8 is still a fractional offset. Measured on the same
-        // frame — wgpu draws rows 70-73 solid, tiny-skia adds partial
-        // rows at 69 and 73. wgpu only; see `tab_bar_rule_style`.
+        // Same as the bar's rule, including the caveat: two logical
+        // pixels at y = 34.8 is still a fractional offset, and
+        // snapping changes no drawn pixel on wgpu — it already draws
+        // rows 70-73 solid. See `tab_bar_rule_style`.
         snap: true,
         ..container::Style::default()
     }
