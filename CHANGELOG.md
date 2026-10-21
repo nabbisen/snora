@@ -25,7 +25,37 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- **An application can turn off iced's default features (RFC-112).** It could
+  not before, and nothing failed to say so: snora's own iced line carried
+  iced's defaults, and Cargo features only ever add up, so
+  `default-features = false` on a consumer's own iced entry was inert. An
+  application that wanted no `linux-theme-detection` still got it, and the
+  `zbus` and `mundy` trees behind it. **aaai** reported it.
+
+  **The rule, stated once:** a feature that decides *how snora draws* is
+  snora's; a feature that decides *what draws, or where it runs*, is the
+  application's. So `web-colors` and `crisp` stay on for everyone — they are
+  snora's colour space and pixel alignment, and every figure snora publishes
+  was measured with them on. Everything else iced enables by
+  default — the renderers, the windowing backends, `linux-theme-detection` —
+  now reaches iced through a new **`iced-default`** feature on `snora`,
+  `snora-widgets` and `snora-style`. It is **on by default**, so a plain
+  `cargo add snora` is unchanged.
+
+  **The one case that stops a build compiling** is narrow and deliberate:
+  passing `default-features = false` to `snora`, `snora-widgets` or
+  `snora-style` *and* writing your own `iced` line that also turns iced's
+  defaults off. That build has no renderer and no windowing backend, and
+  winit refuses to compile for the platform. Either add `iced-default` back
+  to the snora dependency, or name the iced features you want — which is the
+  point of the change, and what the new `examples/opt_out_probe` does.
+
+  **No change for a default build**, measured rather than asserted: the
+  resolved dependency graph is identical — the same 241 packages at the same
+  versions, with the same features on every one of them except two of
+  snora's own feature *names*.
 
 ## [0.53.0] — 2026-10-20
 

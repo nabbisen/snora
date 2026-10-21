@@ -98,6 +98,15 @@ pub(crate) const UNSTYLED_DIM_ALPHA: f32 = 0.44;
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum DimFill {
     /// A colour fixed in advance, as `design` supplies from its tokens.
+    ///
+    /// **`design`-gated, because only that path can produce one.** The
+    /// sole constructor is `design::render::chrome_style`, which is
+    /// itself behind the feature; without it the variant has no way to
+    /// be built, and saying so in the type is what lets the compiler
+    /// agree rather than warning that it is never constructed
+    /// (RFC-112 R-5). An `allow(dead_code)` would have silenced a true
+    /// statement instead of making it false.
+    #[cfg(feature = "design")]
     Fixed(Color),
     /// Derived from the theme at paint time: the pole opposite the
     /// page, at [`UNSTYLED_DIM_ALPHA`].
@@ -108,6 +117,7 @@ impl DimFill {
     /// The colour to paint on `theme`.
     pub(crate) fn resolve(&self, theme: &Theme) -> Color {
         match self {
+            #[cfg(feature = "design")]
             DimFill::Fixed(color) => *color,
             // The pole opposite the page, which is the only choice
             // that dims both a white page and a near-black one. iced's

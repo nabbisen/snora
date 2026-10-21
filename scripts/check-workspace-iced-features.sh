@@ -27,7 +27,19 @@ cd "$(git rev-parse --show-toplevel)"
 # grep can see (nothing in this workspace's source literally says
 # "tokio"), so it cannot be verified the same way canvas/svg can and is
 # named here explicitly rather than silently exempted.
-EXEMPT_FEATURES=("tokio")
+#
+# `web-colors` and `crisp` are exempt for a different reason, and
+# RFC-112 states it as a rule rather than a case: **a feature that
+# decides how snora draws is snora's; a feature that decides what
+# draws, or where it runs, is the application's.** These two are the
+# first kind — snora's colour space and its pixel alignment, which
+# every measured contrast figure in the test suite assumes — so they
+# are named on the workspace line and stay on for every consumer.
+# Neither appears as `iced::widget::<name>` at a call site, because
+# neither is a widget; they change how existing widgets are drawn.
+# Everything of the second kind reaches iced through each crate's
+# `iced-default` feature instead, which an application can turn off.
+EXEMPT_FEATURES=("tokio" "web-colors" "crisp")
 
 # Matches on `^iced = {` alone, not a pinned iced version. R-1 (round 1
 # review, 2026-09-02): the pattern used to require `version = "0.14"`
@@ -38,16 +50,39 @@ EXEMPT_FEATURES=("tokio")
 # was dead code: the gate went red with no output at all. The `|| true`
 # on the substitution is what lets that message actually fire now --
 # without it, `set -e` claims the failure first every time.
-ICED_LINE=$(grep -m1 '^iced = {' Cargo.toml || true)
-if [[ -z "$ICED_LINE" ]]; then
-  echo "error: could not find the workspace [workspace.dependencies] iced line in Cargo.toml" >&2
+# The entry may be written on one line or spread over several (RFC-112
+# put the feature list on its own lines), so take everything from
+# `iced = {` to the line that closes the table and fold it into one.
+#
+# **The single-line version of this read as a pass on a multi-line
+# entry**, which is the failure this project keeps meeting: the sed
+# below found no `features = [...]` on the first line, `FEATURES_RAW`
+# came out empty, and the script printed "declares no extra features"
+# and exited 0 with three features declared right under it. That is
+# RFC-087's D-1 again — a gate that passed because it checked nothing.
+ICED_BLOCK=$(awk '
+  /^iced = \{/ { inside = 1 }
+  inside        { block = block $0 " " }
+  inside && /\}[[:space:]]*$/ { print block; exit }
+' Cargo.toml)
+
+if [[ -z "$ICED_BLOCK" ]]; then
+  echo "error: could not find the workspace [workspace.dependencies] iced entry in Cargo.toml" >&2
   exit 1
 fi
 
-FEATURES_RAW=$(echo "$ICED_LINE" | sed -nE 's/.*features = \[([^]]*)\].*/\1/p')
+FEATURES_RAW=$(echo "$ICED_BLOCK" | sed -nE 's/.*features = \[([^]]*)\].*/\1/p')
 
 if [[ -z "$FEATURES_RAW" ]]; then
-  echo "OK: workspace iced line declares no extra features."
+  # Distinguish "no features key" from "a features key this could not
+  # read". The first is a legitimate pass; the second is the vacuous
+  # one above, and must be loud.
+  if grep -q 'features' <<<"$ICED_BLOCK"; then
+    echo "error: the iced entry declares features, but this script could not parse them:" >&2
+    echo "  $ICED_BLOCK" >&2
+    exit 1
+  fi
+  echo "OK: workspace iced entry declares no extra features."
   exit 0
 fi
 

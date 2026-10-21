@@ -18,8 +18,26 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 # `widgets` is on by default — most applications want the prefab
 # header / sidebar / footer / menu / icon helpers. Opt out with
-# `default-features = false` to ship an engine-only build.
-default = ["widgets"]
+# `default-features = false` to ship an engine-only build. Doing that
+# also turns off `iced-default`, so an engine-only build must either
+# re-enable it or name its own iced features (RFC-112).
+default = ["widgets", "iced-default"]
+
+# Turning this off is how an application takes iced's default features
+# into its own hands: the renderers, the windowing backends and
+# `linux-theme-detection` with its zbus and mundy trees (RFC-112). It
+# is on by default, so a plain `cargo add` is unchanged; an
+# application that turns it off must name its own iced features, or
+# nothing will draw and winit will refuse to compile for the platform.
+#
+# The two `?` entries matter: they reach snora-widgets and snora-style
+# only when `widgets` or `design` has already pulled them in, so this
+# feature never adds a crate, only features to a crate already there.
+iced-default = [
+    "iced/default",
+    "snora-widgets?/iced-default",
+    "snora-style?/iced-default",
+]
 
 # Pulls in the snora-widgets crate and re-exports it under the
 # `snora::widget` module path (preserving the 0.5.x import shape).

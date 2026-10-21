@@ -106,36 +106,49 @@ jobs:
           - name: default
             args: ""
           - name: no-default-features
-            args: "--no-default-features"
+            args: "--no-default-features --features iced-default"
           - name: widgets
-            args: "--no-default-features --features widgets"
+            args: "--no-default-features --features widgets,iced-default"
           - name: widgets-lucide-icons
-            args: "--no-default-features --features widgets,lucide-icons"
+            args: "--no-default-features --features widgets,lucide-icons,iced-default"
           - name: widgets-svg-icons
-            args: "--no-default-features --features widgets,svg-icons"
+            args: "--no-default-features --features widgets,svg-icons,iced-default"
           - name: all-public-features
             args: "--all-features"
           # ---- Design feature combinations (RFC-026 Q2 / Q2-B) ----
           # widgets,design: the primary design activation path.
           - name: widgets-design
-            args: "--no-default-features --features widgets,design"
+            args: "--no-default-features --features widgets,design,iced-default"
           # widgets,design,lucide-icons: icon features stay independent of design.
           - name: widgets-design-lucide-icons
-            args: "--no-default-features --features widgets,design,lucide-icons"
+            args: "--no-default-features --features widgets,design,lucide-icons,iced-default"
           # widgets,design,svg-icons: same for svg-icons.
           - name: widgets-design-svg-icons
-            args: "--no-default-features --features widgets,design,svg-icons"
+            args: "--no-default-features --features widgets,design,svg-icons,iced-default"
           # design alone, no widgets (RFC-094 Unit 1/2): Cargo.toml's own
           # `design` feature doc comment documents this as independent of
           # `widgets` ("everything else works with `design` alone"), and
           # it had no CI entry at all until this one.
           - name: design-only
-            args: "--no-default-features --features design"
+            args: "--no-default-features --features design,iced-default"
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Check feature combination
+        # Every `--no-default-features` row carries `iced-default`
+        # (RFC-112). Without it the row turns off iced's renderers and
+        # windowing too, and winit refuses to compile for the platform
+        # — which would make this matrix measure the absence of a
+        # renderer rather than the feature combination it names. The
+        # build that genuinely has no iced defaults is the opt-out
+        # probe, which supplies its own and has its own job.
+        #
+        # `-D warnings` (RFC-112 Q-3): five of these ten rows were
+        # emitting a dead-code warning nobody saw, because nothing
+        # here ever failed on one.
+        env:
+          RUSTFLAGS: "-D warnings"
         run: cargo check -p snora ${{ matrix.args }}
 
   design-isolation:
@@ -157,7 +170,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: widgets compiles without design (Q2-B)
-        run: cargo check -p snora-widgets --no-default-features
+        # `iced-default` for the same reason as the feature matrix
+        # (RFC-112): without it this checks a build with no renderer.
+        env:
+          RUSTFLAGS: "-D warnings"
+        run: cargo check -p snora-widgets --no-default-features --features iced-default
       - name: snora-design has no iced dependency (Q3)
         # Verify the iced-free guarantee: snora-design's dependency tree must
         # not include iced. `cargo tree` is the authoritative tool; a clean
@@ -213,6 +230,23 @@ jobs:
             exit 1
           fi
           echo "D-1 pass: snora-core and snora-design depend on neither each other"
+
+  opt-out-probe:
+    # RFC-112: an application can turn off iced's default features.
+    #
+    # Before RFC-112 it could not, and nothing failed — snora's own
+    # iced line carried the defaults, Cargo features only add up, and
+    # a consumer's `default-features = false` was simply inert. It
+    # took aaai reporting zbus in their tree to find it. This job is
+    # the gate that would have.
+    name: A consumer can turn iced's defaults off
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: The opt-out resolves as RFC-112 specifies
+        run: scripts/check-opt-out-probe.sh
 
   msrv:
     # Audit 2026-09-12 (R-1): `rust-version` is a published contract every

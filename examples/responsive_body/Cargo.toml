@@ -19,4 +19,11 @@ path = "src/main.rs"
 # every minor bump.
 [dependencies]
 snora = { path = "../../crates/snora", version = "0.53", default-features = false }
-iced  = { workspace = true }
+# `features = ["default"]` (RFC-112): the workspace iced line no
+# longer carries iced's defaults, and this crate turns snora's off, so
+# without this it would have no renderer and no windowing backend, and
+# winit would refuse to compile for the platform. It wants the build it
+# had before RFC-112, and asks for it on its own line rather than
+# through snora's `iced-default`, so that what this crate measures
+# stays independent of snora's feature graph.
+iced  = { workspace = true, features = ["default"] }

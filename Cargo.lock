@@ -3187,6 +3187,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "snora-opt-out-probe"
+version = "0.53.0"
+dependencies = [
+ "iced",
+ "snora",
+]
+
+[[package]]
 name = "snora-size-probe-design"
 version = "0.53.0"
 dependencies = [

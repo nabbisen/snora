@@ -20,6 +20,16 @@ rustdoc-args = ["--cfg", "docsrs"]
 # snora-core, only iced (the styles it produces) and snora-design (the
 # tokens it maps from). If a change here ever needs a third dependency,
 # that is a finding, not a routine addition — see RFC-055 §6 step 1.
+[features]
+default = ["iced-default"]
+# Turning this off is how an application takes iced's default features
+# into its own hands: the renderers, the windowing backends and
+# `linux-theme-detection` with its zbus and mundy trees (RFC-112). It
+# is on by default, so a plain `cargo add` is unchanged; an
+# application that turns it off must name its own iced features, or
+# nothing will draw and winit will refuse to compile for the platform.
+iced-default = ["iced/default"]
+
 [dependencies]
 snora-design = { workspace = true }
 iced = { workspace = true }

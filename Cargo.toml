@@ -40,7 +40,15 @@ authors = ["nabbisen"]
 # `publish = false`.  Cargo validates the workspace as a whole.
 snora = { version = "0.53", path = "crates/snora" }
 snora-core = { version = "0.53", path = "crates/snora-core" }
-snora-widgets = { version = "0.53", path = "crates/snora-widgets" }
+# `default-features = false` on both (RFC-112), and this is load-
+# bearing rather than tidiness: `snora` depends on these two crates.
+# Each one's own `default` turns iced's defaults on, so if they stayed
+# on, `iced/default` would come back through that edge no matter what
+# a consumer did — and `default-features = false` on `snora` would be
+# inert again, which is the exact defect RFC-112 fixes. They are
+# turned off here and re-enabled through `iced-default`, which an
+# application can decline.
+snora-widgets = { version = "0.53", path = "crates/snora-widgets", default-features = false }
 # Iced-free design tokens (Snora Design). Listed here so the `snora` /
 # `snora-widgets` crates can pick it up via workspace inheritance once the
 # `design` feature wiring lands (RFC-021 / RFC-025). It is a workspace member
@@ -50,26 +58,46 @@ snora-design = { version = "0.53", path = "crates/snora-design" }
 # below the widget layer — snora-widgets depends on it, not the reverse
 # — and depends on nothing but iced and snora-design (in particular not
 # snora-core), the same layering property snora-design itself has.
-snora-style = { version = "0.53", path = "crates/snora-style" }
+snora-style = { version = "0.53", path = "crates/snora-style", default-features = false }
 
-# Corrected (RFC-088): `canvas` and `svg` removed — `canvas` had zero
-# occurrences anywhere in `crates/`, and `svg` is used only under our
-# own `svg-icons` feature, which already declares `"iced/svg"`
-# (`crates/snora/Cargo.toml`, `crates/snora-widgets/Cargo.toml`) — this
-# line was forcing it on every consumer regardless.
+# RFC-112's rule, stated once: **a feature that decides how snora
+# draws is snora's; a feature that decides what draws, or where it
+# runs, is the application's.**
+#
+# `web-colors` and `crisp` are the first kind. They are snora's own
+# colour-space and pixel-alignment choices, every figure snora
+# publishes was measured with them on, and they stay on for every
+# consumer — which is why they are named here rather than left inside
+# iced's `default`. (`web-colors` changes blending; `crisp`'s effect
+# on snora's own elements is recorded as unmeasured in RFC-112.)
+#
+# Everything else iced enables by default is the second kind:
+# renderers (`wgpu`, `tiny-skia`), windowing (`x11`, `wayland`),
+# `linux-theme-detection` and its zbus and mundy trees. Those reach
+# iced only through each crate's `iced-default` feature, which is on
+# by default and which an application can turn off. Before RFC-112
+# they were on this line, so `default-features = false` on a
+# consumer's own iced entry was inert — Cargo features only add up,
+# and aaai reported the result.
 #
 # `tokio` stays, measured rather than assumed: `crates/snora/src/
 # toast.rs`'s `subscription()` (unconditional, no snora feature gate)
 # calls `iced::time::every`, which does not exist at all without an
 # executor feature compiled into `iced` — confirmed by removing this
 # feature and hitting `error[E0425]: cannot find function 'every' in
-# module 'iced::time'`. This is not the same shape as `canvas`/`svg`
-# (an unused capability) — it is a real, unconditional compile-time
-# requirement of `snora`'s own baseline functionality. Gating
-# `subscription()` behind a new opt-in feature would remove the forced
-# choice, but is a bigger API change than "one line," was not asked
-# for, and is not added here without saying so first.
-iced = { version = "0.14", features = ["tokio"] }
+# module 'iced::time'`. Gating `subscription()` behind a new opt-in
+# feature would remove the forced choice, but is a bigger API change
+# than "one line," was not asked for, and is not added here without
+# saying so first.
+#
+# Corrected (RFC-088): `canvas` and `svg` removed — `canvas` had zero
+# occurrences anywhere in `crates/`, and `svg` is used only under our
+# own `svg-icons` feature, which already declares `"iced/svg"`.
+iced = { version = "0.14", default-features = false, features = [
+    "tokio",
+    "web-colors",
+    "crisp",
+] }
 lucide-icons = { version = "1", default-features = false }
 
 [profile.release]

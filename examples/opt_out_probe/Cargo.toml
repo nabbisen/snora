@@ -1,0 +1,40 @@
+[package]
+name = "snora-opt-out-probe"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+publish = false
+
+# RFC-112's gate, as a crate rather than a script: the thing it asserts
+# is what Cargo resolves, and the only way to ask Cargo that is to give
+# it a manifest shaped like a consumer's.
+#
+# This is an application that wants snora without any of iced's default
+# features — no `linux-theme-detection`, so no zbus and no mundy — and
+# that names the renderers and platforms it does want. Before RFC-112
+# it could not have them: snora's own iced line carried `default`, and
+# features only ever add up, so a consumer turning them off on their
+# side changed nothing.
+#
+# It is deliberately NOT `iced = { workspace = true }`. The point is a
+# line a consumer writes, resolved against snora's, and inheriting the
+# workspace's would be asserting about snora's line twice.
+[dependencies]
+snora = { path = "../../crates/snora", version = "0.53", default-features = false, features = [
+    "widgets",
+    "design",
+] }
+iced = { version = "0.14", default-features = false, features = [
+    "wgpu",
+    "tiny-skia",
+    "thread-pool",
+    "x11",
+    "wayland",
+] }
+
+[[bin]]
+name = "snora-opt-out-probe"
+path = "src/main.rs"
