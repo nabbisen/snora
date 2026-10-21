@@ -97,8 +97,12 @@ no upgrade clears them while iced uses `zbus` 5. snora accepts them in `deny.tom
 with the condition that retires them.
 
 **If your own `cargo deny` or `cargo audit` denies unmaintained crates**, it will
-report these three. Accept them by ID, or turn off iced's `linux-theme-detection`
-if you don't need the system colour scheme.
+report these three. Accept them by ID.
+
+*Corrected 2026-10-21:* this section also said you could turn off iced's
+`linux-theme-detection` instead. You can't, from your side. `snora`, `snora-style`
+and `snora-widgets` take iced with its default features, and Cargo never switches
+off a feature that another crate in the graph turns on. Reported by aaai.
 
 ## Also new, for contributors and evaluators
 
