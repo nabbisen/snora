@@ -276,5 +276,8 @@ All suggestions accepted, as revised in `e98d8c6`.
 - **Q-3:** warnings are denied on every feature-matrix row and on the
   design-isolation job.
 - **Q-4:** ships in 0.54.0.
-- **Q-5:** one reply, to aaai only. No letter to the other adopters or logolig, and
-  none when 0.54.0 ships.
+- **Q-5:** one reply, to aaai only. No letter to the other adopters or logolig.
+  **Amended by the owner, 2026-10-21: the reply goes when 0.54.0 is published, not on
+  acceptance.** The draft waits in `.git-exclude/upstream/send/draft/`. At the cut,
+  rewrite it from "from 0.54.0" to "0.54.0 is out", and check it against what
+  shipped.
