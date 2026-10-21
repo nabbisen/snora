@@ -168,12 +168,12 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 112 | [A consumer cannot turn off any of iced's default features](./accepted/112-a-consumer-cannot-turn-off-any-iced-default-feature.md) | 0.54.0 — **accepted 2026-10-21**; reported by aaai; snora's crates force all eight iced defaults. Drawing features (`web-colors`, `crisp`) stay snora's (ABDD: without `web-colors` the light dim falls to 1.72); the rest pass through a default-on `iced-default`, proved from a consumer probe (handoff: [`handoffs/112-…`](./handoffs/112-a-consumer-cannot-turn-off-any-iced-default-feature/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 112 | [A consumer cannot turn off any of iced's default features](./proposed/112-a-consumer-cannot-turn-off-any-iced-default-feature.md) | 0.54.0 — reported by aaai; snora's crates force all eight iced defaults. Drawing features (`web-colors`, `crisp`) stay snora's (ABDD: without `web-colors` the light dim falls to 1.72); the rest pass through a default-on `iced-default`, proved from a consumer probe |
 
 ## Archive
 

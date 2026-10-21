@@ -1,6 +1,7 @@
 # RFC-112 — A consumer cannot turn off any of iced's default features
 
-**Status.** Proposed.
+**Status.** Accepted 2026-10-21. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/112-…`](../handoffs/112-a-consumer-cannot-turn-off-any-iced-default-feature/implementation-handoff.md).
 **Raised.** 2026-10-21, architect, from aaai's reply to the 0.53.0 letter
 (`.git-exclude/upstream/receive/0.53.0/aaai-to-snora-2026-10-21.md`). aaai tried our
 advice and reported that it could not be applied. The architect confirmed the report
@@ -260,3 +261,20 @@ The other rules hold as drafted:
    `snora-widgets` and `snora` on Linux.
 5. CHANGELOG under Changed, with the narrow breaking case named. The migration guide
    follows R-4.
+
+---
+
+## Rulings, 2026-10-21
+
+All suggestions accepted, as revised in `e98d8c6`.
+
+- **The rule:** drawing features (`web-colors`, `crisp`) are snora's and always on.
+  Features that choose what draws, or where it runs, are the application's.
+- **Q-1:** the feature is named `iced-default`.
+- **Q-2:** not a forbidden change under the covenant, so D-3 and D-4 stay closed. The
+  reasoning is recorded in `api-freeze-review.md`.
+- **Q-3:** warnings are denied on every feature-matrix row and on the
+  design-isolation job.
+- **Q-4:** ships in 0.54.0.
+- **Q-5:** one reply, to aaai only. No letter to the other adopters or logolig, and
+  none when 0.54.0 ships.
