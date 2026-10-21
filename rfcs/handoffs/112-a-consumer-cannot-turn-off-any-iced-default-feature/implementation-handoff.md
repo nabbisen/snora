@@ -40,7 +40,7 @@ Use it for reference, and re-derive anything you quote.
 - **With R-1 and the workspace line at `["tokio", "web-colors", "crisp"]`:**
   - `consumer` builds;
   - `zbus` and `mundy` are gone;
-  - `tiny-skia` and `wgpu` are present;
+  - `tiny-skia` and `wgpu` are present (raw crates; see the correction under Unit 3);
   - `cargo tree -e features -i iced` lists `crisp` and `web-colors`, though the
     probe's own line omits both.
 - `cargo check -p snora-style`, `-p snora-widgets` and `-p snora`, each on its own
@@ -108,7 +108,7 @@ probe outside the workspace as I did.
 **CI job (Linux),** asserting with `--target x86_64-unknown-linux-gnu`:
 - the probe builds;
 - `cargo tree -e normal -i zbus` and `-i mundy` find nothing;
-- `-i tiny-skia` and `-i wgpu` each find something;
+- `-i iced_tiny_skia` and `-i iced_wgpu` each find something. *(Corrected 2026-10-21, RFC-112 review: these are iced's renderer crates. The raw `tiny-skia` crate also arrives through winit's Wayland decorations, whatever the application asks for, so asserting on it could never fail.)* Test presence by `cargo tree`'s **output**: it exits 0 when it prints "nothing to print";
 - `cargo tree -e features -i iced` lists `web-colors` and `crisp`.
 
 **Feature matrix:**
@@ -135,7 +135,7 @@ Back up to named files with `cp`, break, run, restore, then `sha256sum -c`. **Ne
 |---|---|
 | probe: `zbus` absent | today's manifests (Unit 1) |
 | probe: `web-colors` and `crisp` present | workspace iced line at `["tokio"]` only |
-| probe: `tiny-skia` and `wgpu` present | remove `tiny-skia` from the probe's own iced line: it must fail **only** on tiny-skia |
+| probe: `iced_tiny_skia` and `iced_wgpu` present | remove `tiny-skia` from the probe's own iced line: it must fail **only** on `iced_tiny_skia`; likewise `wgpu` |
 | probe isolated (workspace member only) | add `linux-theme-detection` to one other member's iced line: the probe must stay free of `zbus` |
 | matrix rows need `iced-default` | remove it from one `--no-default-features` row: the winit error |
 | warnings denied | Unit 1's `default` row, before R-5's fix |

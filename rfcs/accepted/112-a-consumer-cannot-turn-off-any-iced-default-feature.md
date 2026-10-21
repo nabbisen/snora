@@ -44,7 +44,7 @@ thing.
 |---|---|---|
 | Consumer probe¹: `cargo tree -i zbus` on Linux | `zbus v5.16.0` | not in the graph |
 | Consumer probe: `-i mundy` | present | not in the graph |
-| Consumer probe: `-i tiny-skia`, `-i wgpu` | present | present (the consumer chose them) |
+| Consumer probe: `-i iced_tiny_skia`, `-i iced_wgpu` | present | present (the consumer chose them) |
 | `cargo check -p snora-style`, `-p snora-widgets`, `-p snora`, each on its own | builds | builds |
 | `snora` with its own defaults: `-i zbus` | present | present (unchanged) |
 | `cargo check -p snora --no-default-features` | builds | **fails**: winit needs `x11` or `wayland` on Linux |
@@ -140,7 +140,7 @@ and after**, which proves that a default build doesn't change.
 **R-3 — CI proves it from a consumer's position.**
 - A `publish = false` probe crate, shaped like the footnote above, that CI builds.
   CI asserts that `cargo tree -i zbus` and `-i mundy` find nothing on Linux, and that
-  `-i tiny-skia` and `-i wgpu` find each. The probe's own iced line leaves out
+  `-i iced_tiny_skia` and `-i iced_wgpu` find each. *(Corrected 2026-10-21, RFC-112 review: these are iced's renderer crates. The raw `tiny-skia` crate also arrives through winit's Wayland decorations, whatever the application asks for, so asserting on it could never fail.)* The probe's own iced line leaves out
   `web-colors` and `crisp`, and CI asserts that `cargo tree -e features -i iced`
   still lists both. **Each assertion must fail first:** `zbus` is present on
   today's manifests, and both features are missing from the probe if R-1 is
