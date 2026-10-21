@@ -70,7 +70,13 @@ jobs:
         # features (no `design`) and `--all-features` (lucide on) — so a
         # test gated on `not(feature = "lucide-icons")` would otherwise
         # never run anywhere in CI.
-        run: cargo test -p snora --no-default-features --features widgets,design
+        #
+        # `iced-default` (RFC-112): `--no-default-features` now turns
+        # iced's defaults off too, and this step *links* a test binary,
+        # so without a renderer winit refuses to compile. The feature
+        # matrix only `check`s, which is why this step failed on `main`
+        # and the matrix did not.
+        run: cargo test -p snora --no-default-features --features widgets,design,iced-default
       - name: Bounded work — toast layout stays linear (RFC-105)
         # A timing ratio, so it is `#[ignore]`d and run here on its own,
         # in release: ten times the toasts must lay out in less than
@@ -87,13 +93,18 @@ jobs:
         run: cargo test -p snora-widgets --all-features
       - name: Test style, all features (RFC-087)
         # Also never run. 26 unit tests + 3 doc-tests (1 ignored) counted
-        # 2026-09-01. snora-style declares no [features], so this is
-        # identical to a default-features run — --all-features here is
-        # for uniformity with the other two new steps, not because it
-        # changes anything.
+        # 2026-09-01. snora-style declared no [features] when this was
+        # written, so --all-features was for uniformity with the other
+        # two new steps rather than because it changed anything. It
+        # declares `iced-default` since RFC-112, which --all-features
+        # turns on, so the two runs still coincide — but no longer
+        # trivially.
         run: cargo test -p snora-style --all-features
       - name: Check engine-only build (Q1 — minimal path)
-        run: cargo check -p snora --no-default-features
+        # `iced-default` (RFC-112): engine-only means no `widgets`, not
+        # no renderer. Without it this would check a build with neither,
+        # which is the opt-out probe's job and not this step's.
+        run: cargo check -p snora --no-default-features --features iced-default
 
   feature-matrix:
     name: Feature matrix (${{ matrix.name }})

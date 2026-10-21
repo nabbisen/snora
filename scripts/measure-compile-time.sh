@@ -83,7 +83,12 @@ measure_ms() {
 
 check_workspace_ms=$(measure_ms  "check_workspace"    cargo check --workspace --all-features)
 build_widgets_ms=$(measure_ms    "build_widgets"      cargo build -p snora-widgets --release)
-build_engine_only_ms=$(measure_ms "build_engine_only"  cargo build -p snora --no-default-features --release)
+# `iced-default` (RFC-112): `--no-default-features` now drops iced's
+# defaults as well as `widgets`, and this links a binary, so without a
+# renderer winit refuses to compile. Keeping it on means this figure
+# still measures what it measured before — the engine without the
+# widget layer, not the engine without a renderer.
+build_engine_only_ms=$(measure_ms "build_engine_only"  cargo build -p snora --no-default-features --features iced-default --release)
 example_hello_ms=$(measure_ms    "example_hello"      cargo build --profile release-baseline -p snora-example-hello)
 build_widgets_design_ms=$(measure_ms "build_widgets_design" cargo build -p snora-widgets --features design --release)
 # Also clean the workbench binary itself (measure_ms does not include it in
