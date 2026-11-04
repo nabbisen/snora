@@ -8,14 +8,21 @@
 //!    toast rendered closest to the anchor edge.
 //! 2. `subscription` — a public helper that emits ticks for TTL sweep.
 //!    Applications wire this into their `iced::Application::subscription`.
-//! 3. [`Holds`] — the sweep, and the toasts the pointer is resting on.
-//!    `Holds::sweep` drops expired transient toasts but keeps a held
-//!    one, so a toast cannot vanish from under someone reading it
-//!    (RFC-113). It replaces `sweep_expired`, which is deprecated.
+//! 3. [`Holds`](crate::toast::Holds) — the sweep, and the toasts the
+//!    pointer is resting on. `Holds::sweep` drops expired transient
+//!    toasts but keeps a held one, so a toast cannot vanish from under
+//!    someone reading it (RFC-113). It replaces `sweep_expired`, which
+//!    is deprecated.
+//!
+//! The two links above are spelled as full paths on purpose. This
+//! module's `//!` docs are concatenated with the `///` docs on
+//! `pub mod toast;` in `lib.rs`, and the whole is then resolved in
+//! **`lib.rs`'s** scope, where `Holds` is not a name — so a bare
+//! `[`Holds`]` here is a broken link that only `cargo doc` reports.
 //!
 //! Together, (2) and (3) move toast TTL bookkeeping from application code
 //! into the framework — the app stores a `Vec<Toast<Message>>` and a
-//! [`Holds`], and calls two one-liners.
+//! [`Holds`](crate::toast::Holds), and calls two one-liners.
 
 use std::time::{Duration, Instant};
 
