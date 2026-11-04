@@ -1,139 +1,199 @@
 # RFC-116 — No snora control can be reached from the keyboard
 
-**Status.** Proposed.
+**Status.** Proposed. **Revised 2026-11-04** after the architect reviewed it against
+the owner's fundamental philosophy (see "Review against snora's principles"). The
+first draft (`b24a8f5`) treated real focus as a distant hope and gave keyboard users
+four ad-hoc helpers. Two facts checked in review made the final design reachable
+now.
 **Raised.** 2026-11-04, architect, from the finding behind RFC-114's correction
 (`.git-exclude/reviewed/iced-buttons-take-no-keyboard-input/`).
 **Owner's direction, 2026-11-04:** *"Keyboard compatibility is required. Even if
 immediate action is not possible, it must be managed as a long-term plan."*
-**Release target.** R-1 in 0.55.0 (Q-4). R-2 is a plan with triggers, not a release.
-**Priority.** WCAG 2.1.1 (Keyboard) is level A, the lowest level. snora's own controls
-do not meet it, and until 2026-11-04 the book said they did.
+**Release target.** Unit 0 first, as its own review (Q-5). **Priority.** WCAG 2.1.1
+(Keyboard) is level A, the lowest level. snora's controls do not meet it.
 
 ---
 
 ## The finding
 
 **iced 0.14's button takes no keyboard input.** `update` handles mouse and touch
-only, and `operate` registers no focus target. Only `text_input` and `text_editor`
-implement `Focusable`. A probe confirmed it:
-- Tab, Enter and Space, three times each, pressed nothing;
-- a click pressed the button, and typing reached a text input.
+only, and `operate` registers no focus target. A probe confirmed it: Tab, Enter and
+Space never press a button, while a click does and typing reaches a text input.
 
 **So every control snora draws is pointer and touch only:**
 - sidebar items, tabs and breadcrumbs;
 - toast and notice dismiss buttons, and the chip ×;
-- menu items, and every `design::button` variant.
+- menu items, and every `design::button` variant, including RFC-117's `link`.
 
-The keyboard reaches only what an application wires itself:
-- its own shortcuts (orbok switches views with `Ctrl/Cmd+1..6`);
-- `snora::keyboard::dismiss_on_escape`, which closes overlays;
-- `snora::keyboard::cycle_zones`, which decides the next zone. Inside a zone it can
-  move focus only between text inputs, the only widgets iced 0.14 can focus.
+**iced does not move focus on Tab either.** Nothing in `iced_winit`, `iced` or
+`iced_runtime` binds Tab. An application must call
+`iced::widget::operation::focus_next()` itself (`iced_runtime/src/widget/operation.rs:55`).
+Today, even a text input is reachable only if the application wires that.
 
-**Why snora cannot simply make its buttons focusable.** A focusable control is a
-custom widget implementing iced's `Widget` trait, which iced exposes only under its
-`advanced` feature (`iced-0.14.0/src/lib.rs:524`). The owner has ruled that `advanced`
-must never be a default (RFC-078). Moving focus (`focus_next`) needs no `advanced`,
-but it only reaches widgets that are already focusable.
+**Two facts change what is possible** (both checked in review):
+1. **A focusable widget needs no iced feature.** The `Widget` trait
+   (`iced_core/src/lib.rs:84`) and the `Focusable` operation
+   (`iced_core/src/widget/operation/focusable.rs:7`) are public in `iced_core`,
+   unconditionally. iced's `advanced` feature only *re-exports* them, and adds a few
+   small methods. snora can build a focusable control on `iced_core` directly,
+   **on by default, without enabling `advanced` for anyone.**
+2. **The owner's 2026-08-20 ruling on `advanced` was conditional:** *"If snora does
+   not require iced's `advanced` feature, snora should not introduce it as default"*
+   (RFC-078). That condition is now in question, because keyboard compatibility is
+   required (Q-1).
+
+**Keys a focused widget uses never reach the application.** `iced::keyboard::listen()`
+"listens to ignored keyboard events" (`iced_futures/src/keyboard.rs:6`). So
+characters a text input consumes do not trigger shortcuts. Keys it ignores still
+reach them, which matters for choosing bindings.
 
 ## Proposal
 
-**R-1 — now: a keyboard route to every snora navigation control, with no `advanced`.**
-Each is a pure function shaped like `cycle_zones` and `dismiss_on_escape`. It takes a
-key and modifiers, and returns `Option<Message>`, or the existing action type the
-control already emits (`TabAction`, `BreadcrumbAction`). snora installs no
-subscription; the application wires `iced::keyboard::listen()`. That is the existing
-non-capture policy.
+The design separates three things that a keyboard user needs:
+- **reach** a control (focus);
+- **operate** it (activate);
+- **jump** straight to a destination (accelerators).
 
-| Control | Helper | Suggested binding (Q-1) |
-|---|---|---|
-| Sidebar item *n* | `side_bar_item(key, mods, &SideBar)` → that item's `on_press` | `Ctrl`/`Cmd` + `1`…`9` |
-| Next or previous tab | `tab_step(key, mods, &TabBar<Id>)` → `Option<TabAction<Id>>` for the neighbour | `Ctrl+Tab` / `Ctrl+Shift+Tab` |
-| Breadcrumb parent | `crumb_up(key, mods, &[Crumb<Id>])` → `Option<BreadcrumbAction<Id>>` for the parent | `Alt+↑` |
-| Newest toast | `dismiss_on_escape` also dismisses the newest toast, once no overlay is open (Q-2) | `Escape` |
+The first two are what WCAG 2.1.1 asks. The third is a convenience that stays even
+when the first two exist, so it is never a stopgap to deprecate later.
 
-- **Every binding is in one keyboard map,** a new book page, and in each control's
-  rustdoc.
-- **Every example that draws a control wires its helper,** so copying an example gives
-  an application the keyboard route as well (Q-3).
+**R-1 — a focusable control: reach and operate, on by default.**
+- **One internal widget,** `snora_widgets::control` (name per Q-2). It wraps the
+  content, and:
+  - registers as `Focusable` in `operate`;
+  - activates on Enter and Space when focused, emitting **exactly the message a click
+    emits**;
+  - takes clicks and touches as iced's button does.
+- **Every snora control is built on it:** sidebar items, tabs, crumbs, toast and
+  notice dismiss buttons, the chip ×, menu items, and the `design::button` variants.
+  No public signature changes.
+- **A visible focus ring, drawn by snora.** snora owns the focus state, so it can
+  finally draw the ring that `accessibility.md` lists as impossible on iced-owned
+  widgets. It uses `FocusTokens` on the design path, and a theme-derived colour on
+  the unstyled path, with the 3:1 non-text floor asserted on drawn pixels.
+- **Traversal:** `snora::keyboard::traverse(key, modifiers)` → `Option<Task>`, with
+  Tab → `focus_next`, Shift+Tab → `focus_previous`. It is the one line an application
+  adds to its keyboard subscription. Getting-started wires it, and so does every
+  example.
+- **Built on `iced_core`, not on iced's `advanced` feature,** so no consumer's feature
+  set changes (RFC-112's lesson). `iced_core` is already in every snora graph; it
+  becomes a direct dependency at the same `0.14` requirement, so it unifies with
+  iced's own.
 
-**R-2 — long term: real focus, managed as a 1.0 gate with triggers.** A new 1.0 gate:
-*"Every snora control is reachable and operable from the keyboard (WCAG 2.1.1),
-without a helper."* It starts ⬜. Two routes can close it, and each has a trigger a
-reader can predict:
-- **(a) upstream.** At **every iced upgrade**, re-run the keyboard probe. That is a
-  planned, mechanical event, and gate 1's row is what an upgrade reads, so the
-  instruction goes there. If iced's button becomes focusable and operable, snora
-  adopts it in that upgrade and the gate closes.
-- **(b) snora's own.** snora's controls become focusable custom widgets, behind an
-  **opt-in** feature that enables `advanced`. RFC-078's ruling allows this, because
-  the feature is not a default. **Trigger:** when the 1.0 register is next swept, if
-  (a) has not closed the gate and no iced release is in sight, measure (b)'s cost (RFC-078's
-  method) and decide.
+**R-2 — accelerators: jump, through one router.**
+- **`snora::keyboard::Shortcuts`**, a builder that takes the controls as the
+  application already passes them to their widgets:
+  - `.side_bar(&side_bar)`;
+  - `.tabs(&tab_bar, &on_action)`;
+  - `.crumbs(&crumbs, &on_action)`;
+  - `.escape(Escape { modal, menu })`.
+- `.route(key, modifiers) -> Option<Message>` answers in **one place**, with one
+  precedence order, so two routes can never both fire.
+- **The rule a reader can predict:** *a shortcut emits exactly the message a click on
+  that control emits.*
+- **Platform-conventional bindings** (Q-3), chosen at compile time with
+  `cfg!(target_os = "macos")`:
 
-**Neither route is fixed in advance.** What is fixed: the gate exists, it is checked
-at every iced upgrade, and it blocks 1.0.
+  | Destination | Windows and Linux | macOS |
+  |---|---|---|
+  | Sidebar item *n* | `Ctrl` + `1`…`9` | `Cmd` + `1`…`9` |
+  | Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` | the same |
+  | Breadcrumb parent | `Alt+↑` | `Cmd+↑` |
+  | Close modal, then menu | `Escape` | `Escape` |
 
-**R-3 — say it plainly, in the book.** `accessibility.md` states WCAG 2.1.1's status:
-not met by snora's controls; R-1's routes are what exists; R-2 is the plan. The
-withdrawn Enter/Space claim is already corrected (`0c6e59e`).
+- **Escape is now named fields, not positional arguments.** `dismiss_on_escape` takes
+  two `bool`s and two `Option`s in a row (`keyboard.rs:61`). That is easy to call in
+  the wrong order without any compiler error. The router's `Escape { modal, menu }`
+  says which is which. **`dismiss_on_escape` is deprecated**, as superseded, and keeps
+  working.
+- **Escape does not dismiss toasts** (revised in review). A stray Escape would clear
+  an unread persistent error, which RFC-113 exists to prevent. A keyboard user
+  reaches the toast's close button through R-1 instead.
+
+**R-3 — the plan, where an upgrade will read it.** A new 1.0 gate: *"Every snora
+control is reachable, operable and visibly focused from the keyboard (WCAG 2.1.1,
+2.4.7)."* It closes when R-1 ships and its probe passes. Gate 1's row, which an iced
+upgrade reads, gains two instructions:
+- **re-run the keyboard probe;**
+- **if iced's own button has become focusable, compare it with snora's `control`.**
+  If upstream is equivalent, `control` is superseded: deprecate it and adopt
+  upstream.
+
+**R-4 — the book.**
+- `accessibility.md` states WCAG 2.1.1's status at each stage.
+- A keyboard map page lists every binding.
+- `cycle_zones`'s doc says which zones contain something focusable.
+- The "no focus ring on snora's own widgets" limitation is withdrawn when R-1 ships.
 
 ## Open questions
 
-**Q-1 — the bindings.** **Suggest the table above.** They follow common desktop
-conventions where one exists: `Ctrl+Tab` for tabs, `Alt+↑` for "up a level", and
-`Ctrl/Cmd+digit`, which orbok already uses. An application can bind others, since
-each helper's key test is separate from its decision. **Collisions** with an
-application's own shortcuts are the application's to resolve. The keyboard map says
-so.
+**Q-1 — the owner's `advanced` ruling.** R-1 needs no iced feature. It does depend on
+the widget API that `advanced` re-exports, which is the API iced changes most between
+versions. **Suggest:** the 2026-08-20 ruling is met: snora introduces no iced feature
+at all. The real cost is maintenance, porting `control` at each iced upgrade, and Unit
+0 measures it. **The owner decides** whether that cost is acceptable for a level-A
+criterion.
 
-**Q-2 — Escape and toasts.** Escape closes modals, then menus, today. **Suggest:**
-once neither is open, Escape dismisses the newest toast. The order is predictable
-(the most recent, innermost thing first). It gives a keyboard user the only way to
-clear a persistent error, which RFC-113 makes the default.
+**Q-2 — the name.** The widget is internal. Only `traverse`, `Shortcuts` and `Escape`
+are public. **Suggest** keeping `control` private until an adopter needs it. A public
+"button that is really focusable" next to iced's `button` would leave every reader
+wondering which one to use.
 
-**Q-3 — ABDD and opt-in wiring.** R-1 still needs the application to wire it, which
-is accessible by choice, the trap RFC-113 met. A deprecation cannot steer here, since
-nothing existing is superseded. **Suggest:**
-- the examples and the getting-started guide wire every helper;
-- the keyboard map heads the accessibility guide.
+**Q-3 — bindings.** **Suggest the table.** Where a platform has a convention, follow
+it; where it has none, use the common one. `Cmd+↑` is "enclosing folder" in macOS
+Finder, and `Alt+↑` is "up one level" in Windows Explorer. Collisions with an
+application's own shortcuts are resolved by not adding that route to the router: each
+route is opt-in per control.
 
-That is as close to "by default" as snora can get without capturing keys, which its
-non-capture policy rules out. The same limit is stated in R-3.
+**Q-4 — is the router opt-in?** It must be, since snora captures no keys. But under
+R-1 the router is a convenience, not the accessibility route. **Reach and operate
+work without it,** once the application adds `traverse`, which every example and
+getting-started does. So ABDD's "by default" now holds for the part WCAG requires.
 
-**Q-4 — release.** **Suggest 0.55.0.** 0.54.0 already carries RFC-112 and Theme E's
-three RFCs, and R-1 adds public API in four places, which deserves its own review.
-R-2's gate row and R-3's statement go in now, as docs, because they are the plan the
-owner asked for.
-
-**Q-5 — the `cycle_zones` doc.** It moves "focus" between zones, but inside the
-sidebar, tab bar and header there is nothing focusable. **Suggest:** its rustdoc and
-the keyboard map say which zones can hold focus (those with text inputs) and which
-cannot.
+**Q-5 — release and order.**
+- **Unit 0, a prototype:** one focusable `control` replacing the sidebar item. Tab
+  reaches it, Enter presses it, the ring draws, and the existing sidebar tests pass.
+  Measure the size and compile cost, and the porting surface (which `iced_core` items
+  it touches). It is its own review.
+- **R-1 for every control, R-2, R-3 and R-4:** the release after Unit 0 is accepted.
+- **R-3's gate row and R-4's status statement go in now**, as docs, because they are
+  the plan the owner asked for.
 
 ## Review against snora's principles
 
-- **ABDD:** R-1 is the reachable part now. R-2 makes the rest a 1.0 blocker rather than
-  a hope. Q-3 states where "by default" stops, and why.
-- **Rules a reader can predict:** conventional bindings; Escape takes the innermost
-  thing first; R-2's triggers are planned events (an iced upgrade, a register sweep),
-  never unplanned ones.
-- **Verify claims:** the button finding rests on source and a probe with positive
-  controls. R-2(a)'s check reuses that probe.
-- **Correspondence cost:** no letter. The book carries the plan and the corrected
-  claim.
+- **Finally clean, robust, sophisticated (owner, 2026-11-04):**
+  - reach, operate and jump are separated, so nothing built now becomes debt later;
+  - one router replaces four helpers of three different shapes;
+  - real focus is the plan, not a hope.
+- **Nobody can misunderstand it (owner, 2026-11-04):**
+  - one rule, "a key emits exactly what a click emits";
+  - named fields replace swappable positional arguments;
+  - each platform's own conventions;
+  - no second public button type to choose between.
+- **Safe:**
+  - no Escape on toasts, so an unread error is never cleared by accident;
+  - shortcuts never see keys a focused input used.
+- **ABDD and keyboard (owner):** reach and operate on by default, needing only one
+  traversal line, which every example carries.
+- **Mark deprecated when superseded:** `dismiss_on_escape`, and later `control` if
+  upstream catches up.
+- **Verify claims:** every iced fact above is cited to its source line, and the probe
+  is reused.
+- **Correspondence cost:** no letter. The book carries the status.
 
 ## What this is not
 
-- Not enabling `advanced` by default.
+- Not enabling iced's `advanced` feature.
 - Not snora capturing keys.
-- Not keyboard routes inside application content (dialog bodies and sheets), which
-  the application owns.
+- Not focus trapping inside modals. That needs to *query* focus, and stays RFC-060's
+  separate question.
 
 ## Acceptance criteria
 
-1. R-1: each helper tested at the key level, with each assertion shown failing. Every
-   example that draws the control wires it.
-2. R-2: the gate row in `api-freeze-review.md`, and the probe instruction in gate 1's
-   row. The architect writes both on acceptance.
-3. R-3 and Q-5: the docs, traced to the probe.
+1. **Unit 0:** the prototype passes the button probe's three cases inverted: Tab
+   reaches it, and Enter and Space press it, each assertion shown failing on today's
+   sidebar. The ring is drawn at ≥ 3:1. The costs are measured.
+2. **R-1 and R-2:** every control passes the same probe. The router's precedence is
+   tested. `dismiss_on_escape` is deprecated, and its callers have moved.
+3. **R-3 and R-4:** the gate row, the gate-1 instructions and the keyboard map,
+   traced to the probe.

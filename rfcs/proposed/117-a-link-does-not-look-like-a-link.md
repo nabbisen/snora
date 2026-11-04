@@ -1,6 +1,7 @@
 # RFC-117 — A link does not look like a link
 
-**Status.** Proposed.
+**Status.** Proposed. **Revised 2026-11-04** after the architect reviewed it against
+the owner's fundamental philosophy (see "Review against snora's principles").
 **Raised.** 2026-11-04, architect, from orbok's request 3
 (`.git-exclude/upstream/receive/0.54.0/orbok-snora-request-0.54.0-easy-to-read-2026-11-04.md`).
 The owner approved opening it. Theme E (older users).
@@ -37,66 +38,90 @@ unmeasured on either renderer (RFC-109 Q-2).
 
 ## Proposal
 
-**R-1 — `design::button::link` and `link_maybe`.** These have the same signatures as
-`ghost` and `ghost_maybe`, and the same style function (`style::button::ghost`), so
-no `snora-style` change is needed. One addition: **a 1 px rule under the label,
-inside the button, in the label's colour**, drawn as RFC-109's crumb underline is.
-- **Present in every state:** rest, hover and pressed. On hover the ghost fill
-  appears behind it, as for the crumb.
-- **Disabled** (`link_maybe(…, None)`): the rule dims with the label, by the same
-  alpha.
-- **Its contrast:** the rule is non-text, at ≥ 3:1 against the background it sits on.
-  The label is accent text, already ≥ 4.5:1 on every preset. Assert both.
+**R-1 — `design::button::link(tokens, label, on_press)`.** The ghost style
+(`style::button::ghost`, so no `snora-style` change) **plus an underline in the
+label's colour, present in every state:** rest, hover and pressed.
+- **The underline follows the text, line by line,** when a label wraps (RFC-105:
+  caller text wraps and never clips). How it is drawn is Unit 0's question (Q-5).
+- **Contrast:** the underline is non-text, at ≥ 3:1 against the background; the label
+  is text, at ≥ 4.5:1. Both are asserted on drawn pixels.
 
-**R-2 — `ghost` is unchanged.** Ghost is a tertiary *action* ("Cancel", "Skip"), not
-navigation. An underline there would make actions look like links (Q-1).
+**R-2 — there is no disabled link** (revised in review). A dimmed, underlined phrase
+still says "you can go here", and then does nothing. That is exactly the
+misunderstanding this RFC exists to remove. So there is no `link_maybe`. When the
+destination is unavailable, the application shows plain text, or nothing, and the
+rustdoc says so. This is the one deliberate asymmetry with `ghost_maybe`, and it is
+stated, not accidental.
 
-**R-3 — the keyboard route.** Like every snora control, a link is a button, and iced
-0.14's buttons take no keyboard input (RFC-116). Its rustdoc says so, and points to
-RFC-116's helpers and the application's own shortcuts. RFC-116's 1.0 gate covers it.
+**R-3 — one rule decides link or action** (revised in review), in the rustdoc of both
+variants and in `design/buttons.md`:
+
+> *A **link** takes the reader somewhere: another view, a document, a chooser. An
+> **action** does something where the reader already is: Cancel, Skip, Save. Use
+> `link` for the first and `ghost` for the second.*
+
+orbok's "Choose another folder" opens a chooser, so it is a link under the rule. That
+it needed thinking about is why the rule is written down.
+
+**R-4 — `ghost` is unchanged.** Underlining it would make every tertiary action read
+as a link.
 
 **R-5 — declare the accent's text use.** `Palette::usages` gains a second accent
-entry, `ThresholdClass::Text` on the neutral surfaces, labelled for the ghost and link
-labels. It costs one declaration, and the existing contrast suite then guards both
-labels. *(Found while writing this RFC.)*
+entry, `ThresholdClass::Text` on the neutral surfaces, for the ghost and link labels.
+*(Found while writing this RFC.)* Today the accent is declared only as non-text,
+although both labels draw it as text.
 
-**R-4 — docs** (the architect's): `design/buttons.md` gains the link, says when to
-use it rather than `ghost`, and states R-3.
+**R-6 — keyboard.** A link is a control, so RFC-116's R-1 makes it focusable and
+operable with Enter, with snora's focus ring. Until that ships, its rustdoc states
+that it is pointer-only, and points to RFC-116.
 
 ## Open questions
 
-**Q-1 — a new variant, or an underline on `ghost`?** orbok offered either. **Suggest
-a new variant.**
-- Underlining `ghost` would change every tertiary action in every design
-  application, and make them read as links.
-- A new variant changes nothing for anyone who does not use it, and names what it is.
+**Q-1 — a new variant, or an underline on `ghost`?** **Suggest a new variant** (R-4).
 
-**Q-2 — the unstyled path.** It has no ghost button either, and an engine-only
-application builds its own buttons. **Suggest: design path only**, like every other
-`design::button` variant.
+**Q-2 — the unstyled path.** **Suggest design path only**, like every other
+`design::button` variant. An engine-only application builds its own buttons.
 
-**Q-3 — links inside running text.** A link in the middle of a sentence cannot be a
-button: iced lays buttons out as blocks. That is `rich_text` with a linked span, which
-iced draws with the font's underline. **Suggest: not this RFC.**
-- The accessibility guide says that a link in running text should use `rich_text`
-  with `underline(true)`.
-- It also says that thickness and offset are the font's, unmeasured by snora.
+**Q-3 — links inside running text.** **Suggest: not this RFC.** A link in mid-sentence
+is `rich_text` with a linked span, not a button. If Unit 0 measures `rich_text`'s
+underline as sound, the accessibility guide recommends it there, with the same
+figures.
 
-**Q-4 — release.** **Suggest 0.54.0,** with Theme E. It is additive and small, and
-orbok adopts it on release.
+**Q-4 — release.** **Suggest 0.54.0,** if Unit 0 settles Q-5 quickly. Otherwise the
+release after. orbok adopts it on release, and said there was no hurry.
+
+**Q-5 — how the underline is drawn: Unit 0 decides by measurement.**
+- **RFC-109's 1 px rule element** is measured and snapped. But it is one rule under
+  one box, so it cannot follow a wrapped label's lines. A two-line link would show one
+  underline, under the second line only, or across the whole box. Either misleads.
+- **`rich_text` underlined spans** follow every line. RFC-109 set them aside because
+  their thickness and offset were the font's, *unmeasured*. Since RFC-108, pixels are
+  measurable.
+- **Suggest:** Unit 0 renders a one-line and a two-line link with `rich_text` on both
+  renderers, and measures the underline's thickness, its gap from the glyphs and its
+  contrast.
+  - If it is at least 1 px everywhere, and clears 3:1, use `rich_text`: it is the
+    robust one.
+  - If not, use the rule element, and the label does not wrap. That would be the one
+    exception to RFC-105, stated in the rustdoc.
+
+  Unit 0 reports, and the owner rules.
 
 ## Review against snora's principles
 
+- **Finally clean and robust (owner, 2026-11-04):**
+  - the underline must survive wrapping, so the drawing method is chosen by
+    measurement, not habit (Q-5);
+  - one variant, with no disabled form to explain.
+- **Nobody can misunderstand it (owner, 2026-11-04):**
+  - no link that looks live and is not (R-2);
+  - one written rule for link versus action (R-3);
+  - `ghost` keeps meaning "action".
 - **ABDD:** a non-colour cue for the one control whose meaning was carried by colour
-  alone, without restyling existing actions.
-- **Rules a reader can predict:** a link is underlined, and an action is not.
-- **Verify claims:** checked that `ghost` draws no underline. Checking it also found
-  the accent declared as non-text while drawn as text (R-5). The rule reuses an
-  approach measured on both renderers.
-- **Keyboard (owner's ruling, 2026-11-04):** the route is stated, and the gap is
-  tracked under RFC-116.
-- **Correspondence cost:** orbok hears at the targeted release (the owner's ruling),
-  not before.
+  alone.
+- **Keyboard (owner's ruling):** covered by RFC-116's R-1 (R-6).
+- **Verify claims:** checked that `ghost` draws no underline, which led to R-5.
+- **Correspondence cost:** orbok hears at the targeted release (the owner's ruling).
 
 ## What this is not
 
@@ -105,12 +130,13 @@ orbok adopts it on release.
 
 ## Acceptance criteria
 
-1. **Failing first:** a rendered test that finds a rule under a `link`'s label, at
-   rest and on hover. It fails until `link` exists.
-2. The rule's contrast (≥ 3:1) and the label's (≥ 4.5:1) on all four presets, read from
-   drawn pixels (RFC-108's route).
-3. `ghost`'s tests unchanged.
-4. R-5 **shown failing:** with the accent temporarily set to 4.0:1 on `surface`, the
-   suite must fail on the new text entry (it passes today on the non-text entry
-   alone).
-5. CHANGELOG under Added (`link`) and Fixed (the accent's declaration).
+1. **Unit 0:** the measurements in Q-5, on both renderers, as their own review.
+2. **Failing first:** a rendered test that finds an underline under a `link`'s label,
+   at rest and on hover, and under **each line** of a wrapped label (or, if Q-5 rules
+   the rule element, that the label does not wrap). It fails until `link` exists.
+3. The underline's contrast (≥ 3:1) and the label's (≥ 4.5:1) on all four presets,
+   read from drawn pixels.
+4. R-5 **shown failing:** with the accent temporarily at 4.0:1 on `surface`, the suite
+   fails on the new text entry.
+5. `ghost`'s tests unchanged. CHANGELOG under Added (`link`) and Fixed (the accent's
+   declaration).

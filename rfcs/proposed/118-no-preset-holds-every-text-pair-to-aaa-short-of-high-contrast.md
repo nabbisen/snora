@@ -1,6 +1,7 @@
 # RFC-118 — No preset holds every text pair to AAA, short of high contrast
 
-**Status.** Proposed.
+**Status.** Proposed. **Revised 2026-11-04** after the architect reviewed it against
+the owner's fundamental philosophy (see "Review against snora's principles").
 **Raised.** 2026-11-04, architect, from orbok's request 4
 (`.git-exclude/upstream/receive/0.54.0/orbok-snora-request-0.54.0-easy-to-read-2026-11-04.md`).
 The owner approved opening it. Theme E (older users).
@@ -61,6 +62,14 @@ presets and every `Palette::usages` text pair, and asserts ≥ 7:1. Non-text pai
 3:1. The composited surfaces (the modal dim and the dialog card) are covered, because
 `all_presets()` already sweeps every preset.
 
+**Two more postconditions, asserted** (added in review):
+- **The text hierarchy keeps its order:** `text_primary` ≥ `text_secondary` ≥
+  `text_muted`, measured against each surface. An AAA preset that made "muted" text
+  stronger than "secondary" would invert what the roles mean.
+- **Each role's hue stays within a stated distance of its parent preset's,** so
+  `light_aaa` still reads as Light, and is not a different theme with Light's name.
+  The bound is set when the palette is designed, and stated in the docs table.
+
 **R-3 — Light and Dark are unchanged.** They remain AA presets, which is their stated
 floor. The book says so, and points AAA applications to R-1's presets or the
 high-contrast pair (Q-3).
@@ -88,9 +97,35 @@ both.
 review of their own, and orbok said there was no hurry. 0.54.0 already carries
 RFC-112 and Theme E's other four RFCs.
 
-**Q-5 — names.** `light_aaa` / `dark_aaa` say what the preset guarantees. Should the
-book ever recommend them by default for older audiences, the name already carries
-that. **Suggest these names.**
+**Q-5 — names, and telling the presets apart.** Two families that both mean "more
+contrast" would confuse anyone choosing between them. So each name says what it
+guarantees, and the docs give the axis in one table:
+
+| Preset | Text | Non-text | For |
+|---|---|---|---|
+| `light`, `dark` | AA, 4.5:1 | 3:1 (borders 3.12–3.81) | general use |
+| `light_aaa`, `dark_aaa` | **AAA, 7:1** | 3:1, as their parents | Light's or Dark's character at AAA text, e.g. older readers |
+| `high_contrast_light`, `high_contrast_dark` | AAA and more (≥ 8.38) | borders at 21:1 | maximum contrast |
+
+**Suggest `light_aaa` / `dark_aaa`.**
+- **Rejected in review: a two-axis constructor,** such as `Tokens::new(Scheme,
+  Contrast)`. It is tidier in the abstract, but it would supersede, and so deprecate,
+  the four frozen preset functions every design application calls. That is churn on
+  the covenant surface for no gain to a reader of the table above.
+
+**Q-6 — a transform instead of presets?** For example `tokens.with_aaa_text()`,
+raising any token set, custom ones included, to 7:1. **Rejected in review, because
+it cannot keep its promise.** Against a mid-tone fill, the better of black and white
+can be as low as √(1.05 / 0.05) ≈ 4.58:1 (RFC-111's bound). So 7:1 is unreachable
+without changing the fill itself, and that changes what the fill means. A transform
+would have to fail at run time or quietly break its guarantee. Hand-designed presets
+meet it by construction, and a test proves it.
+
+**Q-7 — the hierarchy is quieter at AAA.** With `text_muted` raised to 7:1, it sits
+close to `text_secondary`, about 8.8:1 in Light. Colour then carries less of the
+hierarchy. **Suggest:** say so in the docs. An AAA application should let size and
+weight (`Typography`) carry hierarchy, rather than colour alone. That is better for
+older readers anyway.
 
 ## Review against snora's principles
 
@@ -101,6 +136,20 @@ that. **Suggest these names.**
 - **Verify consumer claims:** orbok's figures reproduce. Measuring the whole palette
   showed that the gap is wider than their ask, and Q-2 follows from that.
 - **Correspondence cost:** orbok hears at the targeted release.
+
+## Review against snora's principles, second pass (owner's philosophy, 2026-11-04)
+
+- **Finally clean and robust:**
+  - presets that meet their guarantee by construction, rather than a transform that
+    cannot (Q-6);
+  - no churn on frozen preset functions (Q-5).
+- **Nobody can misunderstand it:**
+  - names that state the guarantee, and one table telling the three families apart
+    (Q-5);
+  - the hierarchy's order asserted, so "muted" never outranks "secondary" (R-2);
+  - each preset recognisably its parent.
+- **Safe:** the guarantee comes from the declaration, so a role added later is swept
+  automatically.
 
 ## What this is not
 
