@@ -8,12 +8,14 @@
 //!    toast rendered closest to the anchor edge.
 //! 2. `subscription` — a public helper that emits ticks for TTL sweep.
 //!    Applications wire this into their `iced::Application::subscription`.
-//! 3. `sweep_expired` — a public helper that drops expired transient
-//!    toasts from the application's toast queue.
+//! 3. [`Holds`] — the sweep, and the toasts the pointer is resting on.
+//!    `Holds::sweep` drops expired transient toasts but keeps a held
+//!    one, so a toast cannot vanish from under someone reading it
+//!    (RFC-113). It replaces `sweep_expired`, which is deprecated.
 //!
 //! Together, (2) and (3) move toast TTL bookkeeping from application code
-//! into the framework — the app only stores a `Vec<Toast<Message>>` and
-//! calls two one-liners.
+//! into the framework — the app stores a `Vec<Toast<Message>>` and a
+//! [`Holds`], and calls two one-liners.
 
 use std::time::{Duration, Instant};
 
@@ -22,7 +24,7 @@ use iced::{
     Alignment::Center,
     Background, Border, Color, Element, Length, Shadow, Subscription,
     alignment::{Horizontal, Vertical},
-    widget::{button, column, container, opaque, row, text},
+    widget::{button, column, container, mouse_area, opaque, row, text},
 };
 
 use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime, ToastPosition};
@@ -152,6 +154,7 @@ pub(crate) fn render_toasts<'a, Message>(
     position: ToastPosition,
     direction: LayoutDirection,
     style: ToastStyle,
+    on_hover: Option<fn(u64, bool) -> Message>,
 ) -> Option<Element<'a, Message>>
 where
     Message: Clone + 'a,
@@ -160,20 +163,36 @@ where
         return None;
     }
 
+    // Only when the application asked for it (RFC-113). An unwired
+    // layout gets the tree it got before: no `mouse_area`, so nothing
+    // that asserts the toast layer's composition has to change.
+    let wrap = |toast: Toast<Message>| -> Element<'a, Message> {
+        match on_hover {
+            Some(f) => {
+                let id = toast.id;
+                mouse_area(render_single_toast(toast, style))
+                    .on_enter(f(id, true))
+                    .on_exit(f(id, false))
+                    .into()
+            }
+            None => render_single_toast(toast, style),
+        }
+    };
+
     let mut stack_col = column![].spacing(8);
     match render_order_for(position) {
         // Top anchors: newest must be at the top of the column (first child),
         // so iterate in reverse — newest (back of queue) is pushed first.
         ToastRenderOrder::ReverseChronological => {
             for toast in toasts.into_iter().rev() {
-                stack_col = stack_col.push(render_single_toast(toast, style));
+                stack_col = stack_col.push(wrap(toast));
             }
         }
         // Bottom anchors: newest must be at the bottom of the column (last child),
         // so iterate in chronological order — newest (back of queue) is pushed last.
         ToastRenderOrder::Chronological => {
             for toast in toasts {
-                stack_col = stack_col.push(render_single_toast(toast, style));
+                stack_col = stack_col.push(wrap(toast));
             }
         }
     }
@@ -579,6 +598,7 @@ fn close_button_style(
 ///
 /// struct MyState {
 ///     toasts: Vec<Toast<Message>>,
+///     holds: snora::toast::Holds,
 /// }
 ///
 /// impl MyState {
@@ -589,7 +609,7 @@ fn close_button_style(
 ///     fn update(&mut self, msg: Message) -> Task<Message> {
 ///         match msg {
 ///             Message::ToastTick => {
-///                 snora::toast::sweep_expired(&mut self.toasts, std::time::Instant::now());
+///                 self.holds.sweep(&mut self.toasts, std::time::Instant::now());
 ///             }
 ///         }
 ///         Task::none()
@@ -623,8 +643,111 @@ where
 ///
 /// Persistent toasts are always retained. Call this from your update
 /// function when handling the tick message produced by [`subscription`].
+#[deprecated(
+    since = "0.54.0",
+    note = "use `Holds::sweep`, which also keeps a toast the pointer is resting on \
+            (RFC-113). Keep one `Holds` in your state and call \
+            `self.holds.sweep(&mut self.toasts, Instant::now())` on the tick. To \
+            hold a toast while it is read, add \
+            `.on_toast_hover(Message::ToastHover)` to the layout and \
+            `self.holds.hover(id, entered, &mut self.toasts, Instant::now())` when \
+            that message arrives. An application that does not want the hold still \
+            calls `Holds::sweep`, and simply never calls `hover`."
+)]
 pub fn sweep_expired<Message: Clone>(toasts: &mut Vec<Toast<Message>>, now: Instant) {
     toasts.retain(|t| !t.is_expired(now));
+}
+
+/// The toasts the pointer is resting on, and the sweep that respects
+/// them (RFC-113).
+///
+/// A transient toast counts down from the moment it appears. If the
+/// reader is still on it when the deadline passes, it vanishes
+/// mid-sentence — and reaching for a toast with the pointer is exactly
+/// what someone does when they need longer with it.
+///
+/// Keep one of these in your application state and sweep through it:
+///
+/// ```no_run
+/// # use snora_core::{AppLayout, Toast, ToastIntent};
+/// # use snora::toast::Holds;
+/// # use std::time::Instant;
+/// # #[derive(Clone, Debug)] enum Message { ToastHover(u64, bool), Tick, Dismiss(u64) }
+/// # struct App { toasts: Vec<Toast<Message>>, holds: Holds }
+/// # impl App {
+/// fn update(&mut self, message: Message) {
+///     match message {
+///         Message::ToastHover(id, entered) => {
+///             self.holds.hover(id, entered, &mut self.toasts, Instant::now());
+///         }
+///         Message::Tick => self.holds.sweep(&mut self.toasts, Instant::now()),
+///         # Message::Dismiss(_) => {}
+///         // ...
+///     }
+/// }
+/// # }
+/// ```
+///
+/// and tell the layout to report the pointer:
+///
+/// ```no_run
+/// # use snora_core::{AppLayout, Toast};
+/// # #[derive(Clone, Debug)] enum Message { ToastHover(u64, bool) }
+/// # let body: () = ();
+/// # let layout: AppLayout<(), Message> = AppLayout::new(body);
+/// let layout = layout.on_toast_hover(Message::ToastHover);
+/// ```
+///
+/// **Leaving restarts the countdown in full**, and [`Holds::hover`]
+/// does that itself. That is why this is one type rather than a pair
+/// of free functions: a toast held past its deadline would otherwise
+/// disappear the instant the pointer left, and an application that
+/// forgot the restart would never see the problem until a user did.
+#[derive(Debug, Default, Clone)]
+pub struct Holds {
+    /// Ids the pointer is currently on. Small by construction: a
+    /// pointer is in one place, and the set is pruned on every sweep.
+    held: Vec<u64>,
+}
+
+impl Holds {
+    /// The pointer entered (`entered = true`) or left (`false`) the
+    /// toast with this id.
+    ///
+    /// On leaving, that toast's countdown **restarts in full** from
+    /// `now`, so the reader gets the whole reading time back rather
+    /// than whatever was left when they arrived. Does nothing if `id`
+    /// is not in `toasts`.
+    pub fn hover<M: Clone>(
+        &mut self,
+        id: u64,
+        entered: bool,
+        toasts: &mut [Toast<M>],
+        now: Instant,
+    ) {
+        if entered {
+            if !self.held.contains(&id) {
+                self.held.push(id);
+            }
+            return;
+        }
+
+        self.held.retain(|&held| held != id);
+        // The restart is the whole point, and it is in here rather
+        // than in the caller's hands.
+        if let Some(toast) = toasts.iter_mut().find(|t| t.id == id) {
+            toast.created_at = now;
+        }
+    }
+
+    /// Drop expired transient toasts, except any the pointer is on.
+    ///
+    /// Also forgets held ids whose toast has gone — dismissed while
+    /// held, say — so the set cannot grow without bound.
+    pub fn sweep<M: Clone>(&mut self, toasts: &mut Vec<Toast<M>>, now: Instant) {
+        toasts.retain(|t| self.held.contains(&t.id) || !t.is_expired(now));
+        self.held.retain(|id| toasts.iter().any(|t| t.id == *id));
+    }
 }
 
 #[cfg(test)]
@@ -637,6 +760,14 @@ mod channel_register;
 mod tests {
     use super::*;
 
+    /// `sweep_expired` is deprecated in favour of `Holds::sweep`
+    /// (RFC-113), but it still ships and still has to behave, so its
+    /// own test keeps calling it. This is the one place the allow is
+    /// correct: a test that exists to exercise a deprecated item.
+    #[expect(
+        deprecated,
+        reason = "this test exists to exercise the deprecated `sweep_expired`"
+    )]
     #[test]
     fn sweep_drops_only_expired_transient() {
         let base = Instant::now();
@@ -788,6 +919,237 @@ mod tests {
             subscription(&mixed, || ()).units(),
             1,
             "any transient toast in the queue must subscribe, even alongside a persistent one",
+        );
+    }
+}
+
+#[cfg(test)]
+mod holds_tests {
+    use super::*;
+    use snora_core::ToastIntent;
+
+    fn toast(id: u64, base: Instant) -> Toast<()> {
+        Toast::new(id, ToastIntent::Info, "t", "m", ())
+            .with_lifetime(ToastLifetime::seconds(10))
+            .with_created_at(base)
+    }
+
+    /// The pointer is on it, and the deadline has long gone.
+    #[test]
+    fn a_held_toast_survives_a_sweep_an_hour_later() {
+        let base = Instant::now();
+        let mut toasts = vec![toast(1, base)];
+        let mut holds = Holds::default();
+        holds.hover(1, true, &mut toasts, base);
+        holds.sweep(&mut toasts, base + Duration::from_secs(3600));
+        assert_eq!(toasts.len(), 1, "a held toast was swept");
+    }
+
+    /// Left at `t`: it gets its whole lifetime again, from `t`.
+    #[test]
+    fn leaving_restarts_the_countdown_in_full() {
+        let base = Instant::now();
+        let left_at = base + Duration::from_secs(3);
+        let mut toasts = vec![toast(1, base)];
+        let mut holds = Holds::default();
+        holds.hover(1, true, &mut toasts, base);
+        holds.hover(1, false, &mut toasts, left_at);
+
+        let mut nearly = toasts.clone();
+        Holds::default().sweep(&mut nearly, left_at + Duration::from_millis(9_999));
+        assert_eq!(nearly.len(), 1, "it went one millisecond early");
+
+        let mut due = toasts.clone();
+        Holds::default().sweep(&mut due, left_at + Duration::from_secs(10));
+        assert!(due.is_empty(), "it outlived its restarted deadline");
+    }
+
+    /// **The case `Holds` exists for.** Held past its deadline, then
+    /// left: an immediate sweep must not take it. Without the restart
+    /// inside `hover`, it would go the instant the pointer moved away.
+    #[test]
+    fn a_toast_left_after_its_deadline_is_not_swept_immediately() {
+        let base = Instant::now();
+        let long_past = base + Duration::from_secs(600);
+        let mut toasts = vec![toast(1, base)];
+        let mut holds = Holds::default();
+        holds.hover(1, true, &mut toasts, base);
+        holds.hover(1, false, &mut toasts, long_past);
+        holds.sweep(&mut toasts, long_past);
+        assert_eq!(
+            toasts.len(),
+            1,
+            "the toast vanished the moment the pointer left it",
+        );
+    }
+
+    /// Dismissed while held: the id must not sit in the set for ever.
+    #[test]
+    fn an_id_dismissed_while_held_is_forgotten() {
+        let base = Instant::now();
+        let mut toasts = vec![toast(1, base), toast(2, base)];
+        let mut holds = Holds::default();
+        holds.hover(1, true, &mut toasts, base);
+        toasts.retain(|t| t.id != 1); // the user clicked its close button
+        holds.sweep(&mut toasts, base + Duration::from_secs(1));
+        assert!(!holds.held.contains(&1), "a dismissed id stayed held");
+    }
+
+    /// Stack order comes from the vector, so a restart must not move
+    /// anything (`snora/src/toast.rs`'s `render_order_for`).
+    #[test]
+    fn leaving_does_not_reorder_the_queue() {
+        let base = Instant::now();
+        let mut toasts = vec![toast(1, base), toast(2, base), toast(3, base)];
+        let before: Vec<u64> = toasts.iter().map(|t| t.id).collect();
+        let mut holds = Holds::default();
+        holds.hover(2, true, &mut toasts, base);
+        holds.hover(2, false, &mut toasts, base + Duration::from_secs(1));
+        let after: Vec<u64> = toasts.iter().map(|t| t.id).collect();
+        assert_eq!(before, after, "the restart reordered the stack");
+    }
+
+    /// An unheld toast is swept exactly as `sweep_expired` swept it.
+    #[test]
+    fn sweep_without_any_hold_matches_the_old_behaviour() {
+        let base = Instant::now();
+        let mut toasts = vec![
+            toast(1, base),
+            Toast::new(2, ToastIntent::Info, "t", "m", ())
+                .persistent()
+                .with_created_at(base),
+        ];
+        Holds::default().sweep(&mut toasts, base + Duration::from_secs(11));
+        assert_eq!(toasts.len(), 1, "the persistent toast should remain");
+        assert_eq!(toasts[0].id, 2);
+    }
+}
+
+#[cfg(test)]
+mod subscription_tests {
+    use super::*;
+    use snora_core::ToastIntent;
+
+    #[derive(Clone, Debug, PartialEq)]
+    enum Msg {
+        Tick,
+    }
+
+    /// With Error persistent by default (RFC-113), an application
+    /// showing only errors no longer wakes the runtime at all.
+    #[test]
+    fn a_queue_of_default_errors_asks_for_no_ticks() {
+        let toasts = vec![
+            Toast::new(1, ToastIntent::Error, "Failed", "No.", Msg::Tick),
+            Toast::new(
+                2,
+                ToastIntent::Error,
+                "Failed again",
+                "Still no.",
+                Msg::Tick,
+            ),
+        ];
+        assert!(
+            toasts
+                .iter()
+                .all(|t| matches!(t.lifetime, ToastLifetime::Persistent)),
+            "the fixture is not what it claims",
+        );
+        // `Subscription` has no public equality, so assert the
+        // condition `subscription` branches on, and that it branches.
+        let has_transient = toasts
+            .iter()
+            .any(|t| matches!(t.lifetime, ToastLifetime::Transient(_)));
+        assert!(!has_transient);
+        let _ = subscription(&toasts, || Msg::Tick);
+    }
+
+    /// A held toast is still transient, so the ticks must keep coming:
+    /// it has to expire on time once the pointer leaves, and that
+    /// needs a sweep to run.
+    #[test]
+    fn a_held_toast_keeps_the_subscription_alive() {
+        let base = Instant::now();
+        let mut toasts =
+            vec![Toast::new(1, ToastIntent::Info, "t", "m", Msg::Tick).with_created_at(base)];
+        let mut holds = Holds::default();
+        holds.hover(1, true, &mut toasts, base);
+        let has_transient = toasts
+            .iter()
+            .any(|t| matches!(t.lifetime, ToastLifetime::Transient(_)));
+        assert!(
+            has_transient,
+            "a held toast stopped looking transient, so nothing would tick and it \
+             would never expire after the pointer left",
+        );
+        let _ = subscription(&toasts, || Msg::Tick);
+    }
+}
+
+#[cfg(test)]
+mod hover_wiring {
+    use crate::{AppLayout, render};
+    use iced::Element;
+    use iced_test::Simulator;
+    use snora_core::{Toast, ToastIntent};
+
+    #[derive(Debug, Clone, PartialEq)]
+    enum Msg {
+        Body,
+        Dismiss(u64),
+        Hover(u64, bool),
+    }
+
+    fn layout(wired: bool) -> Element<'static, Msg> {
+        let body: Element<'static, Msg> = iced::widget::button(iced::widget::text("body"))
+            .on_press(Msg::Body)
+            .into();
+        let toast = Toast::new(7, ToastIntent::Info, "Saved", "All good.", Msg::Dismiss(7));
+        let l = AppLayout::new(body).toasts(vec![toast]);
+        render(if wired {
+            l.on_toast_hover(Msg::Hover)
+        } else {
+            l
+        })
+    }
+
+    /// Wired: moving the pointer onto the toast emits `Hover(id, true)`.
+    #[test]
+    fn hovering_a_toast_reports_the_pointer_when_wired() {
+        let mut ui = Simulator::new(layout(true));
+        let bounds = ui
+            .find("Saved")
+            .expect("the toast draws its title")
+            .visible_bounds()
+            .expect("the title is visible");
+        ui.point_at(bounds.center());
+        let _ = ui.simulate([iced::Event::Mouse(iced::mouse::Event::CursorMoved {
+            position: bounds.center(),
+        })]);
+        let messages: Vec<Msg> = ui.into_messages().collect();
+        assert!(
+            messages.contains(&Msg::Hover(7, true)),
+            "no Hover(7, true) after the pointer entered the toast: {messages:?}",
+        );
+    }
+
+    /// Unwired: the same gesture emits nothing.
+    #[test]
+    fn hovering_a_toast_reports_nothing_when_unwired() {
+        let mut ui = Simulator::new(layout(false));
+        let bounds = ui
+            .find("Saved")
+            .expect("the toast draws its title")
+            .visible_bounds()
+            .expect("the title is visible");
+        ui.point_at(bounds.center());
+        let _ = ui.simulate([iced::Event::Mouse(iced::mouse::Event::CursorMoved {
+            position: bounds.center(),
+        })]);
+        let messages: Vec<Msg> = ui.into_messages().collect();
+        assert!(
+            messages.is_empty(),
+            "an unwired layout reported pointer movement: {messages:?}",
         );
     }
 }

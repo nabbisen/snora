@@ -47,6 +47,9 @@ enum Message {
 struct App {
     direction: LayoutDirection,
     toasts: Vec<Toast<Message>>,
+    /// One `Holds` per application is the sweep path (RFC-113). This
+    /// example does not wire `on_toast_hover`, so nothing is ever held.
+    holds: snora::toast::Holds,
     next_id: u64,
 }
 
@@ -55,6 +58,7 @@ impl Default for App {
         Self {
             direction: LayoutDirection::Ltr,
             toasts: Vec::new(),
+            holds: snora::toast::Holds::default(),
             next_id: 0,
         }
     }
@@ -77,7 +81,11 @@ impl App {
             }
             Message::Dismiss(id) => self.toasts.retain(|t| t.id != id),
             Message::ToastTick => {
-                snora::toast::sweep_expired(&mut self.toasts, Instant::now());
+                // `Holds::sweep` is the one sweep path (RFC-113). This
+                // example does not wire `on_toast_hover`, so nothing is
+                // ever held and this behaves exactly as the old
+                // `sweep_expired` did.
+                self.holds.sweep(&mut self.toasts, Instant::now());
             }
             Message::HeaderAction(_) => {}
         }

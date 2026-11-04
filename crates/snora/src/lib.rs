@@ -153,7 +153,7 @@ pub mod render;
 /// Width-aware rendering: [`responsive::responsive_render`] (RFC-046).
 pub mod responsive;
 /// Toast rendering and lifecycle helpers
-/// ([`subscription`](toast::subscription), [`sweep_expired`](toast::sweep_expired)).
+/// ([`subscription`](toast::subscription), [`Holds`](toast::Holds)).
 pub mod toast;
 
 pub use render::render;

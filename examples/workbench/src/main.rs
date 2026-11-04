@@ -100,6 +100,9 @@ struct Workbench {
     show_dialog: bool,
     show_sheet: bool,
     toasts: Vec<Toast<Message>>,
+    /// One `Holds` per application is the sweep path (RFC-113). This
+    /// example does not wire `on_toast_hover`, so nothing is ever held.
+    holds: snora::toast::Holds,
     next_toast_id: u64,
     toast_position: ToastPosition,
 }
@@ -115,6 +118,7 @@ impl Default for Workbench {
             show_dialog: false,
             show_sheet: false,
             toasts: Vec::new(),
+            holds: snora::toast::Holds::default(),
             next_toast_id: 1,
             toast_position: ToastPosition::TopEnd,
         }
@@ -181,7 +185,11 @@ impl Workbench {
             Message::NoOp => {}
             Message::SetToastPosition(pos) => self.toast_position = pos,
             Message::ToastTick => {
-                snora::toast::sweep_expired(&mut self.toasts, Instant::now());
+                // `Holds::sweep` is the one sweep path (RFC-113). This
+                // example does not wire `on_toast_hover`, so nothing is
+                // ever held and this behaves exactly as the old
+                // `sweep_expired` did.
+                self.holds.sweep(&mut self.toasts, Instant::now());
             }
             // Escape key: dismiss modals first, then menus — via the helper.
             Message::KeyPressed(key) => {

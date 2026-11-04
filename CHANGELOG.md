@@ -27,6 +27,54 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Changed
 
+- **A toast now stays as long as it takes to read (RFC-113).** Every toast
+  lasted four seconds, whatever it said and whichever intent it carried. A
+  reader who is slower than average, reading in a second language, or using
+  a screen magnifier could lose the message before finishing it.
+
+  The rule, in one sentence: **two seconds to notice it, plus one second for
+  every six characters of title and message, rounded up, and never less than
+  six seconds.** `ToastLifetime::reading_time` computes it, and `Toast::new`
+  applies it. Characters, not bytes, so a Japanese message gets the time its
+  length deserves rather than its encoding.
+
+  **An error is now persistent by default.** An error that vanishes unread is
+  an error the user never had. `ToastIntent::Error` no longer counts down at
+  all unless you give it a lifetime yourself. A side effect worth knowing: an
+  application whose queue holds only errors now gets no tick subscription,
+  because there is nothing left to expire.
+
+  Warning stays transient — it is a notice, not an acknowledgement.
+
+### Added
+
+- **`ToastLifetime::reading_time(title, message)`** — the rule above, as a
+  function, so an application can apply it to a toast it builds another way.
+- **`AppLayout::on_toast_hover` and `snora::toast::Holds` (RFC-113).** A toast
+  the pointer is resting on no longer expires underneath it, and **leaving
+  restarts its countdown in full** — so reaching for a toast buys the whole
+  reading time, not whatever was left.
+
+  `Holds` is one type with two methods because the restart has to be
+  automatic: an application that held a toast and forgot to restart it on
+  leave would drop that toast the instant the pointer moved away, and would
+  not find out until a user did.
+
+  Opting in is two lines — `.on_toast_hover(Message::ToastHover)` on the
+  layout, and `holds.hover(id, entered, …)` on that message. **An application
+  that does not opt in gets the tree it got before:** no pointer tracking is
+  added to a toast layer that did not ask for it.
+
+### Deprecated
+
+- **`snora::toast::sweep_expired`** — use `Holds::sweep`, which is the same
+  sweep plus the hold. An application that wants no hold keeps a `Holds` and
+  never calls `hover`; there is one sweep path either way.
+- **`ToastLifetime::DEFAULT`** — `Toast::new` no longer uses it. It still
+  means a four-second transient if you set it deliberately.
+
+### Changed
+
 - **An application can turn off iced's default features (RFC-112).** It could
   not before, and nothing failed to say so: snora's own iced line carried
   iced's defaults, and Cargo features only ever add up, so

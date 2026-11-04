@@ -40,6 +40,11 @@ enum Message {
     Dismiss(u64),
     /// Periodic tick from the framework's toast subscription.
     ToastTick,
+    /// The pointer entered (`true`) or left (`false`) a toast. Wired
+    /// through `AppLayout::on_toast_hover`, and handed to `Holds`,
+    /// which holds the countdown while a toast is being read and
+    /// restarts it in full when the pointer leaves (RFC-113).
+    ToastHover(u64, bool),
     /// User picked a different anchor corner.
     ChangePosition(ToastPosition),
 }
@@ -50,6 +55,10 @@ enum Message {
 #[derive(Default)]
 struct App {
     toasts: Vec<Toast<Message>>,
+    /// The toasts the pointer is resting on. One per application;
+    /// `sweep` goes through it so a held toast is never dropped
+    /// mid-sentence.
+    holds: snora::toast::Holds,
     next_id: u64,
     position: ToastPosition,
 }
@@ -98,7 +107,11 @@ impl App {
             }
             Message::ToastTick => {
                 // This is the entire TTL bookkeeping — framework-owned.
-                snora::toast::sweep_expired(&mut self.toasts, Instant::now());
+                self.holds.sweep(&mut self.toasts, Instant::now());
+            }
+            Message::ToastHover(id, entered) => {
+                self.holds
+                    .hover(id, entered, &mut self.toasts, Instant::now());
             }
             Message::ChangePosition(pos) => {
                 self.position = pos;
@@ -164,6 +177,9 @@ impl App {
         // `toast_position` flips the anchor without per-toast change.
         let layout = AppLayout::new(body.into())
             .toasts(self.toasts.clone())
+            // Hold a toast's countdown while the pointer is on it, and
+            // restart it in full when the pointer leaves (RFC-113).
+            .on_toast_hover(Message::ToastHover)
             .toast_position(self.position);
         render(layout)
     }

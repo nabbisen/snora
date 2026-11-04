@@ -249,6 +249,7 @@ where
         layout.toast_position,
         layout.direction,
         style.toast,
+        layout.on_toast_hover,
     ) {
         layers = layers.push(toast_layer);
     }

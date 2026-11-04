@@ -11,7 +11,7 @@
 //!
 //! * [`ToastLifetime::Transient`] — the toast auto-dismisses after the
 //!   given `Duration`. The engine provides a subscription helper that
-//!   wakes the runtime periodically and the `snora::toast::sweep_expired`
+//!   wakes the runtime periodically and the `snora::toast::Holds::sweep`
 //!   helper removes entries whose deadlines have passed.
 //! * [`ToastLifetime::Persistent`] — the toast remains until the user
 //!   clicks the close button.
@@ -42,8 +42,9 @@ pub enum ToastIntent {
     Success,
     /// Something the user should notice but is not an error.
     Warning,
-    /// A failure. Often paired with [`ToastLifetime::Persistent`] so the
-    /// user must acknowledge before the toast disappears.
+    /// A failure. [`Toast::new`] makes this [`ToastLifetime::Persistent`]
+    /// by default, so the user must acknowledge it rather than risk
+    /// missing it (RFC-113).
     Error,
 }
 
@@ -147,6 +148,14 @@ impl ToastPosition {
     }
 }
 
+/// The floor under [`ToastLifetime::reading_time`], in seconds.
+///
+/// Below this a toast is a flicker rather than a message, however
+/// little it says: the reader has to notice it, move their eyes to it
+/// and read it, and the first two of those do not get shorter when the
+/// text does (RFC-113).
+const MINIMUM_READING_SECONDS: usize = 6;
+
 /// Auto-dismiss policy for a toast.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToastLifetime {
@@ -158,10 +167,75 @@ pub enum ToastLifetime {
 }
 
 impl ToastLifetime {
-    /// The default "normal channel" duration (4 seconds). Long enough to
-    /// read a short message, short enough not to stack up if the user is
-    /// busy with something else.
+    /// The former default: a 4-second transient.
+    ///
+    /// Four seconds is how long a toast lasted for every intent until
+    /// 0.54.0, and it is not long enough. A reader who is slower than
+    /// average, reading in a second language, or using a screen
+    /// magnifier can lose the message before finishing it — and an
+    /// error could vanish unread (RFC-113).
+    #[deprecated(
+        since = "0.54.0",
+        note = "`Toast::new` no longer uses this: an Error is `Persistent`, and every \
+                other intent gets `ToastLifetime::reading_time(title, message)`, which \
+                scales with how much there is to read. This constant still means a \
+                4-second transient if you set it deliberately."
+    )]
     pub const DEFAULT: ToastLifetime = ToastLifetime::Transient(Duration::from_secs(4));
+
+    /// How long a toast of this length should stay, by RFC-113's rule:
+    ///
+    /// > Two seconds to notice it, plus one second for every six
+    /// > characters of title and message, rounded up, and never less
+    /// > than six seconds.
+    ///
+    /// `n` counts `char`s, not bytes, so the figure is about how much
+    /// there is to read rather than how it is encoded — which matters
+    /// most for the scripts that say the most per character.
+    ///
+    /// The arithmetic is integral, so the rounding is exact rather than
+    /// a float that happens to land right.
+    ///
+    /// # Examples
+    ///
+    /// RFC-113's four worked cases:
+    ///
+    /// ```
+    /// use snora_core::ToastLifetime;
+    /// use std::time::Duration;
+    ///
+    /// // 29 characters -> 2 + ceil(29 / 6) = 7s
+    /// assert_eq!(
+    ///     ToastLifetime::reading_time("Saved", "Your changes are stored."),
+    ///     ToastLifetime::Transient(Duration::from_secs(7)),
+    /// );
+    ///
+    /// // 18 characters -> 2 + ceil(18 / 6) = 5s, raised to the 6s floor
+    /// assert_eq!(
+    ///     ToastLifetime::reading_time("保存しました", "変更を保存しました。"),
+    ///     ToastLifetime::Transient(Duration::from_secs(6)),
+    /// );
+    ///
+    /// // 28 characters -> 2 + ceil(28 / 6) = 7s
+    /// assert_eq!(
+    ///     ToastLifetime::reading_time("接続できませんでした", "ネットワークを確認してください。"),
+    ///     ToastLifetime::Transient(Duration::from_secs(7)),
+    /// );
+    ///
+    /// // 120 characters -> 2 + ceil(120 / 6) = 22s
+    /// assert_eq!(
+    ///     ToastLifetime::reading_time(&"x".repeat(20), &"y".repeat(100)),
+    ///     ToastLifetime::Transient(Duration::from_secs(22)),
+    /// );
+    /// ```
+    #[must_use]
+    pub fn reading_time(title: &str, message: &str) -> Self {
+        let n = title.chars().count() + message.chars().count();
+        // `div_ceil` rather than a float: the rule says "rounded up",
+        // and this is that, not an approximation of it.
+        let seconds = (2 + n.div_ceil(6)).max(MINIMUM_READING_SECONDS);
+        ToastLifetime::Transient(Duration::from_secs(seconds as u64))
+    }
 
     /// Convenience constructor for a transient lifetime in whole seconds.
     #[must_use]
@@ -194,8 +268,12 @@ pub struct Toast<Message: Clone> {
     /// Semantic category (`Info`, `Success`, `Warning`, …). Resolved to a
     /// theme color by the engine.
     pub intent: ToastIntent,
-    /// Auto-dismiss policy. Defaults to [`ToastLifetime::DEFAULT`]
-    /// (4-second transient).
+    /// Auto-dismiss policy.
+    ///
+    /// [`Toast::new`] sets this by intent (RFC-113): an
+    /// [`ToastIntent::Error`] is [`ToastLifetime::Persistent`], and
+    /// every other intent gets
+    /// [`ToastLifetime::reading_time`] for its own title and message.
     pub lifetime: ToastLifetime,
     /// When this toast was enqueued. Used with `lifetime` to compute
     /// expiration.
@@ -207,9 +285,16 @@ pub struct Toast<Message: Clone> {
 impl<Message: Clone> Toast<Message> {
     /// Build a new toast with `created_at` set to [`Instant::now()`].
     ///
-    /// This constructor takes the mandatory fields positionally and uses
-    /// [`ToastLifetime::DEFAULT`] for the lifetime. Use builder-style
-    /// methods below to customize further.
+    /// This constructor takes the mandatory fields positionally and
+    /// chooses the lifetime by intent (RFC-113):
+    ///
+    /// - an [`ToastIntent::Error`] is [`ToastLifetime::Persistent`],
+    ///   because an error that vanishes unread is an error the user
+    ///   never had;
+    /// - every other intent gets [`ToastLifetime::reading_time`] for
+    ///   its own title and message, so a longer message stays longer.
+    ///
+    /// Use [`Self::with_lifetime`] or [`Self::persistent`] to override.
     ///
     /// # Example
     ///
@@ -237,12 +322,22 @@ impl<Message: Clone> Toast<Message> {
         message: impl Into<String>,
         on_dismiss: Message,
     ) -> Self {
+        let title = title.into();
+        let message = message.into();
+        // Computed after the conversions, so the count is of the text
+        // that will actually be shown.
+        let lifetime = match intent {
+            // An error that vanishes unread is an error the user never
+            // had (RFC-113).
+            ToastIntent::Error => ToastLifetime::Persistent,
+            _ => ToastLifetime::reading_time(&title, &message),
+        };
         Self {
             id,
-            title: title.into(),
-            message: message.into(),
+            title,
+            message,
             intent,
-            lifetime: ToastLifetime::DEFAULT,
+            lifetime,
             created_at: Instant::now(),
             on_dismiss,
         }
@@ -302,6 +397,89 @@ impl<Message: Clone> Toast<Message> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// RFC-113 R-1: an error must not vanish on its own.
+    #[test]
+    fn a_default_error_is_persistent() {
+        let t = Toast::new(1, ToastIntent::Error, "Failed", "Could not save.", ());
+        assert_eq!(t.lifetime, ToastLifetime::Persistent);
+        assert!(
+            !t.is_expired(t.created_at + Duration::from_secs(60)),
+            "a default Error toast expired within a minute: lifetime is {:?}",
+            t.lifetime,
+        );
+    }
+
+    /// RFC-113 R-1: the countdown follows how much there is to read.
+    ///
+    /// 120 characters, so the rule gives 22s and the toast is still
+    /// there at 21.
+    #[test]
+    fn a_default_toast_lasts_as_long_as_it_takes_to_read() {
+        let title = "x".repeat(20);
+        let message = "y".repeat(100);
+        let t = Toast::new(1, ToastIntent::Info, title, message, ());
+        assert!(
+            !t.is_expired(t.created_at + Duration::from_secs(21)),
+            "a 120-character toast expired within 21s: lifetime is {:?}",
+            t.lifetime,
+        );
+        assert!(t.is_expired(t.created_at + Duration::from_secs(22)));
+    }
+
+    /// Every non-Error intent takes the reading time, not a constant.
+    #[test]
+    fn every_other_intent_takes_its_reading_time() {
+        for intent in [
+            ToastIntent::Debug,
+            ToastIntent::Info,
+            ToastIntent::Success,
+            ToastIntent::Warning,
+        ] {
+            let t = Toast::new(1, intent, "Saved", "Your changes are stored.", ());
+            assert_eq!(
+                t.lifetime,
+                ToastLifetime::reading_time("Saved", "Your changes are stored."),
+                "{intent:?} did not take its reading time",
+            );
+        }
+    }
+
+    /// The floor, and that it is a floor rather than the whole rule.
+    #[test]
+    fn reading_time_has_a_floor_of_six_seconds() {
+        assert_eq!(
+            ToastLifetime::reading_time("", ""),
+            ToastLifetime::Transient(Duration::from_secs(6)),
+        );
+        // 18 characters would give 5s without the floor.
+        assert_eq!(
+            ToastLifetime::reading_time("保存しました", "変更を保存しました。"),
+            ToastLifetime::Transient(Duration::from_secs(6)),
+        );
+        // 25 characters clears it: 2 + ceil(25/6) = 7.
+        assert_eq!(
+            ToastLifetime::reading_time(&"x".repeat(25), ""),
+            ToastLifetime::Transient(Duration::from_secs(7)),
+        );
+    }
+
+    /// `n` counts characters, not bytes: the same number of characters
+    /// gets the same time whatever the script costs to encode.
+    #[test]
+    fn reading_time_counts_characters_not_bytes() {
+        let ascii = "x".repeat(30);
+        let japanese = "あ".repeat(30);
+        assert_eq!(
+            japanese.len(),
+            ascii.len() * 3,
+            "the fixture is not what it claims"
+        );
+        assert_eq!(
+            ToastLifetime::reading_time(&japanese, ""),
+            ToastLifetime::reading_time(&ascii, ""),
+        );
+    }
 
     #[test]
     fn persistent_never_expires() {

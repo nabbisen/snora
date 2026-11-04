@@ -149,7 +149,7 @@ where
     // because positions are expressed in logical (Start / End) terms.
     // -----------------------------------------------------------------
     /// The toast queue, owned by the application. snora does not mutate
-    /// this slice — see `snora::toast::sweep_expired` for in-place
+    /// this slice — see `snora::toast::Holds::sweep` for in-place
     /// expiration handling.
     pub toasts: Vec<Toast<Message>>,
 
@@ -180,6 +180,18 @@ where
     /// Dispatched when the user clicks the dim backdrop of a dialog or
     /// bottom sheet. Semantics mirror [`Self::on_close_menus`].
     pub on_close_modals: Option<Message>,
+
+    /// Emitted when the pointer enters or leaves a toast, as
+    /// `f(toast_id, entered)` (RFC-113).
+    ///
+    /// Wire it to hold a toast's countdown while it is being read:
+    /// pass the message to [`snora::toast::Holds::hover`], which also
+    /// restarts the countdown when the pointer leaves. Leave it unset
+    /// and the toast layer is built exactly as before — no pointer
+    /// tracking is added to a layout that did not ask for it.
+    ///
+    /// [`snora::toast::Holds::hover`]: https://docs.rs/snora/latest/snora/toast/struct.Holds.html#method.hover
+    pub on_toast_hover: Option<fn(u64, bool) -> Message>,
 }
 
 impl<Node, Message> AppLayout<Node, Message>
@@ -203,6 +215,7 @@ where
             direction: LayoutDirection::default(),
             on_close_menus: None,
             on_close_modals: None,
+            on_toast_hover: None,
         }
     }
 
@@ -267,7 +280,7 @@ where
 
     /// Replace the toast queue. Each frame the application typically passes
     /// `state.toasts.clone()` here; snora does not mutate the slice. See
-    /// `snora::toast::subscription` and `snora::toast::sweep_expired` for
+    /// `snora::toast::subscription` and `snora::toast::Holds::sweep` for
     /// framework-managed lifetime handling.
     #[must_use]
     pub fn toasts(mut self, toasts: Vec<Toast<Message>>) -> Self {
@@ -280,6 +293,27 @@ where
     #[must_use]
     pub fn toast_position(mut self, position: ToastPosition) -> Self {
         self.toast_position = position;
+        self
+    }
+
+    /// Hold a toast's countdown while the pointer is on it (RFC-113).
+    ///
+    /// `f(id, entered)` is emitted when the pointer enters a toast
+    /// (`true`) and when it leaves (`false`). Hand both to
+    /// `snora::toast::Holds::hover`, which holds the toast while it is
+    /// being read and restarts its countdown in full when the pointer
+    /// leaves — so a toast cannot vanish out from under someone who
+    /// reached for it.
+    ///
+    /// A function pointer rather than a closure: the message is always
+    /// of the shape `Message::ToastHover(id, entered)`, and a pointer
+    /// keeps `AppLayout` cloneable without a `Box`.
+    ///
+    /// Unset, nothing changes: the toast layer carries no pointer
+    /// tracking at all.
+    #[must_use]
+    pub fn on_toast_hover(mut self, f: fn(u64, bool) -> Message) -> Self {
+        self.on_toast_hover = Some(f);
         self
     }
 
