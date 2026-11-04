@@ -60,8 +60,11 @@ button(my_custom_content)
 
 ## Accessibility notes
 
-- All four variants use `iced::widget::button`, so they inherit iced's native
-  keyboard activation (Enter / Space).
+- All four variants use `iced::widget::button`. **In iced 0.14 that makes them
+  pointer and touch only:** iced's button is not focusable and takes no keyboard
+  input. Give any action that matters a keyboard shortcut in your application.
+  *(Corrected 2026-11-04: this said they inherit keyboard activation, Enter /
+  Space.)*
 - **Custom focus rings are not rendered in iced 0.14.** `button::Status` has
   no `Focused` variant; the style closure cannot draw a ring. This is a
   documented iced 0.14 limitation, not a regression. When iced exposes focus

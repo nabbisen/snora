@@ -155,12 +155,14 @@ Snora Design does not and cannot guarantee:
 
 ```text
 [ ] The primitive uses a native iced interactive widget (iced::widget::button,
-    etc.) that iced makes keyboard-reachable by default where possible.
+    etc.). NOTE: in iced 0.14 a button is pointer and touch only. It is not
+    focusable and takes no keyboard input. Say so in the primitive's docs.
 [ ] If the primitive is built from a non-interactive container plus a mouse
     handler, the limitation is documented and justified.
-[ ] Basic activation via Enter / Space is inherited from iced for
-    button-like primitives. No additional wiring is needed unless the
-    primitive adds custom activation behavior.
+[ ] Keyboard activation is NOT inherited from iced 0.14 (corrected
+    2026-11-04: this item said Enter / Space was). If the primitive's action
+    must be reachable from the keyboard, document the application-wired
+    route (a shortcut, dismiss_on_escape, cycle_zones).
 ```
 
 ### Semantic construction

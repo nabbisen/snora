@@ -137,8 +137,11 @@ contributor-facing documents linked below, not duplicated here.
   as its own state can style it in its own `container` closure today,
   using `FocusTokens` for the colour/width vocabulary — see
   [Semantic accessibility § Consequence for the style bridge](../contributing/semantic-accessibility.md#consequence-for-the-style-bridge).
-  Full detail on what iced *does* provide (keyboard activation still
-  works; only the visual ring on iced-owned widgets is missing) is in the
+  **Buttons take no keyboard input at all in iced 0.14**, so snora's own
+  buttons are pointer and touch only. Keyboard routes are the ones the
+  application wires (*corrected 2026-11-04*: this said "keyboard activation
+  still works; only the visual ring on iced-owned widgets is missing"). Full
+  detail is in the
   [iced 0.14 focus-state limitation](../contributing/semantic-accessibility.md#iced-014-focus-state-limitation).
 - **No semantic identifiers or roles.** `iced::widget::Id`s attached to
   snora-rendered surfaces (RFC-047, where implemented) are labels for

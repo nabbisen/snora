@@ -87,8 +87,9 @@ colour/width/offset vocabulary for it.
 What remains genuinely blocked: a focus ring on a **standard button or
 card that lets iced own focus** — snora's own prefab widgets do this, and
 that is unchanged; snora will wire the ring in when iced exposes focus
-state, rather than build an interim mechanism of its own. Native iced
-focus handling (keyboard activation) works today regardless; only the
-*visual* ring on iced-owned widgets is absent. See
+state, rather than build an interim mechanism of its own. In iced 0.14 a button
+takes no keyboard input at all, so the missing ring is not the whole gap
+(*corrected 2026-11-04*: this said keyboard activation works and only the ring
+is absent). See
 [Semantic accessibility](../contributing/semantic-accessibility.md) for the
 full statement.

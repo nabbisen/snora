@@ -101,7 +101,8 @@ fn result_card<'a, Message: Clone + 'a>(
         content = content.push(tag_row);
     }
 
-    // Wrap the entire card in a button so it is a single tab stop.
+    // Wrap the entire card in a button so it is one pointer target.
+    // (Not a tab stop: in iced 0.14 a button takes no keyboard input.)
     iced::widget::button(
         if selected {
             card::selected(t, content)
