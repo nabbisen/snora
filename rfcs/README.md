@@ -177,6 +177,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 116 | [No snora control can be reached from the keyboard](./proposed/116-no-snora-control-can-be-reached-from-the-keyboard.md) | R-1 0.55.0, R-2 a 1.0 gate — iced 0.14 buttons take no keyboard input (probe); keyboard routes via pure helpers now; real focus as a 1.0 gate checked at every iced upgrade |
 
 ## Archive
 
