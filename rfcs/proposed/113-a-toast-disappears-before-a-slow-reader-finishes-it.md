@@ -48,8 +48,8 @@ more than dismissing one. `with_lifetime` still overrides it.
 intent, `ToastLifetime::DEFAULT` is replaced by a rule computed from the title and
 message, stated in one sentence a reader can apply by hand:
 
-> *A toast stays 2 seconds, plus 1 second for every 8 characters of its title and
-> message, and never less than 6 seconds.*
+> *A toast stays 2 seconds, plus 1 second for every 6 characters of its title and
+> message, rounded up to a whole second, and never less than 6 seconds.*
 
 - **Characters, not words,** because Japanese and Chinese text has no spaces: a word
   count would give a whole Japanese sentence one "word" and the 6 s floor. `chars()`
@@ -59,9 +59,10 @@ message, stated in one sentence a reader can apply by hand:
 
   | Toast | Characters | Duration |
   |---|---|---|
-  | "Saved" / "Your changes are stored." | 29 | 6 s (the floor; 2 + 3.6 = 5.6) |
-  | 120 characters of English | 120 | 17 s |
-  | 「保存しました」/「変更内容を保存しました。」 | 18 | 6 s (the floor; 2 + 2.25 = 4.25) |
+  | "Saved" / "Your changes are stored." | 29 | 7 s (2 + 29 ÷ 6 = 6.8, rounded up) |
+  | 120 characters of English | 120 | 22 s |
+  | 「保存しました」/「変更内容を保存しました。」 | 18 | 6 s (the floor; 2 + 3 = 5) |
+  | 「保存できませんでした」/「ディスクの空き容量が不足しています。」 | 28 | 7 s (2 + 4.7, rounded up) |
 
 - **The rule gets a name:** `ToastLifetime::reading_time(title, message)`.
   `Toast::new` calls it for every intent except Error.
@@ -96,44 +97,79 @@ anything a reader must not miss. This is a stated limit, not a silent one.
 
 ## Open questions
 
-**Q-1 — the numbers.** **Suggest 2 s + 1 s per 8 characters, with a 6 s floor.**
-These are **assumptions, not measurements.** Adult silent reading of English averages
-about 238 words a minute (Brysbaert, 2019), roughly 20 characters a second at about
-5.7 characters a word, spaces included. 8 a
-second leaves room for slower readers and for scripts read more slowly per character.
-The extra 2 s covers noticing the toast and finding it. If the owner or an adopter has
-reading-speed data for their users, it beats these.
+**Q-1 — the numbers.** **Suggest 2 s + 1 s per 6 characters, rounded up, with a
+6 s floor.** These are **assumptions, not measurements.**
+- **English:** adult silent reading averages about 238 words a minute (Brysbaert,
+  2019), roughly 20 characters a second at about 5.7 characters a word. 6 a second
+  leaves a wide margin for older readers.
+- **Japanese and Chinese:** a character carries more, and is read more slowly per
+  character. I have no verified figure. *Revised in review from 8 to 6 a second*,
+  because the first rate left CJK text with little margin. The owner can judge the
+  Japanese worked cases directly, and that judgement is better evidence than mine.
+- **The extra 2 s** covers noticing the toast and finding it.
+- **Rounded up**, so a reader can do the arithmetic and get the same answer.
+- **Erring long is cheap,** because the reader can dismiss a toast. Erring short loses
+  the message.
 
-**Q-2 — hold on hover: in or out?** **Suggest in.** It is the only control the reader
-gets, and it costs applications nothing until they wire the message. Without it, R-2
-merely guesses better.
+The timing is a better guess, nothing more. What the reader can rely on is R-1 and
+R-3.
+
+**Q-2 — hold on hover: in or out?** **Suggest in, and steer every application to
+wire it** (revised in review). The hold is the only control the reader gets. But as
+first drafted it did nothing until an application chose to wire it, so readers of the
+applications that never did would get none: accessible by choice, not by default.
+So:
+- **`sweep_expired` is deprecated,** superseded by `sweep_expired_holding` (Q-3). Every
+  application that sweeps toasts then gets a compiler warning pointing it to the hold,
+  and the deprecation note shows the two lines of wiring.
+- **Deprecated is not removed.** `sweep_expired` keeps working. An application that
+  builds with `-D warnings` will stop compiling until it moves, which is the intent,
+  and the migration guide says so first.
+
+This is the rule "mark superseded things deprecated", applied so that ABDD reaches
+the default.
 
 **Q-3 — where the hold lives.** `Toast` is **not** `#[non_exhaustive]`, so a new field
 breaks every application that builds one with a struct literal.
 - **Suggest:** the application keeps the held ids in a set.
   - `snora::toast::sweep_expired_holding(&mut toasts, now, &held)` skips them.
-    `sweep_expired` itself is unchanged.
+    `sweep_expired` keeps its behaviour, deprecated (Q-2).
   - `snora::toast::restart(&mut toasts, id, now)` resets `created_at`, already
-    public, on release.
+    public, on release. **It cannot reorder the stack:** order comes from the
+    vector (`toast.rs:168`), not from `created_at`. Checked, because a stack that
+    shuffled when the pointer left would be worse than no hold.
 
   All of it is additive, with no vocabulary change to `snora-core`.
 - **The alternative:** mark `Toast` `#[non_exhaustive]` and add a field. That is a
-  breaking change to frozen core vocabulary, and costs gate 2's "two minors without
-  churn".
+  breaking change to core vocabulary, and costs gate 2's "two minors without churn".
 
 **Q-4 — Warning.** **Suggest transient, by R-2's rule.** A warning is something to
 notice, not something to acknowledge. An application that disagrees calls
 `persistent()`.
 
 **Q-5 — release.** **Suggest 0.54.0.** R-1 and R-2 change behaviour on the default
-path; no code breaks. R-3 is additive.
+path. R-3 is additive. Two deprecations, `ToastLifetime::DEFAULT` and `sweep_expired`,
+warn but break nothing, except builds that deny warnings.
+
+## Alternatives considered
+
+- **A key that holds every toast,** bound by the application through a
+  `snora::keyboard` helper, like F6 (RFC-060). It would give keyboard users a hold
+  without iced's `advanced`. **Not suggested:** no platform convention exists for
+  such a key, so readers would not know to press it, and a control nobody discovers
+  helps nobody. Revisit if an adopter asks.
+- **A fixed, longer default,** such as 8 s for every toast. It is simpler, but too
+  long for "Saved" and too short for a paragraph.
 
 ## Review against snora's principles
 
 - **ABDD:** the default moves in the reader's favour (R-1, R-2), and the one thing
   that cannot be done (a keyboard hold) is stated, with a route around it (R-4).
-- **Rules a reader can predict:** one sentence for duration, and "starts again in
-  full" for release.
+- **Rules a reader can predict:** one sentence for duration, rounded up so the
+  arithmetic is exact, and "starts again in full" for release.
+- **ABDD, second pass:** the hold was opt-in. Deprecating `sweep_expired` makes every
+  application meet it (Q-2). The character rate was lowered so CJK readers get a
+  margin (Q-1).
 - **Mark deprecated when superseded:** `DEFAULT` is deprecated rather than silently
   redefined. This was changed in review.
 - **Verify claims:** the reading-speed figure is cited and labelled as an assumption
@@ -148,7 +184,8 @@ path; no code breaks. R-3 is additive.
 ## Acceptance criteria
 
 1. **Failing first:** a test that a default Error toast is still present after 60 s,
-   and that a 120-character Info toast is present at 16 s. Both fail on today's code.
+   and that a 120-character Info toast is present at 21 s (it is due to
+   expire at 22 s). Both fail on today's code.
 2. The R-2 rule, tested at the floor, just above it and on a CJK string, with the
    numbers matching the worked cases.
 3. Hold: a held toast survives a sweep long past its deadline, and a released toast

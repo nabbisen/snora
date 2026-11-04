@@ -20,7 +20,7 @@ The item's name, `SideBarItem::tooltip`, appears only in a tooltip.
 So:
 - **a keyboard user** who tabs along the rail sees a focus ring around an icon, and
   never its name;
-- **a touch user** has no hover at all;
+- **a touch user** has no resting pointer to hover with;
 - **an older user** must either remember what each icon means or hold the pointer
   still long enough for the tooltip's delay, which a tremor makes hard.
 
@@ -50,8 +50,8 @@ under RTL.
 - **No tooltip** in the labelled form. It would only repeat what is already visible.
 
 **R-2 — choosing the form is vocabulary, not a flag.**
-`snora_widgets::SideBarLabels::{Visible, Tooltip}` is passed to `app_side_bar` and
-to `design::app_side_bar`. **Which one is the default is Q-1.**
+`snora_widgets::SideBarLabels::{Visible, Tooltip}` chooses the form, on both
+paths. **Which one is the default is Q-1**, and how a caller passes it is Q-3.
 
 **R-3 — withdraw the false claim.** `SideBarItem::tooltip`'s doc says what is true:
 the item's name, shown beside the icon in the labelled form, and on pointer hover
@@ -69,6 +69,10 @@ iced's `advanced` feature, which the owner has ruled must never be a default
 
 **Q-1 — the default.** **Suggest `Visible`.** ABDD puts the accessible form first, and
 the icon form cannot name its items to a keyboard user at all.
+- **Who pays:** only applications that draw snora's prefab rail. arama composes its
+  own (it has no `snora-widgets` at all). From what the teams have told us, orbok and
+  knotra use prefab widgets; whether either uses `app_side_bar` is **not known**.
+  The migration guide names the change; we do not guess at who it reaches.
 - **The cost:** every application that shows `app_side_bar` gets a wider rail. Its
   body loses that width, and screenshot baselines change.
 - An application that wants the compact rail passes `SideBarLabels::Tooltip`, one
@@ -85,7 +89,10 @@ fixed.
 **Q-3 — the signature.** `app_side_bar` gains a parameter, which is a breaking change
 for every caller. **Suggest:** keep `app_side_bar(side_bar, direction)`, and give it
 the Q-1 default. Add `app_side_bar_with(side_bar, direction, labels)` for the other
-form. Callers compile unchanged, and only what they see changes.
+form. Callers compile unchanged, and only what they see changes. The design path follows
+the same pattern: `design::app_side_bar(tokens, side_bar, direction)` keeps its
+signature, and gains `design::app_side_bar_with`. Nothing is superseded, so nothing is
+deprecated.
 
 **Q-4 — release.** **Suggest 0.54.0, with Theme E's other two RFCs.** It changes
 default appearance if Q-1 is ruled `Visible`, so the migration guide leads with it.
@@ -97,6 +104,8 @@ default appearance if Q-1 is ruled `Visible`, so the migration guide leads with 
 - **Rules a reader can predict:** the rail fits its longest name, up to 240 px.
 - **Verify claims:** the tooltip behaviour was read in iced's source, and the false
   doc claim is withdrawn (R-3).
+- **Priced against real adopters:** the cost names who draws the prefab rail, and
+  says what is not known (Q-1).
 - **Correspondence cost:** no letter. The default-appearance change goes in the
   migration guide, where adopters look when they bump.
 

@@ -74,6 +74,10 @@ Each item names what snora then guarantees, from Unit 0's figures.
 ## Open questions
 
 **Q-1 — the multiplier, and whether the default moves.**
+**The rule always keeps the AA floor:** target ≥ max(24 px, k × text). Without
+the `max`, a host text size under 16 px would shrink targets below 24 px, under WCAG
+2.5.8. *Added in review.*
+
 - At today's default text of 16 px, a rule of "target ≥ 1.5 × text" keeps every
   default exactly as it is (24 px), and gives 36 px at 24 px text.
 - "Target ≥ 2.75 × text" gives 44 px at the default and 66 px at 24 px. That makes
@@ -90,15 +94,19 @@ preset would mix two independent needs, size and contrast, in one switch.
 
 **Q-3 — `Density`.** `Density::{Comfortable, Compact}` is a `Tokens` field that
 nothing reads. **Suggest leaving it alone.** R-2 needs no token, and it works on the
-unstyled path, which has no tokens. Adding a variant would also be a forbidden change
-under the covenant: `Density` is not `#[non_exhaustive]`.
+unstyled path, which has no tokens. Adding a variant would also break any exhaustive
+`match` on `Density`, because it is not `#[non_exhaustive]`. Whether the covenant
+counts that as forbidden is not settled, and this RFC does not need to settle it.
+*Corrected in review: the first draft called it forbidden outright.*
 
 **Q-4 — release.** **Suggest:** Unit 0 lands as its own review, and R-2's target
 release is set then. RFC-113 and RFC-114 do not wait for it.
 
 **Q-5 — ask the adopters?** Whether any of the six teams serves mainly older users
 would turn Q-1 from guidelines into evidence. **Suggest: put the question in the
-0.54.0 release note** (the book, at no relay cost), not a letter. It is not broken
+0.53 → 0.54 migration guide** (the book, at no relay cost), not a letter. The
+guide is where adopters look when they upgrade. A changelog entry records changes,
+and is the wrong place for a question. It is not broken
 now, and they did not ask.
 
 ## Review against snora's principles
@@ -110,7 +118,12 @@ now, and they did not ask.
   setting.
 - **Verify claims:** the size table is labelled as a grep, and Unit 0 replaces it with
   measurements.
-- **Correspondence cost:** the question to adopters goes in the book (Q-5).
+- **Correspondence cost:** the question to adopters goes in the migration guide
+  (Q-5).
+- **Second pass:**
+  - the rule now keeps the 24 px AA floor below 16 px text;
+  - the `Density` covenant claim is no longer overstated;
+  - the adopters' question moved from the changelog to the guide.
 
 ## What this is not
 
