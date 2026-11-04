@@ -117,7 +117,7 @@
 pub use snora_core::{
     AppLayout, BreadcrumbAction, Crumb, Dialog, Edge, Icon, LayoutDirection, Menu, MenuAction,
     MenuItem, Sheet, SheetEdge, SheetSize, SideBar, SideBarItem, Tab, TabAction, TabBar, Toast,
-    ToastIntent, ToastLifetime, ToastPosition,
+    ToastHover, ToastIntent, ToastLifetime, ToastPosition,
 };
 
 /// Zone-navigation vocabulary (RFC-060): [`focus::Cycle`], [`focus::FocusZone`],

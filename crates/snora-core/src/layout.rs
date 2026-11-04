@@ -54,7 +54,7 @@
 use crate::{
     direction::LayoutDirection,
     overlay::{Dialog, Sheet},
-    toast::{Toast, ToastPosition},
+    toast::{Toast, ToastHover, ToastPosition},
 };
 
 /// The complete declarative description of what should be on screen.
@@ -182,7 +182,7 @@ where
     pub on_close_modals: Option<Message>,
 
     /// Emitted when the pointer enters or leaves a toast, as
-    /// `f(toast_id, entered)` (RFC-113).
+    /// `f(toast_id, crossing)` (RFC-113).
     ///
     /// Wire it to hold a toast's countdown while it is being read:
     /// pass the message to [`snora::toast::Holds::hover`], which also
@@ -191,7 +191,7 @@ where
     /// tracking is added to a layout that did not ask for it.
     ///
     /// [`snora::toast::Holds::hover`]: https://docs.rs/snora/latest/snora/toast/struct.Holds.html#method.hover
-    pub on_toast_hover: Option<fn(u64, bool) -> Message>,
+    pub on_toast_hover: Option<fn(u64, ToastHover) -> Message>,
 }
 
 impl<Node, Message> AppLayout<Node, Message>
@@ -298,21 +298,34 @@ where
 
     /// Hold a toast's countdown while the pointer is on it (RFC-113).
     ///
-    /// `f(id, entered)` is emitted when the pointer enters a toast
-    /// (`true`) and when it leaves (`false`). Hand both to
-    /// `snora::toast::Holds::hover`, which holds the toast while it is
-    /// being read and restarts its countdown in full when the pointer
-    /// leaves — so a toast cannot vanish out from under someone who
-    /// reached for it.
+    /// `f(id, crossing)` is emitted with [`ToastHover::Entered`] when
+    /// the pointer comes onto a toast and [`ToastHover::Left`] when it
+    /// goes. Hand both to `snora::toast::Holds::hover`, which holds the
+    /// toast while it is being read and restarts its countdown in full
+    /// when the pointer leaves — so a toast cannot vanish out from
+    /// under someone who reached for it.
+    ///
+    /// ```
+    /// use snora_core::{AppLayout, ToastHover};
+    ///
+    /// #[derive(Clone, Debug)]
+    /// enum Message {
+    ///     ToastHover(u64, ToastHover),
+    /// }
+    ///
+    /// let layout: AppLayout<(), Message> = AppLayout::new(());
+    /// let layout = layout.on_toast_hover(Message::ToastHover);
+    /// assert!(layout.on_toast_hover.is_some());
+    /// ```
     ///
     /// A function pointer rather than a closure: the message is always
-    /// of the shape `Message::ToastHover(id, entered)`, and a pointer
+    /// of the shape `Message::ToastHover(id, crossing)`, and a pointer
     /// keeps `AppLayout` cloneable without a `Box`.
     ///
     /// Unset, nothing changes: the toast layer carries no pointer
     /// tracking at all.
     #[must_use]
-    pub fn on_toast_hover(mut self, f: fn(u64, bool) -> Message) -> Self {
+    pub fn on_toast_hover(mut self, f: fn(u64, ToastHover) -> Message) -> Self {
         self.on_toast_hover = Some(f);
         self
     }

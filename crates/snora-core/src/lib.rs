@@ -65,4 +65,4 @@ pub use menu::{Menu, MenuAction, MenuItem};
 pub use overlay::{Dialog, Sheet, SheetEdge, SheetSize};
 pub use sidebar::{SideBar, SideBarItem};
 pub use tab::{Tab, TabAction, TabBar};
-pub use toast::{Toast, ToastIntent, ToastLifetime, ToastPosition};
+pub use toast::{Toast, ToastHover, ToastIntent, ToastLifetime, ToastPosition};

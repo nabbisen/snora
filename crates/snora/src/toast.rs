@@ -34,7 +34,7 @@ use iced::{
     widget::{button, column, container, mouse_area, opaque, row, text},
 };
 
-use snora_core::{LayoutDirection, Toast, ToastIntent, ToastLifetime, ToastPosition};
+use snora_core::{LayoutDirection, Toast, ToastHover, ToastIntent, ToastLifetime, ToastPosition};
 
 /// How a toast is sized and coloured (RFC-104).
 ///
@@ -161,7 +161,7 @@ pub(crate) fn render_toasts<'a, Message>(
     position: ToastPosition,
     direction: LayoutDirection,
     style: ToastStyle,
-    on_hover: Option<fn(u64, bool) -> Message>,
+    on_hover: Option<fn(u64, ToastHover) -> Message>,
 ) -> Option<Element<'a, Message>>
 where
     Message: Clone + 'a,
@@ -178,8 +178,8 @@ where
             Some(f) => {
                 let id = toast.id;
                 mouse_area(render_single_toast(toast, style))
-                    .on_enter(f(id, true))
-                    .on_exit(f(id, false))
+                    .on_enter(f(id, ToastHover::Entered))
+                    .on_exit(f(id, ToastHover::Left))
                     .into()
             }
             None => render_single_toast(toast, style),
@@ -657,7 +657,7 @@ where
             `self.holds.sweep(&mut self.toasts, Instant::now())` on the tick. To \
             hold a toast while it is read, add \
             `.on_toast_hover(Message::ToastHover)` to the layout and \
-            `self.holds.hover(id, entered, &mut self.toasts, Instant::now())` when \
+            `self.holds.hover(id, crossing, &mut self.toasts, Instant::now())` when \
             that message arrives. An application that does not want the hold still \
             calls `Holds::sweep`, and simply never calls `hover`."
 )]
@@ -679,13 +679,13 @@ pub fn sweep_expired<Message: Clone>(toasts: &mut Vec<Toast<Message>>, now: Inst
 /// # use snora_core::{AppLayout, Toast, ToastIntent};
 /// # use snora::toast::Holds;
 /// # use std::time::Instant;
-/// # #[derive(Clone, Debug)] enum Message { ToastHover(u64, bool), Tick, Dismiss(u64) }
+/// # #[derive(Clone, Debug)] enum Message { ToastHover(u64, snora_core::ToastHover), Tick, Dismiss(u64) }
 /// # struct App { toasts: Vec<Toast<Message>>, holds: Holds }
 /// # impl App {
 /// fn update(&mut self, message: Message) {
 ///     match message {
-///         Message::ToastHover(id, entered) => {
-///             self.holds.hover(id, entered, &mut self.toasts, Instant::now());
+///         Message::ToastHover(id, crossing) => {
+///             self.holds.hover(id, crossing, &mut self.toasts, Instant::now());
 ///         }
 ///         Message::Tick => self.holds.sweep(&mut self.toasts, Instant::now()),
 ///         # Message::Dismiss(_) => {}
@@ -699,7 +699,7 @@ pub fn sweep_expired<Message: Clone>(toasts: &mut Vec<Toast<Message>>, now: Inst
 ///
 /// ```no_run
 /// # use snora_core::{AppLayout, Toast};
-/// # #[derive(Clone, Debug)] enum Message { ToastHover(u64, bool) }
+/// # #[derive(Clone, Debug)] enum Message { ToastHover(u64, snora_core::ToastHover) }
 /// # let body: () = ();
 /// # let layout: AppLayout<(), Message> = AppLayout::new(body);
 /// let layout = layout.on_toast_hover(Message::ToastHover);
@@ -718,21 +718,24 @@ pub struct Holds {
 }
 
 impl Holds {
-    /// The pointer entered (`entered = true`) or left (`false`) the
-    /// toast with this id.
+    /// The pointer crossed onto or off the toast with this id.
     ///
-    /// On leaving, that toast's countdown **restarts in full** from
-    /// `now`, so the reader gets the whole reading time back rather
-    /// than whatever was left when they arrived. Does nothing if `id`
-    /// is not in `toasts`.
+    /// On [`ToastHover::Left`], that toast's countdown **restarts in
+    /// full** from `now`, so the reader gets the whole reading time
+    /// back rather than whatever was left when they arrived. Does
+    /// nothing if `id` is not in `toasts`.
+    ///
+    /// The second argument is an enum rather than a `bool` so that a
+    /// caller cannot get the two the wrong way round without it being
+    /// visible on the line (RFC-113 round 2).
     pub fn hover<M: Clone>(
         &mut self,
         id: u64,
-        entered: bool,
+        crossing: ToastHover,
         toasts: &mut [Toast<M>],
         now: Instant,
     ) {
-        if entered {
+        if crossing == ToastHover::Entered {
             if !self.held.contains(&id) {
                 self.held.push(id);
             }
@@ -947,7 +950,7 @@ mod holds_tests {
         let base = Instant::now();
         let mut toasts = vec![toast(1, base)];
         let mut holds = Holds::default();
-        holds.hover(1, true, &mut toasts, base);
+        holds.hover(1, ToastHover::Entered, &mut toasts, base);
         holds.sweep(&mut toasts, base + Duration::from_secs(3600));
         assert_eq!(toasts.len(), 1, "a held toast was swept");
     }
@@ -959,8 +962,8 @@ mod holds_tests {
         let left_at = base + Duration::from_secs(3);
         let mut toasts = vec![toast(1, base)];
         let mut holds = Holds::default();
-        holds.hover(1, true, &mut toasts, base);
-        holds.hover(1, false, &mut toasts, left_at);
+        holds.hover(1, ToastHover::Entered, &mut toasts, base);
+        holds.hover(1, ToastHover::Left, &mut toasts, left_at);
 
         let mut nearly = toasts.clone();
         Holds::default().sweep(&mut nearly, left_at + Duration::from_millis(9_999));
@@ -972,21 +975,39 @@ mod holds_tests {
     }
 
     /// **The case `Holds` exists for.** Held past its deadline, then
-    /// left: an immediate sweep must not take it. Without the restart
-    /// inside `hover`, it would go the instant the pointer moved away.
+    /// left: an immediate sweep must not take it, and a sweep after
+    /// its restarted lifetime must. Without the restart inside
+    /// `hover`, it would go the instant the pointer moved away.
+    ///
+    /// **Both halves are asserted, because one of them alone cannot
+    /// fail for the obvious breakage.** Mapping `Left` to the entered
+    /// branch — the mistake the `bool` invited and the enum is meant to
+    /// prevent — leaves the toast *held for ever*: the first assertion
+    /// passes, since a held toast is never swept. Only the release
+    /// catches it. Measured: with the two arms swapped, the first
+    /// assertion alone passes and the second fails.
     #[test]
     fn a_toast_left_after_its_deadline_is_not_swept_immediately() {
         let base = Instant::now();
         let long_past = base + Duration::from_secs(600);
         let mut toasts = vec![toast(1, base)];
         let mut holds = Holds::default();
-        holds.hover(1, true, &mut toasts, base);
-        holds.hover(1, false, &mut toasts, long_past);
+        holds.hover(1, ToastHover::Entered, &mut toasts, base);
+        holds.hover(1, ToastHover::Left, &mut toasts, long_past);
         holds.sweep(&mut toasts, long_past);
         assert_eq!(
             toasts.len(),
             1,
             "the toast vanished the moment the pointer left it",
+        );
+
+        // Released, and counting again from when the pointer left: its
+        // fresh 10 seconds are up, so this sweep takes it.
+        holds.sweep(&mut toasts, long_past + Duration::from_secs(10));
+        assert!(
+            toasts.is_empty(),
+            "the toast outlived its restarted deadline — leaving did not release the hold, so \
+             this toast would sit on screen until the application was closed",
         );
     }
 
@@ -996,7 +1017,7 @@ mod holds_tests {
         let base = Instant::now();
         let mut toasts = vec![toast(1, base), toast(2, base)];
         let mut holds = Holds::default();
-        holds.hover(1, true, &mut toasts, base);
+        holds.hover(1, ToastHover::Entered, &mut toasts, base);
         toasts.retain(|t| t.id != 1); // the user clicked its close button
         holds.sweep(&mut toasts, base + Duration::from_secs(1));
         assert!(!holds.held.contains(&1), "a dismissed id stayed held");
@@ -1010,8 +1031,13 @@ mod holds_tests {
         let mut toasts = vec![toast(1, base), toast(2, base), toast(3, base)];
         let before: Vec<u64> = toasts.iter().map(|t| t.id).collect();
         let mut holds = Holds::default();
-        holds.hover(2, true, &mut toasts, base);
-        holds.hover(2, false, &mut toasts, base + Duration::from_secs(1));
+        holds.hover(2, ToastHover::Entered, &mut toasts, base);
+        holds.hover(
+            2,
+            ToastHover::Left,
+            &mut toasts,
+            base + Duration::from_secs(1),
+        );
         let after: Vec<u64> = toasts.iter().map(|t| t.id).collect();
         assert_eq!(before, after, "the restart reordered the stack");
     }
@@ -1080,7 +1106,7 @@ mod subscription_tests {
         let mut toasts =
             vec![Toast::new(1, ToastIntent::Info, "t", "m", Msg::Tick).with_created_at(base)];
         let mut holds = Holds::default();
-        holds.hover(1, true, &mut toasts, base);
+        holds.hover(1, ToastHover::Entered, &mut toasts, base);
         let has_transient = toasts
             .iter()
             .any(|t| matches!(t.lifetime, ToastLifetime::Transient(_)));
@@ -1098,13 +1124,13 @@ mod hover_wiring {
     use crate::{AppLayout, render};
     use iced::Element;
     use iced_test::Simulator;
-    use snora_core::{Toast, ToastIntent};
+    use snora_core::{Toast, ToastHover, ToastIntent};
 
     #[derive(Debug, Clone, PartialEq)]
     enum Msg {
         Body,
         Dismiss(u64),
-        Hover(u64, bool),
+        Hover(u64, ToastHover),
     }
 
     fn layout(wired: bool) -> Element<'static, Msg> {
@@ -1120,7 +1146,8 @@ mod hover_wiring {
         })
     }
 
-    /// Wired: moving the pointer onto the toast emits `Hover(id, true)`.
+    /// Wired: moving the pointer onto the toast emits
+    /// `Hover(id, ToastHover::Entered)`.
     #[test]
     fn hovering_a_toast_reports_the_pointer_when_wired() {
         let mut ui = Simulator::new(layout(true));
@@ -1135,8 +1162,8 @@ mod hover_wiring {
         })]);
         let messages: Vec<Msg> = ui.into_messages().collect();
         assert!(
-            messages.contains(&Msg::Hover(7, true)),
-            "no Hover(7, true) after the pointer entered the toast: {messages:?}",
+            messages.contains(&Msg::Hover(7, ToastHover::Entered)),
+            "no Hover(7, ToastHover::Entered) after the pointer entered the toast: {messages:?}",
         );
     }
 

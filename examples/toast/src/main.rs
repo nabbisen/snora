@@ -26,7 +26,7 @@ use iced::{
     Element, Length, Subscription, Task,
     widget::{button, column, container, row, space, text},
 };
-use snora::{AppLayout, Toast, ToastIntent, ToastLifetime, ToastPosition, render};
+use snora::{AppLayout, Toast, ToastHover, ToastIntent, ToastLifetime, ToastPosition, render};
 
 #[derive(Debug, Clone)]
 enum Message {
@@ -40,11 +40,11 @@ enum Message {
     Dismiss(u64),
     /// Periodic tick from the framework's toast subscription.
     ToastTick,
-    /// The pointer entered (`true`) or left (`false`) a toast. Wired
-    /// through `AppLayout::on_toast_hover`, and handed to `Holds`,
-    /// which holds the countdown while a toast is being read and
-    /// restarts it in full when the pointer leaves (RFC-113).
-    ToastHover(u64, bool),
+    /// The pointer came onto a toast or left it. Wired through
+    /// `AppLayout::on_toast_hover`, and handed to `Holds`, which holds
+    /// the countdown while a toast is being read and restarts it in
+    /// full when the pointer leaves (RFC-113).
+    ToastHover(u64, ToastHover),
     /// User picked a different anchor corner.
     ChangePosition(ToastPosition),
 }
@@ -109,9 +109,9 @@ impl App {
                 // This is the entire TTL bookkeeping — framework-owned.
                 self.holds.sweep(&mut self.toasts, Instant::now());
             }
-            Message::ToastHover(id, entered) => {
+            Message::ToastHover(id, crossing) => {
                 self.holds
-                    .hover(id, entered, &mut self.toasts, Instant::now());
+                    .hover(id, crossing, &mut self.toasts, Instant::now());
             }
             Message::ChangePosition(pos) => {
                 self.position = pos;

@@ -61,9 +61,19 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   not find out until a user did.
 
   Opting in is two lines — `.on_toast_hover(Message::ToastHover)` on the
-  layout, and `holds.hover(id, entered, …)` on that message. **An application
-  that does not opt in gets the tree it got before:** no pointer tracking is
-  added to a toast layer that did not ask for it.
+  layout, and `holds.hover(id, crossing, …)` on that message. **An
+  application that does not opt in gets the tree it got before:** no pointer
+  tracking is added to a toast layer that did not ask for it.
+- **`ToastHover::{Entered, Left}`** — which way the pointer crossed a toast's
+  edge, as core vocabulary beside `ToastIntent` and `ToastPosition`. It is
+  what `on_toast_hover` reports and what `Holds::hover` takes.
+
+  **Not a `bool`**, because nothing in `Message::ToastHover(7, true)` says
+  what `true` meant, and an application that passed the two the wrong way
+  round would hold the toast it meant to release with no type to catch it.
+  Both halves of that mistake are now asserted: a toast left past its
+  deadline must survive the immediate sweep **and** be released by the next
+  one.
 
 ### Deprecated
 

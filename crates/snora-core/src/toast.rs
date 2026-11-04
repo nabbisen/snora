@@ -156,6 +156,43 @@ impl ToastPosition {
 /// text does (RFC-113).
 const MINIMUM_READING_SECONDS: usize = 6;
 
+/// Which way the pointer crossed a toast's edge (RFC-113).
+///
+/// What [`AppLayout::on_toast_hover`] hands an application, and what
+/// `snora::toast::Holds::hover` takes back.
+///
+/// # Why this is not a `bool`
+///
+/// It was one, for one review round. Nothing in
+/// `Message::ToastHover(7, true)` says what `true` meant, so a reader
+/// had to leave the line and go and look — and an application that
+/// passed the two the wrong way round would hold the toast it meant to
+/// release and release the one it meant to hold, which no type would
+/// have caught. `ToastHover::Left` says it where it is written.
+///
+/// There is deliberately no `Default`: a pointer either arrived or
+/// left, and neither is the resting state of anything.
+///
+/// ```
+/// use snora_core::ToastHover;
+///
+/// // The whole point: this reads without a lookup.
+/// let crossing = ToastHover::Left;
+/// assert_ne!(crossing, ToastHover::Entered);
+/// ```
+///
+/// [`AppLayout::on_toast_hover`]: crate::AppLayout::on_toast_hover
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ToastHover {
+    /// The pointer came onto the toast. Its countdown is **held**: the
+    /// toast will not expire while the pointer is on it.
+    Entered,
+    /// The pointer left the toast. Its countdown **restarts in full**,
+    /// so the reader gets the whole reading time rather than whatever
+    /// was left when they arrived.
+    Left,
+}
+
 /// Auto-dismiss policy for a toast.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToastLifetime {
