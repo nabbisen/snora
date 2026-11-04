@@ -1,6 +1,8 @@
 # RFC-117 — A link does not look like a link
 
-**Status.** Proposed. **Revised 2026-11-04** after the architect reviewed it against
+**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/117-…`](../handoffs/117-a-link-does-not-look-like-a-link/implementation-handoff.md).
+**Revised** 2026-11-04, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy (see "Review against snora's principles").
 **Raised.** 2026-11-04, architect, from orbok's request 3
 (`.git-exclude/upstream/receive/0.54.0/orbok-snora-request-0.54.0-easy-to-read-2026-11-04.md`).
@@ -140,3 +142,17 @@ release after. orbok adopts it on release, and said there was no hurry.
    fails on the new text entry.
 5. `ghost`'s tests unchanged. CHANGELOG under Added (`link`) and Fixed (the accent's
    declaration).
+
+---
+
+## Rulings, 2026-11-04
+
+All suggestions accepted, as revised in `387d29f`.
+
+- **Q-1:** a new `link` variant; `ghost` is unchanged.
+- **Q-2:** design path only.
+- **Q-3:** inline links stay out of scope; guidance follows Unit 0's figures.
+- **Q-4:** 0.54.0 if Unit 0 settles Q-5 quickly, otherwise the release after.
+- **Q-5:** Unit 0 measures `rich_text`'s underline on both renderers, and the owner
+  rules on it. There is no disabled link, and the link-or-action rule is written into
+  the rustdoc and the book.

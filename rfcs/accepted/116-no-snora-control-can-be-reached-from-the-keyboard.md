@@ -1,6 +1,8 @@
 # RFC-116 — No snora control can be reached from the keyboard
 
-**Status.** Proposed. **Revised 2026-11-04** after the architect reviewed it against
+**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/116-…`](../handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md).
+**Revised** 2026-11-04, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy (see "Review against snora's principles"). The
 first draft (`b24a8f5`) treated real focus as a distant hope and gave keyboard users
 four ad-hoc helpers. Two facts checked in review made the final design reachable
@@ -197,3 +199,18 @@ getting-started does. So ABDD's "by default" now holds for the part WCAG require
    tested. `dismiss_on_escape` is deprecated, and its callers have moved.
 3. **R-3 and R-4:** the gate row, the gate-1 instructions and the keyboard map,
    traced to the probe.
+
+---
+
+## Rulings, 2026-11-04
+
+All suggestions accepted, as revised in `387d29f`.
+
+- **Q-1:** snora introduces no iced feature. `control` is built on `iced_core`, and
+  Unit 0 measures the porting cost before the rest proceeds.
+- **Q-2:** `control` stays private. The public API is `traverse`, `Shortcuts` and
+  `Escape`.
+- **Q-3:** platform-conventional bindings, as tabled.
+- **Q-4:** the router is opt-in per route. Reach and operate need only `traverse`.
+- **Q-5:** Unit 0 first, as its own review. R-3's gate row and R-4's status statement
+  go in now, written by the architect.

@@ -209,3 +209,21 @@ All suggestions accepted, as revised in `393c753`.
   `snora-core` vocabulary change.
 - **Q-4:** Warning stays transient.
 - **Q-5:** 0.54.0.
+
+## Amendment, 2026-11-04 (owner-approved): the hold is one type
+
+Q-3's ruling ("the application keeps the held ids; `restart` resets `created_at`")
+asked every application to do two things in step: insert and remove ids, and call
+`restart` on pointer exit. **Forgetting the second loses the toast.** Its deadline
+passed while it was held, so the next sweep removes it the moment the pointer leaves,
+which is the failure the hold exists to prevent.
+
+**Amended:** `snora::toast::Holds` owns the held ids.
+- `hover(id, entered, &mut toasts, now)` restarts the countdown itself on leave.
+- `sweep(&mut toasts, now)` skips held toasts, and forgets ids whose toast is gone.
+- `sweep_expired_holding` and `restart` are not public, so there is one way to do it.
+- `sweep_expired`'s deprecation points to `Holds`.
+
+Still no `snora-core` vocabulary change: `Holds` lives in the `snora` engine crate.
+Reviewed against the owner's fundamental philosophy: the misuse can no longer be
+written, and one type replaces two functions plus a convention.

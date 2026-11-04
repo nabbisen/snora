@@ -1,6 +1,8 @@
 # RFC-118 — No preset holds every text pair to AAA, short of high contrast
 
-**Status.** Proposed. **Revised 2026-11-04** after the architect reviewed it against
+**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/118-…`](../handoffs/118-no-preset-holds-every-text-pair-to-aaa-short-of-high-contrast/implementation-handoff.md).
+**Revised** 2026-11-04, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy (see "Review against snora's principles").
 **Raised.** 2026-11-04, architect, from orbok's request 4
 (`.git-exclude/upstream/receive/0.54.0/orbok-snora-request-0.54.0-easy-to-read-2026-11-04.md`).
@@ -163,3 +165,20 @@ older readers anyway.
 2. Every existing preset test passing for the new presets: surfaces, focus, targets.
 3. A side-by-side table, in the design docs, of each AAA role against its parent.
 4. CHANGELOG under Added.
+
+---
+
+## Rulings, 2026-11-04
+
+All suggestions accepted, as revised in `387d29f`.
+
+- **Q-1, Q-2:** new presets, `light_aaa` and `dark_aaa`, with every declared text pair
+  at ≥ 7:1. Light and Dark are unchanged.
+- **Q-3:** both families, AAA and high contrast, explained in one table.
+- **Q-4:** 0.55.0.
+- **Q-5, Q-6:** these names. The two-axis constructor and the transform are both
+  rejected.
+- **Q-7:** the docs say that AAA applications carry hierarchy by size and weight.
+- **R-2's postconditions:** the hierarchy's order is kept, and each role's hue stays
+  within a stated bound of its parent.
+- **Depends on** RFC-117's R-5, the accent's text declaration.

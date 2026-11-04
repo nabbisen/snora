@@ -2,6 +2,12 @@
 
 **RFC.** `rfcs/accepted/113-a-toast-disappears-before-a-slow-reader-finishes-it.md`
 **Release target.** 0.54.0.
+**Amended 2026-11-04 (owner-approved): the hold is one type, `Holds`.** See Unit 3.
+The first version left the application to call `restart` on pointer exit. An
+application that forgot would lose a held toast the instant the pointer left, because
+its deadline had already passed. `Holds` does the restart itself, so that mistake
+cannot be written.
+
 **Rulings (2026-11-04), all as suggested:** errors persistent; `reading_time` = 2 s +
 1 s per 6 characters, rounded up, at least 6 s; hold on hover; `DEFAULT` and
 `sweep_expired` deprecated; Warning transient.
@@ -29,7 +35,7 @@ the migration guide.
 - **Today:** `Toast::new` sets `ToastLifetime::DEFAULT` = `Transient(4 s)` for every
   intent (`snora-core/src/toast.rs:164`, `:233`).
 - **Stack order comes from the vector, not from `created_at`** (`snora/src/toast.rs:168`,
-  where `into_iter().rev()` is chosen by position). So `restart` resetting
+  where `into_iter().rev()` is chosen by position). So the restart, resetting
   `created_at` cannot reorder the stack. **Keep it that way**, and assert it (Unit 3).
 - **`Toast` is not `#[non_exhaustive]`.** Add no field. `AppLayout` is, and it derives
   nothing, so a new field there is additive.
@@ -42,8 +48,8 @@ Write these against today's code and record that they fail:
 1. a default **Error** toast built by `Toast::new` is not expired at `created_at + 60 s`;
 2. a default **Info** toast with a 120-character title and message is not expired at
    `+ 21 s`;
-3. a toast held by `sweep_expired_holding` survives a sweep at `+ 1 h`. This fails to
-   compile today; record that, then stub the function to show it fails at run time.
+3. a toast held through `Holds` survives a sweep at `+ 1 h`. This fails to compile
+   today; record that, then stub the type to show it fails at run time.
 
 ## Unit 2 — R-1 and R-2 (`snora-core`)
 
@@ -83,32 +89,57 @@ say why.
 - when it is not set, the tree is unchanged: **no `mouse_area`**, so
   `render_semantics.rs` passes unmodified for applications that don't opt in.
 
-**`snora::toast`:**
-- `sweep_expired_holding(toasts: &mut Vec<Toast<M>>, now: Instant, held: &HashSet<u64>)`
-  removes what `sweep_expired` would, except ids in `held`. Take whichever set type
-  you judge best, as long as the doc names it.
-- `restart(toasts: &mut [Toast<M>], id: u64, now: Instant)` sets that toast's
-  `created_at = now`. It does nothing if `id` is absent.
-- `sweep_expired`: `#[deprecated(since = "0.54.0", note = …)]`, with its behaviour
-  unchanged. **The note shows the wiring in two lines:** `on_toast_hover`, and the
-  `held` set with `restart` on exit.
+**`snora::toast::Holds`** is the whole hold API: one type, and one way to do it.
 
-**Workspace callers** move to `sweep_expired_holding`. At least one example (`toast`)
-wires the hover and holds properly. The others may pass an empty set, with a comment
+```rust
+#[derive(Debug, Default, Clone)]
+pub struct Holds { /* the held ids; private */ }
+
+impl Holds {
+    /// The pointer entered (`entered = true`) or left (`false`) toast `id`.
+    /// On leave, that toast's countdown restarts in full from `now`.
+    pub fn hover<M: Clone>(&mut self, id: u64, entered: bool,
+                           toasts: &mut [Toast<M>], now: Instant);
+
+    /// Removes expired toasts, except held ones. Also forgets held ids whose
+    /// toast is no longer in `toasts` (dismissed while held), so nothing
+    /// accumulates.
+    pub fn sweep<M: Clone>(&mut self, toasts: &mut Vec<Toast<M>>, now: Instant);
+}
+```
+
+- **The restart is internal:** `hover(id, false, …)` sets that toast's
+  `created_at = now`. It does nothing if `id` is absent.
+- **`sweep_expired_holding` and `restart` are not public.** Exposing them alongside
+  `Holds` would give two ways to do one thing, one of which can be misused.
+- **An application that does not wire hover** still calls `Holds::default().sweep`,
+  or keeps one `Holds` and never calls `hover`. One sweep path for everyone.
+- **`sweep_expired`:** `#[deprecated(since = "0.54.0", note = …)]`, with its
+  behaviour unchanged. **The note shows the wiring:**
+  - `layout.on_toast_hover(Message::ToastHover)`;
+  - `self.holds.hover(id, entered, &mut self.toasts, now)` on that message;
+  - `self.holds.sweep(&mut self.toasts, now)` on the tick.
+
+**Workspace callers** move to `Holds::sweep`. At least one example (`toast`) wires
+`on_toast_hover` and `hover`. The others keep a `Holds` without hover, with a comment
 saying so. `cargo clippy -D warnings` must pass, which it cannot while any caller
 still uses the deprecated items.
 
 **Assert, in `snora/src/toast.rs` tests:**
-- held across a sweep long past the deadline: survives;
-- `restart` then sweep at `+ (duration − 1 ms)`: survives; at `+ duration`: gone;
-- `restart` does not change the order of the vector (ids before = ids after).
+- held (entered, not left) across a sweep long past the deadline: survives;
+- left at `t`, then swept at `t + (duration − 1 ms)`: survives; at `t + duration`:
+  gone;
+- **the case `Holds` exists for:** held past its deadline, then left. An immediate
+  sweep must **not** remove it;
+- dismissed while held (removed from `toasts`), then swept: the id is forgotten;
+- leaving does not change the order of the vector (ids before = ids after).
 
 ## Unit 4 — the subscription
 
 `subscription` wakes only while a transient toast exists. With Error now persistent
 by default, check that an application holding only persistent toasts gets no ticks,
 and that a held transient toast still keeps the subscription alive. A held toast must
-expire on time after `restart`, and that needs a tick.
+expire on time after it is left, and that needs a tick.
 
 ## Check each assertion can fail
 
@@ -120,9 +151,11 @@ Back up to named files with `cp`, break, run, restore, then `sha256sum -c`. **Ne
 | Error persistent | revert `Toast::new` to `DEFAULT` for Error |
 | `reading_time` worked cases | use `/ 8` instead of `div_ceil(6)`: the 29-character case gives 6, not 7 |
 | floor | remove the `max(6, …)`: the 18-character case gives 5 |
-| hold survives | make `sweep_expired_holding` ignore `held` |
-| restart expires on time | make `restart` a no-op |
-| restart keeps order | make `restart` move the toast to the back |
+| hold survives | make `Holds::sweep` ignore the held set |
+| left past its deadline survives an immediate sweep | remove the restart from `hover(…, false, …)` |
+| left expires one duration later | restart from the original `created_at` instead of `now` |
+| dismissed ids forgotten | skip the pruning in `sweep` |
+| leaving keeps order | make the restart move the toast to the back |
 | no `mouse_area` when unwired | wrap unconditionally: `render_semantics.rs` must fail. **If it does not fail, say so**, and add an assertion that does |
 
 ## Acceptance criteria
@@ -135,7 +168,7 @@ Back up to named files with `cp`, break, run, restore, then `sha256sum -c`. **Ne
    that exists to exercise a deprecated item.
 5. CHANGELOG:
    - Changed: the rule's sentence quoted, and errors persistent;
-   - Added: `reading_time`, `on_toast_hover`, `sweep_expired_holding`, `restart`;
+   - Added: `reading_time`, `on_toast_hover`, `Holds`;
    - Deprecated: `DEFAULT`, `sweep_expired`.
 
    Do not write the migration guide.
