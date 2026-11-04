@@ -18,4 +18,4 @@
 - [ ] `cargo clippy --workspace --all-targets --all-features -- -D warnings` passes.
 - [ ] `cargo test -p snora-core` passes.
 - [ ] `cargo test -p snora` passes.
-- [ ] `cargo check -p snora --no-default-features` passes.
+- [ ] `cargo check -p snora --no-default-features --features iced-default` passes (RFC-112: without `iced-default` there is no renderer).

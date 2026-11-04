@@ -53,8 +53,10 @@ Complete this checklist in the PR that promotes an API to stable:
 ```text
 [ ] Is the function/type name final and unambiguous?
 [ ] Does the data model avoid encoding app-specific state?
-[ ] Does `snora --no-default-features` still compile? (minimal path)
-[ ] Does `snora --no-default-features --features widgets` still compile?
+[ ] Does `snora --no-default-features --features iced-default` still compile? (minimal path)
+[ ] Does `snora --no-default-features --features widgets,iced-default` still compile?
+    # `iced-default` (RFC-112): without it the build has no renderer
+    # and no windowing, and winit refuses to compile on Linux.
 [ ] Does adding this API require any new external dependencies?
 [ ] Does the public API expose iced-specific types unnecessarily?
 [ ] Are accessibility scope and limitations documented in the API docs?

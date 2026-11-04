@@ -513,7 +513,7 @@ restate the guide's content.
     # Every fence left at `ignore` must carry a stated reason (RFC-064) —
     # `grep -B1 '```rust,ignore\|```ignore' crates/ -r --include="*.rs"`
     # to spot-check one wasn't added without one.
-[ ] cargo check -p snora --no-default-features
+[ ] cargo check -p snora --no-default-features --features iced-default   # RFC-112
 [ ] mdbook build docs               # validates the book renders
 [ ] mdbook test docs                # validates the doc-fence policy
 [ ] All examples in examples/README.md acceptance matrix compile

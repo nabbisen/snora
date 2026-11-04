@@ -18,7 +18,7 @@ unintended growth before it becomes invisible.
 |---|---|
 | `check_workspace_ms` | `cargo check --workspace --all-features` |
 | `build_widgets_ms` | `cargo build -p snora-widgets --release` |
-| `build_engine_only_ms` | `cargo build -p snora --no-default-features --release` |
+| `build_engine_only_ms` | `cargo build -p snora --no-default-features --features iced-default --release` (`iced-default` since 0.54, RFC-112: without it the build has no renderer, and winit refuses the platform) |
 | `example_hello_ms` | `cargo build --profile release-baseline -p snora-example-hello` |
 | `build_widgets_design_ms` | `cargo build -p snora-widgets --features design --release` |
 | `example_workbench_ms` | `cargo build --profile release-baseline -p snora-example-design-workbench` |
