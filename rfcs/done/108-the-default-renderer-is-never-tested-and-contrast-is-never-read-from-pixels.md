@@ -178,3 +178,20 @@ tiny-skia's, and tiny-skia ignores `snap`. Unit 0's table compared wgpu-with-sna
 with tiny-skia, never with wgpu-without-snap, and the architect accepted it despite
 holding 0.52.0 wgpu data that already showed solid rows. The flag stays, with no
 measured effect at the scale tests render.)*
+
+---
+
+## Note, 2026-11-04: the box around an element is not the element (found in RFC-114's review)
+
+Measuring a sidebar name's colour over the **name's whole box**, the dev team found
+that in Solarized Light the "name colour" came out as the **rail's background**. The
+item's rounded corner, radius 6 px, falls inside the name's box in the `Beneath` form.
+- **A 1 px inset changed nothing.** A 6 px corner needs 6 px of clearance.
+- **A probe without that clearance clamped** reported **1.00:1 in all 21 themes** for
+  a 9 px icon glyph.
+
+**The rule for any drawn-pixel contrast row:** sample an element's colour from a
+region clear of every rounded corner and edge that can overlap it, by at least the
+radius. Then **check that the instrument returns a plausible value** before trusting
+a floor against it. A ratio of 1.00 means the probe sampled the background, not the
+element.
