@@ -38,6 +38,7 @@ use iced::widget::{column, container, row, space};
 use iced::{Color, Element, Event, Length, Point, Size, Theme, mouse};
 use iced_test::Simulator;
 
+use snora::widget::SideBarLabels;
 use snora::{Icon, LayoutDirection, SideBar, SideBarItem};
 
 /// Rail geometry, mirrored from `snora_widgets::sidebar` as an
@@ -184,7 +185,11 @@ fn assert_tooltip_body_covers_the_page(
 fn control_the_patch_is_visible_when_no_tooltip_is_open() {
     let idle = |patch: Color| -> String {
         let element: Element<'_, Msg> = row![
-            snora::widget::app_side_bar(side_bar(), LayoutDirection::Ltr),
+            snora::widget::app_side_bar_with(
+                side_bar(),
+                LayoutDirection::Ltr,
+                SideBarLabels::Tooltip
+            ),
             page(patch)
         ]
         .into();
@@ -219,7 +224,7 @@ fn control_the_patch_is_visible_when_no_tooltip_is_open() {
 #[test]
 fn unstyled_tooltip_has_a_body() {
     assert_tooltip_body_covers_the_page("unstyled", &Theme::Light, || {
-        snora::widget::app_side_bar(side_bar(), LayoutDirection::Ltr)
+        snora::widget::app_side_bar_with(side_bar(), LayoutDirection::Ltr, SideBarLabels::Tooltip)
     });
 }
 
@@ -243,13 +248,23 @@ mod styled {
             let theme = snora::design::theme(&tokens);
             let with_a = hovered_frame_hash(
                 &format!("{label}-a"),
-                snora::design::widget::app_side_bar(&tokens, side_bar(), LayoutDirection::Ltr),
+                snora::design::widget::app_side_bar_with(
+                    &tokens,
+                    side_bar(),
+                    LayoutDirection::Ltr,
+                    SideBarLabels::Tooltip,
+                ),
                 &theme,
                 PATCH_A,
             );
             let with_b = hovered_frame_hash(
                 &format!("{label}-b"),
-                snora::design::widget::app_side_bar(&tokens, side_bar(), LayoutDirection::Ltr),
+                snora::design::widget::app_side_bar_with(
+                    &tokens,
+                    side_bar(),
+                    LayoutDirection::Ltr,
+                    SideBarLabels::Tooltip,
+                ),
                 &theme,
                 PATCH_B,
             );

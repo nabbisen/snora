@@ -28,6 +28,7 @@
 use iced::{Element, Point};
 use iced_test::simulator;
 
+use snora::widget::SideBarLabels;
 use snora::{Icon, LayoutDirection, SideBar, SideBarItem};
 
 /// Mirrors `snora_widgets::sidebar::RAIL_WIDTH`. See module doc.
@@ -122,7 +123,13 @@ fn assert_button_spans_intended_width(
 fn unstyled_side_bar_buttons_span_their_full_width() {
     assert_button_spans_intended_width(
         "unstyled",
-        || snora::widget::app_side_bar(side_bar(), LayoutDirection::Ltr),
+        || {
+            snora::widget::app_side_bar_with(
+                side_bar(),
+                LayoutDirection::Ltr,
+                SideBarLabels::Tooltip,
+            )
+        },
         UNSTYLED_VERTICAL_PADDING,
     );
 }
@@ -138,7 +145,12 @@ mod styled {
             label,
             move || {
                 let t = tokens();
-                snora::design::widget::app_side_bar(&t, side_bar(), LayoutDirection::Ltr)
+                snora::design::widget::app_side_bar_with(
+                    &t,
+                    side_bar(),
+                    LayoutDirection::Ltr,
+                    SideBarLabels::Tooltip,
+                )
             },
             vertical_padding,
         );
@@ -256,7 +268,7 @@ fn assert_icon_centred(label: &str, element: Element<'static, Msg>) {
 fn unstyled_side_bar_icon_is_centred_in_its_button() {
     assert_icon_centred(
         "unstyled",
-        snora::widget::app_side_bar(side_bar(), LayoutDirection::Ltr),
+        snora::widget::app_side_bar_with(side_bar(), LayoutDirection::Ltr, SideBarLabels::Tooltip),
     );
 }
 
@@ -268,7 +280,12 @@ mod styled_centring {
     fn check(label: &str, tokens: Tokens) {
         assert_icon_centred(
             label,
-            snora::design::widget::app_side_bar(&tokens, side_bar(), LayoutDirection::Ltr),
+            snora::design::widget::app_side_bar_with(
+                &tokens,
+                side_bar(),
+                LayoutDirection::Ltr,
+                SideBarLabels::Tooltip,
+            ),
         );
     }
 

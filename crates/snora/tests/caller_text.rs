@@ -308,6 +308,7 @@ mod tooltips {
     use super::*;
     use iced::{Event, Point, Theme, mouse};
 
+    use snora::widget::SideBarLabels;
     use snora::{Icon, LayoutDirection, SideBar, SideBarItem};
 
     /// Big enough for a 320px-wide tooltip and the rail beside it.
@@ -327,7 +328,7 @@ mod tooltips {
             active: 0,
         };
         let element: Element<'_, Msg> = iced::widget::row![
-            snora::widget::app_side_bar(bar, LayoutDirection::Ltr),
+            snora::widget::app_side_bar_with(bar, LayoutDirection::Ltr, SideBarLabels::Tooltip),
             container(text("page")).width(Length::Fill)
         ]
         .into();
@@ -362,5 +363,134 @@ mod tooltips {
              stops mid-word",
             long.len(),
         );
+    }
+}
+
+// ---------------------------------------------------------------------------
+// The labelled rail: caller text on the rail itself (RFC-114)
+// ---------------------------------------------------------------------------
+
+/// The rail's names are caller text now.
+///
+/// Before RFC-114 a `SideBarItem`'s name reached the screen only inside a
+/// tooltip, which the `tooltips` module above covers by frame comparison
+/// because tooltip text is invisible to `Simulator::find`. On a labelled
+/// rail the name is an ordinary text widget on the rail, so the same
+/// natural-versus-rendered measurement the toast and the notice use
+/// applies to it — and the column it has to stay inside is the rail's own
+/// cap.
+mod rail {
+    use super::*;
+    use snora::widget::SideBarLabels;
+    use snora::{Icon, LayoutDirection, SideBar, SideBarItem};
+
+    /// Mirrors `snora_widgets::sidebar::LABELLED_RAIL_MAX_WIDTH` as an
+    /// expectation: a name may wrap, but neither it nor its rail may
+    /// reach past this.
+    const CAP: f32 = 240.0;
+
+    /// A rail of one item carrying `name`, beside a page — which is how
+    /// an application lays one out, and what gives the rail something to
+    /// take its width against.
+    fn rail(name: &str, labels: SideBarLabels) -> Element<'static, Msg> {
+        let bar = SideBar {
+            items: vec![SideBarItem {
+                view_id: 0u8,
+                icon: Icon::Text("S".into()),
+                tooltip: name.to_owned(),
+                on_press: Msg::Dismiss,
+            }],
+            active: 0,
+        };
+        iced::widget::row![
+            snora::widget::app_side_bar_with(bar, LayoutDirection::Ltr, labels),
+            container(text("page")).width(Length::Fill)
+        ]
+        .into()
+    }
+
+    #[cfg(feature = "design")]
+    fn design_rail(name: &str, labels: SideBarLabels) -> Element<'static, Msg> {
+        let tokens = snora::design::Tokens::light();
+        let bar = SideBar {
+            items: vec![SideBarItem {
+                view_id: 0u8,
+                icon: Icon::Text("S".into()),
+                tooltip: name.to_owned(),
+                on_press: Msg::Dismiss,
+            }],
+            active: 0,
+        };
+        iced::widget::row![
+            snora::design::widget::app_side_bar_with(&tokens, bar, LayoutDirection::Ltr, labels),
+            container(text("page")).width(Length::Fill)
+        ]
+        .into()
+    }
+
+    fn forms() -> [(&'static str, SideBarLabels); 2] {
+        [
+            ("rail name Beneath", SideBarLabels::Beneath),
+            ("rail name Beside", SideBarLabels::Beside),
+        ]
+    }
+
+    /// A 400-character name with no break in it wraps and is shown
+    /// whole, on both paths and in both labelled forms.
+    #[test]
+    fn unbroken_text_is_shown_whole_on_the_labelled_rail() {
+        let long = unbroken();
+        let natural = natural_size(&long, None);
+        for (what, labels) in forms() {
+            let rendered = rendered_size(rail(&long, labels), &long);
+            assert_shown_whole(what, rendered, natural, CAP);
+        }
+    }
+
+    #[cfg(feature = "design")]
+    #[test]
+    fn unbroken_text_is_shown_whole_on_the_labelled_rail_design() {
+        let long = unbroken();
+        let size = snora::design::Tokens::light().typography.label.size;
+        let natural = natural_size(&long, Some(size));
+        for (what, labels) in forms() {
+            let rendered = rendered_size(design_rail(&long, labels), &long);
+            assert_shown_whole(&format!("{what} (design)"), rendered, natural, CAP);
+        }
+    }
+
+    /// tekstide's verbatim fixture reaches the rail unchanged: found by
+    /// exact content, so a name that had been trimmed, escaped or
+    /// normalised would not be found at all.
+    #[test]
+    fn verbatim_text_reaches_the_labelled_rail_unchanged() {
+        let fixture = verbatim();
+        let natural = natural_size(&fixture, None);
+        for (what, labels) in forms() {
+            let rendered = rendered_size(rail(&fixture, labels), &fixture);
+            assert_shown_whole(
+                &format!("{what} (verbatim fixture)"),
+                rendered,
+                natural,
+                CAP,
+            );
+        }
+    }
+
+    #[cfg(feature = "design")]
+    #[test]
+    fn verbatim_text_reaches_the_labelled_rail_unchanged_design() {
+        let fixture = verbatim();
+        let size = snora::design::Tokens::light().typography.label.size;
+        let natural = natural_size(&fixture, Some(size));
+        for (what, labels) in forms() {
+            let rendered = rendered_size(design_rail(&fixture, labels), &fixture);
+            assert_shown_whole(
+                &format!("{what} (verbatim fixture, design)"),
+                rendered,
+                natural,
+                CAP,
+            );
+        }
     }
 }

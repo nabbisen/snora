@@ -46,10 +46,42 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
   Warning stays transient — it is a notice, not an acknowledgement.
 
+- **The sidebar now names its items on the rail, and is wider (RFC-114).** An
+  item was an icon and nothing else; its name lived in a tooltip, and iced
+  opens a tooltip only while the cursor rests on the item. So the name was
+  there for someone who already had a pointer, already knew to hover, and
+  already knew which icon to hover — and absent for every touch user.
+
+  The default rail now draws each item's name **beneath its icon, at rest**.
+  The whole item is one button, so the highlight and the pointer target cover
+  the icon and the name together, and the name wraps rather than being cut.
+
+  **The rail is therefore no longer 64px wide.** It is content-sized to its
+  longest name, with 64px as the floor and **240px as the ceiling**, which the
+  names wrap at. Measured across every rail in `examples/`, on both paths, at
+  the host default text size, at a host text size of 24px, and with
+  `Typography` scaled ×2.0: the widest comes to 196px, and a short-named rail
+  such as `examples/rtl`'s single `Demo` stays at exactly 64. An application
+  whose layout assumed 64px should re-check it — and `SideBarLabels::Tooltip`
+  restores the old rail exactly.
+
+  **Still not reachable by keyboard, in any form.** iced 0.14's buttons take
+  no keyboard input — `button::update` handles mouse and touch only, and
+  `button::operate` registers no focus target — so no rail item can be
+  focused and no key presses one. Naming the items puts their names where a
+  reader can see them; it does not make them reachable. RFC-116 is the plan.
+
 ### Added
 
 - **`ToastLifetime::reading_time(title, message)`** — the rule above, as a
   function, so an application can apply it to a toast it builds another way.
+- **`SideBarLabels` and `app_side_bar_with` (RFC-114).** Three forms, chosen
+  by the application: `Beneath` (the default, the name under the icon),
+  `Beside` (the name next to the icon, mirrored under RTL) and `Tooltip` (the
+  icon rail as it was). `snora::widget::app_side_bar_with(side_bar,
+  direction, labels)` and `snora::design::widget::app_side_bar_with(tokens,
+  side_bar, direction, labels)` take it; the existing two-argument
+  `app_side_bar` functions keep their signatures and pass `Beneath`.
 - **`AppLayout::on_toast_hover` and `snora::toast::Holds` (RFC-113).** A toast
   the pointer is resting on no longer expires underneath it, and **leaving
   restarts its countdown in full** — so reaching for a toast buys the whole
@@ -114,6 +146,34 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   resolved dependency graph is identical — the same 241 packages at the same
   versions, with the same features on every one of them except two of
   snora's own feature *names*.
+
+### Fixed
+
+- **The active sidebar item's text missed WCAG AA in four of iced's stock
+  themes (RFC-114).** Its colour is `primary.strong.text` on
+  `primary.strong.color` — iced's own pairing, which is guaranteed readable
+  but not guaranteed to clear 4.5:1. Read from drawn pixels it came to
+  **3.93:1** on Solarized Light and Solarized Dark, **4.23:1** on Tokyo
+  Night Light and **4.27:1** on Catppuccin Latte.
+
+  It has been that way since 0.45, and nothing caught it, because the active
+  item held only an icon — a non-text element, whose floor is 3.0:1. Giving
+  the item a **name** makes it text, and 3.93 is not enough for text.
+
+  The rail now applies the rule the toast has used since 0.52: keep the
+  theme's own pair wherever it clears 4.5:1, and otherwise use black or
+  white, whichever contrasts more (at least 4.58:1 for any opaque fill).
+  Measured after: **4.65, 4.65, 5.07 and 5.13**. Stock Light and Dark are
+  untouched at 4.55, and every design preset is untouched at 10.06–12.62 —
+  the fallback only replaces a pairing that fails. The icon rail's active
+  icon gets the same treatment: one rule for the active item in every form.
+- **`SideBarItem::tooltip`'s doc claimed an accessibility route it never
+  provided (RFC-114).** It said the field was "required for accessibility —
+  keyboard and screen-reader users rely on it". Neither is true in iced 0.14:
+  keyboard users cannot reach the rail at all, and no screen reader reads the
+  string, because iced 0.14 exposes no accessibility tree. The field's doc now
+  says what it is — the item's name, the only thing that says what the icon
+  means — and what it is not.
 
 ## [0.53.0] — 2026-10-20
 

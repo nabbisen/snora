@@ -595,3 +595,139 @@ fn crumb_rule_stays_visible_on_the_hover_fill() {
     println!("crumb-rule-on-hover | lowest {lowest:.2} at {lowest_context}");
     assert_no_failures(failures);
 }
+
+/// This crate's copy of the rule, under one name so the table below
+/// reads the same in both crates.
+mod rule {
+    pub(super) use crate::style::{contrast_ratio, readable_text, stronger_pole};
+}
+
+// ---------------------------------------------------------------------
+// The readable-text rule: one case table, two crates (RFC-114 Unit 3b)
+// ---------------------------------------------------------------------
+
+/// The cases the readable-text rule must decide identically in
+/// `snora::toast` and in `snora_widgets::style`.
+///
+/// # Why the table is duplicated instead of shared
+///
+/// The rule itself is duplicated, and it has to be: `snora` depends on
+/// `snora-widgets`, so `snora-widgets` cannot call the engine's copy,
+/// and `widgets` is an optional feature while the toast is not, so the
+/// engine cannot call the widgets' copy. **This table is the thing that
+/// keeps the two honest.** It is asserted against
+/// `snora_widgets::style`'s copy in `snora_widgets::contrast_tests`
+/// and against `snora::toast`'s copy in `snora::toast::contrast_tests`,
+/// under this same name. If you change one rule and not the other, one
+/// of the two runs fails.
+///
+/// Each row is `(label, fill, paired, keep_the_theme's_pair)`. The
+/// theme rows read their colours out of `iced::Theme` rather than
+/// hardcoding them, so a change in iced moves both crates together
+/// instead of stranding a literal.
+fn readable_text_cases() -> Vec<(String, Color, Color, bool)> {
+    /// A theme's active-sidebar pairing: the fill `sidebar_active_color`
+    /// uses and the text iced pairs with it.
+    fn pairing(name: &str) -> (Color, Color) {
+        let theme = Theme::ALL
+            .iter()
+            .find(|t| t.to_string() == name)
+            .unwrap_or_else(|| panic!("iced ships a theme named {name:?}"));
+        let ep = theme.extended_palette();
+        (ep.primary.strong.color, ep.primary.strong.text)
+    }
+
+    let mut cases = vec![
+        // Above the floor by a mile: the pair is kept.
+        (
+            "synthetic: white on black (21:1)".to_owned(),
+            Color::BLACK,
+            Color::WHITE,
+            true,
+        ),
+        // Far below it: the pair is replaced. Two mid greys, which no
+        // theme would ship and which therefore cannot pass by accident.
+        (
+            "synthetic: grey 0.55 on grey 0.50 (~1.2:1)".to_owned(),
+            Color::from_rgb(0.50, 0.50, 0.50),
+            Color::from_rgb(0.55, 0.55, 0.55),
+            false,
+        ),
+    ];
+
+    // The two stock themes: 4.55:1, so their pair is kept — the same
+    // decision RFC-111 made for the toast.
+    for name in ["Light", "Dark"] {
+        let (fill, paired) = pairing(name);
+        cases.push((format!("stock {name}"), fill, paired, true));
+    }
+
+    // The four themes RFC-114 found short on the rail: 3.93, 3.93,
+    // 4.23 and 4.27 before the fallback.
+    for name in [
+        "Solarized Light",
+        "Solarized Dark",
+        "Tokyo Night Light",
+        "Catppuccin Latte",
+    ] {
+        let (fill, paired) = pairing(name);
+        cases.push((name.to_owned(), fill, paired, false));
+    }
+
+    cases
+}
+
+/// Every row of [`readable_text_cases`], against this crate's own copy
+/// of the rule.
+#[test]
+fn readable_text_table() {
+    let mut failures = Vec::new();
+
+    for (label, fill, paired, keep) in readable_text_cases() {
+        let chosen = rule::readable_text(fill, paired);
+        let before = rule::contrast_ratio(paired, fill);
+        let after = rule::contrast_ratio(chosen, fill);
+
+        // Whatever it decides, the result must clear the floor. This is
+        // the property; the two below say it reached it the right way.
+        if after < AA_TEXT {
+            failures.push(format!(
+                "{label}: the chosen text is {after:.2} against its fill, under {AA_TEXT}",
+            ));
+        }
+
+        if keep {
+            if chosen != paired {
+                failures.push(format!(
+                    "{label}: the theme's pair clears the floor at {before:.2}, and was replaced \
+                     anyway — a theme's deliberate choice must survive",
+                ));
+            }
+        } else {
+            if chosen != rule::stronger_pole(fill) {
+                failures.push(format!(
+                    "{label}: the theme's pair is {before:.2}, under the floor, and was kept",
+                ));
+            }
+            if chosen == paired {
+                failures.push(format!(
+                    "{label}: the pair was kept at {before:.2} — this is the case the fallback \
+                     exists for",
+                ));
+            }
+        }
+
+        println!(
+            "readable-text | {label:<42} | {before:6.2} -> {after:6.2} | kept: {}",
+            chosen == paired
+        );
+    }
+
+    assert!(
+        failures.is_empty(),
+        "{} readable-text disagreement(s). This table is asserted in both `snora` and \
+         `snora-widgets`; if only one run fails, the two copies of the rule have drifted:\n  {}",
+        failures.len(),
+        failures.join("\n  "),
+    );
+}

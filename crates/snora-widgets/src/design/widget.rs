@@ -138,7 +138,7 @@ use std::fmt::Debug;
 use crate::crumb::{CrumbGeometry, build_breadcrumb};
 use crate::footer::{FooterGeometry, build_footer};
 use crate::header::{HeaderGeometry, build_header};
-use crate::sidebar::{SideBarGeometry, TooltipBody, build_side_bar};
+use crate::sidebar::{SideBarGeometry, SideBarLabels, TooltipBody, build_side_bar};
 use crate::tab::{TabGeometry, build_tab_bar};
 
 /// Token-derived styled variant of [`crate::app_header`] (RFC-040).
@@ -213,11 +213,28 @@ where
     Message: Clone + 'a,
     ViewId: Clone + PartialEq + 'a,
 {
+    app_side_bar_with(tokens, side_bar, direction, SideBarLabels::Beneath)
+}
+
+/// Token-derived styled variant of [`crate::app_side_bar_with`]
+/// (RFC-114): the same three forms, with the names at
+/// `Typography::label` and the rail's geometry from `tokens`.
+pub fn app_side_bar_with<'a, Message, ViewId>(
+    tokens: &Tokens,
+    side_bar: SideBar<Message, ViewId>,
+    direction: LayoutDirection,
+    labels: SideBarLabels,
+) -> Element<'a, Message>
+where
+    Message: Clone + 'a,
+    ViewId: Clone + PartialEq + 'a,
+{
     build_side_bar(
         side_bar,
         direction,
         side_bar_geometry(tokens),
         side_bar_tooltip_body(tokens),
+        labels,
     )
 }
 
@@ -246,6 +263,7 @@ fn side_bar_geometry(tokens: &Tokens) -> SideBarGeometry {
         gap: tokens.spacing.md,
         vertical_padding: tokens.spacing.lg,
         button_radius: tokens.radius.md,
+        label_size: Some(snora_style::text::label_size(tokens).0),
     }
 }
 

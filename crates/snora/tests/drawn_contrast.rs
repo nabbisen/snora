@@ -299,8 +299,14 @@ enum RailMsg {
     Second,
 }
 
-fn side_bar_page() -> Element<'static, RailMsg> {
-    let rail = snora::widget::app_side_bar(
+/// The rail page, in a named form.
+///
+/// Parameterised by RFC-114 rather than hardcoding one form, because the
+/// two tests built on it are about different forms: the active
+/// highlight's contrast is a property of every form, and the tooltip
+/// body's border exists only in [`SideBarLabels::Tooltip`].
+fn side_bar_page_with(labels: snora::widget::SideBarLabels) -> Element<'static, RailMsg> {
+    let rail = snora::widget::app_side_bar_with(
         snora::SideBar {
             items: vec![
                 snora::SideBarItem {
@@ -319,6 +325,48 @@ fn side_bar_page() -> Element<'static, RailMsg> {
             active: 0,
         },
         snora::LayoutDirection::Ltr,
+        labels,
+    );
+    row![rail, space().width(Length::Fill)].into()
+}
+
+/// The default rail: names beneath the icons (RFC-114).
+fn side_bar_page() -> Element<'static, RailMsg> {
+    side_bar_page_with(snora::widget::SideBarLabels::Beneath)
+}
+
+/// The icon-only rail, the one form that has a tooltip body to measure.
+fn side_bar_page_tooltip() -> Element<'static, RailMsg> {
+    side_bar_page_with(snora::widget::SideBarLabels::Tooltip)
+}
+
+/// The same rail on the design path, in a named form.
+#[cfg(feature = "design")]
+fn design_side_bar_page_with(
+    tokens: &snora::design::Tokens,
+    labels: snora::widget::SideBarLabels,
+) -> Element<'static, RailMsg> {
+    let rail = snora::design::widget::app_side_bar_with(
+        tokens,
+        snora::SideBar {
+            items: vec![
+                snora::SideBarItem {
+                    view_id: 0,
+                    icon: snora::Icon::Text("A".into()),
+                    tooltip: RAIL_ACTIVE_NAME.to_owned(),
+                    on_press: RailMsg::First,
+                },
+                snora::SideBarItem {
+                    view_id: 1,
+                    icon: snora::Icon::Text("B".into()),
+                    tooltip: RAIL_RESTING_NAME.to_owned(),
+                    on_press: RailMsg::Second,
+                },
+            ],
+            active: 0,
+        },
+        snora::LayoutDirection::Ltr,
+        labels,
     );
     row![rail, space().width(Length::Fill)].into()
 }
@@ -364,6 +412,190 @@ fn sidebar_active_highlight_meets_non_text_floor_against_rail_as_drawn() {
                 "{context}: active sidebar fill as drawn {r:.2} < {NON_TEXT_MIN} \
                  (fill {fill:?} vs rail {rail:?}, button {button:?})",
             ));
+        }
+    }
+    assert_no_failures(failures);
+}
+
+// ---------------------------------------------------------------------
+// The rail's names, against both backgrounds they are drawn on (RFC-114)
+// ---------------------------------------------------------------------
+
+/// The active item's name and the resting item's, as `side_bar_page_with`
+/// spells them.
+const RAIL_ACTIVE_NAME: &str = "first view";
+const RAIL_RESTING_NAME: &str = "second view";
+
+/// How far in from the name's left and right edges the glyph colour is
+/// read.
+///
+/// The item's corners are rounded — 6px unstyled, `radius.md` (also 6)
+/// on every shipped preset — so the fill is cut away there and whatever
+/// is behind the rail shows through. In `Beneath` the name's box spans
+/// the item's full width and reaches its bottom edge, so its own bottom
+/// corners sit exactly where the curve bites. 8 clears any of those
+/// radii with room to spare, and a name is far wider than 16px.
+const LABEL_CORNER_CLEARANCE: f32 = 8.0;
+
+/// Asserts both of a labelled rail's names clear AA against the thing
+/// each is actually drawn on.
+///
+/// # Why this row exists at all
+///
+/// The tooltip form never put caller text on the rail: an item was an
+/// icon, and its name was drawn inside a tooltip body whose own contrast
+/// this file already measures. RFC-114 puts the name on the rail, where
+/// it sits on **two** different backgrounds — the rail itself for every
+/// resting item, and the active highlight for one. The highlight is a
+/// `primary` tier and the rail is a `background` tier, so a text colour
+/// that clears one does not thereby clear the other, and the active
+/// item's is the pairing RFC-085 F-14 already had to correct once for the
+/// icon glyph alone.
+///
+/// # Why it reads text pixels, which this file otherwise avoids
+///
+/// Same reason as the toast's row, and the same method: [`peak_colour`]
+/// takes the pixel furthest from the background, which for a glyph is one
+/// the renderer covered fully and which therefore carries the style's own
+/// text colour rather than a blend. The alternative is
+/// `sidebar_button_style`, private to `snora-widgets`.
+///
+/// # Why the backgrounds are found by clicking
+///
+/// Each background is read from the item's own pointer target, and the
+/// target is whatever answers that item's message. Reading it from the
+/// widget tree would silently measure a different rectangle as soon as
+/// the item's structure changed — which is exactly what RFC-114 changed.
+fn assert_rail_label_contrast(
+    failures: &mut Vec<String>,
+    context: &str,
+    build: impl Fn() -> Element<'static, RailMsg>,
+    theme: &Theme,
+) {
+    let mut ui = simulator(build());
+    let places = [
+        (RAIL_ACTIVE_NAME, "active highlight", RailMsg::First),
+        (RAIL_RESTING_NAME, "resting rail", RailMsg::Second),
+    ]
+    .map(|(name, what, msg)| {
+        let bounds = ui
+            .find(name)
+            .unwrap_or_else(|_| panic!("{context}: the rail draws {name:?} at rest"))
+            .visible_bounds()
+            .unwrap_or_else(|| panic!("{context}: {name:?} is drawn but not visible"));
+        (name, what, bounds, msg)
+    });
+
+    let frame = frame_pixels(&mut ui, theme, &format!("rail-label-{context}"));
+
+    for (name, what, bounds, msg) in places {
+        let item = pointer_target(context, &build, bounds.center(), |m: &RailMsg| *m == msg);
+
+        // The background: the item's modal colour. A name and an icon
+        // together cover a small fraction of the item, so the mode is
+        // what the name is drawn on — the highlight's fill for the
+        // active item, the rail for a resting one.
+        let background = colour_of(frame.modal_colour(item));
+        record_fill(&format!("sidebar-label-bg/{what}/{context}"), &frame, item);
+        record_mark(
+            &format!("sidebar-label/{what}/{context}"),
+            &frame,
+            bounds,
+            background,
+        );
+
+        // Read the glyph core from the name's **middle band**, clear of
+        // the item's rounded corners.
+        //
+        // Measured the other way first: over the name's whole box,
+        // Solarized Light reported the rail's cream background
+        // (0.99, 0.96, 0.89) as the "name colour" in `Beneath` and the
+        // real text colour in `Beside`. One style function, two
+        // answers — the cream was coming through the item's rounded
+        // bottom corners, which in `Beneath` are inside the name's own
+        // box. A 1px inset did not move the figure at all; a 6px corner
+        // needs 6px of clearance.
+        //
+        // The middle half vertically is also where a glyph's stems are,
+        // so this is the region most likely to hold a fully covered
+        // pixel in the first place.
+        // Never more than a quarter of the box from each side: a
+        // probe written without that clamp reported 1.00 for a 9px
+        // icon glyph in all 21 themes, because 8px of clearance left
+        // one column of pure background and nothing else.
+        let clearance = LABEL_CORNER_CLEARANCE.min(bounds.width / 4.0);
+        let interior = Rectangle {
+            x: bounds.x + clearance,
+            y: bounds.y + bounds.height * 0.25,
+            width: (bounds.width - 2.0 * clearance).max(1.0),
+            height: (bounds.height * 0.5).max(1.0),
+        };
+        let label = peak_colour(&frame, interior, background);
+        let r = contrast_ratio(label, background);
+        report(
+            context,
+            &format!("rail name on {what}"),
+            r,
+            AA_TEXT,
+            &format!("{name:?} on {background:?}"),
+        );
+        if r < AA_TEXT {
+            failures.push(format!(
+                "{context}: rail name {name:?} on the {what} as drawn {r:.2} < {AA_TEXT} \
+                 (name {label:?} vs background {background:?}, item {item:?})",
+            ));
+        }
+    }
+}
+
+/// Both labelled forms. The name's background is the same in either, but
+/// its box is not, and the box is what the measurement is taken over.
+#[cfg(feature = "widgets")]
+fn labelled_forms() -> [(&'static str, snora::widget::SideBarLabels); 2] {
+    use snora::widget::SideBarLabels;
+    [
+        ("Beneath", SideBarLabels::Beneath),
+        ("Beside", SideBarLabels::Beside),
+    ]
+}
+
+/// Every theme iced ships, not only the two stock ones.
+///
+/// The rail's resting text colour is `background.base.text` and its
+/// active text colour is `primary.strong.text`, both of which every theme
+/// derives for itself. A sweep of two themes would have said nothing
+/// about the other nineteen — and RFC-111's worst case was found in the
+/// nineteen.
+#[test]
+fn rail_names_meet_aa_on_both_drawn_backgrounds_unstyled() {
+    let mut failures = Vec::new();
+    for theme in Theme::ALL {
+        for (form, labels) in labelled_forms() {
+            assert_rail_label_contrast(
+                &mut failures,
+                &format!("stock {theme} / {form}"),
+                move || side_bar_page_with(labels),
+                theme,
+            );
+        }
+    }
+    assert_no_failures(failures);
+}
+
+#[cfg(feature = "design")]
+#[test]
+fn rail_names_meet_aa_on_both_drawn_backgrounds_design() {
+    let mut failures = Vec::new();
+    for (preset, tokens) in design_presets() {
+        let theme = design_theme(&tokens);
+        for (form, labels) in labelled_forms() {
+            let tokens = tokens.clone();
+            assert_rail_label_contrast(
+                &mut failures,
+                &format!("{preset} / {form}"),
+                move || design_side_bar_page_with(&tokens, labels),
+                &theme,
+            );
         }
     }
     assert_no_failures(failures);
@@ -628,7 +860,7 @@ fn assert_tooltip_border(
 fn unstyled_tooltip_body_border_meets_non_text_floor_as_drawn() {
     let mut failures = Vec::new();
     for (context, theme) in stock_themes() {
-        assert_tooltip_border(&mut failures, context, side_bar_page, &theme);
+        assert_tooltip_border(&mut failures, context, side_bar_page_tooltip, &theme);
     }
     assert_no_failures(failures);
 }
@@ -664,7 +896,7 @@ fn styled_tooltip_body_border_meets_non_text_floor_as_drawn() {
         let build = {
             let tokens = tokens.clone();
             move || -> Element<'static, RailMsg> {
-                let rail = snora::design::widget::app_side_bar(
+                let rail = snora::design::widget::app_side_bar_with(
                     &tokens,
                     snora::SideBar {
                         items: vec![
@@ -684,6 +916,7 @@ fn styled_tooltip_body_border_meets_non_text_floor_as_drawn() {
                         active: 0,
                     },
                     snora::LayoutDirection::Ltr,
+                    snora::widget::SideBarLabels::Tooltip,
                 );
                 row![rail, space().width(Length::Fill)].into()
             }

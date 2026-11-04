@@ -1,27 +1,38 @@
-//! Icon-rail sidebar.
+//! Navigation rail.
 //!
-//! Produces a vertical strip of icon buttons with tooltips. The active
-//! item (matching [`SideBar::active`]) gets a subtle background highlight.
+//! Produces a vertical strip of items, each an icon with its name. Where
+//! the name goes is the application's choice, [`SideBarLabels`]: beneath
+//! the icon (the default), beside it, or — as every rail was before
+//! RFC-114 — only in a tooltip under the pointer. The active item
+//! (matching [`SideBar::active`]) gets a background highlight, which
+//! covers the whole item.
 //!
-//! Tooltip side is direction-aware: it appears on the end side of the rail
-//! so it never overlaps the main content.
+//! A labelled rail is content-sized, as wide as its longest name needs
+//! and never past [`LABELLED_RAIL_MAX_WIDTH`]. The tooltip form is the
+//! fixed [`RAIL_WIDTH`] strip of [`BUTTON_SIZE`] squares it always was,
+//! with its tooltip on the end side of the rail so it never overlaps the
+//! main content.
+//!
+//! **No form of this rail is reachable by keyboard**, because iced
+//! 0.14's buttons take no keyboard input. See [`SideBarLabels`].
 
 use std::rc::Rc;
 
 use iced::widget::text::Wrapping;
 use iced::{
-    Alignment, Background, Border, Length, Padding, Shadow, Theme,
+    Alignment, Background, Border, Element, Length, Padding, Shadow, Theme,
     widget::{button, column, container, text, tooltip},
 };
 
 use snora_core::{LayoutDirection, SideBar};
 
+use crate::direction::row_dir;
 use crate::icon::icon_element;
 use crate::style::sidebar_active_color;
 
 /// Default rail width in pixels.
 const RAIL_WIDTH: f32 = 64.0;
-/// Default button size — square, icon-only.
+/// Default button size — the icon's square box, in every form.
 const BUTTON_SIZE: f32 = 48.0;
 
 /// The rail's horizontal padding: whatever width is left once a button is
@@ -45,6 +56,107 @@ const _: () = assert!(
     BUTTON_SIZE <= RAIL_WIDTH,
     "sidebar BUTTON_SIZE exceeds RAIL_WIDTH"
 );
+
+/// How wide a labelled rail may grow (RFC-114 R-2).
+///
+/// A labelled rail is content-sized: it is as wide as its longest name
+/// needs, so `RAIL_WIDTH` is a floor for it rather than its width. Without
+/// a ceiling one long name would take the window, so the names wrap at
+/// this one instead.
+///
+/// **Confirmed by measurement, not chosen.** Every rail in `examples/` was
+/// measured on both paths at the host's default text size, at a host text
+/// size of 24px, and with `Typography` scaled x2.0 (an adopter's setting).
+/// The widest rail of the 36 measured is 196px — `Beside`, the workbench's
+/// four names, at x2.0 — so 240 cuts nothing any example asks for, and
+/// leaves a name about 14 characters long on one line at the largest of
+/// those sizes. The figures are in RFC-114's review request, under
+/// `evidence/unit2-width-measurement.md`.
+const LABELLED_RAIL_MAX_WIDTH: f32 = 240.0;
+
+// A cap below the icon rail's own width would make a labelled rail
+// narrower than the icon it contains. Checked at compile time, like the
+// button-fits-the-rail fact above.
+const _: () = assert!(
+    RAIL_WIDTH <= LABELLED_RAIL_MAX_WIDTH,
+    "sidebar LABELLED_RAIL_MAX_WIDTH is below RAIL_WIDTH"
+);
+
+/// Where a labelled rail puts an item's name (RFC-114 R-1).
+///
+/// The application's choice, defaulting to [`SideBarLabels::Beneath`]:
+/// before RFC-114 every name lived in a hover tooltip, which a touch user
+/// never sees at all.
+///
+/// # No form of this rail is keyboard-reachable
+///
+/// iced 0.14's `button` takes no keyboard input — its `update` handles
+/// mouse and touch only, and its `operate` registers no focus target — so
+/// a rail item cannot be focused and no key presses it. Labelling the
+/// items puts their names where a reader can see them; it does not make
+/// them reachable. See RFC-116 for the plan.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SideBarLabels {
+    /// The icon, with the name centred beneath it. The default.
+    #[default]
+    Beneath,
+    /// The icon at the start edge, then the name — mirrored under RTL.
+    Beside,
+    /// Icon only, with the name in a tooltip.
+    ///
+    /// What every rail looked like before RFC-114. iced opens a tooltip
+    /// only while the cursor rests on the item
+    /// (`iced_widget-0.14.2/src/tooltip.rs:224`), so this form names its
+    /// items **only under the pointer**: a touch user gets no name at
+    /// all, and a pointer user gets one only for the item they already
+    /// guessed to hover. Choose it when the rail's icons are
+    /// self-evident to every one of your users and the space matters.
+    Tooltip,
+}
+
+/// How much width a name has on a labelled rail, once the rail's own
+/// padding and — in `Beside` — the icon and its gap are taken out of
+/// [`LABELLED_RAIL_MAX_WIDTH`].
+///
+/// # Why the name is bounded here and not only by the rail
+///
+/// `container(col).max_width(..)` caps the rail, but it does not decide
+/// how the room inside is shared, and iced's row hands it out in child
+/// order: the first child is laid out against everything available, and
+/// what is left goes to the next. Under RTL the name comes first, so an
+/// unbounded name takes the room and the icon is laid out against the
+/// remainder.
+///
+/// **Measured**, with a 36-character name and no bound: the icon's glyph
+/// is drawn **7.63px wide under LTR and 2.26px under RTL** — squeezed to
+/// under a third, in one direction only, which is exactly the kind of
+/// defect ABDD exists to prevent. With the bound it is 7.63px in both.
+///
+/// `Beneath` does not need this: its column is a cross-axis fit, so the
+/// rail's own `max_width` already bounds the name there (measured
+/// 222.46px against the 224px available). The arm is spelled out anyway
+/// — the two forms share one cap, and a form whose bound comes from
+/// somewhere else is a thing a reader would have to go and check.
+fn name_max_width(placement: LabelPlacement, label_gap: f32) -> f32 {
+    let inside_rail = LABELLED_RAIL_MAX_WIDTH - 2.0 * RAIL_HORIZONTAL_PADDING;
+
+    match placement {
+        LabelPlacement::Beneath => inside_rail,
+        LabelPlacement::Beside => inside_rail - BUTTON_SIZE - label_gap,
+    }
+}
+
+/// Which of the two labelled forms [`labelled_rail`] is drawing.
+///
+/// [`SideBarLabels`] minus `Tooltip`, which `build_side_bar` has already
+/// dispatched away. Having it means `labelled_rail` matches exhaustively
+/// over the forms it can actually draw, rather than carrying an
+/// unreachable arm.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LabelPlacement {
+    Beneath,
+    Beside,
+}
 
 /// The unstyled tooltip body's corner radius: the rail's own button
 /// radius literal, so the tooltip is shaped like the buttons it belongs
@@ -167,6 +279,16 @@ pub(crate) struct SideBarGeometry {
     pub(crate) vertical_padding: f32,
     /// Icon button corner radius.
     pub(crate) button_radius: f32,
+    /// Size of an item's name on a labelled rail, or `None` to inherit
+    /// the host's `default_text_size`.
+    ///
+    /// RFC-104: the unstyled path inherits, so an application that sets a
+    /// larger text size gets larger rail names without snora knowing
+    /// about it; the design path uses `Typography::label`, the role the
+    /// other chrome labels use. Unused by
+    /// [`SideBarLabels::Tooltip`], which sizes its tooltip text through
+    /// [`TooltipBody`] instead.
+    pub(crate) label_size: Option<f32>,
 }
 
 impl SideBarGeometry {
@@ -176,14 +298,40 @@ impl SideBarGeometry {
             gap: 16.0,
             vertical_padding: 16.0,
             button_radius: 6.0,
+            label_size: None,
         }
     }
 }
 
-/// Render a [`SideBar`] as an icon rail.
+/// Render a [`SideBar`] as a rail that names its items beneath their
+/// icons.
+///
+/// Equivalent to [`app_side_bar_with`] with [`SideBarLabels::Beneath`].
+/// To choose another form — names beside the icons, or icons only with
+/// the names in tooltips — call that instead.
 pub fn app_side_bar<'a, Message, ViewId>(
     side_bar: SideBar<Message, ViewId>,
     direction: LayoutDirection,
+) -> iced::Element<'a, Message>
+where
+    Message: Clone + 'a,
+    ViewId: Clone + PartialEq + 'a,
+{
+    app_side_bar_with(side_bar, direction, SideBarLabels::Beneath)
+}
+
+/// Render a [`SideBar`], choosing where its items are named (RFC-114).
+///
+/// The rail is content-sized in the two labelled forms — as wide as its
+/// longest name needs, and never wider than 240px, which the names wrap
+/// at. In [`SideBarLabels::Tooltip`] it is the fixed 64px icon rail.
+///
+/// Keyboard users cannot reach the rail in any form: iced 0.14's buttons
+/// take no keyboard input. See [`SideBarLabels`].
+pub fn app_side_bar_with<'a, Message, ViewId>(
+    side_bar: SideBar<Message, ViewId>,
+    direction: LayoutDirection,
+    labels: SideBarLabels,
 ) -> iced::Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -194,10 +342,35 @@ where
         direction,
         SideBarGeometry::unstyled(),
         TooltipBody::unstyled(),
+        labels,
     )
 }
 
 pub(crate) fn build_side_bar<'a, Message, ViewId>(
+    side_bar: SideBar<Message, ViewId>,
+    direction: LayoutDirection,
+    geometry: SideBarGeometry,
+    tooltip_body: TooltipBody,
+    labels: SideBarLabels,
+) -> iced::Element<'a, Message>
+where
+    Message: Clone + 'a,
+    ViewId: Clone + PartialEq + 'a,
+{
+    match labels {
+        SideBarLabels::Beneath => {
+            labelled_rail(side_bar, direction, geometry, LabelPlacement::Beneath)
+        }
+        SideBarLabels::Beside => {
+            labelled_rail(side_bar, direction, geometry, LabelPlacement::Beside)
+        }
+        SideBarLabels::Tooltip => icon_rail(side_bar, direction, geometry, tooltip_body),
+    }
+}
+
+/// The icon-only rail: a 64px strip of 48x48 icon buttons, each naming
+/// its item in a tooltip. What every rail was before RFC-114.
+fn icon_rail<'a, Message, ViewId>(
     side_bar: SideBar<Message, ViewId>,
     direction: LayoutDirection,
     geometry: SideBarGeometry,
@@ -281,6 +454,117 @@ where
         .into()
 }
 
+/// A rail that names its items on the rail itself (RFC-114).
+///
+/// # Why this is content-sized and the icon rail is not
+///
+/// The icon rail's width is a constant: a 48px button plus the padding
+/// left over once it is centred. A name has no constant width, so a
+/// labelled rail is as wide as its longest name needs —
+/// `Length::Shrink`, bounded by [`LABELLED_RAIL_MAX_WIDTH`], which is
+/// also the width the names wrap at.
+///
+/// # What the highlight covers
+///
+/// The whole item is one button, so the active highlight spans the icon
+/// and the name together. In the icon rail the button was the icon alone,
+/// because the name was not on the rail to cover.
+///
+/// # What the items align to
+///
+/// `Beneath` centres each item, so a name sits under its own icon.
+/// `Beside` aligns them to the **logical start** edge, so every icon
+/// lands at the same place however long its neighbour's name is — the
+/// start edge being the left under LTR and the right under RTL, since
+/// iced's `Column::align_x` is physical.
+fn labelled_rail<'a, Message, ViewId>(
+    side_bar: SideBar<Message, ViewId>,
+    direction: LayoutDirection,
+    geometry: SideBarGeometry,
+    placement: LabelPlacement,
+) -> iced::Element<'a, Message>
+where
+    Message: Clone + 'a,
+    ViewId: Clone + PartialEq + 'a,
+{
+    // Half the rail's own inter-item gap: an icon and the name belonging
+    // to it are closer together than two different items are, and this
+    // keeps the two distances related rather than independently chosen.
+    // On the design path `geometry.gap` is a `Spacing` token, so this
+    // follows it.
+    let label_gap = geometry.gap / 2.0;
+
+    let align = match (placement, direction) {
+        (LabelPlacement::Beneath, LayoutDirection::Ltr)
+        | (LabelPlacement::Beneath, LayoutDirection::Rtl) => Alignment::Center,
+        (LabelPlacement::Beside, LayoutDirection::Ltr) => Alignment::Start,
+        (LabelPlacement::Beside, LayoutDirection::Rtl) => Alignment::End,
+    };
+
+    let mut col = column![].spacing(geometry.gap).align_x(align);
+
+    for item in side_bar.items {
+        let is_active = item.view_id == side_bar.active;
+        let button_radius = geometry.button_radius;
+
+        // The icon keeps the 48x48 box it has on the icon rail, centred
+        // on both axes for the reason RFC-099 gives there. It is what
+        // makes every item at least 48px tall, whichever form this is,
+        // and it keeps the icons on a labelled rail the same size as the
+        // icons on an icon rail (icon sizing itself is RFC-115's).
+        let icon_box = container(icon_element(&item.icon)).center(Length::Fixed(BUTTON_SIZE));
+
+        // Wrapped, never clipped (RFC-105 R-1). `WordOrGlyph` also
+        // breaks a name with no space in it, which a word-only wrap
+        // would push past the cap instead.
+        let mut name = text(item.tooltip).wrapping(Wrapping::WordOrGlyph);
+        if let Some(size) = geometry.label_size {
+            name = name.size(size);
+        }
+
+        let name = container(name).max_width(name_max_width(placement, label_gap));
+
+        let content: Element<'a, Message> = match placement {
+            LabelPlacement::Beneath => column![icon_box, name]
+                .spacing(label_gap)
+                .align_x(Alignment::Center)
+                .into(),
+            LabelPlacement::Beside => row_dir(direction, icon_box, name)
+                .spacing(label_gap)
+                .align_y(Alignment::Center)
+                .into(),
+        };
+
+        // Zero padding, as on the icon rail: the rail's own horizontal
+        // padding already insets the item, and a second inset here would
+        // put the icons further from the rail edge than they are today
+        // for no reason a reader could see.
+        let btn = button(content)
+            .on_press(item.on_press.clone())
+            .padding(0)
+            .style(move |theme, status| {
+                sidebar_button_style(theme, status, is_active, button_radius)
+            });
+
+        col = col.push(btn);
+    }
+
+    // No `.width(..)`: `Shrink` is the container's default, and the rail
+    // taking its width from its names is the point. `max_width` both caps
+    // the rail and gives the names a line to wrap at.
+    //
+    // `Padding::from([a, b])` is `[vertical, horizontal]` in iced_core
+    // 0.14 (top/bottom = a, left/right = b).
+    container(col)
+        .max_width(LABELLED_RAIL_MAX_WIDTH)
+        .height(Length::Fill)
+        .padding(Padding::from([
+            geometry.vertical_padding,
+            RAIL_HORIZONTAL_PADDING,
+        ]))
+        .into()
+}
+
 pub(crate) fn sidebar_button_style(
     theme: &iced::Theme,
     status: button::Status,
@@ -310,8 +594,24 @@ pub(crate) fn sidebar_button_style(
     // guaranteed-readable pairing for it. The inactive states are
     // unaffected — `background.base.text` already clears the floor
     // against both the page background and `background.weak.color`.
+    //
+    // **Corrected again (RFC-114 Unit 3b).** "iced's own
+    // guaranteed-readable pairing" is not guaranteed at AA: measured
+    // from drawn pixels, `primary.strong.text` on `primary.strong.color`
+    // comes to 3.93:1 on Solarized Light and Solarized Dark, 4.23 on
+    // Tokyo Night Light and 4.27 on Catppuccin Latte. That cleared the
+    // 3.0 non-text floor while the active item held only an icon. RFC-114
+    // puts the item's **name** there, which is text at 4.5 — so the same
+    // rule the toast's text already uses applies here:
+    // [`crate::style::readable_text`] keeps the theme's pair wherever it
+    // holds and falls back to the stronger pole where it does not.
+    //
+    // This is one rule for the active item in **every** form, the icon
+    // rail included: the icon is the item's only content there, and a
+    // glyph a reader cannot make out is no better than a name they
+    // cannot read.
     let text_color = if is_active {
-        ep.primary.strong.text
+        crate::style::readable_text(sidebar_active_color(theme), ep.primary.strong.text)
     } else {
         ep.background.base.text
     };

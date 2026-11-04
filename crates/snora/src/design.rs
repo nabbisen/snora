@@ -87,8 +87,9 @@ pub use render::{render, responsive_render};
 /// prefab building blocks.
 #[cfg(feature = "widgets")]
 pub mod widget {
+    pub use snora_widgets::SideBarLabels;
     pub use snora_widgets::design::widget::{
-        app_breadcrumb, app_footer, app_header, app_side_bar, app_tab_bar,
+        app_breadcrumb, app_footer, app_header, app_side_bar, app_side_bar_with, app_tab_bar,
     };
 }
 

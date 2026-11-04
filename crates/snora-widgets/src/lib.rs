@@ -67,7 +67,7 @@ pub use footer::app_footer;
 pub use header::app_header;
 pub use icon::{icon_element, icon_element_sized};
 pub use menu::render_menu;
-pub use sidebar::app_side_bar;
+pub use sidebar::{SideBarLabels, app_side_bar, app_side_bar_with};
 pub use tab::app_tab_bar;
 
 /// Convenience re-export of the Lucide icon constants, available when

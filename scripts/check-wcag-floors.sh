@@ -50,8 +50,16 @@ cd "$(git rev-parse --show-toplevel)"
 # test-only: the toast's text now falls back to the stronger pole where
 # the theme's own pair misses AA, so the floor has to be readable at
 # runtime and not just by the suite that checks it.
+#
+# 2026-11-04 (RFC-114): AA_TEXT 5 -> 6. The new copy is in
+# `crates/snora-widgets/src/style.rs`, and it is the second that is
+# **not** test-only: the sidebar's active item name falls back to the
+# stronger pole on the same rule as the toast's text. The two runtime
+# copies cannot be shared -- `snora` depends on `snora-widgets`, and
+# `snora-widgets` is optional while the toast is not -- so one case
+# table is asserted against both instead.
 declare -A EXPECTED_COUNT=(
-  [AA_TEXT]=5
+  [AA_TEXT]=6
   [NON_TEXT_MIN]=6
   [FOCUS_MIN]=1
   [TEXT_SIZE_MIN]=1

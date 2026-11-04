@@ -390,10 +390,19 @@ fn readable_text(fill: Color, paired: Color) -> Color {
     }
 }
 
-/// WCAG 1.4.3 AA for body text. A fifth in-crate copy of the same
+/// WCAG 1.4.3 AA for body text. One of six in-crate copies of the same
 /// number, pinned by `scripts/check-wcag-floors.sh`; this one is
 /// runtime rather than test-only, because the fallback has to make the
 /// same judgement the tests do.
+///
+/// **`snora_widgets::style` carries a twin of this whole rule**
+/// (RFC-114 Unit 3b), for the sidebar's active name. Neither crate can
+/// call the other's: `snora` depends on `snora-widgets`, and
+/// `snora-widgets` is optional while the toast is not. One table of
+/// cases is asserted against both copies — `readable_text_table`, in
+/// this crate's `toast::contrast_tests` and in
+/// `snora_widgets::contrast_tests` — so they cannot drift in what they
+/// decide. If you change either, change both.
 const AA_TEXT: f32 = 4.5;
 
 /// Returns `(background, text_color)` for a toast intent — the single

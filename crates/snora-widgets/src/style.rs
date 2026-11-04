@@ -114,3 +114,83 @@ pub(crate) fn chrome_container_style_with_radius(theme: &Theme, radius: f32) -> 
 pub fn sidebar_active_color(theme: &Theme) -> Color {
     theme.extended_palette().primary.strong.color
 }
+
+// ---------------------------------------------------------------------
+// The readable-text rule, as a crate-private twin (RFC-114 Unit 3b)
+// ---------------------------------------------------------------------
+
+/// WCAG 1.4.3 AA for body text.
+///
+/// A sixth in-crate copy of the same number, pinned by
+/// `scripts/check-wcag-floors.sh`, and the second that is **not**
+/// test-only: the rail's active name falls back to the stronger pole
+/// where the theme's own pair misses AA, so the floor has to be readable
+/// at runtime and not only by the suite that checks it.
+pub(crate) const AA_TEXT: f32 = 4.5;
+
+/// Relative luminance, per WCAG 2.x.
+///
+/// # Why this is duplicated
+///
+/// **The twin is `snora::toast`'s copy** (`crates/snora/src/toast.rs`),
+/// which RFC-111 wrote for the toast's own text. `snora-widgets` cannot
+/// call it: `snora` depends on `snora-widgets`, not the other way
+/// round. The engine's toast cannot call this one either, because
+/// `widgets` is an optional feature and the toast is not. So the rule
+/// exists twice on purpose.
+///
+/// **One table of cases is asserted against both copies** —
+/// `readable_text_table` in `crate::contrast_tests` and in
+/// `snora::toast::contrast_tests` — so the two cannot drift in what
+/// they decide, only in where they live. If you change either, change
+/// both, and the table will tell you if you did not.
+pub(crate) fn relative_luminance(c: Color) -> f32 {
+    fn channel(c: f32) -> f32 {
+        if c <= 0.04045 {
+            c / 12.92
+        } else {
+            ((c + 0.055) / 1.055).powf(2.4)
+        }
+    }
+    0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
+}
+
+/// WCAG contrast ratio between two opaque colours. Twin of
+/// `snora::toast`'s copy; see [`relative_luminance`].
+pub(crate) fn contrast_ratio(a: Color, b: Color) -> f32 {
+    let (la, lb) = (relative_luminance(a), relative_luminance(b));
+    (la.max(lb) + 0.05) / (la.min(lb) + 0.05)
+}
+
+/// Black or white, whichever contrasts more with `fill`. Twin of
+/// `snora::toast`'s copy; see [`relative_luminance`].
+///
+/// **This always clears AA.** For any opaque colour with luminance `L`,
+/// black contrasts at `(L + 0.05) / 0.05` and white at
+/// `1.05 / (L + 0.05)`; the two are equal at
+/// `L = √(0.05 × 1.05) − 0.05`, where both are `√(1.05 / 0.05) ≈
+/// 4.583:1`. Every other luminance makes one of them larger, so the
+/// worse case of the better choice is 4.583 — above the floor, for
+/// every fill a theme can produce.
+pub(crate) fn stronger_pole(fill: Color) -> Color {
+    if contrast_ratio(Color::BLACK, fill) >= contrast_ratio(Color::WHITE, fill) {
+        Color::BLACK
+    } else {
+        Color::WHITE
+    }
+}
+
+/// The theme's own paired text when it clears AA against the fill, and
+/// the stronger pole when it does not. Twin of `snora::toast`'s copy;
+/// see [`relative_luminance`].
+///
+/// The theme's choice is kept wherever it holds, because it is the one
+/// that looks deliberate; the fallback only replaces a pairing that
+/// fails.
+pub(crate) fn readable_text(fill: Color, paired: Color) -> Color {
+    if contrast_ratio(paired, fill) >= AA_TEXT {
+        paired
+    } else {
+        stronger_pole(fill)
+    }
+}

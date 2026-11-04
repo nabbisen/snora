@@ -142,7 +142,7 @@ impl App {
             column![
                 text(format!("Current direction: {:?}", self.direction)).size(22),
                 text(
-                    "Click the header button (or the sidebar icon) to flip \
+                    "Click the header button (or the sidebar item) to flip \
                      the layout. Header, sidebar, body row below, and toast \
                      anchor all mirror together.",
                 )
