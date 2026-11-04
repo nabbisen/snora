@@ -151,3 +151,62 @@ All suggestions accepted, as revised in `393c753`.
 - **Q-3:** `Density` is left alone.
 - **Q-4:** the release target is set when Unit 0 reports.
 - **Q-5:** the question to adopters goes in the 0.53 → 0.54 migration guide.
+
+## Amendment, 2026-11-05 (owner-approved): two needs, two exact rules, one place
+
+Unit 0 (`.git-exclude/reviewed/115-size-inventory/`) measured 19 rows. Before ruling
+Q-1, the owner asked whether the rulings met the fundamental philosophy. Three
+refinements resulted.
+
+**1. Targets: two independent inputs, one rule.** Text size answers eyesight, and
+target size answers hands (a tremor). Tying targets only to text would leave a reader
+with steady eyes and unsteady hands no way to get larger targets. orbok asked for
+exactly this (request 2, 2026-11-04). **The rule:**
+
+> *A snora pointer target is at least max(24 px, 1.5 × the text it sits with, the
+> minimum target size).*
+
+- **k = 1.5** (Q-1). Unit 0: it changes 0 of 17 rows at the default text size, and
+  3 at 24 px (toast close, chip filter, chip remove).
+- **The minimum target size is a new design token,** a target group on `Tokens`, at
+  24 px in every preset, so nothing changes until an application raises it, to 44 for
+  instance. It is permitted by the covenant: `Tokens` is `#[non_exhaustive]`, and
+  "new fields on `#[non_exhaustive]` types" are allowed without reopening the gate.
+  This replaces the original Q-3's "no new token": the token answers a need the text
+  cannot.
+- **The unstyled path has no tokens,** so its only input is the application's text
+  size. That fits snora's split, where tunables live in tokens, and the docs say so.
+
+**2. Icons: one exact ratio.** "Follows text" alone could not be applied by hand. **The
+rule:**
+
+> *A pictogram is 1 em of the text it sits with. The × close mark is 1.125 em, because
+> an × fills less of its em than a pictogram.*
+
+- **The icon rail's `Tooltip` form** shows no text, so its icons are 1 em of the label
+  size its names would have.
+- **Defaults:**
+  - **Unstyled chrome icons grow from 14 to 16 px** at the default text size, to match
+    their text. That is a named default change, in the migration guide.
+  - **Design-path icons are unchanged** (`Typography::label`, 14).
+  - **The toast ×** keeps its 18 px at the default text size, and grows with the text.
+- **This ends the split Unit 0 found,** where design-path chip and notice icons follow
+  text and chrome icons are a literal 14 (`icon.rs:8`).
+
+**3. One place implements both rules: RFC-116's `control`.** On the unstyled path,
+view code never sees the text size. Only a widget's layout can read it, through
+`text::Renderer::default_size()` (`iced_core/src/text.rs:344`). SVG icons need a
+numeric size too (`icon.rs:52`). So:
+- `control`'s layout enforces the target rule;
+- the icon rule is applied at layout time;
+- there is no per-widget code to write now and throw away later.
+
+**R-2 therefore follows RFC-116's R-1.** Nothing is urgent: Unit 0 found nothing under
+24 px.
+
+**Rulings, as amended:**
+- **Q-1:** k = 1.5, with a 24 px floor, plus the minimum target size token.
+- **Q-3 (revised):** a target group on `Tokens`; `Density` is still untouched.
+- **The icon rule:** as above.
+- **R-2:** implemented inside RFC-116's `control`, in the release after RFC-116 R-1.
+- **Q-2, Q-4 and Q-5:** unchanged.

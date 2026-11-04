@@ -48,6 +48,7 @@ replaces. Read `.git-exclude/reviewed/iced-buttons-take-no-keyboard-input/` firs
 | **Binary size** | every size probe, before and after. Report the graph change as RFC-112 did; byte-identity is not expected |
 | **Compile time** | `measure-compile-time.sh`'s columns, before and after |
 | **Porting surface** | every `iced_core` item `control` uses, with a note on which are most likely to change in an iced major. This is the figure Q-1 is ruled on |
+| **Sizing feasibility (RFC-115)** | in `control`'s layout, read `text::Renderer::default_size()`, and give the sidebar item a minimum of max(24, 1.5 × text). Show it at default text and at a host text size of 24 px. This proves RFC-115's R-2 can live here. Prototype only: no token yet |
 | **Renderer parity** | the ring on both renderers, through the parity job |
 
 **Also report:** anything iced's `button` does that `control` does not yet do (status

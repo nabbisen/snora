@@ -77,6 +77,11 @@ when the first two exist, so it is never a stopgap to deprecate later.
   Tab → `focus_next`, Shift+Tab → `focus_previous`. It is the one line an application
   adds to its keyboard subscription. Getting-started wires it, and so does every
   example.
+- **It also owns sizing (RFC-115's amendment, 2026-11-05).** `control`'s layout
+  enforces the target rule, target ≥ max(24 px, 1.5 × text, the minimum target
+  token), and the icon rule (a pictogram is 1 em, the × is 1.125 em). It reads the
+  text size through `text::Renderer::default_size()`. One widget owns reach, operate,
+  focus and size.
 - **Built on `iced_core`, not on iced's `advanced` feature,** so no consumer's feature
   set changes (RFC-112's lesson). `iced_core` is already in every snora graph; it
   becomes a direct dependency at the same `0.14` requirement, so it unifies with
