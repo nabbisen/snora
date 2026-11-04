@@ -1,6 +1,7 @@
 # RFC-113 — A toast disappears before a slow reader finishes it
 
-**Status.** Proposed.
+**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/113-…`](../handoffs/113-a-toast-disappears-before-a-slow-reader-finishes-it/implementation-handoff.md).
 **Raised.** 2026-11-04, architect, from the owner's question about older users (Theme
 E). The owner approved opening it.
 **Release target.** 0.54.0 (Q-5). **Priority.** A defect on the default path, for
@@ -192,3 +193,19 @@ warn but break nothing, except builds that deny warnings.
    expires one full duration after release. Each assertion is shown failing with
    hold disabled.
 4. CHANGELOG under Changed, with the rule's sentence quoted.
+
+---
+
+## Rulings, 2026-11-04
+
+All suggestions accepted, as revised in `393c753`.
+
+- **R-1:** Error is persistent by default.
+- **Q-1:** 2 s + 1 s per 6 characters, rounded up, with a 6 s floor, as
+  `ToastLifetime::reading_time`. `DEFAULT` is deprecated, and its value stays 4 s.
+- **Q-2:** the hold is in. `sweep_expired` is deprecated in favour of
+  `sweep_expired_holding`.
+- **Q-3:** the application keeps the held ids; `restart` resets `created_at`. No
+  `snora-core` vocabulary change.
+- **Q-4:** Warning stays transient.
+- **Q-5:** 0.54.0.

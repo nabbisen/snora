@@ -1,10 +1,12 @@
 # RFC-114 — The sidebar names its items only under the pointer
 
-**Status.** Proposed.
+**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/114-…`](../handoffs/114-the-sidebar-names-its-items-only-under-the-pointer/implementation-handoff.md).
 **Raised.** 2026-11-04, architect, from the owner's question about older users (Theme
 E). The owner approved opening it.
-**Release target.** 0.54.0 (Q-4). **Priority.** A defect for keyboard users today. For
-older users it is a usability problem: it asks them to remember what an icon means.
+**Release target.** 0.54.0 (Q-4). **Priority.** A usability defect for pointer, touch and
+older users: it asks every reader to remember what an icon means. *(Corrected
+2026-11-04: this said "a defect for keyboard users". See the correction below.)*
 
 ---
 
@@ -18,15 +20,17 @@ The item's name, `SideBarItem::tooltip`, appears only in a tooltip.
 `iced_widget-0.14.2/src/tooltip.rs:224` moves to `Hovered` and then `Open` from
 `cursor.position_over(bounds)`. Nothing else opens it: not focus, and not a key.
 So:
-- **a keyboard user** who tabs along the rail sees a focus ring around an icon, and
-  never its name;
+- **a keyboard user** cannot reach the rail at all. In iced 0.14 a button is not
+  focusable and takes no keyboard input, in either form of the rail (see the
+  correction below). Their route to a view is an application shortcut, like orbok's
+  `Ctrl/Cmd+1..6`;
 - **a touch user** has no resting pointer to hover with;
 - **an older user** must either remember what each icon means or hold the pointer
   still long enough for the tooltip's delay, which a tremor makes hard.
 
 **Our rustdoc claims the opposite.** `SideBarItem::tooltip`
 (`crates/snora-core/src/sidebar.rs:29`) says: "Required for accessibility — keyboard
-and screen-reader users rely on it." Keyboard users cannot see it. iced 0.14 has no
+and screen-reader users rely on it." Keyboard users cannot reach it. iced 0.14 has no
 accessibility tree, as `accessibility.md` already says correctly, so no screen reader
 reads it either. The sentence is published on docs.rs, and is withdrawn by R-3.
 
@@ -55,20 +59,19 @@ paths. **Which one is the default is Q-1**, and how a caller passes it is Q-3.
 
 **R-3 — withdraw the false claim.** `SideBarItem::tooltip`'s doc says what is true:
 the item's name, shown beside the icon in the labelled form, and on pointer hover
-only in the icon form. In the icon form keyboard users do not see it, and no screen
-reader reads it.
+only in the icon form. Keyboard users cannot reach the rail in either form, because
+iced 0.14's buttons take no keyboard input, and no screen reader reads it.
 
 **R-4 — the compact form says what it costs.** The icon rail stays as the compact
 choice for narrow windows (`examples/responsive` collapses the rail by width). Its
-docs say that keyboard users get no names in it. snora cannot fix that in the icon
-form: a label on focus would need to know which widget has focus, and that needs
-iced's `advanced` feature, which the owner has ruled must never be a default
-(RFC-078).
+docs say that it names items only under the pointer, so touch users and anyone who
+cannot hold the pointer still get no names.
 
 ## Open questions
 
-**Q-1 — the default.** **Suggest `Visible`.** ABDD puts the accessible form first, and
-the icon form cannot name its items to a keyboard user at all.
+**Q-1 — the default.** **Suggest `Visible`.** ABDD puts the accessible form first. The
+icon form makes every reader recall what an icon means, and gives a touch user no
+name at all.
 - **Who pays:** only applications that draw snora's prefab rail. arama composes its
   own (it has no `snora-widgets` at all). From what the teams have told us, orbok and
   knotra use prefab widgets; whether either uses `app_side_bar` is **not known**.
@@ -78,7 +81,7 @@ the icon form cannot name its items to a keyboard user at all.
 - An application that wants the compact rail passes `SideBarLabels::Tooltip`, one
   argument.
 - **The alternative:** keep `Tooltip` as the default and document `Visible`. That
-  leaves today's keyboard defect as the default, which ABDD argues against.
+  leaves recall over recognition as the default, which ABDD argues against.
 
 **Q-2 — the width rule.** **Suggest content-sized, capped at 240 px.** A reader can
 predict it: the rail fits its longest name, up to a limit. A fixed width would waste
@@ -126,3 +129,31 @@ default appearance if Q-1 is ruled `Visible`, so the migration guide leads with 
    `SideBarLabels::Tooltip`.
 4. R-3's doc rewritten. CHANGELOG under Changed (default appearance) and Fixed (the
    doc claim).
+
+---
+
+## Correction, 2026-11-04 (while writing the handoff)
+
+This RFC first argued from keyboard users: "a keyboard user who tabs along the rail
+sees a focus ring around an icon, and never its name". **That was false.** iced
+0.14's `button` handles mouse and touch only, and registers no focus target. A probe
+showed that Tab, Enter and Space never press a button
+(`.git-exclude/reviewed/iced-buttons-take-no-keyboard-input/`). Keyboard users cannot
+reach the rail in either form.
+
+**What still holds:** the labelled form is for pointer, touch and older users, who
+recognise a name rather than recall an icon. Q-1's outcome is unchanged; its keyboard
+reasoning is removed. The owner accepted the RFC with the keyboard argument in it, so
+the change is reported to them. The same finding withdraws the book's claim that iced
+buttons take Enter / Space (six files, corrected the same day).
+
+## Rulings, 2026-11-04
+
+All suggestions accepted, as revised in `393c753`.
+
+- **Q-1:** `SideBarLabels::Visible` is the default.
+- **Q-2:** the rail is content-sized, capped at 240 px. The dev team measures the real
+  labels before the cap is fixed.
+- **Q-3:** `app_side_bar` and `design::app_side_bar` keep their signatures. The
+  `_with` variants take `SideBarLabels`.
+- **Q-4:** 0.54.0.

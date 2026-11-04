@@ -1,6 +1,7 @@
 # RFC-115 — Nothing in snora grows for a reader who needs it larger
 
-**Status.** Proposed.
+**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/115-…`](../handoffs/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger/implementation-handoff.md).
 **Raised.** 2026-11-04, architect, from the owner's question about older users (Theme
 E). The owner approved opening it.
 **Release target.** Not fixed until Unit 0 reports (Q-4). **Priority.** An
@@ -136,3 +137,17 @@ now, and they did not ask.
 2. R-2 (after the Q-1 ruling): a rendered test at 16 px and 24 px host text that
    asserts each target's minimum, failing first on today's literals.
 3. R-3's statement, with every guarantee in it traced to a test.
+
+---
+
+## Rulings, 2026-11-04
+
+All suggestions accepted, as revised in `393c753`.
+
+- **Unit 0 first,** as its own review, after RFC-114 lands (it changes the sidebar).
+- **Q-1:** the rule is target ≥ max(24 px, k × text). k is ruled after Unit 0, starting
+  from 1.5, which leaves today's defaults unchanged.
+- **Q-2:** no 7:1 change here.
+- **Q-3:** `Density` is left alone.
+- **Q-4:** the release target is set when Unit 0 reports.
+- **Q-5:** the question to adopters goes in the 0.53 → 0.54 migration guide.

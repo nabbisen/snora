@@ -169,14 +169,14 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 | 112 | [A consumer cannot turn off any of iced's default features](./accepted/112-a-consumer-cannot-turn-off-any-iced-default-feature.md) | 0.54.0 — **accepted 2026-10-21**; reported by aaai; snora's crates force all eight iced defaults. Drawing features (`web-colors`, `crisp`) stay snora's (ABDD: without `web-colors` the light dim falls to 1.72); the rest pass through a default-on `iced-default`, proved from a consumer probe (handoff: [`handoffs/112-…`](./handoffs/112-a-consumer-cannot-turn-off-any-iced-default-feature/implementation-handoff.md)) |
+| 113 | [A toast disappears before a slow reader finishes it](./accepted/113-a-toast-disappears-before-a-slow-reader-finishes-it.md) | 0.54.0 — Theme E (older users); every toast lasts 4 s and nothing holds it; errors persistent, duration follows text length (2 s + 1 s per 6 characters, rounded up, ≥ 6 s), hold on hover with `sweep_expired` deprecated so every app wires it — **accepted 2026-11-04** (handoff: [`handoffs/113-…`](./handoffs/113-a-toast-disappears-before-a-slow-reader-finishes-it/implementation-handoff.md)) |
+| 114 | [The sidebar names its items only under the pointer](./accepted/114-the-sidebar-names-its-items-only-under-the-pointer.md) | 0.54.0 — Theme E; iced opens tooltips on hover only, so keyboard users never see a rail item's name; a labelled rail, suggested as the default; a false rustdoc claim withdrawn — **accepted 2026-11-04** (handoff: [`handoffs/114-…`](./handoffs/114-the-sidebar-names-its-items-only-under-the-pointer/implementation-handoff.md)) |
+| 115 | [Nothing in snora grows for a reader who needs it larger](./accepted/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger.md) | after Unit 0 — Theme E; text follows the host size but targets and icons are literals; one rule, targets follow text; inventory first — **accepted 2026-11-04** (handoff: [`handoffs/115-…`](./handoffs/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 113 | [A toast disappears before a slow reader finishes it](./proposed/113-a-toast-disappears-before-a-slow-reader-finishes-it.md) | 0.54.0 — Theme E (older users); every toast lasts 4 s and nothing holds it; errors persistent, duration follows text length (2 s + 1 s per 6 characters, rounded up, ≥ 6 s), hold on hover with `sweep_expired` deprecated so every app wires it |
-| 114 | [The sidebar names its items only under the pointer](./proposed/114-the-sidebar-names-its-items-only-under-the-pointer.md) | 0.54.0 — Theme E; iced opens tooltips on hover only, so keyboard users never see a rail item's name; a labelled rail, suggested as the default; a false rustdoc claim withdrawn |
-| 115 | [Nothing in snora grows for a reader who needs it larger](./proposed/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger.md) | after Unit 0 — Theme E; text follows the host size but targets and icons are literals; one rule, targets follow text; inventory first |
 
 ## Archive
 
