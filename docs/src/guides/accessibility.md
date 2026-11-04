@@ -124,6 +124,14 @@ contributor-facing documents linked below, not duplicated here.
   because a default-on mark would double theirs (RFC-103 Q-1). Disabled
   labels are dimmed below 4.5:1 by design; WCAG 1.4.3 exempts inactive
   controls.
+- **Keyboard (WCAG 2.1.1): not met by snora's own controls, today.** In
+  iced 0.14 a `button` is not focusable and takes no keyboard input. So the
+  sidebar, tabs, breadcrumbs, dismiss buttons, menu items and `design::button`
+  are pointer and touch only. Keyboard routes exist only where your
+  application wires them: your shortcuts, `dismiss_on_escape` and
+  `cycle_zones`. **The plan** is RFC-116, tracked as 1.0 gate 11: a focusable
+  control under every snora control, with a focus ring, needing no iced
+  feature. Until it ships, give every action that matters a keyboard shortcut.
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim
