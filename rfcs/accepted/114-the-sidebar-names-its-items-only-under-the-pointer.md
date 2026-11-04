@@ -147,11 +147,46 @@ reasoning is removed. The owner accepted the RFC with the keyboard argument in i
 the change is reported to them. The same finding withdraws the book's claim that iced
 buttons take Enter / Space (six files, corrected the same day).
 
+## Amendment, 2026-11-04 (owner's direction): three forms, the application chooses
+
+The owner asked whether "beside or beneath" had to be a single choice, or whether
+each application could make its own. It does not have to be one choice. **The
+vocabulary names all three forms, and the application chooses:**
+
+| `SideBarLabels::` | Item | Rail width |
+|---|---|---|
+| `Beneath` | icon, with the name centred beneath it | the wider of the icon button and the longest name, capped |
+| `Beside` | icon at the start edge, the name after it, mirrored under RTL | icon + longest name, capped |
+| `Tooltip` | icon only, name in a pointer tooltip (today's rail) | 64 px |
+
+**Default: `Beneath`** (the architect's suggestion; the owner may override it before
+the handoff is released). The reasons:
+- it is what the one adopter with evidence asked for: orbok, 2026-11-04, older
+  users;
+- it keeps the rail narrowest of the two labelled forms, so the applications that
+  adopt the default lose the least body width.
+
+**Everything R-1 says of "the labelled form" applies to both `Beneath` and `Beside`:**
+- the same string;
+- text that follows the host or `Typography`, as orbok scales to ×2.0;
+- wrapping, never clipping;
+- the whole item highlighted when active;
+- at least 48 px per item;
+- no tooltip.
+
+The width cap is one number for both forms, set from the dev team's measurement
+(Q-2). Elsewhere in this RFC, "`Visible`" reads as "the labelled forms", and "the
+default" as `Beneath`.
+
+orbok also reported the icon form's tooltip covering the tab bar's first label when
+the pointer rests on the first item. The labelled forms have no tooltip, so they do
+not have the problem. The icon form keeps it, and its docs say so.
+
 ## Rulings, 2026-11-04
 
 All suggestions accepted, as revised in `393c753`.
 
-- **Q-1:** `SideBarLabels::Visible` is the default.
+- **Q-1:** a labelled form is the default: `Beneath`, per the amendment above.
 - **Q-2:** the rail is content-sized, capped at 240 px. The dev team measures the real
   labels before the cap is fixed.
 - **Q-3:** `app_side_bar` and `design::app_side_bar` keep their signatures. The

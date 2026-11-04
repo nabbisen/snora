@@ -178,6 +178,8 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 | 116 | [No snora control can be reached from the keyboard](./proposed/116-no-snora-control-can-be-reached-from-the-keyboard.md) | R-1 0.55.0, R-2 a 1.0 gate — iced 0.14 buttons take no keyboard input (probe); keyboard routes via pure helpers now; real focus as a 1.0 gate checked at every iced upgrade |
+| 117 | [A link does not look like a link](./proposed/117-a-link-does-not-look-like-a-link.md) | 0.54.0 — orbok request 3 (Theme E); `design::button::link`, an underlined ghost (RFC-109's rule); the accent's text use declared in `Palette::usages` |
+| 118 | [No preset holds every text pair to AAA, short of high contrast](./proposed/118-no-preset-holds-every-text-pair-to-aaa-short-of-high-contrast.md) | 0.55.0 — orbok request 4 (Theme E); measured: `text_muted` 4.53–5.44 and four roles under 7:1 in Light, not only the accent; `light_aaa` / `dark_aaa` presets asserted from the declaration |
 
 ## Archive
 

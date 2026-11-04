@@ -6,7 +6,8 @@ either form, because iced 0.14's buttons take no keyboard input. Do not write an
 test, doc or comment that assumes otherwise.
 **Release target.** 0.54.0.
 **Rulings (2026-11-04):**
-- `SideBarLabels::Visible` is the default;
+- three forms, `SideBarLabels::{Beneath, Beside, Tooltip}`, chosen by the
+  application, with `Beneath` the default. See the RFC's "Amendment, 2026-11-04";
 - the rail is content-sized, capped at 240 px, with the cap confirmed by your
   measurement;
 - `app_side_bar` keeps its signature, and the `_with` variants take `SideBarLabels`.
@@ -33,7 +34,7 @@ writes the migration guide, `accessibility.md` and `reference/widgets.md`.
   (`iced_widget-0.14.2/src/tooltip.rs:224`).
 - **The tooltip form's tests call `app_side_bar(...)` directly:**
   `sidebar_tooltip_body.rs:187,222,246,252`, `side_bar_fit.rs:125,141,259`,
-  `drawn_contrast.rs:303,667` and `caller_text.rs:330`. Once `Visible` is the
+  `drawn_contrast.rs:303,667` and `caller_text.rs:330`. Once `Beneath` is the
   default, those that test the **tooltip** form must call
   `app_side_bar_with(..., SideBarLabels::Tooltip)`. **That is the only change they
   may get** (acceptance criterion 3). Decide per test which form it is about, and
@@ -46,12 +47,16 @@ without hover**, found by exact text. It fails today.
 
 ## Unit 2 — R-1 and R-2
 
-- **`SideBarLabels::{Visible, Tooltip}`** in `snora-widgets`, re-exported beside
+- **`SideBarLabels::{Beneath, Beside, Tooltip}`** in `snora-widgets`, re-exported beside
   `app_side_bar` from `snora::widget` and `snora::design::widget`.
 - **`app_side_bar_with(side_bar, direction, labels)`** and
   `design::app_side_bar_with(tokens, side_bar, direction, labels)`. The existing two
-  functions call these with `Visible`.
-- **The labelled item:** icon at the start edge, then the name, mirrored under RTL.
+  functions call these with `Beneath`.
+- **The labelled items:**
+  - `Beneath`: the icon, with the name centred beneath it;
+  - `Beside`: icon at the start edge, then the name, mirrored under RTL.
+
+  For both:
   - Each item is at least 48 px tall.
   - The active highlight spans the whole item row.
   - The name wraps (`Wrapping::WordOrGlyph`, RFC-105) and never clips.
@@ -59,9 +64,11 @@ without hover**, found by exact text. It fails today.
 - **Text size:** on the unstyled path, inherit the host's `default_text_size`; on the
   design path, use `Typography::label`. This follows RFC-104, the same as the other
   chrome labels.
-- **Width:** content-sized to the longest name, capped at 240 px.
+- **Width:** content-sized to the longest name (`Beneath`: the wider of the button
+  and the name; `Beside`: icon + name), capped. One cap for both, proposed at 240 px.
   - **Measure first:** the rendered width of every rail in `examples/` at the default
-    text size and at a host text size of 24 px.
+    text size, at a host text size of 24 px, and on the design path with
+    `Typography` scaled ×2.0, which is orbok's setting (letter of 2026-11-04).
   - **If 240 cuts names that a reader would expect on one line, report the figures
     and stop.** The cap is the RFC's proposal, not a measurement.
 
@@ -92,10 +99,11 @@ Back up to named files with `cp`, break, run, restore, then `sha256sum -c`. **Ne
 
 | Assertion | Breakage |
 |---|---|
-| names visible at rest | make the default `Tooltip` |
+| names visible at rest (each labelled form) | make the default `Tooltip` |
+| `Beneath` puts the name below the icon | swap it to `Beside`'s row: the name's top must be at or below the icon's bottom |
 | label contrast | draw the label in the rail's own background colour |
 | wraps, never clips | set the label to `Wrapping::None` |
-| RTL mirrors | ignore `direction` in the labelled row |
+| RTL mirrors (`Beside`) | ignore `direction` in the labelled row |
 | tooltip form unchanged | the existing tooltip tests, unmodified apart from the `_with` call |
 
 **If a breakage cannot make its row fail, replace the assertion and say so.**
