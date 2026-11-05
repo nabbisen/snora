@@ -96,6 +96,30 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   layout, and `holds.hover(id, crossing, …)` on that message. **An
   application that does not opt in gets the tree it got before:** no pointer
   tracking is added to a toast layer that did not ask for it.
+- **`Tokens::light_aaa()` and `Tokens::dark_aaa()` (RFC-118).** Light's and
+  Dark's character with **every declared text pair at WCAG AAA** (7:1,
+  criterion 1.4.6) rather than AA. Requested by **orbok**, which holds every
+  text pair it renders to AAA.
+
+  Light and Dark are **unchanged** — they remain AA presets, which is their
+  stated floor, so nothing moves for an application that does not choose a
+  new preset. The high-contrast pair already clears 7:1 everywhere; these
+  two are for an application that wants Light's or Dark's look at AAA
+  without the starkness.
+
+  Each AAA preset keeps its parent's **background, surfaces, border and
+  focus**, and moves only the roles that have to move, by the smallest step
+  that reaches the floor: a lightness-only shift in OKLCh, chroma and hue
+  held. In Light that is `text_muted`, the accent (and `info`, which follows
+  it) and the `success`/`warning`/`danger` fills, each driven by its own
+  text pair. In Dark it is `text_muted`, the accent and `danger` —
+  Dark's success and warning are already clear.
+
+  Two properties are asserted, not just intended: the
+  `text_primary`/`text_secondary`/`text_muted` hierarchy keeps its order
+  (compressed, but never inverted), and **no role's hue moves more than 6°**
+  from its parent's, so `light_aaa` still reads as Light. The largest actual
+  shift is 5.44°.
 - **`ToastHover::{Entered, Left}`** — which way the pointer crossed a toast's
   edge, as core vocabulary beside `ToastIntent` and `ToastPosition`. It is
   what `on_toast_hover` reports and what `Holds::hover` takes.

@@ -46,10 +46,20 @@ const FOCUS_MIN: f32 = 3.0;
 /// which has three. **Enforced by `scripts/check-wcag-floors.sh`.**
 const NON_TEXT_MIN: f32 = 3.0;
 
-fn all_presets() -> [(&'static str, Tokens); 4] {
+/// Every shipped preset.
+///
+/// **The two AAA presets are in here deliberately** (RFC-118): every
+/// test built on this list — mandatory contrast, the surfaces, focus,
+/// the modal dim and the dialog card against it — then runs on them
+/// too, rather than only the AAA sweep that was written for them. A new
+/// preset that passed its own test and failed one of the older ones
+/// would be the obvious way for this to go wrong.
+fn all_presets() -> [(&'static str, Tokens); 6] {
     [
         ("light", Tokens::light()),
         ("dark", Tokens::dark()),
+        ("light_aaa", Tokens::light_aaa()),
+        ("dark_aaa", Tokens::dark_aaa()),
         ("high_contrast_light", Tokens::high_contrast_light()),
         ("high_contrast_dark", Tokens::high_contrast_dark()),
     ]
@@ -463,5 +473,232 @@ fn customizing_a_token_does_not_affect_other_presets() {
         Tokens::light().radius.md,
         6.0,
         "presets must be independent"
+    );
+}
+
+// ---------------------------------------------------------------------
+// The AAA presets (RFC-118)
+// ---------------------------------------------------------------------
+
+/// WCAG 1.4.6 AAA for body text.
+///
+/// Only the AAA presets are held to this. Light, Dark and the two
+/// high-contrast presets keep their own floors — AA for the first two,
+/// which is snora's stated floor, and AA for the high-contrast pair as
+/// a *requirement* even though they happen to clear 7:1 everywhere.
+const AAA_TEXT: f32 = 7.0;
+
+fn aaa_presets() -> [(&'static str, Tokens); 2] {
+    [
+        ("light_aaa", Tokens::light_aaa()),
+        ("dark_aaa", Tokens::dark_aaa()),
+    ]
+}
+
+/// R-2: every text pair the palette *declares* is at AAA, derived from
+/// [`Palette::usages`] rather than from a hand-written list.
+///
+/// **This is why RFC-118 depends on RFC-117's R-5.** Before R-5,
+/// `usages` declared the accent as non-text only, so this sweep would
+/// have skipped the very pair orbok asked about and reported a pass.
+///
+/// Non-text and focus pairs keep their own floors; they are covered by
+/// `all_presets_pass_mandatory_contrast`, which sweeps these two
+/// presets as well.
+///
+/// Every failure is collected and reported together, rather than
+/// stopping at the first: the question "which pairs miss AAA" has a
+/// list for an answer, and a hard assert would show one name at a time.
+#[test]
+fn aaa_presets_hold_every_declared_text_pair_to_aaa() {
+    let mut failures = Vec::new();
+
+    for (name, t) in aaa_presets() {
+        for usage in t.palette.usages() {
+            if usage.class != Some(ThresholdClass::Text) {
+                continue;
+            }
+            for (surface_label, surface_color) in usage.surfaces {
+                let r = contrast_ratio(usage.fg, surface_color);
+                if r < AAA_TEXT {
+                    failures.push(format!(
+                        "{name}: {}/{surface_label} {r:.2} < {AAA_TEXT}",
+                        usage.label
+                    ));
+                }
+            }
+        }
+    }
+
+    assert!(
+        failures.is_empty(),
+        "{} declared text pair(s) under AAA:\n  {}",
+        failures.len(),
+        failures.join("\n  "),
+    );
+}
+
+/// The maximum hue shift an AAA preset may make to any role, in degrees,
+/// measured in OKLCh against its parent preset.
+///
+/// **Proposed from what the values needed, not picked first.** The
+/// largest shift the derivation produced is 5.442° — Dark's accent,
+/// which has to lighten by 0.0706 in OKLCh L and whose chroma is
+/// clipped slightly by the sRGB gamut on the way. The next largest are
+/// Light's warning at 5.095° and Light's success at 2.251°; every other
+/// role moves by under 0.7°, and most by nothing.
+///
+/// 6 leaves the derivation a little room without admitting a shift a
+/// reader would call a different colour. **The owner rules on it**; this
+/// is the figure the values support.
+const AAA_MAX_HUE_SHIFT_DEG: f32 = 6.0;
+
+/// Each AAA preset beside the parent it is derived from.
+fn aaa_parents() -> [(&'static str, Tokens, Tokens); 2] {
+    [
+        ("light_aaa", Tokens::light_aaa(), Tokens::light()),
+        ("dark_aaa", Tokens::dark_aaa(), Tokens::dark()),
+    ]
+}
+
+/// OKLCh hue of a colour, in degrees, or `None` for a colour with no
+/// meaningful hue.
+///
+/// A near-neutral has a hue that is numerically defined but visually
+/// arbitrary: at chroma 0.001 the angle swings freely while the colour
+/// stays grey, so comparing it to a parent's would fail on noise rather
+/// than on anything a reader could see. Those roles are skipped, and
+/// the test says how many it skipped so the number cannot quietly grow.
+fn oklch_hue(c: crate::Color) -> Option<f32> {
+    /// Below this chroma, hue is not a visible property.
+    const NEUTRAL_CHROMA: f32 = 0.01;
+
+    fn to_linear(v: f32) -> f32 {
+        if v <= 0.04045 {
+            v / 12.92
+        } else {
+            ((v + 0.055) / 1.055).powf(2.4)
+        }
+    }
+
+    let (r, g, b) = (to_linear(c.r), to_linear(c.g), to_linear(c.b));
+    let l = 0.412_221_46 * r + 0.536_332_55 * g + 0.051_445_995 * b;
+    let m = 0.211_903_5 * r + 0.680_699_5 * g + 0.107_396_96 * b;
+    let s = 0.088_302_46 * r + 0.281_718_85 * g + 0.629_978_7 * b;
+    let (l_, m_, s_) = (l.cbrt(), m.cbrt(), s.cbrt());
+
+    let a = 1.977_998_5 * l_ - 2.428_592_2 * m_ + 0.450_593_7 * s_;
+    let bb = 0.025_904_037 * l_ + 0.782_771_77 * m_ - 0.808_675_77 * s_;
+
+    let chroma = a.hypot(bb);
+    if chroma < NEUTRAL_CHROMA {
+        return None;
+    }
+    Some(bb.atan2(a).to_degrees().rem_euclid(360.0))
+}
+
+/// **Postcondition 1:** the text hierarchy keeps its order.
+///
+/// `text_primary` ≥ `text_secondary` ≥ `text_muted`, by contrast
+/// against each surface. An AAA preset that made "muted" text stronger
+/// than "secondary" would invert what the role names mean — and
+/// compressing the hierarchy, which raising `text_muted` to 7:1 does,
+/// is exactly the move that could overshoot into inverting it.
+#[test]
+fn aaa_presets_keep_the_text_hierarchy_in_order() {
+    let mut failures = Vec::new();
+
+    for (name, t, _parent) in aaa_parents() {
+        let p = &t.palette;
+        for (surface_label, surface) in [
+            ("background", p.background),
+            ("surface", p.surface),
+            ("surface_raised", p.surface_raised),
+        ] {
+            let primary = contrast_ratio(p.text_primary, surface);
+            let secondary = contrast_ratio(p.text_secondary, surface);
+            let muted = contrast_ratio(p.text_muted, surface);
+
+            if primary < secondary {
+                failures.push(format!(
+                    "{name}/{surface_label}: text_primary {primary:.2} < text_secondary \
+                     {secondary:.2}",
+                ));
+            }
+            if secondary < muted {
+                failures.push(format!(
+                    "{name}/{surface_label}: text_secondary {secondary:.2} < text_muted \
+                     {muted:.2}",
+                ));
+            }
+        }
+    }
+
+    assert!(
+        failures.is_empty(),
+        "{} hierarchy inversion(s):\n  {}",
+        failures.len(),
+        failures.join("\n  "),
+    );
+}
+
+/// **Postcondition 2:** each changed role keeps its parent's hue.
+///
+/// So `light_aaa` still reads as Light, rather than being a different
+/// theme wearing Light's name. Measured in OKLCh, where a hue angle
+/// means roughly the same thing across lightnesses — which is the whole
+/// reason the derivation moved lightness in that space rather than in
+/// sRGB.
+#[test]
+fn aaa_presets_keep_their_parents_hues() {
+    let mut failures = Vec::new();
+    let mut compared = 0usize;
+    let mut skipped_neutral = 0usize;
+
+    for (name, t, parent) in aaa_parents() {
+        let (a, b) = (&t.palette, &parent.palette);
+        for (role, now, before) in [
+            ("text_primary", a.text_primary, b.text_primary),
+            ("text_secondary", a.text_secondary, b.text_secondary),
+            ("text_muted", a.text_muted, b.text_muted),
+            ("border", a.border, b.border),
+            ("accent", a.accent, b.accent),
+            ("accent_text", a.accent_text, b.accent_text),
+            ("success", a.success, b.success),
+            ("success_text", a.success_text, b.success_text),
+            ("warning", a.warning, b.warning),
+            ("warning_text", a.warning_text, b.warning_text),
+            ("danger", a.danger, b.danger),
+            ("danger_text", a.danger_text, b.danger_text),
+            ("info", a.info, b.info),
+            ("info_text", a.info_text, b.info_text),
+            ("focus", a.focus, b.focus),
+        ] {
+            let (Some(h_now), Some(h_before)) = (oklch_hue(now), oklch_hue(before)) else {
+                skipped_neutral += 1;
+                continue;
+            };
+            compared += 1;
+            let delta = (h_now - h_before).abs();
+            let delta = delta.min(360.0 - delta);
+            if delta > AAA_MAX_HUE_SHIFT_DEG {
+                failures.push(format!(
+                    "{name}: {role} moved {delta:.3}° in hue, past {AAA_MAX_HUE_SHIFT_DEG}° \
+                     ({before:?} -> {now:?})",
+                ));
+            }
+        }
+    }
+
+    assert!(
+        compared >= 12,
+        "only {compared} role(s) had a comparable hue; this test is not measuring what it \
+         claims (skipped {skipped_neutral} as near-neutral)",
+    );
+    assert!(
+        failures.is_empty(),
+        "{} hue shift(s) past {AAA_MAX_HUE_SHIFT_DEG}°:\n  {}",
+        failures.len(),
+        failures.join("\n  "),
     );
 }

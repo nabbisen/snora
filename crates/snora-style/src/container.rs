@@ -86,10 +86,16 @@ mod tests {
     use super::*;
     use snora_design::Tokens;
 
-    fn all_presets() -> [Tokens; 4] {
+    // RFC-118: the two AAA presets are swept here too. A preset that
+    // passed `snora-design`'s own suite and then failed a widget-level
+    // style assertion is the obvious way for a new preset to go wrong,
+    // and a list that stayed at four would not have asked.
+    fn all_presets() -> [Tokens; 6] {
         [
             Tokens::light(),
             Tokens::dark(),
+            Tokens::light_aaa(),
+            Tokens::dark_aaa(),
             Tokens::high_contrast_light(),
             Tokens::high_contrast_dark(),
         ]

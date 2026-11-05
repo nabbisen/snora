@@ -48,6 +48,28 @@ impl Tokens {
         crate::presets::dark::tokens()
     }
 
+    /// [`Tokens::light`]'s character, with every declared text pair at
+    /// WCAG AAA (7:1, criterion 1.4.6) rather than AA (RFC-118).
+    ///
+    /// Light and Dark remain AA presets, which is their stated floor.
+    /// This is for an application that wants Light's look at AAA without
+    /// the starkness of [`Tokens::high_contrast_light`]. The background
+    /// and surfaces are Light's own; the text roles and fills are
+    /// darkened only as far as 7:1 requires, and the
+    /// `text_primary`/`text_secondary`/`text_muted` hierarchy keeps its
+    /// order, compressed.
+    #[must_use]
+    pub fn light_aaa() -> Self {
+        crate::presets::light_aaa::tokens()
+    }
+
+    /// [`Tokens::dark`]'s character, with every declared text pair at
+    /// WCAG AAA (RFC-118). See [`Tokens::light_aaa`].
+    #[must_use]
+    pub fn dark_aaa() -> Self {
+        crate::presets::dark_aaa::tokens()
+    }
+
     /// High-contrast light theme prioritizing legibility and border clarity.
     #[must_use]
     pub fn high_contrast_light() -> Self {
