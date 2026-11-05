@@ -85,8 +85,10 @@ impl TabGeometry {
 ///   visual order of the tabs.
 ///
 /// The active tab is rendered with a colored underline drawn from the
-/// theme's primary palette. Each tab is a regular `button`, so keyboard
-/// focus and click semantics come from iced.
+/// theme's primary palette. Each tab is a regular `button`, so its
+/// click semantics come from iced — and so does the absence of keyboard
+/// ones: iced 0.14's buttons take no keyboard input, so a tab cannot be
+/// focused and no key presses one. RFC-116 tracks keyboard access.
 pub fn app_tab_bar<'a, Message, TabId, F>(
     bar: TabBar<TabId>,
     on_action: &'a F,

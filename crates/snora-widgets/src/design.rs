@@ -75,7 +75,9 @@ pub mod notice;
 /// Filter and removable chip primitives (RFC-032).
 ///
 /// See [`chip::filter`] and [`chip::removable`]. Both use
-/// `iced::widget::button` and are keyboard-reachable.
+/// `iced::widget::button`, so both take **pointer and touch input
+/// only**: iced 0.14's buttons take no keyboard input. RFC-116 tracks
+/// keyboard access.
 pub mod chip;
 
 /// Progress row and card primitives (RFC-032).

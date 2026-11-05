@@ -7,7 +7,10 @@
 //!   rest.
 //! * `removable` — a chip with a separate remove (×) button.
 //!
-//! Both are backed by `iced::widget::button` and are keyboard-reachable.
+//! Both are backed by `iced::widget::button`, so both take **pointer
+//! and touch input only**: iced 0.14's `button` handles mouse and touch
+//! events and registers no focus target, so no chip can be focused and
+//! no key presses one. RFC-116 tracks keyboard access.
 //! The application owns selection/filter state.
 //!
 //! # Contrast design (M-4 fix)
@@ -301,8 +304,9 @@ pub fn filter<'a, Message: Clone + 'a>(
 /// A chip with a separate remove button.
 ///
 /// The chip label toggles via `on_toggle`; the remove button emits
-/// `on_remove`. Both controls are `iced::widget::button` and are
-/// keyboard-reachable. The remove button shows lucide `X` under the
+/// `on_remove`. Both controls are `iced::widget::button`, so both take
+/// pointer and touch input only — iced 0.14's buttons take no keyboard
+/// input (RFC-116). The remove button shows lucide `X` under the
 /// `lucide-icons` feature and `"×"` otherwise.
 ///
 /// To show a tooltip on the remove button, use [`removable_with_tooltip`].

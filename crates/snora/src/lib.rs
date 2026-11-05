@@ -201,12 +201,16 @@ pub use snora_widgets::lucide;
 ///   [`design::contrast::contrast_ratio`],
 ///   [`design::contrast::composite_over`].
 ///
-/// # iced 0.14 focus limitation
+/// # iced 0.14 has no keyboard focus to style
 ///
-/// Standard `button` / `container` styles in iced 0.14 do not expose
-/// keyboard-focus state. The style bridge maps every status iced does expose
-/// (hover, pressed, disabled); custom focus rings on standard controls are
-/// not deliverable in v0.20 through this path. See RFC-025 and
+/// Standard `button` / `container` styles in iced 0.14 expose no
+/// keyboard-focus state, and the reason is more basic than styling:
+/// iced 0.14's `button` takes no keyboard input and registers no focus
+/// target, so there is no focus for a style to reflect. The style
+/// bridge maps every status iced does expose (hover, pressed,
+/// disabled). Focus rings on standard controls are therefore not
+/// deliverable through this path at all; RFC-116 tracks keyboard
+/// access. See RFC-025 and
 /// `docs/src/contributing/semantic-accessibility.md` for detail.
 #[cfg(feature = "design")]
 pub mod design;

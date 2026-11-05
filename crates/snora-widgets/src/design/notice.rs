@@ -7,11 +7,14 @@
 //!
 //! # Semantic construction (RFC-027)
 //!
-//! - Action and dismiss controls are `iced::widget::button` — keyboard
-//!   reachable and semantically meaningful.
+//! - Action and dismiss controls are `iced::widget::button`, and take
+//!   **pointer and touch input only**: iced 0.14's buttons take no
+//!   keyboard input. RFC-116 tracks keyboard access.
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
-//! - Focus rings follow the iced 0.14 limitation (no `Focused` status on
-//!   `button::Status`); documented, not a regression.
+//! - There is no focus ring, because there is no focus: iced 0.14's
+//!   `button` registers no focus target at all, so the absent
+//!   `Focused` status on `button::Status` is a symptom and not the
+//!   limitation itself.
 //! - The dismiss button shows lucide `X` under the `lucide-icons` feature and
 //!   `"×"` otherwise, the same glyph as the removable chip (RFC-100).
 //!   [`Notice::dismiss_tooltip`](crate::design::notice::Notice::dismiss_tooltip)
