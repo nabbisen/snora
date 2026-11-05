@@ -32,6 +32,10 @@
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+/// A focusable, key-activatable control (RFC-116 Unit 0 prototype).
+/// Crate-private: only the sidebar item uses it, and only on this
+/// branch.
+mod control;
 mod crumb;
 pub mod direction;
 mod footer;

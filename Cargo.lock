@@ -3233,6 +3233,8 @@ name = "snora-widgets"
 version = "0.54.0"
 dependencies = [
  "iced",
+ "iced_core",
+ "iced_test",
  "lucide-icons",
  "snora-core",
  "snora-design",

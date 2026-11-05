@@ -408,14 +408,19 @@ where
         // 48 x 48 and centring means exactly what it says.
         let centred_icon = container(icon).center(Length::Fill);
 
-        let btn = button(centred_icon)
-            .on_press(item.on_press.clone())
-            .padding(0)
-            .width(BUTTON_SIZE)
-            .height(BUTTON_SIZE)
-            .style(move |theme, status| {
+        // RFC-116 Unit 0: `control` here too, so all three forms of the
+        // item are reachable rather than two of them.
+        let btn = crate::control::Control::new(
+            centred_icon,
+            Box::new(move |theme, status| {
                 sidebar_button_style(theme, status, is_active, button_radius)
-            });
+            }),
+            focus_ring(is_active),
+        )
+        .on_press(item.on_press.clone())
+        .padding(0)
+        .width(BUTTON_SIZE)
+        .height(BUTTON_SIZE);
 
         // The tooltip gets a body of its own (RFC-102 R-4): bare text
         // over the page is legible only by luck.
@@ -452,6 +457,42 @@ where
             RAIL_HORIZONTAL_PADDING,
         ]))
         .into()
+}
+
+/// The focus ring for a rail item (RFC-116 Unit 0).
+///
+/// # Why the caller chooses the colour
+///
+/// The ring has to clear 3:1 against **whatever is behind it**, and
+/// that is not one thing: an inactive item sits on the rail, an active
+/// one on its own `primary.strong` highlight. `control` cannot sample
+/// what is underneath, so the decision belongs here, where `is_active`
+/// is known.
+///
+/// The rule is RFC-114 Unit 3b's, reused: keep the theme's own paired
+/// colour where it clears the floor, and fall back to the stronger of
+/// black and white where it does not. That fallback is at least
+/// 4.58:1 against any opaque fill by construction, so the ring cannot
+/// fail on a theme snora has never seen.
+///
+/// Width and offset are the unstyled literals, matching
+/// `FocusTokens::new(2.0, 2.0, ..)`'s defaults on the design path. The
+/// design path's own tokens are not read yet: Unit 0 is one control,
+/// and wiring `FocusTokens` through is R-1's.
+fn focus_ring<'a>(is_active: bool) -> crate::control::Ring<'a> {
+    crate::control::Ring {
+        color: Box::new(move |theme: &Theme| {
+            let ep = theme.extended_palette();
+            let behind = if is_active {
+                sidebar_active_color(theme)
+            } else {
+                ep.background.base.color
+            };
+            crate::style::readable_text(behind, ep.background.base.text)
+        }),
+        width: 2.0,
+        offset: 2.0,
+    }
 }
 
 /// A rail that names its items on the rail itself (RFC-114).
@@ -539,12 +580,20 @@ where
         // padding already insets the item, and a second inset here would
         // put the icons further from the rail edge than they are today
         // for no reason a reader could see.
-        let btn = button(content)
-            .on_press(item.on_press.clone())
-            .padding(0)
-            .style(move |theme, status| {
+        //
+        // **RFC-116 Unit 0:** `control` in place of `button`, so the item
+        // is a focus target and Enter and Space reach it. The style
+        // closure is unchanged, because `control` takes
+        // `button::Status` — it is drop-in on the styling side.
+        let btn = crate::control::Control::new(
+            content,
+            Box::new(move |theme, status| {
                 sidebar_button_style(theme, status, is_active, button_radius)
-            });
+            }),
+            focus_ring(is_active),
+        )
+        .on_press(item.on_press.clone())
+        .padding(0);
 
         col = col.push(btn);
     }

@@ -52,4 +52,16 @@ snora-design = { workspace = true, optional = true }
 # (`widgets` without `design`) from compiling any style code.
 snora-style = { workspace = true, optional = true }
 iced = { workspace = true }
+# RFC-116 Unit 0: `control` implements `iced_core::Widget` and
+# `iced_core::widget::operation::Focusable`, both public with no feature
+# gate. iced's `advanced` feature only re-exports them, so depending on
+# `iced_core` directly avoids widening snora's feature surface. Same
+# `0.14` requirement as `iced`, so Cargo unifies the two.
+iced_core = "0.14"
 lucide-icons = { workspace = true, optional = true }
+
+[dev-dependencies]
+# RFC-116 Unit 0: `control`'s layout floor is measured through the
+# headless simulator, because the floor is read from the renderer's own
+# `default_size()` and there is no other way to vary that.
+iced_test = "0.14"
