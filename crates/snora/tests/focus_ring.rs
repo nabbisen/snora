@@ -72,6 +72,14 @@ fn rail() -> Element<'static, Msg> {
     .into()
 }
 
+/// The design path's rail.
+///
+/// Gated, because `snora`'s default features do not include `design` —
+/// and `cargo test -p snora` in CI's Rust quality job runs **default**
+/// features, not `--all-features`. An ungated version of this compiled
+/// fine under every `--all-features` run I had made locally and broke
+/// that one job.
+#[cfg(feature = "design")]
 fn design_rail(tokens: &snora::design::Tokens) -> Element<'static, Msg> {
     let bar = SideBar {
         items: NAMES
