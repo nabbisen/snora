@@ -36,7 +36,9 @@ Fails when:
 * a ``mark`` row's core colour differs at all;
 * a ``fill`` row's core colour differs by more than one level in any
   channel (see ``FILL_COLOUR_TOLERANCE``);
-* any bound differs by more than ``BOUNDS_TOLERANCE`` physical pixels.
+* any bound differs by more than that row's bounds allowance:
+  ``BOUNDS_TOLERANCE`` physical pixels for a ``fill``, and
+  ``MARK_BOUNDS_TOLERANCE`` for a ``mark`` (see below).
 
 Usage: scripts/check-renderer-parity.py <file-a> <file-b>
 """
@@ -49,6 +51,46 @@ from pathlib import Path
 # difference in where things are, only the rounding of a fractional
 # edge to the physical grid.
 BOUNDS_TOLERANCE = 1
+
+# **The rule, stated: a thin element's bounds may differ by up to two
+# physical pixels; its colour may not differ at all.**
+#
+# Why two rather than one. At scale 2 a one-logical-pixel element lands
+# on two physical rows when its offset is whole and spreads across three
+# at partial coverage when it is not. tiny-skia spreads; wgpu does not
+# (RFC-108 Unit 0). So the *same* element, laid out by the *same* code,
+# is legitimately recorded one row earlier and two rows taller on one
+# renderer — a difference of 2, which a 1px allowance rejects.
+#
+# Measured twice, on two different elements:
+#
+#   * RFC-117 Unit 0: `rich_text`'s underline is 3 physical rows on
+#     tiny-skia and 2 on wgpu, at every preset and both text sizes.
+#   * RFC-116 Unit 0: the sidebar's focus ring, 22 rows, every one
+#     `(12, 214, 107, 161)` on wgpu against `(12, 213, 107, 163)` on
+#     tiny-skia — off by `[0, 1, 0, 2]`, and identical on CI's runners
+#     and on local hardware.
+#
+# **Why this is keyed on `kind`, and not on the recorded width or
+# height.** The rule wants "an element thinner than two logical pixels",
+# but that number is not in this file's schema: a row records the
+# element's *bounding box*, and a hollow 2px ring around a 48px item has
+# a bounding box 104 physical pixels on its thinner axis. Keying on the
+# box would therefore never fire for the element the rule was written
+# for — checked: the thinnest of the 52 ring rows measures 48 logical
+# pixels. `kind` is the one thinness signal the schema carries, and it
+# carries it by definition: this file's own header calls a `mark` "a few
+# pixels on a background", which is what `record_mark` is for.
+#
+# **The allowance applies to all four bounds of a mark, not only its
+# thin axis**, for the same reason: the row does not say which axis is
+# thin. That is a deliberate widening beyond the rule as first worded,
+# and it is the narrowest implementation the schema allows.
+#
+# **What it still catches.** Three physical pixels on any bound, on a
+# mark or a fill, and any colour difference at all on a mark. RFC-102's
+# reintroduced defect moved an element's colour, not its edge by a row.
+MARK_BOUNDS_TOLERANCE = 2
 
 # **A deviation from RFC-108 R-4's "exact", forced by measurement, and
 # confined to `fill` rows.**
@@ -158,10 +200,14 @@ def main():
                        if allowance else "")
                 )
         drift = [abs(x - y) for x, y in zip(box_a, box_b)]
-        if max(drift) > BOUNDS_TOLERANCE:
+        bounds_allowance = (
+            MARK_BOUNDS_TOLERANCE if kind_a == "mark" else BOUNDS_TOLERANCE
+        )
+        if max(drift) > bounds_allowance:
             failures.append(
                 f"{element}: bounds {box_a} on {name_a} against {box_b} on "
-                f"{name_b} — off by {drift}, over the {BOUNDS_TOLERANCE}px allowance"
+                f"{name_b} — off by {drift}, over the {bounds_allowance}px "
+                f"allowance for a {kind_a}"
             )
 
     if failures:

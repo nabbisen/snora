@@ -78,12 +78,18 @@ for file in "${FILES[@]}"; do
     arg=${code#*.size(}
     arg=$(printf '%s' "$arg" | sed -E 's/[[:space:]]*\)[^)]*$//' | sed -E 's/^[[:space:]]+|[[:space:]]+$//g')
 
-    if [[ -n "${ALLOWED[$arg]+set}" ]]; then
-      continue
-    fi
-
+    # **The empty case is tested before the allow-list lookup, and must
+    # stay that way.** `${ALLOWED[$arg]+set}` with an empty `$arg` is an
+    # associative-array lookup on an empty key, which bash rejects
+    # outright: the script died with `ALLOWED: bad array subscript` and
+    # never reached the branch below that was written for exactly this
+    # input. Found 2026-11-05 (RFC-116 Unit 0), by a zero-argument call
+    # of the pattern -- `Rectangle`'s own size accessor -- and by a
+    # comment naming it, since the grep above reads comment lines too.
     if [[ -z "$arg" ]]; then
-      failures+=("$file:$lineno -- .size( with its argument on another line; keep it on one line so this check can read it")
+      failures+=("$file:$lineno -- .size() with no argument, or with its argument on another line. A zero-argument accessor of this name (Rectangle's, say) is not a text size at all: build the value from its fields instead. A real text size belongs on one line so this check can read it")
+    elif [[ -n "${ALLOWED[$arg]+set}" ]]; then
+      continue
     elif [[ "$arg" =~ [0-9] ]]; then
       failures+=("$file:$lineno -- .size($arg): a numeric literal")
     elif [[ "$arg" =~ ^[A-Z][A-Z0-9_]*$ ]]; then
