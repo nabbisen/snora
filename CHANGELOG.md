@@ -149,6 +149,19 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
+- **The accent's use as text was undeclared, so nothing guarded it
+  (RFC-117 R-5).** `Palette::usages` declared `accent` only as a non-text
+  role, at the 3:1 floor, because that entry is about the filled primary
+  button — where the fill is the control's own boundary. But the accent is
+  also drawn *as text*: it is `style::button::ghost`'s label colour, and it
+  will be the link's. Nothing asserted the 4.5:1 text floor for it, so a
+  later palette edit could have taken the ghost button's label under AA
+  with no test to catch it.
+
+  The role now carries **two** entries, one per usage: `accent` at 3:1 for
+  the fill, `accent (as text)` at 4.5:1 on the three neutral surfaces. No
+  preset moves — measured, the twelve pairs run 5.63 to 11.75, lowest on
+  Dark `surface_raised`.
 - **The active sidebar item's text missed WCAG AA in four of iced's stock
   themes (RFC-114).** Its colour is `primary.strong.text` on
   `primary.strong.color` — iced's own pairing, which is guaranteed readable

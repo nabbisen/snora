@@ -196,6 +196,32 @@ impl Palette {
                 class: Some(ThresholdClass::NonText),
                 surfaces: neutral_surfaces(),
             },
+            // **A second entry for the same role, at the text floor**
+            // (RFC-117 R-5). `accent` is not only a fill: it is also
+            // drawn *as text* on the neutral surfaces, by
+            // `snora_style::button::ghost`'s label
+            // (`snora-style/src/button.rs:138`) and by RFC-117's link.
+            // The entry above covers the filled, borderless primary
+            // button, where the fill is the control's own boundary and
+            // 3:1 is the right floor; it says nothing about the role
+            // used as a foreground, which needs 4.5:1.
+            //
+            // One role, two usages, two floors — so two entries. The
+            // alternative, raising the single entry to `Text`, would
+            // assert 4.5:1 of the filled button's boundary, which WCAG
+            // does not ask and which would be a different claim about a
+            // different element.
+            //
+            // Measured when this was added: the lowest is 5.63:1
+            // (Dark, `surface_raised`), so no preset moves. What the
+            // entry buys is that a later palette edit cannot quietly
+            // take the ghost button's label under the text floor.
+            RoleUsage {
+                label: "accent (as text)",
+                fg: accent,
+                class: Some(ThresholdClass::Text),
+                surfaces: neutral_surfaces(),
+            },
             RoleUsage {
                 label: "danger",
                 fg: danger,
