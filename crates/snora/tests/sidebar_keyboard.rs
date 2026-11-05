@@ -317,7 +317,9 @@ fn the_sidebar_item_is_already_above_the_floor() {
             let mut sizes = Vec::new();
             let _ = ui.find(|candidate: Candidate<'_>| {
                 if let Candidate::Focusable { bounds, .. } = candidate {
-                    sizes.push(bounds.size());
+                    // Built from the two fields; see `control.rs`'s
+                    // note on `check-literal-sizes.sh`.
+                    sizes.push(iced::Size::new(bounds.width, bounds.height));
                 }
                 None::<()>
             });

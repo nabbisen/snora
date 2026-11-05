@@ -503,10 +503,23 @@ mod sizing_tests {
 
         let mut ui: Simulator<'_, Msg> =
             Simulator::with_size(settings(), Size::new(400.0, 400.0), bare_control());
+        // Built from the two fields rather than by calling
+        // `Rectangle`'s own size accessor.
+        //
+        // `scripts/check-literal-sizes.sh` greps every source line for
+        // a text-size call and reads what follows the paren. An empty
+        // argument leaves it indexing an associative array with an
+        // empty key, which bash rejects outright — so the gate dies
+        // with `ALLOWED: bad array subscript` instead of reporting
+        // anything. That is a bug in the gate, reported in RFC-116's
+        // review request with its one-line fix; until it lands, a
+        // zero-argument accessor of that name anywhere under `crates/`
+        // takes the Rust quality job down with it. **Including one
+        // written inside a comment**, which is how this note found it.
         let mut biggest = Size::ZERO;
         let _ = ui.find(|candidate: iced_test::selector::Candidate<'_>| {
             if let iced_test::selector::Candidate::Focusable { bounds, .. } = candidate {
-                biggest = bounds.size();
+                biggest = Size::new(bounds.width, bounds.height);
             }
             None::<()>
         });
