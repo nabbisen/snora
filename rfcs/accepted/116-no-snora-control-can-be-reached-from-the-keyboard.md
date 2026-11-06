@@ -219,3 +219,20 @@ All suggestions accepted, as revised in `387d29f`.
 - **Q-4:** the router is opt-in per route. Reach and operate need only `traverse`.
 - **Q-5:** Unit 0 first, as its own review. R-3's gate row and R-4's status statement
   go in now, written by the architect.
+
+## Ruling, 2026-11-07: R-1 proceeds
+
+Unit 0 (`.git-exclude/reviewed/116-focusable-control/`) measured the cost Q-1 was to
+be ruled on:
+- engine binary byte-identical, widgets +9,728 bytes;
+- no detectable compile-time change;
+- porting breaks loudly, in one file;
+- the focus ring at ≥ 4.65:1.
+
+**The owner ruled that R-1 proceeds.**
+
+**One placement question, raised while writing R-1's handoff,** waits for its own
+ruling. The toast's close button lives in the `snora` engine crate
+(`toast.rs:314`), whose `snora-widgets` dependency is optional, so that engine-only
+builds stay small. `control`, in `snora-widgets`, cannot sit under it. R-1 Unit 1,
+the prerequisites, does not depend on the answer. Units 2 and 3 do.
