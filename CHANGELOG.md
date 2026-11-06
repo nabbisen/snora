@@ -107,19 +107,40 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   two are for an application that wants Light's or Dark's look at AAA
   without the starkness.
 
-  Each AAA preset keeps its parent's **background, surfaces, border and
-  focus**, and moves only the roles that have to move, by the smallest step
-  that reaches the floor: a lightness-only shift in OKLCh, chroma and hue
-  held. In Light that is `text_muted`, the accent (and `info`, which follows
-  it) and the `success`/`warning`/`danger` fills, each driven by its own
-  text pair. In Dark it is `text_muted`, the accent and `danger` —
-  Dark's success and warning are already clear.
+  Each AAA preset keeps its parent's **background, surfaces and border**,
+  and moves only the roles that have to move, by the smallest step that
+  reaches the floor: a lightness-only shift in OKLCh, chroma and hue held.
+  In Light that is `text_muted`, the accent (and `info`, which follows it)
+  and the `success`/`warning`/`danger` fills, each driven by its own text
+  pair. In Dark it is `text_muted`, the accent and `danger` — Dark's
+  success and warning are already clear.
+
+  **`light_aaa`'s focus ring is its accent**, as Light's is: in Light the two
+  are one colour, and that identity is part of what makes the preset
+  recognisably Light, so it follows the accent when the accent darkens.
+  `dark_aaa`'s focus is Dark's own — Dark's focus was never its accent.
 
   Two properties are asserted, not just intended: the
   `text_primary`/`text_secondary`/`text_muted` hierarchy keeps its order
   (compressed, but never inverted), and **no role's hue moves more than 6°**
   from its parent's, so `light_aaa` still reads as Light. The largest actual
   shift is 5.44°.
+- **`Tokens::presets()` (RFC-118)** — every named preset, each with its name,
+  in a fixed order: `light`, `dark`, `light_aaa`, `dark_aaa`,
+  `high_contrast_light`, `high_contrast_dark`. It returns
+  `Vec<(&'static str, Tokens)>`, the shape a theme picker wants: a label to
+  show and a value to apply. A `Vec` rather than an array, so adding a preset
+  is not a change to the function's *type*.
+
+  **The list is complete by test, not by promise.** A test reads
+  `tokens.rs`'s own source and fails if a zero-argument constructor returning
+  `Self` exists that `presets()` does not list, so a seventh preset cannot be
+  added and forgotten.
+
+  Inside the workspace, every preset sweep now iterates it instead of a
+  hand-kept list; several of those lists had missed the AAA presets when they
+  landed. The design workbench example's theme picker is built on it too, so
+  the two new presets can be inspected there.
 - **`ToastHover::{Entered, Left}`** — which way the pointer crossed a toast's
   edge, as core vocabulary beside `ToastIntent` and `ToastPosition`. It is
   what `on_toast_hover` reports and what `Holds::hover` takes.

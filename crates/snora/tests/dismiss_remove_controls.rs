@@ -122,13 +122,10 @@ impl Control {
     }
 }
 
-fn presets() -> [(&'static str, Tokens); 4] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+// RFC-118: every preset, from the one public source. This was a
+// hand-kept list of four that missed the two AAA presets.
+fn presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 /// The glyph rendered alone at the given size, in the font this feature

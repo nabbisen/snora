@@ -81,4 +81,65 @@ impl Tokens {
     pub fn high_contrast_dark() -> Self {
         crate::presets::high_contrast_dark::tokens()
     }
+
+    /// Every named preset, each with its name, in a fixed order (RFC-118).
+    ///
+    /// **The order is part of the contract:**
+    ///
+    /// 1. `light`, `dark`;
+    /// 2. `light_aaa`, `dark_aaa`;
+    /// 3. `high_contrast_light`, `high_contrast_dark`.
+    ///
+    /// **What each family guarantees**, in one line each:
+    ///
+    /// - `light`, `dark` — text at AA (4.5:1), non-text at 3:1; for general use;
+    /// - `light_aaa`, `dark_aaa` — text at **AAA (7:1)**, non-text at 3:1, in
+    ///   the character of their parents; for readers who need more;
+    /// - `high_contrast_light`, `high_contrast_dark` — AAA and beyond (at
+    ///   least 8.38:1), borders at 21:1; for maximum contrast.
+    ///
+    /// **The list is complete.** A test reads this file's own source and
+    /// fails if a zero-argument constructor returning `Self` exists that is
+    /// not listed here, so a seventh preset cannot be added to the crate
+    /// and forgotten by this function — or by any sweep that iterates it.
+    ///
+    /// # Why a `Vec` of `(name, tokens)`
+    ///
+    /// It is the shape an application's theme picker already wants: a label
+    /// to show and a value to apply, with no lookup in between.
+    ///
+    /// ```
+    /// use snora_design::Tokens;
+    ///
+    /// // A theme picker's options: the name, and what choosing it applies.
+    /// for (name, tokens) in Tokens::presets() {
+    ///     assert!(!name.is_empty());
+    ///     assert!(tokens.palette.background.is_valid());
+    /// }
+    ///
+    /// // Or one by name.
+    /// let aaa = Tokens::presets()
+    ///     .into_iter()
+    ///     .find(|(name, _)| *name == "light_aaa")
+    ///     .map(|(_, tokens)| tokens)
+    ///     .expect("light_aaa is a preset");
+    /// assert_eq!(aaa, Tokens::light_aaa());
+    /// ```
+    ///
+    /// A `Vec` rather than an array, so adding a preset is not a change to
+    /// this function's *type*: `[(&str, Tokens); 6]` would become
+    /// `[(&str, Tokens); 7]`, and every caller that named the length would
+    /// break. The names are the constructors' own, and are stable
+    /// identifiers rather than display strings; label them for your users.
+    #[must_use]
+    pub fn presets() -> Vec<(&'static str, Tokens)> {
+        vec![
+            ("light", Self::light()),
+            ("dark", Self::dark()),
+            ("light_aaa", Self::light_aaa()),
+            ("dark_aaa", Self::dark_aaa()),
+            ("high_contrast_light", Self::high_contrast_light()),
+            ("high_contrast_dark", Self::high_contrast_dark()),
+        ]
+    }
 }

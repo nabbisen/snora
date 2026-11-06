@@ -56,7 +56,7 @@ fn selected_active_uses_accent_text_foreground() {
 // ---------------------------------------------------------------------------
 
 /// Verifies that accent_text over the active (solid accent) background meets
-/// WCAG AA (≥4.5:1) for all four built-in presets.
+/// WCAG AA (≥4.5:1) for every built-in preset.
 ///
 /// Verifies: M-4 (chip selected contrast fix).
 #[test]
@@ -142,30 +142,16 @@ fn remove_btn_target_size_clears_24px_floor_for_all_presets() {
 // Test helpers
 // ---------------------------------------------------------------------------
 
-// RFC-118: the two AAA presets are swept here too. A preset that
+// RFC-118: every preset, from the one public source. A preset that
 // passed `snora-design`'s own suite and then failed a widget-level
-// style assertion is the obvious way for a new preset to go wrong,
-// and a list that stayed at four would not have asked.
-fn all_presets() -> [Tokens; 6] {
-    [
-        Tokens::light(),
-        Tokens::dark(),
-        Tokens::light_aaa(),
-        Tokens::dark_aaa(),
-        Tokens::high_contrast_light(),
-        Tokens::high_contrast_dark(),
-    ]
+// style assertion is the obvious way for a new preset to go wrong, and
+// a hand-kept list is how one gets missed.
+fn all_presets() -> Vec<Tokens> {
+    Tokens::presets().into_iter().map(|(_, t)| t).collect()
 }
 
-fn named_presets() -> [(&'static str, Tokens); 6] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("light_aaa", Tokens::light_aaa()),
-        ("dark_aaa", Tokens::dark_aaa()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+fn named_presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 fn all_statuses() -> [Status; 4] {

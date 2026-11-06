@@ -139,41 +139,29 @@ mod styled {
     use super::*;
     use snora::design::Tokens;
 
-    fn check(label: &str, tokens: fn() -> Tokens) {
-        let vertical_padding = tokens().spacing.lg;
-        assert_button_spans_intended_width(
-            label,
-            move || {
-                let t = tokens();
-                snora::design::widget::app_side_bar_with(
-                    &t,
-                    side_bar(),
-                    LayoutDirection::Ltr,
-                    SideBarLabels::Tooltip,
-                )
-            },
-            vertical_padding,
-        );
-    }
-
+    /// Every preset, from the one public source (RFC-118).
+    ///
+    /// This used to be four test functions, one per preset, each naming
+    /// its constructor by hand — which is how the two AAA presets were
+    /// missed. One loop over `Tokens::presets()` cannot omit a preset
+    /// that exists.
     #[test]
-    fn styled_light_side_bar_buttons_span_their_full_width() {
-        check("styled light", Tokens::light);
-    }
-
-    #[test]
-    fn styled_dark_side_bar_buttons_span_their_full_width() {
-        check("styled dark", Tokens::dark);
-    }
-
-    #[test]
-    fn styled_high_contrast_light_side_bar_buttons_span_their_full_width() {
-        check("styled high_contrast_light", Tokens::high_contrast_light);
-    }
-
-    #[test]
-    fn styled_high_contrast_dark_side_bar_buttons_span_their_full_width() {
-        check("styled high_contrast_dark", Tokens::high_contrast_dark);
+    fn every_styled_preset_side_bar_buttons_span_their_full_width() {
+        for (name, tokens) in Tokens::presets() {
+            let vertical_padding = tokens.spacing.lg;
+            assert_button_spans_intended_width(
+                &format!("styled {name}"),
+                move || {
+                    snora::design::widget::app_side_bar_with(
+                        &tokens,
+                        side_bar(),
+                        LayoutDirection::Ltr,
+                        SideBarLabels::Tooltip,
+                    )
+                },
+                vertical_padding,
+            );
+        }
     }
 }
 
@@ -277,35 +265,19 @@ mod styled_centring {
     use super::*;
     use snora::design::Tokens;
 
-    fn check(label: &str, tokens: Tokens) {
-        assert_icon_centred(
-            label,
-            snora::design::widget::app_side_bar_with(
-                &tokens,
-                side_bar(),
-                LayoutDirection::Ltr,
-                SideBarLabels::Tooltip,
-            ),
-        );
-    }
-
+    /// Every preset, from the one public source (RFC-118); see `styled`.
     #[test]
-    fn styled_light_side_bar_icon_is_centred_in_its_button() {
-        check("styled light", Tokens::light());
-    }
-
-    #[test]
-    fn styled_dark_side_bar_icon_is_centred_in_its_button() {
-        check("styled dark", Tokens::dark());
-    }
-
-    #[test]
-    fn styled_high_contrast_light_side_bar_icon_is_centred_in_its_button() {
-        check("styled high_contrast_light", Tokens::high_contrast_light());
-    }
-
-    #[test]
-    fn styled_high_contrast_dark_side_bar_icon_is_centred_in_its_button() {
-        check("styled high_contrast_dark", Tokens::high_contrast_dark());
+    fn every_styled_preset_side_bar_icon_is_centred_in_its_button() {
+        for (name, tokens) in Tokens::presets() {
+            assert_icon_centred(
+                &format!("styled {name}"),
+                snora::design::widget::app_side_bar_with(
+                    &tokens,
+                    side_bar(),
+                    LayoutDirection::Ltr,
+                    SideBarLabels::Tooltip,
+                ),
+            );
+        }
     }
 }

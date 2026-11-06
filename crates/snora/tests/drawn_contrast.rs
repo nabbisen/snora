@@ -866,18 +866,18 @@ fn unstyled_tooltip_body_border_meets_non_text_floor_as_drawn() {
 }
 
 // ---------------------------------------------------------------------
-// The design path: four presets, the token-derived theme
+// The design path: every preset, the token-derived theme
 // ---------------------------------------------------------------------
 
+// RFC-118: every preset, from the one public source, labelled with this
+// file's own prefix. This was a hand-kept list of four that missed the
+// two AAA presets.
 #[cfg(feature = "design")]
-fn design_presets() -> [(&'static str, snora::design::Tokens); 4] {
-    use snora::design::Tokens;
-    [
-        ("design light", Tokens::light()),
-        ("design dark", Tokens::dark()),
-        ("design high_contrast_light", Tokens::high_contrast_light()),
-        ("design high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+fn design_presets() -> Vec<(String, snora::design::Tokens)> {
+    snora::design::Tokens::presets()
+        .into_iter()
+        .map(|(name, tokens)| (format!("design {name}"), tokens))
+        .collect()
 }
 
 /// The iced `Theme` a preset's tokens derive, so the frame is rendered
@@ -921,7 +921,7 @@ fn styled_tooltip_body_border_meets_non_text_floor_as_drawn() {
                 row![rail, space().width(Length::Fill)].into()
             }
         };
-        assert_tooltip_border(&mut failures, context, build, &theme);
+        assert_tooltip_border(&mut failures, &context, build, &theme);
     }
     assert_no_failures(failures);
 }
@@ -1182,7 +1182,7 @@ fn chip_fills_meet_their_register_floors_as_drawn() {
 
         let r = contrast_ratio(selected, unselected);
         report(
-            context,
+            &context,
             "chip selected vs unselected fill",
             r,
             CHIP_SELECTED_MIN,
@@ -1197,7 +1197,7 @@ fn chip_fills_meet_their_register_floors_as_drawn() {
 
         let r = contrast_ratio(selected_disabled, selected);
         report(
-            context,
+            &context,
             "chip disabled vs enabled fill",
             r,
             CHIP_DISABLED_MIN,

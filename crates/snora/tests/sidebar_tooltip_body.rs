@@ -233,13 +233,14 @@ mod styled {
     use super::*;
     use snora::design::Tokens;
 
-    fn presets() -> [(&'static str, Tokens); 4] {
-        [
-            ("styled light", Tokens::light()),
-            ("styled dark", Tokens::dark()),
-            ("styled high_contrast_light", Tokens::high_contrast_light()),
-            ("styled high_contrast_dark", Tokens::high_contrast_dark()),
-        ]
+    // RFC-118: every preset, from the one public source, labelled with this
+    // file's own prefix. This was a hand-kept list of four that missed the
+    // two AAA presets.
+    fn presets() -> Vec<(String, Tokens)> {
+        Tokens::presets()
+            .into_iter()
+            .map(|(name, tokens)| (format!("styled {name}"), tokens))
+            .collect()
     }
 
     #[test]

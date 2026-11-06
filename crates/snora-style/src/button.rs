@@ -259,12 +259,8 @@ mod tests {
 
     #[test]
     fn all_variants_use_all_presets() {
-        for tokens in [
-            Tokens::light(),
-            Tokens::dark(),
-            Tokens::high_contrast_light(),
-            Tokens::high_contrast_dark(),
-        ] {
+        // RFC-118: every preset, from the one public source.
+        for (_name, tokens) in Tokens::presets() {
             for status in all_statuses() {
                 let _ = primary(&tokens, status);
                 let _ = secondary(&tokens, status);

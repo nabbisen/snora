@@ -126,22 +126,22 @@ fn contrast_checked_statuses() -> impl Iterator<Item = button::Status> {
 }
 
 /// Both theme paths (Q-3): two stock `iced::Theme` variants most
-/// consumers start on, and the four `design`-derived ones snora ships.
-fn theme_contexts() -> Vec<(&'static str, Theme)> {
-    vec![
-        ("stock Light", Theme::Light),
-        ("stock Dark", Theme::Dark),
-        ("design light", snora_style::theme::theme(&Tokens::light())),
-        ("design dark", snora_style::theme::theme(&Tokens::dark())),
-        (
-            "design high_contrast_light",
-            snora_style::theme::theme(&Tokens::high_contrast_light()),
-        ),
-        (
-            "design high_contrast_dark",
-            snora_style::theme::theme(&Tokens::high_contrast_dark()),
-        ),
-    ]
+/// consumers start on, and every `design`-derived one snora ships.
+///
+/// The design contexts come from [`Tokens::presets`] (RFC-118), so a
+/// preset added later is swept here with no list to extend. Their labels
+/// are built from the preset's name, hence `String`.
+fn theme_contexts() -> Vec<(String, Theme)> {
+    let mut contexts = vec![
+        ("stock Light".to_owned(), Theme::Light),
+        ("stock Dark".to_owned(), Theme::Dark),
+    ];
+    contexts.extend(
+        Tokens::presets()
+            .into_iter()
+            .map(|(name, tokens)| (format!("design {name}"), snora_style::theme::theme(&tokens))),
+    );
+    contexts
 }
 
 fn to_sn(c: Color) -> snora_design::Color {
@@ -220,7 +220,7 @@ fn menu_button_style_text_meets_aa() {
         for status in contrast_checked_statuses() {
             let style = menu_button_style(&theme, status);
             failures.extend(text_contrast_failure(
-                context,
+                &context,
                 "menu_button_style",
                 status,
                 style.text_color,
@@ -243,7 +243,7 @@ fn chrome_container_style_border_meets_non_text_floor() {
         let ep = theme.extended_palette();
         let style = chrome_container_style_with_radius(&theme, 0.0);
         failures.extend(border_contrast_failure(
-            context,
+            &context,
             "chrome_container_style",
             style.border,
             ep.background.base.color,
@@ -301,7 +301,7 @@ fn sidebar_button_style_text_meets_aa() {
                     ep.background.base.color
                 };
                 failures.extend(text_contrast_failure(
-                    context,
+                    &context,
                     &format!("sidebar_button_style(is_active={is_active})"),
                     status,
                     style.text_color,
@@ -378,7 +378,7 @@ fn unstyled_tooltip_body_text_meets_aa_and_its_border_meets_non_text_floor() {
         // The body must also be visible as an object against the page it
         // floats over, or it cannot separate its text from that page.
         failures.extend(border_contrast_failure(
-            context,
+            &context,
             "unstyled tooltip body",
             style.border,
             ep.background.base.color,
@@ -397,12 +397,8 @@ fn unstyled_tooltip_body_text_meets_aa_and_its_border_meets_non_text_floor() {
 #[test]
 fn styled_tooltip_body_text_meets_aa_and_its_border_meets_non_text_floor() {
     let mut failures = Vec::new();
-    for (name, tokens) in [
-        ("design light", Tokens::light()),
-        ("design dark", Tokens::dark()),
-        ("design high_contrast_light", Tokens::high_contrast_light()),
-        ("design high_contrast_dark", Tokens::high_contrast_dark()),
-    ] {
+    for (name, tokens) in Tokens::presets() {
+        let name = format!("design {name}");
         let style = snora_style::container::card_raised(&tokens);
         let body = background_color(&style, "card_raised");
         let text = style
@@ -418,7 +414,7 @@ fn styled_tooltip_body_text_meets_aa_and_its_border_meets_non_text_floor() {
             ));
         }
         failures.extend(border_contrast_failure(
-            name,
+            &name,
             "styled tooltip body",
             style.border,
             page,
@@ -494,14 +490,14 @@ fn tab_button_style_text_meets_aa() {
                 };
                 let case = format!("tab_button_style(is_active={is_active})");
                 failures.extend(text_contrast_failure(
-                    context,
+                    &context,
                     &case,
                     status,
                     style.text_color,
                     actual_bg,
                 ));
                 failures.extend(border_contrast_failure(
-                    context,
+                    &context,
                     &case,
                     style.border,
                     actual_bg,
@@ -530,7 +526,7 @@ fn crumb_button_style_text_meets_aa() {
                 _ => ep.background.base.color,
             };
             failures.extend(text_contrast_failure(
-                context,
+                &context,
                 "crumb_button_style",
                 status,
                 style.text_color,
@@ -562,19 +558,13 @@ fn crumb_rule_stays_visible_on_the_hover_fill() {
     let mut lowest = f32::MAX;
     let mut lowest_context = String::new();
 
-    let contexts = Theme::ALL
-        .iter()
-        .map(|theme| (theme.to_string(), theme.clone()))
-        .chain(
-            [
-                ("design light", Tokens::light()),
-                ("design dark", Tokens::dark()),
-                ("design high_contrast_light", Tokens::high_contrast_light()),
-                ("design high_contrast_dark", Tokens::high_contrast_dark()),
-            ]
-            .into_iter()
-            .map(|(name, tokens)| (name.to_owned(), snora_style::theme::theme(&tokens))),
-        );
+    let contexts =
+        Theme::ALL
+            .iter()
+            .map(|theme| (theme.to_string(), theme.clone()))
+            .chain(Tokens::presets().into_iter().map(|(name, tokens)| {
+                (format!("design {name}"), snora_style::theme::theme(&tokens))
+            }));
 
     for (context, theme) in contexts {
         let ep = theme.extended_palette();

@@ -6,12 +6,8 @@ use snora_design::{Tokens, Tone};
 
 #[allow(dead_code)] // compile-only: verifies row/card accept all Tone × preset combinations
 fn _progress_compiles_for_all_variants() {
-    for tokens in [
-        Tokens::light(),
-        Tokens::dark(),
-        Tokens::high_contrast_light(),
-        Tokens::high_contrast_dark(),
-    ] {
+    // RFC-118: every preset, from the one public source.
+    for (_name, tokens) in Tokens::presets() {
         for tone in [
             Tone::Neutral,
             Tone::Accent,

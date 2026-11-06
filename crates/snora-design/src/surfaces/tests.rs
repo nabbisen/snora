@@ -3,12 +3,7 @@ use crate::Tokens;
 
 #[test]
 fn dim_alpha_is_always_dim_alpha_constant() {
-    for (name, t) in [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ] {
+    for (name, t) in Tokens::presets() {
         assert_eq!(
             modal_dim(&t).a,
             DIM_ALPHA,

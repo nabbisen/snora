@@ -25,14 +25,13 @@
 //! - **`info` is set to the solved `accent`.** The two are the same
 //!   colour in Light, as are `info_text` and `accent_text`, and solving
 //!   them separately broke that visible identity for no reason.
-//! - **`focus` is Light's own**, unmoved: its floor is 3:1 and it
-//!   clears it. **A consequence worth knowing:** in Light, `focus`
-//!   happens to equal `accent`, and here it no longer does. Dark's
-//!   focus is already distinct from its accent, so "focus is the
-//!   accent" is not a property of the presets generally — but it was
-//!   one of Light's, and this preset drops it. Left for the architect
-//!   to rule on; setting `focus` to the new accent would cost nothing
-//!   against its own floor.
+//! - **`focus` equals the accent, as Light's does** (ruled 2026-11-07).
+//!   In Light the focus ring and the accent are one colour, and that is
+//!   part of what makes the preset recognisably Light. The first
+//!   version of this preset left `focus` at Light's own value while the
+//!   accent darkened, which dropped the identity; focus has its own 3:1
+//!   floor and the darker accent clears it, so it follows the accent.
+//!   Dark's focus was never its accent, so `dark_aaa` is unchanged here.
 //!
 //! The largest hue shift across both AAA presets is 5.442°, asserted in
 //! `tests.rs` against a bound of 6°.
@@ -50,7 +49,8 @@ pub(crate) fn palette() -> Palette {
         surface: parent.surface,
         surface_raised: parent.surface_raised,
         border: parent.border,
-        focus: parent.focus,
+        // Light's focus is its accent, so this follows the AAA accent.
+        focus: accent,
         // Already above 7:1 against every surface.
         text_primary: parent.text_primary,
         text_secondary: parent.text_secondary,

@@ -29,13 +29,11 @@ use snora_design::{Color as SnColor, Tokens, contrast::contrast_ratio};
 const AA: f32 = 4.5;
 const AAA: f32 = 7.0;
 
-fn named_presets() -> [(&'static str, Tokens); 4] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+// RFC-118: every preset, from the one public source — see
+// `Tokens::presets()`. This was a hand-kept list of four that missed the
+// two AAA presets when they landed.
+fn named_presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 fn to_sn(c: iced::Color) -> SnColor {
@@ -358,12 +356,12 @@ fn high_contrast_presets_meet_aaa_where_tokens_already_do() {
     // level, so the corresponding emitted *base* pair (background.base,
     // which is exactly text_primary/background — an exact-fidelity tier,
     // not derived) must too.
-    for name in ["high_contrast_light", "high_contrast_dark"] {
-        let t = if name == "high_contrast_light" {
-            Tokens::high_contrast_light()
-        } else {
-            Tokens::high_contrast_dark()
-        };
+    let family: Vec<_> = Tokens::presets()
+        .into_iter()
+        .filter(|(name, _)| name.starts_with("high_contrast"))
+        .collect();
+    assert_eq!(family.len(), 2, "expected the two high-contrast presets");
+    for (name, t) in family {
         let th = theme(&t);
         let ext = th.extended_palette();
         let pair = ext.background.base;
@@ -459,28 +457,36 @@ fn shift_away_from_does_not_collapse_at_a_clamped_extreme() {
 // is_dark
 // ---------------------------------------------------------------------------
 
+/// Whether a preset is meant to be dark, from its name.
+///
+/// The convention the names already carry — `dark`, `dark_aaa`,
+/// `high_contrast_dark` are dark; `light`, `light_aaa`,
+/// `high_contrast_light` are not. Stated once here, so a new preset has
+/// to follow it or say why it does not.
+fn intended_dark(name: &str) -> bool {
+    name.contains("dark")
+}
+
 #[test]
 fn is_dark_matches_preset_intent() {
-    assert!(
-        !theme(&Tokens::light()).extended_palette().is_dark,
-        "light preset should not be dark"
-    );
-    assert!(
-        theme(&Tokens::dark()).extended_palette().is_dark,
-        "dark preset should be dark"
-    );
-    assert!(
-        !theme(&Tokens::high_contrast_light())
-            .extended_palette()
-            .is_dark,
-        "high_contrast_light preset should not be dark"
-    );
-    assert!(
-        theme(&Tokens::high_contrast_dark())
-            .extended_palette()
-            .is_dark,
-        "high_contrast_dark preset should be dark"
-    );
+    // RFC-118: every preset, from the one public source. This was four
+    // hand-written assertions that missed `light_aaa` and `dark_aaa`.
+    let presets = Tokens::presets();
+
+    // Control: both polarities are present, or the loop below could pass
+    // by only ever checking one of them.
+    assert!(presets.iter().any(|(n, _)| intended_dark(n)));
+    assert!(presets.iter().any(|(n, _)| !intended_dark(n)));
+
+    for (name, tokens) in presets {
+        let is_dark = theme(&tokens).extended_palette().is_dark;
+        assert_eq!(
+            is_dark,
+            intended_dark(name),
+            "{name} preset should {}be dark",
+            if intended_dark(name) { "" } else { "not " }
+        );
+    }
 }
 
 /// RFC-065 review R-1: `snora_design::surfaces::modal_dim` reimplements

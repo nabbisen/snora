@@ -37,31 +37,48 @@ use snora::{
 // Preset selector
 // ---------------------------------------------------------------------------
 
+/// One of snora's named presets, by the name `Tokens::presets()` gives it.
+///
+/// This was a four-variant enum, hand-kept, which is how the two AAA
+/// presets came to be missing from the one tool built for inspecting
+/// presets (RFC-118). It is now a thin wrapper over the one public list,
+/// so a preset added to the crate appears here with no edit — which is
+/// also the theme-picker use `Tokens::presets()` documents.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Preset {
-    Light,
-    Dark,
-    HcLight,
-    HcDark,
-}
+struct Preset(&'static str);
 
 impl Preset {
-    fn label(self) -> &'static str {
-        match self {
-            Self::Light => "Light",
-            Self::Dark => "Dark",
-            Self::HcLight => "HC Light",
-            Self::HcDark => "HC Dark",
+    /// Every preset, in the order `Tokens::presets()` promises.
+    fn all() -> Vec<Preset> {
+        Tokens::presets()
+            .into_iter()
+            .map(|(name, _)| Preset(name))
+            .collect()
+    }
+
+    /// The first preset: Light.
+    fn first() -> Preset {
+        Self::all().remove(0)
+    }
+
+    /// A display label. The names are stable identifiers, not prose, so
+    /// this is the picker's own job: `high_contrast_light` reads
+    /// "High contrast light".
+    fn label(self) -> String {
+        let spaced = self.0.replace('_', " ");
+        let mut chars = spaced.chars();
+        match chars.next() {
+            Some(first) => first.to_uppercase().chain(chars).collect(),
+            None => spaced,
         }
     }
 
     fn tokens(self) -> Tokens {
-        match self {
-            Self::Light => Tokens::light(),
-            Self::Dark => Tokens::dark(),
-            Self::HcLight => Tokens::high_contrast_light(),
-            Self::HcDark => Tokens::high_contrast_dark(),
-        }
+        Tokens::presets()
+            .into_iter()
+            .find(|(name, _)| *name == self.0)
+            .map(|(_, tokens)| tokens)
+            .expect("a Preset is only built from Tokens::presets()")
     }
 }
 
@@ -80,8 +97,8 @@ struct App {
 impl Default for App {
     fn default() -> Self {
         Self {
-            preset: Preset::Light,
-            tokens: Preset::Light.tokens(),
+            preset: Preset::first(),
+            tokens: Preset::first().tokens(),
             notice_dismissed: false,
         }
     }
@@ -141,10 +158,9 @@ fn swatch_text_color(c: Color) -> iced::Color {
 // ---------------------------------------------------------------------------
 
 fn preset_toolbar<'a>(t: &'a Tokens, active: Preset) -> Element<'a, Msg> {
-    let presets = [Preset::Light, Preset::Dark, Preset::HcLight, Preset::HcDark];
-    let btns: Vec<Element<'a, Msg>> = presets
-        .iter()
-        .map(|&p| {
+    let btns: Vec<Element<'a, Msg>> = Preset::all()
+        .into_iter()
+        .map(|p| {
             if p == active {
                 button::primary(t, p.label(), Msg::SetPreset(p))
             } else {

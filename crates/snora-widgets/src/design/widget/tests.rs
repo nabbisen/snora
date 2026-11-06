@@ -8,7 +8,7 @@
 //!   fields, not rendered output, per the Handoff's explicit instruction.
 //! - **Styled geometry is token-derived**: each styled variant's private
 //!   `*_geometry` constructor equals the mapping table in this module's
-//!   own documentation, for all four built-in presets.
+//!   own documentation, for every built-in preset.
 //! - **Density plumbing**: since no built-in preset currently offers two
 //!   distinct `Spacing`/`Radius` values (`Density::Compact` has no
 //!   resolved scale — see the module documentation), this uses a pair of
@@ -19,13 +19,10 @@
 use super::*;
 use snora_design::{Radius, Spacing, Tokens};
 
-fn named_presets() -> [(&'static str, Tokens); 4] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+// RFC-118: every preset, from the one public source — this was a
+// hand-kept list of four that missed the two AAA presets.
+fn named_presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 // ---------------------------------------------------------------------------
@@ -106,7 +103,7 @@ fn menu_unstyled_matches_literal_inventory() {
 
 // ---------------------------------------------------------------------------
 // Styled geometry is token-derived — matches this module's mapping table,
-// for all four built-in presets.
+// for every built-in preset.
 // ---------------------------------------------------------------------------
 
 #[test]

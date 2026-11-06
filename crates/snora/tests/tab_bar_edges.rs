@@ -261,15 +261,17 @@ mod styled {
         )
     }
 
-    /// The four built-in presets. `Element` borrows the tokens, so each
-    /// case owns its bundle for the length of the assertion.
-    fn presets() -> [(&'static str, Tokens); 4] {
-        [
-            ("styled light", Tokens::light()),
-            ("styled dark", Tokens::dark()),
-            ("styled high_contrast_light", Tokens::high_contrast_light()),
-            ("styled high_contrast_dark", Tokens::high_contrast_dark()),
-        ]
+    /// Every built-in preset, from the one public source (RFC-118),
+    /// labelled with this file's own prefix. `Element` borrows the
+    /// tokens, so each case owns its bundle for the length of the
+    /// assertion.
+    ///
+    /// This was a hand-kept list of four that missed the two AAA presets.
+    fn presets() -> Vec<(String, Tokens)> {
+        Tokens::presets()
+            .into_iter()
+            .map(|(name, tokens)| (format!("styled {name}"), tokens))
+            .collect()
     }
 
     #[test]
@@ -279,8 +281,12 @@ mod styled {
             let tab = tab_bounds(&build, LABELS[0], 0);
             let mut ui = Simulator::new(build());
             let all = containers(&mut ui);
-            let underline =
-                sole_element_of_height(&all, INDICATOR_HEIGHT, "the active tab's underline", label);
+            let underline = sole_element_of_height(
+                &all,
+                INDICATOR_HEIGHT,
+                "the active tab's underline",
+                &label,
+            );
             assert!(
                 (underline.x - tab.x).abs() <= TOLERANCE
                     && (underline.width - tab.width).abs() <= TOLERANCE
@@ -300,7 +306,7 @@ mod styled {
                 .max_by(|a, b| (a.width * a.height).total_cmp(&(b.width * b.height)))
                 .expect("the bar renders at least one container");
             let rule =
-                sole_element_of_height(&all, BAR_RULE_HEIGHT, "the bar's bottom rule", label);
+                sole_element_of_height(&all, BAR_RULE_HEIGHT, "the bar's bottom rule", &label);
             assert!(
                 (rule.width - bar.width).abs() <= TOLERANCE
                     && ((rule.y + rule.height) - (bar.y + bar.height)).abs() <= TOLERANCE,

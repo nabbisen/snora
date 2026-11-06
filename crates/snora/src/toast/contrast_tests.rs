@@ -153,22 +153,18 @@ fn unstyled_theme_contexts() -> Vec<(String, Theme)> {
         .map(|theme| (theme.to_string(), theme.clone()))
         .collect();
 
+    // RFC-118: every preset, from the one public source, labelled by the
+    // preset's own name.
     #[cfg(feature = "design")]
     contexts.extend(
-        [
-            ("token theme: light", snora_design::Tokens::light()),
-            ("token theme: dark", snora_design::Tokens::dark()),
-            (
-                "token theme: high_contrast_light",
-                snora_design::Tokens::high_contrast_light(),
-            ),
-            (
-                "token theme: high_contrast_dark",
-                snora_design::Tokens::high_contrast_dark(),
-            ),
-        ]
-        .into_iter()
-        .map(|(name, tokens)| (name.to_owned(), snora_style::theme::theme(&tokens))),
+        snora_design::Tokens::presets()
+            .into_iter()
+            .map(|(name, tokens)| {
+                (
+                    format!("token theme: {name}"),
+                    snora_style::theme::theme(&tokens),
+                )
+            }),
     );
 
     contexts
@@ -219,12 +215,7 @@ fn design_path_toast_text_meets_aa_all_intents_all_presets() {
     use snora_design::Tokens;
 
     let mut failures = Vec::new();
-    for (preset, tokens) in [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ] {
+    for (preset, tokens) in Tokens::presets() {
         let overrides = crate::design::render::toast_intent_colors(&tokens);
         let theme = snora_style::theme::theme(&tokens);
         for intent in ALL_INTENTS {
@@ -264,7 +255,10 @@ fn design_path_intents_use_the_token_palette() {
     use snora_design::Tokens;
     use snora_style::color::to_iced_color;
 
-    for (preset, tokens) in [("light", Tokens::light()), ("dark", Tokens::dark())] {
+    // Every preset, not the two this once named: the property is that the
+    // fill is the palette's own, which holds or fails for each preset on
+    // its own terms.
+    for (preset, tokens) in Tokens::presets() {
         let overrides = crate::design::render::toast_intent_colors(&tokens);
         let theme = snora_style::theme::theme(&tokens);
         let p = &tokens.palette;

@@ -231,19 +231,12 @@ const MENU_DROPDOWN_SRC: &str = include_str!("../../snora/tests/menu_dropdown.rs
 const BREADCRUMB_ANCESTOR_RULE_SRC: &str =
     include_str!("../../snora/tests/breadcrumb_ancestor_rule.rs");
 
-// RFC-118: the two AAA presets are swept here too. A preset that
+// RFC-118: every preset, from the one public source. A preset that
 // passed `snora-design`'s own suite and then failed a widget-level
-// style assertion is the obvious way for a new preset to go wrong,
-// and a list that stayed at four would not have asked.
-fn presets() -> [(&'static str, Tokens); 6] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("light_aaa", Tokens::light_aaa()),
-        ("dark_aaa", Tokens::dark_aaa()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+// style assertion is the obvious way for a new preset to go wrong, and
+// a hand-kept list is how one gets missed.
+fn presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 fn sn(color: Color) -> snora_design::Color {

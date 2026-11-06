@@ -46,23 +46,16 @@ const FOCUS_MIN: f32 = 3.0;
 /// which has three. **Enforced by `scripts/check-wcag-floors.sh`.**
 const NON_TEXT_MIN: f32 = 3.0;
 
-/// Every shipped preset.
+/// Every shipped preset, from the one public source.
 ///
-/// **The two AAA presets are in here deliberately** (RFC-118): every
-/// test built on this list — mandatory contrast, the surfaces, focus,
-/// the modal dim and the dialog card against it — then runs on them
-/// too, rather than only the AAA sweep that was written for them. A new
-/// preset that passed its own test and failed one of the older ones
-/// would be the obvious way for this to go wrong.
-fn all_presets() -> [(&'static str, Tokens); 6] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("light_aaa", Tokens::light_aaa()),
-        ("dark_aaa", Tokens::dark_aaa()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+/// **This used to be a hand-kept list, and so were eight others** across
+/// the workspace; four of the nine missed the AAA presets when they
+/// landed (RFC-118's review). Now every sweep iterates
+/// [`Tokens::presets`], and `presets_is_complete_*` below fails if a
+/// constructor exists that it does not list — so a seventh preset
+/// reaches every test with no list to forget.
+fn all_presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 // ---- token sanity ----
@@ -335,11 +328,17 @@ fn dialog_card_distinguishable_from_modal_dim_all_presets() {
 fn high_contrast_presets_exceed_aa_for_primary_text() {
     // High-contrast presets should clear a stronger bar (>= 7:1) for primary
     // body text on the background.
-    for name in ["high_contrast_light", "high_contrast_dark"] {
-        let t = match name {
-            "high_contrast_light" => Tokens::high_contrast_light(),
-            _ => Tokens::high_contrast_dark(),
-        };
+    let family: Vec<_> = Tokens::presets()
+        .into_iter()
+        .filter(|(name, _)| name.starts_with("high_contrast"))
+        .collect();
+    assert_eq!(
+        family.len(),
+        2,
+        "expected the two high-contrast presets, found {:?}",
+        family.iter().map(|(n, _)| *n).collect::<Vec<_>>(),
+    );
+    for (name, t) in family {
         let r = contrast_ratio(t.palette.text_primary, t.palette.background);
         assert!(r >= 7.0, "{name}: primary text contrast {r:.2} < 7.0");
     }
@@ -488,11 +487,23 @@ fn customizing_a_token_does_not_affect_other_presets() {
 /// a *requirement* even though they happen to clear 7:1 everywhere.
 const AAA_TEXT: f32 = 7.0;
 
-fn aaa_presets() -> [(&'static str, Tokens); 2] {
-    [
-        ("light_aaa", Tokens::light_aaa()),
-        ("dark_aaa", Tokens::dark_aaa()),
-    ]
+/// The AAA family, by the suffix the names carry (RFC-118 Q-5).
+///
+/// Derived from [`Tokens::presets`] rather than listed, so an AAA preset
+/// added later is held to AAA without anyone remembering to say so. The
+/// count is asserted so that a rename which drops the suffix fails here
+/// instead of quietly shrinking the sweep to nothing.
+fn aaa_presets() -> Vec<(&'static str, Tokens)> {
+    let family: Vec<_> = Tokens::presets()
+        .into_iter()
+        .filter(|(name, _)| name.ends_with("_aaa"))
+        .collect();
+    assert!(
+        family.len() >= 2,
+        "found {} AAA preset(s) by the `_aaa` suffix; expected at least light_aaa and dark_aaa",
+        family.len(),
+    );
+    family
 }
 
 /// R-2: every text pair the palette *declares* is at AAA, derived from
@@ -554,11 +565,25 @@ fn aaa_presets_hold_every_declared_text_pair_to_aaa() {
 const AAA_MAX_HUE_SHIFT_DEG: f32 = 6.0;
 
 /// Each AAA preset beside the parent it is derived from.
-fn aaa_parents() -> [(&'static str, Tokens, Tokens); 2] {
-    [
-        ("light_aaa", Tokens::light_aaa(), Tokens::light()),
-        ("dark_aaa", Tokens::dark_aaa(), Tokens::dark()),
-    ]
+///
+/// The parent is found by name — `light_aaa` is derived from `light` —
+/// so the pairing is stated once, in the suffix convention, and not
+/// again here.
+fn aaa_parents() -> Vec<(&'static str, Tokens, Tokens)> {
+    let all = Tokens::presets();
+    aaa_presets()
+        .into_iter()
+        .map(|(name, tokens)| {
+            let parent_name = name.trim_end_matches("_aaa");
+            let parent = all
+                .iter()
+                .find(|(n, _)| *n == parent_name)
+                .unwrap_or_else(|| panic!("{name} has no parent preset named {parent_name}"))
+                .1
+                .clone();
+            (name, tokens, parent)
+        })
+        .collect()
 }
 
 /// OKLCh hue of a colour, in degrees, or `None` for a colour with no
@@ -701,4 +726,184 @@ fn aaa_presets_keep_their_parents_hues() {
         failures.len(),
         failures.join("\n  "),
     );
+}
+
+// ---------------------------------------------------------------------
+// `Tokens::presets()` is the one list, and it is complete (RFC-118)
+// ---------------------------------------------------------------------
+
+/// The names, in the order the function promises.
+const PRESET_ORDER: [&str; 6] = [
+    "light",
+    "dark",
+    "light_aaa",
+    "dark_aaa",
+    "high_contrast_light",
+    "high_contrast_dark",
+];
+
+/// Zero-argument constructors in `impl Tokens` that are deliberately
+/// **not** presets.
+///
+/// Empty, and meant to stay so. If a constructor genuinely is not a
+/// named preset, it is listed here with the reason — the same shape as
+/// `check-literal-sizes.sh`'s allow-list, and for the same purpose:
+/// someone has to write down why.
+const NOT_PRESETS: &[&str] = &[];
+
+/// Zero-argument `pub fn name() -> Self` constructors in `tokens.rs`,
+/// read from the file's own source.
+///
+/// **This is the mechanism.** A function cannot be enumerated from
+/// inside Rust, and an exhaustive `match` only catches a new *variant*,
+/// not a new *function*. So the source is the data, as
+/// `state_register.rs` does for the tests it cross-checks: the pattern is
+/// narrow enough (`pub fn <ident>() -> Self`) that a constructor taking
+/// arguments, or returning anything else — `presets()` itself returns a
+/// `Vec` — is not mistaken for a preset.
+fn constructors_in_source() -> Vec<String> {
+    const SOURCE: &str = include_str!("tokens.rs");
+    SOURCE
+        .lines()
+        .filter_map(|line| {
+            let rest = line.trim_start().strip_prefix("pub fn ")?;
+            let (name, tail) = rest.split_once("()")?;
+            let valid_ident =
+                !name.is_empty() && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_');
+            (valid_ident && tail.trim_start().starts_with("-> Self")).then(|| name.to_owned())
+        })
+        .collect()
+}
+
+/// A constructor added without being added to `presets()` fails here.
+#[test]
+fn presets_is_complete_against_the_constructors_in_its_own_source() {
+    let found = constructors_in_source();
+
+    // Control: the scan must be finding the six known constructors, or
+    // it is scanning nothing and every assertion below passes for free.
+    for known in PRESET_ORDER {
+        assert!(
+            found.iter().any(|f| f == known),
+            "the source scan did not find `{known}`, so it is not reading the constructors \
+             it claims to (found {found:?})",
+        );
+    }
+
+    let listed: Vec<&str> = Tokens::presets().iter().map(|(n, _)| *n).collect();
+    let missing: Vec<&String> = found
+        .iter()
+        .filter(|f| !listed.contains(&f.as_str()) && !NOT_PRESETS.contains(&f.as_str()))
+        .collect();
+    assert!(
+        missing.is_empty(),
+        "`Tokens` has constructor(s) {missing:?} that `Tokens::presets()` does not list. Add \
+         each to `presets()` and to `PRESET_ORDER` here — then every sweep in the workspace \
+         covers it — or, if it is not a named preset, list it in `NOT_PRESETS` with the reason.",
+    );
+}
+
+/// Every listed name is a real constructor, and the order is the one
+/// promised.
+#[test]
+fn presets_lists_exactly_the_promised_names_in_order() {
+    let listed: Vec<&str> = Tokens::presets().iter().map(|(n, _)| *n).collect();
+    assert_eq!(
+        listed, PRESET_ORDER,
+        "the documented order is part of the contract"
+    );
+}
+
+/// Each name is paired with **its own** constructor's tokens.
+///
+/// `presets_lists_exactly_the_promised_names_in_order` would pass for
+/// `("light", Tokens::dark())`: the names are right and the contents are
+/// swapped. This is the check that a label means what it says.
+#[test]
+fn each_preset_name_builds_its_own_constructor() {
+    for (name, tokens) in Tokens::presets() {
+        let built = match name {
+            "light" => Tokens::light(),
+            "dark" => Tokens::dark(),
+            "light_aaa" => Tokens::light_aaa(),
+            "dark_aaa" => Tokens::dark_aaa(),
+            "high_contrast_light" => Tokens::high_contrast_light(),
+            "high_contrast_dark" => Tokens::high_contrast_dark(),
+            other => {
+                panic!("`presets()` lists `{other}`, which this test does not know how to build")
+            }
+        };
+        // `assert!`, not `assert_eq!`: a failing `assert_eq!` prints both
+        // `Tokens` in full, three kilobytes each, and the name is the
+        // whole diagnosis.
+        assert!(
+            tokens == built,
+            "`presets()` pairs `{name}` with another preset's tokens"
+        );
+    }
+}
+
+// ---------------------------------------------------------------------
+// `light_aaa`'s focus is its accent, as Light's is (RFC-118 ruling)
+// ---------------------------------------------------------------------
+
+/// Light's focus is its accent, and `light_aaa`'s is its own new accent.
+///
+/// The identity is Light's, so it is asserted for the pair that has it
+/// rather than as a general property of presets — Dark's focus was never
+/// its accent, and `dark_aaa` is unchanged.
+#[test]
+fn light_aaa_focus_is_its_own_accent() {
+    let light = Tokens::light();
+    assert_eq!(
+        light.palette.focus, light.palette.accent,
+        "the premise: in Light the focus ring and the accent are one colour"
+    );
+
+    let aaa = Tokens::light_aaa();
+    assert_eq!(
+        aaa.palette.focus, aaa.palette.accent,
+        "light_aaa's focus is not its accent, so it dropped the identity that makes it Light"
+    );
+    assert_ne!(
+        aaa.palette.focus, light.palette.focus,
+        "light_aaa's focus is Light's own, but its accent darkened: they have diverged"
+    );
+    assert_eq!(
+        aaa.focus.ring_color, aaa.palette.focus,
+        "the focus-ring token does not follow the palette's focus"
+    );
+}
+
+/// `dark_aaa` is untouched: its focus is Dark's, and was never its accent.
+#[test]
+fn dark_aaa_keeps_darks_focus() {
+    let (dark, aaa) = (Tokens::dark(), Tokens::dark_aaa());
+    assert_eq!(aaa.palette.focus, dark.palette.focus);
+    assert_ne!(
+        dark.palette.focus, dark.palette.accent,
+        "the premise: Dark's focus was never its accent"
+    );
+}
+
+/// The darker focus still clears focus's own floor, on every neutral
+/// surface.
+///
+/// Also covered by `all_presets_pass_mandatory_contrast`, which sweeps
+/// `usages()`; asserted here by name because the ruling made a claim
+/// about exactly this pair.
+#[test]
+fn light_aaa_focus_clears_its_floor() {
+    let p = Tokens::light_aaa().palette;
+    for (surface, colour) in [
+        ("background", p.background),
+        ("surface", p.surface),
+        ("surface_raised", p.surface_raised),
+    ] {
+        let r = contrast_ratio(p.focus, colour);
+        assert!(
+            r >= FOCUS_MIN,
+            "light_aaa focus on {surface}: {r:.2} < {FOCUS_MIN}"
+        );
+    }
 }

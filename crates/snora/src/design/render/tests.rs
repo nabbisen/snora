@@ -92,13 +92,10 @@ enum Msg {
 /// the other" was standing in for.
 const NON_TEXT_MIN: f32 = 3.0;
 
-fn named_presets() -> [(&'static str, Tokens); 4] {
-    [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+// RFC-118: every preset, from the one public source. This was a
+// hand-kept list of four that missed the two AAA presets.
+fn named_presets() -> Vec<(&'static str, Tokens)> {
+    Tokens::presets()
 }
 
 fn to_sn(c: iced::Color) -> SnColor {
@@ -399,12 +396,7 @@ fn responsive_render_keeps_the_design_chrome() {
 /// since it builds the pairs itself.
 #[test]
 fn chrome_style_carries_the_toast_sizes_and_colours() {
-    for (name, tokens) in [
-        ("light", Tokens::light()),
-        ("dark", Tokens::dark()),
-        ("high_contrast_light", Tokens::high_contrast_light()),
-        ("high_contrast_dark", Tokens::high_contrast_dark()),
-    ] {
+    for (name, tokens) in Tokens::presets() {
         let toast = chrome_style(&tokens).toast;
         assert_eq!(
             toast.title_size,

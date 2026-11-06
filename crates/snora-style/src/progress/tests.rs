@@ -11,12 +11,8 @@ fn all_tones_produce_valid_style_for_all_presets() {
         Tone::Danger,
         Tone::Info,
     ];
-    for tokens in [
-        Tokens::light(),
-        Tokens::dark(),
-        Tokens::high_contrast_light(),
-        Tokens::high_contrast_dark(),
-    ] {
+    // RFC-118: every preset, from the one public source.
+    for (_name, tokens) in Tokens::presets() {
         for tone in tones {
             let s = toned(&tokens, tone);
             // bar and background must be Color backgrounds (not gradients for

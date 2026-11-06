@@ -255,15 +255,15 @@ fn stock_themes() -> [(&'static str, Theme); 2] {
     [("stock light", Theme::Light), ("stock dark", Theme::Dark)]
 }
 
+// RFC-118: every preset, from the one public source, labelled with this
+// file's own prefix. This was a hand-kept list of four that missed the
+// two AAA presets.
 #[cfg(feature = "design")]
-fn design_presets() -> [(&'static str, snora::design::Tokens); 4] {
-    use snora::design::Tokens;
-    [
-        ("design light", Tokens::light()),
-        ("design dark", Tokens::dark()),
-        ("design high_contrast_light", Tokens::high_contrast_light()),
-        ("design high_contrast_dark", Tokens::high_contrast_dark()),
-    ]
+fn design_presets() -> Vec<(String, snora::design::Tokens)> {
+    snora::design::Tokens::presets()
+        .into_iter()
+        .map(|(name, tokens)| (format!("design {name}"), tokens))
+        .collect()
 }
 
 /// Measures one context's rule: its contrast against the page, and
@@ -336,7 +336,7 @@ fn the_rule_clears_the_non_text_floor_as_drawn_design() {
                 column![trail, space().height(Length::Fill)].into()
             }
         };
-        assert_rule_drawn(&mut failures, context, build, &theme);
+        assert_rule_drawn(&mut failures, &context, build, &theme);
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
