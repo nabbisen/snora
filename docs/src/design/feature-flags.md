@@ -24,6 +24,7 @@ make `snora`'s `design` feature depend on `widgets`.
 | Flag | Default | Activates |
 |---|---|---|
 | `widgets` | ✅ | `snora-widgets` crate; `snora::widget::*` re-exports |
+| `iced-default` | ✅ | iced's own default features: renderers, windowing, `thread-pool`, `linux-theme-detection` (RFC-112). Also on `snora-widgets` and `snora-style`. |
 | `design` | ❌ | `snora-design` token crate; `snora-style` iced style bridge; `snora::design::*` re-exports (`style`, `theme`, `render`, `responsive_render`, and — additionally, only when `widgets` is *also* on — `widget`, `button`, `card`, `notice`, `chip`, `progress`) |
 | `lucide-icons` | ❌ | `Icon::Lucide`; `snora::lucide` constants. Independent of `design`. |
 | `svg-icons` | ❌ | `Icon::Svg`; iced svg feature. Independent of `design`. |
@@ -62,14 +63,44 @@ additive.
   structurally below the widget layer, not beside it.
 - **Icon features are independent of `design`** — `lucide-icons` and
   `svg-icons` work with and without the design feature.
-- **Engine-only builds remain green** — `snora --no-default-features`
-  compiles with no widgets and no design.
+- **Engine-only builds remain green** — `snora --no-default-features
+  --features iced-default` compiles with no widgets and no design. Without
+  `iced-default`, your own `iced` dependency must supply a renderer and a
+  windowing backend, as every application's does.
 - **The default configuration (`widgets`, no `design`) compiles no
   style code** — `snora-style` stays an optional dependency of
   `snora-widgets`, gated by the same `design` feature as before
   extraction; proven by measurement, not just by the feature
   declaration (`size_probe_widgets` is byte-for-byte unchanged across
   RFC-055's extraction — measured in the RFC-055 review package).
+
+## Choosing iced's features yourself (`iced-default`, RFC-112)
+
+**The rule, stated once:** an iced feature that decides *how snora draws* is
+snora's, and always on. A feature that decides *what draws, or where it runs*,
+is the application's. So `web-colors` and `crisp` are always on, because every
+contrast figure snora publishes was measured with them. Everything else iced
+enables by default reaches it through `iced-default`, which is on by default.
+A plain `cargo add snora` is unchanged.
+
+To choose them yourself, for example to drop `linux-theme-detection` and the
+`zbus` tree behind it, turn snora's defaults off and name iced's features on
+your own line:
+
+```toml
+snora = { version = "0.54", default-features = false, features = ["widgets", "design"] }
+iced  = { version = "0.14", default-features = false, features = [
+    "wgpu", "tiny-skia", "thread-pool", "x11", "wayland",
+] }
+```
+
+snora never chooses a renderer: the renderers you list are the ones you get.
+CI proves this recipe from a consumer's position (`examples/opt_out_probe`).
+
+**The one case that stops compiling:** `default-features = false` on `snora`,
+`snora-widgets` or `snora-style`, *together with* an `iced` line of your own that
+also turns iced's defaults off and names no windowing backend. winit then
+refuses the platform. Add `iced-default` back, or name the features you want.
 
 ## Cargo snippets
 

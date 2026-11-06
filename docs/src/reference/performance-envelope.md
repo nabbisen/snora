@@ -12,7 +12,7 @@ contribution to build and runtime cost.
 | Toast rendering | Linear in toast count |
 | Direction helpers (`row_dir`, `horizontal_align`) | Constant or linear in child count |
 | Prefab widgets | No hidden background work; pure view functions |
-| `sweep_expired` | Linear in toast queue length |
+| `Holds::sweep` (and the deprecated `sweep_expired`) | Linear in toast queue length |
 | `dismiss_on_escape` | O(1) — three comparisons |
 
 None of these should ever grow superlinearly. If a regression appears

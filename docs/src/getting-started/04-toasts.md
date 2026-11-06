@@ -2,18 +2,20 @@
 
 A toast is a small, auto-stacking notification anchored to one corner
 of the window. snora owns the rendering, the stacking, and the lifetime
-sweep; the application only stores `Vec<Toast<Message>>` and writes two
-one-liners.
+sweep. The application stores `Vec<Toast<Message>>` and one
+`snora::toast::Holds`, and writes three one-liners.
 
 ## Three pieces
 
 ```rust,ignore
 use std::time::Instant;
 use iced::{Subscription, Task};
-use snora::{Toast, ToastIntent, ToastLifetime};
+use snora::{Toast, ToastHover, ToastIntent, ToastLifetime};
+use snora::toast::Holds;
 
 struct App {
     toasts: Vec<Toast<Message>>,
+    holds: Holds,                     // which toasts the pointer is resting on
     next_id: u64,
 }
 
@@ -21,6 +23,7 @@ struct App {
 enum Message {
     ShowSaved,
     Dismiss(u64),
+    ToastHover(u64, ToastHover),      // the pointer entered or left a toast
     ToastTick,                        // framework asks us to sweep
 }
 ```
@@ -43,8 +46,13 @@ fn update(&mut self, msg: Message) -> Task<Message> {
     if let Message::Dismiss(id) = msg {
         self.toasts.retain(|t| t.id != id);
     }
+    if let Message::ToastHover(id, crossing) = msg {
+        // Held while the pointer rests on it; when it leaves, the
+        // countdown restarts in full. `Holds` does the restart itself.
+        self.holds.hover(id, crossing, &mut self.toasts, Instant::now());
+    }
     if let Message::ToastTick = msg {
-        snora::toast::sweep_expired(&mut self.toasts, Instant::now());
+        self.holds.sweep(&mut self.toasts, Instant::now());
     }
     Task::none()
 }
@@ -68,7 +76,8 @@ an idle screen.
 fn view(&self) -> iced::Element<'_, Message> {
     let body: iced::Element<'_, Message> = /* … */;
     let layout = snora::AppLayout::new(body)
-        .toasts(self.toasts.clone());
+        .toasts(self.toasts.clone())
+        .on_toast_hover(Message::ToastHover);
     snora::render(layout)
 }
 ```
@@ -77,12 +86,27 @@ fn view(&self) -> iced::Element<'_, Message> {
 
 | API call | Behavior |
 |---|---|
-| `Toast::new(...)` | Default 4-second auto-dismiss |
+| `Toast::new(...)`, intent `Error` | **Stays until the user dismisses it** |
+| `Toast::new(...)`, any other intent | Stays as long as it takes to read (below) |
 | `.with_lifetime(ToastLifetime::seconds(10))` | Custom auto-dismiss |
 | `.persistent()` | Stays until the user clicks the close button |
 
+**How long "as long as it takes to read" is** (RFC-113), a rule you can
+apply by hand: *a toast stays 2 seconds, plus 1 second for every 6
+characters of its title and message, rounded up to a whole second, and
+never less than 6 seconds.* "Saved" / "Your changes are stored." is 29
+characters, so 7 s. It counts characters, not words, so Japanese and
+Chinese text, which has no spaces, gets the same margin.
+`ToastLifetime::reading_time(title, message)` is the rule as a function.
+
+**While the pointer rests on a toast, it does not expire,** once you
+wire `on_toast_hover` and `Holds` as above. When the pointer leaves,
+its countdown starts again in full. A keyboard user has no equivalent,
+because iced 0.14 cannot tell snora which widget has focus. So use
+`.persistent()` for anything a reader must not miss.
+
 Persistent is for messages the user must acknowledge — completed
-exports, fatal errors. Transient is for everything else.
+exports, failures. Errors are persistent by default.
 
 ## Intent → color
 

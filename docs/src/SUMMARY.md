@@ -57,6 +57,7 @@
   - [0.49 → 0.50](guides/migration-0.49-to-0.50.md)
   - [0.50 → 0.51](guides/migration-0.50-to-0.51.md)
   - [0.51 → 0.52](guides/migration-0.51-to-0.52.md)
+  - [0.53 → 0.54](guides/migration-0.53-to-0.54.md)
   - [0.52 → 0.53](guides/migration-0.52-to-0.53.md)
 - [Migration guide template](guides/migration-template.md)
 
@@ -68,6 +69,7 @@
 - [Design tokens](design/tokens.md)
 - [Typography](design/typography.md)
 - [High contrast](design/high-contrast.md)
+- [AAA presets](design/aaa-presets.md)
 - [Buttons](design/buttons.md)
 - [Cards](design/cards.md)
 - [Notices](design/notices.md)

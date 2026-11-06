@@ -48,9 +48,10 @@ primary action.
 
 - If the entire card is interactive (pressing it selects/opens the item),
   wrap it in `iced::widget::button` rather than placing a button inside the
-  card. This makes the full card keyboard reachable as a single tab stop.
+  card. This makes the full card one pointer target. It is not a tab
+  stop: pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
 - If the card is display-only with one action button, the button is
-  `iced::widget::button` — keyboard reachable.
+  `iced::widget::button`, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access).
 - Metadata chips with `on_toggle = None` are display-only and are not in
   the tab order.
 - Selected state is communicated via `card::selected`'s border color — not
@@ -139,5 +140,5 @@ fn result_card<'a, Message: Clone + 'a>(
 **Recipe.** The outer-button-wrapping-a-card pattern is app-specific enough
 (different apps want different content shapes) that a stable helper would
 be over-parameterized. The recipe documents the key insight (wrap the card
-in `iced::widget::button` for keyboard reachability) which is not obvious
+in `iced::widget::button`, so the whole card is one target) which is not obvious
 from the primitives alone.

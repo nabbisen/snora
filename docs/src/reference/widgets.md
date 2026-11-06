@@ -54,8 +54,27 @@ pub fn app_side_bar<'a, Message, ViewId>(
 ) -> Element<'a, Message>
 ```
 
-Vertical icon rail with tooltips. The active item gets a subtle
-background highlight. Tooltip side flips with direction.
+The navigation rail. **Since 0.54 (RFC-114) each item shows its name,
+beneath its icon by default.** The rail is as wide as its longest name,
+capped at 240 px, and a name wraps rather than clipping. The active item
+gets a highlight, and its name and icon always clear 4.5:1 against it: the
+theme's own colour where that reaches AA, otherwise black or white,
+whichever contrasts more.
+
+The application chooses the form with `app_side_bar_with(side_bar,
+direction, labels)`:
+
+| `SideBarLabels::` | Item | Rail width |
+|---|---|---|
+| `Beneath` (default) | icon, with the name centred beneath it | 64 px, wider only for a name that needs it |
+| `Beside` | icon, then the name, mirrored under RTL | icon + longest name |
+| `Tooltip` | icon only; the name in a tooltip under the pointer (the pre-0.54 rail) | 64 px |
+
+**`Tooltip` names items only under a resting pointer.** A touch user, or
+anyone who cannot hold the pointer still, gets no names. In iced 0.14 no
+form is reachable from the keyboard, because iced's buttons take no
+keyboard input. RFC-116 tracks that (1.0 gate 11).
+`design::widget::app_side_bar_with` is the token-styled equivalent.
 
 ### `app_footer`
 

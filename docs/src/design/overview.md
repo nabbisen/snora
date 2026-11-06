@@ -47,8 +47,10 @@ Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 - **`snora-design` crate** — iced-free vocabulary: `Tokens`, `Palette`,
   `Color`, `Spacing`, `Typography`, `Radius`, `FocusTokens`, and the
   `Tone` / `Density` variant enums.
-- **Four built-in token presets** — `light`, `dark`, `high_contrast_light`,
-  `high_contrast_dark` — each with verified WCAG AA contrast.
+- **Six built-in token presets** — `light`, `dark`, `light_aaa`, `dark_aaa`,
+  `high_contrast_light`, `high_contrast_dark` (all listed by
+  `Tokens::presets()`) — each with verified WCAG AA contrast, and the `_aaa` and
+  high-contrast presets at AAA for text ([AAA presets](aaa-presets.md)).
 - **iced style bridge** (`snora::design::style`) — maps tokens to
   `iced::widget::button::Style` and `iced::widget::container::Style`.
 - **Pilot button helpers** (`snora::design::button`) — `primary`, `secondary`,

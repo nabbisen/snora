@@ -221,7 +221,10 @@ through inattention.
 graph on Linux only, through iced's default `linux-theme-detection` (`iced_winit` →
 `mundy` → `zbus` 5). They are run-time D-Bus calls for the desktop colour scheme, and
 absent on Windows and macOS. They are accepted on the same terms as the three above,
-each with its retirement condition in `deny.toml`.
+each with its retirement condition in `deny.toml`. **From 0.54.0 a consumer can keep
+all three out of its own graph** by leaving `linux-theme-detection` off. That became
+possible with RFC-112's `iced-default`; until then, snora turned on every iced default
+for everyone. snora's own default build still contains them, so the entries stay.
 
 `unpinned-build`, the weekly job that re-resolves the graph and fails if
 it stops compiling, is the older mechanism and is not a substitute. It

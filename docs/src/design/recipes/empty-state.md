@@ -40,9 +40,14 @@ with an optional call-to-action button.
 
 ## 6. Accessibility notes
 
-- The CTA button is `iced::widget::button` — keyboard reachable.
-- Descriptive text is plain `iced::widget::text` — readable by screen
-  readers (to the extent iced 0.14 supports it).
+- The CTA button is `iced::widget::button`, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). Give the
+  action a keyboard shortcut in your application.
+- Descriptive text is plain `iced::widget::text`. iced 0.14 has no
+  accessibility tree, so no screen reader reads it.
+
+  *(Corrected 2026-11-07: this said the button was keyboard reachable,
+  and the text readable by screen readers "to the extent iced 0.14
+  supports it". It supports neither.)*
 - No interactive controls besides the optional CTA — no focus-trapping
   concern.
 

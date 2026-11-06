@@ -42,7 +42,13 @@ pub enum ToastPosition {
 
 `ToastIntent` maps to theme colors (intent → palette pair). Helpers:
 
-- `ToastLifetime::DEFAULT` — 4-second transient.
+- `ToastLifetime::reading_time(title, message)` — what `Toast::new` gives every
+  intent except `Error`: 2 s + 1 s per 6 characters, rounded up, at least 6 s
+  (RFC-113). `Error` gets `Persistent`.
+- `ToastLifetime::DEFAULT` — **deprecated since 0.54.0**, still a 4-second
+  transient, no longer what `Toast::new` uses.
+- `ToastHover::{Entered, Left}` — which way the pointer crossed a toast, as
+  `AppLayout::on_toast_hover` reports it and `snora::toast::Holds::hover` takes it.
 - `ToastLifetime::seconds(n)` / `ToastLifetime::millis(ms)`.
 - `ToastPosition::is_top()` / `is_bottom()` — partition helpers.
 
@@ -186,7 +192,8 @@ why this vocabulary arrived (RFC-060).
 ```text
 LayoutDirection::default()  → Ltr
 ToastPosition::default()    → TopEnd
-ToastLifetime::DEFAULT      → Transient(4 s)
+Toast::new(Error, …)        → Persistent
+Toast::new(other, …)        → reading_time(title, message), ≥ 6 s
 SheetEdge::default()        → Bottom
 SheetSize::DEFAULT          → OneThird
 ```

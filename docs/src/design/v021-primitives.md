@@ -29,7 +29,7 @@ Notice::new(&tokens, Tone::Warning, "Disk space low.")
 ### Accessibility (RFC-027)
 
 1. **Native primitive:** `iced::widget::button` for action and dismiss.
-2. **Keyboard reachable:** yes, inherited from iced.
+2. **Keyboard reachable:** no, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
 3. **Focus visible:** no custom focus ring (iced 0.14 limitation).
 4. **Semantic limitation:** no ARIA role exposed; visual tone only.
 5. **Example:** design workbench notice section.
@@ -50,7 +50,7 @@ chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove)
 ### Accessibility (RFC-027)
 
 1. **Native primitive:** `iced::widget::button`.
-2. **Keyboard reachable:** yes.
+2. **Keyboard reachable:** no, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
 3. **Focus visible:** no custom focus ring (iced 0.14 limitation).
 4. **Semantic limitation:** selected state communicated via color — document
    if color-alone would be a barrier in the application context.

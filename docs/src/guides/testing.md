@@ -105,7 +105,7 @@ mod tests {
                 .with_created_at(now),
         );
 
-        snora::toast::sweep_expired(&mut app.toasts, now + Duration::from_secs(1));
+        snora::toast::Holds::default().sweep(&mut app.toasts, now + Duration::from_secs(1));
 
         let ids: Vec<u64> = app.toasts.iter().map(|t| t.id).collect();
         assert_eq!(ids, vec![2]);
@@ -119,9 +119,9 @@ Three things to notice:
 2. `Toast::with_created_at` is a public builder method intended for
    tests — it lets you control the timestamp without freezing the
    real clock.
-3. `snora::toast::sweep_expired` is a public function. Calling it from
-   a test is identical to how production code calls it — the same
-   logic gets exercised.
+3. `snora::toast::Holds::sweep` is the same call production code makes,
+   so the same logic gets exercised. A test of the pointer hold drives
+   `Holds::hover` with `ToastHover::Entered` and `ToastHover::Left`.
 
 ## What is not currently testable this way
 

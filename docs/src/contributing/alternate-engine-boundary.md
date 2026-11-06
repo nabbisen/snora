@@ -29,7 +29,7 @@ to implement:
 | Stack overlays deterministically | layers 0–7 per the z-stack contract |
 | Capture pointer events on backdrop layers | click-to-close for menus and modals |
 | Resolve logical Start/End to physical sides | under LTR and RTL |
-| Manage transient toast sweep outside rendering | `sweep_expired` is already engine-independent |
+| Manage transient toast sweep outside rendering | `Holds::sweep` is already engine-independent |
 | Accept app-supplied content nodes | the `Node` generic parameter on `AppLayout` |
 
 ## What is iced-specific and not portable

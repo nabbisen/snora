@@ -136,7 +136,8 @@ This crate binds the vocabulary to iced 0.14:
   (RFC-039) opt-in — and `sheet` paints an edge-anchored panel; the dim
   backdrop is owned by `render` itself.
 - Lifecycle helpers — `snora::toast::subscription`,
-  `snora::toast::sweep_expired`.
+  `snora::toast::Holds` (its `sweep`, and `hover` for the pointer hold).
+  `snora::toast::sweep_expired` is deprecated since 0.54.0.
 - Re-exports of `snora-widgets` (when the `widgets` feature is on)
   under the path `snora::widget`.
 

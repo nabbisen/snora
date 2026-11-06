@@ -14,17 +14,33 @@ contributor-facing documents linked below, not duplicated here.
   written for LTR readers also works for RTL readers without a
   per-screen rewrite. See [Direction and ABDD](direction.md).
 - **Contrast-tested design tokens.** When the `design` feature is
-  active, all four built-in presets (`light`, `dark`,
-  `high_contrast_light`, `high_contrast_dark`) are WCAG AA–verified —
-  `light`/`dark` and AAA for the two high-contrast presets, where
-  applicable. **Every threshold is a floor, never a ceiling** — if a
+  active, every built-in preset is WCAG AA–verified. Since 0.54 there are
+  three families (`Tokens::presets()` lists them all):
+  - `light` and `dark` hold text at AA, 4.5:1;
+  - `light_aaa` and `dark_aaa` hold **every declared text pair at AAA,
+    7:1**, with their parent's character (RFC-118);
+  - `high_contrast_light` and `high_contrast_dark` are for maximum
+    contrast, with text at 8.38:1 or more and borders at 21:1. **Every threshold is a floor, never a ceiling** — if a
   decision in your own code depends on a snora colour staying *below*
   some contrast value, that is not a guarantee snora makes; see
   [API governance § Permitted without reopening the gate](../contributing/api-governance.md#permitted-without-reopening-the-gate)
   for the full statement.
-- **Keyboard reachability inherited from iced.** Native iced controls
-  (`button`, `checkbox`, `pick_list`, …) keep iced's own keyboard event
-  routing; snora does not intercept it.
+- **snora does not intercept iced's keyboard routing.** What iced
+  delivers to a widget, snora leaves alone. But in iced 0.14 a `button`
+  takes no keyboard input and is not focusable, so snora's own controls
+  are pointer and touch only today (see below, and RFC-116). *(Corrected
+  2026-11-07: this said "keyboard reachability inherited from iced",
+  which overstated what iced 0.14 provides.)*
+- **Toasts stay as long as it takes to read (RFC-113).** An error stays
+  until it is dismissed. Every other toast stays 2 s plus 1 s per 6
+  characters, rounded up, and at least 6 s. A toast under a resting
+  pointer does not expire, once the application wires
+  `on_toast_hover` and `snora::toast::Holds`. A keyboard user has no
+  hold, so use `.persistent()` for anything that must not be missed.
+- **The sidebar names its items on the rail (RFC-114).** It no longer
+  relies on a hover tooltip that touch users and anyone with an unsteady
+  hand cannot use. The icon-only form remains as
+  `SideBarLabels::Tooltip`, and says what it costs.
 - **A typography scale with usable line-height**, for text you write on top
   of snora. See [Readability](readability.md) for how to pick a role.
 - **Frame-level keyboard zone navigation.** snora supplies the decision
@@ -46,10 +62,12 @@ contributor-facing documents linked below, not duplicated here.
   }
   ```
 
-  **snora does not take Tab or Shift+Tab.** Tab already means "next
-  control" to iced and to every application with a form or a text
-  field; claiming it for zone cycling would break in-pane navigation
-  everywhere. Instead, snora recommends the desktop convention —
+  **snora does not take Tab or Shift+Tab** for zone cycling. Tab means
+  "next control" to users, and to every application that wires focus
+  traversal. iced 0.14 itself binds no Tab: an application calls
+  `iced::widget::operation::focus_next()`. Claiming it for zones would
+  break in-pane navigation. *(Corrected 2026-11-07: this said Tab
+  already means "next control" to iced.)* Instead, snora recommends the desktop convention —
   **F6 / Shift+F6** — and supplies a matching key helper,
   `snora::keyboard::cycle_zones`, so you don't have to re-derive which
   modifier means "backward." As with `dismiss_on_escape`, snora installs

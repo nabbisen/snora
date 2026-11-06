@@ -93,11 +93,16 @@ let big_logo = icon_element_sized(&Icon::Text("✓".into()), 24.0);
 
 ## ABDD: icons should not be the only signal
 
-Icons are a *secondary* signal. Always pair them with a text label or
-a tooltip — keyboard users, screen-reader users, and users with low
-vision rely on the text. The prefab `app_side_bar` enforces this by
-requiring `tooltip: String` on every `SideBarItem`; do the same in
-your custom widgets.
+Icons are a *secondary* signal. Always pair them with a **visible**
+text label. A tooltip is not enough: it appears only under a resting
+pointer, so touch users, keyboard users and anyone with an unsteady hand
+never see it. iced 0.14 has no accessibility tree, so no screen reader
+reads either. The prefab `app_side_bar` shows each item's name on the
+rail by default since 0.54 (RFC-114). Do the same in your custom
+widgets.
+
+*(Corrected 2026-11-07: this said a tooltip served keyboard and
+screen-reader users.)*
 
 In the same spirit, the toast renderer encodes intent via *both* the
 background color and the surrounding text, so red is never the sole

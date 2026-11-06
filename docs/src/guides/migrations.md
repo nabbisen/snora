@@ -10,6 +10,11 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.53 → 0.54](migration-0.53-to-0.54.md) — **behaviour changes, nothing removed**:
+  toasts last as long as they take to read and errors stay until dismissed; the
+  sidebar names its items on the rail; `iced-default` lets an application choose
+  iced's features; two AAA presets. Two deprecations (`sweep_expired`,
+  `ToastLifetime::DEFAULT`). **Corrects the book's keyboard claims**: read §6.
 - [0.52 → 0.53](migration-0.52-to-0.53.md) — **no API change; appearance
   changes on the default path**: the modal dim on dark themes, underlined
   ancestor breadcrumbs, and toast text on six non-stock themes. **Corrects a

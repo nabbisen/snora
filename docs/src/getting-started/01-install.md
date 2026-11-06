@@ -58,6 +58,12 @@ In this configuration the `snora-widgets` crate is not pulled in,
 `snora::widget` does not exist, and your build pays only for the
 engine (`render`, overlay layers, toast lifecycle).
 
+**This also turns off `iced-default`** (RFC-112), the feature that passes
+iced's own defaults through, such as the renderers and windowing. An
+application already has its own `iced` dependency, which supplies them, so
+nothing changes for it. To choose iced's features yourself, see
+[feature flags](../design/feature-flags.md#choosing-iceds-features-yourself-iced-default-rfc-112).
+
 ## Verify
 
 ```text

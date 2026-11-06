@@ -53,12 +53,12 @@ with a `mouse_area` loses all of that.
 
 ## Primitive construction table
 
-| Primitive | Required construction | Keyboard reachability |
+| Primitive | Required construction | Keyboard reachability (iced 0.14) |
 |---|---|---|
-| Button (primary / secondary / ghost / danger) | `iced::widget::button` | Inherited from iced |
-| Interactive card | Semantic control (iced button styled as a card) where possible; or documented limitation | Inherited if button; document if not |
-| Notice dismiss / action | Real `iced::widget::button` controls | Inherited from iced |
-| Chip (interactive) | `iced::widget::button` styled as chip where possible | Inherited from iced |
+| Button (primary / secondary / ghost / danger) | `iced::widget::button` | **None:** iced's button takes no keyboard input. RFC-116 |
+| Interactive card | Semantic control (iced button styled as a card) where possible; or documented limitation | **None** if a button (as above); document either way |
+| Notice dismiss / action | Real `iced::widget::button` controls | **None** (as above) |
+| Chip (interactive) | `iced::widget::button` styled as chip where possible | **None** (as above) |
 | Progress bar | `iced::widget::progress_bar` where possible | N/A (display only) |
 | Non-interactive card | `iced::widget::container` | N/A (display only) |
 
@@ -79,7 +79,9 @@ these questions before merge:
 
 2. **Is it keyboard reachable?**
    State whether and how the primitive can be activated without a mouse.
-   For `iced::widget::button`, the answer is "yes, inherited from iced."
+   For `iced::widget::button` in iced 0.14, the answer is **no**: it is not
+   focusable and takes no keyboard input. Name the application-wired route
+   instead, or RFC-116. *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
 
 3. **How is focus visible?**
    State whether a focus ring is rendered. If not (see the iced 0.14

@@ -42,8 +42,8 @@ primary recovery action, using `notice::Notice` with `Tone::Danger` or
 
 ## 6. Accessibility notes
 
-- The recovery action button and dismiss button are `iced::widget::button`
-  — keyboard reachable.
+- The recovery action button and dismiss button are `iced::widget::button`,
+  pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). Give recovery a keyboard shortcut. *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
 - Tone color (red/orange) is supplemented by the notice text — not
   color-only.
 - The notice is rendered inline (not in a modal), so keyboard focus is not
