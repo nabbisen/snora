@@ -88,7 +88,7 @@ To choose them yourself, for example to drop `linux-theme-detection` and the
 your own line:
 
 ```toml
-snora = { version = "0.54", default-features = false, features = ["widgets", "design"] }
+snora = { version = "0.53", default-features = false, features = ["widgets", "design"] }
 iced  = { version = "0.14", default-features = false, features = [
     "wgpu", "tiny-skia", "thread-pool", "x11", "wayland",
 ] }
