@@ -236,3 +236,19 @@ ruling. The toast's close button lives in the `snora` engine crate
 (`toast.rs:314`), whose `snora-widgets` dependency is optional, so that engine-only
 builds stay small. `control`, in `snora-widgets`, cannot sit under it. R-1 Unit 1,
 the prerequisites, does not depend on the answer. Units 2 and 3 do.
+
+## Ruling, 2026-11-07: `control` lives in a new crate, `snora-control`
+
+**The owner ruled for the architect's recommendation.** A new crate, `snora-control`,
+holds `control`. Both `snora` (the engine, for the toast's close button) and
+`snora-widgets` depend on it, non-optionally.
+- **One implementation.** No twin.
+- **Layering kept.** `snora-core` stays iced-free, and the engine's dependency on
+  `snora-widgets` stays optional.
+- **The cost:** a sixth published crate. Its crate doc says it exists to serve
+  snora's own crates, and that it is versioned in lockstep with them.
+
+**Rejected:**
+- making `snora-widgets` mandatory for the engine, which would drop small engine-only
+  builds;
+- placing `control` in `snora-core`, which would break its iced-free design.

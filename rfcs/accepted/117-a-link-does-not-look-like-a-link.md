@@ -156,3 +156,26 @@ All suggestions accepted, as revised in `387d29f`.
 - **Q-5:** Unit 0 measures `rich_text`'s underline on both renderers, and the owner
   rules on it. There is no disabled link, and the link-or-action rule is written into
   the rustdoc and the book.
+
+## Ruling, 2026-11-07 (Q-5): snora draws the underline, one per line
+
+Unit 0 (`.git-exclude/reviewed/117-accent-text-and-underline/`) measured `rich_text`'s
+underline:
+- every line underlined;
+- but a fixed hairline at every text size (3 rows on tiny-skia, 2 on wgpu);
+- and a 0-row gap at 16 px, touching the descenders.
+
+**The owner ruled for the architect's recommendation:**
+- `link` is a widget built on RFC-116's `control`, which it needs anyway for the
+  keyboard;
+- it lays out its own paragraph and reads one rectangle per line through
+  `Paragraph::span_bounds` (`iced_core/src/text/paragraph.rs:66`, shared by both
+  renderers);
+- **it draws an underline under each line, with a thickness and gap that follow the
+  text.**
+
+**The exact thickness and gap rule** is proposed from Unit 0b's measurement of a
+prototype, and then ruled.
+
+**Release:** with RFC-116 R-1 (0.55.0). There is still no disabled link, and R-3's
+link-or-action rule stands.

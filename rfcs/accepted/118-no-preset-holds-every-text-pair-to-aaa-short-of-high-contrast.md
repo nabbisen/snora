@@ -182,3 +182,16 @@ All suggestions accepted, as revised in `387d29f`.
 - **R-2's postconditions:** the hierarchy's order is kept, and each role's hue stays
   within a stated bound of its parent.
 - **Depends on** RFC-117's R-5, the accent's text declaration.
+
+## Rulings, 2026-11-07 (the review's three points)
+
+- **N = 6°** for the hue postcondition. It was derived: the largest shift is 5.442°.
+- **One public source of presets,** `Tokens::presets()`, returning every named
+  preset. Every sweep in the workspace iterates it, in place of the nine hand-kept
+  lists, four of which missed the new presets.
+- **`light_aaa`'s `focus` equals its accent,** as Light's does, which keeps the preset
+  recognisably its parent.
+
+These land **before the 0.54.0 cut**. The first changes a released preset's look, and
+the second is the preset list's own API, so both belong in the release that
+introduces the presets.
