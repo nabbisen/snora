@@ -129,6 +129,21 @@ and weight (`Typography`) carry it.
   in the accent, which was declared only as a non-text colour (3:1). It is now also
   declared as text (4.5:1). Every preset already cleared it: no colour changed.
 
+- **Four advisories, cleared by lockfile updates, none accepted.** Since 0.53:
+  - `tokio` 1.53.1 is unsound in `AsyncFd::new` (RUSTSEC-2026-0386), fixed in
+    1.53.3 and later;
+  - `pin-utils` is unmaintained (RUSTSEC-2026-0441), on `wasm32` only, through
+    `wasmtimer` 0.4.3;
+  - `async-executor` 1.14.0 and `clipboard-win` 5.4.1 were yanked.
+
+  snora's lockfile now resolves `tokio` 1.54.1, `wasmtimer` 0.4.5 (which no longer
+  depends on `pin-utils`), `async-executor` 1.14.1 and `clipboard-win` 5.4.3.
+  **A library's lockfile does not bind yours,** so run this in your own project:
+
+  ```sh
+  cargo update -p tokio -p wasmtimer -p async-executor -p clipboard-win
+  ```
+
 ## 6. For accessibility records: claims corrected
 
 **iced 0.14's `button` takes no keyboard input and is not focusable,** so **no snora
