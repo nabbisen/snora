@@ -96,3 +96,8 @@ iced_test = "0.14"
 # rendered pixels themselves (RFC-108 R-1). Already in the lockfile:
 # `iced_test` encodes with the same crate at the same version.
 png = "0.18"
+# RFC-116 R-1 Unit 1: the end-to-end focus-traversal test builds the
+# runtime's own `UserInterface` and runs `focus_next` / `find_focused`
+# against it, which `iced_test::Simulator` does not expose. Already in
+# the lockfile (iced depends on it): an edge, not a package.
+iced_runtime = "0.14"

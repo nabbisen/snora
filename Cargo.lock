@@ -3023,6 +3023,7 @@ name = "snora"
 version = "0.54.0"
 dependencies = [
  "iced",
+ "iced_runtime",
  "iced_test",
  "lucide-icons",
  "png 0.18.1",
@@ -3234,8 +3235,10 @@ version = "0.54.0"
 dependencies = [
  "iced",
  "iced_core",
+ "iced_runtime",
  "iced_test",
  "lucide-icons",
+ "png 0.18.1",
  "snora-core",
  "snora-design",
  "snora-style",

@@ -65,3 +65,12 @@ lucide-icons = { workspace = true, optional = true }
 # headless simulator, because the floor is read from the renderer's own
 # `default_size()` and there is no other way to vary that.
 iced_test = "0.14"
+# RFC-116 R-1 Unit 1: `control`'s behaviour is driven through the same
+# `UserInterface` the runtime uses, so a test sees what the window loop
+# sees — the `redraw_request` it acts on, and the operations it runs.
+# Already in the lockfile (iced depends on it), so this adds an edge and
+# no package.
+iced_runtime = "0.14"
+# Decodes the PNG the simulator writes, for the one test that has to read
+# pixels (`clip`). Already in the lockfile via `snora`'s dev-dependencies.
+png = "0.18"

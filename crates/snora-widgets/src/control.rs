@@ -34,6 +34,7 @@ use iced::border::Border;
 use iced::keyboard::{self, key};
 use iced::mouse;
 use iced::touch;
+use iced::window;
 use iced::{
     Background, Color, Element, Event, Length, Padding, Pixels, Rectangle, Shadow, Size, Theme,
     Vector,
@@ -89,6 +90,26 @@ pub(crate) struct Ring<'a> {
     pub(crate) offset: f32,
 }
 
+/// What a press publishes — the message itself, or a way to make it.
+///
+/// As `button`'s own: `on_press_with` builds the message **only when
+/// pressed**, which matters when making it is not free (an allocation, a
+/// clone of something large) and the control is drawn and hovered far
+/// more often than it is pressed.
+enum OnPress<'a, Message> {
+    Direct(Message),
+    Closure(Box<dyn Fn() -> Message + 'a>),
+}
+
+impl<Message: Clone> OnPress<'_, Message> {
+    fn get(&self) -> Message {
+        match self {
+            OnPress::Direct(message) => message.clone(),
+            OnPress::Closure(f) => f(),
+        }
+    }
+}
+
 #[derive(Debug, Default)]
 struct State {
     is_pressed: bool,
@@ -111,7 +132,16 @@ impl Focusable for State {
 
 pub(crate) struct Control<'a, Message> {
     content: Element<'a, Message>,
-    on_press: Option<Message>,
+    /// `None` is a **disabled** control: it ignores the pointer and the
+    /// keyboard, draws as `Status::Disabled`, and is not a focus target.
+    on_press: Option<OnPress<'a, Message>>,
+    /// What the control last drew as, recorded when a frame is about to
+    /// be drawn and compared against on every other event. This is
+    /// `button`'s own mechanism: it is how a widget knows its look has
+    /// changed and the runtime must be told.
+    status: Option<button::Status>,
+    /// Whether content is drawn within this control's own bounds.
+    clip: bool,
     id: Id,
     width: Length,
     height: Length,
@@ -123,6 +153,29 @@ pub(crate) struct Control<'a, Message> {
     enforce_minimum: bool,
 }
 
+impl<Message> Control<'_, Message> {
+    /// What the control looks like right now, from its state and the
+    /// cursor. The same four statuses `button` has.
+    fn status_now(
+        &self,
+        state: &State,
+        cursor: mouse::Cursor,
+        bounds: Rectangle,
+    ) -> button::Status {
+        if self.on_press.is_none() {
+            button::Status::Disabled
+        } else if cursor.is_over(bounds) {
+            if state.is_pressed {
+                button::Status::Pressed
+            } else {
+                button::Status::Hovered
+            }
+        } else {
+            button::Status::Active
+        }
+    }
+}
+
 impl<'a, Message> Control<'a, Message> {
     pub(crate) fn new(
         content: impl Into<Element<'a, Message>>,
@@ -132,6 +185,8 @@ impl<'a, Message> Control<'a, Message> {
         Self {
             content: content.into(),
             on_press: None,
+            status: None,
+            clip: false,
             id: Id::unique(),
             width: Length::Shrink,
             height: Length::Shrink,
@@ -142,8 +197,56 @@ impl<'a, Message> Control<'a, Message> {
         }
     }
 
+    /// Publish `message` when pressed.
     pub(crate) fn on_press(mut self, message: Message) -> Self {
-        self.on_press = Some(message);
+        self.on_press = Some(OnPress::Direct(message));
+        self
+    }
+
+    /// Publish what `message` returns, built **only when pressed**.
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "R-1 Unit 1 adds it ahead of the rollout (Units 2-3) that calls it; \
+                      the tests exercise it until then"
+        )
+    )]
+    pub(crate) fn on_press_with(mut self, message: impl Fn() -> Message + 'a) -> Self {
+        self.on_press = Some(OnPress::Closure(Box::new(message)));
+        self
+    }
+
+    /// Publish `message` when pressed, or — for `None` — **disable the
+    /// control**: it ignores the pointer and the keyboard, and is not a
+    /// focus target. Reaching a control that does nothing is the
+    /// confusion the owner's rule forbids.
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "R-1 Unit 1 adds it ahead of the rollout (Units 2-3) that calls it; \
+                      the tests exercise it until then"
+        )
+    )]
+    pub(crate) fn on_press_maybe(mut self, message: Option<Message>) -> Self {
+        self.on_press = message.map(OnPress::Direct);
+        self
+    }
+
+    /// Draw the content within this control's own bounds, so content
+    /// wider than the control is cut off at its edge rather than running
+    /// on past it. As `button`'s own.
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "R-1 Unit 1 adds it ahead of the rollout (Units 2-3) that calls it; \
+                      the tests exercise it until then"
+        )
+    )]
+    pub(crate) fn clip(mut self, clip: bool) -> Self {
+        self.clip = clip;
         self
     }
 
@@ -219,10 +322,13 @@ where
         })
     }
 
-    /// Registers as a focus target.
+    /// Registers as a focus target — **if it can be pressed.**
     ///
-    /// This one call is what `button` does not do, and the whole reason
-    /// Tab cannot reach a snora control today.
+    /// The registration is what `button` does not do, and the whole
+    /// reason Tab cannot reach a snora control today. A control with no
+    /// handler does not register: Tab would land on it and show a ring
+    /// around something that does nothing, which is the confusion the
+    /// owner's rule forbids.
     fn operate(
         &mut self,
         tree: &mut Tree,
@@ -232,7 +338,9 @@ where
     ) {
         let bounds = layout.bounds();
         let state = tree.state.downcast_mut::<State>();
-        operation.focusable(Some(&self.id), bounds, state);
+        if self.on_press.is_some() {
+            operation.focusable(Some(&self.id), bounds, state);
+        }
 
         operation.traverse(&mut |operation| {
             self.content.as_widget_mut().operate(
@@ -266,23 +374,62 @@ where
             viewport,
         );
 
+        let bounds = layout.bounds();
+        let enabled = self.on_press.is_some();
+        let is_press = matches!(
+            event,
+            Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left))
+                | Event::Touch(touch::Event::FingerPressed { .. })
+        );
+
+        {
+            let state = tree.state.downcast_mut::<State>();
+
+            // A control that cannot be pressed cannot be held down or
+            // focused. This is where a control that was focused and was
+            // then rebuilt with no handler lets go: its state survives
+            // the rebuild in the tree, and nothing else would clear it.
+            if !enabled && (state.is_focused || state.is_pressed) {
+                state.is_focused = false;
+                state.is_pressed = false;
+                shell.request_redraw();
+            }
+
+            // **A press anywhere else takes focus away from this
+            // control.** Unit 0 lacked this: a press focused the control
+            // it hit and nothing unfocused the one it had left, so
+            // clicking A then B left both focused. `Focusable` assumes
+            // one at a time, and the focus operations enforce it — but a
+            // click is not an operation. `text_input` does the same.
+            //
+            // **Before the captured-event return below, on purpose.**
+            // Every child of a row gets every event, in order: when the
+            // press lands on B, B captures it, and A — earlier or later
+            // in the row — must still let go.
+            if is_press && state.is_focused && !cursor.is_over(bounds) {
+                state.is_focused = false;
+                shell.request_redraw();
+            }
+        }
+
         if shell.is_event_captured() {
             return;
         }
-
-        let bounds = layout.bounds();
 
         match event {
             // Pointer and touch, as `button`.
             Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left))
             | Event::Touch(touch::Event::FingerPressed { .. }) => {
-                if self.on_press.is_some() && cursor.is_over(bounds) {
+                if enabled && cursor.is_over(bounds) {
                     let state = tree.state.downcast_mut::<State>();
                     state.is_pressed = true;
                     // A click also focuses, so that a pointer user who
                     // then reaches for the keyboard carries on from
                     // where they were rather than from the start.
-                    state.is_focused = true;
+                    if !state.is_focused {
+                        state.is_focused = true;
+                        shell.request_redraw();
+                    }
                     shell.capture_event();
                 }
             }
@@ -293,7 +440,7 @@ where
                     if state.is_pressed {
                         state.is_pressed = false;
                         if cursor.is_over(bounds) {
-                            shell.publish(on_press.clone());
+                            shell.publish(on_press.get());
                         }
                         shell.capture_event();
                     }
@@ -316,11 +463,24 @@ where
                     && state.is_focused
                     && activates
                 {
-                    shell.publish(on_press.clone());
+                    shell.publish(on_press.get());
                     shell.capture_event();
                 }
             }
             _ => {}
+        }
+
+        // **Tell the runtime when the look has changed.** `button`'s own
+        // mechanism: a frame about to be drawn records what the control
+        // looks like, and any other event compares against that. Without
+        // it a hover colour does not appear until something else
+        // happens to redraw the window — and a headless snapshot cannot
+        // see the difference, because it draws on demand.
+        let current = self.status_now(tree.state.downcast_ref::<State>(), cursor, bounds);
+        if let Event::Window(window::Event::RedrawRequested(_)) = event {
+            self.status = Some(current);
+        } else if self.status.is_some_and(|drawn| drawn != current) {
+            shell.request_redraw();
         }
     }
 
@@ -337,19 +497,10 @@ where
         let bounds = layout.bounds();
         let state = tree.state.downcast_ref::<State>();
 
-        let status = if self.on_press.is_none() {
-            button::Status::Disabled
-        } else if cursor.is_over(bounds) {
-            if state.is_pressed {
-                button::Status::Pressed
-            } else {
-                button::Status::Hovered
-            }
-        } else {
-            button::Status::Active
-        };
-
-        let style = (self.style)(theme, status);
+        // The recorded status, as `button`: every draw is preceded by a
+        // `RedrawRequested` that records it. Before the first one the
+        // control draws as disabled, which no frame ever shows.
+        let style = (self.style)(theme, self.status.unwrap_or(button::Status::Disabled));
 
         if style.background.is_some() || style.border.width > 0.0 || style.shadow.color.a > 0.0 {
             renderer.fill_quad(
@@ -365,6 +516,14 @@ where
             );
         }
 
+        // `clip`: the content may draw only inside this control. As
+        // `button`'s own — text, for one, clips to the area it is given.
+        let content_viewport = if self.clip {
+            bounds.intersection(viewport).unwrap_or(*viewport)
+        } else {
+            *viewport
+        };
+
         self.content.as_widget().draw(
             &tree.children[0],
             renderer,
@@ -374,11 +533,12 @@ where
             },
             layout.children().next().expect("the control has content"),
             cursor,
-            viewport,
+            &content_viewport,
         );
 
-        // The ring last, so it is never painted over by the content.
-        if state.is_focused && self.ring.width > 0.0 {
+        // The ring last, so it is never painted over by the content. A
+        // disabled control draws none even if its state says focused.
+        if self.on_press.is_some() && state.is_focused && self.ring.width > 0.0 {
             let o = self.ring.offset;
             renderer.fill_quad(
                 Quad {
@@ -444,119 +604,6 @@ where
 }
 
 #[cfg(test)]
-mod sizing_tests {
-    //! RFC-115's rule, living in `control`'s layout (RFC-116 Unit 0).
-    //!
-    //! The floor is `max(24, 1.5 x text)`, and the text size comes from
-    //! the renderer — `iced::Settings::default_text_size`, the one
-    //! setting RFC-104 made the chrome follow. So the floor follows the
-    //! text with no new API and no new token, which is the feasibility
-    //! question Unit 0 was asked.
-    //!
-    //! **These measure a control with no content of its own**, because
-    //! that is the only way to see the floor bind. The sidebar's own
-    //! items are already larger than it at both text sizes — measured
-    //! in `the_sidebar_item_is_already_above_the_floor` — so a test on
-    //! the rail would pass whether the floor existed or not.
-
-    use super::*;
-    use iced::widget::space;
-    use iced::{Pixels, Settings, Size};
-    use iced_test::Simulator;
-
-    #[derive(Debug, Clone, PartialEq)]
-    enum Msg {
-        Press,
-    }
-
-    fn bare_control() -> Element<'static, Msg> {
-        Control::new(
-            space().width(Length::Fixed(1.0)).height(Length::Fixed(1.0)),
-            Box::new(|_theme, _status| button::Style::default()),
-            Ring {
-                color: Box::new(|_| Color::BLACK),
-                width: 0.0,
-                offset: 0.0,
-            },
-        )
-        .on_press(Msg::Press)
-        .into()
-    }
-
-    /// The control's drawn size at a given host text size.
-    fn measured(text_size: f32) -> Size {
-        let settings = || Settings {
-            default_text_size: Pixels(text_size),
-            ..Settings::default()
-        };
-        let mut ui: Simulator<'_, Msg> =
-            Simulator::with_size(settings(), Size::new(400.0, 400.0), bare_control());
-
-        // Found by clicking, not by tree position: what is measured is
-        // the region that answers the control's own message.
-        ui.point_at(iced::Point::new(12.0, 12.0));
-        let _ = ui.simulate(iced_test::simulator::click());
-        assert!(
-            ui.into_messages().any(|m| m == Msg::Press),
-            "the probe point is not inside the control, so this measures the wrong thing"
-        );
-
-        let mut ui: Simulator<'_, Msg> =
-            Simulator::with_size(settings(), Size::new(400.0, 400.0), bare_control());
-        // Built from the two fields rather than by calling
-        // `Rectangle`'s own size accessor.
-        //
-        // `scripts/check-literal-sizes.sh` greps every source line for
-        // a text-size call and reads what follows the paren. An empty
-        // argument leaves it indexing an associative array with an
-        // empty key, which bash rejects outright — so the gate dies
-        // with `ALLOWED: bad array subscript` instead of reporting
-        // anything. That is a bug in the gate, reported in RFC-116's
-        // review request with its one-line fix; until it lands, a
-        // zero-argument accessor of that name anywhere under `crates/`
-        // takes the Rust quality job down with it. **Including one
-        // written inside a comment**, which is how this note found it.
-        let mut biggest = Size::ZERO;
-        let _ = ui.find(|candidate: iced_test::selector::Candidate<'_>| {
-            if let iced_test::selector::Candidate::Focusable { bounds, .. } = candidate {
-                biggest = Size::new(bounds.width, bounds.height);
-            }
-            None::<()>
-        });
-        biggest
-    }
-
-    /// At the default text size the floor is 24, which is exactly
-    /// WCAG 2.5.8's minimum — so the rule costs nothing at the default,
-    /// which is what RFC-115's Unit 0 measured and what makes k = 1.5
-    /// the position that changes nothing.
-    #[test]
-    fn the_floor_is_24_at_the_default_text_size() {
-        let size = measured(16.0);
-        assert!(
-            size.width >= MIN_TARGET && size.height >= MIN_TARGET,
-            "a control with 1px of content measured {size:?} at 16px text; the floor is \
-             max({MIN_TARGET}, {TARGET_PER_TEXT} x 16) = 24",
-        );
-    }
-
-    /// At 24px host text the floor is 36, and it is the multiplier that
-    /// decides, not the 24px minimum.
-    #[test]
-    fn the_floor_follows_the_text_to_36_at_24px() {
-        let expected = TARGET_PER_TEXT * 24.0;
-        let size = measured(24.0);
-        assert!(
-            size.width >= expected && size.height >= expected,
-            "a control with 1px of content measured {size:?} at 24px text; the floor is \
-             max({MIN_TARGET}, {TARGET_PER_TEXT} x 24) = {expected}",
-        );
-        // And it really did grow: a floor that ignored the text would
-        // have left this at 24.
-        assert!(
-            size.height > MIN_TARGET + 0.5,
-            "the control is {size:?} at 24px text — the same as at 16px, so the floor is \
-             not following the text at all",
-        );
-    }
-}
+mod behaviour_tests;
+#[cfg(test)]
+mod sizing_tests;
