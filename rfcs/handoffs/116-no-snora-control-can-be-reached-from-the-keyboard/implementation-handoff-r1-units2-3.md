@@ -67,6 +67,15 @@ No public signature changes.
 
 A disabled control is not a focus target (Unit 1).
 
+**Tab in a real window (from Unit 1's review).** `iced_winit`'s `Action::Widget` arm
+requests no redraw, so a Tab-driven focus change might not show the ring until the
+next event. Wire `traverse` into one example, and check **by hand, in a real window**
+that the ring appears on the Tab press itself. Record what you saw. If it is late,
+record focus beside status and compare on the next event.
+
+**Document that Tab at the last control leaves the group, with no wrap.** That is
+iced's `focus_next`, and correct for a window with other controls.
+
 **Re-run RFC-115's Unit 0 inventory** (its probe is in
 `.git-exclude/review-request/115-size-inventory/evidence/`). **Only these rows may
 change:**
