@@ -37,6 +37,26 @@
 //! covered, nothing is restored, and focus is simply nowhere, which is what a
 //! user can predict.
 //!
+//! **The application's own choice wins.** If anything in the layer has focus
+//! when it becomes reachable again (the application closed the modal and moved
+//! focus itself, say to a search field, with a focus task), nothing is
+//! restored: two targets would otherwise hold focus, and the explicit choice
+//! would be overridden.
+//!
+//! > **When a modal closes, focus returns to the control that had it, unless
+//! > the page now has a different number of controls, or the application has
+//! > focused something itself. Then focus is wherever the application put it,
+//! > or nowhere.**
+//!
+//! # Overlays
+//!
+//! iced draws overlays above every layer and delivers events to them first. A
+//! tooltip or a `pick_list`'s dropdown that was open on the page when a modal
+//! opened would therefore stay **above the dim** and keep taking the pointer and
+//! the keys. While inert, `Inert` reports **no overlay**; the content's state is
+//! untouched, so the overlay returns if it is still open when the layer is
+//! uncovered.
+//!
 //! **When it runs: on the `RedrawRequested` event,** which the runtime sends
 //! before every draw (`iced_winit` loops `update(RedrawRequested)` and then
 //! `draw`; `Simulator::snapshot` does the same). `diff` has no layout and no
@@ -316,6 +336,11 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         viewport: &Rectangle,
         translation: Vector,
     ) -> Option<overlay::Element<'b, Message, Theme, iced::Renderer>> {
+        // A covered layer has no overlay: it would float above the dim.
+        if self.inert {
+            return None;
+        }
+
         self.content.as_widget_mut().overlay(
             &mut tree.children[0],
             layout,
@@ -360,9 +385,10 @@ impl<Message> Inert<'_, Message> {
                     renderer,
                     &mut survey,
                 );
-                // Only if the layer still has the same focus targets: a
-                // position means nothing in a different layer.
-                if survey.seen == count {
+                // Only if the layer still has the same focus targets (a
+                // position means nothing in a different layer), and only if
+                // the application has not focused something itself.
+                if survey.seen == count && survey.focused.is_none() {
                     self.content.as_widget_mut().operate(
                         &mut tree.children[0],
                         layout,

@@ -264,6 +264,15 @@ where
     }
 
     /// Show a modal dialog.
+    ///
+    /// While it is open, **the keyboard reaches only what the pointer can
+    /// press** (RFC-119): everything under the dim is out of the keyboard's
+    /// reach, and Tab moves between the dialog, any sheet, and the toasts.
+    ///
+    /// **When a modal closes, focus returns to the control that had it, unless
+    /// the page now has a different number of controls, or the application has
+    /// focused something itself. Then focus is wherever the application put
+    /// it, or nowhere.**
     #[must_use]
     pub fn dialog(mut self, dialog: Dialog<Node, Message>) -> Self {
         self.dialog = Some(dialog);
@@ -272,6 +281,9 @@ where
 
     /// Show a modal sheet anchored to one of the window edges.
     /// Configure the anchor with `Sheet::at(...)` on the value passed in.
+    ///
+    /// The keyboard is bound as for [`Self::dialog`], and focus returns to
+    /// the control that had it when the sheet closes, on the same terms.
     #[must_use]
     pub fn sheet(mut self, sheet: Sheet<Node, Message>) -> Self {
         self.sheet = Some(sheet);
@@ -341,6 +353,12 @@ where
     }
 
     /// Wire the click-outside-to-close handler for header / context menus.
+    ///
+    /// **Also published on Escape** (RFC-119): the keyboard cannot reach
+    /// "outside", because an open menu's backdrop covers the page, so Escape
+    /// closes the menu as a click outside does. The event is captured, so an
+    /// application's own `iced::keyboard::listen()` does not also receive it:
+    /// there is one message, not two.
     #[must_use]
     pub fn on_close_menus(mut self, msg: Message) -> Self {
         self.on_close_menus = Some(msg);
@@ -348,6 +366,11 @@ where
     }
 
     /// Wire the click-outside-to-close handler for dialog / bottom sheet.
+    ///
+    /// **Also published on Escape** (RFC-119), as for [`Self::on_close_menus`].
+    /// With no handler here, neither a click outside nor Escape closes the
+    /// modal: Escape is then the application's, through
+    /// `snora::keyboard::dismiss_on_escape`.
     #[must_use]
     pub fn on_close_modals(mut self, msg: Message) -> Self {
         self.on_close_modals = Some(msg);

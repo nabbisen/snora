@@ -258,6 +258,22 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
         subject("chip::removable", &["toggle", "remove"], move || {
             chip::removable(tokens, "Rust", false, msg("toggle"), msg("remove"))
         }),
+        // **A control that is NOT reached** (RFC-119): the page's "page" control
+        // is under an open dialog, so the tree reports one focus target, the
+        // dialog's, and Tab, Enter and the ring are checked on that. A page
+        // control that were reachable would make the count two and fail.
+        subject(
+            "a page control under an open dialog is not reached",
+            &["dialog"],
+            move || {
+                let body = button::primary(tokens, "Delete", msg("page"));
+                let ok = button::primary(tokens, "OK", msg("dialog"));
+                snora::design::render(
+                    snora::AppLayout::new(body).dialog(snora::Dialog::new(ok)),
+                    tokens,
+                )
+            },
+        ),
         subject("design toast close", &["dismiss"], move || {
             snora::design::render(toast_layout(), tokens)
         }),
