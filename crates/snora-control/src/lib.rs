@@ -61,8 +61,12 @@
 
 mod control;
 mod em;
+mod escape;
+mod inert;
 mod underlined;
 
 pub use control::{Control, Ring, StyleFn};
 pub use em::{EmBox, Glyph};
+pub use escape::OnEscape;
+pub use inert::Inert;
 pub use underlined::Underlined;
