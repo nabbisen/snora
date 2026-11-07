@@ -3,11 +3,13 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.55.0):** eight of eleven core gates satisfied.
-Remaining: gate 1 (iced major upgrade), gate 3 (confirmed third-party
-production app), and gate 5 (reopened 2026-09-01, RFC-084). Gate 11, keyboard
-access, was added 2026-11-04 and is met (RFC-116). *(Corrected 2026-11-07: this
-line said "eight of ten" at v0.47.0, which gate 5's reopening had made seven.)*
+**Current status (v0.55.0):** nine of eleven core gates satisfied. Remaining:
+gate 1 (iced major upgrade) and gate 3 (confirmed third-party production app). Gate
+11, keyboard access, was added 2026-11-04 and met in 0.55.0 (RFC-116). *(Corrected
+2026-11-08: the 0.55.0 book said "eight of eleven", counting gate 5 as open. Gate 5
+was re-ticked on 2026-09-02, one day after RFC-084 reopened it. The count paragraph
+below had kept the reopened state since then, and the architect copied it instead of
+re-deriving it. "Eight of ten" at v0.47.0 was right.)*
 The design-track status below is as of v0.47.0.
 
 **Design-track D-gates: four of eight satisfied** — D-3 and
@@ -207,9 +209,11 @@ every crate (0.45.0, RFC-095). `snora-style` exposes no public struct or enum.
 *(Gate 11 was added 2026-11-04 and met in 0.55.0. The counts below
 include it.)*
 
-**Gates satisfied: 2, 4, 6, 7, 8, 9, 10, 11 = eight of eleven** (gate 9
+**Gates satisfied: 2, 4, 5, 6, 7, 8, 9, 10, 11 = nine of eleven** (gate 9
 whole — both 9a and 9b closed, per the table above; gate 5 reopened
-2026-09-01, RFC-084 — see its own row for why).
+2026-09-01 by RFC-084 and re-ticked 2026-09-02 — see its own row). *(Corrected
+2026-11-08: this line had said gate 5 was open since 2026-09-01, a day after
+which it was not.)*
 
 Gate 9 is deliberately recorded as **split** rather than ticked or held
 whole. Its two measurements are in genuinely different conditions, and

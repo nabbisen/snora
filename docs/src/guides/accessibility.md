@@ -93,6 +93,22 @@ contributor-facing documents linked below, not duplicated here.
   suspended while a dialog or sheet is open (focus belongs inside the
   modal), and unaffected by an open menu.
 
+## If your application serves older readers (RFC-115)
+
+Each setting below says what snora then guarantees. Nothing here is on by default,
+because each one costs space. orbok, whose readers are mainly older, uses all of
+them.
+
+| Do this | snora then guarantees |
+|---|---|
+| **Set a larger text size:** `default_text_size` on the unstyled path, or scale `Typography` on the design path | Every control's target is at least **1.5 × its text** (and never under 24 px). Icons are **1 em** of the text beside them, and the toast's × is 1.125 em. Sidebar names, tab labels and toast text follow it. Caller text wraps and is never clipped (RFC-105) |
+| **Raise `tokens.targets.min`** (44, say) | Every design-path control is at least that, in both directions: `design::button`, `design::chip` and its ×, and the `design::widget` tab bar and sidebar. Below 24 it does nothing |
+| **Choose `Tokens::light_aaa()` / `dark_aaa()`**, or the high-contrast presets | **Every declared text pair at 7:1 or more**, the accent included (the AAA presets keep Light's and Dark's character; high contrast goes further, with text at 8.38:1 or more and borders at 21:1). Asserted by `cargo test -p snora-design` |
+| **Keep the labelled sidebar**, the default since 0.54 | Each item's name is on the rail, beneath its icon. Nothing depends on hovering, which an unsteady hand cannot do (RFC-114) |
+| **Use `.persistent()`** for a toast that must be read | It stays until dismissed. Every other toast already stays 2 s plus 1 s per 6 characters, at least 6 s, and errors are persistent by default (RFC-113) |
+| **Use `design::button::link`** for anything that takes the reader somewhere | It is underlined under every line, so it does not depend on colour (RFC-117) |
+| **Route Tab** with `snora::keyboard::traverse` | Every control snora draws is reachable and pressable from the keyboard, with a focus ring of at least 3:1 (RFC-116) |
+
 ## What snora does not provide
 
 - **snora's prefab surfaces distinguish semantic variants by colour
