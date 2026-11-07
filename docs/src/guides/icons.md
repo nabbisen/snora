@@ -83,7 +83,12 @@ and nothing in the type signature says which of the two situations you are in.
 
 ## Sizing
 
-The default size is 14 px to match the default body text. To override:
+**An icon is 1 em of the text it sits with** (0.55, RFC-115): `icon_element`
+reads the host's `default_text_size` when the layout runs, so it is 16 px at
+iced's default and 24 px if your application sets 24. Before 0.55 it was a
+fixed 14 px that followed nothing. On the design path, snora's widgets draw
+their icons at the label token (`Typography::label`, 14), unchanged. The
+toast's × is 1.125 em. To name a size yourself:
 
 ```rust,ignore
 use snora::widget::icon::icon_element_sized;

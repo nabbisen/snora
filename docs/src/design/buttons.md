@@ -1,8 +1,8 @@
 # Buttons
 
-Snora Design provides four semantic button variants via
-`snora::design::button`. Each is a thin wrapper around `iced::widget::button`
-with Snora Design token styling applied.
+Snora Design provides five semantic button variants via
+`snora::design::button`. Each is snora's own `control` (RFC-116) with Snora
+Design token styling applied, so each is reachable from the keyboard.
 
 ## Variants
 
@@ -10,7 +10,8 @@ with Snora Design token styling applied.
 |---|---|
 | `button::primary` | Strongest call to action; use once per surface |
 | `button::secondary` | Secondary action alongside a primary button |
-| `button::ghost` | Tertiary / low-emphasis action |
+| `button::ghost` | Tertiary / low-emphasis **action**: it does something where the reader is |
+| `button::link` | Takes the reader **somewhere**: another view, a document, a chooser (0.55, RFC-117) |
 | `button::danger` | Irreversible actions — delete, revoke, reset |
 
 ## Basic usage
@@ -26,15 +27,56 @@ let t = &self.tokens;
 
 button::primary(t, "Save", Message::Save)
 button::secondary(t, "Cancel", Message::Cancel)
-button::ghost(t, "Learn more", Message::LearnMore)
+button::ghost(t, "Skip", Message::Skip)
+button::link(t, "Choose another folder", Message::ChooseFolder)
 button::danger(t, "Delete", Message::Delete)
 ```
 
+## Link or action
+
+> A **link** takes the reader somewhere: another view, a document, a chooser.
+> An **action** does something where the reader already is: Cancel, Skip,
+> Save. Use `link` for the first and `ghost` for the second.
+
+"Choose another folder" opens a chooser, so it is a link. "Skip" acts where
+the reader is, so it is a `ghost`.
+
+**Why a link is underlined.** Older readers do not read coloured text as
+clickable, and colour is the cue that fails first as eyesight changes (WCAG
+1.4.1, Use of Color). `link` has `ghost`'s colours, and an underline in the
+label's colour in every state (rest, hover, pressed), **under every line** if
+the label wraps.
+
+**The underline's rule.** Let a unit *u* be 1/16 em of the label's size,
+rounded to the nearest whole pixel (halves up), and never under 1 px.
+
+> An underline is *u* thick, and its top edge is *u* below its line's box;
+> snapping to the pixel grid never moves it up toward the text. Every wrapped
+> line has its own. A link's lines are 4 *u* taller than plain text's, with the
+> text centred in each.
+
+At the default label size (14 px), *u* is 1 px. The extra line spacing keeps
+an underline clear of the next line's accents and tall letters. It was
+measured at scale 1, 1.5 and 2, in three fonts, at 12 to 32 px (RFC-117).
+**The link is as tall as a `ghost` with the same label**, because its padding
+gives the extra height back, except:
+- for a label of 40 px or more, where there is no padding left to give;
+- at 24 px or more on the two high-contrast presets, where it is 1 to 2 px
+  taller, to keep their wider focus ring off the underline.
+
+The gap is measured from the line's box, which is all iced reports. A font
+whose descenders reach past its own line box comes closer to the underline
+than the default fonts do.
+
+**There is no disabled link, and no `link_maybe`.** A dimmed, underlined
+phrase still says "you can go here", and then does nothing. When the
+destination is unavailable, show plain text, or nothing.
+
 ## Disabled state
 
-Each variant has a `*_maybe` counterpart that accepts `Option<Message>`.
-Passing `None` produces a disabled button (iced applies the `Disabled`
-status automatically):
+Each variant except `link` has a `*_maybe` counterpart that accepts
+`Option<Message>`. Passing `None` produces a disabled button. A disabled button
+is not a focus target: Tab skips it.
 
 ```rust,ignore
 button::primary_maybe(t, "Save", self.can_save.then_some(Message::Save))
@@ -58,17 +100,27 @@ button(my_custom_content)
     .style(move |_theme, status| style::button::primary(&tok, status))
 ```
 
+**This is iced's `button`, not snora's control.** In iced 0.14 it is pointer
+and touch only: it is not focusable, it takes no keyboard input, and it draws
+no focus ring. snora has no public control for content of your own yet
+(RFC-116's long-term plan), so give such an action a keyboard shortcut.
+
 ## Accessibility notes
 
-- All four variants use `iced::widget::button`. **In iced 0.14 that makes them
-  pointer and touch only:** iced's button is not focusable and takes no keyboard
-  input. Give any action that matters a keyboard shortcut in your application.
-  *(Corrected 2026-11-04: this said they inherit keyboard activation, Enter /
-  Space.)*
-- **Custom focus rings are not rendered in iced 0.14.** `button::Status` has
-  no `Focused` variant; the style closure cannot draw a ring. This is a
-  documented iced 0.14 limitation, not a regression. When iced exposes focus
-  state in a future version, the style bridge will be extended.
+- **Keyboard (0.55, RFC-116).** Every variant is a focus target. Enter and Space
+  press the focused one and publish the same message a click does. **Tab moves
+  between them once your application routes the key**, in one line of `update`:
+  `snora::keyboard::traverse(key, modifiers)`. See
+  [Accessibility](../guides/accessibility.md). *(Corrected 2026-11-04: before
+  0.55 they were iced buttons, which take no keyboard input; this page once said
+  they inherited Enter and Space.)*
+- **Focus ring.** It is drawn from `Tokens::focus` (width, offset, colour), and
+  clears 3:1 against what it sits on in every preset. Where the token's colour
+  would not, it is black or white instead. It is drawn above neighbouring
+  controls, so a neighbour cannot hide part of it.
+- **Target size (RFC-115).** A button is at least
+  `max(24 px, 1.5 × its label, Tokens::targets.min)` in both directions.
+  `targets.min` is 24 in every preset; raise it to grow every control.
 - The `danger` variant uses `palette.danger_text` on `palette.danger`; this
   pair is mandatory and tested by `cargo test -p snora-design`.
 - Disabled buttons pass the WCAG 1.4.3 exception for low-contrast states.

@@ -42,13 +42,16 @@ primary recovery action, using `notice::Notice` with `Tone::Danger` or
 
 ## 6. Accessibility notes
 
-- The recovery action button and dismiss button are `iced::widget::button`,
-  pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). Give recovery a keyboard shortcut. *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
+- The recovery action and dismiss buttons are snora controls, reachable from
+  the keyboard from 0.55 once the application routes Tab with
+  `snora::keyboard::traverse` (RFC-116). Dismissing moves focus nowhere: the
+  next Tab starts from the top. *(Corrected 2026-11-07: up to 0.54 they were
+  iced buttons, which take no keyboard input.)*
 - Tone color (red/orange) is supplemented by the notice text — not
   color-only.
 - The notice is rendered inline (not in a modal), so keyboard focus is not
   trapped.
-- Custom focus ring is not rendered in iced 0.14 — documented limitation.
+- A focus ring from `Tokens::focus` shows which control has focus (0.55).
 
 ## 7. Code example
 
@@ -101,8 +104,9 @@ if let Some(notice) = error_recovery_notice(
 
 - Use `Tone::Warning` for recoverable problems that are not strictly errors
   (e.g. "Index is stale — rebuild recommended").
-- Add a secondary `button::ghost` link ("Learn more") alongside the
-  recovery action for complex errors.
+- Add a `button::link` ("Learn more") alongside the recovery action for
+  complex errors: it takes the reader somewhere, so it is a link, not a
+  `ghost`.
 - Omit `.dismiss()` if the error must be acknowledged via the action button
   (i.e. it is not optional).
 

@@ -43,8 +43,10 @@ and optional cancellation or pause control — inside a `card::surface`.
 
 ## 6. Accessibility notes
 
-- Cancel and pause controls are `iced::widget::button`, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). Give
-  cancel a keyboard shortcut. *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
+- Cancel (`button::ghost`) and a pause toggle (`chip::filter`) are snora
+  controls, reachable from the keyboard from 0.55 once the application routes
+  Tab with `snora::keyboard::traverse` (RFC-116). *(Corrected 2026-11-07:
+  up to 0.54 they were iced buttons, which take no keyboard input.)*
 - Progress bar uses `iced::widget::progress_bar` — the percentage is also
   rendered as a text label so the value is not color-only.
 - For indeterminate tasks, the "…" suffix is the only signal that the task
@@ -69,7 +71,7 @@ fn background_task_card<'a, Message: Clone + 'a>(
 
     let mut controls = row![].spacing(t.spacing.sm);
     if let Some(msg) = on_cancel {
-        controls = controls.push(button::ghost(t, "Cancel", Some(msg)));
+        controls = controls.push(button::ghost(t, "Cancel", msg));
     }
 
     let inner = column![

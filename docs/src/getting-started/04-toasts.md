@@ -101,9 +101,10 @@ Chinese text, which has no spaces, gets the same margin.
 
 **While the pointer rests on a toast, it does not expire,** once you
 wire `on_toast_hover` and `Holds` as above. When the pointer leaves,
-its countdown starts again in full. A keyboard user has no equivalent,
-because iced 0.14 cannot tell snora which widget has focus. So use
-`.persistent()` for anything a reader must not miss.
+its countdown starts again in full. **A keyboard user has no equivalent
+hold.** From 0.55 the toast's × is reachable from the keyboard (RFC-116), but
+focusing it does not hold the toast; RFC-116's long-term plan records that. So
+use `.persistent()` for anything a reader must not miss.
 
 Persistent is for messages the user must acknowledge — completed
 exports, failures. Errors are persistent by default.

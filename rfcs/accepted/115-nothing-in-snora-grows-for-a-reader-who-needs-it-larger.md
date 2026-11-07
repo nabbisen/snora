@@ -1,6 +1,8 @@
 # RFC-115 — Nothing in snora grows for a reader who needs it larger
 
 **Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Sizing rules merged to `main` 2026-11-07** with RFC-116 R-1 Unit 3 (`952e1a2`), shipping in
+0.55.0: target ≥ max(24, 1.5 × text, `Tokens::targets.min`); a pictogram is 1 em and the × is 1.125 em.
 **Handoff.** [`handoffs/115-…`](../handoffs/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger/implementation-handoff.md).
 **Raised.** 2026-11-04, architect, from the owner's question about older users (Theme
 E). The owner approved opening it.

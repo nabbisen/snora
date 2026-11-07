@@ -48,8 +48,8 @@ for tag in &self.active_tags {
 
 ## Accessibility
 
-- Both variants use `iced::widget::button`.
+- Both variants are snora controls (RFC-116; iced buttons before 0.55): from 0.55, Tab reaches the chip, and a removable chip's remove button, once the application routes it with `snora::keyboard::traverse`. Enter and Space press them, and a chip keeps its focus when pressing it toggles it.
 - Selected state is communicated via solid accent background + contrast-tested `accent_text` foreground (WCAG AA ≥4.5:1 across all presets, verified by automated tests).
   If color-alone would be a barrier in your application context, add a
   checkmark glyph to the label.
-- Custom focus ring not rendered in iced 0.14 — documented limitation.
+- A focus ring from `Tokens::focus` shows focus, drawn above the neighbouring remove button so it is never partly hidden.

@@ -57,11 +57,7 @@ When testing under a high-contrast preset in the workbench:
 - Button text must be readable in all four states (active, hover, pressed,
   disabled).
 - The focus ring at `3.0` width must be visible when tabbing through
-  controls. **`BLOCKED (iced 0.14 — no focus variant in
-  button::Status)`**, matching the severity label
-  `accessibility-checklist.md`'s "Known limitations" section defines
-  for exactly this shape of gap: the ring is not rendered through
-  `button::Style` in iced 0.14, so this item cannot pass on snora's
-  own standard button today — see [Semantic
-  accessibility](../contributing/semantic-accessibility.md) for the
-  full limitation and what does and does not fall under it.
+  controls. From 0.55 snora's controls draw it (RFC-116), so this item can
+  pass: route Tab with `snora::keyboard::traverse` and look. The wider ring
+  reaches 1 px inside the control (3 px wide, 2 px out); a `button::link`
+  keeps its underline clear of it.

@@ -25,12 +25,29 @@ contributor-facing documents linked below, not duplicated here.
   some contrast value, that is not a guarantee snora makes; see
   [API governance § Permitted without reopening the gate](../contributing/api-governance.md#permitted-without-reopening-the-gate)
   for the full statement.
-- **snora does not intercept iced's keyboard routing.** What iced
-  delivers to a widget, snora leaves alone. But in iced 0.14 a `button`
-  takes no keyboard input and is not focusable, so snora's own controls
-  are pointer and touch only today (see below, and RFC-116). *(Corrected
-  2026-11-07: this said "keyboard reachability inherited from iced",
-  which overstated what iced 0.14 provides.)*
+- **Every control snora draws is reachable from the keyboard (0.55,
+  RFC-116).** Tabs, breadcrumb ancestors, menu triggers and items, the
+  notice's buttons, chips and their remove buttons, every
+  `design::button` variant (including `link`), the toast's close mark and
+  the sidebar's items are focus targets. Enter and Space press the focused
+  one and publish the same message a click does, and a focus ring of at
+  least 3:1 shows where focus is. A control with no handler is disabled and
+  skipped. **iced binds no Tab key, so your application routes it, in one
+  line of `update`:**
+
+  ```rust,ignore
+  Message::KeyPressed(key, modifiers) => {
+      if let Some(task) = snora::keyboard::traverse(key, modifiers) {
+          return task;
+      }
+  }
+  ```
+
+  Subscribe with `iced::keyboard::listen()`, as the `tab` example does. Tab
+  past the last control leaves the group; it does not wrap. Before 0.55,
+  snora's controls were iced `button`s, which take no keyboard input at all.
+  *(Corrected 2026-11-07: this once said "keyboard reachability inherited
+  from iced", which iced 0.14 does not provide.)*
 - **Toasts stay as long as it takes to read (RFC-113).** An error stays
   until it is dismissed. Every other toast stays 2 s plus 1 s per 6
   characters, rounded up, and at least 6 s. A toast under a resting
@@ -142,44 +159,43 @@ contributor-facing documents linked below, not duplicated here.
   because a default-on mark would double theirs (RFC-103 Q-1). Disabled
   labels are dimmed below 4.5:1 by design; WCAG 1.4.3 exempts inactive
   controls.
-- **Keyboard (WCAG 2.1.1): not met by snora's own controls, today.** In
-  iced 0.14 a `button` is not focusable and takes no keyboard input. So the
-  sidebar, tabs, breadcrumbs, dismiss buttons, menu items and `design::button`
-  are pointer and touch only. Keyboard routes exist only where your
-  application wires them: your shortcuts, `dismiss_on_escape` and
-  `cycle_zones`. **The plan** is RFC-116, tracked as 1.0 gate 11: a focusable
-  control under every snora control, with a focus ring, needing no iced
-  feature. Until it ships, give every action that matters a keyboard shortcut.
+- **Keyboard (WCAG 2.1.1): met by snora's own controls from 0.55, once
+  your application routes Tab with `snora::keyboard::traverse`** (above).
+  Without that one line, Tab does nothing, as before. Two gaps remain, and
+  are planned:
+  - **with a dialog or sheet open, Tab also reaches the controls beneath
+    it**, which the pointer cannot reach (RFC-119);
+  - **when the focused control removes itself** (a dismissed notice, a
+    closed toast, a removed chip), focus goes nowhere, and the next Tab
+    starts from the top of the window (RFC-116's long-term plan).
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim
   abstraction of its own — is in
   [Position on assistive technology](../contributing/semantic-accessibility.md#position-on-assistive-technology-rfc-045).
-- **No custom focus ring on snora's own standard buttons or cards** — the
-  widgets that let iced own their focus state. This is a hard constraint
-  of the pinned iced 0.14 version (`button::Status` has no `Focused`
-  variant), not a snora design choice. It does **not** mean focus styling
-  is unavailable to your own code: an application that already owns focus
-  as its own state can style it in its own `container` closure today,
-  using `FocusTokens` for the colour/width vocabulary — see
-  [Semantic accessibility § Consequence for the style bridge](../contributing/semantic-accessibility.md#consequence-for-the-style-bridge).
-  **Buttons take no keyboard input at all in iced 0.14**, so snora's own
-  buttons are pointer and touch only. Keyboard routes are the ones the
-  application wires (*corrected 2026-11-04*: this said "keyboard activation
-  still works; only the visual ring on iced-owned widgets is missing"). Full
-  detail is in the
+- **Your own `iced::widget::button`s are still pointer and touch only.**
+  The keyboard route above is snora's `control`, under every control snora
+  draws. An iced `button` you build yourself takes no keyboard input and
+  registers no focus target, in iced 0.14. Where snora has a control for the
+  job, use it: `design::button::{primary, secondary, ghost, danger, link}`
+  on the design path. snora has no public control for content of your own
+  yet; RFC-116's long-term plan records that. Until then, give such an action
+  a keyboard shortcut. Details:
   [iced 0.14 focus-state limitation](../contributing/semantic-accessibility.md#iced-014-focus-state-limitation).
+  *(Corrected 2026-11-04: this once said "keyboard activation still works;
+  only the visual ring on iced-owned widgets is missing".)*
 - **No semantic identifiers or roles.** `iced::widget::Id`s attached to
   snora-rendered surfaces (RFC-047, where implemented) are labels for
   external observation, not accessibility roles or names — an `Id` is
   not a role.
-- **No modal focus trapping.** Zone navigation (above) is correctly
-  suspended while a dialog or sheet is open, but nothing bounds Tab
-  *inside* the modal's own content once focus is there — a keyboard
-  user can still Tab out to controls the modal is meant to be gating.
-  This is a known, staged gap, not an oversight: it needs iced's
-  `advanced` feature, which snora does not enable, and is a separate,
-  measured decision. See [design decisions](../contributing/design-decisions.md#why-focus-trapping-is-deferred-v014).
+- **No modal focus trapping, yet: with a dialog or sheet open, Tab also
+  reaches the controls beneath it.** The dim blocks the pointer (Law 8), but
+  iced delivers key presses to every layer, so a control under the dim can be
+  focused and pressed. This matters from 0.55, which made snora's controls
+  focus targets. **RFC-119 proposes the fix**: the keyboard reaches exactly
+  what the pointer can press. Until it ships, close menus and modals before
+  acting on the page, and do not rely on a modal to gate keyboard input. Zone
+  navigation (above) is already suspended while a modal is open.
 
 ## What "ABDD" means, precisely
 

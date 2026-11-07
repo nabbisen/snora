@@ -519,6 +519,19 @@ evidence changed: the register no longer lists a consumer as currently
 asking for it, but the blocker and the additive constraint above are
 unaffected.
 
+**Changed 2026-11-07 (RFC-116, RFC-119): the keyboard now reaches beneath a
+modal, and a fix needs no `advanced`.** From 0.55 every control snora draws is a
+focus target (`control`). iced delivers key presses to every layer, and the dim
+captures only the pointer. So an application that routes Tab can reach and press
+controls beneath an open dialog. Before 0.55 there was nothing there to reach.
+This is not trapping. It is a gap between the keyboard and Law 8's pointer
+blocking, and it is new. **The blocker above does not bind the fix:** a widget that
+takes part in focus implements `iced_core::Widget` and `Focusable`, which are
+public without `advanced`, as `snora-control` does. A wrapper that keeps its
+content out of focus and key events needs no focus *query*. RFC-119 proposes one.
+Whether it is default behaviour or an optional field is RFC-119's question,
+against the additive constraint above.
+
 ## Why `advanced` is enabled nowhere (v0.40)
 
 **This page has said `advanced` is "not stable-by-default" since before

@@ -48,10 +48,15 @@ primary action.
 
 - If the entire card is interactive (pressing it selects/opens the item),
   wrap it in `iced::widget::button` rather than placing a button inside the
-  card. This makes the full card one pointer target. It is not a tab
-  stop: pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
-- If the card is display-only with one action button, the button is
-  `iced::widget::button`, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access).
+  card. This makes the full card one pointer target. **It is not a tab
+  stop:** an iced `button` takes no keyboard input in iced 0.14, and
+  snora has no public control for content of your own yet (RFC-116's long-term plan). Give selection a keyboard route of its own (a shortcut, or a
+  `button::link` "Open" inside the card). *(Corrected 2026-11-07: in iced
+  0.14 a `button` takes no keyboard input; see RFC-116.)*
+- If the card is display-only with one action button, use
+  `button::primary`, `ghost` or `link`: snora controls, reachable from the
+  keyboard from 0.55 once the application routes Tab with
+  `snora::keyboard::traverse`.
 - Metadata chips with `on_toggle = None` are display-only and are not in
   the tab order.
 - Selected state is communicated via `card::selected`'s border color — not
@@ -103,7 +108,8 @@ fn result_card<'a, Message: Clone + 'a>(
     }
 
     // Wrap the entire card in a button so it is one pointer target.
-    // (Not a tab stop: in iced 0.14 a button takes no keyboard input.)
+    // (Not a tab stop: this is iced's button, which takes no keyboard
+    // input in iced 0.14. Give "select" a keyboard route of its own.)
     iced::widget::button(
         if selected {
             card::selected(t, content)

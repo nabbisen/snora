@@ -179,3 +179,40 @@ prototype, and then ruled.
 
 **Release:** with RFC-116 R-1 (0.55.0). There is still no disabled link, and R-3's
 link-or-action rule stands.
+
+## Ruling, 2026-11-07: the underline's rule (Unit 0b, amended by Unit 1's measurement)
+
+Unit 0b measured a prototype (`.git-exclude/reviewed/117-link-unit0b/`). The architect
+ruled the rule, and Unit 1 measured the one part the ruling left open, the line
+spacing (`.git-exclude/reviewed/117-link-unit1/`).
+
+**Let a unit *u* be 1/16 em, rounded to the nearest whole pixel (halves up), and never
+under 1 px.**
+
+> **An underline is *u* thick, and its top edge is *u* below its text's line box;
+> snapping never moves it up. Every wrapped line has its own. A link's lines are 4 *u*
+> taller than plain text's, with the text centred in each.**
+
+| text | *u* |
+|---|---|
+| 12, 16 px | 1 |
+| 24, 32 px | 2 |
+| 40 px | 3 |
+
+- **Why the line box, and not the baseline.** Descenders end 0.01 to 0.09 em above the
+  box's bottom, depending on the font, and iced 0.14's `Paragraph` reports no
+  baseline.
+- **Why whole pixels.** Unrounded, the two renderers disagree. Rounded, they agree on
+  every row measured.
+- **Why 4 *u*.** An underline sits in the next line's box, where accents and tall
+  letters reach. At 2 *u*, 10 of 24 cases touched (3 fonts × 4 sizes × scale 1 and 2).
+  At 3 *u*, 3 still touched, all at 12 px and scale 1. At 4 *u*, none did, with the
+  tightest clearance 1 row.
+- **Height.** The link's padding gives the extra height back, so a link is as tall as
+  a `ghost` with the same label, and its text sits at the same height. There are two
+  exceptions, both stated in the rustdoc:
+  - a label of 40 px or more;
+  - the two high-contrast presets at 24 px or more, which are 1 to 2 px taller, to keep
+    their wider ring off the underline.
+
+`link` merged to `main` 2026-11-07 (`b8f9cd3`), shipping in 0.55.0.

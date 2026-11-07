@@ -1,6 +1,9 @@
 # RFC-116 — No snora control can be reached from the keyboard
 
 **Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**R-1 merged to `main` 2026-11-07** (`952e1a2`), shipping in 0.55.0: every control snora
+draws is `control`, and 1.0 gate 11 is met. **R-2, the `Shortcuts` router, is open.** The
+long-term plan is at the end. RFC-119 covers the keyboard beneath an open modal.
 **Handoff.** [`handoffs/116-…`](../handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md).
 **Revised** 2026-11-04, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy (see "Review against snora's principles"). The
@@ -274,3 +277,18 @@ crates.io. So **the first version is published from the local machine:**
 The skip is general, not a one-off exclusion: it also makes a re-run after a partly
 failed publish safe. The procedure is recorded in `release-process.md` for any future
 new crate.
+
+## Long-term plan: the keyboard gaps that remain after R-1 (2026-11-07)
+
+Recorded under the owner's ruling of 2026-11-04: *"Even if immediate action is not
+possible, it must be managed as a long-term plan."* Each item has a trigger. When the
+trigger fires, the item becomes an RFC or a unit, and nobody waits for a re-read.
+
+| # | Gap | Who meets it | Trigger |
+|---|---|---|---|
+| L-1 | **Focus after a control removes itself.** Dismissing a notice, closing a toast, removing a chip, or pressing an ancestor crumb, which becomes the current page: focus goes nowhere, and the next Tab starts from the top of the window | everyone who dismisses from the keyboard | RFC-119 Unit 1 accepted; its "focus kept or dropped" finding (Q-3) decides how |
+| L-2 | **Focus returns to the opener when a modal closes** (WAI-ARIA's dialog pattern) | keyboard users of every dialog | RFC-119 Q-3: met there if it comes free, otherwise it moves here |
+| L-3 | **No hold for a keyboard-focused toast.** Focusing the toast's × does not hold it, as a resting pointer does (RFC-113) | keyboard users reading a toast | with L-1, since both concern the toast's control |
+| L-4 | **No public control for an application's own content.** An application's own iced `button` (an icon button, a card as a target) is pointer and touch only; `control` serves snora's crates only | applications that build their own controls | the first adopter that asks, or 1.0's API freeze review, whichever comes first |
+| L-5 | **A focused item on the `Tooltip` rail shows no name:** iced opens tooltips only under the pointer | keyboard users of `SideBarLabels::Tooltip` | an iced release with focus-driven tooltips; until then, the book says so (`reference/widgets.md`), and `Beneath` is the default; the next rustdoc pass on `SideBarLabels::Tooltip` says it too |
+| L-6 | **Native Wayland.** The real-window Tab check ran under X11 only | Wayland users | the next real-window check, or any Wayland report |

@@ -172,14 +172,15 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 115 | [Nothing in snora grows for a reader who needs it larger](./accepted/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger.md) | after RFC-116 R-1 — Theme E; Unit 0 done (no 2.5.8 defect). Target ≥ max(24, 1.5 × text, the minimum target token); pictogram 1 em, × 1.125 em; both enforced in RFC-116's `control` — **accepted 2026-11-04** (handoff: [`handoffs/115-…`](./handoffs/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger/implementation-handoff.md)) |
-| 116 | [No snora control can be reached from the keyboard](./accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md) | Unit 0 first — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router; `dismiss_on_escape` deprecated; a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
-| 117 | [A link does not look like a link](./accepted/117-a-link-does-not-look-like-a-link.md) | R-5 **shipped v0.54.0**; `link` 0.55.0 (with RFC-116 R-1) — orbok request 3 (Theme E); `design::button::link`, an underlined ghost whose underline follows wrapped lines (method by measurement); no disabled link; a written link-vs-action rule; the accent's text use declared — **accepted 2026-11-04** (handoff: [`handoffs/117-…`](./handoffs/117-a-link-does-not-look-like-a-link/implementation-handoff.md)) |
+| 115 | [Nothing in snora grows for a reader who needs it larger](./accepted/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger.md) | **merged 2026-11-07, ships 0.55.0** — Theme E; Unit 0 done (no 2.5.8 defect). Target ≥ max(24, 1.5 × text, the minimum target token); pictogram 1 em, × 1.125 em; both enforced in RFC-116's `control` — **accepted 2026-11-04** (handoff: [`handoffs/115-…`](./handoffs/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger/implementation-handoff.md)) |
+| 116 | [No snora control can be reached from the keyboard](./accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md) | **R-1 merged 2026-11-07, ships 0.55.0 (gate 11 met); R-2 open; long-term plan L-1–L-6** — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router; `dismiss_on_escape` deprecated; a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
+| 117 | [A link does not look like a link](./accepted/117-a-link-does-not-look-like-a-link.md) | R-5 **shipped v0.54.0**; `link` **merged 2026-11-07, ships 0.55.0**; underline rule ruled (unit *u* = 1/16 em; 4 *u* line spacing) — orbok request 3 (Theme E); `design::button::link`, an underlined ghost whose underline follows wrapped lines (method by measurement); no disabled link; a written link-vs-action rule; the accent's text use declared — **accepted 2026-11-04** (handoff: [`handoffs/117-…`](./handoffs/117-a-link-does-not-look-like-a-link/implementation-handoff.md)) |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
+| 119 | [The keyboard reaches beneath an open modal](./proposed/119-the-keyboard-reaches-beneath-an-open-modal.md) | 0.55.0 if Q-1 rules so — found while rewriting the book after RFC-116 R-1: a modal's dim blocks the pointer only, so Tab reaches and Enter presses controls beneath it. Proposed: the keyboard reaches exactly what the pointer can press (an `Inert` wrapper, no `advanced`) |
 
 ## Archive
 

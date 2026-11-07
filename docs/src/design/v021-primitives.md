@@ -14,7 +14,8 @@ See the dedicated pages for usage details:
 ## Notice
 
 A toned banner that communicates status. Action and dismiss controls are
-`iced::widget::button` — keyboard-reachable. App owns visibility state.
+snora's `control` (RFC-116), reachable from the keyboard from 0.55. App owns
+visibility state.
 
 ```rust,ignore
 use snora::design::{Tokens, Tone, notice::Notice};
@@ -28,9 +29,9 @@ Notice::new(&tokens, Tone::Warning, "Disk space low.")
 
 ### Accessibility (RFC-027)
 
-1. **Native primitive:** `iced::widget::button` for action and dismiss.
-2. **Keyboard reachable:** no, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
-3. **Focus visible:** no custom focus ring (iced 0.14 limitation).
+1. **Native primitive:** snora's `control` for action and dismiss (iced's `button` before 0.55).
+2. **Keyboard reachable:** yes, from 0.55: Tab reaches each (once the application routes it with `snora::keyboard::traverse`), and Enter and Space press it. Dismissing moves focus nowhere: the next Tab starts from the top (RFC-116's long-term plan). *(Corrected 2026-11-07: up to 0.54 these were iced buttons, which take no keyboard input; this page had said "keyboard-reachable".)*
+3. **Focus visible:** yes, a ring from `Tokens::focus`, ≥ 3:1.
 4. **Semantic limitation:** no ARIA role exposed; visual tone only.
 5. **Example:** design workbench notice section.
 
@@ -38,7 +39,7 @@ Notice::new(&tokens, Tone::Warning, "Disk space low.")
 
 ## Filter chip
 
-A toggle chip backed by `iced::widget::button`.
+A toggle chip built on snora's `control` (RFC-116; iced's `button` before 0.55).
 
 ```rust,ignore
 use snora::design::chip;
@@ -49,9 +50,9 @@ chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove)
 
 ### Accessibility (RFC-027)
 
-1. **Native primitive:** `iced::widget::button`.
-2. **Keyboard reachable:** no, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
-3. **Focus visible:** no custom focus ring (iced 0.14 limitation).
+1. **Native primitive:** snora's `control`; a removable chip has two, the label and the remove button.
+2. **Keyboard reachable:** yes, from 0.55, as for the notice. A chip keeps its focus when pressing it toggles it. *(Corrected 2026-11-07: up to 0.54 it was an iced button, which takes no keyboard input.)*
+3. **Focus visible:** yes, a ring from `Tokens::focus`, ≥ 3:1, drawn above the neighbouring remove button.
 4. **Semantic limitation:** selected state communicated via color — document
    if color-alone would be a barrier in the application context.
 5. **Example:** design workbench chip section.

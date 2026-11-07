@@ -71,9 +71,11 @@ direction, labels)`:
 | `Tooltip` | icon only; the name in a tooltip under the pointer (the pre-0.54 rail) | 64 px |
 
 **`Tooltip` names items only under a resting pointer.** A touch user, or
-anyone who cannot hold the pointer still, gets no names. In iced 0.14 no
-form is reachable from the keyboard, because iced's buttons take no
-keyboard input. RFC-116 tracks that (1.0 gate 11).
+anyone who cannot hold the pointer still, gets no names. **Every form is
+reachable from the keyboard from 0.55** (RFC-116): each item is a focus
+target once the application routes Tab with `snora::keyboard::traverse`, and
+Enter and Space press it. A focused item in the `Tooltip` form still shows no
+name, because iced opens tooltips only under the pointer.
 `design::widget::app_side_bar_with` is the token-styled equivalent.
 
 ### `app_footer`

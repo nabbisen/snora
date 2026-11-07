@@ -53,12 +53,12 @@ with a `mouse_area` loses all of that.
 
 ## Primitive construction table
 
-| Primitive | Required construction | Keyboard reachability (iced 0.14) |
+| Primitive | Required construction | Keyboard reachability |
 |---|---|---|
-| Button (primary / secondary / ghost / danger) | `iced::widget::button` | **None:** iced's button takes no keyboard input. RFC-116 |
-| Interactive card | Semantic control (iced button styled as a card) where possible; or documented limitation | **None** if a button (as above); document either way |
-| Notice dismiss / action | Real `iced::widget::button` controls | **None** (as above) |
-| Chip (interactive) | `iced::widget::button` styled as chip where possible | **None** (as above) |
+| Button (primary / secondary / ghost / danger / link) | snora's `control` (`snora-control`, RFC-116) | **Yes, from 0.55:** a focus target; Enter and Space press it; a ring shows focus. Tab moves once the application routes it (`snora::keyboard::traverse`) |
+| Interactive card | Semantic control where possible; or documented limitation | **None** if built on an iced `button`, which takes no keyboard input in iced 0.14; document either way |
+| Notice dismiss / action | `control` | **Yes** (as for buttons) |
+| Chip (interactive), and its remove button | `control` | **Yes** (as for buttons) |
 | Progress bar | `iced::widget::progress_bar` where possible | N/A (display only) |
 | Non-interactive card | `iced::widget::container` | N/A (display only) |
 
@@ -79,13 +79,16 @@ these questions before merge:
 
 2. **Is it keyboard reachable?**
    State whether and how the primitive can be activated without a mouse.
-   For `iced::widget::button` in iced 0.14, the answer is **no**: it is not
-   focusable and takes no keyboard input. Name the application-wired route
-   instead, or RFC-116. *(Corrected 2026-11-07: in iced 0.14 a `button` takes no keyboard input; see RFC-116.)*
+   **A new snora control is built on `control`**, which answers yes: Tab
+   reaches it (through `traverse`), and Enter and Space press it. Built on
+   `iced::widget::button`, the answer is **no** in iced 0.14: it is not
+   focusable and takes no keyboard input. *(Corrected 2026-11-07: in iced
+   0.14 a `button` takes no keyboard input; see RFC-116.)*
 
 3. **How is focus visible?**
-   State whether a focus ring is rendered. If not (see the iced 0.14
-   limitation below), state that explicitly.
+   State whether a focus ring is rendered. `control` draws one, from
+   `Tokens::focus` on the design path, at ≥ 3:1 against what it sits on.
+   If the primitive has none, state that explicitly.
 
 4. **What semantic limitation remains?**
    List any known gaps: missing focus ring, no ARIA role, missing screen-reader
@@ -100,6 +103,11 @@ these questions before merge:
 ## iced 0.14 focus-state limitation
 
 This is a hard constraint of the pinned iced version, not a design choice.
+
+**From 0.55 it no longer limits snora's own controls**: they are `control`, which
+keeps its own focus state and draws its own ring (RFC-116). It still describes
+iced's `button` and `container`, which an application's own code uses, and the
+style bridge, which maps their statuses.
 
 ### What iced 0.14 exposes
 
@@ -144,9 +152,12 @@ therefore has a **present-day audience**, not only a future one:
 
 ### What this means for QA
 
-A **missing focus ring on snora's own standard button or card** — where
-snora hands the widget to iced and iced owns its focus state — is a
-**known, documented limitation**, not a QA regression: record it in the
+**A missing focus ring on a snora control is a bug** from 0.55: every control
+snora draws is `control`, which draws its own ring.
+
+A **missing focus ring on an iced `button` or card** — where the widget is
+handed to iced and iced owns its focus state — is a **known, documented
+limitation**, not a QA regression: record it in the
 primitive's accessibility checklist under "Known limitations" with
 severity `BLOCKED (iced 0.14 — no focus variant in button::Status)`.
 
@@ -166,9 +177,15 @@ separately rather than reworking the status mapping.
 **Pointer and touch only, for buttons.** iced 0.14's `button` handles mouse and touch events only, and registers no focus target: only `text_input` and `text_editor` implement `Focusable` (`iced_widget-0.14.2/src/button.rs`). A probe confirmed
 it: a click presses a button and typing reaches a text input, but Tab, Enter and Space
 never press a button, even after it has been clicked. So the gap is not only the
-missing ring. **snora's own buttons cannot be reached or pressed from the keyboard.**
-The keyboard reaches what the application wires: its own shortcuts, and snora's
-`dismiss_on_escape` and `cycle_zones` helpers.
+missing ring.
+
+**snora's answer, from 0.55 (RFC-116): `control`.** It is snora's own widget, in
+`snora-control`, built on the public `iced_core::Widget` and `Focusable` (no
+`advanced` feature). It registers a focus target when it has a handler, answers
+Enter and Space with the message a click publishes, and draws its own ring in a
+layer above its neighbours. Every control snora draws is one. **An application's
+own iced `button` is still pointer and touch only**: snora has no public control
+for application content yet (RFC-116's long-term plan).
 
 *Corrected 2026-11-04:* this section said that iced's buttons respond to Enter and
 Space when focused, and that the gap was "exclusively" visual. Both were wrong for
@@ -184,12 +201,13 @@ beside a new one.
 
 | Behavior | Owner |
 |---|---|
-| Button activation via Enter / Space | **Nobody, in iced 0.14.** iced's buttons take no keyboard input (see above). An application shortcut is the only keyboard route to an action. *(Corrected 2026-11-04: this row said "iced (inherited)".)* |
+| Moving focus between controls (Tab / Shift+Tab) | **Application, in one line**: iced binds no Tab key, so `update` calls `snora::keyboard::traverse(key, modifiers)`. Tab past the last control leaves the group; it does not wrap |
+| Activation via Enter / Space | **Snora**, for every control it draws (`control`, from 0.55). **Nobody** for an application's own iced `button`, which takes no keyboard input in iced 0.14. *(Corrected 2026-11-04: this row said "iced (inherited)".)* |
 | Frame-level zone navigation (Header/SideBar/Body/Footer) | **Snora** — `snora_core::focus::next_zone`, a pure decision function; the application wires the key (`snora::keyboard::cycle_zones`, F6/Shift+F6 recommended) and owns the current zone as its own state (RFC-060). Snora installs no subscription. |
-| Snora visual focus ring | Snora, where iced exposes focus state — and, since RFC-059, reachable *today* by an application that already owns focus as its own state, styling it in its own `container` closure. Not rendered by snora's own widgets yet; staged behind Q-2 of RFC-060. |
+| Snora visual focus ring | **Snora**: `control` draws it, from `Tokens::focus` on the design path, at ≥ 3:1 (0.55). An application that owns focus as its own state can still style its own `container` with `FocusTokens` (RFC-059). |
 | Application keyboard shortcuts | Application |
 | Escape-key overlay dismissal | Application (via `snora::keyboard::dismiss_on_escape`) |
-| Modal focus trapping | **Staged, not shipped.** The reconsideration trigger recorded in [design decisions](design-decisions.md#why-focus-trapping-is-deferred-v014) fired — a concrete downstream app (tekstide) demonstrated the need, and moving focus (not querying it) is reachable without the `advanced` iced feature — but trapping itself needs the query half, which does need `advanced`. Whether to enable it is Q-1 of RFC-060: a separate, measured decision, not an implementation detail of zone navigation. When it lands, it arrives as a new optional `Dialog`/`Sheet` field (RFC-011-C), inherited from the original deferral. |
+| Modal focus trapping | **Staged, not shipped; and from 0.55, Tab reaches controls beneath an open modal** (they became focus targets). **RFC-119 proposes the fix:** the keyboard reaches exactly what the pointer can press. The history: The reconsideration trigger recorded in [design decisions](design-decisions.md#why-focus-trapping-is-deferred-v014) fired — a concrete downstream app (tekstide) demonstrated the need, and moving focus (not querying it) is reachable without the `advanced` iced feature — but trapping itself needs the query half, which does need `advanced`. Whether to enable it is Q-1 of RFC-060: a separate, measured decision, not an implementation detail of zone navigation. When it lands, it arrives as a new optional `Dialog`/`Sheet` field (RFC-011-C), inherited from the original deferral. |
 | Screen-reader announcements | **None.** iced 0.14 has no accessibility tree and no AccessKit integration ([accessibility](../guides/accessibility.md)). *(Corrected 2026-11-04: this row named an "iced accessibility layer", which does not exist.)* |
 
 ---

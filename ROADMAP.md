@@ -234,14 +234,22 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.55.0
 
+**Merged to `main` 2026-11-07:**
 - **Keyboard access to every snora control** (RFC-116 R-1). A focusable `control`, in
   a new `snora-control` crate, sits under every button snora draws, with a focus
-  ring snora draws. That closes 1.0 gate 11, WCAG 2.1.1.
+  ring snora draws. That meets 1.0 gate 11, WCAG 2.1.1.
 - **Sizes that follow the reader** (RFC-115 R-2), inside `control`:
-  - targets ≥ max(24 px, 1.5 × text, a minimum-target token);
-  - icons at 1 em.
+  - targets ≥ max(24 px, 1.5 × text, `Tokens::targets.min`);
+  - icons at 1 em, and the × at 1.125 em.
 - **`design::button::link`** (RFC-117): an underline drawn by snora under every line,
   and growing with the text.
+- `release.yaml` skips crates already on crates.io (RFC-116 Unit 2b).
+
+**Proposed, for the owner's ruling:**
+- **The keyboard beneath an open modal** (RFC-119). Tab now reaches controls under a
+  dialog's dim. If Q-1 rules so, 0.55.0 waits for the fix.
+
+**Later:** RFC-116 R-2, the `Shortcuts` router, and the long-term plan L-1 to L-6.
 
 ## Recently shipped
 

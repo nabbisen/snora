@@ -40,14 +40,16 @@ with an optional call-to-action button.
 
 ## 6. Accessibility notes
 
-- The CTA button is `iced::widget::button`, pointer and touch only in iced 0.14 (RFC-116 tracks keyboard access). Give the
-  action a keyboard shortcut in your application.
+- The CTA is `button::primary`, a snora control: reachable from the keyboard
+  from 0.55 once the application routes Tab with `snora::keyboard::traverse`
+  (RFC-116). If it takes the reader somewhere rather than acting, use
+  `button::link`.
 - Descriptive text is plain `iced::widget::text`. iced 0.14 has no
   accessibility tree, so no screen reader reads it.
 
   *(Corrected 2026-11-07: this said the button was keyboard reachable,
   and the text readable by screen readers "to the extent iced 0.14
-  supports it". It supports neither.)*
+  supports it". Up to 0.54 neither held; from 0.55 the button is.)*
 - No interactive controls besides the optional CTA — no focus-trapping
   concern.
 
@@ -81,7 +83,7 @@ fn empty_state<'a, Message: Clone + 'a>(
     .align_x(iced::Alignment::Center);
 
     if let (Some(label), Some(msg)) = (cta_label, on_cta) {
-        col = col.push(button::primary(t, label, Some(msg)));
+        col = col.push(button::primary(t, label, msg));
     }
 
     card::surface(t, col)

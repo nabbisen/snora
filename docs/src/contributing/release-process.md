@@ -663,11 +663,17 @@ release introduces a new workspace crate:
 2. **The owner adds its trusted publisher** on crates.io: this repository,
    `release.yaml`.
 3. **Push the tag.** `release.yaml` skips every crate whose exact version is already
-   on crates.io, and publishes the rest. *(The skip arrives with 0.55.0, RFC-116
-   Unit 2b's `scripts/publish-plan.sh`. Until then, `release.yaml` publishes all
-   crates unconditionally.)*
+   on crates.io, and publishes the rest (`scripts/publish-plan.sh`, RFC-116 Unit 2b).
 
 The first instance is `snora-control`, at 0.55.0.
+
+**What the plan checks, and what it does not.** `publish-plan.sh` asks crates.io, per
+crate, whether the exact `name@version` exists. Anything but "yes" or "no" stops
+the run before it asks for a credential. It logs each decision. **It checks that a
+version exists, not what it contains:** a crate published locally from the wrong
+commit is skipped like any other. Step 1's "clean worktree at the release commit" is
+what guards that. A yanked version counts as existing, since it cannot be republished.
+The same skip makes a re-run after a partly failed publish safe.
 
 **Pushing the tag publishes. There is no command to run here.**
 

@@ -138,31 +138,34 @@ Snora Design does not and cannot guarantee:
 ### Focus visibility
 
 ```text
-[ ] The focus-ring limitation for this iced version is documented if
-    the primitive uses a standard iced button or container.
+[ ] A snora control is built on `control` (snora-control, RFC-116), which
+    draws its own focus ring: Tokens::focus on the design path, the 2/2
+    literals and the theme's text colour on the unstyled path.
+[ ] The ring clears 3:1 against what it sits on, in every stock theme and
+    every preset (crates/snora/tests/every_control.rs adds the control as
+    a subject).
+[ ] If the primitive is NOT built on `control` (an iced button or
+    container), the absence of a ring is documented as a known limitation
     (iced 0.14: button::Status has no Focused variant; container has no
-    interaction status. See semantic-accessibility.md for the full
-    statement.)
-[ ] If a focus ring IS expressible (custom widget or future iced version),
-    it meets the non-text boundary contrast requirement (see § Contrast)
-    against adjacent colors and uses the focus token
-    (tokens.focus.ring_color, ring_width, ring_offset).
-[ ] The absence of a custom focus ring is documented as a known limitation,
-    not left undiscovered.
+    interaction status). See semantic-accessibility.md.
 ```
 
 ### Keyboard reachability
 
 ```text
-[ ] The primitive uses a native iced interactive widget (iced::widget::button,
-    etc.). NOTE: in iced 0.14 a button is pointer and touch only. It is not
-    focusable and takes no keyboard input. Say so in the primitive's docs.
+[ ] Every pressable part is a `control`: Tab reaches it once the
+    application routes Tab with snora::keyboard::traverse, and Enter and
+    Space publish exactly what a click publishes.
+[ ] A part with no handler is disabled and is NOT a focus target.
+[ ] A press that changes the control's state keeps its focus: the tree
+    around the control has the same shape before and after (a `stack`,
+    `row` or `column` that appears with the state drops it; a `container`
+    does not). Test it as every_control.rs does for tabs and chips.
+[ ] NOT on `control` (an iced button): in iced 0.14 it is pointer and
+    touch only, takes no keyboard input, and is not focusable. Say so in
+    the primitive's docs and justify it.
 [ ] If the primitive is built from a non-interactive container plus a mouse
     handler, the limitation is documented and justified.
-[ ] Keyboard activation is NOT inherited from iced 0.14 (corrected
-    2026-11-04: this item said Enter / Space was). If the primitive's action
-    must be reachable from the keyboard, document the application-wired
-    route (a shortcut, dismiss_on_escape, cycle_zones).
 ```
 
 ### Semantic construction
