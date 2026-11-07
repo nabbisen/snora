@@ -1,34 +1,26 @@
-//! A focusable, key-activatable control (RFC-116 Unit 0, prototype).
+//! [`Control`]: `button`'s behaviour, plus focus.
 //!
-//! # Why this exists
+//! What it adds to iced's `button`, and nothing else:
 //!
-//! iced 0.14's `button` takes no keyboard input: its `update` handles
-//! mouse and touch events only, and its `operate` registers no focus
-//! target. Only `text_input` and `text_editor` implement
-//! [`Focusable`]. So no snora control built on `button` can be focused,
-//! and no key presses one — which the probe in
-//! `.git-exclude/reviewed/iced-buttons-take-no-keyboard-input/`
-//! established by experiment rather than by reading.
+//! - **`operate` registers it as a focus target** (`Focusable`), so
+//!   `focus_next` / `focus_previous` can land on it;
+//! - **Enter and Space press it** while focused, publishing **the same
+//!   message a click publishes** — a control with two ways in and two
+//!   messages out would let an application handle one and not the
+//!   other, with nothing to say so;
+//! - **a click focuses it**, and a press anywhere else takes focus
+//!   away, so at most one control holds focus;
+//! - **a focus ring** is drawn while it is focused;
+//! - **it tells the runtime when its look changes** — `button`'s own
+//!   mechanism, recorded status compared on each event — so a hover
+//!   colour appears when the pointer arrives and not when something
+//!   else next redraws the window;
+//! - **a control with no handler is disabled, and is not a focus
+//!   target**: reaching a control that does nothing is the confusion
+//!   the owner's rule forbids.
 //!
-//! `control` is the smallest widget that fixes that: it is `button`'s
-//! behaviour plus a focus target, plus Enter and Space, plus a ring to
-//! show where focus is.
-//!
-//! # What it depends on, and why not `iced`'s `advanced` feature
-//!
-//! [`iced_core::Widget`] and
-//! [`iced_core::widget::operation::Focusable`] are public with no
-//! feature gate; iced's `advanced` feature only re-exports them. So
-//! this depends on `iced_core` directly, at the same `0.14`
-//! requirement as `iced`, and Cargo unifies the two. Turning on
-//! `advanced` would have widened snora's own feature surface for
-//! nothing.
-//!
-//! # Prototype, not the shipped design
-//!
-//! Unit 0 asks what one focusable control costs. This one is
-//! crate-private and used only by the sidebar item. The list of what
-//! `button` does that it does not is in RFC-116's review request.
+//! Everything else — padding, size, the style closure, `clip`,
+//! `on_press_with` and `on_press_maybe` — is as on `button`.
 
 use iced::border::Border;
 use iced::keyboard::{self, key};
@@ -55,9 +47,14 @@ use iced::widget::button;
 
 /// WCAG 2.5.8's minimum pointer target, in logical pixels.
 ///
-/// One of the copies `scripts/check-wcag-floors.sh` pins. This one is
-/// runtime rather than test-only: RFC-115's rule has to hold at layout
+/// Runtime rather than test-only: RFC-115's rule has to hold at layout
 /// time, not only in a suite.
+///
+/// **Not pinned by `scripts/check-wcag-floors.sh`** — an earlier version
+/// of this comment said it was, and it was not. That script pins
+/// `AA_TEXT`, `NON_TEXT_MIN`, `FOCUS_MIN` and `TEXT_SIZE_MIN` only, and
+/// this number has copies it does not see (the toast's
+/// `CLOSE_TARGET_MIN`, and the test mirrors).
 pub(crate) const MIN_TARGET: f32 = 24.0;
 
 /// RFC-115's multiplier, at the position its Unit 0 measured as free:
@@ -65,9 +62,9 @@ pub(crate) const MIN_TARGET: f32 = 24.0;
 /// what every target already measured, so the rule changes nothing for
 /// an application that changes nothing.
 ///
-/// **Prototype only.** RFC-115's amendment makes this a token
-/// (`minimum-target`); Unit 0 is here to show the rule can live in
-/// `control`'s layout at all.
+/// The floor is `max(24, 1.5 x text)` here. RFC-115's amendment adds a
+/// third input, a minimum-target *token*, which the design-path wrappers
+/// will pass in; that is the next unit's, not this one's.
 pub(crate) const TARGET_PER_TEXT: f32 = 1.5;
 
 /// How the control's fill is styled.
@@ -77,17 +74,18 @@ pub(crate) const TARGET_PER_TEXT: f32 = 1.5;
 /// sidebar's existing `sidebar_button_style` is reused unchanged. A
 /// `Focused` variant would have been a new enum for every caller to
 /// match on, and the ring is drawn separately anyway.
-pub(crate) type StyleFn<'a> = Box<dyn Fn(&Theme, button::Status) -> button::Style + 'a>;
+pub type StyleFn<'a> = Box<dyn Fn(&Theme, button::Status) -> button::Style + 'a>;
 
 /// The focus ring's own appearance.
-pub(crate) struct Ring<'a> {
+pub struct Ring<'a> {
     /// Colour, given the theme. The caller supplies it because only the
     /// caller knows what the ring will sit on — the rail, or the active
     /// item's own highlight.
-    pub(crate) color: Box<dyn Fn(&Theme) -> Color + 'a>,
-    pub(crate) width: f32,
+    pub color: Box<dyn Fn(&Theme) -> Color + 'a>,
+    /// The ring's stroke width, in logical pixels. `0` draws no ring.
+    pub width: f32,
     /// How far outside the control's bounds the ring is drawn.
-    pub(crate) offset: f32,
+    pub offset: f32,
 }
 
 /// What a press publishes — the message itself, or a way to make it.
@@ -130,7 +128,10 @@ impl Focusable for State {
     }
 }
 
-pub(crate) struct Control<'a, Message> {
+/// A focusable, key-activatable control: `button` plus focus.
+///
+/// See the module documentation for exactly what it adds.
+pub struct Control<'a, Message> {
     content: Element<'a, Message>,
     /// `None` is a **disabled** control: it ignores the pointer and the
     /// keyboard, draws as `Status::Disabled`, and is not a focus target.
@@ -177,7 +178,10 @@ impl<Message> Control<'_, Message> {
 }
 
 impl<'a, Message> Control<'a, Message> {
-    pub(crate) fn new(
+    /// A control around `content`, styled by `style`, with `ring` shown
+    /// while it is focused. It has no handler yet, so it starts
+    /// **disabled**; give it one with [`Control::on_press`] and friends.
+    pub fn new(
         content: impl Into<Element<'a, Message>>,
         style: StyleFn<'a>,
         ring: Ring<'a>,
@@ -197,22 +201,21 @@ impl<'a, Message> Control<'a, Message> {
         }
     }
 
-    /// Publish `message` when pressed.
-    pub(crate) fn on_press(mut self, message: Message) -> Self {
+    /// Publish `message` when pressed — by a click, a tap, or Enter or
+    /// Space while focused.
+    #[must_use]
+    pub fn on_press(mut self, message: Message) -> Self {
         self.on_press = Some(OnPress::Direct(message));
         self
     }
 
     /// Publish what `message` returns, built **only when pressed**.
-    #[cfg_attr(
-        not(test),
-        expect(
-            dead_code,
-            reason = "R-1 Unit 1 adds it ahead of the rollout (Units 2-3) that calls it; \
-                      the tests exercise it until then"
-        )
-    )]
-    pub(crate) fn on_press_with(mut self, message: impl Fn() -> Message + 'a) -> Self {
+    ///
+    /// For a message that cannot be cloned up front, or that is not free
+    /// to make: the control is drawn and hovered far more often than it
+    /// is pressed.
+    #[must_use]
+    pub fn on_press_with(mut self, message: impl Fn() -> Message + 'a) -> Self {
         self.on_press = Some(OnPress::Closure(Box::new(message)));
         self
     }
@@ -221,15 +224,8 @@ impl<'a, Message> Control<'a, Message> {
     /// control**: it ignores the pointer and the keyboard, and is not a
     /// focus target. Reaching a control that does nothing is the
     /// confusion the owner's rule forbids.
-    #[cfg_attr(
-        not(test),
-        expect(
-            dead_code,
-            reason = "R-1 Unit 1 adds it ahead of the rollout (Units 2-3) that calls it; \
-                      the tests exercise it until then"
-        )
-    )]
-    pub(crate) fn on_press_maybe(mut self, message: Option<Message>) -> Self {
+    #[must_use]
+    pub fn on_press_maybe(mut self, message: Option<Message>) -> Self {
         self.on_press = message.map(OnPress::Direct);
         self
     }
@@ -237,12 +233,18 @@ impl<'a, Message> Control<'a, Message> {
     /// Draw the content within this control's own bounds, so content
     /// wider than the control is cut off at its edge rather than running
     /// on past it. As `button`'s own.
+    ///
+    /// **Crate-private on purpose.** This crate's public items are only
+    /// what `snora` and `snora-widgets` use, and neither uses `clip`:
+    /// `button`'s own `clip` has no caller in snora either. It exists for
+    /// parity and is tested. The `expect` below is a tripwire: the day a
+    /// dependent needs it, the expectation goes unfulfilled, the build
+    /// says so, and making it `pub` is a decision rather than a drift.
     #[cfg_attr(
         not(test),
         expect(
             dead_code,
-            reason = "R-1 Unit 1 adds it ahead of the rollout (Units 2-3) that calls it; \
-                      the tests exercise it until then"
+            reason = "no dependent uses `clip`; kept for parity with `button`, and tested"
         )
     )]
     pub(crate) fn clip(mut self, clip: bool) -> Self {
@@ -250,17 +252,23 @@ impl<'a, Message> Control<'a, Message> {
         self
     }
 
-    pub(crate) fn padding(mut self, padding: impl Into<Padding>) -> Self {
+    /// Padding between the control's bounds and its content.
+    #[must_use]
+    pub fn padding(mut self, padding: impl Into<Padding>) -> Self {
         self.padding = padding.into();
         self
     }
 
-    pub(crate) fn width(mut self, width: impl Into<Length>) -> Self {
+    /// The control's width.
+    #[must_use]
+    pub fn width(mut self, width: impl Into<Length>) -> Self {
         self.width = width.into();
         self
     }
 
-    pub(crate) fn height(mut self, height: impl Into<Length>) -> Self {
+    /// The control's height.
+    #[must_use]
+    pub fn height(mut self, height: impl Into<Length>) -> Self {
         self.height = height.into();
         self
     }

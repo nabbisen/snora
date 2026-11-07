@@ -145,7 +145,7 @@ automatic next step.
 
 Crate-level doctests (`///`/`//!` comments in `src/`) are tested by
 `cargo test -p <crate> --doc` (or `cargo test --workspace --all-features`
-for all five crates at once). Unlike the `docs/src` prose fences above,
+for all six crates at once). Unlike the `docs/src` prose fences above,
 these run inside the crate's own compilation context, so a bare
 ` ```rust ` fence compiles **and executes**.
 
@@ -196,6 +196,7 @@ As of **0.54.0**, re-counted at the cut (`cargo test --workspace --all-features
 | `snora-core` | 23 | 0 |
 | `snora-design` | 9 | 0 |
 | `snora-style` | 3 | 1 |
+| `snora-control` | 0 | 0 |
 | `snora-widgets` | 6 | 0 |
 | `snora` | 9 | 2 |
 | **Total** | **50** | **3** |

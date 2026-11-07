@@ -36,8 +36,12 @@ declare -A ALLOWED=(
 # modules in these crates are whole files:
 #   tests.rs / *_tests.rs -- unit-test modules
 #   *_register.rs         -- the channel and state registers, both `#[cfg(test)]`
+# `snora-control` is scanned too (RFC-116). `control` used to live in
+# `snora-widgets`, so moving it to its own crate would have taken it
+# quietly out of this gate's reach: a scan that names its directories
+# only covers what it names.
 mapfile -t FILES < <(
-  find crates/snora-widgets/src crates/snora/src -name '*.rs' \
+  find crates/snora-widgets/src crates/snora/src crates/snora-control/src -name '*.rs' \
     ! -name 'tests.rs' ! -name '*_tests.rs' ! -name '*_register.rs' | sort
 )
 

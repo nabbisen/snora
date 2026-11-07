@@ -64,9 +64,9 @@ jobs:
         id: auth
 
       - name: cargo publish --workspace
-        # One command, five crates, as today (RFC-090's own non-goal:
-        # not changing what is published). If Trusted Publishing is not
-        # yet configured for one of the five crates against this exact
+        # One command, six crates (RFC-116 added `snora-control`; RFC-090's own
+        # non-goal: not changing the mechanism). If Trusted Publishing is not
+        # yet configured for one of the six crates against this exact
         # workflow filename, crates.io refuses the token exchange or the
         # upload here — loudly, in this step's own log, not silently.
         env:

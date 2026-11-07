@@ -410,7 +410,7 @@ where
 
         // RFC-116 Unit 0: `control` here too, so all three forms of the
         // item are reachable rather than two of them.
-        let btn = crate::control::Control::new(
+        let btn = snora_control::Control::new(
             centred_icon,
             Box::new(move |theme, status| {
                 sidebar_button_style(theme, status, is_active, button_radius)
@@ -479,8 +479,8 @@ where
 /// `FocusTokens::new(2.0, 2.0, ..)`'s defaults on the design path. The
 /// design path's own tokens are not read yet: Unit 0 is one control,
 /// and wiring `FocusTokens` through is R-1's.
-fn focus_ring<'a>(is_active: bool) -> crate::control::Ring<'a> {
-    crate::control::Ring {
+fn focus_ring<'a>(is_active: bool) -> snora_control::Ring<'a> {
+    snora_control::Ring {
         color: Box::new(move |theme: &Theme| {
             let ep = theme.extended_palette();
             let behind = if is_active {
@@ -585,7 +585,7 @@ where
         // is a focus target and Enter and Space reach it. The style
         // closure is unchanged, because `control` takes
         // `button::Status` — it is drop-in on the styling side.
-        let btn = crate::control::Control::new(
+        let btn = snora_control::Control::new(
             content,
             Box::new(move |theme, status| {
                 sidebar_button_style(theme, status, is_active, button_radius)

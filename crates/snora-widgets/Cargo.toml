@@ -27,7 +27,11 @@ default = ["iced-default"]
 # `snora-style?/iced-default` keeps its `?`: it reaches snora-style
 # only when `design` has already pulled it in, so turning iced's
 # defaults back on does not drag the style bridge along with them.
-iced-default = ["iced/default", "snora-style?/iced-default"]
+iced-default = [
+    "iced/default",
+    "snora-control/iced-default",
+    "snora-style?/iced-default",
+]
 
 # When enabled, exposes the Snora Design prefab widgets (`snora_widgets::design`
 # — button, card, notice, chip, progress, chrome geometry). NOT the style
@@ -52,25 +56,8 @@ snora-design = { workspace = true, optional = true }
 # (`widgets` without `design`) from compiling any style code.
 snora-style = { workspace = true, optional = true }
 iced = { workspace = true }
-# RFC-116 Unit 0: `control` implements `iced_core::Widget` and
-# `iced_core::widget::operation::Focusable`, both public with no feature
-# gate. iced's `advanced` feature only re-exports them, so depending on
-# `iced_core` directly avoids widening snora's feature surface. Same
-# `0.14` requirement as `iced`, so Cargo unifies the two.
-iced_core = "0.14"
+# The focusable control every prefab widget is built on (RFC-116).
+# Non-optional: a sidebar item that cannot be focused is the gap this
+# closes, so there is no configuration in which it is absent.
+snora-control = { workspace = true }
 lucide-icons = { workspace = true, optional = true }
-
-[dev-dependencies]
-# RFC-116 Unit 0: `control`'s layout floor is measured through the
-# headless simulator, because the floor is read from the renderer's own
-# `default_size()` and there is no other way to vary that.
-iced_test = "0.14"
-# RFC-116 R-1 Unit 1: `control`'s behaviour is driven through the same
-# `UserInterface` the runtime uses, so a test sees what the window loop
-# sees — the `redraw_request` it acts on, and the operations it runs.
-# Already in the lockfile (iced depends on it), so this adds an edge and
-# no package.
-iced_runtime = "0.14"
-# Decodes the PNG the simulator writes, for the one test that has to read
-# pixels (`clip`). Already in the lockfile via `snora`'s dev-dependencies.
-png = "0.18"

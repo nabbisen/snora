@@ -59,6 +59,15 @@ snora-design = { version = "0.54", path = "crates/snora-design" }
 # — and depends on nothing but iced and snora-design (in particular not
 # snora-core), the same layering property snora-design itself has.
 snora-style = { version = "0.54", path = "crates/snora-style", default-features = false }
+# The focusable control behind snora's widgets (RFC-116). An internal
+# crate: it exists so that `snora` (the engine's toast close button) and
+# `snora-widgets` (every prefab control) share one implementation,
+# versioned in lockstep with them. `default-features = false` for the
+# same reason as `snora-widgets` and `snora-style` above (RFC-112): its
+# own `default` turns iced's defaults on, and both dependents depend on
+# it non-optionally, so leaving that on would bring `iced/default` back
+# through this edge whatever a consumer did.
+snora-control = { version = "0.54", path = "crates/snora-control", default-features = false }
 
 # RFC-112's rule, stated once: **a feature that decides how snora
 # draws is snora's; a feature that decides what draws, or where it

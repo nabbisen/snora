@@ -1,11 +1,13 @@
 # Architecture overview
 
-Snora is five crates with a strict dependency direction. `snora-core`
+Snora is six crates with a strict dependency direction. `snora-core`
 and `snora-design` are independent, iced-free leaves; `snora-style`
-depends only on `snora-design` and `iced`; `snora-widgets` depends on
-`snora-core`, `snora-design`, and (opt-in) `snora-style`; `snora`
-depends on `snora-core` always and on the other three behind its
-`widgets` / `design` features — independently of each other (RFC-055).
+depends only on `snora-design` and `iced`; `snora-control` depends on
+`iced` alone and is internal (RFC-116); `snora-widgets` depends on
+`snora-core`, `snora-control`, `snora-design`, and (opt-in)
+`snora-style`; `snora` depends on `snora-core` and `snora-control`
+always and on the other three behind its `widgets` / `design` features
+— independently of each other (RFC-055).
 
 ```text
 your application
@@ -21,9 +23,12 @@ your application
        │        │
        │        └──► snora-design
        │
+       ├──► snora-control   (focusable control — internal, always present; iced only)
+       │
        └──► snora-widgets   (optional, prefab UI parts — depends on iced)
                 │
                 ├──► snora-core
+                ├──► snora-control
                 ├──► snora-design
                 └──► snora-style   (opt-in, when its own `design` feature is on)
 ```
