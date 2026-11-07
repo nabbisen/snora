@@ -384,7 +384,6 @@ fn leading(size: f32) -> f32 {
 
 struct Measured {
     link: Shot,
-    ghost: Shot,
     found: Vec<Underline>,
     clear: Vec<Clearance>,
 }
@@ -441,12 +440,7 @@ fn measure(tokens: &Tokens, text: &str, scale: f32, font: Font, pointer: Pointer
     );
     let found = underlines(&link, &reference, bg);
     let clear = clearances(&reference, &found, bg);
-    Measured {
-        link,
-        ghost: reference,
-        found,
-        clear,
-    }
+    Measured { link, found, clear }
 }
 
 fn assert_clean(what: &str, failures: Vec<String>) {
