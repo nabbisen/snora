@@ -66,10 +66,15 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   target is centred in it.
 - **Icons follow the text they sit with (RFC-115).** On the unstyled path an icon
   is **1 em** of the host's `default_text_size`: **16 px at the default, where it
-  was a fixed 14.** The toast's × is **1.125 em**: 18 px at the default, as
-  before, and larger when the text is. The icon rail's `Tooltip` form sizes its
-  icons as the other two forms do. **Design-path icons are unchanged**: they are
-  the `Typography::label` size, 14.
+  was a fixed 14.** The toast's × is **1.125 em of the text it sits with**: on
+  the unstyled path that is the host's text, so 18 px at the default, as before,
+  and larger when the text is. The icon rail's `Tooltip` form sizes its icons as
+  the other two forms do. **Design-path icons are unchanged**: they are the
+  `Typography::label` size, 14.
+- **On the design path the toast's × follows the toast's message**
+  (`Typography::body`), at 1.125 em: **15.75 px at the default tokens, where it
+  was a fixed 18**, and it grows with `body` and not with `default_text_size`. Its
+  target stays 24 px at the default, and is `1.5 ×` the body text beyond that.
 - The focus ring is drawn **above its neighbours**, so a control whose neighbour
   sits closer than the ring's offset and width (a chip's label and its remove
   button) keeps its whole ring.

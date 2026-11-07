@@ -1012,3 +1012,226 @@ fn an_svg_icon_is_a_square_of_one_em() {
         );
     }
 }
+
+// ---- focus survives the press, for every control that survives its press -------
+
+/// The shape of `a_tab_keeps_its_focus_when_it_becomes_the_active_tab`, once,
+/// for any control: focus it, **press it from the keyboard**, rebuild the view
+/// with the state that press implies, and ask whether it still has focus.
+///
+/// `build(false)` is the view before the press and `build(true)` the view the
+/// application would draw after handling its message. `which` is the control
+/// pressed, among `count` focus targets, in tree order.
+///
+/// The class this guards: the runtime keeps a widget's state by its place in the
+/// tree, so a press that reshapes the control's place drops its state, and its
+/// focus with it. A keyboard user is left with nothing focused.
+fn assert_keeps_focus_after_its_press(
+    context: &str,
+    build: &dyn Fn(bool) -> Element<'static, Msg>,
+    which: usize,
+    count: usize,
+) {
+    use iced::keyboard::key::Named;
+
+    let mut rig = Rig::new(build(false));
+    rig.tab(which + 1);
+    rig.key(Named::Enter);
+    assert!(
+        !rig.messages.is_empty(),
+        "{context}: Enter published nothing, so the press this test is about did not happen",
+    );
+
+    let mut rig = rig.rebuilt(build(true));
+    let flags: Vec<bool> = rig.targets().iter().map(|t| t.focused).collect();
+    let expected: Vec<bool> = (0..count).map(|i| i == which).collect();
+    assert_eq!(
+        flags, expected,
+        "{context}: the control lost its focus when its own press changed how it looks"
+    );
+}
+
+fn rail(active: u8, labels: snora::widget::SideBarLabels) -> snora::SideBar<Msg, u8> {
+    let _ = labels;
+    snora::SideBar {
+        items: ["Home", "Search", "Settings"]
+            .iter()
+            .enumerate()
+            .map(|(i, name)| snora::SideBarItem {
+                view_id: i as u8,
+                icon: snora::Icon::Text(i.to_string()),
+                tooltip: (*name).to_owned(),
+                on_press: msg(&format!("go {i}")),
+            })
+            .collect(),
+        active,
+    }
+}
+
+/// A sidebar item becomes the active one when it is pressed, in all three forms
+/// of the rail and on both paths.
+#[test]
+fn a_sidebar_item_keeps_its_focus_when_it_becomes_active() {
+    use snora::widget::SideBarLabels;
+    for (form, labels) in [
+        ("Beneath", SideBarLabels::Beneath),
+        ("Beside", SideBarLabels::Beside),
+        ("Tooltip", SideBarLabels::Tooltip),
+    ] {
+        assert_keeps_focus_after_its_press(
+            &format!("unstyled rail, {form}"),
+            &move |after| {
+                let active = if after { 1 } else { 0 };
+                snora::widget::app_side_bar_with(rail(active, labels), LayoutDirection::Ltr, labels)
+            },
+            1,
+            3,
+        );
+    }
+}
+
+#[cfg(feature = "design")]
+#[test]
+fn a_design_sidebar_item_keeps_its_focus_when_it_becomes_active() {
+    use snora::widget::SideBarLabels;
+    for (preset, tokens) in presets() {
+        for (form, labels) in [
+            ("Beneath", SideBarLabels::Beneath),
+            ("Beside", SideBarLabels::Beside),
+            ("Tooltip", SideBarLabels::Tooltip),
+        ] {
+            assert_keeps_focus_after_its_press(
+                &format!("{preset} rail, {form}"),
+                &move |after| {
+                    let active = if after { 1 } else { 0 };
+                    snora::design::widget::app_side_bar_with(
+                        tokens,
+                        rail(active, labels),
+                        LayoutDirection::Ltr,
+                        labels,
+                    )
+                },
+                1,
+                3,
+            );
+        }
+    }
+}
+
+/// A filter chip toggles to selected when it is pressed, and the selected chip
+/// is drawn in a different style: the one place a control's *look* changes
+/// with its own press on the design path.
+#[cfg(feature = "design")]
+#[test]
+fn a_filter_chip_keeps_its_focus_when_it_becomes_selected() {
+    for (preset, tokens) in presets() {
+        assert_keeps_focus_after_its_press(
+            &format!("{preset} chip::filter"),
+            &move |selected| snora::design::chip::filter(tokens, "Rust", selected, msg("toggle")),
+            0,
+            1,
+        );
+    }
+}
+
+/// The same for a removable chip's label, which toggles; its remove button is
+/// beside it and must not be disturbed.
+#[cfg(feature = "design")]
+#[test]
+fn a_removable_chips_label_keeps_its_focus_when_it_becomes_selected() {
+    for (preset, tokens) in presets() {
+        assert_keeps_focus_after_its_press(
+            &format!("{preset} chip::removable"),
+            &move |selected| {
+                snora::design::chip::removable(
+                    tokens,
+                    "Rust",
+                    selected,
+                    msg("toggle"),
+                    msg("remove"),
+                )
+            },
+            0,
+            2,
+        );
+    }
+}
+
+// ---- the toast's close mark, on the design path ---------------------------------
+
+/// **On the design path the × follows the toast's own text**, `Typography::body`,
+/// at 1.125 em — and not the host's `default_text_size`, which the design
+/// path's text does not use.
+///
+/// Two results nobody would predict if it did not: raising `body` would grow
+/// the message and leave the ×, and raising the host with default tokens would
+/// grow the × and leave the message.
+#[cfg(feature = "design")]
+mod design_toast_mark {
+    use super::*;
+
+    fn tokens_with_body(size: f32) -> &'static snora::design::Tokens {
+        let mut tokens = snora::design::Tokens::light();
+        tokens.typography.body.size = size;
+        Box::leak(Box::new(tokens))
+    }
+
+    fn mark(tokens: &'static snora::design::Tokens, host: f32) -> Rectangle {
+        bounds_of(
+            snora::design::render(toast_layout(), tokens),
+            CLOSE_GLYPH,
+            host,
+        )
+    }
+
+    fn reference(size: f32) -> Rectangle {
+        bounds_of(reference_text(CLOSE_GLYPH, Some(size)), CLOSE_GLYPH, 16.0)
+    }
+
+    #[test]
+    fn raising_the_body_text_grows_the_mark_with_it() {
+        for body in [14.0_f32, 20.0, 28.0] {
+            let got = mark(tokens_with_body(body), 16.0);
+            let want = reference(1.125 * body);
+            assert!(
+                same_size(got, want),
+                "body {body}px: the mark is {:.2} x {:.2}, 1.125 em of the body is {:.2} x {:.2}",
+                got.width,
+                got.height,
+                want.width,
+                want.height,
+            );
+        }
+    }
+
+    #[test]
+    fn raising_the_host_text_with_default_tokens_leaves_the_mark_alone() {
+        let tokens = tokens_with_body(14.0);
+        let at_16 = mark(tokens, 16.0);
+        let at_24 = mark(tokens, 24.0);
+        assert!(
+            same_size(at_16, at_24),
+            "the host's text went 16 -> 24 and the design path's mark went from {:.2} x {:.2} \
+             to {:.2} x {:.2}, following a size the toast's own text does not use",
+            at_16.width,
+            at_16.height,
+            at_24.width,
+            at_24.height,
+        );
+    }
+
+    /// The control's target is measured against the same text: a body of 28
+    /// makes `1.5 x 28 = 42`.
+    #[test]
+    fn the_close_target_follows_the_body_text_too() {
+        let tokens = tokens_with_body(28.0);
+        for b in control_boxes(snora::design::render(toast_layout(), tokens), 16.0) {
+            assert!(
+                b.width >= 41.99 && b.height >= 41.99,
+                "the close target is {:.1} x {:.1}, under 1.5 x a 28px body",
+                b.width,
+                b.height,
+            );
+        }
+    }
+}

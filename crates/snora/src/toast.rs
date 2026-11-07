@@ -93,10 +93,12 @@ impl ToastIntentColors {
 /// 14pt text at default font sizes.
 const TOAST_WIDTH: f32 = 340.0;
 
-/// The close mark's size, in ems of the host's text size (RFC-115's
+/// The close mark's size, in ems of the text the toast sits with (RFC-115's
 /// amendment): 1.125, because an × fills less of its em than a pictogram
-/// does. At the default 16 px that is the 18 px it has always been, and it
-/// now follows the text instead of staying 18.
+/// does. On the unstyled path that text is the host's, so at the default
+/// 16 px the mark is the 18 px it has always been and follows the text
+/// instead of staying 18. On the design path it is the message's
+/// `Typography::body`.
 ///
 /// The pointer target is not set here: it is `control`'s, which makes
 /// every control at least `max(24, 1.5 x text, the minimum-target token)`
@@ -299,17 +301,35 @@ where
     // font here settles it. The harness loads lucide alone, so no test can
     // see that case.
     //
-    // **Sized in ems, not pixels** (RFC-115's amendment): `Glyph` reads the
-    // host's text size when the layout runs, because on this path view code
-    // never sees it.
+    // **Sized with the text it sits with** (RFC-115's amendment: × is 1.125
+    // em). Which text that is depends on the path:
+    //
+    // - **unstyled:** the host's `default_text_size`, which view code never
+    //   sees, so `Glyph` reads it when the layout runs;
+    // - **design:** the toast's own message, `Typography::body`
+    //   (`style.message_size`), so raising the body text grows the × with it,
+    //   and raising the host's size with default tokens does not — the two
+    //   move together or the × would follow a size the toast's text does not
+    //   use. A pixel size is exact here, so `text` does it.
     #[cfg(feature = "lucide-icons")]
-    let close_glyph = snora_control::Glyph::new(
-        char::from(lucide_icons::Icon::X).to_string(),
-        CLOSE_GLYPH_EM,
-    )
-    .font(iced::Font::with_name("lucide"));
+    let close_content = char::from(lucide_icons::Icon::X).to_string();
     #[cfg(not(feature = "lucide-icons"))]
-    let close_glyph = snora_control::Glyph::new("×", CLOSE_GLYPH_EM);
+    let close_content = String::from("×");
+    let close_glyph: Element<'a, Message> = match style.message_size {
+        Some(message) => {
+            let mark = CLOSE_GLYPH_EM * message;
+            let glyph = text(close_content).size(mark);
+            #[cfg(feature = "lucide-icons")]
+            let glyph = glyph.font(iced::Font::with_name("lucide"));
+            glyph.into()
+        }
+        None => {
+            let glyph = snora_control::Glyph::new(close_content, CLOSE_GLYPH_EM);
+            #[cfg(feature = "lucide-icons")]
+            let glyph = glyph.font(iced::Font::with_name("lucide"));
+            glyph.into()
+        }
+    };
 
     // `control` in place of `button` (RFC-116): the close mark is a focus
     // target, Enter and Space dismiss, and the target is `control`'s own
@@ -327,7 +347,7 @@ where
     // resolved. The ring is that same colour, which is the pair iced or
     // the token palette guarantees against the toast's fill.
     let (ring_width, ring_offset) = style.ring.unwrap_or(CLOSE_RING_UNSTYLED);
-    let close_btn = snora_control::Control::new(
+    let mut close_btn = snora_control::Control::new(
         close_glyph,
         Box::new(move |theme, status| close_button_style(theme, intent, status, intents)),
         snora_control::Ring {
@@ -336,9 +356,13 @@ where
             offset: ring_offset,
         },
     )
-    .min_target(style.min_target)
-    .on_press(toast.on_dismiss)
-    .padding(0);
+    .min_target(style.min_target);
+    // The `1.5 x text` term is measured against the text the control sits
+    // with: the message, on the design path.
+    if let Some(message) = style.message_size {
+        close_btn = close_btn.text_size(message);
+    }
+    let close_btn = close_btn.on_press(toast.on_dismiss).padding(0);
 
     let body = row![container(text_col).width(Length::Fill), close_btn]
         .align_y(Center)

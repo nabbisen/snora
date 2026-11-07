@@ -75,9 +75,9 @@ measure_ms() {
     # `snora` and `snora-widgets` build on it, so it is cleaned too: left
     # warm, every measurement below would silently exclude its compile
     # cost and understate the real one.
-    cargo clean -p snora-core -p snora-design -p snora-control -p snora-widgets -p snora 2>/dev/null || true
-    cargo clean -p snora-core -p snora-design -p snora-control -p snora-widgets -p snora --release 2>/dev/null || true
-    cargo clean -p snora-core -p snora-design -p snora-control -p snora-widgets -p snora --profile release-baseline 2>/dev/null || true
+    cargo clean -p snora-core -p snora-design -p snora-style -p snora-control -p snora-widgets -p snora 2>/dev/null || true
+    cargo clean -p snora-core -p snora-design -p snora-style -p snora-control -p snora-widgets -p snora --release 2>/dev/null || true
+    cargo clean -p snora-core -p snora-design -p snora-style -p snora-control -p snora-widgets -p snora --profile release-baseline 2>/dev/null || true
     local start end
     start=$(date +%s%3N)
     "$@" > "/tmp/snora-build-cost-${name}.log" 2>&1
