@@ -66,7 +66,9 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   rounded to whole pixels (halves up, never under 1), and never moves up toward
   the text. **A link's lines are spaced further apart than a ghost's**, so the
   underline does not touch the next line's accents; the link is nevertheless as
-  tall as a `ghost`. It is focusable like every control.
+  tall as a `ghost`, except for a label of 40 px or more and, at 24 px or more,
+  in the two high-contrast presets, where it is 1 to 2 px taller. It is focusable
+  like every control.
 
   **There is no disabled link, and no `link_maybe`:** a dimmed underlined phrase
   still says "you can go here" and then does nothing. When the destination is

@@ -193,9 +193,17 @@ pub fn ghost_maybe<'a, Message: Clone + 'a>(
 /// box is four of those units taller (1/16 em each, rounded, never under 1 px),
 /// with the text centred in it, because an underline sits in the space the next
 /// line's accents and tall ascenders occupy and would otherwise touch them. The
-/// link is nevertheless exactly as tall as a [`ghost`] button with the same
-/// label, and its text sits where the ghost's does: the padding gives the extra
-/// height back.
+/// link is nevertheless as tall as a [`ghost`] button with the same label, and
+/// its text sits where the ghost's does: the padding gives the extra height
+/// back. **Two exceptions, both taller:**
+///
+/// - **a label of 40 px or more**, where half of the extra height exceeds the
+///   button's default 5 px of padding, so there is none left to give back;
+/// - **a preset whose focus ring is wider than its offset** (the two
+///   high-contrast presets: 3 px wide, 2 px out), at a label of 24 px or more:
+///   the ring reaches inside the control, so the bottom padding keeps the
+///   underline clear of it, and the link is 1 to 2 px taller than a ghost. The
+///   text still sits where the ghost's does.
 ///
 /// The gap is measured from the line's box, which is all iced reports: a font
 /// whose descenders reach past its own line box would come closer to the
