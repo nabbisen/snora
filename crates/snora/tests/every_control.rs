@@ -232,6 +232,9 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
         subject("button::ghost", &["ghost"], move || {
             button::ghost(tokens, "Save", msg("ghost"))
         }),
+        subject("button::link", &["link"], move || {
+            button::link(tokens, "Choose another folder", msg("link"))
+        }),
         subject("button::danger", &["danger"], move || {
             button::danger(tokens, "Delete", msg("danger"))
         }),

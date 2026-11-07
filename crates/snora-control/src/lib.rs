@@ -65,4 +65,4 @@ mod underlined;
 
 pub use control::{Control, Ring, StyleFn};
 pub use em::{EmBox, Glyph};
-pub use underlined::{UnderlineRule, Underlined};
+pub use underlined::Underlined;

@@ -56,6 +56,24 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   match. `Tokens` is `#[non_exhaustive]`, so the new field is not a breaking
   change.
 
+- **`design::button::link(tokens, label, on_press)` (RFC-117).** A button for
+  something that takes the reader **somewhere**, underlined so that "this goes
+  somewhere" is not carried by colour alone (WCAG 1.4.1). Requested by **orbok**,
+  which used `ghost` as an inline link.
+
+  The underline is the label's colour in every state, and **under every line** if
+  the label wraps. It is 1/16 em thick, 1/16 em below its line's box, each
+  rounded to whole pixels (halves up, never under 1), and never moves up toward
+  the text. **A link's lines are spaced further apart than a ghost's**, so the
+  underline does not touch the next line's accents; the link is nevertheless as
+  tall as a `ghost`. It is focusable like every control.
+
+  **There is no disabled link, and no `link_maybe`:** a dimmed underlined phrase
+  still says "you can go here" and then does nothing. When the destination is
+  unavailable, show plain text. The rule for choosing: a **link** takes the reader
+  somewhere (another view, a document, a chooser); an **action** does something
+  where they are (Cancel, Skip, Save), and stays a `ghost`. `ghost` is unchanged.
+
 ### Changed
 
 - **A control's target is at least `max(24 px, 1.5 × its text, the minimum-target

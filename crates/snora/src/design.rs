@@ -105,7 +105,7 @@ pub mod widget {
 #[cfg(feature = "widgets")]
 pub mod button {
     pub use snora_widgets::design::button::{
-        danger, danger_maybe, ghost, ghost_maybe, primary, primary_maybe, secondary,
+        danger, danger_maybe, ghost, ghost_maybe, link, primary, primary_maybe, secondary,
         secondary_maybe,
     };
 }

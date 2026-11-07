@@ -48,7 +48,7 @@
 //! ```
 
 use iced::{
-    Element, Theme,
+    Element, Padding, Theme,
     widget::{button, text},
 };
 use snora_design::Tokens;
@@ -137,6 +137,13 @@ pub fn secondary_maybe<'a, Message: Clone + 'a>(
 
 /// Ghost button (no fill or border at rest; tertiary / low-emphasis action).
 ///
+/// **A ghost button is an action: it does something where the reader already
+/// is** (Cancel, Skip, Save). If pressing it takes the reader *somewhere* — a
+/// view, a document, a chooser — use [`link`], which is underlined so that
+/// "this goes somewhere" is not carried by colour alone. It has no underline
+/// and never will: underlining it would make every tertiary action read as a
+/// link.
+///
 /// To disable, use [`ghost_maybe`] with `None`.
 #[must_use]
 pub fn ghost<'a, Message: Clone + 'a>(
@@ -155,6 +162,93 @@ pub fn ghost_maybe<'a, Message: Clone + 'a>(
     on_press: Option<Message>,
 ) -> Element<'a, Message> {
     make_button(tokens, label, on_press, style::button::ghost)
+}
+
+/// A link: the ghost button's colours, **underlined**, for something that
+/// takes the reader somewhere.
+///
+/// # Link or action
+///
+/// > A **link** takes the reader somewhere: another view, a document, a
+/// > chooser. An **action** does something where the reader already is:
+/// > Cancel, Skip, Save. Use `link` for the first and [`ghost`] for the second.
+///
+/// "Choose another folder" opens a chooser, so it is a link.
+///
+/// # Why underlined
+///
+/// Older readers do not read coloured text as clickable, and colour is the
+/// cue that fails first as eyesight changes (WCAG 1.4.1, Use of Color). The
+/// underline is drawn **in the label's colour, in every state** (rest, hover,
+/// pressed), and **under every line** if the label wraps (RFC-105: caller text
+/// wraps and is never clipped).
+///
+/// **The rule.** An underline is 1/16 em thick, and its top edge is 1/16 em
+/// below its line's box. Each of the two is rounded to the nearest whole pixel,
+/// halves up, and is never under 1 px. Every wrapped line has its own underline,
+/// and snapping to the pixel grid never moves an underline up toward its text.
+/// At the default label size that is 1 px thick, 1 px below the box.
+///
+/// **A link's lines are spaced further apart than plain text's:** each line's
+/// box is four of those units taller (1/16 em each, rounded, never under 1 px),
+/// with the text centred in it, because an underline sits in the space the next
+/// line's accents and tall ascenders occupy and would otherwise touch them. The
+/// link is nevertheless exactly as tall as a [`ghost`] button with the same
+/// label, and its text sits where the ghost's does: the padding gives the extra
+/// height back.
+///
+/// The gap is measured from the line's box, which is all iced reports: a font
+/// whose descenders reach past its own line box would come closer to the
+/// underline than the default font's do.
+///
+/// # There is no disabled link
+///
+/// There is no `link_maybe`, deliberately: a dimmed, underlined phrase still
+/// says "you can go here" and then does nothing, which is the misunderstanding
+/// this control exists to remove. When the destination is unavailable, show
+/// **plain text**, or nothing.
+///
+/// # Keyboard
+///
+/// A link is a `control` like every other: Tab reaches it (once the
+/// application routes the key with `snora::keyboard::traverse`), Enter and
+/// Space press it, and the focus ring shows where it is.
+#[must_use]
+pub fn link<'a, Message: Clone + 'a>(
+    tokens: &Tokens,
+    label: impl Into<String>,
+    on_press: Message,
+) -> Element<'a, Message> {
+    let t = tokens.clone();
+    let size = style::text::label_size(tokens);
+    // The label is `reach` taller than plain text (its lines are spaced
+    // further apart, the text centred in each, the underline inside), so the
+    // vertical padding gives half of it back on each side: the control is then
+    // exactly as tall as a ghost button, and its text sits where the ghost's
+    // does. Where the text is so large that `reach / 2` exceeds the default
+    // padding, there is no padding left to give and the link is taller.
+    let vertical =
+        (BUTTON_DEFAULT_PADDING.top - snora_control::Underlined::reach(size.0) / 2.0).max(0.0);
+    // The underline ends at the bottom of the label, and a focus ring wider
+    // than its offset reaches that far *into* the control (the high-contrast
+    // presets: 3 px wide, 2 px out). So the bottom padding keeps the underline
+    // clear of the ring, plus a pixel for snapping the underline down. Only
+    // the bottom: the text stays where a ghost button's is.
+    let ring_inside = (tokens.focus.ring_width - tokens.focus.ring_offset).max(0.0);
+    let bottom = vertical.max(ring_inside + 1.0);
+    design_control(
+        tokens,
+        snora_control::Underlined::new(label.into()).size(size),
+        move |_theme: &Theme, status| style::button::ghost(&t, status),
+        tokens.palette.background,
+    )
+    .padding(Padding {
+        top: vertical,
+        bottom,
+        ..BUTTON_DEFAULT_PADDING
+    })
+    .on_press(on_press)
+    .into()
 }
 
 /// Danger / destructive button (irreversible actions: delete, revoke, reset).
