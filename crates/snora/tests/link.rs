@@ -468,17 +468,12 @@ fn every_wrapped_line_of_a_link_is_underlined() {
     for size in SIZES {
         let tokens = tokens_at(size);
         let m = measure(&tokens, SENTENCE, 2.0, Font::DEFAULT, Pointer::Away);
-        let bg = bg_of(&tokens);
-        // Lines, counted from the ghost's ink: each is one contiguous run of
-        // ink rows, and a blank row always separates two lines of this text.
-        let mut runs = 0;
-        let mut last = None;
-        for y in m.ghost.ink_rows(bg) {
-            if last.is_none_or(|l| y != l + 1) {
-                runs += 1;
-            }
-            last = Some(y);
-        }
+        // Lines, counted from the **layout**: the label's box is that many
+        // line boxes tall. Counting runs of ink rows failed on CI's fonts,
+        // where a dotted `i` leaves a blank row inside one line and reads as
+        // two; the layout does not depend on what the glyphs look like.
+        let line_box = 1.3 * size + leading(size);
+        let runs = (m.link.texts[0].height / line_box).round() as usize;
         if runs < 2 {
             failures.push(format!(
                 "{size}px: the sample did not wrap ({runs} line), so this proves nothing"
