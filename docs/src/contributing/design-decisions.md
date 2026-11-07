@@ -32,7 +32,7 @@ empirical re-check.
 | Default `ToastPosition` is `TopEnd` | Accepted | User research showing another default is more ergonomic | 2026-08-20 |
 | Application owns toast `Vec` | Firm boundary | Framework-owned queue that apps cannot control | 2026-08-20 |
 | No `snora-test` crate | Firm boundary | A test need the `pub` fields + pure `update` pattern cannot serve | 2026-08-20 |
-| Five crates (`-core`, `-design`, `-style`, `-widgets`, engine) | Accepted | A layer gains a second consumer that does not fit its crate, as the style bridge did (RFC-055) | 2026-08-20 |
+| Six crates (`-core`, `-design`, `-style`, `-control`, `-widgets`, engine) | Accepted | A layer gains a second consumer that does not fit its crate, as the style bridge did (RFC-055) and the focusable control did (RFC-116: the engine's toast close and the widgets' rail both stand on it) | 2026-08-20 |
 | `Tab` and `Crumb` are separate vocabulary | Accepted | A combined type that handles both cleanly | 2026-08-20 |
 | Coarse `widgets` feature gate | Accepted — trigger checked, not fired (RFC-062) | Two of the five feature-gating indicators are met; at most one is | 2026-08-20 — matches [feature-gating-criteria.md's own re-derivation](feature-gating-criteria.md#current-status-snora-0391-re-derived-2026-08-20-rfc-062), same date |
 | `AppLayout` has both fields and builder | Firm boundary | — (the `#[non_exhaustive]` decision below) | 2026-08-20 |

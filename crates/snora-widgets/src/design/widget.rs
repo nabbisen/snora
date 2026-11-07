@@ -139,6 +139,7 @@ use crate::crumb::{CrumbGeometry, build_breadcrumb};
 use crate::footer::{FooterGeometry, build_footer};
 use crate::header::{HeaderGeometry, build_header};
 use crate::sidebar::{SideBarGeometry, SideBarLabels, TooltipBody, build_side_bar};
+use crate::style::ControlGeometry;
 use crate::tab::{TabGeometry, build_tab_bar};
 
 /// Token-derived styled variant of [`crate::app_header`] (RFC-040).
@@ -181,6 +182,7 @@ fn header_geometry(tokens: &Tokens) -> HeaderGeometry {
         title_size: Some(snora_style::text::title_size(tokens).0),
         menu_gap: tokens.spacing.sm,
         menu_label_size: Some(snora_style::text::label_size(tokens).0),
+        control: ControlGeometry::from_tokens(tokens),
     }
 }
 
@@ -264,6 +266,7 @@ fn side_bar_geometry(tokens: &Tokens) -> SideBarGeometry {
         vertical_padding: tokens.spacing.lg,
         button_radius: tokens.radius.md,
         label_size: Some(snora_style::text::label_size(tokens).0),
+        control: ControlGeometry::from_tokens(tokens),
     }
 }
 
@@ -290,6 +293,7 @@ fn tab_geometry(tokens: &Tokens) -> TabGeometry {
         tab_pad_x: tokens.spacing.md,
         tab_pad_y: tokens.spacing.sm,
         label_size: Some(snora_style::text::label_size(tokens).0),
+        control: ControlGeometry::from_tokens(tokens),
     }
 }
 
@@ -317,6 +321,7 @@ fn breadcrumb_geometry(tokens: &Tokens) -> CrumbGeometry {
         btn_pad_y: tokens.spacing.xs,
         btn_radius: tokens.radius.sm,
         label_size: Some(snora_style::text::label_size(tokens).0),
+        control: ControlGeometry::from_tokens(tokens),
     }
 }
 

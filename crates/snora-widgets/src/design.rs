@@ -18,13 +18,14 @@
 //! `snora::design::style::*` / `snora::design::theme` (through the
 //! `snora` facade) or depend on `snora-style` directly.
 //!
-//! # iced 0.14 focus limitation
+//! # Keyboard focus
 //!
 //! `iced::widget::button::Status` exposes `Active | Hovered | Pressed |
-//! Disabled` only — there is **no focused state**. The style bridge maps the
-//! statuses iced does expose; custom focus rings on standard buttons/cards are
-//! not deliverable in iced 0.14 through this path. `FocusTokens` remain valid
-//! vocabulary for future iced versions or custom widgets that do expose focus.
+//! Disabled` only — there is **no focused state** — and iced 0.14's `button`
+//! registers no focus target. The style bridge maps the statuses iced does
+//! expose, and the prefab widgets in this module are therefore not iced
+//! buttons: each is a `control` (RFC-116) that is a focus target, is pressed
+//! by Enter and Space, and draws its own ring from `Tokens::focus`.
 //!
 //! See `docs/src/contributing/semantic-accessibility.md` for the documented
 //! limitation.
@@ -68,16 +69,17 @@ pub mod card;
 /// Notice banner primitive (RFC-032).
 ///
 /// Builder-style wrapper: tone, optional title, body, optional action
-/// button, optional dismiss button. All interactive controls are native
-/// iced buttons.
+/// button, optional dismiss button. The action and dismiss buttons are
+/// focusable: Tab reaches them (once the application routes the key with
+/// `snora::keyboard::traverse`), Enter and Space press them, and a ring
+/// shows which has focus.
 pub mod notice;
 
 /// Filter and removable chip primitives (RFC-032).
 ///
-/// See [`chip::filter`] and [`chip::removable`]. Both use
-/// `iced::widget::button`, so both take **pointer and touch input
-/// only**: iced 0.14's buttons take no keyboard input. RFC-116 tracks
-/// keyboard access.
+/// See [`chip::filter`] and [`chip::removable`]. Every control on them is
+/// focusable, and Enter and Space press the focused one: see the module's
+/// own documentation.
 pub mod chip;
 
 /// Progress row and card primitives (RFC-032).

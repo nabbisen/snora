@@ -31,7 +31,6 @@
 #![warn(missing_docs)]
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-
 mod crumb;
 pub mod direction;
 mod footer;

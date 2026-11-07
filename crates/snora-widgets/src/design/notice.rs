@@ -7,14 +7,17 @@
 //!
 //! # Semantic construction (RFC-027)
 //!
-//! - Action and dismiss controls are `iced::widget::button`, and take
-//!   **pointer and touch input only**: iced 0.14's buttons take no
-//!   keyboard input. RFC-116 tracks keyboard access.
+//! - Action and dismiss controls are **focusable**: they are `control`s
+//!   (RFC-116), not iced buttons, and iced 0.14's `button` registers no
+//!   focus target. Tab reaches them once the application routes the key
+//!   with `snora::keyboard::traverse`; Enter and Space press the focused
+//!   one and publish the message a click publishes; a ring shows which has
+//!   focus. A notice with no action or no dismiss has no control for it,
+//!   so there is nothing to Tab to.
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
-//! - There is no focus ring, because there is no focus: iced 0.14's
-//!   `button` registers no focus target at all, so the absent
-//!   `Focused` status on `button::Status` is a symptom and not the
-//!   limitation itself.
+//! - The focus ring is drawn by the control, from `Tokens::focus`, in
+//!   whichever of that colour or black and white clears 3:1 against the
+//!   surface the notice sits on.
 //! - The dismiss button shows lucide `X` under the `lucide-icons` feature and
 //!   `"×"` otherwise, the same glyph as the removable chip (RFC-100).
 //!   [`Notice::dismiss_tooltip`](crate::design::notice::Notice::dismiss_tooltip)
@@ -44,14 +47,15 @@
 
 use iced::widget::text::Wrapping;
 use iced::{
-    Border, Color, Element, Length,
-    widget::{button, column, container, row, text},
+    Border, Color, Element, Length, Theme,
+    widget::{column, container, row, text},
 };
 use snora_design::{Tokens, Tone};
 
 use snora_style as style;
 
 use super::chip::{close_glyph, with_close_tooltip};
+use crate::style::{BUTTON_DEFAULT_PADDING, design_control};
 
 // ---------------------------------------------------------------------------
 // Internal action type
@@ -170,13 +174,16 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         if let Some(act) = self.action {
             let tok = t.clone();
             controls.push(
-                button(
+                design_control(
+                    t,
                     text(act.label)
                         .size(style::text::label_size(t))
                         .color(accent_color),
+                    move |_theme: &Theme, status| style::button::ghost(&tok, status),
+                    t.palette.surface,
                 )
+                .padding(BUTTON_DEFAULT_PADDING)
                 .on_press(act.on_press)
-                .style(move |_theme, status| style::button::ghost(&tok, status))
                 .into(),
             );
         }
@@ -184,10 +191,15 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         // Optional dismiss button
         if let Some(on_dismiss) = self.dismiss {
             let tok = t.clone();
-            let dismiss_btn = button(close_glyph(t, Some(text_color)))
-                .on_press(on_dismiss)
-                .style(move |_theme, status| style::button::ghost(&tok, status))
-                .into();
+            let dismiss_btn = design_control(
+                t,
+                close_glyph(t, Some(text_color)),
+                move |_theme: &Theme, status| style::button::ghost(&tok, status),
+                t.palette.surface,
+            )
+            .padding(BUTTON_DEFAULT_PADDING)
+            .on_press(on_dismiss)
+            .into();
             controls.push(with_close_tooltip(t, dismiss_btn, self.dismiss_tooltip));
         }
 

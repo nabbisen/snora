@@ -59,19 +59,47 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Plan the publish (skip what crates.io already has)
+        # RFC-116 Unit 2b. A new crate's first version is published from
+        # the owner's machine before the tag (it cannot have a Trusted
+        # Publisher until it exists), so `cargo publish --workspace`
+        # would fail on it. This asks crates.io, per crate, whether the
+        # exact name@version is there, and logs each decision. It fails
+        # closed if crates.io cannot be asked. Run before the auth step
+        # on purpose: it needs no credentials, and a plan that cannot be
+        # made should stop the run before one is requested.
+        id: plan
+        env:
+          TAG: ${{ github.ref_name }}
+        run: scripts/publish-plan.sh "$TAG"
+
       - name: Authenticate to crates.io (Trusted Publishing)
+        if: steps.plan.outputs.remaining != '0'
         uses: rust-lang/crates-io-auth-action@v1
         id: auth
 
       - name: cargo publish --workspace
-        # One command, five crates, as today (RFC-090's own non-goal:
-        # not changing what is published). If Trusted Publishing is not
-        # yet configured for one of the five crates against this exact
-        # workflow filename, crates.io refuses the token exchange or the
-        # upload here — loudly, in this step's own log, not silently.
+        # One command, as before (RFC-090's own non-goal: not changing
+        # the mechanism), minus the crates the plan found already
+        # published. If Trusted Publishing is not yet configured for one
+        # of the crates left against this exact workflow filename,
+        # crates.io refuses the token exchange or the upload here —
+        # loudly, in this step's own log, not silently.
+        #
+        # `$EXCLUDES` is deliberately unquoted: it is a list of flags
+        # (`--exclude a --exclude b`), and it comes from a script in this
+        # repository, not from anything a tag or a pull request names.
+        if: steps.plan.outputs.remaining != '0'
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
-        run: cargo publish --workspace
+          EXCLUDES: ${{ steps.plan.outputs.excludes }}
+        run: |
+          # shellcheck disable=SC2086
+          cargo publish --workspace $EXCLUDES
+
+      - name: Nothing to publish
+        if: steps.plan.outputs.remaining == '0'
+        run: echo "Every crate is already on crates.io at this version; nothing to publish."
 
   github-release:
     name: Publish the GitHub Release

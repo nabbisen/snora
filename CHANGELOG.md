@@ -25,7 +25,68 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Keyboard access to every control snora draws (RFC-116).** Tabs, breadcrumb
+  ancestors, menu triggers and items, the notice's action and dismiss buttons,
+  chips and their remove buttons, every `design::button` variant, the toast's
+  close mark and the sidebar's items are now **focus targets**. Enter and Space
+  press the focused one and publish **the same message a click publishes**; a
+  ring, drawn from `Tokens::focus` (or the unstyled literals), shows which has
+  focus and clears 3:1 against what it sits on. A control with no handler (a
+  `*_maybe(.., None)` button, a chip given `None`) is disabled and is skipped by
+  Tab.
+
+  iced binds no Tab of its own, so the application routes the key:
+  `snora::keyboard::traverse(key, modifiers)` returns the task, in one line of
+  `update`. **Tab past the last control of a group leaves it; it does not wrap
+  to the first** — that is iced's `focus_next`, and what a window with other
+  controls after the group needs.
+
+  Nothing changes for an application that does not route Tab: its controls
+  still work by pointer and touch as before.
+- **`snora-control`**, a new internal crate that holds the control itself
+  (RFC-116). `snora` and `snora-widgets` depend on it; **applications should
+  not**. It is published only because they cannot be without it, and is
+  versioned in lockstep with them. It depends on `iced` and `iced_core` and
+  nothing of snora's.
+- **`Tokens::targets` and `TargetTokens` (RFC-115).** The minimum size of a
+  control's pointer target: `24.0` in all six presets, so choosing a preset moves
+  no size. Raise it (`44.0`, say) and every control on the design path grows to
+  match. `Tokens` is `#[non_exhaustive]`, so the new field is not a breaking
+  change.
+
+### Changed
+
+- **A control's target is at least `max(24 px, 1.5 × its text, the minimum-target
+  token)` (RFC-115).** At the default 16 px text that is 24, which every control
+  already measured, so nothing moves for an application that sets no text size.
+  At a larger text size the targets follow it: at 24 px text the toast's close
+  mark becomes 36 × 36, where it was a fixed 24 × 24. The mark inside a larger
+  target is centred in it.
+- **Icons follow the text they sit with (RFC-115).** On the unstyled path an icon
+  is **1 em** of the host's `default_text_size`: **16 px at the default, where it
+  was a fixed 14.** The toast's × is **1.125 em of the text it sits with**: on
+  the unstyled path that is the host's text, so 18 px at the default, as before,
+  and larger when the text is. The icon rail's `Tooltip` form sizes its icons as
+  the other two forms do. **Design-path icons are unchanged**: they are the
+  `Typography::label` size, 14.
+- **On the design path the toast's × follows the toast's message**
+  (`Typography::body`), at 1.125 em: **15.75 px at the default tokens, where it
+  was a fixed 18**, and it grows with `body` and not with `default_text_size`. Its
+  target stays 24 px at the default, and is `1.5 ×` the body text beyond that.
+- The focus ring is drawn **above its neighbours**, so a control whose neighbour
+  sits closer than the ring's offset and width (a chip's label and its remove
+  button) keeps its whole ring.
+
+### Fixed
+
+- **WCAG 2.1.1, Keyboard: snora's controls could not be reached from the
+  keyboard.** iced 0.14's `button` takes no keyboard input and registers no focus
+  target, and every control snora drew was one. See Added.
+- A tab that was pressed from the keyboard lost its focus the moment it became the
+  active tab, because the active tab was built with a different shape from the
+  others and the runtime dropped its state. Every tab now has the same shape.
 
 ## [0.54.0] — 2026-11-07
 

@@ -17,8 +17,13 @@
 //!         │
 //!         ├─► snora-widgets   (optional, prefab UI parts)
 //!         │         │
+//!         │         ├─► snora-style    (optional, the iced style bridge)
+//!         │         │         │
+//!         │         │         ▼
+//!         │         │   snora-design   (optional, design tokens — no iced dependency)
 //!         │         ▼
-//!         │   snora-design   (optional, design tokens — no iced dependency)
+//!         ├─► snora-control   (always present: the focusable control both
+//!         │                    the engine and snora-widgets are built on)
 //!         ▼
 //!  snora-core   (vocabulary: Toast, Dialog, Sheet, SheetSize, …)
 //! ```
@@ -30,12 +35,22 @@
 //!   (what choices exist).
 //! * `snora-design` has zero iced dependency. It owns the opt-in design
 //!   token vocabulary (`Tokens`, `Palette`, contrast utilities).
-//! * `snora-widgets` depends on `snora-core`, `iced`, and (behind the
-//!   `design` feature) `snora-design`. It owns the prefab widget visuals
-//!   and the iced style bridge that turns tokens into `iced::*::Style`.
-//! * `snora` depends on `snora-core` and (optionally) `snora-widgets`
-//!   and `snora-design`. It owns the engine — `render`, the layer
-//!   composition, and the toast lifecycle helpers.
+//! * `snora-style` depends on `iced` and `snora-design` only. It owns the
+//!   iced style bridge that turns tokens into `iced::*::Style`.
+//! * `snora-control` depends on `iced` and `iced_core` only, and on
+//!   nothing of snora's. It owns the focusable, key-activatable
+//!   control (RFC-116). It is an **internal** crate, published only
+//!   because `snora` and `snora-widgets` cannot be without it, and
+//!   versioned in lockstep with them: depend on `snora`, not on it.
+//! * `snora-widgets` depends on `snora-core`, `snora-control`, `iced`,
+//!   and (behind the `design` feature) `snora-design` and `snora-style`.
+//!   It owns the prefab widget visuals.
+//! * `snora` depends on `snora-core`, `snora-control` and (optionally)
+//!   `snora-widgets`, `snora-design` and `snora-style`. It owns the
+//!   engine — `render`, the layer composition, and the toast lifecycle
+//!   helpers. `snora-control` is non-optional so the engine can build
+//!   the toast's close button without depending on `snora-widgets`,
+//!   which stays optional so engine-only builds stay small.
 //!
 //! Applications normally only depend on `snora` and use it as the single
 //! umbrella crate; the workspace split exists so each layer can evolve
@@ -201,16 +216,21 @@ pub use snora_widgets::lucide;
 ///   [`design::contrast::contrast_ratio`],
 ///   [`design::contrast::composite_over`].
 ///
-/// # iced 0.14 has no keyboard focus to style
+/// # Keyboard focus: snora's controls have it, iced's `button` does not
 ///
-/// Standard `button` / `container` styles in iced 0.14 expose no
-/// keyboard-focus state, and the reason is more basic than styling:
 /// iced 0.14's `button` takes no keyboard input and registers no focus
-/// target, so there is no focus for a style to reflect. The style
-/// bridge maps every status iced does expose (hover, pressed,
-/// disabled). Focus rings on standard controls are therefore not
-/// deliverable through this path at all; RFC-116 tracks keyboard
-/// access. See RFC-025 and
+/// target, so a style closure on a standard `button` has no focus to
+/// reflect, and the style bridge maps only the statuses iced exposes
+/// (hover, pressed, disabled).
+///
+/// **snora's own controls are not iced buttons.** Every control the prefab
+/// widgets and the engine draw (tabs, breadcrumb crumbs, menu triggers
+/// and items, the notice and chip buttons, [`design::button`], the toast's
+/// close mark) is a `control` (RFC-116): a focus target that Enter and
+/// Space press, publishing the message a click publishes, with a focus ring
+/// drawn from [`design::Tokens::focus`]. The ring is the control's own, and
+/// is not a button status. iced binds no Tab: route it with
+/// [`keyboard::traverse`]. See RFC-025 and
 /// `docs/src/contributing/semantic-accessibility.md` for detail.
 #[cfg(feature = "design")]
 pub mod design;

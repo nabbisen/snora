@@ -13,8 +13,9 @@
 //! with its tooltip on the end side of the rail so it never overlaps the
 //! main content.
 //!
-//! **No form of this rail is reachable by keyboard**, because iced
-//! 0.14's buttons take no keyboard input. See [`SideBarLabels`].
+//! **Every form of this rail is reachable by keyboard** (RFC-116): each
+//! item is a focus target, Enter and Space press it, and a ring shows
+//! which has focus. See [`SideBarLabels`].
 
 use std::rc::Rc;
 
@@ -27,7 +28,8 @@ use iced::{
 use snora_core::{LayoutDirection, SideBar};
 
 use crate::direction::row_dir;
-use crate::icon::icon_element;
+use crate::icon::icon_beside_label;
+use crate::style::ControlGeometry;
 use crate::style::sidebar_active_color;
 
 /// Default rail width in pixels.
@@ -88,13 +90,14 @@ const _: () = assert!(
 /// before RFC-114 every name lived in a hover tooltip, which a touch user
 /// never sees at all.
 ///
-/// # No form of this rail is keyboard-reachable
+/// # Every form of this rail is keyboard-reachable
 ///
-/// iced 0.14's `button` takes no keyboard input — its `update` handles
-/// mouse and touch only, and its `operate` registers no focus target — so
-/// a rail item cannot be focused and no key presses it. Labelling the
-/// items puts their names where a reader can see them; it does not make
-/// them reachable. See RFC-116 for the plan.
+/// An item is a `control`, not an iced `button`: it registers as a focus
+/// target, Enter and Space press it (publishing the item's `on_press`),
+/// and a ring shows which has focus. iced binds no Tab, so the
+/// application routes it with `snora::keyboard::traverse`; Tab past the
+/// last item leaves the rail, and does not wrap to the first. Where the
+/// names are drawn changes none of this (RFC-116).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SideBarLabels {
     /// The icon, with the name centred beneath it. The default.
@@ -289,6 +292,8 @@ pub(crate) struct SideBarGeometry {
     /// [`SideBarLabels::Tooltip`], which sizes its tooltip text through
     /// [`TooltipBody`] instead.
     pub(crate) label_size: Option<f32>,
+    /// The minimum-target token and the focus ring (RFC-116).
+    pub(crate) control: ControlGeometry,
 }
 
 impl SideBarGeometry {
@@ -299,6 +304,7 @@ impl SideBarGeometry {
             vertical_padding: 16.0,
             button_radius: 6.0,
             label_size: None,
+            control: ControlGeometry::unstyled(),
         }
     }
 }
@@ -326,8 +332,7 @@ where
 /// longest name needs, and never wider than 240px, which the names wrap
 /// at. In [`SideBarLabels::Tooltip`] it is the fixed 64px icon rail.
 ///
-/// Keyboard users cannot reach the rail in any form: iced 0.14's buttons
-/// take no keyboard input. See [`SideBarLabels`].
+/// Every form of the rail is reachable by keyboard: see [`SideBarLabels`].
 pub fn app_side_bar_with<'a, Message, ViewId>(
     side_bar: SideBar<Message, ViewId>,
     direction: LayoutDirection,
@@ -389,7 +394,11 @@ where
 
     for item in side_bar.items {
         let is_active = item.view_id == side_bar.active;
-        let icon = icon_element(&item.icon);
+        // 1 em of the label size its name would have (RFC-115's
+        // amendment): the Tooltip form shows no name on the rail, but the
+        // icon is sized as if it did, so it does not change size between
+        // forms.
+        let icon = icon_beside_label(&item.icon, tooltip_body.text_size);
         let button_radius = geometry.button_radius;
 
         // Centred on both axes (RFC-099). Without this, a fixed-size button
@@ -408,14 +417,19 @@ where
         // 48 x 48 and centring means exactly what it says.
         let centred_icon = container(icon).center(Length::Fill);
 
-        let btn = button(centred_icon)
-            .on_press(item.on_press.clone())
-            .padding(0)
-            .width(BUTTON_SIZE)
-            .height(BUTTON_SIZE)
-            .style(move |theme, status| {
-                sidebar_button_style(theme, status, is_active, button_radius)
-            });
+        // RFC-116 Unit 0: `control` here too, so all three forms of the
+        // item are reachable rather than two of them.
+        let btn = rail_item(
+            centred_icon,
+            is_active,
+            button_radius,
+            geometry.control,
+            tooltip_body.text_size,
+        )
+        .on_press(item.on_press.clone())
+        .padding(0)
+        .width(BUTTON_SIZE)
+        .height(BUTTON_SIZE);
 
         // The tooltip gets a body of its own (RFC-102 R-4): bare text
         // over the page is legible only by luck.
@@ -452,6 +466,38 @@ where
             RAIL_HORIZONTAL_PADDING,
         ]))
         .into()
+}
+
+/// A rail item's control: the sidebar's fill, the ring, and the sizing
+/// rules (RFC-116).
+///
+/// # Why the ring's colour is chosen here
+///
+/// The ring has to clear 3:1 against **whatever is behind it**, and that
+/// is not one thing: an inactive item sits on the rail, an active one on
+/// its own `primary.strong` highlight. `control` cannot sample what is
+/// underneath, so the decision belongs where `is_active` is known. The
+/// rule itself is [`crate::style::focus_ring`]'s.
+fn rail_item<'a, Message>(
+    content: impl Into<Element<'a, Message>>,
+    is_active: bool,
+    button_radius: f32,
+    geometry: ControlGeometry,
+    label_size: Option<f32>,
+) -> snora_control::Control<'a, Message> {
+    crate::style::control(
+        content,
+        move |theme: &Theme, status| sidebar_button_style(theme, status, is_active, button_radius),
+        geometry,
+        label_size,
+        move |theme: &Theme| {
+            if is_active {
+                sidebar_active_color(theme)
+            } else {
+                crate::style::page_background(theme)
+            }
+        },
+    )
 }
 
 /// A rail that names its items on the rail itself (RFC-114).
@@ -512,7 +558,8 @@ where
         // makes every item at least 48px tall, whichever form this is,
         // and it keeps the icons on a labelled rail the same size as the
         // icons on an icon rail (icon sizing itself is RFC-115's).
-        let icon_box = container(icon_element(&item.icon)).center(Length::Fixed(BUTTON_SIZE));
+        let icon_box = container(icon_beside_label(&item.icon, geometry.label_size))
+            .center(Length::Fixed(BUTTON_SIZE));
 
         // Wrapped, never clipped (RFC-105 R-1). `WordOrGlyph` also
         // breaks a name with no space in it, which a word-only wrap
@@ -539,12 +586,20 @@ where
         // padding already insets the item, and a second inset here would
         // put the icons further from the rail edge than they are today
         // for no reason a reader could see.
-        let btn = button(content)
-            .on_press(item.on_press.clone())
-            .padding(0)
-            .style(move |theme, status| {
-                sidebar_button_style(theme, status, is_active, button_radius)
-            });
+        //
+        // **RFC-116 Unit 0:** `control` in place of `button`, so the item
+        // is a focus target and Enter and Space reach it. The style
+        // closure is unchanged, because `control` takes
+        // `button::Status` — it is drop-in on the styling side.
+        let btn = rail_item(
+            content,
+            is_active,
+            button_radius,
+            geometry.control,
+            geometry.label_size,
+        )
+        .on_press(item.on_press.clone())
+        .padding(0);
 
         col = col.push(btn);
     }

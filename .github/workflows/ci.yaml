@@ -84,6 +84,14 @@ jobs:
         # quadratic measured 92 — the bound is set to catch a change in
         # complexity, not to police absolute time.
         run: cargo test --release -p snora --test bounded_work -- --ignored --nocapture
+      - name: Test control, all features (RFC-116)
+        # The focusable control and its behaviour tests moved here from
+        # snora-widgets. **This step is what keeps them running**: a
+        # crate with no test step in CI is not a feature gap but an
+        # entire crate going untested, which is exactly how snora-widgets
+        # sat for a long time before RFC-087. 15 unit tests counted at
+        # the move.
+        run: cargo test -p snora-control --all-features
       - name: Test widgets, all features (RFC-087)
         # snora-widgets had no test step in CI at all before this — not a
         # feature gap, an entire crate. 28 unit tests + 6 doc-tests
@@ -142,6 +150,18 @@ jobs:
           # it had no CI entry at all until this one.
           - name: design-only
             args: "--no-default-features --features design,iced-default"
+          # ---- snora-control (RFC-116) ----
+          # The crate both `snora` and `snora-widgets` stand on, checked as
+          # itself. Every row above reaches it through `snora`, with
+          # whatever `snora` turns on; these two check it alone, with
+          # iced's defaults handed back and with the crate's own defaults.
+          # It has exactly one feature, so two rows is the whole matrix.
+          - name: control-default
+            package: snora-control
+            args: ""
+          - name: control-no-default-features
+            package: snora-control
+            args: "--no-default-features --features iced-default"
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
@@ -160,7 +180,7 @@ jobs:
         # here ever failed on one.
         env:
           RUSTFLAGS: "-D warnings"
-        run: cargo check -p snora ${{ matrix.args }}
+        run: cargo check -p ${{ matrix.package || 'snora' }} ${{ matrix.args }}
 
   design-isolation:
     # Q2-B and Q3: verify that widgets-without-design compiles cleanly and

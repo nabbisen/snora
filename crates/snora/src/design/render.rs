@@ -204,6 +204,8 @@ fn toast_style(tokens: &Tokens) -> ToastStyle {
         title_size: Some(snora_style::text::title_size(tokens).0),
         message_size: Some(snora_style::text::body_size(tokens).0),
         intents: Some(toast_intent_colors(tokens)),
+        min_target: tokens.targets.min,
+        ring: Some((tokens.focus.ring_width, tokens.focus.ring_offset)),
     }
 }
 

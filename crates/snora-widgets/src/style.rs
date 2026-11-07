@@ -194,3 +194,143 @@ pub(crate) fn readable_text(fill: Color, paired: Color) -> Color {
         stronger_pole(fill)
     }
 }
+
+// ---------------------------------------------------------------------
+// Controls (RFC-116 R-1 Unit 3)
+// ---------------------------------------------------------------------
+
+/// What a control needs beyond its look: the minimum-target token and the
+/// focus ring's geometry.
+///
+/// **One value, carried by each widget's geometry struct**, so that the
+/// unstyled path and the design path build a control by the same call and
+/// differ only in what they hand it. The unstyled path has no tokens, so
+/// it has no minimum token (`0` means none: 24 px and 1.5 x text still
+/// apply) and the ring's literals, which match `FocusTokens::new(2.0,
+/// 2.0, ..)`. The design path reads all four from `Tokens`.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct ControlGeometry {
+    /// `Tokens::targets.min`; `0.0` on the unstyled path.
+    pub(crate) min_target: f32,
+    /// The ring's stroke width.
+    pub(crate) ring_width: f32,
+    /// How far outside the control the ring is drawn.
+    pub(crate) ring_offset: f32,
+    /// The ring colour the design path prefers (`Tokens::focus`), kept
+    /// only where it is readable against what is behind the control. The
+    /// unstyled path has none and uses the theme's own text colour.
+    pub(crate) ring_preferred: Option<Color>,
+}
+
+impl ControlGeometry {
+    /// The unstyled path: no token, and the ring's literals.
+    pub(crate) const fn unstyled() -> Self {
+        Self {
+            min_target: 0.0,
+            ring_width: 2.0,
+            ring_offset: 2.0,
+            ring_preferred: None,
+        }
+    }
+
+    /// The design path: every value from the tokens.
+    #[cfg(feature = "design")]
+    pub(crate) fn from_tokens(tokens: &snora_design::Tokens) -> Self {
+        Self {
+            min_target: tokens.targets.min,
+            ring_width: tokens.focus.ring_width,
+            ring_offset: tokens.focus.ring_offset,
+            ring_preferred: Some(snora_style::color::to_iced_color(tokens.focus.ring_color)),
+        }
+    }
+}
+
+/// The focus ring for a control that sits on `behind`.
+///
+/// # Why the caller says what is behind
+///
+/// The ring has to clear 3:1 against **whatever is behind it**, and
+/// `control` cannot sample that. The rule is RFC-114 Unit 3b's: keep the
+/// preferred colour where it is readable against `behind`, and fall back
+/// to the stronger of black and white where it is not. That fallback is at
+/// least 4.58:1 against any opaque fill by construction, so the ring
+/// cannot fail on a theme snora has never seen. With no preferred colour
+/// the theme's own text colour is the preference.
+pub(crate) fn focus_ring<'a>(
+    geometry: ControlGeometry,
+    behind: impl Fn(&Theme) -> Color + 'a,
+) -> snora_control::Ring<'a> {
+    snora_control::Ring {
+        color: Box::new(move |theme: &Theme| {
+            let preferred = geometry
+                .ring_preferred
+                .unwrap_or(theme.extended_palette().background.base.text);
+            readable_text(behind(theme), preferred)
+        }),
+        width: geometry.ring_width,
+        offset: geometry.ring_offset,
+    }
+}
+
+/// A control around `content`: `button`'s padding, `style`, the ring, and
+/// the minimum-target token — everything but the press handler, which the
+/// caller chooses (`on_press`, `on_press_with`, `on_press_maybe`).
+///
+/// `label_size` is the size of the text the control carries when the
+/// caller set one (the design path), so RFC-115's `1.5 x text` is measured
+/// against the text actually on it; `None` reads the host's.
+pub(crate) fn control<'a, Message>(
+    content: impl Into<iced::Element<'a, Message>>,
+    style: impl Fn(&Theme, button::Status) -> button::Style + 'a,
+    geometry: ControlGeometry,
+    label_size: Option<f32>,
+    behind: impl Fn(&Theme) -> Color + 'a,
+) -> snora_control::Control<'a, Message> {
+    let mut control =
+        snora_control::Control::new(content, Box::new(style), focus_ring(geometry, behind))
+            .min_target(geometry.min_target);
+    if let Some(size) = label_size {
+        control = control.text_size(size);
+    }
+    control
+}
+
+/// What `iced::widget::button` pads its content with when it is not told
+/// otherwise (`[5, 10]`). A control replaces a button without moving its
+/// content, so the sites that never set a padding set this one.
+pub(crate) const BUTTON_DEFAULT_PADDING: iced::Padding = iced::Padding {
+    top: 5.0,
+    right: 10.0,
+    bottom: 5.0,
+    left: 10.0,
+};
+
+/// The page background, which is what a control with no fill of its own
+/// sits on in the unstyled chrome.
+pub(crate) fn page_background(theme: &Theme) -> Color {
+    theme.extended_palette().background.base.color
+}
+
+/// A design-path control: [`control`] with every value from `tokens`.
+///
+/// The text the control carries is at `Typography::label`, which is what
+/// RFC-115's `1.5 x text` is measured against; the minimum-target token and
+/// the ring come from `tokens` too. `behind` is the palette role the control
+/// sits on, which the ring's colour is checked against. Padding is the
+/// caller's.
+#[cfg(feature = "design")]
+pub(crate) fn design_control<'a, Message>(
+    tokens: &snora_design::Tokens,
+    content: impl Into<iced::Element<'a, Message>>,
+    style: impl Fn(&Theme, button::Status) -> button::Style + 'a,
+    behind: snora_design::Color,
+) -> snora_control::Control<'a, Message> {
+    let behind = snora_style::color::to_iced_color(behind);
+    control(
+        content,
+        style,
+        ControlGeometry::from_tokens(tokens),
+        Some(snora_style::text::label_size(tokens).0),
+        move |_| behind,
+    )
+}

@@ -520,14 +520,14 @@ restate the guide's content.
     (covered by workspace check above; verify no example was removed)
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
 [ ] cargo package --workspace
-    # Inspects all five .crate archives (snora-core, snora-design,
-    # snora-style, snora-widgets, snora — snora-style added in RFC-055,
-    # 0.32.0). Examples are ALSO packaged (each emits "manifest has no
+    # Inspects all six .crate archives (snora-core, snora-design,
+    # snora-style, snora-control, snora-widgets, snora — snora-style added
+    # in RFC-055, 0.32.0; snora-control in RFC-116). Examples are ALSO packaged (each emits "manifest has no
     # description"); `publish = false` stops them being *published*, not
     # packaged, so no exclusion flag is needed but the output is noisier
-    # than "five archives". Corrected at 0.38.0 — the previous wording
+    # than "six archives". Corrected at 0.38.0 — the previous wording
     # said they were skipped, and they are not.
-    # Do NOT package the five crates individually (see "Publishing").
+    # Do NOT package the six crates individually (see "Publishing").
 [ ] Merge to main, then dispatch the `unpinned-build` workflow on main and
     confirm a green run BEFORE tagging.
     # WHEN IT IS RED FOR SOMEONE ELSE'S REASON: still hold. 2026-09-03,
@@ -646,11 +646,11 @@ restate the guide's content.
     #   git worktree add --detach /tmp/pub X.Y.Z && cd /tmp/pub && cargo publish --workspace
     # Cargo refuses a dirty tree by default. NEVER pass --allow-dirty.
     # ONE command — cargo resolves member order itself. Do not publish the
-    # five crates individually; an interrupted per-crate sequence leaves a
+    # six crates individually; an interrupted per-crate sequence leaves a
     # public tag with `snora` itself missing from crates.io, and anyone
     # depending on the new minor gets a resolution failure until it is
     # finished. See "Publishing" below.
-[ ] Confirm all five crates report the new version on crates.io
+[ ] Confirm all six crates report the new version on crates.io
 ```
 
 ### Publishing
@@ -672,7 +672,7 @@ The first instance is `snora-control`, at 0.55.0.
 **Pushing the tag publishes. There is no command to run here.**
 
 `release.yaml` triggers on a bare `X.Y.Z` tag, checks out that tag, and runs
-`cargo publish --workspace` — one command, five crates, as before. It
+`cargo publish --workspace` — one command, six crates. It
 authenticates with crates.io **Trusted Publishing** (OIDC); there is no
 long-lived token anywhere in this repository.
 
@@ -726,9 +726,10 @@ two unreleased features' source.
 
 Cargo computes the dependency order from the manifests
 (`snora-core` and `snora-design` have no internal dependencies;
-`snora-style` depends on `snora-design`; `snora-widgets` depends on
-`snora-core`, `snora-design` and `snora-style`; `snora` depends on all
-four) and waits
+`snora-style` depends on `snora-design`; `snora-control` depends on
+nothing of snora's; `snora-widgets` depends on `snora-core`,
+`snora-control`, `snora-design` and `snora-style`; `snora` depends on all
+five) and waits
 for each to become available on crates.io before publishing the next. The
 order cannot drift from the manifests, because nothing restates it.
 

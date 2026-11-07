@@ -27,7 +27,11 @@ default = ["iced-default"]
 # `snora-style?/iced-default` keeps its `?`: it reaches snora-style
 # only when `design` has already pulled it in, so turning iced's
 # defaults back on does not drag the style bridge along with them.
-iced-default = ["iced/default", "snora-style?/iced-default"]
+iced-default = [
+    "iced/default",
+    "snora-control/iced-default",
+    "snora-style?/iced-default",
+]
 
 # When enabled, exposes the Snora Design prefab widgets (`snora_widgets::design`
 # — button, card, notice, chip, progress, chrome geometry). NOT the style
@@ -52,4 +56,8 @@ snora-design = { workspace = true, optional = true }
 # (`widgets` without `design`) from compiling any style code.
 snora-style = { workspace = true, optional = true }
 iced = { workspace = true }
+# The focusable control every prefab widget is built on (RFC-116).
+# Non-optional: a sidebar item that cannot be focused is the gap this
+# closes, so there is no configuration in which it is absent.
+snora-control = { workspace = true }
 lucide-icons = { workspace = true, optional = true }

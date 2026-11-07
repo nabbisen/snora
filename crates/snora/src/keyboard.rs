@@ -221,3 +221,81 @@ mod tests {
         );
     }
 }
+
+// ---------------------------------------------------------------------
+// Focus traversal (RFC-116 Unit 0)
+// ---------------------------------------------------------------------
+
+/// Moves focus with Tab and Shift+Tab.
+///
+/// # Why an application has to call this at all
+///
+/// **iced binds no Tab.** Focus moves only when something runs
+/// `iced::widget::operation::focus_next()` or `focus_previous()`
+/// (`iced_runtime/src/widget/operation.rs:50,55`), and nothing in iced
+/// 0.14 does that for you. So a `control` that registers as a focus
+/// target is still unreachable until the application routes the key —
+/// which is one line in `update`, and is this function.
+///
+/// Returns `None` for anything that is not Tab, so an application can
+/// hand it every key event and let it decline.
+///
+/// ```rust,ignore
+/// // In your update:
+/// Message::KeyPressed(key, modifiers) => {
+///     if let Some(task) = snora::keyboard::traverse(key, modifiers) {
+///         return task;
+///     }
+///     Task::none()
+/// }
+/// ```
+///
+/// # Tab at the end of a group leaves it
+///
+/// **Tab on the last focus target does not wrap to the first.** Focus
+/// leaves: nothing is focused until the next Tab, which starts again from
+/// the first target in the window. That is iced's `focus_next`, and it is
+/// right for a window with other controls after the group (a rail, then
+/// the page): a wrap would trap a keyboard user inside whichever group
+/// they were in. Shift+Tab at the first target behaves the same way, in
+/// reverse. Observed in a real window on the `tab` example.
+///
+/// # What this does not do
+///
+/// It does not know about snora's zones ([`crate::focus::Cycle`], F6):
+/// that cycles between *regions*, this moves between *controls*. The
+/// two are different axes and RFC-116 Unit 0 does not join them.
+#[must_use]
+pub fn traverse<Message: 'static>(key: Key, modifiers: Modifiers) -> Option<iced::Task<Message>> {
+    if key != Key::Named(Named::Tab) {
+        return None;
+    }
+
+    Some(if modifiers.shift() {
+        iced::widget::operation::focus_previous()
+    } else {
+        iced::widget::operation::focus_next()
+    })
+}
+
+#[cfg(test)]
+mod traverse_tests {
+    use super::*;
+
+    /// Tab and Shift+Tab are claimed; nothing else is.
+    ///
+    /// **What this cannot assert**, and why there is a rendered test
+    /// for it instead: a `Task` is opaque, so this cannot tell
+    /// `focus_next` from `focus_previous`. It asserts only which keys
+    /// are claimed. That the two directions actually differ is shown in
+    /// `crates/snora/tests/sidebar_keyboard.rs`, by focusing through a
+    /// rail and reading which item answers.
+    #[test]
+    fn only_tab_is_claimed() {
+        assert!(traverse::<()>(Key::Named(Named::Tab), Modifiers::empty()).is_some());
+        assert!(traverse::<()>(Key::Named(Named::Tab), Modifiers::SHIFT).is_some());
+        assert!(traverse::<()>(Key::Named(Named::Enter), Modifiers::empty()).is_none());
+        assert!(traverse::<()>(Key::Named(Named::Escape), Modifiers::empty()).is_none());
+        assert!(traverse::<()>(Key::Character("a".into()), Modifiers::empty()).is_none());
+    }
+}
