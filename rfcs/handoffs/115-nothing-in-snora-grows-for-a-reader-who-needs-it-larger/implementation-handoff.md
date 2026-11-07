@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-115, Unit 0 only: measure every target and icon
 
-**RFC.** `rfcs/accepted/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger.md`
+**RFC.** `rfcs/done/115-nothing-in-snora-grows-for-a-reader-who-needs-it-larger.md`
 **Scope.** Unit 0, a measurement, delivered as its own review request. **No source
 change.** R-2's rule, target ≥ max(24 px, k × text), is designed after this reports,
 and k is ruled then.

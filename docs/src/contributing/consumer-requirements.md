@@ -38,7 +38,7 @@ would have to be true for adoption, as *"requirements, not requests"*.
   (migration guide §6). Keyboard *reach and operation* (WCAG 2.1.1) is not an
   accessibility tree, but it is the part snora can deliver without one: RFC-116
   plans it for 0.55.0 as 1.0 gate 11. Names, roles and states still wait on iced.
-- **Status on `main` for 0.55.0: still blocked; keyboard reach delivered.** Every
+- **Status at 0.55.0: still blocked; keyboard reach delivered.** Every
   control snora draws is a focus target, pressed by Enter and Space, with a ring
   (RFC-116, gate 11 met). Names, roles and states still wait on iced.
 - **Possible now:** an inventory of each component's name, role and state and

@@ -1,6 +1,6 @@
 # RFC-119 — The keyboard reaches beneath an open modal
 
-**Status.** Accepted 2026-11-07. Every open question ruled as suggested, with the
+**Status.** Done — shipped v0.55.0. Accepted 2026-11-07. Every open question ruled as suggested, with the
 revision below (see Rulings).
 **Merged to `main` 2026-11-07** (`b73fb77`), shipping in 0.55.0. Unit 0 and Unit 1 reviewed
 (`.git-exclude/reviewed/119-unit0/`, `119-unit1/`).

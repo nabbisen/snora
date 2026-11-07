@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-119: the keyboard does what the pointer can
 
-**RFC.** `rfcs/accepted/119-the-keyboard-reaches-beneath-an-open-modal.md`. Read R-1 to
+**RFC.** `rfcs/done/119-the-keyboard-reaches-beneath-an-open-modal.md`. Read R-1 to
 R-5 and the Rulings.
 **Release target.** 0.55.0. **The release waits for this** (Q-1).
 **Branch.** `rfc119-inert`, off `main` (`e9d7229` or later). Each unit is its own

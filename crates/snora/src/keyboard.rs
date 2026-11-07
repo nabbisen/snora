@@ -263,6 +263,9 @@ mod tests {
 /// Returns `None` for anything that is not Tab, so an application can
 /// hand it every key event and let it decline.
 ///
+/// `ignore` (RFC-064): a bare `match` arm fragment of the application's own
+/// `update`, not a standalone item.
+///
 /// ```rust,ignore
 /// // In your update:
 /// Message::KeyPressed(key, modifiers) => {

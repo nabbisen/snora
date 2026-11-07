@@ -232,26 +232,32 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.55.0
+## Next — 0.56.0
 
-**Merged to `main` 2026-11-07:**
-- **Keyboard access to every snora control** (RFC-116 R-1). A focusable `control`, in
-  a new `snora-control` crate, sits under every button snora draws, with a focus
-  ring snora draws. That meets 1.0 gate 11, WCAG 2.1.1.
-- **Sizes that follow the reader** (RFC-115 R-2), inside `control`:
-  - targets ≥ max(24 px, 1.5 × text, `Tokens::targets.min`);
-  - icons at 1 em, and the × at 1.125 em.
-- **`design::button::link`** (RFC-117): an underline drawn by snora under every line,
-  and growing with the text.
-- `release.yaml` skips crates already on crates.io (RFC-116 Unit 2b).
-
-- **The keyboard does what the pointer can, around overlays** (RFC-119): it reaches only
-  what the pointer can press, Escape closes an overlay that closes on a click outside,
-  focus returns to the opener, and the page is never reset.
-
-**Later:** RFC-116 R-2, the `Shortcuts` router, and the long-term plan L-1 to L-6.
+- **RFC-116 R-2, the `Shortcuts` router.** Its Escape part is reconsidered first:
+  RFC-119 now answers Escape for any overlay that closes on a click outside.
+- **RFC-116's long-term plan, L-1: focus after a control removes itself.** Its
+  trigger fired when RFC-119 was accepted, and RFC-119's position-and-count memory
+  is the likely mechanism.
+- The starter example's `dismiss_on_escape` call, made redundant by RFC-119, is
+  removed.
 
 ## Recently shipped
+
+- **0.55.0** — keyboard access, Theme E's sizes, and the link.
+  - **Every control snora draws is reachable and pressable from the keyboard**
+    (RFC-116 R-1), on a focusable `control` in a new `snora-control` crate, with a
+    focus ring snora draws. 1.0 gate 11 is met.
+  - **Overlays: the keyboard does what the pointer can** (RFC-119): it reaches only
+    what the pointer can press, Escape closes an overlay that closes on a click
+    outside, focus returns to the opener, and the page is never reset. Found while
+    writing the book for R-1, and fixed before either shipped.
+  - **Sizes follow the reader** (RFC-115): targets ≥ max(24 px, 1.5 × text,
+    `Tokens::targets.min`); icons at 1 em.
+  - **`design::button::link`** (RFC-117, asked for by orbok), underlined under
+    every line.
+  - `release.yaml` skips crates already on crates.io (RFC-116 Unit 2b), which let
+    `snora-control` be published first from the owner's machine.
 
 - **0.54.0** — Theme E, older users, and an adopter's opt-out.
   - **Toasts last as long as their text takes to read**, errors stay until

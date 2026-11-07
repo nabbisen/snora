@@ -1,7 +1,7 @@
 # RFC-116 — No snora control can be reached from the keyboard
 
 **Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
-**R-1 merged to `main` 2026-11-07** (`952e1a2`), shipping in 0.55.0: every control snora
+**R-1 shipped in v0.55.0** (merged 2026-11-07, `952e1a2`): every control snora
 draws is `control`, and 1.0 gate 11 is met. **R-2, the `Shortcuts` router, is open.** The
 long-term plan is at the end. RFC-119 covers the keyboard beneath an open modal.
 **Handoff.** [`handoffs/116-…`](../handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md).

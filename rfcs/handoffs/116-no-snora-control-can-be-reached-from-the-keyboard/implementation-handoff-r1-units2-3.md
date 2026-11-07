@@ -2,7 +2,7 @@
 
 **RFCs.**
 - `rfcs/accepted/116-…`: its rulings of 2026-11-07, R-1 and the new crate;
-- `rfcs/accepted/115-…`: its amendment of 2026-11-05, the sizing rules, which live in
+- `rfcs/done/115-…`: its amendment of 2026-11-05, the sizing rules, which live in
   `control`.
 
 **Release target.** 0.55.0.

@@ -1,6 +1,6 @@
 # RFC-117 — A link does not look like a link
 
-**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings). **R-5 shipped in v0.54.0;** `link` ships in 0.55.0 with RFC-116 R-1.
+**Status.** Done — shipped v0.55.0 (R-5 in v0.54.0). Accepted 2026-11-04. Every open question ruled as suggested (see Rulings). **R-5 shipped in v0.54.0;** `link` ships in 0.55.0 with RFC-116 R-1.
 **Handoff.** [`handoffs/117-…`](../handoffs/117-a-link-does-not-look-like-a-link/implementation-handoff.md).
 **Revised** 2026-11-04, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy (see "Review against snora's principles").

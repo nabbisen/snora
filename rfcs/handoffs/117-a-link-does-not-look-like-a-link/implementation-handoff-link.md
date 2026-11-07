@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-117: `link`, drawn by snora, underlined per line
 
-**RFC.** `rfcs/accepted/117-a-link-does-not-look-like-a-link.md`. Read its "Ruling,
+**RFC.** `rfcs/done/117-a-link-does-not-look-like-a-link.md`. Read its "Ruling,
 2026-11-07 (Q-5)".
 **Release target.** 0.55.0, with RFC-116 R-1.
 **Order.** After RFC-116's Unit 2 is accepted, since `link` is built on

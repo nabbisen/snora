@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-117, Unit 0 and R-5: measure the underline, declare the accent
 
-**RFC.** `rfcs/accepted/117-a-link-does-not-look-like-a-link.md`
+**RFC.** `rfcs/done/117-a-link-does-not-look-like-a-link.md`
 **Scope.**
 - **Unit 0:** a measurement, delivered as its own review. The owner then rules Q-5,
   and `link` itself gets a follow-up handoff.

@@ -25,6 +25,37 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.55.0] — 2026-11-07
+
+**Upgrading from 0.54:** read the [0.54 → 0.55 migration guide](docs/src/guides/migration-0.54-to-0.55.md).
+
+> **In short:** every control snora draws can now be reached and pressed from the
+> keyboard, once your application routes Tab in one line
+> (`snora::keyboard::traverse`). Overlays block the keyboard as they block the
+> pointer, close on Escape when they close on a click outside, and give focus back
+> when they close. Targets and icons grow with the text. `design::button::link` is
+> new.
+>
+> **Code:** no change needed; nothing is deprecated or removed. A new crate,
+> `snora-control`, arrives through `snora`: do not depend on it directly. While an
+> overlay with a close message is open, the engine now takes Escape, so your own
+> `keyboard::listen()` does not see it.
+>
+> **Appearance:** changes on the default path:
+>
+> - unstyled chrome icons are 16 px at the default text size, not 14, and tabs and
+>   menu items with an icon are 1 to 1.5 px wider;
+> - the design path's toast × is 15.75 px, not 18;
+> - a focus ring appears on the control the keyboard has reached;
+> - at a larger text size, targets and icons grow with it.
+>
+> Colours and presets are unchanged.
+>
+> **Security:** none. The advisory gate is clean, with the same accepted
+> advisories as 0.54.0.
+
 ### Added
 
 - **Keyboard access to every control snora draws (RFC-116).** Tabs, breadcrumb
@@ -75,6 +106,14 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   unavailable, show plain text. The rule for choosing: a **link** takes the reader
   somewhere (another view, a document, a chooser); an **action** does something
   where they are (Cancel, Skip, Save), and stays a `ghost`. `ghost` is unchanged.
+- **Overlays: the keyboard reaches only what the pointer can press (RFC-119).**
+  Under a dialog or sheet, and under a menu that has its outside-click backdrop,
+  the page takes neither focus nor key presses, and draws no overlay of its own
+  above the dim; Tab moves between the overlay and the toasts. A menu with no
+  backdrop leaves the page pressable, and so reachable. A confirmation dialog
+  therefore gates the keyboard as it gates the pointer. *(Built with the keyboard
+  access above, before either shipped: 0.54 had no keyboard route beneath a
+  modal to close.)*
 
 ### Changed
 
@@ -114,21 +153,9 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
-- **The keyboard reached beneath an open modal (RFC-119).** With a dialog or
-  sheet open, Tab could land on a control the dim was covering, and Enter or
-  Space pressed it: a confirmation dialog did not gate the action it was meant
-  to gate, which a pointer user could not have got past. This is a defect of the
-  keyboard access added in this release, found before it shipped. **The keyboard
-  now reaches only what the pointer can press**: under a dialog or sheet, and
-  under a menu that has its outside-click backdrop, the page takes neither focus
-  nor key presses; Tab moves between the overlay and the toasts. A menu with no
-  backdrop leaves the page pressable, and so reachable.
 - **WCAG 2.1.1, Keyboard: snora's controls could not be reached from the
   keyboard.** iced 0.14's `button` takes no keyboard input and registers no focus
   target, and every control snora drew was one. See Added.
-- A tab that was pressed from the keyboard lost its focus the moment it became the
-  active tab, because the active tab was built with a different shape from the
-  others and the runtime dropped its state. Every tab now has the same shape.
 
 ## [0.54.0] — 2026-11-07
 
@@ -920,7 +947,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.54.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.55.0...HEAD
+[0.55.0]: https://github.com/nabbisen/snora/compare/0.54.0...0.55.0
 [0.54.0]: https://github.com/nabbisen/snora/compare/0.53.0...0.54.0
 [0.53.0]: https://github.com/nabbisen/snora/compare/0.52.0...0.53.0
 [0.52.0]: https://github.com/nabbisen/snora/compare/0.51.0...0.52.0

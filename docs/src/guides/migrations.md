@@ -10,6 +10,11 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.54 → 0.55](migration-0.54-to-0.55.md) — **behaviour changes, nothing removed**:
+  every snora control is reachable from the keyboard once the application routes
+  Tab (`snora::keyboard::traverse`); overlays block the keyboard as they block the
+  pointer, and close on Escape; targets and icons grow with the text;
+  `design::button::link`. No deprecations.
 - [0.53 → 0.54](migration-0.53-to-0.54.md) — **behaviour changes, nothing removed**:
   toasts last as long as they take to read and errors stay until dismissed; the
   sidebar names its items on the rail; `iced-default` lets an application choose
