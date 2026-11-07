@@ -179,7 +179,7 @@ finishing while a dialog is open should not be invisible.
 Snora provides visual modality and pointer blocking. It does not yet block
 the keyboard: from 0.55, if your application routes Tab with
 `snora::keyboard::traverse`, Tab also reaches controls beneath an open dialog
-or sheet, and Enter presses them (RFC-119 proposes the fix). It provides no
+or sheet, and Enter presses them (RFC-119, accepted for 0.55.0, fixes it). It provides no
 screen-reader semantics. Before shipping a dialog or sheet, check:
 
 ```text

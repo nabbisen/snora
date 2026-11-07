@@ -528,7 +528,7 @@ This is not trapping. It is a gap between the keyboard and Law 8's pointer
 blocking, and it is new. **The blocker above does not bind the fix:** a widget that
 takes part in focus implements `iced_core::Widget` and `Focusable`, which are
 public without `advanced`, as `snora-control` does. A wrapper that keeps its
-content out of focus and key events needs no focus *query*. RFC-119 proposes one.
+content out of focus and key events needs no focus *query*. RFC-119, accepted 2026-11-07, builds one.
 Whether it is default behaviour or an optional field is RFC-119's question,
 against the additive constraint above.
 

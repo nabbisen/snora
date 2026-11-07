@@ -245,9 +245,9 @@ crate short of the pixels**, and that is RFC-085's real subject.
   and growing with the text.
 - `release.yaml` skips crates already on crates.io (RFC-116 Unit 2b).
 
-**Proposed, for the owner's ruling:**
+**Accepted, and 0.55.0 waits for it:**
 - **The keyboard beneath an open modal** (RFC-119). Tab now reaches controls under a
-  dialog's dim. If Q-1 rules so, 0.55.0 waits for the fix.
+  dialog's dim; the keyboard will do what the pointer can (reach, and leave).
 
 **Later:** RFC-116 R-2, the `Shortcuts` router, and the long-term plan L-1 to L-6.
 

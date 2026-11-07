@@ -192,7 +192,7 @@ contributor-facing documents linked below, not duplicated here.
   reaches the controls beneath it.** The dim blocks the pointer (Law 8), but
   iced delivers key presses to every layer, so a control under the dim can be
   focused and pressed. This matters from 0.55, which made snora's controls
-  focus targets. **RFC-119 proposes the fix**: the keyboard reaches exactly
+  focus targets. **RFC-119, accepted for 0.55.0, fixes it**: the keyboard reaches exactly
   what the pointer can press. Until it ships, close menus and modals before
   acting on the page, and do not rely on a modal to gate keyboard input. Zone
   navigation (above) is already suspended while a modal is open.

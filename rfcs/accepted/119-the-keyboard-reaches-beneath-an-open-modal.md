@@ -1,14 +1,15 @@
 # RFC-119 — The keyboard reaches beneath an open modal
 
-**Status.** Proposed 2026-11-07. The owner accepted the first draft's suggested rulings
-"almost", subject to a review against the fundamental philosophy.
-**Revised** 2026-11-07 after that review. It found a keyboard trap that R-1 alone would
-create, and a state reset in the obvious way to build it. R-4 and R-5 are new, and Q-3
-is now firm. **Awaiting the owner's confirmation of the revision.** See "Review against
-snora's principles".
+**Status.** Accepted 2026-11-07. Every open question ruled as suggested, with the
+revision below (see Rulings).
+**Handoff.** [`handoffs/119-…`](../handoffs/119-the-keyboard-reaches-beneath-an-open-modal/implementation-handoff.md).
+**Revised** 2026-11-07, before acceptance, after the architect reviewed it against
+the owner's fundamental philosophy. It found a keyboard trap that R-1 alone would
+create, and a state reset in the obvious way to build it. R-4 and R-5 are new, and
+Q-3 is firm. See "Review against snora's principles".
 **Raised.** 2026-11-07, architect, while rewriting the book's keyboard pages after
 RFC-116 R-1 merged (`952e1a2`).
-**Release target.** 0.55.0, if Q-1 rules that the release waits for it.
+**Release target.** 0.55.0. The release waits for it (Q-1).
 **Priority.** A defect introduced by 0.55's own keyboard work, before any release
 carries it.
 
@@ -217,3 +218,23 @@ need, and the question is restated, not closed.**
    - Q-4's Tab order asserted.
 3. **Law 8 and the book,** by the architect.
 4. CHANGELOG under Fixed.
+
+## Rulings, 2026-11-07
+
+**The owner accepted every suggested ruling of the first draft ("almost accepted"),**
+and asked for a review against the fundamental philosophy. **The owner then confirmed
+and accepted the revision** that review produced.
+- **Q-1:** 0.55.0 waits for this RFC.
+- **Q-2:** on by default, with no opt-out.
+- **Q-3:** focus returns to the control that had it when the modal opened, and no ring
+  draws under the dim. If that proves impossible, it comes back to the owner.
+- **Q-4:** toasts stay reachable during a modal. The Tab order is dialog, sheet, then
+  toasts.
+- **Q-5:** this meets the need focus trapping was for. RFC-060 Q-1 is restated, not
+  closed.
+- **R-4 and R-5** are part of the accepted design.
+
+**One correction, made in the handoff.** R-3 said `render_semantics.rs` "gains"
+assertions. That file is gate 5's, and must pass **unmodified**. The new assertions
+go in a new test file, and `render_semantics.rs` passing unchanged is the proof that
+the composition did not move.
