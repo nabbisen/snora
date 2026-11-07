@@ -356,7 +356,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.53.0, re-derived 2026-10-20, RFC-062)
+## Current status (snora 0.54.0, re-derived 2026-11-07, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -366,9 +366,9 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 | Indicator | Threshold | Current | Met? |
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Measured 2026-09-12, no longer unassessed.** **~0.2 s marginal** (`snora-widgets` alone, closure warm; 181–222 ms over four runs on a 16-core desktop) — **~150× under**. The cold-closure reading is 29 523 ms on the same machine, but that cost is `iced`'s and is paid by every snora consumer whether or not a widget is enabled, so per-widget gating cannot reduce it; the marginal number is the one this indicator's own purpose needs. **The procedure printed here until today measured a no-op** (393 ms — `cargo clean -p <pkg>` does not reach the release profile); corrected above. The threshold's magnitude fits the cold-closure quantity rather than the marginal one — flagged for the owner, not silently rewritten | **No** |
-| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **50,432 B (~49 KB)**, from `binary-size.csv`'s 0.53.0 row, read back after the tag. **33% of a 150 KB bar.** It moved **−1152 B**, but this row **cannot be attributed to the release:** the CI toolchain changed between the two rows (rustc 1.98.1 → 1.99.1). Every absolute size fell with it: `engine_bytes` −47,872, `widgets_bytes` −49,024, `design_bytes` −54,272. The compiler is the plausible cause, **not verified**, and it dwarfs anything 0.53.0's small code changes could add. The next row on an unchanged toolchain is the first clean comparison. | **No** |
+| 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **40,832 B (~40 KB)**, from `binary-size.csv`'s 0.54.0 row, read back after the tag. **27% of a 150 KB bar.** It moved **−9,600 B** from 0.53.0's 50,432, and this is a **clean comparison**: both rows were built with rustc 1.99.1 on `ubuntu-latest`. `widgets_bytes` fell 17,536 and `engine_bytes` fell 7,936. **Which change caused the fall is not established** (0.54.0 changed iced's feature plumbing, RFC-112, as well as widget code), so it is recorded, not explained | **No** |
 | 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked against current manifests, not inherited: `snora-widgets` depends on `snora-core`, `snora-design` (optional), `snora-style` (optional, arrived RFC-055), `iced`, `lucide-icons` (optional); `snora-style` itself depends only on `snora-design` and `iced` — no new heavy dependency. 0.38.0 added one workspace member, `examples/book_snippets` (RFC-069), which is `publish = false` and ships to nobody | **No** |
-| 4. Platform-specific dep | Any system library not already required | None — re-run for 0.53.0: no package added or moved in `Cargo.lock` since 0.52.0. The one new edge is `png` 0.18.1, already in the graph through iced, now also a **dev**-dependency of `snora` (RFC-108); CI's new wgpu job installs `mesa-vulkan-drivers` for tests only, which no consumer build needs | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.54.0: no package added to `Cargo.lock` since 0.53.0. Four moved within their ranges to clear advisories (`tokio` 1.54.1, `wasmtimer` 0.4.5, `async-executor` 1.14.1, `clipboard-win` 5.4.3), and `pin-utils` was removed. None is a system library | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
 **No indicator is met, and that is now measured rather than open.**
