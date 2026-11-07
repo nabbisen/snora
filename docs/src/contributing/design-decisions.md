@@ -519,18 +519,23 @@ evidence changed: the register no longer lists a consumer as currently
 asking for it, but the blocker and the additive constraint above are
 unaffected.
 
-**Changed 2026-11-07 (RFC-116, RFC-119): the keyboard now reaches beneath a
-modal, and a fix needs no `advanced`.** From 0.55 every control snora draws is a
-focus target (`control`). iced delivers key presses to every layer, and the dim
-captures only the pointer. So an application that routes Tab can reach and press
-controls beneath an open dialog. Before 0.55 there was nothing there to reach.
-This is not trapping. It is a gap between the keyboard and Law 8's pointer
-blocking, and it is new. **The blocker above does not bind the fix:** a widget that
-takes part in focus implements `iced_core::Widget` and `Focusable`, which are
-public without `advanced`, as `snora-control` does. A wrapper that keeps its
-content out of focus and key events needs no focus *query*. RFC-119, accepted 2026-11-07, builds one.
-Whether it is default behaviour or an optional field is RFC-119's question,
-against the additive constraint above.
+**Changed 2026-11-07 (RFC-116, RFC-119): the keyboard reached beneath a modal for
+one unreleased stretch, and the fix needed no `advanced`.** Once RFC-116 made every
+control snora draws a focus target, Tab could reach, and Enter press, controls under
+an open dialog: iced delivers key presses to every layer, and the dim captures only
+the pointer. RFC-119 closed it before any release carried it. An `Inert` wrapper,
+always in the tree around each layer a backdrop may cover, hides its content's focus
+targets, key presses, text input and overlays while covered. It also parks and
+restores focus. It implements `iced_core::Widget`, public without `advanced`, and
+needs no focus *query*.
+
+**The additive constraint above was weighed, and does not apply** (RFC-119 Q-2,
+owner's ruling): it was written for trapping, a new behaviour that changes where
+focus moves. Keyboard blocking keeps a promise the pointer already keeps
+unconditionally (Law 8), and changes nothing snora's own controls did in 0.54. It is
+default, with no opt-out. **Tab inside the modal is now bounded** to the modal and
+the toasts, which meets the need trapping was for. RFC-060 Q-1's strict trap, a wrap
+with no gap, stays unbuilt, and is restated rather than closed.
 
 ## Why `advanced` is enabled nowhere (v0.40)
 

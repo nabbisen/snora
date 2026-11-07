@@ -245,9 +245,9 @@ crate short of the pixels**, and that is RFC-085's real subject.
   and growing with the text.
 - `release.yaml` skips crates already on crates.io (RFC-116 Unit 2b).
 
-**Accepted, and 0.55.0 waits for it:**
-- **The keyboard beneath an open modal** (RFC-119). Tab now reaches controls under a
-  dialog's dim; the keyboard will do what the pointer can (reach, and leave).
+- **The keyboard does what the pointer can, around overlays** (RFC-119): it reaches only
+  what the pointer can press, Escape closes an overlay that closes on a click outside,
+  focus returns to the opener, and the page is never reset.
 
 **Later:** RFC-116 R-2, the `Shortcuts` router, and the long-term plan L-1 to L-6.
 

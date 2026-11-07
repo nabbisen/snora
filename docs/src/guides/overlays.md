@@ -176,22 +176,26 @@ finishing while a dialog is open should not be invisible.
 
 ## Accessibility responsibilities
 
-Snora provides visual modality and pointer blocking. It does not yet block
-the keyboard: from 0.55, if your application routes Tab with
-`snora::keyboard::traverse`, Tab also reaches controls beneath an open dialog
-or sheet, and Enter presses them (RFC-119, accepted for 0.55.0, fixes it). It provides no
-screen-reader semantics. Before shipping a dialog or sheet, check:
+Snora provides visual modality, pointer blocking and, from 0.55, keyboard
+blocking (RFC-119): with a dialog or sheet open, Tab and Enter reach only the
+overlay and the toasts. With `on_close_modals` set, Escape closes it, as a click
+on the dim does. When it closes, focus returns to the control that had it, unless
+the page has changed or your application has focused something itself (Laws 7 and
+8). It provides no screen-reader semantics. Before shipping a dialog or sheet,
+check:
 
 ```text
 [ ] A visible close/cancel button exists inside the overlay content.
 [ ] `on_close_modals` is set when outside-click dismissal is intended.
-[ ] Escape is wired via snora::keyboard::dismiss_on_escape if desired.
-    (See keyboard section of overlay-interaction-semantics.md.)
+    Escape then closes the overlay too, with nothing to wire (Law 7).
+[ ] With no `on_close_modals`: the visible close button above is the only
+    way out, for pointer and keyboard alike. If Escape should close it,
+    wire snora::keyboard::dismiss_on_escape.
 [ ] Destructive actions have explicit labels; they are not triggered
     by backdrop click alone.
-[ ] If initial keyboard focus inside the dialog matters, wire it via
-    iced's widget::Id and the operate mechanism — Snora does not
-    trap focus automatically.
+[ ] If initial keyboard focus inside the dialog matters, set it with
+    iced's widget::Id and a focus operation. Snora bounds Tab to the
+    modal and the toasts, but does not choose where focus starts.
 ```
 
 ABDD is a layout discipline, not a complete accessibility or localization

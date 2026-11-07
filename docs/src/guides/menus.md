@@ -138,8 +138,9 @@ Arrow-key traversal **between items inside an open menu** — moving the
 highlighted item down the list with `↓`, wrapping, picking with
 `Enter` — is a different concern from the two keyboard axes snora
 already owns: `snora::keyboard::cycle_zones` moves **between**
-skeleton regions (RFC-060), and `dismiss_on_escape` **closes** an open
-menu or modal. Neither moves between items inside one.
+skeleton regions (RFC-060), and Escape **closes** an open menu or modal
+that has a close message (Law 7, from 0.55; `dismiss_on_escape` for one
+that has none). Neither moves between items inside one.
 
 **Whether you can implement it today depends on which of the two menu
 paths you use:**

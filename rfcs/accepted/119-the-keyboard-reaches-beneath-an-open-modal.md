@@ -2,6 +2,8 @@
 
 **Status.** Accepted 2026-11-07. Every open question ruled as suggested, with the
 revision below (see Rulings).
+**Merged to `main` 2026-11-07** (`b73fb77`), shipping in 0.55.0. Unit 0 and Unit 1 reviewed
+(`.git-exclude/reviewed/119-unit0/`, `119-unit1/`).
 **Handoff.** [`handoffs/119-…`](../handoffs/119-the-keyboard-reaches-beneath-an-open-modal/implementation-handoff.md).
 **Revised** 2026-11-07, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy. It found a keyboard trap that R-1 alone would

@@ -105,7 +105,7 @@ contributor-facing documents linked below, not duplicated here.
   consumer supplies the words.
 
   This is asserted by test, not just stated — the same shape
-  [Law 8](../reference/overlay-interaction-semantics.md#law-8--modal-focus-trapping-is-staged-not-shipped)
+  [Law 8](../reference/overlay-interaction-semantics.md#law-8--the-keyboard-reaches-only-what-the-pointer-can-press)
   uses for its own boundary. Three surfaces are covered, each exhaustive
   over its variant enum so a new variant fails to compile without an
   entry:
@@ -161,13 +161,21 @@ contributor-facing documents linked below, not duplicated here.
   controls.
 - **Keyboard (WCAG 2.1.1): met by snora's own controls from 0.55, once
   your application routes Tab with `snora::keyboard::traverse`** (above).
-  Without that one line, Tab does nothing, as before. Two gaps remain, and
-  are planned:
-  - **with a dialog or sheet open, Tab also reaches the controls beneath
-    it**, which the pointer cannot reach (RFC-119);
-  - **when the focused control removes itself** (a dismissed notice, a
-    closed toast, a removed chip), focus goes nowhere, and the next Tab
-    starts from the top of the window (RFC-116's long-term plan).
+  Without that one line, Tab does nothing, as before.
+- **Overlays: the keyboard does what the pointer can (0.55, RFC-119).** With a
+  dialog, a sheet, or a menu with its backdrop open, Tab and Enter reach only
+  what the pointer can press: the overlay and the toasts, never the page
+  beneath. An overlay that closes on a click outside also closes on **Escape**,
+  with nothing to wire. **When a modal closes, focus returns to the control
+  that had it**, unless the page now has a different number of controls, or
+  your application has focused something itself; then focus is wherever you
+  put it, or nowhere, and the next Tab starts from the top. Opening a modal
+  never resets the page: scroll offsets and a text input's cursor survive.
+  The rules are [Laws 7 and 8](../reference/overlay-interaction-semantics.md#law-7--an-overlay-that-closes-on-a-click-outside-also-closes-on-escape).
+- **One keyboard gap remains, planned:** when the focused control removes
+  itself (a dismissed notice, a closed toast, a removed chip), focus goes
+  nowhere, and the next Tab starts from the top of the window (RFC-116's
+  long-term plan, L-1).
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim
@@ -188,14 +196,11 @@ contributor-facing documents linked below, not duplicated here.
   snora-rendered surfaces (RFC-047, where implemented) are labels for
   external observation, not accessibility roles or names — an `Id` is
   not a role.
-- **No modal focus trapping, yet: with a dialog or sheet open, Tab also
-  reaches the controls beneath it.** The dim blocks the pointer (Law 8), but
-  iced delivers key presses to every layer, so a control under the dim can be
-  focused and pressed. This matters from 0.55, which made snora's controls
-  focus targets. **RFC-119, accepted for 0.55.0, fixes it**: the keyboard reaches exactly
-  what the pointer can press. Until it ships, close menus and modals before
-  acting on the page, and do not rely on a modal to gate keyboard input. Zone
-  navigation (above) is already suspended while a modal is open.
+- **No strict modal focus trap.** Tab inside an open modal moves through the
+  modal and the toasts only (Law 8), but past the last control there is one
+  press where nothing is focused before Tab starts again from the modal's
+  first control. That is iced's `focus_next`. Where focus *starts* when a
+  modal opens is your application's to set.
 
 ## What "ABDD" means, precisely
 

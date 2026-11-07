@@ -11,7 +11,7 @@ don't.
 |---|---|
 | `AppLayout` assembly | `view()` — assembles header, sidebar, body, footer |
 | Header menu with close sink | `menu_open` state + `on_close_menus` |
-| Dialog with Escape close | `show_dialog` state + `on_close_modals` + `keyboard::dismiss_on_escape` |
+| Dialog with Escape close | `show_dialog` state + `on_close_modals`: from 0.55 Escape closes it with nothing to wire (Law 7); the example's `keyboard::dismiss_on_escape` call predates that and is harmless |
 | Transient toast | `toasts: Vec<Toast<Message>>` + sweep subscription |
 | LTR/RTL toggle | `direction: LayoutDirection` + `ToggleDirection` message |
 | Tab bar | `TabBar` + `TabAction` message |
