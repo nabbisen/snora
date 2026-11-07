@@ -252,3 +252,25 @@ holds `control`. Both `snora` (the engine, for the toast's close button) and
 - making `snora-widgets` mandatory for the engine, which would drop small engine-only
   builds;
 - placing `control` in `snora-core`, which would break its iced-free design.
+
+## Rulings, 2026-11-07: the branch push, and the new crate's first publish
+
+**The branch push (owner).** The rebased `rfc116-unit0` is force-pushed with a lease
+(`--force-with-lease=rfc116-unit0:d6d6a00`). The dev team's local backup branch is kept
+until 0.55.0 ships. The auto-mode permission system denied the push to the dev team and
+to the architect alike, so the owner runs it.
+
+**The first publish of `snora-control` (owner, confirmed).** Trusted Publishing is
+configured per crate, and cannot be configured for a crate that does not yet exist on
+crates.io. So **the first version is published from the local machine:**
+1. At the 0.55.0 cut, from a clean worktree at the release commit, before the tag is
+   pushed: `cargo publish -p snora-control`.
+2. The owner adds the crate's trusted publisher on crates.io (`release.yaml`, this
+   repository).
+3. The tag is pushed, and `release.yaml` publishes the other five. It **skips any crate
+   whose version is already on crates.io** (the Units 2–3 handoff, Unit 2b), so the
+   pre-published crate does not fail the run.
+
+The skip is general, not a one-off exclusion: it also makes a re-run after a partly
+failed publish safe. The procedure is recorded in `release-process.md` for any future
+new crate.
