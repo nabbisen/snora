@@ -24,7 +24,8 @@ use iced::{
 use snora_core::{LayoutDirection, TabAction, TabBar};
 
 use crate::direction::row_dir;
-use crate::icon::icon_element;
+use crate::icon::icon_beside_label;
+use crate::style::{ControlGeometry, control, page_background};
 
 /// Height of the active tab's underline (RFC-102 R-1).
 const INDICATOR_HEIGHT: f32 = 2.0;
@@ -54,6 +55,8 @@ pub(crate) struct TabGeometry {
     /// `default_text_size` (RFC-104). The unstyled path inherits; the
     /// styled path maps it to `Typography::label`.
     pub(crate) label_size: Option<f32>,
+    /// The minimum-target token and the focus ring (RFC-116).
+    pub(crate) control: ControlGeometry,
 }
 
 // `bar_border_radius` was retired by RFC-102. The bar had
@@ -72,6 +75,7 @@ impl TabGeometry {
             tab_pad_x: 12.0,
             tab_pad_y: 8.0,
             label_size: None,
+            control: ControlGeometry::unstyled(),
         }
     }
 }
@@ -85,10 +89,11 @@ impl TabGeometry {
 ///   visual order of the tabs.
 ///
 /// The active tab is rendered with a colored underline drawn from the
-/// theme's primary palette. Each tab is a regular `button`, so its
-/// click semantics come from iced — and so does the absence of keyboard
-/// ones: iced 0.14's buttons take no keyboard input, so a tab cannot be
-/// focused and no key presses one. RFC-116 tracks keyboard access.
+/// theme's primary palette. Each tab is a focusable control (RFC-116):
+/// Tab and Shift+Tab move between tabs once the application routes the
+/// key with `snora::keyboard::traverse`, Enter and Space press the focused
+/// one and publish `TabAction::Pressed`, and a ring shows which has focus.
+/// Tab past the last tab leaves the bar rather than wrapping to the first.
 pub fn app_tab_bar<'a, Message, TabId, F>(
     bar: TabBar<TabId>,
     on_action: &'a F,
@@ -131,15 +136,7 @@ where
 
     for tab in tabs {
         let is_active = tab.id == active;
-        tab_row = tab_row.push(render_tab(
-            tab,
-            is_active,
-            on_action,
-            geometry.content_gap,
-            geometry.tab_pad_x,
-            geometry.tab_pad_y,
-            geometry.label_size,
-        ));
+        tab_row = tab_row.push(render_tab(tab, is_active, on_action, &geometry));
     }
 
     // Leave the trailing edge fillable so the row hugs the start edge
@@ -170,19 +167,17 @@ fn render_tab<'a, Message, TabId, F>(
     tab: snora_core::Tab<TabId>,
     is_active: bool,
     on_action: &'a F,
-    content_gap: f32,
-    tab_pad_x: f32,
-    tab_pad_y: f32,
-    label_size: Option<f32>,
+    geometry: &TabGeometry,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
     TabId: Clone + Debug + PartialEq + 'a,
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
-    let mut content = row![].spacing(content_gap).align_y(Center);
+    let label_size = geometry.label_size;
+    let mut content = row![].spacing(geometry.content_gap).align_y(Center);
     if let Some(icon) = &tab.icon {
-        content = content.push(icon_element::<Message>(icon));
+        content = content.push(icon_beside_label::<Message>(icon, label_size));
     }
     // No literal size: the label inherits the host's `default_text_size`
     // unless the caller's geometry maps it to a token role (RFC-104).
@@ -193,14 +188,17 @@ where
     content = content.push(label);
 
     let id_for_msg = tab.id.clone();
-    let pressable = button(content)
-        .on_press_with(move || on_action(TabAction::Pressed(id_for_msg.clone())))
-        .padding(Padding::from([tab_pad_y, tab_pad_x]))
-        .style(move |theme: &Theme, status| tab_button_style(theme, status, is_active));
-
-    if !is_active {
-        return pressable.into();
-    }
+    // RFC-116: `control` in place of `button`, so a tab is a focus target
+    // and Enter and Space press it.
+    let pressable = control(
+        content,
+        move |theme: &Theme, status| tab_button_style(theme, status, is_active),
+        geometry.control,
+        label_size,
+        page_background,
+    )
+    .on_press_with(move || on_action(TabAction::Pressed(id_for_msg.clone())))
+    .padding(Padding::from([geometry.tab_pad_y, geometry.tab_pad_x]));
 
     // The underline is its own element (RFC-102 R-1), laid over the
     // bottom of the tab's own box in a `stack`.
@@ -215,12 +213,26 @@ where
     // there means exactly the button's width. It also means the tab's
     // height does not depend on whether it is active, so labels cannot
     // shift when the active tab changes.
-    let indicator = container(space())
-        .width(Length::Fill)
-        .height(INDICATOR_HEIGHT)
-        .style(tab_indicator_style);
+    //
+    // **Every tab has the stack, active or not (RFC-116 Unit 3).** Only the
+    // active tab used to, so the tab that was pressed changed shape: the
+    // runtime keeps a widget's state by its place in the tree, found the
+    // place holding a different widget, and dropped the state — and with it
+    // the focus. Found in a real window: Tab, then Space, and the ring
+    // vanished from the tab that had just been chosen. An inactive tab's
+    // second layer is an empty `space`, which draws nothing and has no
+    // underline-shaped box for anything to mistake for one.
+    let underline: Element<'a, Message> = if is_active {
+        let indicator = container(space())
+            .width(Length::Fill)
+            .height(INDICATOR_HEIGHT)
+            .style(tab_indicator_style);
+        container(indicator).align_bottom(Length::Fill).into()
+    } else {
+        space().into()
+    };
 
-    stack![pressable, container(indicator).align_bottom(Length::Fill)].into()
+    stack![pressable, underline].into()
 }
 
 /// Container style for the whole tab bar.

@@ -250,6 +250,16 @@ mod tests {
 /// }
 /// ```
 ///
+/// # Tab at the end of a group leaves it
+///
+/// **Tab on the last focus target does not wrap to the first.** Focus
+/// leaves: nothing is focused until the next Tab, which starts again from
+/// the first target in the window. That is iced's `focus_next`, and it is
+/// right for a window with other controls after the group (a rail, then
+/// the page): a wrap would trap a keyboard user inside whichever group
+/// they were in. Shift+Tab at the first target behaves the same way, in
+/// reverse. Observed in a real window on the `tab` example.
+///
 /// # What this does not do
 ///
 /// It does not know about snora's zones ([`crate::focus::Cycle`], F6):

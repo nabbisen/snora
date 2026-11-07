@@ -28,9 +28,13 @@ cd "$(git rev-parse --show-toplevel)"
 # Allow-listed constant -> the one-line reason it is not a text size.
 # Named constants only: a bare number is never allow-listed, because the
 # point of the allow-list is that someone had to write down why.
-declare -A ALLOWED=(
-  [CLOSE_GLYPH_SIZE]="the toast close control's glyph metric (RFC-101), sized to the control's 24x24 target rather than to running text"
-)
+#
+# **Empty since RFC-116 Unit 3.** Its one entry, `CLOSE_GLYPH_SIZE`, was the
+# toast close control's literal 18 px; that mark is now 1.125 em of the host's
+# text size, read when the layout runs, so there is no number left to excuse.
+# The mechanism stays: the next glyph metric that is genuinely not a text
+# size is added here with its reason.
+declare -A ALLOWED=()
 
 # Non-test source only. The exclusions are by filename because the test
 # modules in these crates are whole files:

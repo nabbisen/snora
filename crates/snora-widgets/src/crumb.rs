@@ -23,6 +23,8 @@ use iced::{
 
 use snora_core::{BreadcrumbAction, Crumb, LayoutDirection};
 
+use crate::style::{ControlGeometry, control, page_background};
+
 /// Geometry parameters [`build_breadcrumb`] takes, letting
 /// [`app_breadcrumb`] (unstyled) and the `design`-gated styled variant
 /// (RFC-040) share one implementation.
@@ -44,6 +46,8 @@ pub(crate) struct CrumbGeometry {
     /// `default_text_size` (RFC-104). The unstyled path inherits; the
     /// styled path maps it to `Typography::label`.
     pub(crate) label_size: Option<f32>,
+    /// The minimum-target token and the focus ring (RFC-116).
+    pub(crate) control: ControlGeometry,
 }
 
 impl CrumbGeometry {
@@ -57,6 +61,7 @@ impl CrumbGeometry {
             btn_pad_y: 2.0,
             btn_radius: 3.0,
             label_size: None,
+            control: ControlGeometry::unstyled(),
         }
     }
 }
@@ -118,6 +123,7 @@ where
             geometry.btn_pad_y,
             geometry.btn_radius,
             geometry.label_size,
+            geometry.control,
         ));
         if i < last {
             // The separator follows the crumbs' own size (RFC-104).
@@ -200,6 +206,7 @@ fn render_crumb<'a, Message, CrumbId, F>(
     btn_pad_y: f32,
     btn_radius: f32,
     label_size: Option<f32>,
+    control_geometry: ControlGeometry,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -230,11 +237,18 @@ where
                 .style(crumb_rule_style),
         ]
         .width(Length::Shrink);
-        button(underlined)
-            .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
-            .padding(Padding::from([btn_pad_y, btn_pad_x]))
-            .style(move |theme, status| crumb_button_style(theme, status, btn_radius))
-            .into()
+        // RFC-116: `control` in place of `button`, so an ancestor crumb is a
+        // focus target and Enter and Space press it.
+        control(
+            underlined,
+            move |theme: &Theme, status| crumb_button_style(theme, status, btn_radius),
+            control_geometry,
+            label_size,
+            page_background,
+        )
+        .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
+        .padding(Padding::from([btn_pad_y, btn_pad_x]))
+        .into()
     }
 }
 

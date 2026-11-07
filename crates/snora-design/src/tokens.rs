@@ -1,6 +1,6 @@
 //! The top-level [`Tokens`] bundle and its preset constructors.
 
-use crate::{Density, FocusTokens, Palette, Radius, Spacing, Typography};
+use crate::{Density, FocusTokens, Palette, Radius, Spacing, TargetTokens, Typography};
 
 /// A complete, resolved set of design tokens.
 ///
@@ -31,6 +31,9 @@ pub struct Tokens {
     pub radius: Radius,
     /// Focus-ring tokens.
     pub focus: FocusTokens,
+    /// Pointer-target tokens: the minimum size of a control's target
+    /// (RFC-115, RFC-116).
+    pub targets: TargetTokens,
     /// UI density. All v0.20 presets are [`Density::Comfortable`].
     pub density: Density,
 }

@@ -7,7 +7,7 @@ pub(crate) mod high_contrast_light;
 pub(crate) mod light;
 pub(crate) mod light_aaa;
 
-use crate::{Density, FocusTokens, Palette, Radius, Spacing, Tokens, Typography};
+use crate::{Density, FocusTokens, Palette, Radius, Spacing, TargetTokens, Tokens, Typography};
 
 /// Shared assembly: combine a palette and a focus-ring width with the default
 /// spacing/typography/radius scales and comfortable density.
@@ -19,6 +19,9 @@ pub(crate) fn assemble(palette: Palette, ring_width: f32) -> Tokens {
         typography: Typography::default_roles(),
         radius: Radius::default_roles(),
         focus,
+        // WCAG 2.5.8's own figure, in every preset: choosing a preset
+        // must not move a size.
+        targets: TargetTokens::new(24.0),
         density: Density::Comfortable,
     }
 }

@@ -17,7 +17,11 @@
 //!   else next redraws the window;
 //! - **a control with no handler is disabled, and is not a focus
 //!   target**: reaching a control that does nothing is the confusion
-//!   the owner's rule forbids.
+//!   the owner's rule forbids;
+//! - **it is at least `max(24, 1.5 x its text, the minimum-target
+//!   token)`** in both directions, with its content centred in whatever
+//!   the floor adds (RFC-115's amendment): see [`Control::min_target`] and
+//!   [`Control::text_size`].
 //!
 //! Everything else — padding, size, the style closure, `clip`,
 //! `on_press_with` and `on_press_maybe` — is as on `button`.
@@ -28,8 +32,8 @@ use iced::mouse;
 use iced::touch;
 use iced::window;
 use iced::{
-    Background, Color, Element, Event, Length, Padding, Pixels, Rectangle, Shadow, Size, Theme,
-    Vector,
+    Background, Color, Element, Event, Length, Padding, Pixels, Point, Rectangle, Shadow, Size,
+    Theme, Vector,
 };
 use iced_core::layout::{self, Layout};
 // `Renderer` is the trait that owns `fill_quad`; `text::Renderer` the
@@ -62,9 +66,11 @@ pub(crate) const MIN_TARGET: f32 = 24.0;
 /// what every target already measured, so the rule changes nothing for
 /// an application that changes nothing.
 ///
-/// The floor is `max(24, 1.5 x text)` here. RFC-115's amendment adds a
-/// third input, a minimum-target *token*, which the design-path wrappers
-/// will pass in; that is the next unit's, not this one's.
+/// A control's target is **the largest of three things**: 24 px, this
+/// factor times the text it carries, and the minimum-target token the
+/// design-path wrappers pass in through [`Control::min_target`]
+/// (`Tokens::targets.min`). The unstyled path has no token, and passes
+/// none.
 pub(crate) const TARGET_PER_TEXT: f32 = 1.5;
 
 /// How the control's fill is styled.
@@ -149,9 +155,15 @@ pub struct Control<'a, Message> {
     padding: Padding,
     style: StyleFn<'a>,
     ring: Ring<'a>,
-    /// Whether RFC-115's minimum applies. On for the prototype's
-    /// sidebar item; the figures are in the review request.
-    enforce_minimum: bool,
+    /// The minimum-target token (`Tokens::targets.min`), when the control
+    /// is on the design path. `0` is "none": the unstyled path has no
+    /// token, and 24 px and 1.5 x text apply regardless.
+    min_target: f32,
+    /// The size of the text the control carries, when it knows it (a
+    /// design-path control is told its label size). `None` reads the
+    /// renderer's default text size, which is what an unstyled `text`
+    /// with no size of its own draws at.
+    text_size: Option<Pixels>,
 }
 
 impl<Message> Control<'_, Message> {
@@ -197,7 +209,8 @@ impl<'a, Message> Control<'a, Message> {
             padding: Padding::ZERO,
             style,
             ring,
-            enforce_minimum: true,
+            min_target: 0.0,
+            text_size: None,
         }
     }
 
@@ -272,6 +285,33 @@ impl<'a, Message> Control<'a, Message> {
         self.height = height.into();
         self
     }
+
+    /// The minimum-target token (`Tokens::targets.min`): the control's
+    /// target, in both dimensions, is never smaller than this.
+    ///
+    /// It **adds to** the other two inputs rather than replacing them:
+    /// the target is `max(24, 1.5 x text, this)`. A value under 24
+    /// therefore changes nothing, which is deliberate: WCAG 2.5.8's own
+    /// 24 px is not something a token can take a target under.
+    #[must_use]
+    pub fn min_target(mut self, min: f32) -> Self {
+        self.min_target = min;
+        self
+    }
+
+    /// The size of the text this control carries, which RFC-115's
+    /// `1.5 x text` is measured against.
+    ///
+    /// Left unset, the control reads the renderer's default text size.
+    /// That is right for content with no size of its own, and wrong for
+    /// a label drawn at a token's size: a design-path wrapper that sets
+    /// the label's size says so here, so the target follows the text
+    /// that is actually on it.
+    #[must_use]
+    pub fn text_size(mut self, size: impl Into<Pixels>) -> Self {
+        self.text_size = Some(size.into());
+        self
+    }
 }
 
 impl<Message> Widget<Message, Theme, iced::Renderer> for Control<'_, Message>
@@ -301,33 +341,61 @@ where
         }
     }
 
-    /// `button`'s padded layout, with RFC-115's floor applied through
-    /// the limits.
+    /// `button`'s padded layout, grown to RFC-115's floor, with the content
+    /// **centred in the growth**.
     ///
-    /// The text size comes from the renderer
-    /// (`text::Renderer::default_size`), which is the host's
-    /// `default_text_size` — the one setting RFC-104 made the chrome
-    /// follow. So the floor follows the text with no new API, which is
-    /// the feasibility question Unit 0 was asked to answer.
+    /// The target is `max(24, 1.5 x text, the token)`. The text size is
+    /// the control's own (`text_size`) when it was told one, and
+    /// otherwise the renderer's (`text::Renderer::default_size`), which
+    /// is the host's `default_text_size` — the one setting RFC-104 made
+    /// the chrome follow.
+    ///
+    /// **The content is laid out at its natural size, and the box grown
+    /// around it.** Handing the floor to the content as a minimum (the
+    /// obvious way to apply it) stretches the content's own bounds, and
+    /// a mark or a label then sits in the corner of its stretched
+    /// bounds: a bigger target around a mark that has drifted to one
+    /// edge is a defect of its own. Only the growth the *floor* caused
+    /// is split, so a control the application made wider with `width`,
+    /// whose content is meant to start at the edge (a menu item), keeps
+    /// it there.
     fn layout(
         &mut self,
         tree: &mut Tree,
         renderer: &iced::Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
-        let limits = if self.enforce_minimum {
-            let text: Pixels = renderer.default_size();
-            let floor = MIN_TARGET.max(TARGET_PER_TEXT * text.0);
-            limits.min_width(floor).min_height(floor)
-        } else {
-            *limits
-        };
-
-        layout::padded(&limits, self.width, self.height, self.padding, |limits| {
+        let node = layout::padded(limits, self.width, self.height, self.padding, |limits| {
             self.content
                 .as_widget_mut()
                 .layout(&mut tree.children[0], renderer, limits)
-        })
+        });
+
+        let text: Pixels = self.text_size.unwrap_or_else(|| renderer.default_size());
+        let floor = MIN_TARGET
+            .max(TARGET_PER_TEXT * text.0)
+            .max(self.min_target);
+        // Built from the bounds: `scripts/check-literal-sizes.sh` reads a
+        // zero-argument accessor of the other name as a text size.
+        let bounds = node.bounds();
+        let natural = Size::new(bounds.width, bounds.height);
+        let size =
+            limits
+                .min_width(floor)
+                .min_height(floor)
+                .resolve(self.width, self.height, natural);
+
+        let grown = Vector::new(
+            (size.width - natural.width).max(0.0) / 2.0,
+            (size.height - natural.height).max(0.0) / 2.0,
+        );
+        if grown == Vector::ZERO {
+            return node;
+        }
+
+        let child = node.children()[0].clone();
+        let at = Point::new(child.bounds().x + grown.x, child.bounds().y + grown.y);
+        layout::Node::with_children(size, vec![child.move_to(at)])
     }
 
     /// Registers as a focus target — **if it can be pressed.**
@@ -345,6 +413,11 @@ where
         operation: &mut dyn Operation,
     ) {
         let bounds = layout.bounds();
+        // As `button` does: the control's whole box is reported as a
+        // container, which is how a selector or a test finds the region
+        // that answers a click. Without it the only container a control's
+        // region has is whatever its content happens to be.
+        operation.container(None, bounds);
         let state = tree.state.downcast_mut::<State>();
         if self.on_press.is_some() {
             operation.focusable(Some(&self.id), bounds, state);
@@ -546,26 +619,35 @@ where
 
         // The ring last, so it is never painted over by the content. A
         // disabled control draws none even if its state says focused.
+        //
+        // **In a layer of its own, so a neighbour cannot paint over it.**
+        // The ring is drawn outside the control, and a control whose
+        // neighbour sits closer than `offset + width` (a chip's label and
+        // its remove button, with nothing between) has the neighbour drawn
+        // *after* it in tree order, filling the very pixels the ring is on:
+        // measured, the ring lost its whole right side. Layers are
+        // composited in the order they are made, whatever order the
+        // widgets draw in, so the ring lands above every sibling's fill.
         if self.on_press.is_some() && state.is_focused && self.ring.width > 0.0 {
             let o = self.ring.offset;
-            renderer.fill_quad(
-                Quad {
-                    bounds: Rectangle {
-                        x: bounds.x - o,
-                        y: bounds.y - o,
-                        width: bounds.width + 2.0 * o,
-                        height: bounds.height + 2.0 * o,
-                    },
-                    border: Border {
-                        color: (self.ring.color)(theme),
-                        width: self.ring.width,
-                        radius: style.border.radius,
-                    },
-                    shadow: Shadow::default(),
-                    snap: true,
+            let ring = Quad {
+                bounds: Rectangle {
+                    x: bounds.x - o,
+                    y: bounds.y - o,
+                    width: bounds.width + 2.0 * o,
+                    height: bounds.height + 2.0 * o,
                 },
-                Background::Color(Color::TRANSPARENT),
-            );
+                border: Border {
+                    color: (self.ring.color)(theme),
+                    width: self.ring.width,
+                    radius: style.border.radius,
+                },
+                shadow: Shadow::default(),
+                snap: true,
+            };
+            renderer.with_layer(*viewport, |renderer| {
+                renderer.fill_quad(ring, Background::Color(Color::TRANSPARENT));
+            });
         }
     }
 
@@ -615,3 +697,5 @@ where
 mod behaviour_tests;
 #[cfg(test)]
 mod sizing_tests;
+#[cfg(test)]
+mod target_tests;

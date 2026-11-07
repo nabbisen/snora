@@ -216,16 +216,21 @@ pub use snora_widgets::lucide;
 ///   [`design::contrast::contrast_ratio`],
 ///   [`design::contrast::composite_over`].
 ///
-/// # iced 0.14 has no keyboard focus to style
+/// # Keyboard focus: snora's controls have it, iced's `button` does not
 ///
-/// Standard `button` / `container` styles in iced 0.14 expose no
-/// keyboard-focus state, and the reason is more basic than styling:
 /// iced 0.14's `button` takes no keyboard input and registers no focus
-/// target, so there is no focus for a style to reflect. The style
-/// bridge maps every status iced does expose (hover, pressed,
-/// disabled). Focus rings on standard controls are therefore not
-/// deliverable through this path at all; RFC-116 tracks keyboard
-/// access. See RFC-025 and
+/// target, so a style closure on a standard `button` has no focus to
+/// reflect, and the style bridge maps only the statuses iced exposes
+/// (hover, pressed, disabled).
+///
+/// **snora's own controls are not iced buttons.** Every control the prefab
+/// widgets and the engine draw (tabs, breadcrumb crumbs, menu triggers
+/// and items, the notice and chip buttons, [`design::button`], the toast's
+/// close mark) is a `control` (RFC-116): a focus target that Enter and
+/// Space press, publishing the message a click publishes, with a focus ring
+/// drawn from [`design::Tokens::focus`]. The ring is the control's own, and
+/// is not a button status. iced binds no Tab: route it with
+/// [`keyboard::traverse`]. See RFC-025 and
 /// `docs/src/contributing/semantic-accessibility.md` for detail.
 #[cfg(feature = "design")]
 pub mod design;

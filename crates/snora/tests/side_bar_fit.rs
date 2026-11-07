@@ -180,8 +180,19 @@ mod styled {
 const TOLERANCE: f32 = 0.5;
 
 /// The icon's own size, laid out with nothing around it.
-fn natural_icon_size() -> iced::Size {
-    let mut ui = simulator(snora::widget::icon_element::<Msg>(&Icon::Text("A".into())));
+///
+/// `label_size` is the size the rail's icons are drawn at: `None` on the
+/// unstyled path, where an icon is 1 em of the host's text (`icon_element`),
+/// and the label token on the design path, where it is that size and always
+/// was (`icon_element_sized`). RFC-116 Unit 3 split the two; before it both
+/// were a literal 14 and one reference served both.
+fn natural_icon_size(label_size: Option<f32>) -> iced::Size {
+    let icon = Icon::Text("A".into());
+    let element = match label_size {
+        Some(size) => snora::widget::icon_element_sized::<Msg>(&icon, size),
+        None => snora::widget::icon_element::<Msg>(&icon),
+    };
+    let mut ui = simulator(element);
     let bounds = ui
         .find("A")
         .expect("standalone icon renders its text")
@@ -205,8 +216,8 @@ fn natural_icon_size() -> iced::Size {
 /// So this first asserts the icon's box is its **natural** size (the box is
 /// the glyph, not the space around it), and only then that the box is
 /// centred. Remove the centring container and the size assertion fails.
-fn assert_icon_centred(label: &str, element: Element<'static, Msg>) {
-    let natural = natural_icon_size();
+fn assert_icon_centred(label: &str, element: Element<'static, Msg>, label_size: Option<f32>) {
+    let natural = natural_icon_size(label_size);
 
     let mut ui = simulator(element);
     let icon = ui
@@ -257,6 +268,7 @@ fn unstyled_side_bar_icon_is_centred_in_its_button() {
     assert_icon_centred(
         "unstyled",
         snora::widget::app_side_bar_with(side_bar(), LayoutDirection::Ltr, SideBarLabels::Tooltip),
+        None,
     );
 }
 
@@ -277,6 +289,7 @@ mod styled_centring {
                     LayoutDirection::Ltr,
                     SideBarLabels::Tooltip,
                 ),
+                Some(snora::design::style::text::label_size(&tokens).0),
             );
         }
     }

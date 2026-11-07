@@ -1,8 +1,8 @@
 //! Pilot button helper for Snora Design (RFC-028).
 //!
-//! Provides ergonomic, token-driven wrappers around `iced::widget::button`
-//! for the four semantic variants: `primary`, `secondary`, `ghost`, and
-//! `danger`.
+//! Provides ergonomic, token-driven buttons for the four semantic
+//! variants: `primary`, `secondary`, `ghost`, and `danger`. Each is a
+//! `control` (RFC-116), styled from the tokens.
 //!
 //! # Token cloning
 //!
@@ -12,17 +12,22 @@
 //! is `Clone` and small; the clone cost is acceptable in a retained-mode
 //! `view()` function.
 //!
-//! # iced 0.14 focus limitation
+//! # Keyboard
 //!
-//! `iced::widget::button::Status` has `Active | Hovered | Pressed | Disabled`
-//! — no `Focused` variant. These helpers do not render a custom focus ring.
-//! That is a known, documented limitation for iced 0.14 (see RFC-025 and
-//! `docs/src/contributing/semantic-accessibility.md`), not a regression.
+//! iced 0.14's `button` takes no keyboard input and registers no focus
+//! target (its `Status` has no `Focused` variant), which is why these are
+//! not iced buttons. Each is a focus target: Tab reaches it once the
+//! application routes the key with `snora::keyboard::traverse`, Enter and
+//! Space press it and publish the message a click publishes, and a ring
+//! drawn from `Tokens::focus` shows which has focus. A disabled button
+//! (`*_maybe(.., None)`) is not a focus target, so Tab skips it. The
+//! button is at least `max(24, 1.5 x its label, Tokens::targets.min)`
+//! pixels in each direction (RFC-115).
 //!
 //! # Disabled state
 //!
-//! Pass `on_press: None` to disable the button. Iced automatically applies the
-//! `Disabled` status when no press handler is set.
+//! Pass `on_press: None` to disable the button: it draws with the `Disabled`
+//! status, ignores the pointer and the keyboard, and is skipped by Tab.
 //!
 //! # Usage
 //!
@@ -43,10 +48,12 @@
 //! ```
 
 use iced::{
-    Element,
+    Element, Theme,
     widget::{button, text},
 };
 use snora_design::Tokens;
+
+use crate::style::{BUTTON_DEFAULT_PADDING, design_control};
 
 use snora_style as style;
 
@@ -59,10 +66,18 @@ fn make_button<'a, Message: Clone + 'a>(
     style_fn: fn(&Tokens, button::Status) -> button::Style,
 ) -> Element<'a, Message> {
     let t = tokens.clone();
-    button(text(label.into()).size(style::text::label_size(tokens)))
-        .on_press_maybe(on_press)
-        .style(move |_theme, status| style_fn(&t, status))
-        .into()
+    // RFC-116: `control` in place of `button`, so every variant is a focus
+    // target, Enter and Space press it, and a disabled one (`None`) is
+    // skipped by Tab. Padding is `button`'s own default.
+    design_control(
+        tokens,
+        text(label.into()).size(style::text::label_size(tokens)),
+        move |_theme: &Theme, status| style_fn(&t, status),
+        tokens.palette.background,
+    )
+    .padding(BUTTON_DEFAULT_PADDING)
+    .on_press_maybe(on_press)
+    .into()
 }
 
 // ---- public API -------------------------------------------------------------

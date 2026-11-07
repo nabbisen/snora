@@ -10,13 +10,15 @@ use std::fmt::Debug;
 use iced::{
     Alignment::Center,
     Element,
-    widget::{button, column, container, row, text},
+    widget::{column, container, row, text},
 };
 
 use snora_core::{Menu, MenuAction};
 
-use crate::icon::icon_element;
-use crate::style::menu_button_style;
+use crate::icon::icon_beside_label;
+use crate::style::{
+    BUTTON_DEFAULT_PADDING, ControlGeometry, control, menu_button_style, page_background,
+};
 
 /// Geometry parameter [`build_menu`] takes, letting [`render_menu`]
 /// (unstyled) and the `design`-gated styled variant (RFC-040) share one
@@ -28,6 +30,8 @@ pub(crate) struct MenuGeometry {
     /// `default_text_size` (RFC-104). The unstyled path inherits; the
     /// styled path maps it to `Typography::label`.
     pub(crate) label_size: Option<f32>,
+    /// The minimum-target token and the focus ring (RFC-116).
+    pub(crate) control: ControlGeometry,
 }
 
 impl MenuGeometry {
@@ -36,6 +40,7 @@ impl MenuGeometry {
         Self {
             gap: 6.0,
             label_size: None,
+            control: ControlGeometry::unstyled(),
         }
     }
 }
@@ -75,7 +80,7 @@ where
     // Trigger button (always visible).
     let mut header_content = row![].spacing(geometry.gap).align_y(Center);
     if let Some(ref ic) = menu.icon {
-        header_content = header_content.push(icon_element(ic));
+        header_content = header_content.push(icon_beside_label(ic, geometry.label_size));
     }
     // No literal size (RFC-104): inherited unless the geometry maps it.
     let mut trigger_label = text(menu.label);
@@ -87,10 +92,19 @@ where
     let trigger_msg = on_action(MenuAction::MenuPressed(menu.id.clone()));
 
     let mut stack = column![];
+    // RFC-116: `control` in place of `button`, so the trigger is a focus
+    // target and Enter and Space open the menu. Padding is `button`'s own
+    // default, set explicitly because `control` has none.
     stack = stack.push(
-        button(header_content)
-            .style(menu_button_style)
-            .on_press(trigger_msg),
+        control(
+            header_content,
+            menu_button_style,
+            geometry.control,
+            geometry.label_size,
+            page_background,
+        )
+        .padding(BUTTON_DEFAULT_PADDING)
+        .on_press(trigger_msg),
     );
 
     if !is_active {
@@ -101,7 +115,7 @@ where
     for item in menu.items {
         let mut btn_content = row![].spacing(geometry.gap).align_y(Center);
         if let Some(ref ic) = item.icon {
-            btn_content = btn_content.push(icon_element(ic));
+            btn_content = btn_content.push(icon_beside_label(ic, geometry.label_size));
         }
         let mut item_label = text(item.label);
         if let Some(size) = geometry.label_size {
@@ -114,7 +128,17 @@ where
             menu_item_id: item.id.clone(),
         });
 
-        stack = stack.push(button(btn_content).style(menu_button_style).on_press(msg));
+        stack = stack.push(
+            control(
+                btn_content,
+                menu_button_style,
+                geometry.control,
+                geometry.label_size,
+                page_background,
+            )
+            .padding(BUTTON_DEFAULT_PADDING)
+            .on_press(msg),
+        );
     }
 
     container(stack).into()

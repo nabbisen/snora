@@ -7,15 +7,18 @@
 //! tooltip — is the engine's business and the application's choice, not
 //! part of this contract (RFC-114).
 //!
-//! # No form of this rail is reachable by keyboard
+//! # Keyboard
 //!
-//! iced 0.14's `button` takes no keyboard input: its `update` handles
-//! mouse and touch only, and its `operate` registers no focus target.
-//! Only `text_input` and `text_editor` implement `Focusable`. So a rail
-//! item cannot be focused and no key presses it, whichever form the
-//! engine draws. RFC-116 is the plan for that; until it lands, an
-//! application that must be operable by keyboard needs a route to each
-//! view that does not go through the rail.
+//! The engine's rail is reachable by keyboard in every form it draws
+//! (RFC-116): each item is a focus target, Enter and Space press the
+//! focused one and publish the item's `on_press`, and a ring shows which
+//! has focus. iced binds no Tab of its own, so the application routes the
+//! key (`snora::keyboard::traverse`); Tab past the last item leaves the
+//! rail rather than wrapping to the first.
+//!
+//! That is a property of the engine's rail. An application that supplies
+//! its own `side_bar` element in the slot is responsible for its own
+//! keyboard access.
 //!
 //! This is the minimum-viable navigation affordance. If your app needs
 //! collapsible groups or nested navigation, compose your own element and
@@ -46,12 +49,12 @@ where
     /// in a tooltip, which appears only under the pointer, so a touch
     /// user never sees it.
     ///
-    /// **It is not an accessibility route, in either form.** Keyboard
-    /// users cannot reach the rail at all, because iced 0.14's buttons
-    /// take no keyboard input, and no screen reader reads this string:
-    /// iced 0.14 exposes no accessibility tree. What it gives a reader is
-    /// a name they can see. Choose it accordingly — it is the only thing
-    /// that says what the icon means (RFC-114).
+    /// **It is not an accessibility route, in either form.** No screen
+    /// reader reads this string: iced 0.14 exposes no accessibility tree.
+    /// What it gives a reader is a name they can see (and a keyboard user
+    /// reaches the item itself, by Tab, without needing the name to find
+    /// it). Choose it accordingly — it is the only thing that says what
+    /// the icon means (RFC-114).
     pub tooltip: String,
     /// Message emitted when the user activates this item.
     pub on_press: Message,

@@ -24,7 +24,7 @@ use snora_core::{LayoutDirection, Menu, MenuAction};
 
 use crate::direction::row_dir;
 use crate::menu::{MenuGeometry, build_menu};
-use crate::style::chrome_container_style_with_radius;
+use crate::style::{ControlGeometry, chrome_container_style_with_radius};
 
 /// Geometry parameters [`build_header`] takes, letting [`app_header`]
 /// (unstyled) and the `design`-gated styled variant (RFC-040) share one
@@ -50,6 +50,8 @@ pub(crate) struct HeaderGeometry {
     pub(crate) menu_label_size: Option<f32>,
     /// Forwarded to each rendered [`Menu`]'s icon-label gap.
     pub(crate) menu_gap: f32,
+    /// Forwarded to each menu's controls (RFC-116).
+    pub(crate) control: ControlGeometry,
 }
 
 impl HeaderGeometry {
@@ -63,6 +65,7 @@ impl HeaderGeometry {
             title_size: None,
             menu_gap: MenuGeometry::unstyled().gap,
             menu_label_size: MenuGeometry::unstyled().label_size,
+            control: ControlGeometry::unstyled(),
         }
     }
 }
@@ -145,6 +148,7 @@ where
             MenuGeometry {
                 gap: geometry.menu_gap,
                 label_size: geometry.menu_label_size,
+                control: geometry.control,
             },
         ));
     }

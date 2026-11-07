@@ -64,6 +64,8 @@ pub mod spacing;
 /// Composited/derived surfaces that are not a `Palette` role
 /// ([`surfaces::modal_dim`], RFC-065).
 pub mod surfaces;
+/// Pointer-target tokens ([`TargetTokens`]).
+pub mod targets;
 /// The top-level [`Tokens`] bundle and its constructors.
 pub mod tokens;
 /// Text role and [`Typography`] scale (size + line-height).
@@ -76,6 +78,7 @@ pub use focus::FocusTokens;
 pub use palette::Palette;
 pub use radius::Radius;
 pub use spacing::Spacing;
+pub use targets::TargetTokens;
 pub use tokens::Tokens;
 pub use typography::{TextRole, Typography};
 pub use variants::{Density, Tone};

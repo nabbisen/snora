@@ -16,6 +16,16 @@
 //! the gap RFC-116 closes. [`Control`] is `button`'s behaviour plus a focus
 //! registration, Enter and Space, and a focus ring.
 //!
+//! # What else is here: marks sized in ems
+//!
+//! RFC-115 sizes a pictogram at 1 em of the text it sits with and the ×
+//! close mark at 1.125 em. On the unstyled path the text size is the host's,
+//! which view code never sees: only a widget's layout can read it. [`Glyph`]
+//! (a string drawn at so many ems) and [`EmBox`] (a square of so many ems,
+//! for an SVG) resolve it there, and [`Control`] does the same for its
+//! target. They live here because the engine's toast close mark and the
+//! widgets' icons both need them, and neither can use the other's.
+//!
 //! # Why a crate of its own (RFC-116, ruling of 2026-11-07)
 //!
 //! The toast's close button lives in the `snora` engine, whose dependency on
@@ -50,5 +60,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 mod control;
+mod em;
 
 pub use control::{Control, Ring, StyleFn};
+pub use em::{EmBox, Glyph};

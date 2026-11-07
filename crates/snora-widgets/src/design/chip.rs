@@ -7,10 +7,13 @@
 //!   rest.
 //! * `removable` — a chip with a separate remove (×) button.
 //!
-//! Both are backed by `iced::widget::button`, so both take **pointer
-//! and touch input only**: iced 0.14's `button` handles mouse and touch
-//! events and registers no focus target, so no chip can be focused and
-//! no key presses one. RFC-116 tracks keyboard access.
+//! Every control on a chip is **focusable** (RFC-116): they are `control`s,
+//! not iced buttons, and iced 0.14's `button` registers no focus target.
+//! Tab reaches the label and, on a removable chip, the remove button, once
+//! the application routes the key with `snora::keyboard::traverse`; Enter
+//! and Space press the focused one and publish the message a click
+//! publishes; a ring shows which has focus. A control given `None` is
+//! disabled and is skipped.
 //! The application owns selection/filter state.
 //!
 //! # Contrast design (M-4 fix)
@@ -66,12 +69,14 @@
 
 use iced::widget::text::Wrapping;
 use iced::{
-    Border, Color, Element,
+    Border, Color, Element, Theme,
     widget::{button, container, row, text, tooltip},
 };
 use snora_design::Tokens;
 
 use snora_style as style;
+
+use crate::style::design_control;
 
 // ---------------------------------------------------------------------------
 // Private helpers
@@ -294,20 +299,23 @@ pub fn filter<'a, Message: Clone + 'a>(
     } else {
         chip_style_unselected
     };
-    button(text(label.into()).size(style::text::label_size(tokens)))
-        .on_press_maybe(on_toggle.into())
-        .padding([tokens.spacing.xs, tokens.spacing.sm])
-        .style(move |_theme, status| style_fn(&t, status))
-        .into()
+    design_control(
+        tokens,
+        text(label.into()).size(style::text::label_size(tokens)),
+        move |_theme: &Theme, status| style_fn(&t, status),
+        tokens.palette.background,
+    )
+    .on_press_maybe(on_toggle.into())
+    .padding([tokens.spacing.xs, tokens.spacing.sm])
+    .into()
 }
 
 /// A chip with a separate remove button.
 ///
 /// The chip label toggles via `on_toggle`; the remove button emits
-/// `on_remove`. Both controls are `iced::widget::button`, so both take
-/// pointer and touch input only — iced 0.14's buttons take no keyboard
-/// input (RFC-116). The remove button shows lucide `X` under the
-/// `lucide-icons` feature and `"×"` otherwise.
+/// `on_remove`. Both controls are focusable, in that order, and Enter and
+/// Space press the focused one (RFC-116). The remove button shows lucide
+/// `X` under the `lucide-icons` feature and `"×"` otherwise.
 ///
 /// To show a tooltip on the remove button, use [`removable_with_tooltip`].
 #[must_use]
@@ -366,12 +374,15 @@ fn build_removable<'a, Message: Clone + 'a>(
         chip_style_unselected
     };
 
-    let label_btn: Element<'a, Message> =
-        button(text(label.into()).size(style::text::label_size(tokens)))
-            .on_press_maybe(on_toggle.into())
-            .padding([tokens.spacing.xs, tokens.spacing.sm])
-            .style(move |_theme, status| style_fn(&t_label, status))
-            .into();
+    let label_btn: Element<'a, Message> = design_control(
+        tokens,
+        text(label.into()).size(style::text::label_size(tokens)),
+        move |_theme: &Theme, status| style_fn(&t_label, status),
+        tokens.palette.background,
+    )
+    .on_press_maybe(on_toggle.into())
+    .padding([tokens.spacing.xs, tokens.spacing.sm])
+    .into();
 
     // Pointer-target size (RFC-061): the glyph's own advance width is
     // not token-derivable (font/shaping-dependent — measured at 15.0px
@@ -386,12 +397,15 @@ fn build_removable<'a, Message: Clone + 'a>(
     // so the centering has to happen one level in.
     let target_size = remove_btn_target_size(tokens);
     let content_width = target_size - 2.0 * tokens.spacing.xs;
-    let remove_btn: Element<'a, Message> =
-        button(container(close_glyph(tokens, None)).center_x(content_width))
-            .on_press_maybe(on_remove.into())
-            .padding([tokens.spacing.xs, tokens.spacing.xs])
-            .style(move |_theme, status| style_fn(&t_remove, status))
-            .into();
+    let remove_btn: Element<'a, Message> = design_control(
+        tokens,
+        container(close_glyph(tokens, None)).center_x(content_width),
+        move |_theme: &Theme, status| style_fn(&t_remove, status),
+        tokens.palette.background,
+    )
+    .on_press_maybe(on_remove.into())
+    .padding([tokens.spacing.xs, tokens.spacing.xs])
+    .into();
     let remove_btn = with_close_tooltip(tokens, remove_btn, tip);
 
     row![label_btn, remove_btn].spacing(0).into()
