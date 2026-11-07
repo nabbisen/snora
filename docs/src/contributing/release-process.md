@@ -655,6 +655,20 @@ restate the guide's content.
 
 ### Publishing
 
+**A crate's first version (RFC-116, 2026-11-07).** Trusted Publishing is configured per
+crate, on crates.io, and cannot be set up for a crate that does not exist yet. When a
+release introduces a new workspace crate:
+1. **Before pushing the tag,** from a clean worktree at the release commit, publish
+   that crate alone with the owner's local token: `cargo publish -p <crate>`.
+2. **The owner adds its trusted publisher** on crates.io: this repository,
+   `release.yaml`.
+3. **Push the tag.** `release.yaml` skips every crate whose exact version is already
+   on crates.io, and publishes the rest. *(The skip arrives with 0.55.0, RFC-116
+   Unit 2b's `scripts/publish-plan.sh`. Until then, `release.yaml` publishes all
+   crates unconditionally.)*
+
+The first instance is `snora-control`, at 0.55.0.
+
 **Pushing the tag publishes. There is no command to run here.**
 
 `release.yaml` triggers on a bare `X.Y.Z` tag, checks out that tag, and runs

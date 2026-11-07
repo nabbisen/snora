@@ -34,6 +34,32 @@
 - **Proof that nothing moved:** the sidebar's tests, Unit 0's and Unit 1's, pass
   unmodified. Engine-only and widgets size probes are reported against `main`.
 
+## Unit 2b — `release.yaml` publishes idempotently
+
+**Why:** `snora-control`'s first version is published from the owner's machine before
+the 0.55.0 tag (RFC-116's ruling of 2026-11-07), so `cargo publish --workspace` would
+fail on a version that already exists.
+
+**Do:**
+- before publishing, query crates.io for each publishable crate's `name@version`;
+- pass every one that already exists to `cargo publish --workspace` as
+  `--exclude <name>`;
+- log, in the step's output, which crates were skipped and why.
+
+**A crate that exists at a version this tag does not have is not skipped.** Only the
+exact `name@version`.
+
+**Testable without publishing:** put the planning in a script
+(`scripts/publish-plan.sh <version>`) that prints the `--exclude` list. Show it:
+- excluding all five crates at `0.54.0`, which is published;
+- excluding none at `9.9.9`, which is not.
+
+Use `cargo publish --workspace --dry-run` with the printed flags to show the command
+line is accepted. **Never tag to test this** (RFC-090's lesson).
+
+**Docs:** `release-process.md`'s Publishing section is the architect's. The script's
+header states the rule.
+
 ## Unit 3 — every snora control on `control`, with RFC-115's sizing inside it
 
 **The rollout.** Each of these replaces `button` with `control`:
