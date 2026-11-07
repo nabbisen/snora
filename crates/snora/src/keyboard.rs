@@ -13,6 +13,20 @@ use snora_core::focus::Cycle;
 /// Returns the message to emit when `Escape` is pressed, following the
 /// Snora overlay dismissal priority.
 ///
+/// # When the engine already answers Escape (RFC-119)
+///
+/// **An overlay that closes on a click outside also closes on Escape, with no
+/// help from you:** whenever `AppLayout::on_close_menus` or `on_close_modals`
+/// is set, the backdrop publishes it on Escape and captures the event, so
+/// `iced::keyboard::listen()` never delivers that Escape to you and you do not
+/// get a second message. Calling this function as well is harmless: it is never
+/// reached for an overlay the engine closed.
+///
+/// **The one case left to this function** is an overlay that closes on Escape
+/// **but not on a click outside**: a modal with no `on_close_modals`. The
+/// pointer cannot leave it by clicking outside either (the dim captures the
+/// press and does nothing), so Escape is the application's decision.
+///
 /// Priority: **modal before menu.** If both a modal and a menu are
 /// open (a state the overlay semantics docs recommend avoiding), the
 /// modal is dismissed first.
@@ -227,6 +241,15 @@ mod tests {
 // ---------------------------------------------------------------------
 
 /// Moves focus with Tab and Shift+Tab.
+///
+/// # What Tab reaches while an overlay is open (RFC-119)
+///
+/// **Only what the pointer can press.** Under an open dialog or sheet, and
+/// under a menu that has its outside-click backdrop, the page is out of
+/// reach: Tab moves between the overlay and the toasts (dialog, then sheet,
+/// then toasts), and nothing beneath takes focus or key presses. A menu with no
+/// backdrop leaves the page pressable, so Tab reaches it. Where focus starts
+/// when an overlay opens is still yours (`widget::Id` and `operate`).
 ///
 /// # Why an application has to call this at all
 ///

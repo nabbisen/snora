@@ -50,6 +50,7 @@ use iced::{
     widget::{column, container, mouse_area, row, space, stack},
 };
 
+use snora_control::{Inert, OnEscape};
 use snora_core::{AppLayout, LayoutDirection};
 
 use crate::identifiers;
@@ -192,6 +193,24 @@ where
     // -----------------------------------------------------------------
     // Layer 0 — skeleton.
     // -----------------------------------------------------------------
+    let has_menu = layout.header_menu.is_some() || layout.context_menu.is_some();
+    let has_modal = layout.dialog.is_some() || layout.sheet.is_some();
+
+    // The keyboard does what the pointer can (RFC-119): a layer the pointer
+    // cannot reach is out of the keyboard's reach too.
+    //
+    // - The skeleton is covered by a menu's outside-click backdrop (a click
+    //   there closes the menu and presses nothing) and by a modal. A menu
+    //   **without** a backdrop leaves the page pressable, and so reachable.
+    // - A menu, and its backdrop, are covered by a modal.
+    // - Toasts are never covered: the pointer reaches them (Law 6).
+    //
+    // **Every `Inert` is built whether or not it is on**, so that opening a
+    // modal does not reshape the tree and reset the page (R-5).
+    let menu_backdrop_up = has_menu && layout.on_close_menus.is_some();
+    let skeleton_inert = menu_backdrop_up || has_modal;
+    let menus_inert = has_modal;
+
     let skeleton = build_skeleton(
         layout.direction,
         layout.header,
@@ -200,30 +219,26 @@ where
         layout.footer,
     );
 
-    let mut layers = stack![skeleton];
+    let mut layers = stack![Inert::new(skeleton, skeleton_inert)];
 
     // -----------------------------------------------------------------
     // Layers 1-3 — light overlays (menus).
     // -----------------------------------------------------------------
-    let has_menu = layout.header_menu.is_some() || layout.context_menu.is_some();
-
     if has_menu {
         if let Some(on_close) = layout.on_close_menus {
-            layers = layers.push(transparent_backdrop(on_close));
+            layers = layers.push(Inert::new(transparent_backdrop(on_close), menus_inert));
         }
         if let Some(header_menu) = layout.header_menu {
-            layers = layers.push(header_menu);
+            layers = layers.push(Inert::new(header_menu, menus_inert));
         }
         if let Some(context_menu) = layout.context_menu {
-            layers = layers.push(context_menu);
+            layers = layers.push(Inert::new(context_menu, menus_inert));
         }
     }
 
     // -----------------------------------------------------------------
     // Layers 4-6 — modals.
     // -----------------------------------------------------------------
-    let has_modal = layout.dialog.is_some() || layout.sheet.is_some();
-
     if has_modal {
         if let Some(on_close) = layout.on_close_modals {
             layers = layers.push(dim_backdrop(on_close, style.dim));
@@ -331,7 +346,10 @@ where
         .width(Length::Fill)
         .height(Length::Fill)
         .id(identifiers::MENU_BACKDROP);
-    mouse_area(surface).on_press(on_press).into()
+    // Escape closes the menu as a click outside does (RFC-119 R-4): the
+    // keyboard cannot reach "outside", so without this a keyboard user is
+    // trapped in the menu.
+    OnEscape::new(mouse_area(surface).on_press(on_press.clone()), on_press).into()
 }
 
 /// A full-window dim click target, filled with `dim_color`. Used above
@@ -357,10 +375,14 @@ where
             ..Default::default()
         });
     let on_scroll = on_press.clone();
-    mouse_area(dim)
-        .on_press(on_press)
-        .on_scroll(move |_delta| on_scroll.clone())
-        .into()
+    // Escape closes the modal as a click on the dim does (RFC-119 R-4).
+    OnEscape::new(
+        mouse_area(dim)
+            .on_press(on_press.clone())
+            .on_scroll(move |_delta| on_scroll.clone()),
+        on_press,
+    )
+    .into()
 }
 
 /// Same visual as [`dim_backdrop`] but without the click sink — used when

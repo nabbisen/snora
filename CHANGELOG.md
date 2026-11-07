@@ -78,6 +78,19 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Changed
 
+- **An overlay that closes on a click outside also closes on Escape (RFC-119).**
+  Whenever `on_close_menus` or `on_close_modals` is set, Escape publishes it, once,
+  and the event is captured, so an application's own `keyboard::listen()` does
+  not receive a second one. `snora::keyboard::dismiss_on_escape` is not
+  deprecated: it still serves a modal that has no `on_close_modals`. **Modal
+  before menu**, as ever.
+- **An application's own `text_input` beneath an open modal no longer takes
+  keys.** The pointer could not reach it either; this is the same fix.
+- **When a modal closes, focus returns to the control that had it**, unless the
+  page now has a different number of controls or the application focused
+  something itself; and no focus ring is drawn under the dim while it is open.
+  The page is not reset: scroll offsets and a text input's state are as they
+  were.
 - **A control's target is at least `max(24 px, 1.5 × its text, the minimum-target
   token)` (RFC-115).** At the default 16 px text that is 24, which every control
   already measured, so nothing moves for an application that sets no text size.
@@ -101,6 +114,15 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
+- **The keyboard reached beneath an open modal (RFC-119).** With a dialog or
+  sheet open, Tab could land on a control the dim was covering, and Enter or
+  Space pressed it: a confirmation dialog did not gate the action it was meant
+  to gate, which a pointer user could not have got past. This is a defect of the
+  keyboard access added in this release, found before it shipped. **The keyboard
+  now reaches only what the pointer can press**: under a dialog or sheet, and
+  under a menu that has its outside-click backdrop, the page takes neither focus
+  nor key presses; Tab moves between the overlay and the toasts. A menu with no
+  backdrop leaves the page pressable, and so reachable.
 - **WCAG 2.1.1, Keyboard: snora's controls could not be reached from the
   keyboard.** iced 0.14's `button` takes no keyboard input and registers no focus
   target, and every control snora drew was one. See Added.
