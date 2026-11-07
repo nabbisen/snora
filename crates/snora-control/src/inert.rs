@@ -1,4 +1,4 @@
-//! [`Inert`]: a layer the keyboard cannot reach (RFC-119, Unit 0 prototype).
+//! [`Inert`]: a layer the keyboard cannot reach (RFC-119).
 //!
 //! # What it is for
 //!
@@ -14,6 +14,12 @@
 //! - delivers **no keyboard or input-method event** to its content;
 //! - leaves drawing, layout and the pointer alone: pointer blocking is the
 //!   backdrops' job, and an animation beneath must keep running.
+//!
+//! # Its public surface
+//!
+//! `Inert` and [`OnEscape`](crate::OnEscape) are public because the engine
+//! (`snora`) builds them. They are not for applications: an application gets
+//! their behaviour from `snora::render`.
 //!
 //! # Always in the tree
 //!

@@ -1,4 +1,4 @@
-//! [`OnEscape`]: a layer that answers Escape (RFC-119 R-4, Unit 0 prototype).
+//! [`OnEscape`]: a layer that answers Escape (RFC-119 R-4).
 //!
 //! A backdrop is a `mouse_area`, which takes no keys. Whenever a backdrop has
 //! a close message, Escape must send it, or a keyboard user who can no longer
