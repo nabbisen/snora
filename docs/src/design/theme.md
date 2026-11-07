@@ -240,7 +240,7 @@ have no slot in the emitted theme. Applications needing these read
 fixed to `&Tokens` only, so `is_dark` is derived from the token data
 itself via iced's own public `iced::theme::palette::is_dark` function on
 `palette.background` — the same function `Extended::generate` uses
-internally. This is correct for all four built-in presets but means an
+internally. This is correct for every built-in preset but means an
 application supplying a custom, mutated `Tokens` gets `is_dark` computed
 from its background luminance rather than a hand-declared intent.
 

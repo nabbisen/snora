@@ -1,6 +1,6 @@
 # RFC-112 — A consumer cannot turn off any of iced's default features
 
-**Status.** Accepted 2026-10-21. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.54.0. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/112-…`](../handoffs/112-a-consumer-cannot-turn-off-any-iced-default-feature/implementation-handoff.md).
 **Raised.** 2026-10-21, architect, from aaai's reply to the 0.53.0 letter
 (`.git-exclude/upstream/receive/0.53.0/aaai-to-snora-2026-10-21.md`). aaai tried our

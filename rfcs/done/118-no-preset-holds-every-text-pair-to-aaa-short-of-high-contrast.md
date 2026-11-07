@@ -1,6 +1,6 @@
 # RFC-118 — No preset holds every text pair to AAA, short of high contrast
 
-**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.54.0. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/118-…`](../handoffs/118-no-preset-holds-every-text-pair-to-aaa-short-of-high-contrast/implementation-handoff.md).
 **Revised** 2026-11-04, before acceptance, after the architect reviewed it against
 the owner's fundamental philosophy (see "Review against snora's principles").

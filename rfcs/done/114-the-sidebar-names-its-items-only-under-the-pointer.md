@@ -1,6 +1,6 @@
 # RFC-114 — The sidebar names its items only under the pointer
 
-**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.54.0. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/114-…`](../handoffs/114-the-sidebar-names-its-items-only-under-the-pointer/implementation-handoff.md).
 **Raised.** 2026-11-04, architect, from the owner's question about older users (Theme
 E). The owner approved opening it.

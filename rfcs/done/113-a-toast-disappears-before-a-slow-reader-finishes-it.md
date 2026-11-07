@@ -1,6 +1,6 @@
 # RFC-113 — A toast disappears before a slow reader finishes it
 
-**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.54.0. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/113-…`](../handoffs/113-a-toast-disappears-before-a-slow-reader-finishes-it/implementation-handoff.md).
 **Raised.** 2026-11-04, architect, from the owner's question about older users (Theme
 E). The owner approved opening it.

@@ -25,51 +25,36 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-### Changed
+Nothing yet.
 
-- **A toast now stays as long as it takes to read (RFC-113).** Every toast
-  lasted four seconds, whatever it said and whichever intent it carried. A
-  reader who is slower than average, reading in a second language, or using
-  a screen magnifier could lose the message before finishing it.
+## [0.54.0] — 2026-11-07
 
-  The rule, in one sentence: **two seconds to notice it, plus one second for
-  every six characters of title and message, rounded up, and never less than
-  six seconds.** `ToastLifetime::reading_time` computes it, and `Toast::new`
-  applies it. Characters, not bytes, so a Japanese message gets the time its
-  length deserves rather than its encoding.
+**Upgrading from 0.53:** read the [0.53 → 0.54 migration guide](docs/src/guides/migration-0.53-to-0.54.md).
 
-  **An error is now persistent by default.** An error that vanishes unread is
-  an error the user never had. `ToastIntent::Error` no longer counts down at
-  all unless you give it a lifetime yourself. A side effect worth knowing: an
-  application whose queue holds only errors now gets no tick subscription,
-  because there is nothing left to expire.
-
-  Warning stays transient — it is a notice, not an acknowledgement.
-
-- **The sidebar now names its items on the rail, and is wider (RFC-114).** An
-  item was an icon and nothing else; its name lived in a tooltip, and iced
-  opens a tooltip only while the cursor rests on the item. So the name was
-  there for someone who already had a pointer, already knew to hover, and
-  already knew which icon to hover — and absent for every touch user.
-
-  The default rail now draws each item's name **beneath its icon, at rest**.
-  The whole item is one button, so the highlight and the pointer target cover
-  the icon and the name together, and the name wraps rather than being cut.
-
-  **The rail is therefore no longer 64px wide.** It is content-sized to its
-  longest name, with 64px as the floor and **240px as the ceiling**, which the
-  names wrap at. Measured across every rail in `examples/`, on both paths, at
-  the host default text size, at a host text size of 24px, and with
-  `Typography` scaled ×2.0: the widest comes to 196px, and a short-named rail
-  such as `examples/rtl`'s single `Demo` stays at exactly 64. An application
-  whose layout assumed 64px should re-check it — and `SideBarLabels::Tooltip`
-  restores the old rail exactly.
-
-  **Still not reachable by keyboard, in any form.** iced 0.14's buttons take
-  no keyboard input — `button::update` handles mouse and touch only, and
-  `button::operate` registers no focus target — so no rail item can be
-  focused and no key presses one. Naming the items puts their names where a
-  reader can see them; it does not make them reachable. RFC-116 is the plan.
+> **In short:** a toast now stays as long as its text takes to read, and an error
+> stays until it is dismissed. The sidebar names its items on the rail. An
+> application can now choose iced's features itself (`iced-default`). Two AAA
+> presets hold every text pair at 7:1. The book's claims that snora's controls are
+> keyboard-reachable are withdrawn: in iced 0.14 they are not (RFC-116 plans the
+> fix).
+>
+> **Code:** no change needed. Two deprecations warn: `sweep_expired` and
+> `ToastLifetime::DEFAULT`. Builds only stop compiling in one narrow case:
+> `default-features = false` on a snora crate, together with an `iced` line of your
+> own that turns off iced's defaults and names no windowing backend.
+>
+> **Appearance:** changes on the default path:
+>
+> - the sidebar shows each item's name beneath its icon; the rail widens for long
+>   names, capped at 240 px;
+> - the active sidebar item's text and icon change colour on Solarized Light and
+>   Dark, Tokyo Night Light and Catppuccin Latte, to clear 4.5:1;
+> - toasts stay longer (at least 6 s), and errors stay until dismissed.
+>
+> Existing presets are unchanged.
+>
+> **Security:** no vulnerability in snora. Four advisories are cleared in its
+> lockfile; run the `cargo update` under Security in your own project.
 
 ### Added
 
@@ -152,15 +137,51 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   deadline must survive the immediate sweep **and** be released by the next
   one.
 
-### Deprecated
-
-- **`snora::toast::sweep_expired`** — use `Holds::sweep`, which is the same
-  sweep plus the hold. An application that wants no hold keeps a `Holds` and
-  never calls `hover`; there is one sweep path either way.
-- **`ToastLifetime::DEFAULT`** — `Toast::new` no longer uses it. It still
-  means a four-second transient if you set it deliberately.
-
 ### Changed
+
+- **A toast now stays as long as it takes to read (RFC-113).** Every toast
+  lasted four seconds, whatever it said and whichever intent it carried. A
+  reader who is slower than average, reading in a second language, or using
+  a screen magnifier could lose the message before finishing it.
+
+  The rule, in one sentence: **two seconds to notice it, plus one second for
+  every six characters of title and message, rounded up, and never less than
+  six seconds.** `ToastLifetime::reading_time` computes it, and `Toast::new`
+  applies it. Characters, not bytes, so a Japanese message gets the time its
+  length deserves rather than its encoding.
+
+  **An error is now persistent by default.** An error that vanishes unread is
+  an error the user never had. `ToastIntent::Error` no longer counts down at
+  all unless you give it a lifetime yourself. A side effect worth knowing: an
+  application whose queue holds only errors now gets no tick subscription,
+  because there is nothing left to expire.
+
+  Warning stays transient — it is a notice, not an acknowledgement.
+
+- **The sidebar now names its items on the rail, and is wider (RFC-114).** An
+  item was an icon and nothing else; its name lived in a tooltip, and iced
+  opens a tooltip only while the cursor rests on the item. So the name was
+  there for someone who already had a pointer, already knew to hover, and
+  already knew which icon to hover — and absent for every touch user.
+
+  The default rail now draws each item's name **beneath its icon, at rest**.
+  The whole item is one button, so the highlight and the pointer target cover
+  the icon and the name together, and the name wraps rather than being cut.
+
+  **The rail is therefore no longer 64px wide.** It is content-sized to its
+  longest name, with 64px as the floor and **240px as the ceiling**, which the
+  names wrap at. Measured across every rail in `examples/`, on both paths, at
+  the host default text size, at a host text size of 24px, and with
+  `Typography` scaled ×2.0: the widest comes to 196px, and a short-named rail
+  such as `examples/rtl`'s single `Demo` stays at exactly 64. An application
+  whose layout assumed 64px should re-check it — and `SideBarLabels::Tooltip`
+  restores the old rail exactly.
+
+  **Still not reachable by keyboard, in any form.** iced 0.14's buttons take
+  no keyboard input — `button::update` handles mouse and touch only, and
+  `button::operate` registers no focus target — so no rail item can be
+  focused and no key presses one. Naming the items puts their names where a
+  reader can see them; it does not make them reachable. RFC-116 is the plan.
 
 - **An application can turn off iced's default features (RFC-112).** It could
   not before, and nothing failed to say so: snora's own iced line carried
@@ -191,6 +212,14 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   resolved dependency graph is identical — the same 241 packages at the same
   versions, with the same features on every one of them except two of
   snora's own feature *names*.
+
+### Deprecated
+
+- **`snora::toast::sweep_expired`** — use `Holds::sweep`, which is the same
+  sweep plus the hold. An application that wants no hold keeps a `Holds` and
+  never calls `hover`; there is one sweep path either way.
+- **`ToastLifetime::DEFAULT`** — `Toast::new` no longer uses it. It still
+  means a four-second transient if you set it deliberately.
 
 ### Fixed
 
@@ -232,6 +261,16 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   string, because iced 0.14 exposes no accessibility tree. The field's doc now
   says what it is — the item's name, the only thing that says what the icon
   means — and what it is not.
+
+### Security
+
+- **Four advisories cleared in snora's lockfile; none accepted.** `tokio` 1.53.1 was
+  unsound in `AsyncFd::new` (RUSTSEC-2026-0386), and is now 1.54.1. `pin-utils` was
+  unmaintained (RUSTSEC-2026-0441), on `wasm32` only; it left the graph with
+  `wasmtimer` 0.4.5. `async-executor` 1.14.0 and `clipboard-win` 5.4.1 were yanked;
+  they are now 1.14.1 and 5.4.3. **A library's lockfile does not bind yours:** run
+  `cargo update -p tokio -p wasmtimer -p async-executor -p clipboard-win` in your own
+  project.
 
 ## [0.53.0] — 2026-10-20
 
@@ -778,7 +817,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.53.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.54.0...HEAD
+[0.54.0]: https://github.com/nabbisen/snora/compare/0.53.0...0.54.0
 [0.53.0]: https://github.com/nabbisen/snora/compare/0.52.0...0.53.0
 [0.52.0]: https://github.com/nabbisen/snora/compare/0.51.0...0.52.0
 [0.51.0]: https://github.com/nabbisen/snora/compare/0.50.0...0.51.0

@@ -74,8 +74,9 @@ This crate owns the **opt-in token vocabulary** for applications that
 want contrast-tested, theme-aware styling without snora imposing a
 theme. It contains:
 
-- `Tokens` — the top-level token bundle, with four built-in presets
-  (light, dark, high-contrast light, high-contrast dark).
+- `Tokens` — the top-level token bundle, with six built-in presets
+  (light, dark, light AAA, dark AAA, high-contrast light, high-contrast dark),
+  all listed by `Tokens::presets()`.
 - `Palette` — 18 semantic color roles.
 - WCAG 2.1 AA contrast utilities (`relative_luminance`,
   `contrast_ratio`, `composite_over`).

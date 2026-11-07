@@ -32,6 +32,12 @@ would have to be true for adoption, as *"requirements, not requests"*.
   integrate one when iced exposes it and not to build a parallel abstraction.
 - **Satisfied by:** an iced release with an accessibility tree, followed by
   snora exposing name, role and state for every interactive component.
+- **Status at 0.54.0: still blocked, and one adjacent claim corrected.** The book
+  said snora's controls were keyboard-reachable through iced. In iced 0.14 a
+  `button` takes no keyboard input, so they are not. That is withdrawn in 0.54.0
+  (migration guide §6). Keyboard *reach and operation* (WCAG 2.1.1) is not an
+  accessibility tree, but it is the part snora can deliver without one: RFC-116
+  plans it for 0.55.0 as 1.0 gate 11. Names, roles and states still wait on iced.
 - **Possible now:** an inventory of each component's name, role and state and
   their source (caller label, snora text, none), so the work is sized before
   iced moves. *(Theme D.)*

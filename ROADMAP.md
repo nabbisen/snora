@@ -232,7 +232,30 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
+## Next — 0.55.0
+
+- **Keyboard access to every snora control** (RFC-116 R-1). A focusable `control`, in
+  a new `snora-control` crate, sits under every button snora draws, with a focus
+  ring snora draws. That closes 1.0 gate 11, WCAG 2.1.1.
+- **Sizes that follow the reader** (RFC-115 R-2), inside `control`:
+  - targets ≥ max(24 px, 1.5 × text, a minimum-target token);
+  - icons at 1 em.
+- **`design::button::link`** (RFC-117): an underline drawn by snora under every line,
+  and growing with the text.
+
 ## Recently shipped
+
+- **0.54.0** — Theme E, older users, and an adopter's opt-out.
+  - **Toasts last as long as their text takes to read**, errors stay until
+    dismissed, and a toast under the pointer waits (RFC-113).
+  - **The sidebar names its items on the rail** (RFC-114).
+  - **Applications choose iced's features** through `iced-default` (RFC-112,
+    reported by aaai).
+  - **Two AAA presets** and `Tokens::presets()` (RFC-118, asked for by orbok).
+  - **The book's keyboard claims are withdrawn:** iced 0.14's buttons take no
+    keyboard input, which RFC-116 found, and which made keyboard access 1.0 gate 11.
+  - **The supply-chain job, red for three weeks unnoticed, is green** through
+    lockfile updates.
 
 - **0.41.0** — **Both Criticals from the external audit.** A click on a dialog's
   own text dismissed it: `render_dialog` wrapped content in `center()` with no

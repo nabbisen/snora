@@ -646,7 +646,7 @@ snora integrates it, the same relationship snora already has to iced's
 `Theme`.
 
 This bounds a *claim*; it does not retreat from a *capability*. The
-contrast-tested presets, the four built-in tokens, and the ABDD layout
+contrast-tested presets, the built-in token presets, and the ABDD layout
 discipline are unchanged and are genuinely strong for a framework this
 size — the correction is to stop implying they cover assistive
 technology too.

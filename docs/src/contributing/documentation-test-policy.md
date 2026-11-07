@@ -187,17 +187,18 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of 0.39.0 — RFC-064's audit, with `snora` at **6** since RFC-076 added
-the `focus` re-export's doctest (0.39.0):
+As of **0.54.0**, re-counted at the cut (`cargo test --workspace --all-features
+--doc`). Against the table's previous figures: `snora-core` +3, `snora-design` +1 and
+`snora` +3. 0.54.0 added doctests in all three (RFC-113, RFC-118). No new `ignore`.
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|
-| `snora-core` | 20 | 0 |
-| `snora-design` | 8 | 0 |
+| `snora-core` | 23 | 0 |
+| `snora-design` | 9 | 0 |
 | `snora-style` | 3 | 1 |
 | `snora-widgets` | 6 | 0 |
-| `snora` | 6 | 2 |
-| **Total** | **43** | **3** |
+| `snora` | 9 | 2 |
+| **Total** | **50** | **3** |
 
 Tracked in the [release checklist](release-process.md). Do not
 accidentally break these by changing vocabulary without updating the

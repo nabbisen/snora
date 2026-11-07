@@ -38,7 +38,7 @@ all of the following are true:
    - What semantic limitation remains?
    - What example demonstrates usage?
 4. **High-contrast behavior documented.** The primitive's visual-fit checklist
-   is complete for all four built-in token presets.
+   is complete for every built-in token preset (`Tokens::presets()`).
 5. **API is small enough to maintain.** If adding the primitive requires more
    than ~100 lines of non-test, non-doc code, revisit the scope boundary.
 6. **Reason a recipe cannot serve the need.** If a recipe with the nine-section

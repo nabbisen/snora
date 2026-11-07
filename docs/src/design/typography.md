@@ -50,8 +50,8 @@ renderer's own default, so calling it changes nothing observable — see
 its own doc comment. See [Readability](../guides/readability.md) for
 what this means in practice when picking a role for text that wraps.
 
-**These are defaults a preset supplies, not constants.** All four built-in
-presets (`light`, `dark`, `high_contrast_light`, `high_contrast_dark`) share
+**These are defaults a preset supplies, not constants.** All six built-in
+presets (`Tokens::presets()`) share
 `Typography::default_roles()`, but `Typography` is a plain, non-`#[non_exhaustive]`
 struct — an application supplying its own `Tokens` can set every field to
 whatever its design calls for. See [Design tokens](tokens.md#customizing).
@@ -108,6 +108,6 @@ snora renders a full type hierarchy on your behalf.
 (`body`, `body_small`, or any other) is separate guidance about
 keeping sizes in one place, not a second floor. See
 [Readability](../guides/readability.md) for the full guidance,
-including what's actually asserted for the four built-in presets
+including what's actually asserted for the built-in presets
 (RFC-081) and what stays the application's own responsibility on a
 custom `Tokens`.
