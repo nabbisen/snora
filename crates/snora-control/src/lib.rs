@@ -61,6 +61,8 @@
 
 mod control;
 mod em;
+mod underlined;
 
 pub use control::{Control, Ring, StyleFn};
 pub use em::{EmBox, Glyph};
+pub use underlined::Underlined;
