@@ -1,6 +1,6 @@
 # RFC-120 — Focus is lost when the focused control goes away
 
-**Status.** Accepted 2026-11-08. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.56.0. Accepted 2026-11-08. Every open question ruled as suggested (see Rulings).
 **Merged to `main` 2026-11-08** (`274a88b`), shipping in 0.56.0.
 **Handoff.** [`handoffs/120-…`](../handoffs/120-focus-is-lost-when-the-focused-control-goes-away/implementation-handoff.md).
 **Revised** 2026-11-08, before ruling, after the owner asked for a careful check against

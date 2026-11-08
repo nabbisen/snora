@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-121: a click presses and does not focus; a held key presses once
 
-**RFC.** `rfcs/accepted/121-a-click-gives-keyboard-focus-and-a-held-key-repeats.md`.
+**RFC.** `rfcs/done/121-a-click-gives-keyboard-focus-and-a-held-key-repeats.md`.
 Read F-1 to F-3 and the Rulings.
 **Release target.** 0.56.0, **first in it.** The owner wants 0.56.0 as soon as
 possible, so this is **one unit, one review**, with a stop condition for R-2.

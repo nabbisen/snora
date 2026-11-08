@@ -3,7 +3,7 @@
 This page tracks readiness for declaring Snora 1.0. It is maintained
 alongside the codebase: update it in any PR that changes a checked item.
 
-**Current status (v0.55.0):** nine of eleven core gates satisfied. Remaining:
+**Current status (v0.56.0):** nine of eleven core gates satisfied. Remaining:
 gate 1 (iced major upgrade) and gate 3 (confirmed third-party production app). Gate
 11, keyboard access, was added 2026-11-04 and met in 0.55.0 (RFC-116). *(Corrected
 2026-11-08: the 0.55.0 book said "eight of eleven", counting gate 5 as open. Gate 5

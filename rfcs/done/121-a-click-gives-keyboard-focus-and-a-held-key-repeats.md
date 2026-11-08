@@ -1,6 +1,6 @@
 # RFC-121 — A click gives a control keyboard focus, and a held key presses it again and again
 
-**Status.** Accepted 2026-11-08. Q-1, Q-2 and Q-4 ruled as suggested; Q-3 ruled otherwise:
+**Status.** Done — shipped v0.56.0. Accepted 2026-11-08. Q-1, Q-2 and Q-4 ruled as suggested; Q-3 ruled otherwise:
 no patch, the fix ships in 0.56.0 (see Rulings).
 **Handoff.** [`handoffs/121-…`](../handoffs/121-a-click-gives-keyboard-focus-and-a-held-key-repeats/implementation-handoff.md).
 **Raised.** 2026-11-08, architect, while re-reviewing RFC-120 against the owner's

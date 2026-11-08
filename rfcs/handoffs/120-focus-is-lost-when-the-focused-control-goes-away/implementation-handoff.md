@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-120: focus after the focused control goes away, and the toast hold
 
-**RFC.** `rfcs/accepted/120-focus-is-lost-when-the-focused-control-goes-away.md`. Read R-1
+**RFC.** `rfcs/done/120-focus-is-lost-when-the-focused-control-goes-away.md`. Read R-1
 (the group-first neighbour rule), R-2, R-3, Q-4 and the Rulings.
 **Release target.** 0.56.0.
 **Order:**

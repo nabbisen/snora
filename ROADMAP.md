@@ -232,20 +232,7 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.56.0
-
-Accepted as 0.56's core by the owner, 2026-11-08:
-- **A click presses a control, and no longer focuses it** (RFC-121): no ring after a
-  click, and no key answers for a control the reader only clicked. 0.55.0 changed both,
-  and its notes said it had not. A held key presses once. Folded into 0.56.0 rather
-  than a 0.55.1 patch (owner, cost balance).
-- **Focus after the focused control goes away** (RFC-120): focus moves to its nearest
-  remaining neighbour, within its own group first, and a toast waits while the keyboard
-  is on it.
-- **Housekeeping:** the examples' redundant `dismiss_on_escape`, `snora-control`'s
-  pixel tests on wgpu in CI, and the real-window Tab check under native Wayland.
-
-## Then — 0.57.0
+## Next — 0.57.0
 
 - **RFC-116 R-2, the shortcuts router,** after its amendment is ruled. As specified it
   would fire beneath an overlay, and its Escape now overlaps RFC-119's. The amendment
@@ -261,6 +248,19 @@ Accepted as 0.56's core by the owner, 2026-11-08:
   L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
+
+- **0.56.0** — the keyboard, made predictable.
+  - **A click presses a control and does not focus it** (RFC-121), as in 0.54. 0.55.0
+    drew a ring after every click, and let Space or Enter press the clicked control
+    again; its notes said it did not. A held key presses once, and Tab carries on
+    from a clicked control.
+  - **Focus after the focused control goes away** (RFC-120): to its nearest
+    neighbour in the same group, else nothing. 0.55.0 left it to tree positions,
+    and half the time one more Enter pressed a control nobody chose.
+  - **A toast waits while the keyboard is on its ×** (`on_toast_attention`, superseding
+    `on_toast_hover`).
+  - The starter and workbench examples route Tab, and the real-window Tab check
+    passed under native Wayland.
 
 - **0.55.0** — keyboard access, Theme E's sizes, and the link.
   - **Every control snora draws is reachable and pressable from the keyboard**

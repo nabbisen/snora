@@ -10,6 +10,11 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.55 → 0.56](migration-0.55-to-0.56.md) — **behaviour fixes, three
+  deprecations**: a click presses and no longer focuses (0.55.0's ring after a
+  click is gone); a held key presses once; focus after a removal moves to the
+  nearest neighbour; a toast waits while the keyboard is on its ×
+  (`on_toast_attention`, superseding `on_toast_hover`).
 - [0.54 → 0.55](migration-0.54-to-0.55.md) — **behaviour changes, nothing removed**:
   every snora control is reachable from the keyboard once the application routes
   Tab (`snora::keyboard::traverse`); overlays block the keyboard as they block the

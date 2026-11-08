@@ -187,20 +187,19 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of **0.55.0**, re-counted at the cut (`cargo test --workspace --all-features
---doc`). Against the table's previous figures: `snora-design` +1 (`TargetTokens`,
-RFC-115) and one new `ignore` in `snora` (`keyboard::traverse`, an `update` arm
-fragment, RFC-116), with its reason stated. `snora-control` has none.
+As of **0.56.0**, re-counted at the cut (`cargo test --workspace --all-features
+--doc`). Against the table's previous figures: `snora-core` +2 (`ToastAttention` and
+`AppLayout::on_toast_attention`, RFC-120). No new `ignore`.
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|
-| `snora-core` | 23 | 0 |
+| `snora-core` | 25 | 0 |
 | `snora-design` | 10 | 0 |
 | `snora-style` | 3 | 1 |
 | `snora-control` | 0 | 0 |
 | `snora-widgets` | 6 | 0 |
 | `snora` | 9 | 3 |
-| **Total** | **51** | **4** |
+| **Total** | **53** | **4** |
 
 Tracked in the [release checklist](release-process.md). Do not
 accidentally break these by changing vocabulary without updating the

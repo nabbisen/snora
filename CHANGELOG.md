@@ -25,6 +25,33 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.56.0] — 2026-11-08
+
+**Upgrading from 0.55:** read the [0.55 → 0.56 migration guide](docs/src/guides/migration-0.55-to-0.56.md).
+
+> **In short:** a click presses a control and no longer focuses it, as in 0.54.
+> 0.55.0 drew a focus ring after every click, and let Space or Enter press the
+> clicked control again. A held key presses once. When the focused control goes
+> away, focus moves to its nearest neighbour in the same group. A toast waits
+> while the keyboard is on its ×, as it does under the pointer.
+>
+> **Code:** no change needed. Three items are deprecated, and warn:
+> `on_toast_hover`, `ToastHover` and `Holds::hover`. Their replacements are
+> `on_toast_attention`, `ToastAttention` and `Holds::attend`.
+>
+> **Appearance:** changes on the default path:
+>
+> - no focus ring appears after a click or a tap (0.55.0 drew one);
+> - after a removal from the keyboard, the ring moves to the neighbour that now
+>   has focus.
+>
+> Colours, sizes and presets are unchanged.
+>
+> **Security:** none. The advisory gate is clean, with the same accepted
+> advisories as 0.55.0.
+
 ### Added
 
 - **`ToastAttention`, `AppLayout::on_toast_attention` and
@@ -1025,7 +1052,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.55.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.56.0...HEAD
+[0.56.0]: https://github.com/nabbisen/snora/compare/0.55.0...0.56.0
 [0.55.0]: https://github.com/nabbisen/snora/compare/0.54.0...0.55.0
 [0.54.0]: https://github.com/nabbisen/snora/compare/0.53.0...0.54.0
 [0.53.0]: https://github.com/nabbisen/snora/compare/0.52.0...0.53.0
