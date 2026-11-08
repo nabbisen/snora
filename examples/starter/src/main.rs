@@ -5,11 +5,11 @@
 //!
 //! * `AppLayout` assembled from prefab widgets + your own slots.
 //! * Header menu with click-outside close sink.
-//! * Dialog with button close and Escape dismissal.
+//! * Dialog with button close and Escape dismissal (the engine answers
+//!   Escape, because the layout sets both click-outside close messages).
 //! * Transient toast added by a button.
 //! * Live LTR ↔ RTL toggle (ABDD).
 //! * Tab bar for simple view switching.
-//! * `snora::keyboard::dismiss_on_escape` for keyboard handling.
 //!
 //! The workbench example (`snora-example-workbench`) covers every surface
 //! in depth. This starter stays small so you can read it in one sitting.
@@ -101,9 +101,6 @@ enum Message {
     AddToast,
     DismissToast(u64),
     ToastTick,
-    // ---- Keyboard ----
-    KeyPressed(iced::keyboard::Key),
-    NoOp,
 }
 
 // ---------------------------------------------------------------------------
@@ -145,34 +142,12 @@ impl App {
             // example does not wire `on_toast_hover`, so nothing is ever
             // held and this behaves exactly as `sweep_expired` did.
             Message::ToastTick => self.holds.sweep(&mut self.toasts, Instant::now()),
-            // Escape: dismiss modal first, then menu (modal priority).
-            Message::KeyPressed(key) => {
-                if let Some(m) = snora::keyboard::dismiss_on_escape(
-                    self.show_dialog,
-                    self.menu_open,
-                    Some(Message::CloseModals),
-                    Some(Message::CloseMenus),
-                    key,
-                ) {
-                    return self.update(m);
-                }
-            }
-            Message::NoOp => {}
         }
         Task::none()
     }
 
     fn subscription(&self) -> Subscription<Message> {
-        Subscription::batch([
-            snora::toast::subscription(&self.toasts, || Message::ToastTick),
-            iced::keyboard::listen().map(|ev| {
-                if let iced::keyboard::Event::KeyPressed { key, .. } = ev {
-                    Message::KeyPressed(key)
-                } else {
-                    Message::NoOp
-                }
-            }),
-        ])
+        snora::toast::subscription(&self.toasts, || Message::ToastTick)
     }
 }
 
@@ -348,7 +323,10 @@ impl App {
             .toasts(self.toasts.clone())
             .toast_position(ToastPosition::TopEnd)
             .direction(self.direction) // ← drives all mirroring
-            .on_close_menus(Message::CloseMenus) // ← outside-click close sink
+            // Outside-click close sinks. Since 0.55 they are also what Escape
+            // answers (RFC-119): the engine closes the modal first, then the
+            // menu, and captures the key. No keyboard listener is needed.
+            .on_close_menus(Message::CloseMenus)
             .on_close_modals(Message::CloseModals);
 
         if self.menu_open {
