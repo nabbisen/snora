@@ -20,10 +20,21 @@ set -euo pipefail
 #
 # Resolution order:
 #   1. `actionlint` already on PATH -- used as-is, whatever version.
-#   2. Otherwise, downloads the pinned version's release binary for this
-#      machine's OS/arch from GitHub releases, verifies it against a
-#      pinned SHA-256 (not merely fetched and trusted), and caches it
-#      under target/actionlint-cache/ so repeat runs don't re-download.
+#   2. Otherwise, uses the pinned version's release **archive** for this
+#      machine's OS/arch, from target/actionlint-cache/ if it is there and
+#      from GitHub releases if it is not (a few retries on a server error:
+#      the release server answered 504 twice in two days, with nothing wrong
+#      in the workflows). **The pinned SHA-256 of the archive is checked on
+#      every run, cached or just downloaded, before anything is unpacked**;
+#      the unpacked binary is made in a temporary directory and thrown away.
+#
+# Why the archive and not the binary is what is cached: a cached, already
+# unpacked binary would run with no check at all, and so would a cache that
+# had been poisoned. A cached archive that fails its checksum is deleted, said
+# so loudly (a `::warning::` in CI), and replaced by a fresh download checked
+# against the same pin; a fresh download that fails refuses. An
+# `actionlint` left unpacked in the cache directory by an earlier version of
+# this script is an unverified binary too; it is never run, and is removed.
 #
 # If neither is possible -- unsupported OS/arch, no network, checksum
 # mismatch -- this script says so on stderr and exits non-zero. It does
@@ -38,6 +49,10 @@ set -euo pipefail
 #      actionlint ran and found problems
 
 ACTIONLINT_VERSION="1.7.12"
+
+# The release server's base URL. Overridable **only to test the failure paths
+# against a local server** (a 5xx, a corrupt body); the workflow does not set it.
+RELEASES_BASE="${SNORA_ACTIONLINT_RELEASES_BASE:-https://github.com/rhysd/actionlint/releases/download}"
 
 # Pinned SHA-256 sums for this version's release assets, from
 # https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_checksums.txt
@@ -87,39 +102,65 @@ resolve_actionlint() {
   fi
 
   local cache_dir="target/actionlint-cache/${ACTIONLINT_VERSION}"
-  local bin_path="${cache_dir}/actionlint"
-  if [[ -x "$bin_path" ]]; then
-    bin_path="$(cd "$(dirname "$bin_path")" && pwd)/$(basename "$bin_path")"
-    echo "$bin_path"
-    return 0
-  fi
-
-  mkdir -p "$cache_dir"
   local archive="${cache_dir}/actionlint_${ACTIONLINT_VERSION}_${platform}.tar.gz"
-  local url="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_${platform}.tar.gz"
-
-  echo "no actionlint on PATH; downloading pinned v${ACTIONLINT_VERSION} for ${platform}..." >&2
-  if ! curl -fsSL -o "$archive" "$url"; then
-    echo "error: failed to download actionlint from $url" >&2
-    return 1
-  fi
+  local url="${RELEASES_BASE}/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_${platform}.tar.gz"
+  mkdir -p "$cache_dir"
+  # An unpacked binary an earlier version of this script left here has never
+  # been checked on this run: never run it.
+  rm -f "${cache_dir}/actionlint"
 
   local actual_sha
-  actual_sha=$(sha256sum "$archive" | cut -d' ' -f1)
-  if [[ "$actual_sha" != "$expected_sha" ]]; then
-    echo "error: actionlint download checksum mismatch -- expected $expected_sha, got $actual_sha" >&2
-    echo "refusing to run an unverified binary" >&2
-    rm -f "$archive"
-    return 1
+  if [[ -f "$archive" ]]; then
+    echo "using the cached actionlint archive (it is verified below, as every run)" >&2
+    actual_sha=$(sha256sum "$archive" | cut -d' ' -f1)
+    if [[ "$actual_sha" != "$expected_sha" ]]; then
+      # A bad cache entry is immutable on GitHub, so refusing here would block
+      # every later run until someone deleted it by hand. A fresh download is
+      # exactly as trustworthy as the first one: it is checked against the same
+      # pinned SHA-256. So: say so, loudly, and fetch afresh.
+      local key="actionlint-archive-${ACTIONLINT_VERSION}-${os}-${arch}"
+      local msg="the cached actionlint archive failed its pinned SHA-256 (expected $expected_sha, got $actual_sha). It was NOT used and has been deleted; a fresh verified download follows. Delete the cache entry '$key' (repository Actions caches) so the next run does not restore it again."
+      if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+        # To the script's own stdout (fd 3), not this function's, whose stdout
+        # is the path of the binary and nothing else.
+        echo "::warning::$msg" >&3
+      fi
+      echo "WARNING: $msg" >&2
+      rm -f "$archive"
+    fi
   fi
 
-  tar -xzf "$archive" -C "$cache_dir" actionlint
-  rm -f "$archive"
-  chmod +x "$bin_path"
-  bin_path="$(cd "$(dirname "$bin_path")" && pwd)/$(basename "$bin_path")"
-  echo "$bin_path"
+  if [[ ! -f "$archive" ]]; then
+    echo "no actionlint on PATH; downloading pinned v${ACTIONLINT_VERSION} for ${platform}..." >&2
+    # Retries on any error, a 5xx included, and says so (no --silent: curl
+    # reports each retry on stderr). Written to a .part file and renamed, so a
+    # download that was cut off is never taken for a cached archive.
+    if ! curl -fL --no-progress-meter --retry 4 --retry-all-errors --retry-delay 2 \
+        --connect-timeout 20 --max-time 180 -o "${archive}.part" "$url"; then
+      rm -f "${archive}.part"
+      echo "error: failed to download actionlint from $url (after retries)" >&2
+      return 1
+    fi
+    mv "${archive}.part" "$archive"
+    actual_sha=$(sha256sum "$archive" | cut -d' ' -f1)
+    if [[ "$actual_sha" != "$expected_sha" ]]; then
+      echo "error: actionlint archive checksum mismatch -- expected $expected_sha, got $actual_sha" >&2
+      echo "refusing to run an unverified binary; the archive is deleted" >&2
+      rm -f "$archive"
+      return 1
+    fi
+  fi
+
+  tar -xzf "$archive" -C "$WORK" actionlint
+  chmod +x "${WORK}/actionlint"
+  echo "${WORK}/actionlint"
 }
 
+# The unpacked binary lives here for this run only.
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+
+exec 3>&1
 ACTIONLINT_BIN=$(resolve_actionlint) || {
   echo "REFUSED: actionlint is unavailable and could not be obtained -- this tree is unvalidated, not clean." >&2
   exit 1

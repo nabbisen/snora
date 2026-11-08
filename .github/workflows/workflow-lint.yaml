@@ -44,4 +44,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      # GitHub's release server answered 504 twice in two days, with nothing
+      # wrong in the workflows. So the pinned actionlint **archive** is cached
+      # (never the unpacked binary: that would run with no check at all), and
+      # `scripts/check-workflows.sh` verifies the archive's pinned SHA-256 on
+      # every run, cached or downloaded, before it unpacks anything. The key
+      # is the pinned version and platform; a changed pin is a new entry.
+      - id: pin
+        run: echo "version=$(sed -n 's/^ACTIONLINT_VERSION="\(.*\)"/\1/p' scripts/check-workflows.sh)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: target/actionlint-cache
+          key: actionlint-archive-${{ steps.pin.outputs.version }}-linux-amd64
       - run: scripts/check-workflows.sh
