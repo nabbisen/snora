@@ -1,6 +1,7 @@
 # RFC-120 — Focus is lost when the focused control goes away
 
-**Status.** Proposed 2026-11-08. Awaiting the owner's rulings on Q-1 to Q-5.
+**Status.** Accepted 2026-11-08. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/120-…`](../handoffs/120-focus-is-lost-when-the-focused-control-goes-away/implementation-handoff.md).
 **Revised** 2026-11-08, before ruling, after the owner asked for a careful check against
 the fundamental philosophy. R-1's rule was rewritten: as first stated, it would have
 sent focus to the footer after a breadcrumb press. The held-key rule (first R-5)
@@ -205,3 +206,17 @@ the owner with the measurements.
      does not leave its container while a control remains in it.
 3. **The book** by the architect: the keyboard pages and `04-toasts.md`. **CHANGELOG**
    under Fixed (focus), and Added and Deprecated (the hold, if Q-4 (b)).
+
+## Rulings, 2026-11-08 (owner)
+
+The owner accepted every suggested ruling, Q-1 to Q-5, after the revision recorded at
+the top:
+- **R-1:** the group-first neighbour rule;
+- **Q-2:** the scope follows the mechanism, and returns to the owner if it narrows;
+- **Q-3:** focus is nowhere when no control is left;
+- **Q-4:** one attention callback, with `on_toast_hover`, `ToastHover` and
+  `Holds::hover` deprecated;
+- **Q-5:** 0.56.0, with the hold shipping alone if R-1's mechanism does not hold.
+
+RFC-121, the click focus and the held key, also ships in 0.56.0 by the owner's
+ruling. It goes first.

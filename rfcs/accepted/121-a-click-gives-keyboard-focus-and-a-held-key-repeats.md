@@ -1,9 +1,11 @@
 # RFC-121 — A click gives a control keyboard focus, and a held key presses it again and again
 
-**Status.** Proposed 2026-11-08. Awaiting the owner's rulings on Q-1 to Q-4.
+**Status.** Accepted 2026-11-08. Q-1, Q-2 and Q-4 ruled as suggested; Q-3 ruled otherwise:
+no patch, the fix ships in 0.56.0 (see Rulings).
+**Handoff.** [`handoffs/121-…`](../handoffs/121-a-click-gives-keyboard-focus-and-a-held-key-repeats/implementation-handoff.md).
 **Raised.** 2026-11-08, architect, while re-reviewing RFC-120 against the owner's
 fundamental philosophy, at the owner's request.
-**Release target.** 0.55.1, a patch (Q-3).
+**Release target.** 0.56.0 (Q-3, owner).
 **Priority.** **0.55.0 changed what every pointer user sees and what a key does, in
 every application, including those that never route Tab. Its release notes say it did
 not.**
@@ -138,3 +140,17 @@ correction reaches everyone.
    keyboard test still passes, unmodified. A test that relied on click-focus is reported
    to the architect, not edited.
 3. **The architect:** the guide's correction, the 0.55.1 CHANGELOG lead, and the cut.
+
+## Rulings, 2026-11-08 (owner)
+
+- **Q-1:** R-1. A click presses a control and does not focus it.
+- **Q-2:** R-2's starting point, if Unit 0 shows it is feasible without `advanced`.
+  One lead to check: `iced_runtime::task::widget(operation)` is public in
+  `iced_runtime` (`task.rs:423`), which `snora` already uses as a dev-dependency.
+  Making it a normal dependency would add an edge, not a package.
+- **Q-3: no 0.55.1. The fix ships in 0.56.0,** which starts now and is to be reached as
+  soon as possible. The reason is cost balance. 0.55.0's behaviour stands until then.
+  **The guide's correction (R-4) is not held back:** the book is live, and a false
+  claim on it is corrected now.
+- **Q-4:** the letters to aaai and orbok are held, and they name **0.56.0** as the
+  version to take.

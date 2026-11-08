@@ -232,19 +232,16 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Now — 0.55.1 (proposed, RFC-121)
-
-- **A click no longer gives a control keyboard focus,** so no ring appears after a click,
-  and no key presses a control the reader only clicked. That is 0.54's pointer
-  behaviour, which 0.55.0's notes said was unchanged.
-- **A held key presses once.**
-
 ## Next — 0.56.0
 
 Accepted as 0.56's core by the owner, 2026-11-08:
-- **Focus after the focused control goes away** (RFC-120, proposed): focus moves to the
-  control that came after it, a toast waits while the keyboard is on it, and a held key
-  presses once.
+- **A click presses a control, and no longer focuses it** (RFC-121): no ring after a
+  click, and no key answers for a control the reader only clicked. 0.55.0 changed both,
+  and its notes said it had not. A held key presses once. Folded into 0.56.0 rather
+  than a 0.55.1 patch (owner, cost balance).
+- **Focus after the focused control goes away** (RFC-120): focus moves to its nearest
+  remaining neighbour, within its own group first, and a toast waits while the keyboard
+  is on it.
 - **Housekeeping:** the examples' redundant `dismiss_on_escape`, `snora-control`'s
   pixel tests on wgpu in CI, and the real-window Tab check under native Wayland.
 

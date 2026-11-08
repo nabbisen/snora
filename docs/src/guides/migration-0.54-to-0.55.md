@@ -9,7 +9,7 @@
 
 | You use… | What changes | Do |
 |---|---|---|
-| Any snora control: tabs, crumbs, menus, notices, chips, `design::button`, the toast's ×, the sidebar | Each is a **focus target**: Enter and Space press it, and a ring shows focus | Route Tab (§1). Without it, nothing changes |
+| Any snora control: tabs, crumbs, menus, notices, chips, `design::button`, the toast's ×, the sidebar | Each is a **focus target**: Enter and Space press it, and a ring shows focus. **A click also focuses it** (see the correction below) | Route Tab (§1). Without it, a click still focuses a control: see the correction |
 | The unstyled path at the default text size | Chrome icons are **16 px, not 14**; tabs and menu items with an icon are 1 to 1.5 px wider | Retake screenshot baselines (§2) |
 | A larger `default_text_size` (unstyled) | Icons and targets follow the text: at 24 px, icons are 24 px and the toast's × target is 36 × 36 | Retake baselines (§2) |
 | The design path's toasts | The × is **15.75 px, not 18**: it follows `Typography::body`. Its target stays 24 | Retake toast baselines (§2) |
@@ -19,6 +19,23 @@
 | Your dependency list | A new crate, `snora-control`, arrives through `snora` | Nothing. **Do not depend on it directly** |
 
 **For code:** nothing breaks to compile, and nothing warns.
+
+> **Correction, 2026-11-08 (RFC-121).** This guide and the 0.55.0 CHANGELOG said
+> that nothing changes for an application that does not route Tab. **That is not
+> true of 0.55.0:** a click or a tap on a snora control gives it keyboard focus. So,
+> in every application:
+>
+> - a focus ring appears on each control a mouse or touch user presses, and stays
+>   until they press somewhere else;
+> - Space or Enter afterwards presses that control again;
+> - holding the key presses it again and again.
+>
+> **0.56.0 fixes all three:** a click presses a control and does not focus it, which
+> is 0.54's behaviour, and a held key presses once. **What to re-check:** screenshot
+> baselines taken on 0.55.0 after a click show a ring that 0.56.0 removes. If a
+> repeated press would do harm in your application (a delete, a send), guard it until
+> you take 0.56.0, for example with a confirmation dialog, which 0.55.0's keyboard
+> cannot get past (§4).
 
 ## 1. The keyboard (RFC-116)
 

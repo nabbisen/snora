@@ -177,7 +177,10 @@ them.
   controls.
 - **Keyboard (WCAG 2.1.1): met by snora's own controls from 0.55, once
   your application routes Tab with `snora::keyboard::traverse`** (above).
-  Without that one line, Tab does nothing, as before.
+  Without that one line, Tab does nothing, as before. **In 0.55.0 a click also
+  focuses a control**, so a ring appears after a click, and Space or Enter presses
+  the clicked control again; 0.56.0 removes that (RFC-121, and the 0.54 → 0.55
+  guide's correction).
 - **Overlays: the keyboard does what the pointer can (0.55, RFC-119).** With a
   dialog, a sheet, or a menu with its backdrop open, Tab and Enter reach only
   what the pointer can press: the overlay and the toasts, never the page
