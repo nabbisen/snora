@@ -189,6 +189,15 @@ fn unstyled() -> Vec<Subject> {
             snora::widget::render_menu(menu(), &ON_MENU, true)
         }),
         subject("toast close", &["dismiss"], || render(toast_layout())),
+        // RFC-122 Unit 0: aaai's cases on the prototype `snora::control`.
+        #[cfg(feature = "design")]
+        subject("control: glyph beside a label", &["open"], || {
+            common::aaai_cases::glyph_label_engine(msg("open"))
+        }),
+        #[cfg(feature = "design")]
+        subject("control: file-tree row, Fill", &["tree"], || {
+            common::aaai_cases::tree_row_engine(msg("tree"))
+        }),
     ]
 }
 
@@ -277,6 +286,26 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
         ),
         subject("design toast close", &["dismiss"], move || {
             snora::design::render(toast_layout(), tokens)
+        }),
+        // RFC-122 Unit 0: aaai's cases on the prototype `snora::design::control`.
+        subject(
+            "design control: glyph beside a label, primary",
+            &["open"],
+            move || common::aaai_cases::glyph_label_design(tokens, msg("open")),
+        ),
+        subject(
+            "design control: file-tree row, Fill",
+            &["tree"],
+            move || common::aaai_cases::tree_row_design(tokens, msg("tree")),
+        ),
+        subject(
+            "design control: a suggestion, long data text",
+            &["suggestion"],
+            move || common::aaai_cases::suggestion_design(tokens, msg("suggestion")),
+        ),
+        // A disabled control is not a focus target: Tab skips it.
+        subject("design control: on_press_maybe(None)", &[], move || {
+            common::aaai_cases::disabled_design(tokens)
         }),
     ]
 }
