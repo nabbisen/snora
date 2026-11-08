@@ -248,11 +248,18 @@ where
             layers = layers.push(dim_without_capture(style.dim));
         }
 
+        // A dialog and a sheet are layers of their own for where focus goes
+        // after a removal (RFC-120): the group is never wider than the layer,
+        // so a control removed in a dialog never hands focus to the page.
+        // Never inert: nothing covers them.
         if let Some(dialog) = layout.dialog {
-            layers = layers.push(render_dialog(dialog, style.dialog_card.as_ref()));
+            layers = layers.push(Inert::new(
+                render_dialog(dialog, style.dialog_card.as_ref()),
+                false,
+            ));
         }
         if let Some(sheet) = layout.sheet {
-            layers = layers.push(render_sheet(sheet, layout.direction));
+            layers = layers.push(Inert::new(render_sheet(sheet, layout.direction), false));
         }
     }
 
@@ -264,7 +271,9 @@ where
         layout.toast_position,
         layout.direction,
         style.toast,
+        #[expect(deprecated, reason = "still honours the deprecated `on_toast_hover`")]
         layout.on_toast_hover,
+        layout.on_toast_attention,
     ) {
         layers = layers.push(toast_layer);
     }

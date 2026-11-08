@@ -118,10 +118,27 @@ impl<Message: Clone> OnPress<'_, Message> {
     }
 }
 
+/// What a press leaves for the tracker (RFC-120): shared with [`crate::Inert`],
+/// which reads and clears it through `operation::custom`.
+#[derive(Debug, Default)]
+pub(crate) struct PressMark {
+    /// The control published its message since the tracker last looked.
+    pub(crate) acted: bool,
+    /// Targets that go with it, before and after it ([`Control::removes`]).
+    pub(crate) removes: (usize, usize),
+}
+
 #[derive(Debug, Default)]
 struct State {
     is_pressed: bool,
     is_focused: bool,
+    /// The focus the control last **told the application about**
+    /// ([`Control::on_focus_change`]): focus changes by an operation, which no
+    /// event announces, so the control compares at its next update.
+    reported_focus: bool,
+    /// Set when the control publishes its message; read and cleared by
+    /// [`crate::Inert`]'s tracker through `operation.custom` (RFC-120).
+    mark: PressMark,
     /// Tab's starting point (RFC-121 R-2): set by a click on this control,
     /// cleared by a press anywhere else. It is not focus, and draws nothing.
     start_here: bool,
@@ -171,6 +188,12 @@ pub struct Control<'a, Message> {
     /// renderer's default text size, which is what an unstyled `text`
     /// with no size of its own draws at.
     text_size: Option<Pixels>,
+    /// Told to the application when focus arrives and when it leaves
+    /// (`gained`, `lost`), for what depends on it: the toast hold (RFC-120 R-3).
+    focus_change: Option<(Message, Message)>,
+    /// How many focus targets go with this control when it is pressed: before
+    /// it and after it, in Tab order (RFC-120). `(0, 0)` is "only this one".
+    removes: (usize, usize),
 }
 
 impl<Message> Control<'_, Message> {
@@ -218,7 +241,34 @@ impl<'a, Message> Control<'a, Message> {
             ring,
             min_target: 0.0,
             text_size: None,
+            focus_change: None,
+            removes: (0, 0),
         }
+    }
+
+    /// Tell the application when this control gains and loses keyboard
+    /// focus: `gained` when focus arrives, `lost` when it leaves.
+    ///
+    /// A control sees its focus change **at its next update** (a focus
+    /// operation raises no event), so the message comes with the redraw the
+    /// runtime sends before showing the ring. The engine uses this for the
+    /// toast hold (RFC-120 R-3).
+    #[must_use]
+    pub fn on_focus_change(mut self, gained: Message, lost: Message) -> Self {
+        self.focus_change = Some((gained, lost));
+        self
+    }
+
+    /// Say that pressing this control removes **`before`** focus targets before
+    /// it and **`after`** after it, in Tab order, besides itself (RFC-120): a
+    /// chip's × takes its label (`removes(1, 0)`); an ancestor crumb takes the
+    /// crumbs after it. It is what lets focus go to the neighbour that is
+    /// still there (R-1) rather than nowhere, because position and count alone
+    /// cannot say which controls went. Undeclared is `(0, 0)`: only this one.
+    #[must_use]
+    pub fn removes(mut self, before: usize, after: usize) -> Self {
+        self.removes = (before, after);
+        self
     }
 
     /// Publish `message` when pressed — by a click, a tap, or Enter or
@@ -431,6 +481,10 @@ where
             // Tab's starting point, for `sequential_focus`, keyed by the
             // same id so a hidden focus target takes no part.
             operation.custom(Some(&self.id), bounds, &mut state.start_here);
+            // What the tracker needs to act after a press (RFC-120): whether
+            // this control was just pressed, and how many targets go with it.
+            state.mark.removes = self.removes;
+            operation.custom(Some(&self.id), bounds, &mut state.mark);
         }
 
         operation.traverse(&mut |operation| {
@@ -454,6 +508,21 @@ where
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
     ) {
+        // Focus that changed since the last update (by an operation, which
+        // raises no event, or by this control's own press elsewhere) is told
+        // to the application now (RFC-120 R-3).
+        if let Some((gained, lost)) = &self.focus_change {
+            let state = tree.state.downcast_mut::<State>();
+            if state.is_focused != state.reported_focus {
+                state.reported_focus = state.is_focused;
+                shell.publish(if state.is_focused {
+                    gained.clone()
+                } else {
+                    lost.clone()
+                });
+            }
+        }
+
         self.content.as_widget_mut().update(
             &mut tree.children[0],
             event,
@@ -541,6 +610,7 @@ where
                         state.is_pressed = false;
                         if cursor.is_over(bounds) {
                             shell.publish(on_press.get());
+                            state.mark.acted = true;
                         }
                         shell.capture_event();
                     }
@@ -571,6 +641,7 @@ where
                     // control had taken it.
                     if !repeat {
                         shell.publish(on_press.get());
+                        state.mark.acted = true;
                     }
                     shell.capture_event();
                 }

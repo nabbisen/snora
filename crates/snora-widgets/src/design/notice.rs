@@ -14,6 +14,11 @@
 //!   one and publish the message a click publishes; a ring shows which has
 //!   focus. A notice with no action or no dismiss has no control for it,
 //!   so there is nothing to Tab to.
+//! - **Where focus goes when the notice is dismissed (RFC-120):** if the dismiss
+//!   control had focus and the application removes the notice, focus moves to the
+//!   nearest control after the notice in the container it sat in, or else the
+//!   nearest before it. The notice's own action control goes with it. With no
+//!   control left in that container, nothing is focused.
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
 //! - The focus ring is drawn by the control, from `Tokens::focus`, in
 //!   whichever of that colour or black and white clears 3:1 against the
@@ -171,6 +176,9 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
 
         // Optional action button (ghost style — low emphasis inside notice)
         let mut controls: Vec<Element<'a, Message>> = Vec::new();
+        // Dismissing the notice takes its action control with it, which comes
+        // first in Tab order (RFC-120).
+        let action_goes = usize::from(self.action.is_some());
         if let Some(act) = self.action {
             let tok = t.clone();
             controls.push(
@@ -198,6 +206,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
                 t.palette.surface,
             )
             .padding(BUTTON_DEFAULT_PADDING)
+            .removes(action_goes, 0)
             .on_press(on_dismiss)
             .into();
             controls.push(with_close_tooltip(t, dismiss_btn, self.dismiss_tooltip));

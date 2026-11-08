@@ -26,6 +26,10 @@
 #![allow(dead_code)]
 
 #[cfg(feature = "widgets")]
+pub mod removal;
+#[cfg(all(feature = "widgets", feature = "design"))]
+pub mod removal_scenes;
+#[cfg(feature = "widgets")]
 pub mod subjects;
 #[cfg(feature = "widgets")]
 pub mod tab_router;

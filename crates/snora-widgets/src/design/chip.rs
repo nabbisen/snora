@@ -317,6 +317,13 @@ pub fn filter<'a, Message: Clone + 'a>(
 /// Space press the focused one (RFC-116). The remove button shows lucide
 /// `X` under the `lucide-icons` feature and `"×"` otherwise.
 ///
+/// **Where focus goes when the chip is removed (RFC-120):** if the × had focus
+/// and the application removes the chip, focus moves to the **next chip's
+/// label**, or else the **previous chip's ×**, within the row the chip sat in;
+/// with no chip left in the row, nothing is focused. (The label goes with the
+/// chip, which is why the next chip's label and not its ×: a second Enter
+/// toggles rather than removes.)
+///
 /// To show a tooltip on the remove button, use [`removable_with_tooltip`].
 #[must_use]
 pub fn removable<'a, Message: Clone + 'a>(
@@ -404,6 +411,8 @@ fn build_removable<'a, Message: Clone + 'a>(
         tokens.palette.background,
     )
     .on_press_maybe(on_remove.into())
+    // Removing the chip takes its label control with it (RFC-120).
+    .removes(1, 0)
     .padding([tokens.spacing.xs, tokens.spacing.xs])
     .into();
     let remove_btn = with_close_tooltip(tokens, remove_btn, tip);

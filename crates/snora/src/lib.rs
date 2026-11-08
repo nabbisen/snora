@@ -129,10 +129,15 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 // ---- Re-export the vocabulary from snora-core --------------------------
+#[expect(
+    deprecated,
+    reason = "`ToastHover` is deprecated and still exported (RFC-120)"
+)]
+pub use snora_core::ToastHover;
 pub use snora_core::{
     AppLayout, BreadcrumbAction, Crumb, Dialog, Edge, Icon, LayoutDirection, Menu, MenuAction,
     MenuItem, Sheet, SheetEdge, SheetSize, SideBar, SideBarItem, Tab, TabAction, TabBar, Toast,
-    ToastHover, ToastIntent, ToastLifetime, ToastPosition,
+    ToastAttention, ToastIntent, ToastLifetime, ToastPosition,
 };
 
 /// Zone-navigation vocabulary (RFC-060): [`focus::Cycle`], [`focus::FocusZone`],

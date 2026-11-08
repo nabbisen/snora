@@ -25,7 +25,60 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Added
+
+- **`ToastAttention`, `AppLayout::on_toast_attention` and
+  `snora::toast::Holds::attend` (RFC-120 R-3).** A toast now waits while the
+  reader is attending to it **by pointer or by keyboard**: it holds while the
+  pointer is on it **or** focus is on its ×, and its countdown restarts in full
+  only when both have gone. `ToastAttention` is `#[non_exhaustive]`
+  (`PointerEntered`, `PointerLeft`, `FocusGained`, `FocusLost`), so a third source
+  can come without breaking a `match`. A toast's × now reports focus gained and
+  lost when `on_toast_attention` is set; the toast layer carries no tracking when
+  it is not. **While both `on_toast_attention` and the deprecated `on_toast_hover`
+  are set, the pointer's crossings go to `on_toast_attention` only**, so a toast
+  is never held twice for one crossing.
+
+### Deprecated
+
+- **`AppLayout::on_toast_hover` (and its public field), `ToastHover` and
+  `Holds::hover`** (since 0.56.0), superseded by `on_toast_attention`,
+  `ToastAttention` and `Holds::attend`. They still work and are removed in a later
+  release. The migration is mechanical: `ToastHover::Entered` is
+  `ToastAttention::PointerEntered`, `Left` is `PointerLeft`, and a `match` on the
+  new enum needs a wildcard arm.
+
 ### Fixed
+
+- **Focus after the focused control goes away (RFC-120).** 0.55.0 left it to
+  chance: iced keeps a widget's state by its position in the tree, so when a chip,
+  a notice, an ancestor crumb, a toast or an application's own list row went, focus
+  was **lost in half the cases and inherited by whichever control moved into its
+  place in the other half**, and one more Enter pressed it (after a chip's ×, the
+  next chip was removed). Now:
+
+  > When the focused control goes away, focus moves to its nearest neighbour in
+  > the same group: the next one, or else the previous one. Otherwise, nothing is
+  > focused.
+
+  The group is the innermost container that held the control and is still there,
+  never wider than its layer (the page, a dialog, a sheet, the toast stack), so
+  focus does not jump to the footer after a breadcrumb press or from the toasts to
+  the page. "Otherwise" is two cases: the group has no control left (the root
+  crumb, the last toast), or snora cannot tell which controls went (an application
+  removed more than the pressed control without saying so, or the focused target
+  was not a snora control). **Toasts are known by id**, so a toast that expires or is
+  closed elsewhere leaves focus on the toast it was on. The application's own focus
+  task still wins.
+
+  **Not covered:** in an application's own list, a removal *elsewhere* can still
+  move focus to another control, because snora has no identity for an
+  application's widgets (RFC-116, L-7). Set focus explicitly in a list that
+  changes under the reader.
+
+  **What changed under the hood:** `Inert` is now also wrapped around a dialog and
+  a sheet (never inert) so each is a layer of its own, and `snora-control` gains
+  `Keyed` and `Group`. None is for applications.
 
 - **A click no longer gives a control keyboard focus, and a held key presses
   once (RFC-121).** Both came in with 0.55.0, in **every** application, including

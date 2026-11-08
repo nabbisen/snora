@@ -65,4 +65,9 @@ pub use menu::{Menu, MenuAction, MenuItem};
 pub use overlay::{Dialog, Sheet, SheetEdge, SheetSize};
 pub use sidebar::{SideBar, SideBarItem};
 pub use tab::{Tab, TabAction, TabBar};
-pub use toast::{Toast, ToastHover, ToastIntent, ToastLifetime, ToastPosition};
+#[expect(
+    deprecated,
+    reason = "`ToastHover` is deprecated and still exported (RFC-120)"
+)]
+pub use toast::ToastHover;
+pub use toast::{Toast, ToastAttention, ToastIntent, ToastLifetime, ToastPosition};

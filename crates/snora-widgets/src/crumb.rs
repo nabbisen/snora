@@ -78,6 +78,14 @@ impl CrumbGeometry {
 ///
 /// Empty crumb lists are valid and render as an empty row — no special
 /// case for "no breadcrumb".
+///
+/// **Where focus goes when an ancestor is pressed (RFC-120).** Pressing an
+/// ancestor makes it the current page: it becomes plain text, and the crumbs
+/// deeper than it go. If it had focus, focus moves to **the nearest crumb still
+/// there in the bar, the one before it** (its new parent; the other way round
+/// under right-to-left, where Tab runs the other way), so it stays in the bar.
+/// From the root crumb there is no crumb left, and **nothing is focused**: not
+/// the controls beyond the bar.
 pub fn app_breadcrumb<'a, Message, CrumbId, F>(
     crumbs: Vec<Crumb<CrumbId>>,
     on_action: &'a F,
@@ -107,17 +115,32 @@ where
         LayoutDirection::Rtl => "‹",
     };
 
-    let crumbs: Vec<_> = match direction {
-        LayoutDirection::Ltr => crumbs,
-        LayoutDirection::Rtl => crumbs.into_iter().rev().collect(),
-    };
+    // Pressing an ancestor makes it the current page, and the crumbs deeper than
+    // it go: how many targets go with it (RFC-120), counted in the trail's own
+    // order, before the direction reverses it.
+    let deeper: Vec<usize> = (0..crumbs.len())
+        .map(|i| crumbs[i + 1..].iter().filter(|c| !c.is_leaf).count())
+        .collect();
+    let mut crumbs: Vec<_> = crumbs.into_iter().zip(deeper).collect();
+    if direction == LayoutDirection::Rtl {
+        crumbs.reverse();
+    }
 
     let mut trail = row![].spacing(geometry.gap).align_y(Center);
 
     let last = crumbs.len().saturating_sub(1);
-    for (i, crumb) in crumbs.into_iter().enumerate() {
+    for (i, (crumb, deeper)) in crumbs.into_iter().enumerate() {
         trail = trail.push(render_crumb(
-            crumb,
+            // In Tab order the deeper crumbs come after this one in a
+            // left-to-right trail and before it in a right-to-left one.
+            (
+                crumb,
+                if direction == LayoutDirection::Rtl {
+                    (deeper, 0)
+                } else {
+                    (0, deeper)
+                },
+            ),
             on_action,
             geometry.btn_pad_x,
             geometry.btn_pad_y,
@@ -137,10 +160,15 @@ where
         }
     }
 
-    container(trail)
-        .width(Length::Fill)
-        .padding(Padding::from([geometry.row_pad_y, geometry.row_pad_x]))
-        .into()
+    // The bar stays when its last ancestor is pressed (it holds the current
+    // page's name), so it is the group focus stays in, and an empty bar means
+    // nothing is focused, not the footer beyond it (RFC-120 D-3).
+    snora_control::Group::new(
+        container(trail)
+            .width(Length::Fill)
+            .padding(Padding::from([geometry.row_pad_y, geometry.row_pad_x])),
+    )
+    .into()
 }
 
 /// Height of an ancestor's underline, in logical pixels (RFC-109).
@@ -199,8 +227,10 @@ pub(crate) fn crumb_rule_style(theme: &Theme) -> container::Style {
     }
 }
 
+/// One crumb, with how many focus targets go with it when it is pressed
+/// (`removes`: before it and after it, in Tab order; RFC-120).
 fn render_crumb<'a, Message, CrumbId, F>(
-    crumb: Crumb<CrumbId>,
+    (crumb, removes): (Crumb<CrumbId>, (usize, usize)),
     on_action: &'a F,
     btn_pad_x: f32,
     btn_pad_y: f32,
@@ -247,6 +277,7 @@ where
             page_background,
         )
         .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
+        .removes(removes.0, removes.1)
         .padding(Padding::from([btn_pad_y, btn_pad_x]))
         .into()
     }

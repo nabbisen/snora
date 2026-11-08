@@ -103,7 +103,7 @@ struct Workbench {
     show_sheet: bool,
     toasts: Vec<Toast<Message>>,
     /// One `Holds` per application is the sweep path (RFC-113). This
-    /// example does not wire `on_toast_hover`, so nothing is ever held.
+    /// example does not wire `on_toast_attention`, so nothing is ever held.
     holds: snora::toast::Holds,
     next_toast_id: u64,
     toast_position: ToastPosition,
@@ -187,7 +187,7 @@ impl Workbench {
             Message::SetToastPosition(pos) => self.toast_position = pos,
             Message::ToastTick => {
                 // `Holds::sweep` is the one sweep path (RFC-113). This
-                // example does not wire `on_toast_hover`, so nothing is
+                // example does not wire `on_toast_attention`, so nothing is
                 // ever held and this behaves exactly as the old
                 // `sweep_expired` did.
                 self.holds.sweep(&mut self.toasts, Instant::now());

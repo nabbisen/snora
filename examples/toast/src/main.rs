@@ -26,7 +26,7 @@ use iced::{
     Element, Length, Subscription, Task,
     widget::{button, column, container, row, space, text},
 };
-use snora::{AppLayout, Toast, ToastHover, ToastIntent, ToastLifetime, ToastPosition, render};
+use snora::{AppLayout, Toast, ToastAttention, ToastIntent, ToastLifetime, ToastPosition, render};
 
 #[derive(Debug, Clone)]
 enum Message {
@@ -40,11 +40,15 @@ enum Message {
     Dismiss(u64),
     /// Periodic tick from the framework's toast subscription.
     ToastTick,
-    /// The pointer came onto a toast or left it. Wired through
-    /// `AppLayout::on_toast_hover`, and handed to `Holds`, which holds
-    /// the countdown while a toast is being read and restarts it in
-    /// full when the pointer leaves (RFC-113).
-    ToastHover(u64, ToastHover),
+    /// The pointer came onto a toast or left it, or keyboard focus arrived on
+    /// its × or left it. Wired through `AppLayout::on_toast_attention`, and
+    /// handed to `Holds`, which holds the countdown while a toast is being
+    /// read, by either, and restarts it in full when both have gone
+    /// (RFC-113, RFC-120).
+    ToastAttention(u64, ToastAttention),
+    /// A key, for Tab: iced binds none, so the application routes it.
+    KeyPressed(iced::keyboard::Key, iced::keyboard::Modifiers),
+    Ignored,
     /// User picked a different anchor corner.
     ChangePosition(ToastPosition),
 }
@@ -109,10 +113,18 @@ impl App {
                 // This is the entire TTL bookkeeping — framework-owned.
                 self.holds.sweep(&mut self.toasts, Instant::now());
             }
-            Message::ToastHover(id, crossing) => {
+            Message::ToastAttention(id, attention) => {
                 self.holds
-                    .hover(id, crossing, &mut self.toasts, Instant::now());
+                    .attend(id, attention, &mut self.toasts, Instant::now());
             }
+            // Tab reaches a toast's × (and the buttons); focus there holds
+            // the toast like the pointer does.
+            Message::KeyPressed(key, modifiers) => {
+                if let Some(task) = snora::keyboard::traverse(key, modifiers) {
+                    return task;
+                }
+            }
+            Message::Ignored => {}
             Message::ChangePosition(pos) => {
                 self.position = pos;
             }
@@ -124,7 +136,15 @@ impl App {
         // Subscribe to sweep ticks only while transient toasts exist.
         // When the queue is empty or all-persistent, this returns
         // `Subscription::none()` automatically.
-        snora::toast::subscription(&self.toasts, || Message::ToastTick)
+        Subscription::batch([
+            snora::toast::subscription(&self.toasts, || Message::ToastTick),
+            iced::keyboard::listen().map(|event| match event {
+                iced::keyboard::Event::KeyPressed { key, modifiers, .. } => {
+                    Message::KeyPressed(key, modifiers)
+                }
+                _ => Message::Ignored,
+            }),
+        ])
     }
 
     fn view(&self) -> Element<'_, Message> {
@@ -177,9 +197,10 @@ impl App {
         // `toast_position` flips the anchor without per-toast change.
         let layout = AppLayout::new(body.into())
             .toasts(self.toasts.clone())
-            // Hold a toast's countdown while the pointer is on it, and
-            // restart it in full when the pointer leaves (RFC-113).
-            .on_toast_hover(Message::ToastHover)
+            // Hold a toast's countdown while the pointer is on it or keyboard
+            // focus is on its ×, and restart it in full when both have gone
+            // (RFC-113, RFC-120).
+            .on_toast_attention(Message::ToastAttention)
             .toast_position(self.position);
         render(layout)
     }

@@ -182,6 +182,12 @@ const MINIMUM_READING_SECONDS: usize = 6;
 /// ```
 ///
 /// [`AppLayout::on_toast_hover`]: crate::AppLayout::on_toast_hover
+#[deprecated(
+    since = "0.56.0",
+    note = "use `ToastAttention`, which also reports keyboard focus: \
+            `AppLayout::on_toast_attention` and `snora::toast::Holds::attend` (RFC-120). \
+            `ToastHover::Entered` is `ToastAttention::PointerEntered` and `Left` is `PointerLeft`."
+)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ToastHover {
     /// The pointer came onto the toast. Its countdown is **held**: the
@@ -191,6 +197,43 @@ pub enum ToastHover {
     /// so the reader gets the whole reading time rather than whatever
     /// was left when they arrived.
     Left,
+}
+
+/// What a reader's attention did to a toast: the pointer crossed its edge, or
+/// keyboard focus arrived on or left its controls (RFC-120 R-3).
+///
+/// What [`AppLayout::on_toast_attention`] hands an application, and what
+/// `snora::toast::Holds::attend` takes back. **One rule:** a toast waits while
+/// the reader is attending to it, by pointer or by keyboard.
+///
+/// - `PointerEntered` and `FocusGained` **hold** the toast's countdown.
+/// - `PointerLeft` and `FocusLost` release their half of the hold. When
+///   **neither** is left, the countdown **restarts in full**.
+///
+/// `#[non_exhaustive]`: a third source of attention may come (a screen reader's
+/// cursor, say), and adding it must not break an application's `match`. That is
+/// why this replaces [`ToastHover`], which could not take a focus variant
+/// without breaking every application that matched it.
+///
+/// ```
+/// use snora_core::ToastAttention;
+///
+/// let a = ToastAttention::FocusLost;
+/// assert_ne!(a, ToastAttention::FocusGained);
+/// ```
+///
+/// [`AppLayout::on_toast_attention`]: crate::AppLayout::on_toast_attention
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
+pub enum ToastAttention {
+    /// The pointer came onto the toast.
+    PointerEntered,
+    /// The pointer left the toast.
+    PointerLeft,
+    /// Keyboard focus arrived on a control in the toast.
+    FocusGained,
+    /// Keyboard focus left the toast's controls.
+    FocusLost,
 }
 
 /// Auto-dismiss policy for a toast.
@@ -288,6 +331,14 @@ impl ToastLifetime {
 }
 
 /// A toast notification.
+///
+/// **Where focus goes when a toast goes (RFC-120).** A toast's × is its only
+/// focus target. If it had focus and the toast is closed, focus moves to the
+/// **next toast's ×**, or else the **previous toast's ×**; with no toast left,
+/// nothing is focused, and never a control on the page beneath. Toasts are known
+/// by their `id`, so **a toast that expires or is closed elsewhere leaves focus on
+/// the toast it was on.** (Which toast is "next" is Tab order: the stack's
+/// layout order.)
 ///
 /// `Message` is your application's top-level message type. The `on_dismiss`
 /// field is fired when the user clicks the toast's close button. It is *not*

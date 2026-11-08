@@ -51,10 +51,17 @@
 //! application code without any wrapping trait or enum, and all overlay /
 //! close state lives as plain fields here.
 
+// `on_toast_hover` and `ToastHover` are deprecated (RFC-120) and still live
+// here until they are removed: this module defines and initialises them.
+#![expect(
+    deprecated,
+    reason = "defines and initialises the deprecated `on_toast_hover`"
+)]
+
 use crate::{
     direction::LayoutDirection,
     overlay::{Dialog, Sheet},
-    toast::{Toast, ToastHover, ToastPosition},
+    toast::{Toast, ToastAttention, ToastHover, ToastPosition},
 };
 
 /// The complete declarative description of what should be on screen.
@@ -191,7 +198,19 @@ where
     /// tracking is added to a layout that did not ask for it.
     ///
     /// [`snora::toast::Holds::hover`]: https://docs.rs/snora/latest/snora/toast/struct.Holds.html#method.hover
+    #[deprecated(
+        since = "0.56.0",
+        note = "use `on_toast_attention`, which also reports keyboard focus (RFC-120)"
+    )]
     pub on_toast_hover: Option<fn(u64, ToastHover) -> Message>,
+
+    /// `f(toast_id, attention)`: what the reader's pointer and keyboard focus
+    /// did to a toast (RFC-120 R-3).
+    ///
+    /// Wire it to hold a toast's countdown while it is being read, by pointer
+    /// or keyboard: pass the message to `snora::toast::Holds::attend`. Leave it
+    /// unset and the toast layer carries no tracking.
+    pub on_toast_attention: Option<fn(u64, ToastAttention) -> Message>,
 }
 
 impl<Node, Message> AppLayout<Node, Message>
@@ -216,6 +235,7 @@ where
             on_close_menus: None,
             on_close_modals: None,
             on_toast_hover: None,
+            on_toast_attention: None,
         }
     }
 
@@ -308,6 +328,40 @@ where
         self
     }
 
+    /// Hold a toast's countdown while it is being read: by the pointer **or**
+    /// by keyboard focus (RFC-120 R-3).
+    ///
+    /// `f(id, attention)` is emitted with [`ToastAttention::PointerEntered`] and
+    /// [`ToastAttention::PointerLeft`] as the pointer crosses a toast, and with
+    /// [`ToastAttention::FocusGained`] and [`ToastAttention::FocusLost`] as
+    /// keyboard focus arrives on and leaves the toast's controls. Hand each to
+    /// `snora::toast::Holds::attend`, which holds the toast while either is
+    /// present and restarts its countdown in full when both have gone.
+    ///
+    /// ```
+    /// use snora_core::{AppLayout, ToastAttention};
+    ///
+    /// #[derive(Clone, Debug)]
+    /// enum Message {
+    ///     ToastAttention(u64, ToastAttention),
+    /// }
+    ///
+    /// let layout: AppLayout<(), Message> = AppLayout::new(());
+    /// let layout = layout.on_toast_attention(Message::ToastAttention);
+    /// assert!(layout.on_toast_attention.is_some());
+    /// ```
+    ///
+    /// **If [`on_toast_hover`](Self::on_toast_hover) is also set**, which it
+    /// may be while an application moves over, the pointer's crossings go to
+    /// this callback **only**, so a toast is never held twice for one crossing.
+    ///
+    /// Unset, the toast layer carries no tracking at all.
+    #[must_use]
+    pub fn on_toast_attention(mut self, f: fn(u64, ToastAttention) -> Message) -> Self {
+        self.on_toast_attention = Some(f);
+        self
+    }
+
     /// Hold a toast's countdown while the pointer is on it (RFC-113).
     ///
     /// `f(id, crossing)` is emitted with [`ToastHover::Entered`] when
@@ -318,6 +372,7 @@ where
     /// under someone who reached for it.
     ///
     /// ```
+    /// # #![allow(deprecated)]
     /// use snora_core::{AppLayout, ToastHover};
     ///
     /// #[derive(Clone, Debug)]
@@ -336,6 +391,13 @@ where
     ///
     /// Unset, nothing changes: the toast layer carries no pointer
     /// tracking at all.
+    #[deprecated(
+        since = "0.56.0",
+        note = "use `AppLayout::on_toast_attention`, which also reports keyboard focus, \
+                with `snora::toast::Holds::attend` (RFC-120). Replace \
+                `ToastHover::Entered` with `ToastAttention::PointerEntered` and `Left` with \
+                `PointerLeft`; while both callbacks are set, only the new one is called."
+    )]
     #[must_use]
     pub fn on_toast_hover(mut self, f: fn(u64, ToastHover) -> Message) -> Self {
         self.on_toast_hover = Some(f);
