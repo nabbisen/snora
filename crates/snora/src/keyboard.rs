@@ -313,7 +313,7 @@ pub fn traverse<Message: 'static>(key: Key, modifiers: Modifiers) -> Option<iced
     // (RFC-121 R-2) and not from the top. With something focused they behave
     // exactly as iced's do.
     Some(iced_runtime::task::effect(iced_runtime::Action::widget(
-        snora_control::sequential_focus::<()>(!modifiers.shift()),
+        snora_interaction::sequential_focus::<()>(!modifiers.shift()),
     )))
 }
 

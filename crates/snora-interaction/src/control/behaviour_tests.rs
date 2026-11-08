@@ -651,8 +651,10 @@ fn clip_cuts_overflowing_text_at_the_controls_edge() {
 
         let mut ui: Simulator<'_, Msg> =
             Simulator::with_size(Settings::default(), Size::new(300.0, 60.0), page);
-        let dir =
-            std::env::temp_dir().join(format!("snora-control-clip-{}-{clip}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "snora-interaction-clip-{}-{clip}",
+            std::process::id()
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).expect("create a scratch directory");
         let snapshot = ui.snapshot(&Theme::Light).expect("render a frame");

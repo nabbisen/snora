@@ -167,7 +167,7 @@ where
     // The bar stays when its last ancestor is pressed (it holds the current
     // page's name), so it is the group focus stays in, and an empty bar means
     // nothing is focused, not the footer beyond it (RFC-120 D-3).
-    snora_control::Group::new(
+    snora_interaction::Group::new(
         container(trail)
             .width(Length::Fill)
             .padding(Padding::from([geometry.row_pad_y, geometry.row_pad_x])),

@@ -22,7 +22,7 @@
 //!         │         │         ▼
 //!         │         │   snora-design   (optional, design tokens — no iced dependency)
 //!         │         ▼
-//!         ├─► snora-control   (always present: the focusable control both
+//!         ├─► snora-interaction   (always present: the focusable control both
 //!         │                    the engine and snora-widgets are built on)
 //!         ▼
 //!  snora-core   (vocabulary: Toast, Dialog, Sheet, SheetSize, …)
@@ -37,18 +37,18 @@
 //!   token vocabulary (`Tokens`, `Palette`, contrast utilities).
 //! * `snora-style` depends on `iced` and `snora-design` only. It owns the
 //!   iced style bridge that turns tokens into `iced::*::Style`.
-//! * `snora-control` depends on `iced` and `iced_core` only, and on
+//! * `snora-interaction` depends on `iced` and `iced_core` only, and on
 //!   nothing of snora's. It owns the focusable, key-activatable
 //!   control (RFC-116). It is an **internal** crate, published only
 //!   because `snora` and `snora-widgets` cannot be without it, and
 //!   versioned in lockstep with them: depend on `snora`, not on it.
-//! * `snora-widgets` depends on `snora-core`, `snora-control`, `iced`,
+//! * `snora-widgets` depends on `snora-core`, `snora-interaction`, `iced`,
 //!   and (behind the `design` feature) `snora-design` and `snora-style`.
 //!   It owns the prefab widget visuals.
-//! * `snora` depends on `snora-core`, `snora-control` and (optionally)
+//! * `snora` depends on `snora-core`, `snora-interaction` and (optionally)
 //!   `snora-widgets`, `snora-design` and `snora-style`. It owns the
 //!   engine — `render`, the layer composition, and the toast lifecycle
-//!   helpers. `snora-control` is non-optional so the engine can build
+//!   helpers. `snora-interaction` is non-optional so the engine can build
 //!   the toast's close button without depending on `snora-widgets`,
 //!   which stays optional so engine-only builds stay small.
 //!

@@ -67,7 +67,7 @@ snora-style = { version = "0.56", path = "crates/snora-style", default-features 
 # own `default` turns iced's defaults on, and both dependents depend on
 # it non-optionally, so leaving that on would bring `iced/default` back
 # through this edge whatever a consumer did.
-snora-control = { version = "0.56", path = "crates/snora-control", default-features = false }
+snora-interaction = { version = "0.56", path = "crates/snora-interaction", default-features = false }
 
 # RFC-112's rule, stated once: **a feature that decides how snora
 # draws is snora's; a feature that decides what draws, or where it

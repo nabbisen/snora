@@ -25,7 +25,17 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- **`snora-control` is renamed `snora-interaction`.** Beside `snora-widgets`,
+  "control" read as another word for widget, and the crate holds far more than the
+  control now (`Inert`, `OnEscape`, `Keyed`, `Group`, `sequential_focus`, `Glyph`,
+  `EmBox`, `Underlined`): it is how the reader operates snora. Every item moved
+  unchanged, and the type `Control` keeps its name. **Applications are not
+  affected:** `snora-control` was an internal crate that `snora` and
+  `snora-widgets` depend on, and an application depends on `snora` alone. A final
+  `snora-control` release has no items and says so; 0.55.0 and 0.56.0 stay
+  published and are never yanked, so existing lockfiles keep working.
 
 ## [0.56.0] — 2026-11-08
 

@@ -484,7 +484,7 @@ fn rail_item<'a, Message>(
     button_radius: f32,
     geometry: ControlGeometry,
     label_size: Option<f32>,
-) -> snora_control::Control<'a, Message> {
+) -> snora_interaction::Control<'a, Message> {
     crate::style::control(
         content,
         move |theme: &Theme, status| sidebar_button_style(theme, status, is_active, button_radius),

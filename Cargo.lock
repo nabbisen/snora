@@ -3027,9 +3027,9 @@ dependencies = [
  "iced_test",
  "lucide-icons",
  "png 0.18.1",
- "snora-control",
  "snora-core",
  "snora-design",
+ "snora-interaction",
  "snora-style",
  "snora-widgets",
 ]
@@ -3046,13 +3046,6 @@ dependencies = [
 [[package]]
 name = "snora-control"
 version = "0.56.0"
-dependencies = [
- "iced",
- "iced_core",
- "iced_runtime",
- "iced_test",
- "png 0.18.1",
-]
 
 [[package]]
 name = "snora-core"
@@ -3194,6 +3187,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "snora-interaction"
+version = "0.56.0"
+dependencies = [
+ "iced",
+ "iced_core",
+ "iced_runtime",
+ "iced_test",
+ "png 0.18.1",
+]
+
+[[package]]
 name = "snora-opt-out-probe"
 version = "0.56.0"
 dependencies = [
@@ -3247,9 +3251,9 @@ version = "0.56.0"
 dependencies = [
  "iced",
  "lucide-icons",
- "snora-control",
  "snora-core",
  "snora-design",
+ "snora-interaction",
  "snora-style",
 ]
 

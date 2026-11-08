@@ -50,8 +50,8 @@ use iced::{
     widget::{column, container, mouse_area, row, space, stack},
 };
 
-use snora_control::{Inert, OnEscape};
 use snora_core::{AppLayout, LayoutDirection};
+use snora_interaction::{Inert, OnEscape};
 
 use crate::identifiers;
 use crate::overlay::dialog::DialogCardStyle;

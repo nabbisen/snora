@@ -91,7 +91,7 @@ jobs:
         # entire crate going untested, which is exactly how snora-widgets
         # sat for a long time before RFC-087. 15 unit tests counted at
         # the move.
-        run: cargo test -p snora-control --all-features
+        run: cargo test -p snora-interaction --all-features
       - name: Test widgets, all features (RFC-087)
         # snora-widgets had no test step in CI at all before this — not a
         # feature gap, an entire crate. 28 unit tests + 6 doc-tests
@@ -150,17 +150,17 @@ jobs:
           # it had no CI entry at all until this one.
           - name: design-only
             args: "--no-default-features --features design,iced-default"
-          # ---- snora-control (RFC-116) ----
+          # ---- snora-interaction (RFC-116) ----
           # The crate both `snora` and `snora-widgets` stand on, checked as
           # itself. Every row above reaches it through `snora`, with
           # whatever `snora` turns on; these two check it alone, with
           # iced's defaults handed back and with the crate's own defaults.
           # It has exactly one feature, so two rows is the whole matrix.
           - name: control-default
-            package: snora-control
+            package: snora-interaction
             args: ""
           - name: control-no-default-features
-            package: snora-control
+            package: snora-interaction
             args: "--no-default-features --features iced-default"
     steps:
       - uses: actions/checkout@v6
@@ -438,7 +438,7 @@ jobs:
           # nothing.
           SNORA_PARITY_OUT: ${{ github.workspace }}/parity-wgpu.tsv
         run: cargo test -p snora --all-features --tests -- --test-threads=1 --nocapture
-      - name: snora-control's own rendered tests on wgpu
+      - name: snora-interaction's own rendered tests on wgpu
         # Its own step and not a longer command above: that step's
         # `SNORA_PARITY_OUT` belongs to `snora`'s parity rows, and a failure
         # here should say which crate it is in (RFC-119 Unit 0 noted that
@@ -456,7 +456,7 @@ jobs:
         # of RFC-099's SIGSEGV.
         env:
           ICED_TEST_BACKEND: wgpu
-        run: cargo test -p snora-control --all-features --tests -- --test-threads=1 --nocapture
+        run: cargo test -p snora-interaction --all-features --tests -- --test-threads=1 --nocapture
       - name: Say which renderer drew
         # `frame_pixels` already fails if the renderer is not the one
         # asked for, so a pass is proof. This prints it anyway: a

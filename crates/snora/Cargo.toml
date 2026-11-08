@@ -33,13 +33,13 @@ default = ["widgets", "iced-default"]
 # The two `?` entries matter: they reach snora-widgets and snora-style
 # only when `widgets` or `design` has already pulled them in, so this
 # feature never adds a crate, only features to a crate already there.
-# `snora-control` has no `?` because it is not optional: it is always
+# `snora-interaction` has no `?` because it is not optional: it is always
 # present, so there is nothing for the `?` to guard, and without this
 # entry its own default would be the only thing left switching iced's
 # defaults on, whatever the consumer chose.
 iced-default = [
     "iced/default",
-    "snora-control/iced-default",
+    "snora-interaction/iced-default",
     "snora-widgets?/iced-default",
     "snora-style?/iced-default",
 ]
@@ -88,7 +88,7 @@ snora-widgets = { workspace = true, optional = true }
 # The focusable control (RFC-116). Non-optional, and the reason the
 # engine can use it for the toast's close button without depending on
 # `snora-widgets`, which stays optional so engine-only builds stay small.
-snora-control = { workspace = true }
+snora-interaction = { workspace = true }
 # `traverse` runs a widget operation as a task (RFC-121 R-2: Tab after a click
 # carries on from the clicked control). Already in the lockfile, under iced: an
 # edge, not a package, and it needs no `advanced` feature.

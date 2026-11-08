@@ -4,7 +4,7 @@
 //! The simulator has no runtime, so it cannot run `snora::keyboard::traverse`'s
 //! task. Before RFC-121 these tests gave a control focus by clicking it. A click
 //! no longer focuses, so they focus by Tab, and this is what turns a Tab key
-//! event into the operation `traverse` runs: `snora_control::sequential_focus`,
+//! event into the operation `traverse` runs: `snora_interaction::sequential_focus`,
 //! the same one, run over the content.
 //!
 //! `iced_test::Simulator::tap_key(Named::Tab)` on `tab_router(view)` is then
@@ -91,8 +91,9 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Router<'_, Message> {
             && *key == keyboard::Key::Named(keyboard::key::Named::Tab)
         {
             // Run it to completion, as the window loop does.
-            let mut current: Box<dyn Operation<()>> =
-                Box::new(snora_control::sequential_focus::<()>(!modifiers.shift()));
+            let mut current: Box<dyn Operation<()>> = Box::new(
+                snora_interaction::sequential_focus::<()>(!modifiers.shift()),
+            );
             loop {
                 self.content.as_widget_mut().operate(
                     &mut tree.children[0],

@@ -236,7 +236,7 @@ pub fn link<'a, Message: Clone + 'a>(
     // does. Where the text is so large that `reach / 2` exceeds the default
     // padding, there is no padding left to give and the link is taller.
     let vertical =
-        (BUTTON_DEFAULT_PADDING.top - snora_control::Underlined::reach(size.0) / 2.0).max(0.0);
+        (BUTTON_DEFAULT_PADDING.top - snora_interaction::Underlined::reach(size.0) / 2.0).max(0.0);
     // The underline ends at the bottom of the label, and a focus ring wider
     // than its offset reaches that far *into* the control (the high-contrast
     // presets: 3 px wide, 2 px out). So the bottom padding keeps the underline
@@ -246,7 +246,7 @@ pub fn link<'a, Message: Clone + 'a>(
     let bottom = vertical.max(ring_inside + 1.0);
     design_control(
         tokens,
-        snora_control::Underlined::new(label.into()).size(size),
+        snora_interaction::Underlined::new(label.into()).size(size),
         move |_theme: &Theme, status| style::button::ghost(&t, status),
         tokens.palette.background,
     )

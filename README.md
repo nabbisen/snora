@@ -40,8 +40,8 @@ code stays your UI code.
   menus — direction-aware, theme-aware, and entirely opt-in.
 - **Six crates, one umbrella.** `snora-core` is the iced-free
   vocabulary, `snora-design` is the iced-free (opt-in) token system,
-  `snora-style` is the opt-in iced style bridge, `snora-control` is the
-  internal focusable control, `snora-widgets` is the optional prefab
+  `snora-style` is the opt-in iced style bridge, `snora-interaction` (renamed from `snora-control`) is the
+  internal crate for how the reader operates snora, `snora-widgets` is the optional prefab
   UI parts, and `snora` is the engine — applications only depend on
   `snora`.
 
@@ -133,7 +133,7 @@ demos are in the
 | [`snora-core`](https://crates.io/crates/snora-core) | Iced-free vocabulary and contract | [![snora-core](https://img.shields.io/crates/v/snora-core?label=snora-core)](https://crates.io/crates/snora-core) | [![snora-core Docs](https://docs.rs/snora-core/badge.svg?version=latest)](https://docs.rs/snora-core) | [![snora-core Deps Status](https://deps.rs/crate/snora-core/latest/status.svg)](https://deps.rs/crate/snora-core) |
 | [`snora-design`](https://crates.io/crates/snora-design) | Iced-free design tokens (opt-in) | [![snora-design](https://img.shields.io/crates/v/snora-design?label=snora-design)](https://crates.io/crates/snora-design) | [![snora-design Docs](https://docs.rs/snora-design/badge.svg?version=latest)](https://docs.rs/snora-design) | [![snora-design Deps Status](https://deps.rs/crate/snora-design/latest/status.svg)](https://deps.rs/crate/snora-design) |
 | [`snora-style`](https://crates.io/crates/snora-style) | Iced style bridge for those tokens (opt-in) | [![snora-style](https://img.shields.io/crates/v/snora-style?label=snora-style)](https://crates.io/crates/snora-style) | [![snora-style Docs](https://docs.rs/snora-style/badge.svg?version=latest)](https://docs.rs/snora-style) | [![snora-style Deps Status](https://deps.rs/crate/snora-style/latest/status.svg)](https://deps.rs/crate/snora-style) |
-| [`snora-control`](https://crates.io/crates/snora-control) | Internal: the focusable, key-activatable control the engine and the widgets stand on — depend on `snora`, not on this | [![snora-control](https://img.shields.io/crates/v/snora-control?label=snora-control)](https://crates.io/crates/snora-control) | [![snora-control Docs](https://docs.rs/snora-control/badge.svg?version=latest)](https://docs.rs/snora-control) | [![snora-control Deps Status](https://deps.rs/crate/snora-control/latest/status.svg)](https://deps.rs/crate/snora-control) |
+| [`snora-interaction`](https://crates.io/crates/snora-interaction) | Internal: how the reader operates snora (the focusable control, focus after a removal), renamed from `snora-control` in 0.57.0 — depend on `snora`, not on this | [![snora-interaction](https://img.shields.io/crates/v/snora-interaction?label=snora-interaction)](https://crates.io/crates/snora-interaction) | [![snora-interaction Docs](https://docs.rs/snora-interaction/badge.svg?version=latest)](https://docs.rs/snora-interaction) | [![snora-interaction Deps Status](https://deps.rs/crate/snora-interaction/latest/status.svg)](https://deps.rs/crate/snora-interaction) |
 | [`snora-widgets`](https://crates.io/crates/snora-widgets) | Prefab UI parts — header, footer, sidebar, menu, icon (optional) | [![snora-widgets](https://img.shields.io/crates/v/snora-widgets?label=snora-widgets)](https://crates.io/crates/snora-widgets) | [![snora-widgets Docs](https://docs.rs/snora-widgets/badge.svg?version=latest)](https://docs.rs/snora-widgets) | [![snora-widgets Deps Status](https://deps.rs/crate/snora-widgets/latest/status.svg)](https://deps.rs/crate/snora-widgets) |
 
 ## Read more

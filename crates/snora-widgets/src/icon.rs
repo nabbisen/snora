@@ -1,10 +1,10 @@
 //! Render a [`snora_core::Icon`] into an `iced::Element`.
 
 use iced::{Element, widget::text};
-#[cfg(feature = "svg-icons")]
-use snora_control::EmBox;
-use snora_control::Glyph;
 use snora_core::Icon;
+#[cfg(feature = "svg-icons")]
+use snora_interaction::EmBox;
+use snora_interaction::Glyph;
 
 /// Render an icon at **1 em of the text it sits with** (RFC-115's
 /// amendment).

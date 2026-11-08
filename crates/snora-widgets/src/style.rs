@@ -259,8 +259,8 @@ impl ControlGeometry {
 pub(crate) fn focus_ring<'a>(
     geometry: ControlGeometry,
     behind: impl Fn(&Theme) -> Color + 'a,
-) -> snora_control::Ring<'a> {
-    snora_control::Ring {
+) -> snora_interaction::Ring<'a> {
+    snora_interaction::Ring {
         color: Box::new(move |theme: &Theme| {
             let preferred = geometry
                 .ring_preferred
@@ -285,9 +285,9 @@ pub(crate) fn control<'a, Message>(
     geometry: ControlGeometry,
     label_size: Option<f32>,
     behind: impl Fn(&Theme) -> Color + 'a,
-) -> snora_control::Control<'a, Message> {
+) -> snora_interaction::Control<'a, Message> {
     let mut control =
-        snora_control::Control::new(content, Box::new(style), focus_ring(geometry, behind))
+        snora_interaction::Control::new(content, Box::new(style), focus_ring(geometry, behind))
             .min_target(geometry.min_target);
     if let Some(size) = label_size {
         control = control.text_size(size);
@@ -324,7 +324,7 @@ pub(crate) fn design_control<'a, Message>(
     content: impl Into<iced::Element<'a, Message>>,
     style: impl Fn(&Theme, button::Status) -> button::Style + 'a,
     behind: snora_design::Color,
-) -> snora_control::Control<'a, Message> {
+) -> snora_interaction::Control<'a, Message> {
     let behind = snora_style::color::to_iced_color(behind);
     control(
         content,

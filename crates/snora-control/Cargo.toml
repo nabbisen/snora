@@ -1,56 +1,19 @@
 [package]
 name = "snora-control"
-description = "The focusable, key-activatable control behind snora's widgets. An internal crate: it exists to serve the other snora crates, so depend on `snora`."
+description = "Deprecated: renamed to snora-interaction. This release is a notice and has no items; applications never needed this crate, they use `snora`."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
-readme = "../../README.md"
+readme = "README.md"
 keywords = ["gui", "iced", "accessibility", "keyboard", "ui"]
 categories = ["gui", "accessibility"]
 
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+[badges]
+maintenance = { status = "deprecated" }
 
-# Deliberately minimal (RFC-116, ruling of 2026-11-07): this crate is
-# structurally below both `snora` (the engine, for the toast's close
-# button) and `snora-widgets` (every prefab control), and so imports
-# nothing from either, nor from `snora-core` or `snora-design`. It needs
-# only the iced types its one widget is built from. If a change here ever
-# needs a third dependency, that is a finding, not a routine addition.
-[features]
-default = ["iced-default"]
-# Turning this off is how an application takes iced's default features
-# into its own hands: the renderers, the windowing backends and
-# `linux-theme-detection` with its zbus and mundy trees (RFC-112). It
-# is on by default, so a plain `cargo add` is unchanged; an
-# application that turns it off must name its own iced features, or
-# nothing will draw and winit will refuse to compile for the platform.
-iced-default = ["iced/default"]
-
+# No dependencies, and nothing depends on this crate: it is the notice release
+# of a crate that was renamed (0.57.0), in the workspace for that release only.
 [dependencies]
-iced = { workspace = true }
-# `Widget` and `Focusable` are public in `iced_core` with no feature
-# gate; iced's `advanced` feature only re-exports them. Depending on
-# `iced_core` directly avoids widening snora's feature surface. The same
-# `0.14` requirement as `iced`, so Cargo unifies the two and there is
-# one `iced_core` in the graph (RFC-116 Unit 0, checked with
-# `cargo tree`).
-iced_core = "0.14"
-
-[dev-dependencies]
-# `control`'s layout floor is measured through the headless simulator,
-# because the floor is read from the renderer's own `default_size()` and
-# there is no other way to vary that.
-iced_test = "0.14"
-# `control`'s behaviour is driven through the same `UserInterface` the
-# runtime uses, so a test sees what the window loop sees: the
-# `redraw_request` it acts on, and the operations it runs. Already in
-# the lockfile (iced depends on it): an edge, not a package.
-iced_runtime = "0.14"
-# Decodes the PNG the simulator writes, for the one test that has to
-# read pixels (`clip`). Already in the lockfile.
-png = "0.18"

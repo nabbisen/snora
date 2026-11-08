@@ -249,7 +249,7 @@ where
     // state by position, so a toast that goes would hand its focus to whichever
     // moves into its place). `Keyed` does not change what the tree reports.
     Some(
-        snora_control::Keyed::new(
+        snora_interaction::Keyed::new(
             container(stack_col)
                 .width(Length::Fill)
                 .height(Length::Fill)
@@ -354,7 +354,7 @@ where
             glyph.into()
         }
         None => {
-            let glyph = snora_control::Glyph::new(close_content, CLOSE_GLYPH_EM);
+            let glyph = snora_interaction::Glyph::new(close_content, CLOSE_GLYPH_EM);
             #[cfg(feature = "lucide-icons")]
             let glyph = glyph.font(iced::Font::with_name("lucide"));
             glyph.into()
@@ -377,10 +377,10 @@ where
     // resolved. The ring is that same colour, which is the pair iced or
     // the token palette guarantees against the toast's fill.
     let (ring_width, ring_offset) = style.ring.unwrap_or(CLOSE_RING_UNSTYLED);
-    let mut close_btn = snora_control::Control::new(
+    let mut close_btn = snora_interaction::Control::new(
         close_glyph,
         Box::new(move |theme, status| close_button_style(theme, intent, status, intents)),
-        snora_control::Ring {
+        snora_interaction::Ring {
             color: Box::new(move |theme| intent_colors(theme, intent, intents).1),
             width: ring_width,
             offset: ring_offset,
