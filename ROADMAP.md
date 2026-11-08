@@ -232,6 +232,13 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
+## Now — 0.55.1 (proposed, RFC-121)
+
+- **A click no longer gives a control keyboard focus,** so no ring appears after a click,
+  and no key presses a control the reader only clicked. That is 0.54's pointer
+  behaviour, which 0.55.0's notes said was unchanged.
+- **A held key presses once.**
+
 ## Next — 0.56.0
 
 Accepted as 0.56's core by the owner, 2026-11-08:

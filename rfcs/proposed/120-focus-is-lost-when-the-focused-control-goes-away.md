@@ -1,6 +1,10 @@
 # RFC-120 — Focus is lost when the focused control goes away
 
-**Status.** Proposed 2026-11-08. Awaiting the owner's rulings on Q-1 to Q-6.
+**Status.** Proposed 2026-11-08. Awaiting the owner's rulings on Q-1 to Q-5.
+**Revised** 2026-11-08, before ruling, after the owner asked for a careful check against
+the fundamental philosophy. R-1's rule was rewritten: as first stated, it would have
+sent focus to the footer after a breadcrumb press. The held-key rule (first R-5)
+moved to RFC-121, with a larger finding, for a 0.55.1 patch.
 **Raised.** 2026-11-08, architect. This is RFC-116's long-term plan item L-1, whose
 trigger fired when RFC-119 was accepted. It also takes L-3, the toast hold for a
 keyboard user. The owner accepted both as the core of 0.56 on 2026-11-08.
@@ -47,25 +51,30 @@ their focus with it.
 ## Proposal
 
 **R-1. The rule a reader can predict.** It follows WAI-ARIA's guidance for removing an
-item from a list:
+item from a list, kept inside the group the control belonged to:
 
-> **When the focused control goes away, focus moves to the control that came after it
-> in Tab order. If it was the last, focus moves to the one before it. If no control
-> is left, focus is nowhere, and the next Tab starts from the top.**
+> **When the focused control goes away, focus moves to its nearest neighbour that is
+> still there: the one after it if there is one, otherwise the one before it. It
+> looks within the control's own group first (a chip row, the toast stack, the
+> breadcrumb bar), and only then further out. If no control is left anywhere, focus
+> is nowhere, and the next Tab starts from the top.**
 
-What that gives, case by case:
+- **"After" and "before" are Tab order as it was before the removal.** Only that
+  version is the same to a reader whichever way the application arranged its
+  widgets. Under RTL it follows the mirrored order, as Tab does.
+- **"Still there" means present after the update.** When a press changes the view,
+  only what survives the change counts.
+- **"Its own group" is the nearest enclosing widget that still holds a control.**
+  This is what stops focus jumping to an unrelated region, such as the footer after a
+  breadcrumb press, as the first draft's rule would have done.
 
 | Case | Focus goes to |
 |---|---|
 | chip *k*'s × | chip *k* + 1's label; after the last chip, chip *k* − 1's × |
-| a notice's dismiss | the first control after the notice |
-| toast *k*'s × | toast *k* + 1's ×; after the last toast, the control before it |
-| an ancestor crumb | the first control after the breadcrumb bar |
+| a notice's dismiss | the nearest control after the notice in the container it sat in, else before it |
+| toast *k*'s × | toast *k* + 1's ×, else toast *k* − 1's ×; with no toast left, the nearest control before the stack |
+| an ancestor crumb | the nearest crumb before it, the current page's new parent, so focus stays in the bar (as a pressed sidebar item or tab keeps its focus); from the root crumb, further out |
 | an application's own control | the same rule |
-
-**"Came after it" means in the Tab order as it was before the removal,** not as it is
-afterwards. Only that version is the same to a reader whichever way the application
-arranged its widgets.
 
 **R-2. The application's own focus still wins** (RFC-119's rule A). If the application
 moves focus itself in the same update, as with a focus task, R-1 does nothing.
@@ -95,17 +104,10 @@ known:
 
   If none of these gives R-1 for an application's own controls, Q-2 decides the scope.
 
-**R-5. A held key presses once.** Found while reviewing R-1 against the principles.
-- **Today, in 0.55.0, every snora control presses again on each key repeat.**
-  `control`'s `update` matches `KeyPressed` on Enter or Space and ignores its `repeat`
-  field (`crates/snora-control/src/control.rs:537`; iced 0.14 reports it,
-  `iced_core/src/keyboard/event.rs:34`). Holding Enter on a `danger` button presses it
-  again and again. A pointer press never repeats.
-- **With R-1 it is worse.** Holding Enter on a chip's × would remove that chip, move
-  focus on, and press the next control, and so on down the row.
-- **Rule:** *a key press activates a control once; holding the key does not repeat
-  it.* That is the pointer's behaviour, so it is RFC-119's principle, "the keyboard
-  does what the pointer can", applied to time.
+**R-5 moved.** "A held key presses once" was first proposed here. It moved to
+**RFC-121**, together with a larger finding: in 0.55.0 a click gives a control keyboard
+focus. RFC-121 proposes a 0.55.1 patch. R-1 relies on it, since moving focus on after a
+removal is only safe if a held key cannot follow it.
 
 ## Open questions, with suggested rulings
 
@@ -139,7 +141,9 @@ variant added to it would break every application's `match`. Two options:
     and keep working.
 
 **Suggest (b).** One concept, one callback, and room for a third source without
-another break. That is the "finally clean" design. Its cost is a deprecation one
+another break. **While both are set, during the deprecation,** the engine sends the
+pointer's crossings to `on_toast_attention` only. So a toast is never held twice for one
+crossing, and an application that has moved need not unset the old callback first. That is the "finally clean" design. Its cost is a deprecation one
 release after `on_toast_hover` arrived (0.54). The migration is mechanical, and the
 guide states it. Under (a), the forgotten second callback is exactly the kind of
 misunderstanding the owner's rule forbids.
@@ -147,14 +151,6 @@ misunderstanding the owner's rule forbids.
 **Q-5 — release.** **Suggest 0.56.0,** the release the owner gave this item. If Unit 0
 finds no mechanism for R-1 that holds, R-3 (the hold) can ship alone, and R-1 returns to
 the owner with the measurements.
-
-**Q-6 — R-5 now, as a 0.55.1 patch, or with 0.56?** **Suggest 0.56.0, with RFC-120.**
-- It needs Enter held past the platform's repeat delay, about half a second, on a
-  control whose repeated press does harm. Applications already guard destructive
-  actions with a confirmation dialog, and RFC-119 makes the dialog hold.
-- No adopter has routed Tab yet: 0.55.0 is one day old.
-- It is one line and one test, though, so if the owner prefers it in users' hands
-  sooner, a patch costs little.
 
 ## Review against snora's principles
 
@@ -165,11 +161,17 @@ the owner with the measurements.
   tree position. Today, Enter after a removal may press a control the user never
   reached. R-1 replaces that with a control next to the one they pressed, which they
   were moving through.
-- **The review found R-5.** Moving focus on after a removal is only safe if a held key
-  cannot follow it. For chips, R-1 also lands on the next chip's **label**, not its ×,
-  so even a deliberate second Enter toggles rather than removes.
+- **The review found three things.**
+  - **The footer jump.** The first rule, "the control after it", would send focus to
+    the footer after a breadcrumb press, because nothing after the crumb survived the
+    view change. R-1 now looks within the group first.
+  - **The held key**, now RFC-121's R-3.
+  - **The click focus,** RFC-121's F-1.
+
+  For chips, R-1 lands on the next chip's **label**, not its ×, so even a deliberate
+  second Enter toggles rather than removes.
 - **Not yet safe: toasts.** A toast's × is its only control, so after closing toast
-  *k*, a second deliberate Enter closes toast *k* + 1. With R-5 that takes a second
+  *k*, a second deliberate Enter closes toast *k* + 1. With RFC-121's R-3 that takes a second
   press, after the reader has seen the next toast and its ring. An unread error toast
   still needs that deliberate press. This is accepted, and stated, rather than given a
   special case.
@@ -199,7 +201,7 @@ the owner with the measurements.
    - RTL Tab order;
    - the application's focus winning;
    - the hold from both sources, and a restart in full only when both have gone;
-   - R-5: a repeated `KeyPressed` presses nothing, with the breakage row to honour
-     `repeat`.
+   - the group rule: a breadcrumb press keeps focus in the bar, and a notice's dismiss
+     does not leave its container while a control remains in it.
 3. **The book** by the architect: the keyboard pages and `04-toasts.md`. **CHANGELOG**
    under Fixed (focus), and Added and Deprecated (the hold, if Q-4 (b)).

@@ -181,7 +181,8 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 120 | [Focus is lost when the focused control goes away](./proposed/120-focus-is-lost-when-the-focused-control-goes-away.md) | 0.56.0 — RFC-116's L-1 and L-3: focus moves to the control that came after the one that went (WAI-ARIA's list rule); a toast waits while the keyboard is on it; a held key presses once (found in review, present in 0.55). Today's behaviour is measured first: L-1's "focus goes nowhere" was inferred, not measured |
+| 120 | [Focus is lost when the focused control goes away](./proposed/120-focus-is-lost-when-the-focused-control-goes-away.md) | 0.56.0 — RFC-116's L-1 and L-3: focus moves to the nearest surviving neighbour, after first, within its own group first (revised: the first rule sent focus to the footer after a crumb press); a toast waits while the keyboard is on it, through one attention callback. Today's behaviour measured first |
+| 121 | [A click gives a control keyboard focus, and a held key presses it again and again](./proposed/121-a-click-gives-keyboard-focus-and-a-held-key-repeats.md) | **0.55.1, a patch** — found re-reviewing RFC-120: in 0.55.0 every click focuses the control, so a ring appears after every press and Space or Enter presses it again, in every application, contrary to 0.55.0's notes; and a held key repeats the press. Proposed: a click does not focus; Tab carries on from the clicked control if feasible; a held key presses once |
 
 ## Archive
 
