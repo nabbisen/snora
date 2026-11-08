@@ -25,7 +25,32 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **A click no longer gives a control keyboard focus, and a held key presses
+  once (RFC-121).** Both came in with 0.55.0, in **every** application, including
+  those that never route Tab, and 0.55.0's notes said otherwise ("nothing changes
+  for an application that does not route Tab"):
+  - **a focus ring appeared on every snora button a mouse or touch user
+    pressed**, and stayed until they pressed somewhere else, and Space or Enter
+    then **pressed that control again**: a user who clicked "Send" and then pressed
+    Space for any other reason sent twice. A click now presses and does not
+    focus, as in 0.54.0; focus moves only by the keyboard (Tab, through
+    `traverse`) or by the application;
+  - **a held Enter or Space repeated the press**, on a focused destructive button
+    as on any other; a pointer press never repeats. A key press now activates a
+    control once. The repeat is still the control's while it has focus, so it is
+    captured and not handed to the application.
+
+  **Tab after a click carries on from the clicked control**, so a pointer user who
+  reaches for the keyboard does not start again from the top: Tab moves to the
+  control after it, Shift+Tab to the one before, and after a press anywhere else
+  Tab starts from the top. `snora::keyboard::traverse` does this; `snora` now
+  depends on `iced_runtime` directly (already in the dependency tree under
+  iced, so no new package).
+
+  **What to re-check:** screenshot baselines taken on 0.55.0 after a click show a
+  ring that this release removes.
 
 ## [0.55.0] — 2026-11-07
 

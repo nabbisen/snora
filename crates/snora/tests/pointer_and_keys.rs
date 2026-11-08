@@ -375,3 +375,205 @@ fn separate_presses_still_press_each_time() {
     });
     assert_clean("separate-presses", failures);
 }
+
+// ---- R-2: Tab after a click carries on from the clicked control ---------------
+
+use iced::widget::{row, space};
+use snora::design::button;
+
+fn three() -> Element<'static, Msg> {
+    let tokens: &'static snora::design::Tokens =
+        Box::leak(Box::new(snora::design::Tokens::light()));
+    iced::widget::container(
+        iced::widget::column![
+            row![
+                button::ghost(tokens, "Alpha", Msg("a".to_owned())),
+                button::ghost(tokens, "Bravo", Msg("b".to_owned())),
+                button::ghost(tokens, "Charlie", Msg("c".to_owned())),
+            ]
+            .spacing(20),
+            space().height(iced::Length::Fixed(200.0)),
+        ]
+        .spacing(10),
+    )
+    .padding(24)
+    .into()
+}
+
+/// Tab, or Shift+Tab, **through `snora::keyboard::traverse`**: the task it
+/// returns is taken apart, and the widget operation inside it is run on the
+/// interface to completion, as the window loop does. (`focus_next` itself is
+/// not what `traverse` runs any more, so a test that ran it would prove
+/// nothing about R-2.)
+fn traverse(rig: &mut Rig, shift: bool) {
+    use iced::futures::StreamExt;
+    let modifiers = if shift {
+        keyboard::Modifiers::SHIFT
+    } else {
+        keyboard::Modifiers::empty()
+    };
+    let task = snora::keyboard::traverse::<Msg>(Key::Named(Named::Tab), modifiers)
+        .expect("Tab is claimed");
+    let mut stream = iced_runtime::task::into_stream(task).expect("a task with work in it");
+    let Some(iced_runtime::Action::Widget(operation)) =
+        iced::futures::executor::block_on(stream.next())
+    else {
+        panic!("traverse did not produce a widget operation");
+    };
+    let mut current: Box<dyn Operation<()>> = operation;
+    loop {
+        rig.ui
+            .operate(&rig.renderer, &mut operation::black_box(current.as_mut()));
+        match current.finish() {
+            Outcome::None | Outcome::Some(()) => return,
+            Outcome::Chain(next) => current = next,
+        }
+    }
+}
+
+fn focused_of(rig: &mut Rig) -> Vec<bool> {
+    rig.targets().iter().map(|t| t.focused).collect()
+}
+
+fn centre(rig: &mut Rig, k: usize) -> Point {
+    rig.targets()[k].bounds.center()
+}
+
+/// **After a click on B, Tab moves to C**; Shift+Tab, to A.
+#[test]
+fn tab_after_a_click_carries_on_from_the_clicked_control() {
+    let mut rig = Rig::new(three());
+    let b = centre(&mut rig, 1);
+    rig.click(b);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, false, false],
+        "the premise: a click focuses nothing"
+    );
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, false, true],
+        "Tab after clicking B"
+    );
+
+    let mut rig = Rig::new(three());
+    let b = centre(&mut rig, 1);
+    rig.click(b);
+    traverse(&mut rig, true);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "Shift+Tab after clicking B"
+    );
+}
+
+/// **After a press anywhere else, Tab starts from the top** (and Shift+Tab from
+/// the bottom): the click's starting point is gone.
+#[test]
+fn tab_after_a_press_elsewhere_starts_from_the_top() {
+    let mut rig = Rig::new(three());
+    let b = centre(&mut rig, 1);
+    rig.click(b);
+    rig.click(Point::new(500.0, 500.0)); // empty space
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "Tab after clicking empty space"
+    );
+
+    let mut rig = Rig::new(three());
+    let b = centre(&mut rig, 1);
+    rig.click(b);
+    rig.click(Point::new(500.0, 500.0));
+    traverse(&mut rig, true);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, false, true],
+        "Shift+Tab from the bottom"
+    );
+
+    // And a plain Tab on an untouched window is the top, as before.
+    let mut rig = Rig::new(three());
+    traverse(&mut rig, false);
+    assert_eq!(focused_of(&mut rig), vec![true, false, false]);
+}
+
+/// **After a click on the last control, Tab leaves the group** (no wrap, as
+/// iced's `focus_next`), and the next Tab starts from the top.
+#[test]
+fn tab_after_a_click_on_the_last_control_leaves_the_group() {
+    let mut rig = Rig::new(three());
+    let c = centre(&mut rig, 2);
+    rig.click(c);
+    traverse(&mut rig, false);
+    assert_eq!(focused_of(&mut rig), vec![false, false, false], "no wrap");
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "then from the top"
+    );
+}
+
+/// **Once the keyboard has focus, the click is forgotten**: with something
+/// focused, Tab is `focus_next`'s, whatever was clicked before.
+#[test]
+fn a_focused_control_beats_a_clicked_one() {
+    let mut rig = Rig::new(three());
+    let c = centre(&mut rig, 2);
+    rig.click(c);
+    // The application focuses a control itself, with the runtime's own
+    // `focus_next`, which knows nothing of the click.
+    rig.tab();
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "the application's focus"
+    );
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, true, false],
+        "Tab moved from the focused control, not from the clicked one"
+    );
+}
+
+/// **A Tab run forgets the click**: click B, Tab to C, Tab past the end, and
+/// the next Tab is the top, not C again. (The mark is cleared when the keyboard
+/// takes over.)
+#[test]
+fn a_tab_run_forgets_the_click() {
+    let mut rig = Rig::new(three());
+    let b = centre(&mut rig, 1);
+    rig.click(b);
+    traverse(&mut rig, false); // C
+    traverse(&mut rig, false); // past the end: nothing
+    assert_eq!(focused_of(&mut rig), vec![false, false, false]);
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "the click's starting point outlived the Tab run"
+    );
+}
+
+/// The premise of the ring test above, as a test of its own: Tab **does** draw
+/// a ring on every control, so "a click draws none" is not true because no
+/// control ever draws one.
+#[test]
+fn tab_to_a_control_draws_a_ring() {
+    let failures = for_every_target(|_, subject, k, _| {
+        let mut untouched = Rig::new(subject.element());
+        untouched.redraw_requested();
+        let plain = untouched.frame();
+        let mut tabbed = Rig::new(subject.element());
+        for _ in 0..=k {
+            tabbed.tab();
+        }
+        tabbed.redraw_requested();
+        (tabbed.frame() == plain).then(|| "Tab changed no pixel".to_owned())
+    });
+    assert_clean("tab-ring", failures);
+}

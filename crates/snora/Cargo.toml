@@ -89,6 +89,10 @@ snora-widgets = { workspace = true, optional = true }
 # engine can use it for the toast's close button without depending on
 # `snora-widgets`, which stays optional so engine-only builds stay small.
 snora-control = { workspace = true }
+# `traverse` runs a widget operation as a task (RFC-121 R-2: Tab after a click
+# carries on from the clicked control). Already in the lockfile, under iced: an
+# edge, not a package, and it needs no `advanced` feature.
+iced_runtime = "0.14"
 snora-design = { workspace = true, optional = true }
 # The iced style bridge (RFC-055) — design/render.rs's card_raised and
 # to_iced_color calls reach this directly, without depending on
@@ -105,8 +109,3 @@ iced_test = "0.14"
 # rendered pixels themselves (RFC-108 R-1). Already in the lockfile:
 # `iced_test` encodes with the same crate at the same version.
 png = "0.18"
-# RFC-116 R-1 Unit 1: the end-to-end focus-traversal test builds the
-# runtime's own `UserInterface` and runs `focus_next` / `find_focused`
-# against it, which `iced_test::Simulator` does not expose. Already in
-# the lockfile (iced depends on it): an edge, not a package.
-iced_runtime = "0.14"
