@@ -234,13 +234,24 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.56.0
 
-- **RFC-116 R-2, the `Shortcuts` router.** Its Escape part is reconsidered first:
-  RFC-119 now answers Escape for any overlay that closes on a click outside.
-- **RFC-116's long-term plan, L-1: focus after a control removes itself.** Its
-  trigger fired when RFC-119 was accepted, and RFC-119's position-and-count memory
-  is the likely mechanism.
-- The starter example's `dismiss_on_escape` call, made redundant by RFC-119, is
-  removed.
+Accepted as 0.56's core by the owner, 2026-11-08:
+- **Focus after the focused control goes away** (RFC-120, proposed): focus moves to the
+  control that came after it, a toast waits while the keyboard is on it, and a held key
+  presses once.
+- **Housekeeping:** the examples' redundant `dismiss_on_escape`, `snora-control`'s
+  pixel tests on wgpu in CI, and the real-window Tab check under native Wayland.
+
+## Then — 0.57.0
+
+- **RFC-116 R-2, the shortcuts router,** after its amendment is ruled. As specified it
+  would fire beneath an overlay, and its Escape now overlaps RFC-119's. The amendment
+  proposes one router placed by the engine inside the page layer, and an `AppLayout`
+  field for an Escape that does not close on a click outside.
+
+## Future wanted
+
+- A name shown when the keyboard reaches an icon-only (`Tooltip`) rail item (RFC-116
+  L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
 

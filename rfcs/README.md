@@ -181,6 +181,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 120 | [Focus is lost when the focused control goes away](./proposed/120-focus-is-lost-when-the-focused-control-goes-away.md) | 0.56.0 — RFC-116's L-1 and L-3: focus moves to the control that came after the one that went (WAI-ARIA's list rule); a toast waits while the keyboard is on it; a held key presses once (found in review, present in 0.55). Today's behaviour is measured first: L-1's "focus goes nowhere" was inferred, not measured |
 
 ## Archive
 

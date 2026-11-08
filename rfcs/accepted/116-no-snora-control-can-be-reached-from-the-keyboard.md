@@ -286,9 +286,86 @@ trigger fires, the item becomes an RFC or a unit, and nobody waits for a re-read
 
 | # | Gap | Who meets it | Trigger |
 |---|---|---|---|
-| L-1 | **Focus after a control removes itself.** Dismissing a notice, closing a toast, removing a chip, or pressing an ancestor crumb, which becomes the current page: focus goes nowhere, and the next Tab starts from the top of the window | everyone who dismisses from the keyboard | **fired 2026-11-07** (RFC-119 Unit 1 accepted). Next: an RFC, after 0.55.0. RFC-119's position-and-count memory is the likely mechanism |
+| L-1 | **Focus after a control removes itself** — *taken by RFC-120 (0.56).* Dismissing a notice, closing a toast, removing a chip, or pressing an ancestor crumb, which becomes the current page: focus goes nowhere, and the next Tab starts from the top of the window | everyone who dismisses from the keyboard | **fired 2026-11-07** (RFC-119 Unit 1 accepted). Next: an RFC, after 0.55.0. RFC-119's position-and-count memory is the likely mechanism |
 | L-2 | ~~Focus returns to the opener when a modal closes~~ **Met by RFC-119** (merged 2026-11-07): focus returns, unless the page's number of controls changed or the application focused something itself | — | — |
-| L-3 | **No hold for a keyboard-focused toast.** Focusing the toast's × does not hold it, as a resting pointer does (RFC-113) | keyboard users reading a toast | with L-1, since both concern the toast's control |
+| L-3 | **No hold for a keyboard-focused toast** — *taken by RFC-120 (0.56).* Focusing the toast's × does not hold it, as a resting pointer does (RFC-113) | keyboard users reading a toast | with L-1, since both concern the toast's control |
 | L-4 | **No public control for an application's own content.** An application's own iced `button` (an icon button, a card as a target) is pointer and touch only; `control` serves snora's crates only | applications that build their own controls | the first adopter that asks, or 1.0's API freeze review, whichever comes first |
 | L-5 | **A focused item on the `Tooltip` rail shows no name:** iced opens tooltips only under the pointer | keyboard users of `SideBarLabels::Tooltip` | an iced release with focus-driven tooltips; until then, the book says so (`reference/widgets.md`), and `Beneath` is the default; the next rustdoc pass on `SideBarLabels::Tooltip` says it too |
-| L-6 | **Native Wayland.** The real-window Tab check ran under X11 only | Wayland users | the next real-window check, or any Wayland report |
+| L-6 | **Native Wayland** — *in 0.56's housekeeping handoff.* The real-window Tab check ran under X11 only | Wayland users | the next real-window check, or any Wayland report |
+
+**L-5 is *future wanted* (owner, 2026-11-08).** It is not scheduled, and stays on this
+list. snora could draw a name on focus itself. But the labelled rail is the default, and
+the `Tooltip` form's cost is stated in the book. It is revisited with L-4, or when iced's
+tooltips can open on focus.
+
+## Proposed amendment to R-2, for 0.57 (2026-11-08): awaiting the owner's rulings
+
+**Owner, 2026-11-08:** R-2 moves to 0.57, *"carefully and with consideration."* R-2 was
+accepted before RFC-119. Read again after it, two of its parts no longer hold, and its
+placement needs deciding afresh.
+
+### What no longer holds
+
+**F-1. As specified, shortcuts would fire beneath an overlay.**
+- R-2's `Shortcuts::route(key, modifiers)` runs in the application's `update`, fed by
+  `iced::keyboard::listen()`.
+- That subscription receives every key nothing captured. With a dialog open, `Ctrl+1`
+  is captured by nothing (RFC-119's `Inert` only stops it reaching the page's widgets),
+  so the router would switch the sidebar's view beneath the dialog.
+- That breaks the rule 0.55 shipped: *the keyboard does only what the pointer can.*
+
+**F-2. "`dismiss_on_escape` is deprecated" now conflicts with RFC-119.**
+- RFC-119 answers Escape in the engine for every overlay that closes on a click outside.
+- `dismiss_on_escape` was kept for the one case left: an overlay that should close on
+  Escape but **not** on a click outside, such as a destructive confirmation.
+- R-2's `.escape(Escape { modal, menu })` was to replace it. Named fields are right:
+  `dismiss_on_escape`'s two `bool`s and two `Option`s in a row are easy to call in the
+  wrong order, with no compiler error.
+- But an Escape answered inside the page would be silenced by `Inert` while the modal
+  it should close is open. **That Escape has to live with the overlay, not the page.**
+
+### Where shortcuts live: three options
+
+| | The application's `update` (R-2 as accepted) | Each snora widget answers its own keys | **One router, placed by the engine inside the page layer** |
+|---|---|---|---|
+| Silent under an overlay | only if the application passes the overlay state, and it can forget | yes, through `Inert` | **yes, through `Inert`**: nothing to remember |
+| One precedence order, so two routes never both fire (R-2's own guarantee) | yes | no: two tab bars would each answer Ctrl+Tab | **yes** |
+| Takes no key the application did not ask for | yes | only if every widget is opt-in | **yes: only the routes the builder names** |
+| No double message | the application's own concern | yes, captured | **yes, captured** |
+
+**Suggest the third.** The application builds `Shortcuts` in `view`, from the same
+side bar, tab bar and crumbs it hands its widgets, and passes it with
+`AppLayout::shortcuts(…)`. The engine places it inside the page's `Inert`. Every
+property in the table then comes from mechanisms 0.55 already has and tests.
+
+### The Escape that does not close on a click outside
+
+**Suggest an `AppLayout` field, beside `on_close_modals` and `on_close_menus`.** For
+example `.escape(Escape { modal, menu })`, with named fields and no positional
+arguments. The engine places it on the overlay layers, as `OnEscape` already is, so it
+works while the overlay is open.
+- `dismiss_on_escape` is then **superseded**, and is deprecated in the release that
+  ships this, per the owner's rule;
+- the router (above) has **no** Escape route, so Escape has one home, the overlay;
+- the exact name, and how `Escape` combines with a close message that is also set,
+  are Q-R2-2.
+
+### Questions for the owner
+
+- **Q-R2-1 — placement.** Suggest the engine-placed router. The alternatives are the
+  application-side router of R-2 as accepted, or keys owned by each widget.
+- **Q-R2-2 — Escape without a click-outside close.** Suggest an `AppLayout` field with
+  named fields, and `dismiss_on_escape` deprecated when it ships. The alternative is
+  to keep `dismiss_on_escape` undeprecated, and live with its positional arguments.
+- **Q-R2-3 — bindings.** Suggest R-2's table unchanged, with each route opt-in through
+  the builder:
+  - `Ctrl`/`Cmd` + `1`…`9` for sidebar items;
+  - `Ctrl+Tab` for tabs;
+  - `Alt+↑`/`Cmd+↑` for the breadcrumb parent.
+
+  A text editor that needs `Ctrl+Tab` for itself then leaves that route out.
+
+**Before ruling,** a Unit 0 for 0.57 measures two things: that a router inside `Inert`
+is silent under each overlay of RFC-119's table, and that it captures what it answers.
+This amendment is reviewed against the principles as part of that unit's review. It is
+not ruled now.
