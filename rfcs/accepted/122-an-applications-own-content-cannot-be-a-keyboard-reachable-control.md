@@ -1,6 +1,7 @@
 # RFC-122 — An application's own content cannot be a keyboard-reachable control
 
-**Status.** Proposed 2026-11-09. Awaiting the owner's rulings on Q-1 to Q-5.
+**Status.** Accepted 2026-11-09. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/122-…`](../handoffs/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control/implementation-handoff.md).
 **Raised.** 2026-11-09, architect. RFC-116's long-term plan item **L-4** has its trigger,
 "the first adopter that asks". aaai asked on 2026-11-09
 (`.git-exclude/upstream/receive/0.57.0/aaai-to-snora-2026-11-09.md`). The plan says a fired
@@ -154,3 +155,19 @@ renderers.
    - the accessibility guide's "your own buttons" bullet, which stops saying "pointer
      and touch only".
 4. **The reply to aaai,** after the ruling.
+
+## Rulings, 2026-11-09 (owner)
+
+- **Q-1:** expose it.
+- **Q-2:** iced `button`'s builder shape.
+- **Q-3:** `snora::control(content)` and `snora::design::control(&tokens, content)`. The owner
+  asked whether it should be `snora::interaction`. The answer, accepted:
+  - a reader looks for what they make, a control;
+  - a public module named after the internal crate would invite the assumption that it
+    re-exports that crate, while the crate's own docs say not to depend on it;
+  - the two names mirror `snora::render` and `snora::design::render`.
+
+  There is no `snora::interaction` module. The public type's rustdoc says what it is
+  built on.
+- **Q-4:** `ghost` is the design path's default style.
+- **Q-5:** 0.58.0, with Unit 0 first.
