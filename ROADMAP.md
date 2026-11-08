@@ -234,10 +234,21 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.57.0
 
-- **RFC-116 R-2, the shortcuts router,** after its amendment is ruled. As specified it
-  would fire beneath an overlay, and its Escape now overlaps RFC-119's. The amendment
-  proposes one router placed by the engine inside the page layer, and an `AppLayout`
-  field for an Escape that does not close on a click outside.
+Scoped and ruled by the owner, 2026-11-08:
+- **`snora-control` becomes `snora-interaction`**, with a last `snora-control` 0.57.0 that
+  declares itself deprecated.
+- **The shortcuts router** (RFC-116 R-2), measurement first:
+  - a shortcut does exactly what a click on that control does;
+  - it works unless the focused control uses the key;
+  - every binding has a modifier;
+  - the digit binding is set by surveying the conventions.
+
+  If it does not fit 0.57, the owner decides at the measurement review.
+- **The 0.54 deprecations are removed** (`sweep_expired`, `ToastLifetime::DEFAULT`), under
+  the new rule: removed in the third minor after deprecation, with the version named
+  from the start.
+- **Workflow lint survives a download outage:** the cached actionlint archive is
+  verified on every run.
 
 ## Future wanted
 

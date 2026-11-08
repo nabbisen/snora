@@ -366,7 +366,43 @@ works while the overlay is open.
 
   A text editor that needs `Ctrl+Tab` for itself then leaves that route out.
 
+### Additions, 2026-11-08, from re-checking against 0.56
+
+- **B1 — a shortcut does exactly what a click on that control does.** That means the
+  same message, focus taken away from wherever it was, and the Tab starting point set on
+  that control (RFC-121); a disabled control does nothing. Without it, a shortcut that
+  swaps the view would leave keyboard focus at a tree position the new view fills with
+  another control, which would inherit it (RFC-120's finding).
+- **B2 — a shortcut works unless the focused control uses that key itself.** The router
+  answers only keys nothing else took. The keyboard map page lists which keys snora's own
+  controls use.
+- **B3 — the digit binding.** Browsers and most tabbed applications use Ctrl/Cmd + 1…9 for
+  *tabs*. R-2 gave it to *sidebar items*. Unit 0 surveys the conventions, and the binding
+  table is ruled on them.
+- **Every binding has a modifier** (Ctrl, Alt or Cmd). WCAG 2.1.4 governs single-character
+  shortcuts, so the router stays outside it by design.
+
+**Owner, 2026-11-08 (Q-3):** R-2 stays in 0.57, with B1 to B3. Unit 0 runs first
+(`handoffs/116-…/implementation-handoff-r2-unit0.md`). If it shows the router does not fit,
+the owner decides at its review whether it moves to 0.58.
+
 **Before ruling,** a Unit 0 for 0.57 measures two things: that a router inside `Inert`
 is silent under each overlay of RFC-119's table, and that it captures what it answers.
 This amendment is reviewed against the principles as part of that unit's review. It is
 not ruled now.
+
+## Ruling, 2026-11-08: `snora-control` is renamed `snora-interaction` (0.57)
+
+**Owner, agreed.** Beside `snora-widgets`, "control" reads as another word for widget.
+The crate also now holds far more than the control: everything in it is about *how the
+reader operates snora*, by pointer, keyboard and focus.
+- In 0.57.0 the crate becomes `snora-interaction`. The type `Control` keeps its name.
+- **The last release of `snora-control`, 0.57.0, declares the crate deprecated** (Q-1):
+  no items, only a notice naming `snora-interaction`.
+- 0.55.0 and 0.56.0 stay published and are never yanked, so existing lockfiles keep
+  working.
+- The notice crate leaves the workspace in 0.58.
+- The first publish of `snora-interaction` follows `release-process.md`'s first-version
+  procedure.
+
+Handoff: `handoffs/housekeeping-0-57/implementation-handoff.md`.

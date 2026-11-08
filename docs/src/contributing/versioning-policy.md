@@ -127,12 +127,19 @@ downstream users "code that followed the docs was already correct."
 When a public name is renamed:
 
 1. Add a `#[deprecated]` alias in the same PR.
-2. Keep the alias for **at least two** consecutive minor releases.
-3. Remove the alias in a minor release, citing the minor where it was
-   added and the current minor.
+2. **A deprecated item is removed in the third minor after the one that
+   deprecated it** (owner, 2026-11-08). An item deprecated in 0.54 is
+   removed in 0.57; one deprecated in 0.56, in 0.59.
+3. **The removal version is stated from the start:** in the `#[deprecated]`
+   note ("removed in 0.59.0") and in the CHANGELOG's Deprecated entry. A
+   rule is only predictable if the reader is told the date.
+4. The removing release's CHANGELOG cites the minor that deprecated the
+   item, and the migration guide gives the one-line replacement.
 
-"At least two" gives downstream projects that move slowly one full
-release cycle to migrate before the alias disappears.
+This keeps an item for two full minors after the one that deprecated it,
+which gives a downstream project that moves slowly one whole release cycle
+to migrate. *(Changed 2026-11-08: this said "at least two", which told no
+one when an item would actually go.)*
 
 ## Questions any PR must answer when touching public API
 
