@@ -10,6 +10,8 @@
 //! - Toasts: all five intents, all six positions, TTL lifecycle.
 //! - Direction: live LTR ↔ RTL toggle (ABDD demonstration).
 //! - Navigation: tab bar, breadcrumb.
+//! - Keyboard: Tab and Shift+Tab move focus between controls, routed with
+//!   `snora::keyboard::traverse`; Escape closes overlays with no listener.
 //!
 //! Run with:
 //!
@@ -83,6 +85,8 @@ enum Message {
     DismissToast(u64),
     SetToastPosition(ToastPosition),
     ToastTick,
+    KeyPressed(iced::keyboard::Key, iced::keyboard::Modifiers),
+    Ignored,
 }
 
 // ---------------------------------------------------------------------------
@@ -188,12 +192,32 @@ impl Workbench {
                 // `sweep_expired` did.
                 self.holds.sweep(&mut self.toasts, Instant::now());
             }
+            // iced moves focus only when something runs `focus_next`;
+            // `traverse` is that something, for Tab and Shift+Tab
+            // (RFC-116). Without this arm no control can be reached by key.
+            Message::KeyPressed(key, modifiers) => {
+                if let Some(task) = snora::keyboard::traverse(key, modifiers) {
+                    return task;
+                }
+            }
+            Message::Ignored => {}
         }
         Task::none()
     }
 
     fn subscription(&self) -> Subscription<Message> {
-        snora::toast::subscription(&self.toasts, || Message::ToastTick)
+        Subscription::batch([
+            snora::toast::subscription(&self.toasts, || Message::ToastTick),
+            // Tab does need a listener: iced binds no Tab of its own, so the
+            // application routes it (see `update`). Escape does not: the engine
+            // answers it, above.
+            iced::keyboard::listen().map(|event| match event {
+                iced::keyboard::Event::KeyPressed { key, modifiers, .. } => {
+                    Message::KeyPressed(key, modifiers)
+                }
+                _ => Message::Ignored,
+            }),
+        ])
     }
 }
 

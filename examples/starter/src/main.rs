@@ -10,6 +10,8 @@
 //! * Transient toast added by a button.
 //! * Live LTR ↔ RTL toggle (ABDD).
 //! * Tab bar for simple view switching.
+//! * Keyboard access: Tab and Shift+Tab move focus between controls, routed
+//!   with `snora::keyboard::traverse` (iced binds no Tab of its own).
 //!
 //! The workbench example (`snora-example-workbench`) covers every surface
 //! in depth. This starter stays small so you can read it in one sitting.
@@ -101,6 +103,9 @@ enum Message {
     AddToast,
     DismissToast(u64),
     ToastTick,
+    // ---- Keyboard ----
+    KeyPressed(iced::keyboard::Key, iced::keyboard::Modifiers),
+    Ignored,
 }
 
 // ---------------------------------------------------------------------------
@@ -142,12 +147,32 @@ impl App {
             // example does not wire `on_toast_hover`, so nothing is ever
             // held and this behaves exactly as `sweep_expired` did.
             Message::ToastTick => self.holds.sweep(&mut self.toasts, Instant::now()),
+            // iced moves focus only when something runs `focus_next`;
+            // `traverse` is that something, for Tab and Shift+Tab
+            // (RFC-116). Without this arm no control can be reached by key.
+            Message::KeyPressed(key, modifiers) => {
+                if let Some(task) = snora::keyboard::traverse(key, modifiers) {
+                    return task;
+                }
+            }
+            Message::Ignored => {}
         }
         Task::none()
     }
 
     fn subscription(&self) -> Subscription<Message> {
-        snora::toast::subscription(&self.toasts, || Message::ToastTick)
+        Subscription::batch([
+            snora::toast::subscription(&self.toasts, || Message::ToastTick),
+            // Tab does need a listener: iced binds no Tab of its own, so the
+            // application routes it (see `update`). Escape does not: the engine
+            // answers it, above.
+            iced::keyboard::listen().map(|event| match event {
+                iced::keyboard::Event::KeyPressed { key, modifiers, .. } => {
+                    Message::KeyPressed(key, modifiers)
+                }
+                _ => Message::Ignored,
+            }),
+        ])
     }
 }
 
@@ -325,7 +350,8 @@ impl App {
             .direction(self.direction) // ← drives all mirroring
             // Outside-click close sinks. Since 0.55 they are also what Escape
             // answers (RFC-119): the engine closes the modal first, then the
-            // menu, and captures the key. No keyboard listener is needed.
+            // menu, and captures the key, so Escape needs no listener. Tab does:
+            // see `update` and `subscription`.
             .on_close_menus(Message::CloseMenus)
             .on_close_modals(Message::CloseModals);
 
