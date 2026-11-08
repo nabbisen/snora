@@ -25,6 +25,9 @@
 // Each test binary uses a subset of this module.
 #![allow(dead_code)]
 
+#[cfg(feature = "widgets")]
+pub mod subjects;
+
 use std::path::Path;
 
 use iced::{Element, Point, Rectangle, Theme};
