@@ -58,14 +58,45 @@ measurements, as the ruling says. Do not narrow it yourself.
 **Watch for the trap RFC-119 found:** a test that asks `find_focused` can only see what
 `operate` reports. Where the question is "is a ring drawn there", read pixels.
 
-## Unit 1 — R-1 to R-3, after Unit 0 is reviewed and RFC-121 is merged
+## Unit 1 — R-1 to R-3. **Ruled 2026-11-08; RFC-121 is on `main`. Start now.**
 
-**R-1 and R-2:** as the review of Unit 0 rules the mechanism and the scope.
-- One test per case in the table above, asserting where focus lands under R-1.
-- Under RTL as well: the mirrored order.
-- **The application's own focus wins:** a focus task in the same update, and R-1 does
-  nothing.
-- With no control left, focus is nowhere.
+Read the RFC's last section, "After Unit 0", which the owner confirmed. The rule:
+
+> **When the focused control goes away, focus moves to its nearest neighbour in the
+> same group: the next one, or else the previous one. Otherwise, nothing is focused.**
+
+**The mechanism, as Unit 0 found and the review accepted:**
+- **A press mark on `Control`:** one `bool`, read through `operation.custom`, as RFC-121's
+  `start_here` is. `Inert` acts only after a press, and never on a `text_input`'s Enter.
+- **The tracker in `Inert`:**
+  - `observe` after a press: survey, remember, and take focus off everything;
+  - `resolve` at the next `RedrawRequested`: the application's focus wins; an unchanged
+    count means the same index; otherwise R-1, or nothing focused.
+- **The declared spans,** at the four snora sites: chip × `(1,0)`, notice dismiss `(1,0)`,
+  toast × `(0,0)`, crumb `(0, later crumbs)`. An undeclared removal is `(0,0)`.
+- **The group (D-3):** the innermost container that held the control and is still there,
+  **never wider than its layer.** The page, a dialog, a sheet and the toast stack are each
+  a boundary. With no control left in the group, nothing is focused. **Remove the outward
+  search** your prototype had: root crumb, nothing focused; last toast, nothing focused.
+- **Toasts by identity (D-2).** The toast stack knows each toast by its `u64` id:
+  - focus on toast *k*'s × stays there when another toast expires or is closed;
+  - R-1 for a toast's × uses the ids, not a span;
+  - add 1b's toast rows as tests: toast 3 expires while toast 2's × is focused, and
+    toast 2's × keeps focus.
+- **Not covered, a stated limit (L-7):** in an application's own list, a removal
+  elsewhere. Add **no** test that claims it is fixed. Unit 0's 1b page rows stay as a
+  characterisation, with their comments saying "L-7, a known limit".
+
+**Tests:**
+- every row of Unit 0's table, against the ruled targets;
+- RTL;
+- the application's own focus winning;
+- the group boundary: the root crumb and the last toast leave nothing focused, and never
+  the footer or the page;
+- a removal of more than the pressed control, undeclared: nothing focused;
+- **the timing question you raised.** Does a focus task arrive after the first
+  `RedrawRequested`? Measure it in a real runtime order. If it does, show that the
+  application's focus still wins, and say whether one frame shows R-1's ring first.
 
 **R-3, the hold.** As Q-4 (b) ruled:
 - `snora_core::ToastAttention`, `#[non_exhaustive]`, with:

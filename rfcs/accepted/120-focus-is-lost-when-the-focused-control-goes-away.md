@@ -221,7 +221,7 @@ the top:
 RFC-121, the click focus and the held key, also ships in 0.56.0 by the owner's
 ruling. It goes first.
 
-## After Unit 0 (2026-11-08): the rule, simplified. Awaiting the owner's confirmation
+## After Unit 0 (2026-11-08): the rule, simplified. **Confirmed and authorized by the owner, 2026-11-08**
 
 Unit 0 (`.git-exclude/reviewed/120-unit0/`) measured 0.55.0:
 - in 6 of 12 removals, focus is inherited by whichever control takes the removed one's
