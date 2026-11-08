@@ -134,6 +134,35 @@ impl<M: Clone + 'static> Rig<M> {
         ))]);
     }
 
+    /// A key press with `modifiers`, and what the interface did with it: the
+    /// event's `Status`, which is the testable stand-in for "an application's
+    /// `keyboard::listen()` never receives it" (`listen()` passes only `Ignored`).
+    pub fn press(
+        &mut self,
+        key: iced::keyboard::Key,
+        modifiers: iced::keyboard::Modifiers,
+    ) -> iced_runtime::core::event::Status {
+        let event = Event::Keyboard(iced::keyboard::Event::KeyPressed {
+            key: key.clone(),
+            modified_key: key,
+            physical_key: iced::keyboard::key::Physical::Unidentified(
+                iced::keyboard::key::NativeCode::Unidentified,
+            ),
+            location: iced::keyboard::Location::Standard,
+            modifiers,
+            repeat: false,
+            text: None,
+        });
+        let (_, statuses) = self.ui.update(
+            &[event],
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        statuses[0]
+    }
+
     pub fn key(&mut self, key: Named) {
         self.deliver(&[iced_test::simulator::press_key(key, None)]);
     }
