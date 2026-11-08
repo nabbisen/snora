@@ -220,3 +220,41 @@ the top:
 
 RFC-121, the click focus and the held key, also ships in 0.56.0 by the owner's
 ruling. It goes first.
+
+## After Unit 0 (2026-11-08): the rule, simplified. Awaiting the owner's confirmation
+
+Unit 0 (`.git-exclude/reviewed/120-unit0/`) measured 0.55.0:
+- in 6 of 12 removals, focus is inherited by whichever control takes the removed one's
+  position, and one more Enter presses it;
+- a removal *elsewhere* moves focus too (1b).
+
+It also showed that R-1 can be exact only where snora can tell what went. The owner
+asked that the essence stay simple, so R-1 is restated in two sentences, and everything
+else becomes a definition beneath them, for application authors, not a second rule.
+
+> **When the focused control goes away, focus moves to its nearest neighbour in the
+> same group: the next one, or else the previous one. Otherwise, nothing is focused.**
+
+**Beneath it, for application authors (rustdoc and the book):**
+- **"Group"** is the innermost container that held the control and is still there:
+  a chip row, the toast stack, the breadcrumb bar, a list. It is never wider than the
+  layer: the page, a dialog, a sheet, or the toast stack. That is D-3: no jump to the
+  footer, or from the toasts to the page.
+- **"Otherwise"** covers two cases:
+  - the group has no control left (the root crumb, the last toast);
+  - snora cannot tell which controls went: an application removed more than the pressed
+    control without saying so, or the focused target was not a snora control (D-1).
+
+  "Nothing is focused" is today's state for the last item. It is predictable, and it is
+  safe: an inherited focus is what lets one more Enter press the wrong control.
+- **Toasts are known by id** (D-2), so a toast that expires elsewhere leaves focus where
+  it was, and a toast's × needs no declared span.
+- **Not covered, a stated limit:** in an application's own list, a removal *elsewhere*
+  can still move focus to another control. iced 0.14 keeps state by position, and snora
+  has no identity for an application's widgets. RFC-116's long-term plan, L-7.
+
+**Dropped from the first wording:** "never handed to a control you did not reach". The
+neighbour is not a control the reader reached either, and the L-7 limit means snora could
+not keep that promise in every case. A rule that claims more than it keeps is the
+confusion the owner's rule forbids. "Otherwise, nothing is focused" says the same thing
+truthfully.
