@@ -92,7 +92,7 @@ contributor-facing documents linked below, not duplicated here.
   already means "next control" to iced.)* Instead, snora recommends the desktop convention —
   **F6 / Shift+F6** — and supplies a matching key helper,
   `snora::keyboard::cycle_zones`, so you don't have to re-derive which
-  modifier means "backward." As with `dismiss_on_escape`, snora installs
+  modifier means "backward." As with `traverse`, snora installs
   no subscription: your application wires `iced::keyboard::listen()`
   and calls the pure function itself. Cycling is automatically
   suspended while a dialog or sheet is open (focus belongs inside the
@@ -186,6 +186,11 @@ them.
   also focused a control, so a ring appeared after a click and Space or Enter
   pressed it again. 0.56.0 removed that; see RFC-121 and the 0.54 → 0.55
   guide's correction.)*
+- **Shortcuts, opt-in (0.57, RFC-116 R-2).** `AppLayout::shortcuts` routes
+  next and previous tab, tab or sidebar item *n*, and the breadcrumb's parent. A
+  shortcut does exactly what a click does, and works unless the focused control uses
+  the key. Every binding needs a modifier, and the macOS table has not yet been
+  checked on a Mac. The [Keyboard map](keyboard.md) lists every key.
 - **Overlays: the keyboard does what the pointer can (0.55, RFC-119).** With a
   dialog, a sheet, or a menu with its backdrop open, Tab and Enter reach only
   what the pointer can press: the overlay and the toasts, never the page

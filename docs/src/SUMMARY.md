@@ -18,6 +18,7 @@
 - [Header and context menus](guides/menus.md)
 - [Direction and ABDD](guides/direction.md)
 - [Accessibility](guides/accessibility.md)
+- [Keyboard map](guides/keyboard.md)
 - [Readability](guides/readability.md)
 - [Responsive layout width](guides/responsive.md)
 - [Icons](guides/icons.md)

@@ -177,7 +177,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 116 | [No snora control can be reached from the keyboard](./accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md) | **R-1 shipped v0.55.0 (gate 11 met); R-2 open; long-term plan L-1–L-6** — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router (its Escape part and `dismiss_on_escape`'s deprecation reconsidered after RFC-119); a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
+| 116 | [No snora control can be reached from the keyboard](./accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md) | **R-1 shipped v0.55.0 (gate 11 met); R-2 merged 2026-11-08, ships 0.57.0; long-term plan L-1–L-6** — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router (its Escape part and `dismiss_on_escape`'s deprecation reconsidered after RFC-119); a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
 
 ## Proposed
 

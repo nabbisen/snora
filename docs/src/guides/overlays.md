@@ -190,7 +190,8 @@ check:
     Escape then closes the overlay too, with nothing to wire (Law 7).
 [ ] With no `on_close_modals`: the visible close button above is the only
     way out, for pointer and keyboard alike. If Escape should close it,
-    wire snora::keyboard::dismiss_on_escape.
+    set AppLayout::escape(Escape { modal, .. }) (0.57). dismiss_on_escape
+    is deprecated.
 [ ] Destructive actions have explicit labels; they are not triggered
     by backdrop click alone.
 [ ] If initial keyboard focus inside the dialog matters, set it with

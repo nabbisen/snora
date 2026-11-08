@@ -177,7 +177,9 @@ toast layer is pushed after the modal layers" are the same fact. Swapping
 the push order (this RFC's evidence) makes the dim capture the toast's
 dismiss click instead of the toast's own button receiving it.
 
-### Law 7 — An overlay that closes on a click outside also closes on Escape
+<a id="law-7--an-overlay-that-closes-on-a-click-outside-also-closes-on-escape"></a>
+
+### Law 7 — Escape closes an overlay that has an escape or a close message
 
 **Changed in 0.55 (RFC-119).** When a menu's backdrop or a modal's dim has a close
 message (`on_close_menus`, `on_close_modals`), **Escape publishes it**, exactly as a
@@ -192,11 +194,20 @@ and the menu's own trigger is beneath it. Without this law, a keyboard user woul
 trapped in any overlay whose application had not wired Escape (WCAG 2.1.2). The rule
 is the pointer's: **the keyboard leaves the way the pointer can.**
 
-**Every other Escape is still the application's.** With no close message, the
-pointer cannot leave by clicking outside either, and Escape is left to the
-application: `snora::keyboard::dismiss_on_escape` serves that case, an overlay that
-closes on Escape but not on a click outside. Snora installs no subscription, and
-owns no other shortcut.
+**Changed in 0.57 (RFC-116 R-2): an escape message of its own.** `AppLayout::escape(Escape
+{ modal, menu })` gives an overlay a message for Escape alone. That is right for an overlay
+that should close on Escape but not on a stray click outside, such as a destructive
+confirmation. The rule:
+
+> **Escape publishes the overlay's escape message if one is set, and otherwise its
+> click-outside close message. The click-outside message still answers clicks.**
+
+It is answered on the overlay's own layer, after the overlay's content, so a focused field
+still takes the first Escape. With neither message set, Escape does nothing, and the
+overlay's own close button is the way out, for the pointer and the keyboard alike.
+`snora::keyboard::dismiss_on_escape` is **deprecated since 0.57.0, and removed in 0.60.0**.
+Snora installs no subscription. Its other keys are the shortcuts the application opts into
+([Keyboard map](../guides/keyboard.md)).
 
 *History.* Until 0.55 this law read "Keyboard dismissal is application-owned", and
 the engine answered no key at all. RFC-060 had already added a second keyboard
@@ -241,7 +252,7 @@ semantics are not provided: iced 0.14 has no accessibility tree.
 | Visual modality (dim layer) | yes |
 | Pointer blocking (backdrop capture) | yes — the backdrop, the dialog, the sheet, and toasts each capture pointer input over their own bounds, so nothing beneath a modal or a toast is reachable through it (RFC-084; negative assertions in `crates/snora/tests/render_semantics.rs`). Covers both clicks and wheel-scroll. Independent of whether a close sink is provided (Law 5). |
 | **Keyboard blocking** (what Tab and Enter reach) | **yes, from 0.55 (RFC-119).** Everything beneath the topmost backdrop is out of the keyboard's reach: no focus target, no key press, no text input, and no overlay of its own drawn above it. With a modal up, that is the skeleton and any menu. With a menu up **and** its backdrop (`on_close_menus`), it is the skeleton. A menu **without** a backdrop leaves the page reachable, by pointer and keyboard alike. Toasts stay reachable (Law 6). Independent of whether the modal has a close sink. Guarded in `crates/snora/tests/modal_keyboard.rs` |
-| Keyboard dismissal (Escape) | yes, where a click outside closes (Law 7); otherwise application-owned |
+| Keyboard dismissal (Escape) | yes: the overlay's escape message, or else its click-outside close message (Law 7; the escape field from 0.57) |
 | **Where focus goes** | **When a modal closes, focus returns to the control that had it**, unless the page now has a different number of controls, or the application has focused something itself. Then focus is wherever the application put it, or **nowhere** (not the first control): the next Tab starts from the top. While the dim is up, a covered control shows no focus ring, and a covered `text_input` has no cursor; both come back on closing |
 | **The page's state** | **Kept.** Opening and closing a modal or a menu does not rebuild the page: scroll offsets, a text input's cursor and every widget's state survive |
 | Frame-level zone navigation | **yes (RFC-060)** — `snora_core::focus::next_zone`; **suspended** while a modal is open (it reports this rather than guessing where focus inside the modal should go), unaffected while only a menu is open |
@@ -343,60 +354,34 @@ match msg {
 
 ## Keyboard dismissal
 
-**From 0.55, an overlay that closes on a click outside also closes on Escape,
-with nothing to wire** (Law 7). The recipe below is for the remaining case: an
-overlay with **no** click-outside close message that should still close on
-Escape. It is harmless alongside the engine's Escape, which the application
-never receives.
+**Nothing to wire for snora's overlays** (Law 7): Escape publishes an overlay's escape
+message, or else its click-outside close message.
 
 ```rust,ignore
-fn subscription(&self) -> iced::Subscription<Message> {
-    let key_sub = iced::keyboard::listen().map(|event| {
-        if let iced::keyboard::Event::KeyPressed { key, .. } = event {
-            Message::KeyPressed(key)
-        } else {
-            Message::NoOp
-        }
-    });
-    Subscription::batch([snora::toast::subscription(&self.toasts, || Message::ToastTick), key_sub])
-}
-
-fn update(&mut self, msg: Message) -> Task<Message> {
-    match msg {
-        Message::KeyPressed(key) => {
-            if let Some(msg) = snora::keyboard::dismiss_on_escape(
-                self.show_dialog || self.show_sheet,
-                self.menu_open,
-                Some(Message::CloseModals),
-                Some(Message::CloseMenus),
-                key,
-            ) {
-                return self.update(msg);
-            }
-        }
-        // ...
-    }
-    Task::none()
-}
+let layout = snora::AppLayout::new(body)
+    .on_close_modals(Message::CloseModals)   // a click outside, and Escape
+    .on_close_menus(Message::CloseMenus)
+    // Optional: Escape alone, for a modal that a stray click must not close.
+    .escape(snora::keyboard::Escape { modal: Some(Message::CancelDelete), menu: None });
 ```
 
-| State (`dismiss_on_escape`) | `Escape` behavior |
+| Open | Escape publishes |
 |---|---|
-| Modal open | emit `on_close_modals` |
-| Menu open, no modal | emit `on_close_menus` |
-| Both open | modal takes priority |
-| No overlay | no-op |
-| Sink is `None` | no-op |
+| a dialog or sheet, and a menu beneath | the modal's message (the top layer first) |
+| a menu | the menu's message |
+| an overlay with neither message | nothing |
+| nothing | nothing |
 
-The workbench example demonstrates this pattern end-to-end.
+`dismiss_on_escape`, the recipe this section used to show, is **deprecated since 0.57.0
+and removed in 0.60.0**. For an overlay of your own outside `AppLayout`, match the Escape key
+in your `update`; the [Keyboard map](../guides/keyboard.md#escape) shows it.
 
 ## What Snora does not do
 
-- **Escape beyond Law 7** — Snora answers Escape only for an overlay that
-  closes on a click outside (Law 7, from 0.55). Every other key, and Escape
-  anywhere else, is the application's; `snora::keyboard::dismiss_on_escape`
-  and `cycle_zones` are pure decision functions, and snora installs no
-  subscription.
+- **Keys beyond Law 7 and the shortcuts** — Snora answers Escape for its
+  overlays (Law 7), Tab through `traverse`, and the shortcuts the
+  application opts into (RFC-116 R-2, the [Keyboard map](../guides/keyboard.md)).
+  Every other key is the application's, and snora installs no subscription.
 - **A strict focus trap** — Tab inside an open modal is bounded to the modal
   and the toasts (Law 8, RFC-119), with one empty press between the last
   control and the first, which is iced's `focus_next`. A wrap with no gap is
