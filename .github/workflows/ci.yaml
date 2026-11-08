@@ -438,6 +438,25 @@ jobs:
           # nothing.
           SNORA_PARITY_OUT: ${{ github.workspace }}/parity-wgpu.tsv
         run: cargo test -p snora --all-features --tests -- --test-threads=1 --nocapture
+      - name: snora-control's own rendered tests on wgpu
+        # Its own step and not a longer command above: that step's
+        # `SNORA_PARITY_OUT` belongs to `snora`'s parity rows, and a failure
+        # here should say which crate it is in (RFC-119 Unit 0 noted that
+        # these ran on tiny-skia only).
+        #
+        # What this reaches, stated exactly: `Inert`'s tests read
+        # `ICED_TEST_BACKEND` and assert the renderer that drew is the one
+        # asked for, so they now run on wgpu. The rest of the crate's tests
+        # pin tiny-skia on purpose (they measure behaviour and layout, not
+        # pixels; see `behaviour_tests.rs`) and run again here unchanged.
+        # `Underlined` has no tests in this crate; its pixel tests are
+        # `snora`'s `link.rs`, covered by the step above.
+        #
+        # `--tests` for the same reason as above; `--test-threads=1` because
+        # of RFC-099's SIGSEGV.
+        env:
+          ICED_TEST_BACKEND: wgpu
+        run: cargo test -p snora-control --all-features --tests -- --test-threads=1 --nocapture
       - name: Say which renderer drew
         # `frame_pixels` already fails if the renderer is not the one
         # asked for, so a pass is proof. This prints it anyway: a
