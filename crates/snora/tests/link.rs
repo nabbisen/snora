@@ -675,7 +675,15 @@ fn the_underline_is_the_labels_colour_at_rest_hover_and_pressed() {
                 })
                 .collect();
             let want = snora::design::style::button::ghost(&tokens, status).text_color;
-            let Some(u) = found.first() else {
+            // **The last run, not the first.** A hovered or pressed control has
+            // a fill, and in the high-contrast presets the link is a pixel
+            // taller than the ghost, so the fill's extra row is a one-row
+            // difference *above* the underline. A pressed control used to be
+            // focused too, and the ring covered that row in both frames; since
+            // RFC-121 a press draws no ring, and the row shows (wgpu, where
+            // CI's lavapipe and the local GPU both draw it). The underline is
+            // the lowest thing that differs inside the label's box.
+            let Some(u) = found.last() else {
                 failures.push(format!("{preset} {state}: no underline"));
                 continue;
             };
