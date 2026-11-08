@@ -86,6 +86,10 @@ impl CrumbGeometry {
 /// under right-to-left, where Tab runs the other way), so it stays in the bar.
 /// From the root crumb there is no crumb left, and **nothing is focused**: not
 /// the controls beyond the bar.
+///
+/// If your container is left with no control in it, snora cannot tell that it is still
+/// there, and treats it as gone: focus moves to the nearest control in the container
+/// around it.
 pub fn app_breadcrumb<'a, Message, CrumbId, F>(
     crumbs: Vec<Crumb<CrumbId>>,
     on_action: &'a F,

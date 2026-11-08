@@ -319,10 +319,13 @@ pub fn filter<'a, Message: Clone + 'a>(
 ///
 /// **Where focus goes when the chip is removed (RFC-120):** if the × had focus
 /// and the application removes the chip, focus moves to the **next chip's
-/// label**, or else the **previous chip's ×**, within the row the chip sat in;
-/// with no chip left in the row, nothing is focused. (The label goes with the
-/// chip, which is why the next chip's label and not its ×: a second Enter
-/// toggles rather than removes.)
+/// label**, or else the **previous chip's ×**, within the row the chip sat in.
+/// (The label goes with the chip, which is why the next chip's label and not its
+/// ×: a second Enter toggles rather than removes.)
+///
+/// If your container is left with no control in it, snora cannot tell that it is still
+/// there, and treats it as gone: focus moves to the nearest control in the container
+/// around it.
 ///
 /// To show a tooltip on the remove button, use [`removable_with_tooltip`].
 #[must_use]

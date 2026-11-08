@@ -17,8 +17,11 @@
 //! - **Where focus goes when the notice is dismissed (RFC-120):** if the dismiss
 //!   control had focus and the application removes the notice, focus moves to the
 //!   nearest control after the notice in the container it sat in, or else the
-//!   nearest before it. The notice's own action control goes with it. With no
-//!   control left in that container, nothing is focused.
+//!   nearest before it. The notice's own action control goes with it.
+//!
+//!   If your container is left with no control in it, snora cannot tell that it is
+//!   still there, and treats it as gone: focus moves to the nearest control in the
+//!   container around it.
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
 //! - The focus ring is drawn by the control, from `Tokens::focus`, in
 //!   whichever of that colour or black and white clears 3:1 against the

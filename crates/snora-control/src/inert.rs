@@ -84,6 +84,10 @@
 //!   own content. With no target left in the group, or if the counts do not add
 //!   up to exactly the declared removal, nothing is focused.
 //!
+//! If your container is left with no control in it, snora cannot tell that it is
+//! still there, and treats it as gone: focus moves to the nearest control in the
+//! container around it.
+//!
 //! **Not covered (a stated limit, RFC-116 L-7):** a removal *elsewhere* in an
 //! application's list can still move focus, because nothing says which control
 //! went.

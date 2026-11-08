@@ -340,6 +340,10 @@ impl ToastLifetime {
 /// the toast it was on.** (Which toast is "next" is Tab order: the stack's
 /// layout order.)
 ///
+/// If your container is left with no control in it, snora cannot tell that it is still
+/// there, and treats it as gone: focus moves to the nearest control in the container
+/// around it.
+///
 /// `Message` is your application's top-level message type. The `on_dismiss`
 /// field is fired when the user clicks the toast's close button. It is *not*
 /// fired when a transient toast expires; expiration is a silent sweep.
