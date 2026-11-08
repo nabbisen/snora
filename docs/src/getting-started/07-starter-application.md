@@ -11,7 +11,8 @@ don't.
 |---|---|
 | `AppLayout` assembly | `view()` — assembles header, sidebar, body, footer |
 | Header menu with close sink | `menu_open` state + `on_close_menus` |
-| Dialog with Escape close | `show_dialog` state + `on_close_modals`: from 0.55 Escape closes it with nothing to wire (Law 7); the example's `keyboard::dismiss_on_escape` call predates that and is harmless |
+| Dialog with Escape close | `show_dialog` state + `on_close_modals`: Escape closes it with nothing to wire (Law 7, from 0.55) |
+| Keyboard: Tab between controls | `keyboard::listen()` + `snora::keyboard::traverse` in `update` (iced binds no Tab of its own) |
 | Transient toast | `toasts: Vec<Toast<Message>>` + sweep subscription |
 | LTR/RTL toggle | `direction: LayoutDirection` + `ToggleDirection` message |
 | Tab bar | `TabBar` + `TabAction` message |
@@ -32,7 +33,9 @@ The 177 ELOC are split into four sections with inline comments:
 2. **Message** — one variant per user action. `CloseMenus` / `CloseModals`
    are the Snora close-sink messages; everything else is app logic.
 3. **Update** — pure state mutation. Shows the Law 2 pattern (clear menus
-   before opening a modal) and `dismiss_on_escape` wiring.
+   before opening a modal), and routes Tab with `snora::keyboard::traverse`.
+   Escape needs no code: the engine closes a menu or dialog that has a close
+   message.
 4. **View** — builds slots with prefab widgets, assembles `AppLayout`,
    hands it to `snora::render`. The comment on `direction` explains why
    one field drives all mirroring.
