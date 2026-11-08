@@ -50,6 +50,7 @@ pub mod menu;
 /// Modal overlay surfaces — [`Dialog`], [`Sheet`].
 pub mod overlay;
 /// Vertical navigation rail.
+pub mod shortcuts;
 pub mod sidebar;
 /// Horizontal tab bar — [`TabBar`], [`Tab`], [`TabAction`].
 pub mod tab;
@@ -63,6 +64,9 @@ pub use icon::Icon;
 pub use layout::AppLayout;
 pub use menu::{Menu, MenuAction, MenuItem};
 pub use overlay::{Dialog, Sheet, SheetEdge, SheetSize};
+pub use shortcuts::{
+    Digits, Escape, Platform, ShortcutAction, ShortcutRoute, Shortcuts, TargetRole,
+};
 pub use sidebar::{SideBar, SideBarItem};
 pub use tab::{Tab, TabAction, TabBar};
 #[expect(

@@ -1,7 +1,17 @@
-//! Keyboard dismissal and navigation helpers.
+//! Keyboard dismissal and navigation helpers, and the shortcuts router.
 //!
-//! Snora does not own application shortcut routing, but it provides
-//! small helpers for the two patterns every multi-region application
+//! **Shortcuts (RFC-116 R-2).** [`Shortcuts`](crate::keyboard::Shortcuts), passed with
+//! [`AppLayout::shortcuts`](snora_core::AppLayout::shortcuts), is the one router for
+//! the keys that jump: `Ctrl/Cmd + 1…9`, next and previous tab, the breadcrumb's
+//! parent. [`Digits`](crate::keyboard::Digits) says where the digits go, and
+//! [`Escape`](crate::keyboard::Escape), passed with
+//! [`AppLayout::escape`](snora_core::AppLayout::escape), says what Escape does on each
+//! overlay. The rules and the bindings are in [`snora_core::shortcuts`].
+//! **The macOS bindings follow Apple's conventions but have not been checked on
+//! a Mac.**
+//!
+//! Beyond those, Snora does not own application shortcut routing, but it provides
+//! small helpers for the patterns every multi-region application
 //! needs: pressing `Escape` to close menus or modals, and cycling
 //! between frame-level zones. See
 //! [overlay interaction semantics](https://nabbisen.github.io/snora/reference/overlay-interaction-semantics.html)
@@ -10,8 +20,18 @@
 use iced::keyboard::{Key, Modifiers, key::Named};
 use snora_core::focus::Cycle;
 
+pub use snora_core::{Digits, Escape, Platform, ShortcutAction, Shortcuts};
+
 /// Returns the message to emit when `Escape` is pressed, following the
 /// Snora overlay dismissal priority.
+///
+/// **Superseded by [`AppLayout::escape`](snora_core::AppLayout::escape)**
+/// (RFC-116 R-2): its two `bool`s and two `Option`s in a row are easy to pass in
+/// the wrong order with no compiler error, and an `Escape { modal, menu }` says
+/// which is which. The field also answers on the overlay's own layer, so an
+/// overlay that closes on Escape but not on a click outside needs no
+/// `keyboard::listen()` at all. **An overlay of your own, outside `AppLayout`,
+/// writes the three-line `match` itself.**
 ///
 /// # When the engine already answers Escape (RFC-119)
 ///
@@ -72,6 +92,13 @@ use snora_core::focus::Cycle;
 ///     }
 /// }
 /// ```
+#[deprecated(
+    since = "0.57.0",
+    note = "use `AppLayout::escape(Escape { modal, menu })`, which answers Escape on the \
+            overlay's own layer, with named fields instead of two `bool`s and two \
+            `Option`s in a row (RFC-116 R-2). An overlay of your own, outside `AppLayout`, \
+            needs a three-line `match`. This is removed in 0.60.0."
+)]
 pub fn dismiss_on_escape<Message: Clone>(
     has_modal: bool,
     has_menu: bool,
@@ -145,6 +172,10 @@ pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
 }
 
 #[cfg(test)]
+#[expect(
+    deprecated,
+    reason = "these tests exist to exercise the deprecated `dismiss_on_escape`, which still has to work (RFC-116 R-2)"
+)]
 mod tests {
     use super::*;
 
@@ -304,7 +335,11 @@ mod tests {
 /// two are different axes and RFC-116 Unit 0 does not join them.
 #[must_use]
 pub fn traverse<Message: 'static>(key: Key, modifiers: Modifiers) -> Option<iced::Task<Message>> {
-    if key != Key::Named(Named::Tab) {
+    // **Plain Tab and Shift+Tab only** (RFC-116 R-2). `Ctrl+Tab`, `Alt+Tab` and
+    // `Cmd+Tab` are not Tab: `Ctrl+Tab` is "next tab" in the shortcuts router, and
+    // when the router is silent (under an overlay, or with that route left out)
+    // it must not fall through and move focus.
+    if key != Key::Named(Named::Tab) || modifiers.control() || modifiers.alt() || modifiers.logo() {
         return None;
     }
 
@@ -321,7 +356,8 @@ pub fn traverse<Message: 'static>(key: Key, modifiers: Modifiers) -> Option<iced
 mod traverse_tests {
     use super::*;
 
-    /// Tab and Shift+Tab are claimed; nothing else is.
+    /// Tab and Shift+Tab are claimed; nothing else is: not with Ctrl, Alt or
+    /// Command either (RFC-116 R-2).
     ///
     /// **What this cannot assert**, and why there is a rendered test
     /// for it instead: a `Task` is opaque, so this cannot tell
@@ -336,5 +372,25 @@ mod traverse_tests {
         assert!(traverse::<()>(Key::Named(Named::Enter), Modifiers::empty()).is_none());
         assert!(traverse::<()>(Key::Named(Named::Escape), Modifiers::empty()).is_none());
         assert!(traverse::<()>(Key::Character("a".into()), Modifiers::empty()).is_none());
+    }
+
+    /// **`Ctrl+Tab`, `Alt+Tab` and `Cmd+Tab` do not move focus**, with or without
+    /// Shift: they were Tab with a modifier, and `Ctrl+Tab` is "next tab".
+    #[test]
+    fn tab_with_ctrl_alt_or_command_is_not_claimed() {
+        let tab = || Key::Named(Named::Tab);
+        for modifiers in [
+            Modifiers::CTRL,
+            Modifiers::ALT,
+            Modifiers::LOGO,
+            Modifiers::CTRL | Modifiers::SHIFT,
+            Modifiers::ALT | Modifiers::SHIFT,
+            Modifiers::LOGO | Modifiers::SHIFT,
+        ] {
+            assert!(
+                traverse::<()>(tab(), modifiers).is_none(),
+                "Tab with {modifiers:?} was claimed"
+            );
+        }
     }
 }

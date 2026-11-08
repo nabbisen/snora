@@ -53,6 +53,8 @@ use iced_core::{Clipboard, Shell, Widget, overlay, widget::Id};
 
 use iced::widget::button;
 
+use crate::tag::{Role, Tag, TagReport};
+
 /// WCAG 2.5.8's minimum pointer target, in logical pixels.
 ///
 /// Runtime rather than test-only: RFC-115's rule has to hold at layout
@@ -194,6 +196,8 @@ pub struct Control<'a, Message> {
     /// How many focus targets go with this control when it is pressed: before
     /// it and after it, in Tab order (RFC-120). `(0, 0)` is "only this one".
     removes: (usize, usize),
+    /// Which control this is, for a shortcut that is a click on it (RFC-116 R-2).
+    tag: Option<Tag>,
 }
 
 impl<Message> Control<'_, Message> {
@@ -243,7 +247,19 @@ impl<'a, Message> Control<'a, Message> {
             text_size: None,
             focus_change: None,
             removes: (0, 0),
+            tag: None,
         }
+    }
+
+    /// Say which control this is: the `index`-th control of `role` in its widget
+    /// (RFC-116 R-2). A shortcut then finds it by this, and does **exactly what a
+    /// click on it does**: its message, focus taken away, and Tab's starting point
+    /// set here. A disabled control reports no tag, so it cannot be found, and a
+    /// shortcut to it does nothing.
+    #[must_use]
+    pub fn tag(mut self, role: Role, index: usize) -> Self {
+        self.tag = Some(Tag::new(role, index));
+        self
     }
 
     /// Tell the application when this control gains and loses keyboard
@@ -485,6 +501,17 @@ where
             // this control was just pressed, and how many targets go with it.
             state.mark.removes = self.removes;
             operation.custom(Some(&self.id), bounds, &mut state.mark);
+            // Who this is, and (if a shortcut asks) make it Tab's starting point.
+            if let Some(tag) = self.tag {
+                let mut report = TagReport {
+                    tag,
+                    start_here: false,
+                };
+                operation.custom(Some(&self.id), bounds, &mut report);
+                if report.start_here {
+                    state.start_here = true;
+                }
+            }
         }
 
         operation.traverse(&mut |operation| {

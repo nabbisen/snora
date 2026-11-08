@@ -17,12 +17,20 @@ use iced_core::{Clipboard, Event, Shell, Widget, mouse, overlay, renderer};
 /// A layer that publishes `message` when Escape is pressed.
 pub struct OnEscape<'a, Message> {
     content: Element<'a, Message>,
-    message: Message,
+    message: Option<Message>,
 }
 
 impl<'a, Message> OnEscape<'a, Message> {
     /// `content`, answering Escape with `message`.
     pub fn new(content: impl Into<Element<'a, Message>>, message: Message) -> Self {
+        Self::maybe(content, Some(message))
+    }
+
+    /// `content`, answering Escape with `message` **if there is one**. The layer
+    /// is built either way, so an application that sets or clears its Escape
+    /// message at run time does not reshape the tree (and so reset what the
+    /// runtime keeps by position) (RFC-116 R-2).
+    pub fn maybe(content: impl Into<Element<'a, Message>>, message: Option<Message>) -> Self {
         Self {
             content: content.into(),
             message,
@@ -79,17 +87,10 @@ impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for OnEscape<'_, Mes
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
     ) {
-        if let Event::Keyboard(keyboard::Event::KeyPressed {
-            key: keyboard::Key::Named(key::Named::Escape),
-            ..
-        }) = event
-            && !shell.is_event_captured()
-        {
-            shell.publish(self.message.clone());
-            shell.capture_event();
-            return;
-        }
-
+        // **The content first** (RFC-116 R-2): a focused `text_input` in a dialog
+        // takes Escape for itself (it blurs), and the second press closes the
+        // dialog, as iced does and as RFC-119 measured. A backdrop's content takes
+        // no key, so for the backdrops this changes nothing.
         self.content.as_widget_mut().update(
             &mut tree.children[0],
             event,
@@ -100,6 +101,17 @@ impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for OnEscape<'_, Mes
             shell,
             viewport,
         );
+
+        if let Event::Keyboard(keyboard::Event::KeyPressed {
+            key: keyboard::Key::Named(key::Named::Escape),
+            ..
+        }) = event
+            && !shell.is_event_captured()
+            && let Some(message) = &self.message
+        {
+            shell.publish(message.clone());
+            shell.capture_event();
+        }
     }
 
     fn draw(

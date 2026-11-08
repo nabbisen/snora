@@ -392,7 +392,7 @@ where
 
     let mut col = column![].spacing(geometry.gap).align_x(Alignment::Center);
 
-    for item in side_bar.items {
+    for (index, item) in side_bar.items.into_iter().enumerate() {
         let is_active = item.view_id == side_bar.active;
         // 1 em of the label size its name would have (RFC-115's
         // amendment): the Tooltip form shows no name on the rail, but the
@@ -427,6 +427,8 @@ where
             tooltip_body.text_size,
         )
         .on_press(item.on_press.clone())
+        // A shortcut to this item finds it by this (RFC-116 R-2).
+        .tag(snora_interaction::Role::SideBarItem, index)
         .padding(0)
         .width(BUTTON_SIZE)
         .height(BUTTON_SIZE);
@@ -549,7 +551,7 @@ where
 
     let mut col = column![].spacing(geometry.gap).align_x(align);
 
-    for item in side_bar.items {
+    for (index, item) in side_bar.items.into_iter().enumerate() {
         let is_active = item.view_id == side_bar.active;
         let button_radius = geometry.button_radius;
 
@@ -599,6 +601,7 @@ where
             geometry.label_size,
         )
         .on_press(item.on_press.clone())
+        .tag(snora_interaction::Role::SideBarItem, index)
         .padding(0);
 
         col = col.push(btn);

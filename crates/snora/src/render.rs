@@ -50,8 +50,9 @@ use iced::{
     widget::{column, container, mouse_area, row, space, stack},
 };
 
-use snora_core::{AppLayout, LayoutDirection};
-use snora_interaction::{Inert, OnEscape};
+use iced::keyboard::Modifiers;
+use snora_core::{AppLayout, LayoutDirection, Platform, ShortcutAction, Shortcuts, TargetRole};
+use snora_interaction::{Inert, KeyMatch, OnEscape, Role, Route, Router, Tag};
 
 use crate::identifiers;
 use crate::overlay::dialog::DialogCardStyle;
@@ -219,6 +220,18 @@ where
         layout.footer,
     );
 
+    // The shortcuts router (RFC-116 R-2) wraps the whole skeleton, **inside** its
+    // `Inert`: a router in the page is silent under every overlay that blocks the
+    // pointer, through the mechanism the page already has. It is built whether or
+    // not the application asked for routes (an empty router answers nothing), so
+    // setting or clearing `shortcuts` does not reshape the tree and reset the page.
+    let routes = layout
+        .shortcuts
+        .as_ref()
+        .map(|s| router_routes(s, layout.direction))
+        .unwrap_or_default();
+    let skeleton = Router::new(skeleton, routes);
+
     let mut layers = stack![Inert::new(skeleton, skeleton_inert)];
 
     // -----------------------------------------------------------------
@@ -228,11 +241,19 @@ where
         if let Some(on_close) = layout.on_close_menus {
             layers = layers.push(Inert::new(transparent_backdrop(on_close), menus_inert));
         }
+        // Escape on a menu's own layer (RFC-116 R-2), inside the `Inert`, so it is
+        // silent while a modal covers the menu. The layer is built either way.
         if let Some(header_menu) = layout.header_menu {
-            layers = layers.push(Inert::new(header_menu, menus_inert));
+            layers = layers.push(Inert::new(
+                OnEscape::maybe(header_menu, layout.escape.menu.clone()),
+                menus_inert,
+            ));
         }
         if let Some(context_menu) = layout.context_menu {
-            layers = layers.push(Inert::new(context_menu, menus_inert));
+            layers = layers.push(Inert::new(
+                OnEscape::maybe(context_menu, layout.escape.menu.clone()),
+                menus_inert,
+            ));
         }
     }
 
@@ -252,14 +273,26 @@ where
         // after a removal (RFC-120): the group is never wider than the layer,
         // so a control removed in a dialog never hands focus to the page.
         // Never inert: nothing covers them.
+        // Escape on the overlay's own layer (RFC-116 R-2): the overlay's escape
+        // message if one is set; otherwise nothing here, and the backdrop's own
+        // answer (its click-outside message) is reached.
         if let Some(dialog) = layout.dialog {
             layers = layers.push(Inert::new(
-                render_dialog(dialog, style.dialog_card.as_ref()),
+                OnEscape::maybe(
+                    render_dialog(dialog, style.dialog_card.as_ref()),
+                    layout.escape.modal.clone(),
+                ),
                 false,
             ));
         }
         if let Some(sheet) = layout.sheet {
-            layers = layers.push(Inert::new(render_sheet(sheet, layout.direction), false));
+            layers = layers.push(Inert::new(
+                OnEscape::maybe(
+                    render_sheet(sheet, layout.direction),
+                    layout.escape.modal.clone(),
+                ),
+                false,
+            ));
         }
     }
 
@@ -279,6 +312,91 @@ where
     }
 
     layers.into()
+}
+
+// -----------------------------------------------------------------------
+// The shortcuts router's keys (RFC-116 R-2).
+// -----------------------------------------------------------------------
+
+/// The keys of an action on a platform. **Every binding has a modifier**, so
+/// WCAG 2.1.4 (single-character shortcuts) does not apply.
+///
+/// Digits and punctuation are matched on the physical key, named keys on the
+/// logical one (`snora_interaction::KeyMatch`).
+fn bindings(action: ShortcutAction, platform: Platform) -> Vec<(KeyMatch, Modifiers)> {
+    use iced::keyboard::key::{Code, Named};
+    let mac = platform == Platform::MacOs;
+    // The key that "commands": Cmd on macOS, Ctrl elsewhere.
+    let command = if mac {
+        Modifiers::LOGO
+    } else {
+        Modifiers::CTRL
+    };
+    match action {
+        ShortcutAction::NextTab if mac => vec![
+            (KeyMatch::Named(Named::Tab), Modifiers::CTRL),
+            (
+                KeyMatch::Physical(Code::BracketRight),
+                Modifiers::LOGO | Modifiers::SHIFT,
+            ),
+        ],
+        ShortcutAction::PreviousTab if mac => vec![
+            (
+                KeyMatch::Named(Named::Tab),
+                Modifiers::CTRL | Modifiers::SHIFT,
+            ),
+            (
+                KeyMatch::Physical(Code::BracketLeft),
+                Modifiers::LOGO | Modifiers::SHIFT,
+            ),
+        ],
+        ShortcutAction::NextTab => vec![
+            (KeyMatch::Named(Named::Tab), Modifiers::CTRL),
+            (KeyMatch::Named(Named::PageDown), Modifiers::CTRL),
+        ],
+        ShortcutAction::PreviousTab => vec![
+            (
+                KeyMatch::Named(Named::Tab),
+                Modifiers::CTRL | Modifiers::SHIFT,
+            ),
+            (KeyMatch::Named(Named::PageUp), Modifiers::CTRL),
+        ],
+        ShortcutAction::Parent => vec![(
+            KeyMatch::Named(Named::ArrowUp),
+            if mac { Modifiers::LOGO } else { Modifiers::ALT },
+        )],
+        ShortcutAction::Digit(n) => vec![(KeyMatch::Digit(n), command)],
+        // An action this version does not know has no keys.
+        _ => Vec::new(),
+    }
+}
+
+/// The router's routes for a layout: each action's keys on the platform, each
+/// key carrying the message a click on the target publishes and the target's tag.
+fn router_routes<Message: Clone>(
+    shortcuts: &Shortcuts<Message>,
+    direction: LayoutDirection,
+) -> Vec<Route<Message>> {
+    let platform = shortcuts.platform_in_use();
+    let mut routes = Vec::new();
+    for route in shortcuts.routes(direction) {
+        let role = match route.role {
+            TargetRole::SideBarItem => Role::SideBarItem,
+            TargetRole::Tab => Role::Tab,
+            TargetRole::Crumb => Role::Crumb,
+            // A role this version does not know has no control to find.
+            _ => continue,
+        };
+        for (key, modifiers) in bindings(route.action, platform) {
+            routes.push(Route {
+                key,
+                modifiers,
+                message: route.message.clone(),
+                target: Tag::new(role, route.index),
+            });
+        }
+    }
+    routes
 }
 
 // -----------------------------------------------------------------------

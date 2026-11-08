@@ -61,6 +61,7 @@
 use crate::{
     direction::LayoutDirection,
     overlay::{Dialog, Sheet},
+    shortcuts::{Escape, Shortcuts},
     toast::{Toast, ToastAttention, ToastHover, ToastPosition},
 };
 
@@ -212,6 +213,16 @@ where
     /// or keyboard: pass the message to `snora::toast::Holds::attend`. Leave it
     /// unset and the toast layer carries no tracking.
     pub on_toast_attention: Option<fn(u64, ToastAttention) -> Message>,
+
+    /// The shortcuts router (RFC-116 R-2): keys with a modifier that jump, built
+    /// in `view` from the same side bar, tab bar and crumbs the widgets get. The
+    /// engine places it around the skeleton **inside the page's `Inert`**, so it
+    /// is silent under every overlay that blocks the pointer.
+    pub shortcuts: Option<Shortcuts<Message>>,
+
+    /// What Escape does on each overlay (RFC-116 R-2). The rule: the overlay's
+    /// escape message if set, otherwise its click-outside message.
+    pub escape: Escape<Message>,
 }
 
 impl<Node, Message> AppLayout<Node, Message>
@@ -237,6 +248,8 @@ where
             on_close_modals: None,
             on_toast_hover: None,
             on_toast_attention: None,
+            shortcuts: None,
+            escape: Escape::default(),
         }
     }
 
@@ -326,6 +339,49 @@ where
     #[must_use]
     pub fn toast_position(mut self, position: ToastPosition) -> Self {
         self.toast_position = position;
+        self
+    }
+
+    /// The shortcuts router (RFC-116 R-2): `Ctrl/Cmd` + digits, next and previous
+    /// tab, the breadcrumb's parent. **Every route is opt-in**, and every binding
+    /// has a modifier. See [`Shortcuts`] for the rules and the bindings.
+    ///
+    /// ```
+    /// use snora_core::{AppLayout, Digits, Shortcuts};
+    ///
+    /// #[derive(Clone, Debug)]
+    /// enum Message {}
+    ///
+    /// let layout: AppLayout<(), Message> =
+    ///     AppLayout::new(()).shortcuts(Shortcuts::new().digits(Digits::Tabs));
+    /// assert!(layout.shortcuts.is_some());
+    /// ```
+    #[must_use]
+    pub fn shortcuts(mut self, shortcuts: Shortcuts<Message>) -> Self {
+        self.shortcuts = Some(shortcuts);
+        self
+    }
+
+    /// What Escape does on each overlay, with named fields (RFC-116 R-2). Escape
+    /// publishes the overlay's escape message if one is set, and otherwise its
+    /// click-outside message; the click-outside message still answers clicks.
+    /// Replaces `snora::keyboard::dismiss_on_escape`. See [`Escape`].
+    ///
+    /// ```
+    /// use snora_core::{AppLayout, Escape};
+    ///
+    /// #[derive(Clone, Debug)]
+    /// enum Message { CloseDialog }
+    ///
+    /// let layout: AppLayout<(), Message> = AppLayout::new(()).escape(Escape {
+    ///     modal: Some(Message::CloseDialog),
+    ///     menu: None,
+    /// });
+    /// assert!(layout.escape.modal.is_some());
+    /// ```
+    #[must_use]
+    pub fn escape(mut self, escape: Escape<Message>) -> Self {
+        self.escape = escape;
         self
     }
 

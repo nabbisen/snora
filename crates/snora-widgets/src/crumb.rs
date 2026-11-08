@@ -125,7 +125,15 @@ where
     let deeper: Vec<usize> = (0..crumbs.len())
         .map(|i| crumbs[i + 1..].iter().filter(|c| !c.is_leaf).count())
         .collect();
-    let mut crumbs: Vec<_> = crumbs.into_iter().zip(deeper).collect();
+    // Each crumb also carries its place in the trail **as declared**, so a
+    // shortcut to the parent finds it whichever way the row is mirrored
+    // (RFC-116 R-2).
+    let mut crumbs: Vec<_> = crumbs
+        .into_iter()
+        .zip(deeper)
+        .enumerate()
+        .map(|(index, (crumb, deeper))| (index, crumb, deeper))
+        .collect();
     if direction == LayoutDirection::Rtl {
         crumbs.reverse();
     }
@@ -133,12 +141,13 @@ where
     let mut trail = row![].spacing(geometry.gap).align_y(Center);
 
     let last = crumbs.len().saturating_sub(1);
-    for (i, (crumb, deeper)) in crumbs.into_iter().enumerate() {
+    for (i, (index, crumb, deeper)) in crumbs.into_iter().enumerate() {
         trail = trail.push(render_crumb(
             // In Tab order the deeper crumbs come after this one in a
             // left-to-right trail and before it in a right-to-left one.
             (
                 crumb,
+                index,
                 if direction == LayoutDirection::Rtl {
                     (deeper, 0)
                 } else {
@@ -234,7 +243,7 @@ pub(crate) fn crumb_rule_style(theme: &Theme) -> container::Style {
 /// One crumb, with how many focus targets go with it when it is pressed
 /// (`removes`: before it and after it, in Tab order; RFC-120).
 fn render_crumb<'a, Message, CrumbId, F>(
-    (crumb, removes): (Crumb<CrumbId>, (usize, usize)),
+    (crumb, index, removes): (Crumb<CrumbId>, usize, (usize, usize)),
     on_action: &'a F,
     btn_pad_x: f32,
     btn_pad_y: f32,
@@ -282,6 +291,7 @@ where
         )
         .on_press_with(move || on_action(BreadcrumbAction::Pressed(id_for_msg.clone())))
         .removes(removes.0, removes.1)
+        .tag(snora_interaction::Role::Crumb, index)
         .padding(Padding::from([btn_pad_y, btn_pad_x]))
         .into()
     }

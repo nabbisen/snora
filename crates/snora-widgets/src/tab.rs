@@ -129,14 +129,16 @@ where
     // both reading directions. This matches how `row_dir` treats its
     // start/end pair, and what users expect from `vec[0]` being the
     // primary tab.
-    let tabs: Vec<_> = match direction {
-        LayoutDirection::Ltr => bar.tabs.into_iter().collect(),
-        LayoutDirection::Rtl => bar.tabs.into_iter().rev().collect(),
-    };
+    // Each tab carries its place in the bar **as declared**, so a shortcut to
+    // "tab 3" finds it whichever way the row is mirrored (RFC-116 R-2).
+    let mut tabs: Vec<_> = bar.tabs.into_iter().enumerate().collect();
+    if direction == LayoutDirection::Rtl {
+        tabs.reverse();
+    }
 
-    for tab in tabs {
+    for (index, tab) in tabs {
         let is_active = tab.id == active;
-        tab_row = tab_row.push(render_tab(tab, is_active, on_action, &geometry));
+        tab_row = tab_row.push(render_tab(tab, index, is_active, on_action, &geometry));
     }
 
     // Leave the trailing edge fillable so the row hugs the start edge
@@ -165,6 +167,7 @@ where
 /// its bottom edge; inactive tabs look like flat text buttons.
 fn render_tab<'a, Message, TabId, F>(
     tab: snora_core::Tab<TabId>,
+    index: usize,
     is_active: bool,
     on_action: &'a F,
     geometry: &TabGeometry,
@@ -198,6 +201,7 @@ where
         page_background,
     )
     .on_press_with(move || on_action(TabAction::Pressed(id_for_msg.clone())))
+    .tag(snora_interaction::Role::Tab, index)
     .padding(Padding::from([geometry.tab_pad_y, geometry.tab_pad_x]));
 
     // The underline is its own element (RFC-102 R-1), laid over the

@@ -25,6 +25,60 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Added
+
+- **`Shortcuts` and `AppLayout::shortcuts`: one router for the keys that jump
+  (RFC-116 R-2).** Built in `view` from the same side bar, tab bar and crumbs the
+  widgets get (`.side_bar(&…)`, `.tabs(&…, &on_action)`, `.crumbs(&…, &on_action)`),
+  and placed by the engine **around the page, inside its `Inert`**, so it is silent
+  under every overlay that blocks the pointer. **Every route is opt-in, and every
+  binding has a modifier.** The bindings:
+
+  | Destination | Windows and Linux | macOS |
+  |---|---|---|
+  | Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab`, and `Ctrl+PageDown` / `Ctrl+PageUp` | `Control+Tab` / `Control+Shift+Tab`, and `Shift+Cmd+]` / `[` |
+  | Destination *n* | `Ctrl+1…9` | `Cmd+1…9` |
+  | Breadcrumb parent | `Alt+↑` | `Cmd+↑` |
+
+  The rules a reader can predict:
+  - **a shortcut does exactly what a click on that control does:** the same message,
+    focus taken away from wherever it was, and the Tab starting point on the target
+    (RFC-121); a disabled or absent target does nothing;
+  - **a shortcut works unless the focused control uses that key,** and a focused text
+    field uses every arrow key, with any modifier;
+  - **the digit routes match the physical digit row** (on AZERTY the key marked `1`
+    types `&`); named keys match the logical key;
+  - **`Ctrl/Cmd + 1…9` go to exactly one destination, chosen with
+    `.digits(Digits::Tabs | Digits::SideBar)`,** and never change while the
+    application runs; `9` is the last, and a digit beyond the count does nothing;
+  - **next and previous tab follow Tab order and wrap**; under right-to-left the tab
+    row is mirrored, and next is the one Tab calls next.
+
+  **The macOS bindings follow Apple's conventions but have not been checked on a Mac**
+  (how `iced_winit` reports `Cmd+↑`; the text-field rule keeps it from ever firing in a
+  field). `Shortcuts::platform(…)` selects a table other than the build's.
+- **`AppLayout::escape(Escape { modal, menu })`: what Escape does on each overlay,
+  with named fields.** It is answered on the overlay's own layer, so it works while
+  the overlay is open, and **Escape publishes the overlay's escape message if one is
+  set, and otherwise its click-outside message** (`on_close_modals`,
+  `on_close_menus`), which still answers clicks. An overlay with neither is left to
+  the application. Escape still does not dismiss toasts.
+
+### Deprecated
+
+- **`snora::keyboard::dismiss_on_escape`** (since 0.57.0), superseded by
+  `AppLayout::escape`: its two `bool`s and two `Option`s in a row were easy to pass
+  in the wrong order with no compiler error. **It is removed in 0.60.0.** An overlay
+  of your own, outside `AppLayout`, needs a three-line `match`.
+
+### Fixed
+
+- **`snora::keyboard::traverse` claimed Tab with any modifier,** so `Ctrl+Tab`,
+  `Alt+Tab` and `Cmd+Tab` moved focus as plain Tab does, against its own
+  documentation. It now claims **plain Tab and Shift+Tab only**. (With `Ctrl+Tab`
+  bound to the next tab, every time the router is silent it would otherwise have
+  moved focus instead.)
+
 ### Removed
 
 - **`snora::toast::sweep_expired`** (deprecated since 0.54.0). Use `Holds::sweep`,

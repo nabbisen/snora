@@ -74,7 +74,9 @@ mod escape;
 mod group;
 mod inert;
 mod keyed;
+mod router;
 mod sequence;
+mod tag;
 mod underlined;
 
 pub use control::{Control, Ring, StyleFn};
@@ -83,5 +85,7 @@ pub use escape::OnEscape;
 pub use group::Group;
 pub use inert::Inert;
 pub use keyed::Keyed;
+pub use router::{KeyMatch, Route, Router};
 pub use sequence::sequential_focus;
+pub use tag::{Role, Tag};
 pub use underlined::Underlined;
