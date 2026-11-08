@@ -88,7 +88,7 @@ To choose them yourself, for example to drop `linux-theme-detection` and the
 your own line:
 
 ```toml
-snora = { version = "0.56", default-features = false, features = ["widgets", "design"] }
+snora = { version = "0.57", default-features = false, features = ["widgets", "design"] }
 iced  = { version = "0.14", default-features = false, features = [
     "wgpu", "tiny-skia", "thread-pool", "x11", "wayland",
 ] }
@@ -106,19 +106,19 @@ refuses the platform. Add `iced-default` back, or name the features you want.
 
 ```toml
 # Minimal (engine only)
-snora = { version = "0.56", default-features = false }
+snora = { version = "0.57", default-features = false }
 
 # Default (layout + prefab widgets)
-snora = { version = "0.56" }
+snora = { version = "0.57" }
 
 # Design tokens + helpers, no prefab widgets (RFC-055 — new)
-snora = { version = "0.56", default-features = false, features = ["design"] }
+snora = { version = "0.57", default-features = false, features = ["design"] }
 
 # Widgets + design tokens
-snora = { version = "0.56", features = ["widgets", "design"] }
+snora = { version = "0.57", features = ["widgets", "design"] }
 
 # Widgets + design + Lucide icons
-snora = { version = "0.56", features = ["widgets", "design", "lucide-icons"] }
+snora = { version = "0.57", features = ["widgets", "design", "lucide-icons"] }
 ```
 
 ## Token-only use (no iced dependency in your crate)
@@ -127,7 +127,7 @@ Use `snora-design` directly for a pure-Rust token library with no iced
 dependency:
 
 ```toml
-snora-design = { version = "0.56" }
+snora-design = { version = "0.57" }
 ```
 
 This is useful for testing token values, computing contrast in a CLI tool,

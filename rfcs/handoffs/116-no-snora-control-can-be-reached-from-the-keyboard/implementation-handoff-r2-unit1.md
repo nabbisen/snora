@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-116 R-2, Unit 1: the shortcuts router, and the Escape field
 
-**RFC.** `rfcs/accepted/116-…`, **"Rulings, 2026-11-08: R-2, after Unit 0"** (confirmed by
+**RFC.** `rfcs/done/116-…`, **"Rulings, 2026-11-08: R-2, after Unit 0"** (confirmed by
 the owner). Read it first: it holds the rules, the bindings table, R2-1 to R2-3 and L-8.
 **Review.** `.git-exclude/reviewed/116-r2-unit0/review-result.md`, including its
 refinements.

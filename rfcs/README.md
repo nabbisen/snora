@@ -168,6 +168,7 @@ Numbers remain stable forever and are never reused.
 | 119 | [The keyboard reaches beneath an open modal](./done/119-the-keyboard-reaches-beneath-an-open-modal.md) | **v0.55.0** — found while rewriting the book after RFC-116 R-1: a modal's dim blocks the pointer only. The keyboard does what the pointer can: reaches only what it can press (an `Inert` wrapper, always in the tree, no `advanced`), and leaves as it can (Escape closes an overlay that closes on a click outside); focus returns to the opener — **accepted 2026-11-07** (handoff: [`handoffs/119-…`](./handoffs/119-the-keyboard-reaches-beneath-an-open-modal/implementation-handoff.md)) |
 | 120 | [Focus is lost when the focused control goes away](./done/120-focus-is-lost-when-the-focused-control-goes-away.md) | **v0.56.0** — RFC-116's L-1 and L-3: focus moves to the nearest surviving neighbour, after first, within its own group first (revised: the first rule sent focus to the footer after a crumb press); a toast waits while the keyboard is on it, through one attention callback. Today's behaviour measured first — **accepted 2026-11-08** |
 | 121 | [A click gives a control keyboard focus, and a held key presses it again and again](./done/121-a-click-gives-keyboard-focus-and-a-held-key-repeats.md) | **v0.56.0** — found re-reviewing RFC-120: in 0.55.0 every click focuses the control, so a ring appears after every press and Space or Enter presses it again, in every application, contrary to 0.55.0's notes; and a held key repeats the press. Proposed: a click does not focus; Tab carries on from the clicked control if feasible; a held key presses once — **accepted 2026-11-08** |
+| 116 | [No snora control can be reached from the keyboard](./done/116-no-snora-control-can-be-reached-from-the-keyboard.md) | **v0.55.0 (R-1, gate 11 met) and v0.57.0 (R-2); the long-term plan stays live; long-term plan L-1–L-6** — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router (its Escape part and `dismiss_on_escape`'s deprecation reconsidered after RFC-119); a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
 
 ## Accepted
 
@@ -177,7 +178,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 116 | [No snora control can be reached from the keyboard](./accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md) | **R-1 shipped v0.55.0 (gate 11 met); R-2 merged 2026-11-08, ships 0.57.0; long-term plan L-1–L-6** — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router (its Escape part and `dismiss_on_escape`'s deprecation reconsidered after RFC-119); a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
 
 ## Proposed
 

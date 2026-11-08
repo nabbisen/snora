@@ -10,6 +10,11 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.56 → 0.57](migration-0.56-to-0.57.md) — **one breaking change**:
+  `sweep_expired` and `ToastLifetime::DEFAULT` removed (deprecated since 0.54).
+  Opt-in keyboard shortcuts (`AppLayout::shortcuts`); an Escape message per overlay
+  (`AppLayout::escape`), with `dismiss_on_escape` deprecated; `snora-control` renamed
+  `snora-interaction`.
 - [0.55 → 0.56](migration-0.55-to-0.56.md) — **behaviour fixes, three
   deprecations**: a click presses and no longer focuses (0.55.0's ring after a
   click is gone); a held key presses once; focus after a removal moves to the

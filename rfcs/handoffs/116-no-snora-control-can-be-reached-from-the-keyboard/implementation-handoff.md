@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-116, Unit 0 only: a focusable control, prototyped
 
-**RFC.** `rfcs/accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md`
+**RFC.** `rfcs/done/116-no-snora-control-can-be-reached-from-the-keyboard.md`
 **Scope.** Unit 0: one focusable `control`, used by the sidebar item, with its costs
 measured. **On a branch (`rfc116-unit0`), not merged to `main`.** The owner rules on
 Q-1's porting cost from your figures, and only then does R-1 cover every control.

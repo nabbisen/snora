@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-116 R-1, Unit 1: `control`'s prerequisites
 
-**RFC.** `rfcs/accepted/116-no-snora-control-can-be-reached-from-the-keyboard.md`.
+**RFC.** `rfcs/done/116-no-snora-control-can-be-reached-from-the-keyboard.md`.
 Read its "Ruling, 2026-11-07".
 **Ruled.** R-1 proceeds (owner, 2026-11-07).
 **Scope.** Unit 1 only: what `control` must do before it replaces `button` anywhere

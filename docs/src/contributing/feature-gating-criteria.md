@@ -356,7 +356,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.56.0, re-derived 2026-11-08, RFC-062)
+## Current status (snora 0.57.0, re-derived 2026-11-08, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -367,8 +367,8 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Measured 2026-09-12, no longer unassessed.** **~0.2 s marginal** (`snora-widgets` alone, closure warm; 181–222 ms over four runs on a 16-core desktop) — **~150× under**. The cold-closure reading is 29 523 ms on the same machine, but that cost is `iced`'s and is paid by every snora consumer whether or not a widget is enabled, so per-widget gating cannot reduce it; the marginal number is the one this indicator's own purpose needs. **The procedure printed here until today measured a no-op** (393 ms — `cargo clean -p <pkg>` does not reach the release profile); corrected above. The threshold's magnitude fits the cold-closure quantity rather than the marginal one — flagged for the owner, not silently rewritten | **No** |
 | 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **56,704 B (~55 KB)**, from `binary-size.csv`'s 0.56.0 row, read back after the tag. **37% of a 150 KB bar.** It moved **+6,528 B** from 0.55.0's 50,176, a **clean comparison**: both rows were built with rustc 1.99.1 on `ubuntu-latest`. `widgets_bytes` rose 16,256 and `engine_bytes` rose 9,728. 0.56.0 added the focus tracker in `Inert`, `Keyed`, `Group` and the attention path; **which accounts for the rise is not established**, so it is recorded, not explained | **No** |
-| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked for 0.56.0 against the manifests: one new edge, `snora` → `iced_runtime` (RFC-121), a crate already in every graph under `iced`; no new package. Otherwise as at 0.55.0: `snora-control` depends on `iced` and `iced_core` only; `snora-widgets` on `snora-core`, `snora-control`, `snora-design` (optional), `snora-style` (optional), `iced`, `lucide-icons` (optional) | **No** |
-| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.56.0: no package was added to or removed from `Cargo.lock` since 0.55.0, and only snora's own packages changed version | **No** |
+| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked for 0.57.0 against the manifests: `snora-control` was renamed `snora-interaction` (the same code, depending on `iced` and `iced_core` only), and `snora-control` 0.57.0 is a notice crate with no dependencies, which nothing depends on. `snora-widgets` depends on `snora-core`, `snora-interaction`, `snora-design` (optional), `snora-style` (optional), `iced`, `lucide-icons` (optional); `snora` on `iced_runtime` as before | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.57.0: the only package added to `Cargo.lock` since 0.56.0 is `snora-interaction` itself; nothing else was added, removed or moved | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
 **No indicator is met, and that is now measured rather than open.**

@@ -232,23 +232,11 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.57.0
+## Next — 0.58.0
 
-Scoped and ruled by the owner, 2026-11-08:
-- **`snora-control` becomes `snora-interaction`**, with a last `snora-control` 0.57.0 that
-  declares itself deprecated.
-- **The shortcuts router** (RFC-116 R-2), measurement first:
-  - a shortcut does exactly what a click on that control does;
-  - it works unless the focused control uses the key;
-  - every binding has a modifier;
-  - the digit binding is set by surveying the conventions.
-
-  If it does not fit 0.57, the owner decides at the measurement review.
-- **The 0.54 deprecations are removed** (`sweep_expired`, `ToastLifetime::DEFAULT`), under
-  the new rule: removed in the third minor after deprecation, with the version named
-  from the start.
-- **Workflow lint survives a download outage:** the cached actionlint archive is
-  verified on every run.
+- `snora-control`'s notice crate leaves the workspace; its 0.57.0 stays published.
+- Nothing else is scheduled. RFC-116's long-term plan (L-4, L-5, L-7, L-8) and the future
+  wanted items below wait on their triggers.
 
 ## Future wanted
 
@@ -259,6 +247,17 @@ Scoped and ruled by the owner, 2026-11-08:
   L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
+
+- **0.57.0** — keyboard shortcuts, and a clearer name.
+  - **Opt-in shortcuts** for tabs, sidebar items and the breadcrumb parent (RFC-116
+    R-2). Each does exactly what a click does, is silent under overlays, and defers to a
+    focused control that uses the key. The digits use the physical number row.
+  - **An Escape message per overlay** (`AppLayout::escape`), superseding
+    `dismiss_on_escape`.
+  - **`snora-control` became `snora-interaction`.**
+  - **The 0.54 deprecations were removed,** under the new rule: removed in the third
+    minor after deprecation.
+  - Workflow lint survives a download outage, verifying the cached actionlint every run.
 
 - **0.56.0** — the keyboard, made predictable.
   - **A click presses a control and does not focus it** (RFC-121), as in 0.54. 0.55.0

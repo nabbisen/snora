@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-116 R-2, Unit 0: measure the shortcuts router before it is ruled
 
-**RFC.** `rfcs/accepted/116-…`: read R-2, and **"Proposed amendment to R-2, for 0.57"**,
+**RFC.** `rfcs/done/116-…`: read R-2, and **"Proposed amendment to R-2, for 0.57"**,
 including the 2026-11-08 additions B1 to B3.
 **Release target.** 0.57.0. **If this unit shows the router does not fit in 0.57, the
 owner decides at its review whether it moves to 0.58.**

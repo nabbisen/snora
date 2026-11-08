@@ -1,6 +1,7 @@
 # RFC-116 — No snora control can be reached from the keyboard
 
-**Status.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
+**Status.** Done — R-1 shipped v0.55.0, R-2 shipped v0.57.0. **Its long-term plan (L-1 to L-8, at the
+end) stays live here.** Accepted 2026-11-04. Every open question ruled as suggested (see Rulings).
 **R-1 shipped in v0.55.0** (merged 2026-11-07, `952e1a2`): every control snora
 draws is `control`, and 1.0 gate 11 is met. **R-2, the `Shortcuts` router and the Escape field,
 merged 2026-11-08 (`51331bc`), shipping in 0.57.0.** The

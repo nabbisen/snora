@@ -116,7 +116,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! snora = { version = "0.56", default-features = false }
+//! snora = { version = "0.57", default-features = false }
 //! ```
 //!
 //! In this configuration `snora-widgets` is not pulled in and the

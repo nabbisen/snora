@@ -1,7 +1,7 @@
 # Implementation handoff — RFC-116 R-1, Units 2 and 3: `snora-control`, and every control on it
 
 **RFCs.**
-- `rfcs/accepted/116-…`: its rulings of 2026-11-07, R-1 and the new crate;
+- `rfcs/done/116-…`: its rulings of 2026-11-07, R-1 and the new crate;
 - `rfcs/done/115-…`: its amendment of 2026-11-05, the sizing rules, which live in
   `control`.
 

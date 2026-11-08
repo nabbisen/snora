@@ -25,6 +25,28 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.57.0] — 2026-11-08
+
+**Upgrading from 0.56:** read the [0.56 → 0.57 migration guide](docs/src/guides/migration-0.56-to-0.57.md).
+
+> **In short:** opt-in keyboard shortcuts for snora's tabs, sidebar and breadcrumbs
+> (`AppLayout::shortcuts`), each doing exactly what a click does. Escape can have a
+> message of its own on each overlay (`AppLayout::escape`). `snora-control` is renamed
+> `snora-interaction`. Two items deprecated since 0.54 are removed.
+>
+> **Code:** **one breaking change:** `snora::toast::sweep_expired` and
+> `ToastLifetime::DEFAULT` are removed. Use `Holds::sweep` and
+> `ToastLifetime::reading_time`. `dismiss_on_escape` is deprecated, and is removed in
+> 0.60.0. Nothing changes for an application that sets no shortcuts and no escape
+> message, except that `Ctrl+Tab` no longer moves focus as Tab does.
+>
+> **Appearance:** unchanged.
+>
+> **Security:** none. The advisory gate is clean, with the same accepted advisories as
+> 0.56.0.
+
 ### Added
 
 - **`Shortcuts` and `AppLayout::shortcuts`: one router for the keys that jump
@@ -64,33 +86,6 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   `on_close_menus`), which still answers clicks. An overlay with neither is left to
   the application. Escape still does not dismiss toasts.
 
-### Deprecated
-
-- **`snora::keyboard::dismiss_on_escape`** (since 0.57.0), superseded by
-  `AppLayout::escape`: its two `bool`s and two `Option`s in a row were easy to pass
-  in the wrong order with no compiler error. **It is removed in 0.60.0.** An overlay
-  of your own, outside `AppLayout`, needs a three-line `match`.
-
-### Fixed
-
-- **`snora::keyboard::traverse` claimed Tab with any modifier,** so `Ctrl+Tab`,
-  `Alt+Tab` and `Cmd+Tab` moved focus as plain Tab does, against its own
-  documentation. It now claims **plain Tab and Shift+Tab only**. (With `Ctrl+Tab`
-  bound to the next tab, every time the router is silent it would otherwise have
-  moved focus instead.)
-
-### Removed
-
-- **`snora::toast::sweep_expired`** (deprecated since 0.54.0). Use `Holds::sweep`,
-  which also keeps a toast that is being attended to.
-- **`ToastLifetime::DEFAULT`** (deprecated since 0.54.0). Use
-  `ToastLifetime::reading_time(title, message)`, which scales with how much there
-  is to read; `Toast::new` has not used the 4-second constant since 0.54.0.
-
-**The rule:** a deprecated item is removed in the third minor after the one that
-deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go in
-0.59.
-
 ### Changed
 
 - **The deprecation notes of `on_toast_hover`, `ToastHover` and `Holds::hover` now
@@ -105,6 +100,33 @@ deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go 
   `snora-widgets` depend on, and an application depends on `snora` alone. A final
   `snora-control` release has no items and says so; 0.55.0 and 0.56.0 stay
   published and are never yanked, so existing lockfiles keep working.
+
+### Deprecated
+
+- **`snora::keyboard::dismiss_on_escape`** (since 0.57.0), superseded by
+  `AppLayout::escape`: its two `bool`s and two `Option`s in a row were easy to pass
+  in the wrong order with no compiler error. **It is removed in 0.60.0.** An overlay
+  of your own, outside `AppLayout`, needs a three-line `match`.
+
+### Removed
+
+- **`snora::toast::sweep_expired`** (deprecated since 0.54.0). Use `Holds::sweep`,
+  which also keeps a toast that is being attended to.
+- **`ToastLifetime::DEFAULT`** (deprecated since 0.54.0). Use
+  `ToastLifetime::reading_time(title, message)`, which scales with how much there
+  is to read; `Toast::new` has not used the 4-second constant since 0.54.0.
+
+**The rule:** a deprecated item is removed in the third minor after the one that
+deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go in
+0.59.
+
+### Fixed
+
+- **`snora::keyboard::traverse` claimed Tab with any modifier,** so `Ctrl+Tab`,
+  `Alt+Tab` and `Cmd+Tab` moved focus as plain Tab does, against its own
+  documentation. It now claims **plain Tab and Shift+Tab only**. (With `Ctrl+Tab`
+  bound to the next tab, every time the router is silent it would otherwise have
+  moved focus instead.)
 
 ## [0.56.0] — 2026-11-08
 
@@ -1131,7 +1153,8 @@ deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go 
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.56.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.57.0...HEAD
+[0.57.0]: https://github.com/nabbisen/snora/compare/0.56.0...0.57.0
 [0.56.0]: https://github.com/nabbisen/snora/compare/0.55.0...0.56.0
 [0.55.0]: https://github.com/nabbisen/snora/compare/0.54.0...0.55.0
 [0.54.0]: https://github.com/nabbisen/snora/compare/0.53.0...0.54.0
