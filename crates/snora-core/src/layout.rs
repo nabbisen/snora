@@ -200,7 +200,8 @@ where
     /// [`snora::toast::Holds::hover`]: https://docs.rs/snora/latest/snora/toast/struct.Holds.html#method.hover
     #[deprecated(
         since = "0.56.0",
-        note = "use `on_toast_attention`, which also reports keyboard focus (RFC-120)"
+        note = "use `on_toast_attention`, which also reports keyboard focus (RFC-120). \
+                It is removed in 0.59.0."
     )]
     pub on_toast_hover: Option<fn(u64, ToastHover) -> Message>,
 
@@ -396,7 +397,8 @@ where
         note = "use `AppLayout::on_toast_attention`, which also reports keyboard focus, \
                 with `snora::toast::Holds::attend` (RFC-120). Replace \
                 `ToastHover::Entered` with `ToastAttention::PointerEntered` and `Left` with \
-                `PointerLeft`; while both callbacks are set, only the new one is called."
+                `PointerLeft`; while both callbacks are set, only the new one is called. \
+                It is removed in 0.59.0."
     )]
     #[must_use]
     pub fn on_toast_hover(mut self, f: fn(u64, ToastHover) -> Message) -> Self {

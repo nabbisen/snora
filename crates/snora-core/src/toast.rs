@@ -186,7 +186,8 @@ const MINIMUM_READING_SECONDS: usize = 6;
     since = "0.56.0",
     note = "use `ToastAttention`, which also reports keyboard focus: \
             `AppLayout::on_toast_attention` and `snora::toast::Holds::attend` (RFC-120). \
-            `ToastHover::Entered` is `ToastAttention::PointerEntered` and `Left` is `PointerLeft`."
+            `ToastHover::Entered` is `ToastAttention::PointerEntered` and `Left` is `PointerLeft`. \
+            It is removed in 0.59.0."
 )]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ToastHover {
@@ -247,22 +248,6 @@ pub enum ToastLifetime {
 }
 
 impl ToastLifetime {
-    /// The former default: a 4-second transient.
-    ///
-    /// Four seconds is how long a toast lasted for every intent until
-    /// 0.54.0, and it is not long enough. A reader who is slower than
-    /// average, reading in a second language, or using a screen
-    /// magnifier can lose the message before finishing it — and an
-    /// error could vanish unread (RFC-113).
-    #[deprecated(
-        since = "0.54.0",
-        note = "`Toast::new` no longer uses this: an Error is `Persistent`, and every \
-                other intent gets `ToastLifetime::reading_time(title, message)`, which \
-                scales with how much there is to read. This constant still means a \
-                4-second transient if you set it deliberately."
-    )]
-    pub const DEFAULT: ToastLifetime = ToastLifetime::Transient(Duration::from_secs(4));
-
     /// How long a toast of this length should stay, by RFC-113's rule:
     ///
     /// > Two seconds to notice it, plus one second for every six

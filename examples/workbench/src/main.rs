@@ -189,7 +189,7 @@ impl Workbench {
                 // `Holds::sweep` is the one sweep path (RFC-113). This
                 // example does not wire `on_toast_attention`, so nothing is
                 // ever held and this behaves exactly as the old
-                // `sweep_expired` did.
+                // the old free sweep did.
                 self.holds.sweep(&mut self.toasts, Instant::now());
             }
             // iced moves focus only when something runs `focus_next`;

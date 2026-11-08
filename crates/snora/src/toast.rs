@@ -11,8 +11,8 @@
 //! 3. [`Holds`](crate::toast::Holds) — the sweep, and the toasts the
 //!    pointer is resting on. `Holds::sweep` drops expired transient
 //!    toasts but keeps a held one, so a toast cannot vanish from under
-//!    someone reading it (RFC-113). It replaces `sweep_expired`, which
-//!    is deprecated.
+//!    someone reading it (RFC-113). It replaced the free function that swept
+//!    without a hold, removed in 0.57.0.
 //!
 //! The two links above are spelled as full paths on purpose. This
 //! module's `//!` docs are concatenated with the `///` docs on
@@ -741,25 +741,6 @@ where
     }
 }
 
-/// Drop expired transient toasts from the queue.
-///
-/// Persistent toasts are always retained. Call this from your update
-/// function when handling the tick message produced by [`subscription`].
-#[deprecated(
-    since = "0.54.0",
-    note = "use `Holds::sweep`, which also keeps a toast the pointer is resting on \
-            (RFC-113). Keep one `Holds` in your state and call \
-            `self.holds.sweep(&mut self.toasts, Instant::now())` on the tick. To \
-            hold a toast while it is read, add \
-            `.on_toast_attention(Message::ToastAttention)` to the layout and \
-            `self.holds.attend(id, attention, &mut self.toasts, Instant::now())` when \
-            that message arrives. An application that does not want the hold still \
-            calls `Holds::sweep`, and simply never calls `attend`."
-)]
-pub fn sweep_expired<Message: Clone>(toasts: &mut Vec<Toast<Message>>, now: Instant) {
-    toasts.retain(|t| !t.is_expired(now));
-}
-
 /// The toasts someone is attending to, and the sweep that respects them
 /// (RFC-113, RFC-120).
 ///
@@ -874,7 +855,7 @@ impl Holds {
         since = "0.56.0",
         note = "use `Holds::attend` with `ToastAttention::PointerEntered` and `PointerLeft`, \
                 which also takes keyboard focus (RFC-120). `ToastHover::Entered` is \
-                `PointerEntered` and `Left` is `PointerLeft`."
+                `PointerEntered` and `Left` is `PointerLeft`. It is removed in 0.59.0."
     )]
     #[expect(deprecated, reason = "takes the deprecated `ToastHover`")]
     pub fn hover<M: Clone>(
@@ -915,35 +896,6 @@ mod channel_register;
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    /// `sweep_expired` is deprecated in favour of `Holds::sweep`
-    /// (RFC-113), but it still ships and still has to behave, so its
-    /// own test keeps calling it. This is the one place the allow is
-    /// correct: a test that exists to exercise a deprecated item.
-    #[expect(
-        deprecated,
-        reason = "this test exists to exercise the deprecated `sweep_expired`"
-    )]
-    #[test]
-    fn sweep_drops_only_expired_transient() {
-        let base = Instant::now();
-
-        let live_transient = Toast::new(1, ToastIntent::Info, "a", "b", ())
-            .with_lifetime(ToastLifetime::seconds(10))
-            .with_created_at(base);
-        let dead_transient = Toast::new(2, ToastIntent::Info, "a", "b", ())
-            .with_lifetime(ToastLifetime::millis(100))
-            .with_created_at(base);
-        let persistent = Toast::new(3, ToastIntent::Error, "a", "b", ())
-            .persistent()
-            .with_created_at(base);
-
-        let mut v = vec![live_transient, dead_transient, persistent];
-        sweep_expired(&mut v, base + Duration::from_secs(1));
-
-        let remaining_ids: Vec<u64> = v.iter().map(|t| t.id).collect();
-        assert_eq!(remaining_ids, vec![1, 3]);
-    }
 
     // -----------------------------------------------------------------------
     // horizontal_align — RTL Start/End mirroring (RFC-011-D / RFC-012-A ABDD)
@@ -1303,7 +1255,7 @@ mod holds_tests {
         assert_eq!(before, after, "the restart reordered the stack");
     }
 
-    /// An unheld toast is swept exactly as `sweep_expired` swept it.
+    /// An unheld toast is swept exactly as the old free sweep swept it.
     #[test]
     fn sweep_without_any_hold_matches_the_old_behaviour() {
         let base = Instant::now();

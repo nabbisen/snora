@@ -145,7 +145,7 @@ impl App {
             Message::DismissToast(id) => self.toasts.retain(|t| t.id != id),
             // `Holds::sweep` is the one sweep path (RFC-113). This
             // example does not wire `on_toast_attention`, so nothing is ever
-            // held and this behaves exactly as `sweep_expired` did.
+            // held and this behaves exactly as the old free sweep did.
             Message::ToastTick => self.holds.sweep(&mut self.toasts, Instant::now()),
             // iced moves focus only when something runs `focus_next`;
             // `traverse` is that something, for Tab and Shift+Tab

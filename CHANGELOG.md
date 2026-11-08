@@ -25,7 +25,22 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Removed
+
+- **`snora::toast::sweep_expired`** (deprecated since 0.54.0). Use `Holds::sweep`,
+  which also keeps a toast that is being attended to.
+- **`ToastLifetime::DEFAULT`** (deprecated since 0.54.0). Use
+  `ToastLifetime::reading_time(title, message)`, which scales with how much there
+  is to read; `Toast::new` has not used the 4-second constant since 0.54.0.
+
+**The rule:** a deprecated item is removed in the third minor after the one that
+deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go in
+0.59.
+
 ### Changed
+
+- **The deprecation notes of `on_toast_hover`, `ToastHover` and `Holds::hover` now
+  name their removal version, 0.59.0.**
 
 - **`snora-control` is renamed `snora-interaction`.** Beside `snora-widgets`,
   "control" read as another word for widget, and the crate holds far more than the

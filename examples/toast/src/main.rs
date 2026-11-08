@@ -8,7 +8,7 @@
 //!     - Default (4 s auto-dismiss),
 //!     - Custom duration (per-toast override),
 //!     - Persistent (manual dismiss only).
-//! * The framework's TTL subscription + `sweep_expired` pair — the
+//! * The framework's TTL subscription + `Holds::sweep` pair — the
 //!   application only writes two one-liners and stores a `Vec<Toast<_>>`.
 //! * All six [`ToastPosition`] anchors. Switching position re-anchors the
 //!   stack at the next render with no per-toast change required.
