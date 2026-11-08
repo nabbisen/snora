@@ -29,7 +29,7 @@
 //!
 //! # How the ring is measured
 //!
-//! The control is focused by a click, the cursor is parked away so no
+//! The control is focused by Tab, the cursor is parked away so no
 //! hover is in the frame, and two frames are compared: the pixels that
 //! changed *are* the ring. On each of the control's four sides, the
 //! changed pixels are compared with what was under them in the unfocused
@@ -59,6 +59,7 @@ use snora::{
 };
 
 mod common;
+use common::tab_router::tab_router;
 use common::{Frame, NON_TEXT_MIN, colour_of, contrast_ratio, frame_pixels, simulator};
 
 const WINDOW: Size = Size::new(1024.0, 768.0);
@@ -632,9 +633,12 @@ fn ring_failures(context: &str, theme: &Theme, subject: &Subject, out: &mut Vec<
     );
 
     for (k, target) in bounds.iter().enumerate() {
-        let mut ui = simulator(subject.element());
-        ui.point_at(target.center());
-        let _ = ui.simulate(iced_test::simulator::click());
+        // Focused by Tab (a click no longer focuses, RFC-121): target `k` is the
+        // (k + 1)th, so that many Tabs reach it from nothing focused.
+        let mut ui = simulator(tab_router(subject.element()));
+        for _ in 0..=k {
+            let _ = ui.tap_key(iced::keyboard::key::Named::Tab);
+        }
         ui.point_at(AWAY);
         let focused = frame_pixels(
             &mut ui,

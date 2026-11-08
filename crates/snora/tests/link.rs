@@ -134,13 +134,15 @@ impl Operation for Report {
     }
 }
 
-/// What a control looks like: nothing happening, the pointer over it, or the
-/// pointer held down on it.
+/// What a control looks like: nothing happening, the pointer over it, the
+/// pointer held down on it, or keyboard focus on the first control with the
+/// pointer away (a click no longer focuses, RFC-121, so `Down` draws no ring).
 #[derive(Clone, Copy, PartialEq, Debug)]
 enum Pointer {
     Away,
     Over,
     Down,
+    Focused,
 }
 
 fn backend() -> String {
@@ -201,6 +203,21 @@ fn shoot(
             &mut clipboard::Null,
             &mut messages,
         );
+    }
+    if pointer == Pointer::Focused {
+        // `focus_next`, run to completion as the window loop does.
+        let mut current: Box<dyn Operation<()>> =
+            Box::new(iced_runtime::core::widget::operation::focusable::focus_next::<()>());
+        loop {
+            ui.operate(
+                &renderer,
+                &mut iced_runtime::core::widget::operation::black_box(current.as_mut()),
+            );
+            match current.finish() {
+                iced_runtime::core::widget::operation::Outcome::Chain(next) => current = next,
+                _ => break,
+            }
+        }
     }
     // A control records what it is about to look like on the redraw request,
     // so a frame drawn without one is drawn "disabled".
@@ -884,17 +901,35 @@ fn a_focused_links_ring_does_not_cover_its_underline() {
                 failures.push(format!("{preset} {size}px: no underline"));
                 continue;
             };
-            // Pressing focuses the control, so the ring is drawn; the label
-            // (and so the underline) is the pressed state's colour.
+            // Focused by the keyboard, so the ring is drawn and the label (and
+            // so the underline) is the resting colour. (Pressing used to focus
+            // the control, and this was drawn from a press; it no longer does.)
             let down = shoot(
                 window_of(&tokens, link_of(&tokens, "Open")),
                 &theme,
                 2.0,
                 Font::DEFAULT,
-                Pointer::Down,
+                Pointer::Focused,
             );
+            // The premise, asserted: a ring is drawn, i.e. the frame differs from
+            // the resting one somewhere. Without it this test passes just as well
+            // when nothing is focused.
+            // The ring lies outside the control (its inner edge may reach 1px
+            // in), so a differing pixel *outside* the control's box is the ring.
+            let own = down.controls[0];
+            let ring_drawn = (0..down.height).any(|y| {
+                (0..down.width).any(|x| {
+                    let at = iced::Point::new(x as f32 / down.scale, y as f32 / down.scale);
+                    !own.contains(at) && down.differs(&rest_link, x, y)
+                })
+            });
+            if !ring_drawn {
+                failures.push(format!(
+                    "{preset} {size}px: focusing the link drew no ring, so the underline check below proves nothing"
+                ));
+            }
             let want =
-                snora::design::style::button::ghost(&tokens, iced::widget::button::Status::Pressed)
+                snora::design::style::button::ghost(&tokens, iced::widget::button::Status::Active)
                     .text_color;
             let x = ((PAD + 20.0) * 2.0) as u32;
             for y in u.top..=u.bottom {

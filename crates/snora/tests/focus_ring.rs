@@ -30,6 +30,7 @@ use snora::widget::SideBarLabels;
 use snora::{Icon, LayoutDirection, SideBar, SideBarItem};
 
 mod common;
+use common::tab_router::tab_router;
 use common::{
     Frame, NON_TEXT_MIN, colour_of, contrast_ratio, frame_pixels, peak_colour, record_mark,
     simulator,
@@ -106,8 +107,9 @@ fn design_rail(tokens: &snora::design::Tokens) -> Element<'static, Msg> {
     .into()
 }
 
-/// Renders the rail, optionally focusing item `focus` by clicking it,
-/// and returns the frame plus the bounds of item `report`'s icon.
+/// Renders the rail, optionally focusing item `focus` by Tab (a click no
+/// longer focuses, RFC-121), and returns the frame plus the bounds of item
+/// `report`'s icon.
 ///
 /// **`report` is a separate argument on purpose.** The first version
 /// took one index and used it for both, so the unfocused frame reported
@@ -122,7 +124,7 @@ fn frame(
     report: usize,
     name: &str,
 ) -> (Frame, Rectangle) {
-    let mut ui = simulator(build());
+    let mut ui = simulator(tab_router(build()));
     let item_glyph = |ui: &mut iced_test::Simulator<'_, Msg>, i: usize| {
         ui.find(GLYPHS[i])
             .expect("the rail draws the item's icon")
@@ -133,9 +135,10 @@ fn frame(
     let glyph = item_glyph(&mut ui, report);
 
     if let Some(i) = focus {
-        let g = item_glyph(&mut ui, i);
-        ui.point_at(g.center());
-        let _ = ui.simulate(iced_test::simulator::click());
+        // Item `i` is the (i + 1)th focus target, so that many Tabs reach it.
+        for _ in 0..=i {
+            let _ = ui.tap_key(iced::keyboard::key::Named::Tab);
+        }
     }
     // Park the cursor for both frames, so hover is never in the diff.
     ui.point_at(AWAY);
@@ -377,7 +380,17 @@ fn two_unfocused_frames_are_identical() {
 fn only_the_focused_item_gets_a_ring() {
     let theme = Theme::Light;
     let (plain, other) = frame(&rail, &theme, None, RESTING, "ring-one-plain");
-    let (focused, _) = frame(&rail, &theme, Some(ACTIVE), RESTING, "ring-one-focused");
+    let (focused, active) = frame(&rail, &theme, Some(ACTIVE), ACTIVE, "ring-one-focused");
+
+    // The premise, asserted: the item that was focused *has* a ring. Without
+    // this the test passes just as well when focusing did nothing (as it did
+    // when this set-up was a click, from RFC-121 on).
+    let ring = changed(&plain, &focused)
+        .expect("focusing the active item changed nothing, so this test would pass for any reason");
+    assert!(
+        ring.contains(active.center()),
+        "the change {ring:?} is not around the active item's icon {active:?}",
+    );
 
     // Grown by the ring's offset and width, so a ring drawn around the
     // *other* item would fall inside this region.

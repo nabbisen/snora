@@ -27,6 +27,8 @@
 
 #[cfg(feature = "widgets")]
 pub mod subjects;
+#[cfg(feature = "widgets")]
+pub mod tab_router;
 
 use std::path::Path;
 
