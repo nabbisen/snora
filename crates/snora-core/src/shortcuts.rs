@@ -237,6 +237,10 @@ impl<Message: Clone> Shortcuts<Message> {
     }
 
     /// The platform whose bindings apply. Defaults to [`Platform::current`].
+    ///
+    /// **An application normally leaves this alone**: the default is the platform
+    /// it was built for, which is the table its users expect. It exists for tests
+    /// and previews of the other platform's table.
     #[must_use]
     pub fn platform(mut self, platform: Platform) -> Self {
         self.platform = platform;
