@@ -196,7 +196,7 @@ As of **0.56.0**, re-counted at the cut (`cargo test --workspace --all-features
 | `snora-core` | 25 | 0 |
 | `snora-design` | 10 | 0 |
 | `snora-style` | 3 | 1 |
-| `snora-control` | 0 | 0 |
+| `snora-interaction` | 0 | 0 |
 | `snora-widgets` | 6 | 0 |
 | `snora` | 9 | 3 |
 | **Total** | **53** | **4** |

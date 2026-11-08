@@ -406,3 +406,56 @@ reader operates snora*, by pointer, keyboard and focus.
   procedure.
 
 Handoff: `handoffs/housekeeping-0-57/implementation-handoff.md`.
+
+## Rulings, 2026-11-08: R-2, after Unit 0 (owner, confirmed after a check against the principles)
+
+Unit 0 (`.git-exclude/reviewed/116-r2-unit0/`) measured a prototype router on both
+renderers. Nothing proposed was infeasible.
+- It is silent under every overlay that blocks the pointer, and captures what it answers.
+- A focused control that uses the key wins.
+- A shortcut does what a click does. Without that, Enter after a view swap pressed a
+  control nobody chose.
+
+**Placement (Q-R2-1):** one router, built by the application in `view`, passed with
+`AppLayout::shortcuts(…)`, and placed by the engine around the skeleton, inside its
+`Inert`. It sees a key only after its content, and answers only if nothing captured it.
+
+**The rules a reader can predict:**
+- **A shortcut does exactly what a click on that control does.** That covers the
+  message, focus taken away, and the Tab starting point (RFC-121); a disabled or absent
+  target does nothing.
+- **A shortcut works unless the focused control uses that key, and a focused text field
+  is taken to use every arrow key, with any modifier.** The text-field clause was added
+  in review: on macOS, Cmd+↑ in a field means "start of text".
+- **Every binding has a modifier,** so WCAG 2.1.4 does not apply.
+- **The digit routes match the physical digit row; named keys match the logical key.**
+  This was added in review, because on AZERTY the "1" key types "&".
+
+**R2-1, the digits.** `Ctrl/Cmd + 1…9` go to **exactly one destination, chosen by the
+application in the builder** (tabs or sidebar items), and never change at run time. `9`
+is the last. The book recommends tabs when the application has a tab bar (the browsers'
+convention), and the sidebar when it has none.
+
+**The bindings:**
+
+| Destination | Windows / Linux | macOS |
+|---|---|---|
+| Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab`, and `Ctrl+PgDn` / `Ctrl+PgUp` | `Control+Tab` / `Control+Shift+Tab`, and `Shift+Cmd+]` / `[` |
+| Destination *n* (tabs or sidebar, as chosen) | `Ctrl+1…9` | `Cmd+1…9` |
+| Breadcrumb parent | `Alt+↑` | `Cmd+↑` |
+
+**R2-2, Escape.** `AppLayout` gains an escape field with named fields. Escape publishes
+the overlay's escape message if one is set, and otherwise its click-outside message.
+The click-outside message still answers clicks. **`dismiss_on_escape` is deprecated in
+0.57.0, and removed in 0.60.0.**
+
+**R2-3, macOS.** The macOS table ships. The book states that it follows Apple's
+conventions but has not been checked on a Mac. The text-field rule keeps Cmd+↑ from ever
+firing in a field. **L-8** is added to the long-term plan.
+
+**Found in review:** `traverse` claimed Tab with any modifier, so Ctrl+Tab moved focus.
+It now claims plain Tab and Shift+Tab only.
+
+| # | Gap | Who meets it | Trigger |
+|---|---|---|---|
+| L-8 | **The macOS bindings have not been checked on a Mac** (how `iced_winit` reports Cmd+↑, and whether a field keeps it) | Mac users | the first check on macOS, by the owner or an adopter |

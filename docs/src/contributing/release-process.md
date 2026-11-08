@@ -521,8 +521,9 @@ restate the guide's content.
 [ ] Workbench manual QA checklist completed (docs/src/getting-started/06-workbench.md)
 [ ] cargo package --workspace
     # Inspects all six .crate archives (snora-core, snora-design,
-    # snora-style, snora-control, snora-widgets, snora — snora-style added
-    # in RFC-055, 0.32.0; snora-control in RFC-116). Examples are ALSO packaged (each emits "manifest has no
+    # snora-style, snora-interaction, snora-widgets, snora — snora-style added
+    # in RFC-055, 0.32.0; snora-interaction in RFC-116, named snora-control
+    # until 0.57.0, whose last release is a notice crate packaged with them). Examples are ALSO packaged (each emits "manifest has no
     # description"); `publish = false` stops them being *published*, not
     # packaged, so no exclusion flag is needed but the output is noisier
     # than "six archives". Corrected at 0.38.0 — the previous wording
@@ -665,7 +666,8 @@ release introduces a new workspace crate:
 3. **Push the tag.** `release.yaml` skips every crate whose exact version is already
    on crates.io, and publishes the rest (`scripts/publish-plan.sh`, RFC-116 Unit 2b).
 
-The first instance is `snora-control`, at 0.55.0.
+The first instances are `snora-control`, at 0.55.0, and `snora-interaction`, at
+0.57.0 (the rename).
 
 **What the plan checks, and what it does not.** `publish-plan.sh` asks crates.io, per
 crate, whether the exact `name@version` exists. Anything but "yes" or "no" stops
@@ -732,9 +734,9 @@ two unreleased features' source.
 
 Cargo computes the dependency order from the manifests
 (`snora-core` and `snora-design` have no internal dependencies;
-`snora-style` depends on `snora-design`; `snora-control` depends on
+`snora-style` depends on `snora-design`; `snora-interaction` depends on
 nothing of snora's; `snora-widgets` depends on `snora-core`,
-`snora-control`, `snora-design` and `snora-style`; `snora` depends on all
+`snora-interaction`, `snora-design` and `snora-style`; `snora` depends on all
 five) and waits
 for each to become available on crates.io before publishing the next. The
 order cannot drift from the manifests, because nothing restates it.

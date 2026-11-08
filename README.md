@@ -27,7 +27,7 @@ code stays your UI code.
   Each slot is any `iced::Element`. No trait to implement, no
   dispatcher enum to write.
 - **Framework-managed toasts.** `Vec<Toast<Message>>` on your state,
-  two one-liners (`subscription` + `sweep_expired`) for lifetime,
+  two one-liners (`subscription` + `Holds::sweep`) for lifetime,
   intent → theme color, six anchor positions including RTL-aware ones.
 - **One close sink per channel.** `on_close_modals` for dialogs and
   sheets, `on_close_menus` for header / context menus. Wired once.

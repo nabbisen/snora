@@ -55,7 +55,7 @@ with a `mouse_area` loses all of that.
 
 | Primitive | Required construction | Keyboard reachability |
 |---|---|---|
-| Button (primary / secondary / ghost / danger / link) | snora's `control` (`snora-control`, RFC-116) | **Yes, from 0.55:** a focus target; Enter and Space press it; a ring shows focus. Tab moves once the application routes it (`snora::keyboard::traverse`) |
+| Button (primary / secondary / ghost / danger / link) | snora's `control` (`snora-interaction`, RFC-116) | **Yes, from 0.55:** a focus target; Enter and Space press it; a ring shows focus. Tab moves once the application routes it (`snora::keyboard::traverse`) |
 | Interactive card | Semantic control where possible; or documented limitation | **None** if built on an iced `button`, which takes no keyboard input in iced 0.14; document either way |
 | Notice dismiss / action | `control` | **Yes** (as for buttons) |
 | Chip (interactive), and its remove button | `control` | **Yes** (as for buttons) |
@@ -180,7 +180,7 @@ never press a button, even after it has been clicked. So the gap is not only the
 missing ring.
 
 **snora's answer, from 0.55 (RFC-116): `control`.** It is snora's own widget, in
-`snora-control`, built on the public `iced_core::Widget` and `Focusable` (no
+`snora-interaction` (named `snora-control` until 0.57), built on the public `iced_core::Widget` and `Focusable` (no
 `advanced` feature). It registers a focus target when it has a handler, answers
 Enter and Space with the message a click publishes, and draws its own ring in a
 layer above its neighbours. Every control snora draws is one. **An application's

@@ -138,7 +138,7 @@ Snora Design does not and cannot guarantee:
 ### Focus visibility
 
 ```text
-[ ] A snora control is built on `control` (snora-control, RFC-116), which
+[ ] A snora control is built on `control` (snora-interaction, RFC-116), which
     draws its own focus ring: Tokens::focus on the design path, the 2/2
     literals and the theme's text colour on the unstyled path.
 [ ] The ring clears 3:1 against what it sits on, in every stock theme and

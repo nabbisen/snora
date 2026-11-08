@@ -45,8 +45,8 @@ pub enum ToastPosition {
 - `ToastLifetime::reading_time(title, message)` — what `Toast::new` gives every
   intent except `Error`: 2 s + 1 s per 6 characters, rounded up, at least 6 s
   (RFC-113). `Error` gets `Persistent`.
-- `ToastLifetime::DEFAULT` — **deprecated since 0.54.0**, still a 4-second
-  transient, no longer what `Toast::new` uses.
+- `ToastLifetime::DEFAULT` — **removed in 0.57.0** (deprecated since 0.54.0); use
+  `ToastLifetime::reading_time`, which `Toast::new` uses.
 - `ToastAttention::{PointerEntered, PointerLeft, FocusGained, FocusLost}` —
   the reader's attention coming to or leaving a toast, by pointer or keyboard,
   as `AppLayout::on_toast_attention` reports it and

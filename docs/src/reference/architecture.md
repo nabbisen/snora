@@ -2,10 +2,13 @@
 
 Snora is six crates with a strict dependency direction. `snora-core`
 and `snora-design` are independent, iced-free leaves; `snora-style`
-depends only on `snora-design` and `iced`; `snora-control` depends on
-`iced` alone and is internal (RFC-116); `snora-widgets` depends on
-`snora-core`, `snora-control`, `snora-design`, and (opt-in)
-`snora-style`; `snora` depends on `snora-core` and `snora-control`
+depends only on `snora-design` and `iced`; `snora-interaction` (how the
+reader operates snora: the focusable control, focus, Escape, covered
+layers) depends on `iced` alone and is internal (RFC-116; named
+`snora-control` until 0.57, whose last release is a deprecation notice);
+`snora-widgets` depends on `snora-core`, `snora-interaction`,
+`snora-design`, and (opt-in) `snora-style`; `snora` depends on
+`snora-core` and `snora-interaction`
 always and on the other three behind its `widgets` / `design` features
 — independently of each other (RFC-055).
 
@@ -23,12 +26,12 @@ your application
        │        │
        │        └──► snora-design
        │
-       ├──► snora-control   (focusable control — internal, always present; iced only)
+       ├──► snora-interaction (pointer, keyboard, focus — internal, always present; iced only)
        │
        └──► snora-widgets   (optional, prefab UI parts — depends on iced)
                 │
                 ├──► snora-core
-                ├──► snora-control
+                ├──► snora-interaction
                 ├──► snora-design
                 └──► snora-style   (opt-in, when its own `design` feature is on)
 ```
@@ -142,8 +145,9 @@ This crate binds the vocabulary to iced 0.14:
   (RFC-039) opt-in — and `sheet` paints an edge-anchored panel; the dim
   backdrop is owned by `render` itself.
 - Lifecycle helpers — `snora::toast::subscription`,
-  `snora::toast::Holds` (its `sweep`, and `hover` for the pointer hold).
-  `snora::toast::sweep_expired` is deprecated since 0.54.0.
+  `snora::toast::Holds` (its `sweep`, and `attend` for the hold by pointer
+  or keyboard; `hover` is deprecated since 0.56.0, removed in 0.59.0).
+  `sweep_expired` was removed in 0.57.0 (use `Holds::sweep`).
 - Re-exports of `snora-widgets` (when the `widgets` feature is on)
   under the path `snora::widget`.
 
