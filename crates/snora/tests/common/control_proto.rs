@@ -71,7 +71,7 @@ pub fn control<'a, M: Clone + 'a>(content: impl Into<Element<'a, M>>) -> Control
         width: Length::Shrink,
         height: Length::Shrink,
         // iced's own default, so a move from `button` changes one name only.
-        style: Rc::new(|theme, status| button::primary(theme, status)),
+        style: Rc::new(button::primary),
         ring: RingConfig {
             width: 2.0,
             offset: 2.0,
