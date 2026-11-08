@@ -6,6 +6,8 @@ no patch, the fix ships in 0.56.0 (see Rulings).
 **Raised.** 2026-11-08, architect, while re-reviewing RFC-120 against the owner's
 fundamental philosophy, at the owner's request.
 **Release target.** 0.56.0 (Q-3, owner).
+**Merged to `main` 2026-11-08** (`b74ab3e`), with R-2 (Tab carries on after a click) built within its stop
+condition.
 **Priority.** **0.55.0 changed what every pointer user sees and what a key does, in
 every application, including those that never route Tab. Its release notes say it did
 not.**

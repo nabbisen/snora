@@ -44,16 +44,21 @@ contributor-facing documents linked below, not duplicated here.
   ```
 
   Subscribe with `iced::keyboard::listen()`, as the `tab` example does. Tab
-  past the last control leaves the group; it does not wrap. Before 0.55,
+  past the last control leaves the group; it does not wrap. **A click presses
+  a control and does not focus it** (0.56, RFC-121): no ring appears from a
+  click, and no key answers for a control the reader only clicked. The next
+  Tab carries on from the clicked control, as in a browser. **A held key
+  presses once.** Before 0.55,
   snora's controls were iced `button`s, which take no keyboard input at all.
   *(Corrected 2026-11-07: this once said "keyboard reachability inherited
   from iced", which iced 0.14 does not provide.)*
 - **Toasts stay as long as it takes to read (RFC-113).** An error stays
   until it is dismissed. Every other toast stays 2 s plus 1 s per 6
   characters, rounded up, and at least 6 s. A toast under a resting
-  pointer does not expire, once the application wires
-  `on_toast_hover` and `snora::toast::Holds`. A keyboard user has no
-  hold, so use `.persistent()` for anything that must not be missed.
+  pointer does not expire, and nor does one whose × has keyboard focus
+  (0.56), once the application wires `on_toast_attention` and
+  `snora::toast::Holds`. Use `.persistent()` for anything that must not be
+  missed.
 - **The sidebar names its items on the rail (RFC-114).** It no longer
   relies on a hover tooltip that touch users and anyone with an unsteady
   hand cannot use. The icon-only form remains as
@@ -177,10 +182,10 @@ them.
   controls.
 - **Keyboard (WCAG 2.1.1): met by snora's own controls from 0.55, once
   your application routes Tab with `snora::keyboard::traverse`** (above).
-  Without that one line, Tab does nothing, as before. **In 0.55.0 a click also
-  focuses a control**, so a ring appears after a click, and Space or Enter presses
-  the clicked control again; 0.56.0 removes that (RFC-121, and the 0.54 → 0.55
-  guide's correction).
+  Without that one line, Tab does nothing, as before. *(In 0.55.0 alone, a click
+  also focused a control, so a ring appeared after a click and Space or Enter
+  pressed it again. 0.56.0 removed that; see RFC-121 and the 0.54 → 0.55
+  guide's correction.)*
 - **Overlays: the keyboard does what the pointer can (0.55, RFC-119).** With a
   dialog, a sheet, or a menu with its backdrop open, Tab and Enter reach only
   what the pointer can press: the overlay and the toasts, never the page
@@ -191,10 +196,37 @@ them.
   put it, or nowhere, and the next Tab starts from the top. Opening a modal
   never resets the page: scroll offsets and a text input's cursor survive.
   The rules are [Laws 7 and 8](../reference/overlay-interaction-semantics.md#law-7--an-overlay-that-closes-on-a-click-outside-also-closes-on-escape).
-- **One keyboard gap remains, planned:** when the focused control removes
-  itself (a dismissed notice, a closed toast, a removed chip), focus goes
-  nowhere, and the next Tab starts from the top of the window (RFC-116's
-  long-term plan, L-1).
+- **When the focused control goes away (0.56, RFC-120):**
+
+  > **Focus moves to its nearest neighbour in the same group: the next one, or
+  > else the previous one. Otherwise, nothing is focused.**
+
+  Removing a chip moves focus to the next chip's label, not its ×, so pressing
+  Enter again cannot chain into removing more. Dismissing a notice moves focus
+  to the control after it. Closing a toast moves focus to the next toast's ×.
+  Pressing an ancestor breadcrumb keeps focus in the breadcrumb bar.
+
+  **For application authors, what the two sentences mean exactly:**
+  - **"The same group"** is the innermost container that held the control and
+    is still there: a chip row, the toast stack, the breadcrumb bar, your list.
+    It never reaches beyond its layer (the page, a dialog, a sheet, the
+    toasts), so focus does not jump to the footer, or from the toasts to the
+    page. **If your container is left with no control in it, snora cannot tell
+    that it is still there, and treats it as gone: focus moves to the nearest
+    control in the container around it.**
+  - **"Otherwise"** is when the group has no control left, or snora cannot
+    tell which controls went. That happens if you removed more than the
+    pressed control, such as a row with both Edit and Delete, or if the
+    focused target is not a snora control. Leaving nothing focused is the safe
+    answer: an inherited focus is what would let one more Enter press a
+    control nobody chose.
+  - **Your own focus wins.** If your `update` moves focus itself, snora
+    leaves it there.
+  - **A known limit (RFC-116 L-7):** in your own list, removing a *different*
+    item from the one focused can still move focus to another control, because
+    iced 0.14 keeps widget state by position, and snora has no identity for
+    your widgets. snora's toasts are followed by id and are not affected. In a
+    list that changes under the reader, set focus yourself.
 - **No accessibility tree, no AccessKit integration.** iced 0.14 does
   not expose one, and a layout framework cannot supply this on its own.
   snora's stated position — and why it will not build an interim

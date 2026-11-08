@@ -44,8 +44,8 @@ primary recovery action, using `notice::Notice` with `Tone::Danger` or
 
 - The recovery action and dismiss buttons are snora controls, reachable from
   the keyboard from 0.55 once the application routes Tab with
-  `snora::keyboard::traverse` (RFC-116). Dismissing moves focus nowhere: the
-  next Tab starts from the top. *(Corrected 2026-11-07: up to 0.54 they were
+  `snora::keyboard::traverse` (RFC-116). Dismissing moves focus to the nearest
+  control after the notice in its container, or else before it (RFC-120). *(Corrected 2026-11-07: up to 0.54 they were
   iced buttons, which take no keyboard input.)*
 - Tone color (red/orange) is supplemented by the notice text — not
   color-only.

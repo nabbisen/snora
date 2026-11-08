@@ -10,12 +10,12 @@ sweep. The application stores `Vec<Toast<Message>>` and one
 ```rust,ignore
 use std::time::Instant;
 use iced::{Subscription, Task};
-use snora::{Toast, ToastHover, ToastIntent, ToastLifetime};
+use snora::{Toast, ToastAttention, ToastIntent, ToastLifetime};
 use snora::toast::Holds;
 
 struct App {
     toasts: Vec<Toast<Message>>,
-    holds: Holds,                     // which toasts the pointer is resting on
+    holds: Holds,                     // which toasts the reader is attending to
     next_id: u64,
 }
 
@@ -23,7 +23,7 @@ struct App {
 enum Message {
     ShowSaved,
     Dismiss(u64),
-    ToastHover(u64, ToastHover),      // the pointer entered or left a toast
+    ToastAttention(u64, ToastAttention), // pointer or keyboard came or went
     ToastTick,                        // framework asks us to sweep
 }
 ```
@@ -46,10 +46,11 @@ fn update(&mut self, msg: Message) -> Task<Message> {
     if let Message::Dismiss(id) = msg {
         self.toasts.retain(|t| t.id != id);
     }
-    if let Message::ToastHover(id, crossing) = msg {
-        // Held while the pointer rests on it; when it leaves, the
-        // countdown restarts in full. `Holds` does the restart itself.
-        self.holds.hover(id, crossing, &mut self.toasts, Instant::now());
+    if let Message::ToastAttention(id, attention) = msg {
+        // Held while the pointer rests on it or the keyboard is on its ×;
+        // when both have gone, the countdown restarts in full. `Holds`
+        // does the restart itself.
+        self.holds.attend(id, attention, &mut self.toasts, Instant::now());
     }
     if let Message::ToastTick = msg {
         self.holds.sweep(&mut self.toasts, Instant::now());
@@ -77,7 +78,7 @@ fn view(&self) -> iced::Element<'_, Message> {
     let body: iced::Element<'_, Message> = /* … */;
     let layout = snora::AppLayout::new(body)
         .toasts(self.toasts.clone())
-        .on_toast_hover(Message::ToastHover);
+        .on_toast_attention(Message::ToastAttention);
     snora::render(layout)
 }
 ```
@@ -99,12 +100,20 @@ characters, so 7 s. It counts characters, not words, so Japanese and
 Chinese text, which has no spaces, gets the same margin.
 `ToastLifetime::reading_time(title, message)` is the rule as a function.
 
-**While the pointer rests on a toast, it does not expire,** once you
-wire `on_toast_hover` and `Holds` as above. When the pointer leaves,
-its countdown starts again in full. **A keyboard user has no equivalent
-hold.** From 0.55 the toast's × is reachable from the keyboard (RFC-116), but
-focusing it does not hold the toast; RFC-116's long-term plan records that. So
+**A toast waits while the reader is attending to it, by pointer or by
+keyboard** (0.56, RFC-120), once you wire `on_toast_attention` and `Holds` as
+above. It does not expire while the pointer rests on it, or while the keyboard
+is on its ×. When both have gone, its countdown starts again in full. Still,
 use `.persistent()` for anything a reader must not miss.
+
+**Keyboard focus and toasts** (RFC-120). Closing a toast from the keyboard
+moves focus to the next toast's ×, or else the previous one's. With no toast
+left, nothing is focused. A toast that expires or is closed elsewhere leaves
+your focus where it was, because snora follows toasts by their id.
+
+*Moving from 0.54 or 0.55:* `on_toast_hover`, `ToastHover` and `Holds::hover`
+are deprecated since 0.56.0 and still work. Replace them with
+`on_toast_attention`, `ToastAttention` and `Holds::attend`, as above.
 
 Persistent is for messages the user must acknowledge — completed
 exports, failures. Errors are persistent by default.

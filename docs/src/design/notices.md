@@ -51,7 +51,8 @@ if self.show_notice {
 - Action and dismiss controls are snora controls (RFC-116): from 0.55, Tab
   reaches them once the application routes it with `snora::keyboard::traverse`,
   Enter and Space press them, and a ring from `Tokens::focus` shows focus.
-  Dismissing moves focus nowhere; the next Tab starts from the top.
+  Dismissing moves focus to the nearest control after the notice in its
+  container, or else before it (RFC-120).
   *(Corrected 2026-11-07: up to 0.54 they were iced buttons, which take no
   keyboard input; this page had said "keyboard-reachable".)*
 - Tone colors all pass WCAG AA (verified by automated contrast tests).

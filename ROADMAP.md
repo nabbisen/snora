@@ -254,6 +254,9 @@ Accepted as 0.56's core by the owner, 2026-11-08:
 
 ## Future wanted
 
+- A public way for an application to declare its structure to the focus rule: a
+  container that stays when emptied, and controls that go together (RFC-120; owner,
+  2026-11-08). Built when an adopter asks.
 - A name shown when the keyboard reaches an icon-only (`Tooltip`) rail item (RFC-116
   L-5; owner, 2026-11-08). Not scheduled.
 

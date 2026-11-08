@@ -1,6 +1,7 @@
 # RFC-120 — Focus is lost when the focused control goes away
 
 **Status.** Accepted 2026-11-08. Every open question ruled as suggested (see Rulings).
+**Merged to `main` 2026-11-08** (`274a88b`), shipping in 0.56.0.
 **Handoff.** [`handoffs/120-…`](../handoffs/120-focus-is-lost-when-the-focused-control-goes-away/implementation-handoff.md).
 **Revised** 2026-11-08, before ruling, after the owner asked for a careful check against
 the fundamental philosophy. R-1's rule was rewritten: as first stated, it would have
@@ -258,3 +259,27 @@ neighbour is not a control the reader reached either, and the L-7 limit means sn
 not keep that promise in every case. A rule that claims more than it keeps is the
 confusion the owner's rule forbids. "Otherwise, nothing is focused" says the same thing
 truthfully.
+
+## Ruling, 2026-11-08 (owner): an application's container left empty (Unit 1, §6.1)
+
+snora cannot see that an application's container is still there once it holds no
+control. Containers have no identity across a rebuild in iced 0.14, so a removed list
+row and an emptied chip row look the same. **The owner accepted the suggested ruling:
+it is stated, not built around.** One sentence, in `Inert`'s rustdoc, in the removal
+controls' rustdoc, and in the book:
+
+> If your container is left with no control in it, snora cannot tell that it is still
+> there, and treats it as gone: focus moves to the nearest control in the container
+> around it.
+
+snora's own groups are exact: the breadcrumb bar says it stays (`Group`), and the toast
+stack follows toasts by id (`Keyed`).
+
+**Future wanted (owner, 2026-11-08: "a good direction for the future"):** a public way
+for an application to declare its structure, with the trigger "an adopter asks". It
+would cover two things:
+- **"this container stays"** (`Group`, made public);
+- **"these controls go together"** (D-1's span declaration).
+
+Both are new API an application can forget, which is why neither is built until an
+application needs it.

@@ -120,8 +120,8 @@ Three things to notice:
    tests — it lets you control the timestamp without freezing the
    real clock.
 3. `snora::toast::Holds::sweep` is the same call production code makes,
-   so the same logic gets exercised. A test of the pointer hold drives
-   `Holds::hover` with `ToastHover::Entered` and `ToastHover::Left`.
+   so the same logic gets exercised. A test of the hold drives
+   `Holds::attend` with `ToastAttention`'s pointer and focus variants.
 
 ## What is not currently testable this way
 

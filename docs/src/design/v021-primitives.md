@@ -30,7 +30,7 @@ Notice::new(&tokens, Tone::Warning, "Disk space low.")
 ### Accessibility (RFC-027)
 
 1. **Native primitive:** snora's `control` for action and dismiss (iced's `button` before 0.55).
-2. **Keyboard reachable:** yes, from 0.55: Tab reaches each (once the application routes it with `snora::keyboard::traverse`), and Enter and Space press it. Dismissing moves focus nowhere: the next Tab starts from the top (RFC-116's long-term plan). *(Corrected 2026-11-07: up to 0.54 these were iced buttons, which take no keyboard input; this page had said "keyboard-reachable".)*
+2. **Keyboard reachable:** yes, from 0.55: Tab reaches each (once the application routes it with `snora::keyboard::traverse`), and Enter and Space press it. Dismissing moves focus to the nearest control after the notice in its container, or else before it (0.56, RFC-120). *(Corrected 2026-11-07: up to 0.54 these were iced buttons, which take no keyboard input; this page had said "keyboard-reachable".)*
 3. **Focus visible:** yes, a ring from `Tokens::focus`, ≥ 3:1.
 4. **Semantic limitation:** no ARIA role exposed; visual tone only.
 5. **Example:** design workbench notice section.

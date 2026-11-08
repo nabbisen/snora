@@ -47,8 +47,13 @@ pub enum ToastPosition {
   (RFC-113). `Error` gets `Persistent`.
 - `ToastLifetime::DEFAULT` — **deprecated since 0.54.0**, still a 4-second
   transient, no longer what `Toast::new` uses.
-- `ToastHover::{Entered, Left}` — which way the pointer crossed a toast, as
-  `AppLayout::on_toast_hover` reports it and `snora::toast::Holds::hover` takes it.
+- `ToastAttention::{PointerEntered, PointerLeft, FocusGained, FocusLost}` —
+  the reader's attention coming to or leaving a toast, by pointer or keyboard,
+  as `AppLayout::on_toast_attention` reports it and
+  `snora::toast::Holds::attend` takes it (0.56, RFC-120). `#[non_exhaustive]`.
+- `ToastHover::{Entered, Left}` — **deprecated since 0.56.0**, superseded by
+  `ToastAttention`; still reported by `AppLayout::on_toast_hover` and taken by
+  `Holds::hover`.
 - `ToastLifetime::seconds(n)` / `ToastLifetime::millis(ms)`.
 - `ToastPosition::is_top()` / `is_bottom()` — partition helpers.
 
