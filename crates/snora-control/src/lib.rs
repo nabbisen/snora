@@ -63,10 +63,12 @@ mod control;
 mod em;
 mod escape;
 mod inert;
+mod sequence;
 mod underlined;
 
 pub use control::{Control, Ring, StyleFn};
 pub use em::{EmBox, Glyph};
 pub use escape::OnEscape;
 pub use inert::Inert;
+pub use sequence::sequential_focus;
 pub use underlined::Underlined;

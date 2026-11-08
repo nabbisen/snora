@@ -276,6 +276,17 @@ mod tests {
 /// }
 /// ```
 ///
+/// # After a click, Tab carries on from the clicked control (RFC-121)
+///
+/// **A click presses a control and does not focus it**, so no ring appears and
+/// no key answers for a control the reader only clicked. But a pointer user who
+/// then reaches for the keyboard does not start again from the top: **the next
+/// Tab moves to the control after the one clicked, and Shift+Tab to the one
+/// before it.** After a press anywhere else, Tab starts from the top. Once
+/// anything has focus, Tab moves from that, as it always did. This function runs
+/// that operation rather than iced's `focus_next` and `focus_previous`; it needs
+/// nothing from you.
+///
 /// # Tab at the end of a group leaves it
 ///
 /// **Tab on the last focus target does not wrap to the first.** Focus
@@ -297,11 +308,13 @@ pub fn traverse<Message: 'static>(key: Key, modifiers: Modifiers) -> Option<iced
         return None;
     }
 
-    Some(if modifiers.shift() {
-        iced::widget::operation::focus_previous()
-    } else {
-        iced::widget::operation::focus_next()
-    })
+    // Not iced's `focus_next` / `focus_previous`: the same two passes, except
+    // that when nothing has focus they start from the control last clicked
+    // (RFC-121 R-2) and not from the top. With something focused they behave
+    // exactly as iced's do.
+    Some(iced_runtime::task::effect(iced_runtime::Action::widget(
+        snora_control::sequential_focus::<()>(!modifiers.shift()),
+    )))
 }
 
 #[cfg(test)]

@@ -7,9 +7,13 @@
 //! - **Enter and Space press it** while focused, publishing **the same
 //!   message a click publishes** — a control with two ways in and two
 //!   messages out would let an application handle one and not the
-//!   other, with nothing to say so;
-//! - **a click focuses it**, and a press anywhere else takes focus
-//!   away, so at most one control holds focus;
+//!   other, with nothing to say so — **once per press**: a held key's
+//!   auto-repeat presses nothing;
+//! - **a click presses it and does not focus it** (RFC-121). Focus moves
+//!   only by the keyboard (Tab, through `snora::keyboard::traverse`) or by
+//!   the application, so a ring means the keyboard is there, and no key
+//!   answers for a control the reader only clicked. A press anywhere else
+//!   takes focus away from a focused control, so at most one holds it;
 //! - **a focus ring** is drawn while it is focused;
 //! - **it tells the runtime when its look changes** — `button`'s own
 //!   mechanism, recorded status compared on each event — so a hover
@@ -118,6 +122,9 @@ impl<Message: Clone> OnPress<'_, Message> {
 struct State {
     is_pressed: bool,
     is_focused: bool,
+    /// Tab's starting point (RFC-121 R-2): set by a click on this control,
+    /// cleared by a press anywhere else. It is not focus, and draws nothing.
+    start_here: bool,
 }
 
 impl Focusable for State {
@@ -421,6 +428,9 @@ where
         let state = tree.state.downcast_mut::<State>();
         if self.on_press.is_some() {
             operation.focusable(Some(&self.id), bounds, state);
+            // Tab's starting point, for `sequential_focus`, keyed by the
+            // same id so a hidden focus target takes no part.
+            operation.custom(Some(&self.id), bounds, &mut state.start_here);
         }
 
         operation.traverse(&mut |operation| {
@@ -491,6 +501,11 @@ where
                 state.is_focused = false;
                 shell.request_redraw();
             }
+            // A press anywhere else clears Tab's starting point too: Tab
+            // then starts from the top (or from the control that was hit).
+            if is_press && !cursor.is_over(bounds) {
+                state.start_here = false;
+            }
         }
 
         if shell.is_event_captured() {
@@ -504,13 +519,17 @@ where
                 if enabled && cursor.is_over(bounds) {
                     let state = tree.state.downcast_mut::<State>();
                     state.is_pressed = true;
-                    // A click also focuses, so that a pointer user who
-                    // then reaches for the keyboard carries on from
-                    // where they were rather than from the start.
-                    if !state.is_focused {
-                        state.is_focused = true;
-                        shell.request_redraw();
-                    }
+                    // Tab, if the user reaches for it next, carries on from
+                    // here (RFC-121 R-2): a starting point, not focus.
+                    state.start_here = true;
+                    // **A click presses and does not focus** (RFC-121).
+                    // 0.55.0 focused here, "so that a pointer user who
+                    // then reaches for the keyboard carries on from where
+                    // they were" — and so drew a ring after every click in
+                    // every application, and let Space or Enter press the
+                    // control again. A pointer user's keyboard starting
+                    // point is the application's to give with a focus
+                    // task, as for a `text_input`.
                     shell.capture_event();
                 }
             }
@@ -534,7 +553,7 @@ where
             // click emits**. Not a second message: a control with two
             // ways in and two messages out would let an application
             // handle one and not the other, and nothing would say so.
-            Event::Keyboard(keyboard::Event::KeyPressed { key, .. }) => {
+            Event::Keyboard(keyboard::Event::KeyPressed { key, repeat, .. }) => {
                 let state = tree.state.downcast_mut::<State>();
                 let activates = matches!(
                     key.as_ref(),
@@ -544,7 +563,15 @@ where
                     && state.is_focused
                     && activates
                 {
-                    shell.publish(on_press.get());
+                    // **Once per press** (RFC-121). A held key reports
+                    // `repeat: true`, and a pointer press never repeats:
+                    // the keyboard does what the pointer can. The repeat is
+                    // still the control's key while it has focus, so it is
+                    // captured and not handed to the application as if no
+                    // control had taken it.
+                    if !repeat {
+                        shell.publish(on_press.get());
+                    }
                     shell.capture_event();
                 }
             }
