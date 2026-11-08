@@ -324,6 +324,9 @@ fn leaving_asks_the_runtime_for_a_redraw() {
 /// Clicking elsewhere takes focus away from a control, and the
 /// ring has to disappear.
 ///
+/// **The control is focused by `focus_next`, not by a click** (RFC-121:
+/// a click no longer focuses).
+///
 /// **Isolated from the status path on purpose:** the cursor is
 /// parked away from the control before the click, so its status
 /// (idle) does not change. Only the focus logic can ask for this
@@ -331,15 +334,11 @@ fn leaving_asks_the_runtime_for_a_redraw() {
 #[test]
 fn losing_focus_to_a_click_elsewhere_asks_for_a_redraw() {
     let mut rig = Rig::new(control(Msg::A));
-    rig.move_to(A.0, A.1);
-    rig.press();
-    rig.release();
-    // `release` published, so rebuild as the application would.
-    let mut rig = rig.rebuilt(control(Msg::A));
+    let _ = rig.run(iced_core::widget::operation::focusable::focus_next::<()>());
     assert_eq!(
         focused(&mut rig),
         vec![true],
-        "the click focused the control"
+        "focus_next focused the control"
     );
 
     rig.move_to(NOWHERE.0, NOWHERE.1);
@@ -363,19 +362,18 @@ fn losing_focus_to_a_click_elsewhere_asks_for_a_redraw() {
 // -----------------------------------------------------------------
 
 /// **A defect Unit 0 had and its tests could not see.** Clicking A
-/// then B left *both* focused: a press focused the control it hit
-/// and nothing unfocused the one it had left. `Focusable` assumes
-/// one focus at a time, and the focus operations enforce it — but a
-/// click is not an operation.
+/// then B left *both* focused, because a click is not an operation and
+/// nothing unfocused the one it had left. `Focusable` assumes one
+/// focus at a time.
+///
+/// Since RFC-121 a click focuses nothing, so the question is the other
+/// half: A is focused (by `focus_next`), B is clicked, and **A must lose
+/// its focus while B does not gain it**. Never both, never B alone.
 #[test]
-fn clicking_one_control_then_another_leaves_only_the_second_focused() {
+fn clicking_another_control_takes_focus_from_the_first_and_gives_none() {
     let mut rig = two_controls();
-
-    rig.move_to(A.0, A.1);
-    rig.press();
-    rig.release();
-    let mut rig = rig.rebuilt(row![control(Msg::A), control(Msg::B)]);
-    assert_eq!(focused(&mut rig), vec![true, false]);
+    let _ = rig.run(iced_core::widget::operation::focusable::focus_next::<()>());
+    assert_eq!(focused(&mut rig), vec![true, false], "premise: A has focus");
 
     rig.move_to(B.0, B.1);
     rig.press();
@@ -384,8 +382,8 @@ fn clicking_one_control_then_another_leaves_only_the_second_focused() {
 
     assert_eq!(
         focused(&mut rig),
-        vec![false, true],
-        "after clicking A and then B, the focus state of (A, B) is not (false, true)",
+        vec![false, false],
+        "after A was focused and B clicked, the focus state of (A, B) is not (false, false)",
     );
 }
 
@@ -438,12 +436,8 @@ fn tab_skips_a_disabled_control() {
 #[test]
 fn a_control_that_becomes_disabled_drops_focus_and_ignores_keys() {
     let mut rig = Rig::new(control(Msg::A));
-    rig.move_to(A.0, A.1);
-    rig.press();
-    rig.release();
-    let mut rig = rig.rebuilt(control(Msg::A));
-    assert_eq!(focused(&mut rig), vec![true]);
-    rig.messages.clear();
+    let _ = rig.run(iced_core::widget::operation::focusable::focus_next::<()>());
+    assert_eq!(focused(&mut rig), vec![true], "premise: it has focus");
 
     // The application rebuilds it with no handler.
     let mut rig = rig.rebuilt(disabled());
@@ -515,9 +509,12 @@ fn on_press_with_builds_the_message_only_on_press() {
         "and the message it built was not published"
     );
 
-    // The keyboard route builds it too, once per press.
+    // The keyboard route builds it too, once per press. The click did not
+    // focus the control (RFC-121), so it is focused by `focus_next` first.
     rig.messages.clear();
     let mut rig = rig.rebuilt(counting(&count));
+    let _ = rig.run(iced_core::widget::operation::focusable::focus_next::<()>());
+    assert_eq!(focused(&mut rig), vec![true], "premise: it has focus");
     let _ = rig.key(iced::keyboard::key::Named::Enter);
     assert_eq!(
         count.get(),

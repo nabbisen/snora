@@ -50,6 +50,7 @@ use snora::{Icon, LayoutDirection, SideBar, SideBarItem};
 
 mod common;
 use common::simulator;
+use common::tab_router::tab_router;
 
 const NAMES: [&str; 3] = ["Home", "Search", "Settings"];
 const GLYPHS: [&str; 3] = ["1", "2", "3"];
@@ -137,12 +138,17 @@ fn the_rail_registers_a_focus_target_per_item() {
 // Row 1b — a click focuses it
 // ---------------------------------------------------------------------
 
-/// Clicking an item focuses it, so a pointer user who then reaches for
-/// the keyboard carries on from where they were.
+/// A click presses and does **not** focus (RFC-121), and Tab then carries on
+/// from the item that was clicked.
+///
+/// This replaces the test that asserted the opposite, "clicking an item focuses
+/// it, so a pointer user who then reaches for the keyboard carries on from where
+/// they were". The promise is kept, by a different route: the click sets where
+/// Tab starts from, not where focus is.
 #[test]
-fn a_click_focuses_the_item_it_hits() {
+fn a_click_focuses_nothing_and_tab_carries_on_after_the_item() {
     for (form, labels) in forms() {
-        let mut ui = simulator(rail(labels));
+        let mut ui = simulator(tab_router(rail(labels)));
         // The first item's icon is inside its target in every form.
         let glyph = ui
             .find(GLYPHS[0])
@@ -152,24 +158,28 @@ fn a_click_focuses_the_item_it_hits() {
         ui.point_at(glyph.center());
         let _ = ui.simulate(iced_test::simulator::click());
 
-        let mut focused = Vec::new();
-        let _ = ui.find(|candidate: Candidate<'_>| {
-            if let Candidate::Focusable { state, .. } = candidate {
-                focused.push(state.is_focused());
-            }
-            None::<()>
-        });
+        let focused_now = |ui: &mut iced_test::Simulator<'_, Msg>| {
+            let mut focused = Vec::new();
+            let _ = ui.find(|candidate: Candidate<'_>| {
+                if let Candidate::Focusable { state, .. } = candidate {
+                    focused.push(state.is_focused());
+                }
+                None::<()>
+            });
+            focused
+        };
 
         assert_eq!(
-            focused.iter().filter(|f| **f).count(),
-            1,
-            "{form}: after one click, {} of {} items are focused",
-            focused.iter().filter(|f| **f).count(),
-            focused.len(),
+            focused_now(&mut ui),
+            vec![false; NAMES.len()],
+            "{form}: a click focused an item",
         );
-        assert!(
-            focused.first().copied().unwrap_or(false),
-            "{form}: the click focused something other than the item it hit",
+
+        let _ = ui.tap_key(Named::Tab);
+        assert_eq!(
+            focused_now(&mut ui),
+            vec![false, true, false],
+            "{form}: Tab after a click on the first item did not land on the second",
         );
     }
 }
@@ -178,32 +188,19 @@ fn a_click_focuses_the_item_it_hits() {
 // Row 2 and 3 — Enter and Space press it, with the same message
 // ---------------------------------------------------------------------
 
-/// Focuses the first item by clicking it, then taps `key`, and returns
-/// the messages that came out **after** the click.
+/// Focuses the first item by Tab (a click no longer focuses, RFC-121), then
+/// taps `key`, and returns the messages that came out **after** the Tab.
 fn press_with_key(labels: SideBarLabels, key: Named) -> Vec<Msg> {
-    let mut ui = simulator(rail(labels));
-    let glyph = ui
-        .find(GLYPHS[0])
-        .expect("the rail draws the first item's icon")
-        .visible_bounds()
-        .expect("the icon is visible");
-    ui.point_at(glyph.center());
-    let _ = ui.simulate(iced_test::simulator::click());
-
-    // Move the cursor away, so that anything the key produces cannot be
-    // attributed to the pointer still resting on the item.
+    // The cursor is parked away, so that anything the key produces cannot be
+    // attributed to a pointer resting on the item.
+    let mut ui = simulator(tab_router(rail(labels)));
     ui.point_at(iced::Point::new(900.0, 900.0));
+    let _ = ui.tap_key(Named::Tab);
     let before = ui.into_messages().count();
 
-    let mut ui = simulator(rail(labels));
-    let glyph = ui
-        .find(GLYPHS[0])
-        .expect("the rail draws the first item's icon")
-        .visible_bounds()
-        .expect("the icon is visible");
-    ui.point_at(glyph.center());
-    let _ = ui.simulate(iced_test::simulator::click());
+    let mut ui = simulator(tab_router(rail(labels)));
     ui.point_at(iced::Point::new(900.0, 900.0));
+    let _ = ui.tap_key(Named::Tab);
     let _ = ui.tap_key(key);
 
     let all: Vec<Msg> = ui.into_messages().collect();
