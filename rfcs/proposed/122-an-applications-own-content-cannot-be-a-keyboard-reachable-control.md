@@ -102,7 +102,8 @@ free to change.
 - These sit beside `snora::render` and `snora::design::render`, which already split the
   two paths that way.
 - `snora::control` needs no feature, because `snora-interaction` is always present.
-- So an application on the engine path alone, like aaai, has it without `widgets`.
+- So an application on the engine path alone has it without `widgets`. aaai, on the design
+  path, uses `snora::design::control`.
 
 **Q-4 — the design-path default style.** **Suggest `ghost`:** the quietest
 `design::button` variant. Arbitrary content, such as a tree row or a suggestion, should
