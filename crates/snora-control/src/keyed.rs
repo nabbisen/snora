@@ -21,6 +21,10 @@
 //! If the content does not have exactly one focus target per key, `Keyed`
 //! stands aside and does nothing: it would be guessing.
 //!
+//! **A known limit:** if the reader presses Tab in the very frame in which the
+//! set of keys changes, `Keyed` puts focus back on the item it last saw focused,
+//! not the one Tab chose. It has not been observed, and it is not tested.
+//!
 //! Like [`Inert`](crate::Inert), it is public because the engine builds it, and
 //! it is not for applications.
 
