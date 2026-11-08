@@ -121,7 +121,12 @@ roles, and fills whose own text needed it, move, in lightness only, with hue wit
 | `high_contrast_light`, `high_contrast_dark` | ≥ 8.38:1, borders 21:1 | maximum contrast |
 
 With `text_muted` raised to 7:1, colour carries less of the text hierarchy. Let size
-and weight (`Typography`) carry it.
+(`Typography`) and weight carry it.
+
+*Corrected 2026-11-09:* this said "size and weight (`Typography`)". But `Typography`
+carries no weight; set it on your `Font`, and prefer `Weight::Bold`. A Semibold request can
+switch CJK text to a serif face. See
+[AAA presets](../design/aaa-presets.md#the-hierarchy-is-quieter-at-aaa).
 
 ## 5. Fixed without a visible change
 

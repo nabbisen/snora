@@ -76,6 +76,18 @@ alongside each other.
 See [Readability](../guides/readability.md) for how to pick a role and why
 line-height matters for prose.
 
+## Weight is yours, and Bold is the safe one
+
+A `TextRole` carries a size and a line height, not a weight. snora's only weight is the
+header title's `Bold`. When you make strong text, set the weight on your `Font`, and
+**prefer `Weight::Bold` to `Semibold`**:
+- many CJK sans families ship no SemiBold (Noto Sans CJK JP has Medium and Bold);
+- their serif siblings often do (Noto Serif CJK JP);
+- so a Semibold request can switch Japanese text to a serif face beside sans body text.
+
+Latin text looks right, so a check that reads only English misses it. **Check the typeface
+of strong text in every script you ship.** *(Reported by knotra, 2026-11-09.)*
+
 ## What snora's own widgets use today
 
 **snora uses two of these six roles: `label` and `body`.** `body_small`,

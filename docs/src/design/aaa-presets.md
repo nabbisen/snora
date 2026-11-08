@@ -57,3 +57,10 @@ Muted text at 7:1 sits close to secondary text: 7.05 against 8.12 in `light_aaa`
 and 7.05 against 7.62 in `dark_aaa`. Colour then carries less of the hierarchy. **In
 an AAA application, let size and weight carry it** ([Typography](typography.md)),
 not colour alone. That is better for older readers anyway.
+
+Weight is not part of `Typography`: its roles carry size and line height only. Set it
+on the `Font` you draw with, and **prefer `Weight::Bold` over `Semibold`**. Many CJK sans
+families ship no SemiBold. Noto Sans CJK JP has Medium and Bold but no SemiBold, while
+Noto Serif CJK JP has one. So a Semibold request can switch Japanese text to a serif
+face beside sans body text, while Latin text looks right. **Check the typeface of strong
+text in every script you ship.** *(Reported by knotra, 2026-11-09.)*
