@@ -245,3 +245,116 @@ fn the_ring_colour_clears_the_non_text_floor_on_every_theme_and_preset() {
         weakest.0, weakest.1
     );
 }
+
+// ---- 3.1: the ring against every surface snora defines -------------------------------
+
+/// **Where the ring is guaranteed** (the review's 3.1 measurement): the ring's colour
+/// against **every surface an application can get from snora**, not only the page.
+///
+/// - **Design path**, in all six presets: `background` (the page, which the ring is
+///   chosen against), `surface`, `surface_raised` (the dialog card, a raised card, a
+///   `Debug` toast), `accent` (a primary button's fill), and the four status fills a
+///   notice or a toast uses: `info`, `success`, `warning`, `danger`.
+/// - **Engine path**, in all 22 stock themes: the eight background variants of the
+///   theme's extended palette (`base`, `weakest`, `weaker`, `weak`, `neutral`,
+///   `strong`, `stronger`, `strongest`), and the primary, success, warning and danger
+///   `base` fills.
+///
+/// Printed (`--nocapture`) with every pair under 3:1; **asserts only that the page,
+/// which the ring is chosen against, clears it**, because the rest is a finding to
+/// report, not a rule this prototype keeps.
+#[test]
+fn the_ring_against_every_surface_snora_defines() {
+    use common::control_proto::Control as Proto;
+
+    let to_iced = |c: snora::design::Color| iced::Color::from_rgba(c.r, c.g, c.b, c.a);
+
+    println!("\n## design path: the ring against each surface (ratio)\n");
+    println!(
+        "| preset | ring | page | surface | surface_raised | accent | info | success | warning | danger | weakest |"
+    );
+    println!("|---|---|---|---|---|---|---|---|---|---|---|");
+    let mut under = Vec::new();
+    for (preset, tokens) in Tokens::presets() {
+        let tokens = leak(tokens);
+        let theme = snora::design::theme(tokens);
+        let (ring, _) = design_control::<Msg>(tokens, text("x")).resolve_ring(&theme);
+        let p = &tokens.palette;
+        let surfaces = [
+            ("page", p.background),
+            ("surface", p.surface),
+            ("surface_raised", p.surface_raised),
+            ("accent", p.accent),
+            ("info", p.info),
+            ("success", p.success),
+            ("warning", p.warning),
+            ("danger", p.danger),
+        ];
+        let mut row = format!(
+            "| {preset} | #{:02x}{:02x}{:02x} |",
+            (ring.r * 255.0).round() as u8,
+            (ring.g * 255.0).round() as u8,
+            (ring.b * 255.0).round() as u8
+        );
+        let mut weakest = (f32::MAX, "");
+        for (name, colour) in surfaces {
+            let ratio = Proto::<Msg>::contrast_of(ring, to_iced(colour));
+            row.push_str(&format!(" {ratio:.2} |"));
+            if ratio < weakest.0 {
+                weakest = (ratio, name);
+            }
+            if ratio < 3.0 {
+                under.push(format!("design / {preset} / {name}: {ratio:.2}:1"));
+            }
+        }
+        row.push_str(&format!(" {:.2} ({}) |", weakest.0, weakest.1));
+        println!("{row}");
+        assert!(
+            Proto::<Msg>::contrast_of(ring, to_iced(p.background)) >= 3.0,
+            "{preset}: the ring does not clear the page it is chosen against"
+        );
+    }
+
+    println!("\n## engine path: the ring against each surface of the theme\n");
+    println!("| theme | weakest | where |");
+    println!("|---|---|---|");
+    for theme in Theme::ALL {
+        let (ring, _) = control::<Msg>(text("x")).resolve_ring(theme);
+        let ep = theme.extended_palette();
+        let b = &ep.background;
+        let surfaces = [
+            ("base (the page)", b.base.color),
+            ("weakest", b.weakest.color),
+            ("weaker", b.weaker.color),
+            ("weak", b.weak.color),
+            ("neutral", b.neutral.color),
+            ("strong", b.strong.color),
+            ("stronger", b.stronger.color),
+            ("strongest", b.strongest.color),
+            ("primary.base", ep.primary.base.color),
+            ("success.base", ep.success.base.color),
+            ("warning.base", ep.warning.base.color),
+            ("danger.base", ep.danger.base.color),
+        ];
+        let mut weakest = (f32::MAX, "");
+        for (name, colour) in surfaces {
+            let ratio = Proto::<Msg>::contrast_of(ring, colour);
+            if ratio < weakest.0 {
+                weakest = (ratio, name);
+            }
+            if ratio < 3.0 {
+                under.push(format!("engine / {theme:?} / {name}: {ratio:.2}:1"));
+            }
+        }
+        println!("| {theme:?} | {:.2} | {} |", weakest.0, weakest.1);
+        assert!(
+            Proto::<Msg>::contrast_of(ring, b.base.color) >= 3.0,
+            "{theme:?}: the ring does not clear the page"
+        );
+    }
+
+    println!("\n{} pair(s) under 3:1:", under.len());
+    for pair in &under {
+        println!("  {pair}");
+    }
+}
