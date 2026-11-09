@@ -237,14 +237,15 @@ them.
   snora's stated position — and why it will not build an interim
   abstraction of its own — is in
   [Position on assistive technology](../contributing/semantic-accessibility.md#position-on-assistive-technology-rfc-045).
-- **Your own `iced::widget::button`s are still pointer and touch only.**
-  The keyboard route above is snora's `control`, under every control snora
-  draws. An iced `button` you build yourself takes no keyboard input and
-  registers no focus target, in iced 0.14. Where snora has a control for the
-  job, use it: `design::button::{primary, secondary, ghost, danger, link}`
-  on the design path. snora has no public control for content of your own
-  yet; RFC-116's long-term plan records that. Until then, give such an action
-  a keyboard shortcut. Details:
+- **Your own pressable content: use `snora::control` (0.58, RFC-122).** An
+  iced `button` you build yourself takes no keyboard input and registers no
+  focus target, in iced 0.14. **Change its name to `snora::control`**, or to
+  `snora::design::control(&tokens, …)` on the design path, and keep the rest
+  (`on_press`, `padding`, `style`). It then gets everything above: Tab, Enter
+  and Space once, no focus from a click, a focus ring, the target floor
+  (`targets.min` on the design path), silence under an overlay, and focus to a
+  neighbour if it goes away. *The ring is at least 3:1 against the page and every neutral surface snora's tokens define; on the engine path, against the theme's background tiers except SolarizedDark's `strongest` (2.91:1). On a coloured fill of your own, check it.* For plain labels,
+  `design::button::*` is still the shorter way. Details:
   [iced 0.14 focus-state limitation](../contributing/semantic-accessibility.md#iced-014-focus-state-limitation).
   *(Corrected 2026-11-04: this once said "keyboard activation still works;
   only the visual ring on iced-owned widgets is missing".)*

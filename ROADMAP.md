@@ -234,8 +234,11 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.58.0
 
+- **Your own content as a keyboard-reachable control** (RFC-122, merged): `snora::control`
+  and `snora::design::control`, with iced `button`'s builder. This closes RFC-116 L-4,
+  which aaai asked for.
 - `snora-control`'s notice crate leaves the workspace; its 0.57.0 stays published.
-- Nothing else is scheduled. RFC-116's long-term plan (L-4, L-5, L-7, L-8) and the future
+- Nothing else is scheduled. RFC-116's long-term plan (L-5, L-7, L-8) and the future
   wanted items below wait on their triggers.
 
 ## Future wanted

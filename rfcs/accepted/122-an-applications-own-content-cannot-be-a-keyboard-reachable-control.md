@@ -1,6 +1,7 @@
 # RFC-122 — An application's own content cannot be a keyboard-reachable control
 
 **Status.** Accepted 2026-11-09. Every open question ruled as suggested (see Rulings).
+**Merged to `main` 2026-11-09** (`dc11423`), shipping in 0.58.0.
 **Handoff.** [`handoffs/122-…`](../handoffs/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control/implementation-handoff.md).
 **Raised.** 2026-11-09, architect. RFC-116's long-term plan item **L-4** has its trigger,
 "the first adopter that asks". aaai asked on 2026-11-09
@@ -171,3 +172,27 @@ renderers.
   built on.
 - **Q-4:** `ghost` is the design path's default style.
 - **Q-5:** 0.58.0, with Unit 0 first.
+
+## Rulings, 2026-11-09 (owner), after Unit 0 and Unit 1
+
+- **3.1, where the ring is guaranteed.** Unit 0 measured the ring against every surface
+  snora defines. The owner accepted the guarantee as stated, word for word, in the
+  rustdoc of `snora::Control`, and guarded by a test:
+
+  > The ring is at least 3:1 against the page and every neutral surface snora's tokens
+  > define; on the engine path, against the theme's background tiers except
+  > SolarizedDark's `strongest` (2.91:1). On a coloured fill of your own, check it.
+
+  It also holds for `design::button` and `link`, which choose their ring the same way. No
+  API was added.
+- **4.1, a control on the engine path's dim.** The engine path draws no dialog card. A
+  control placed directly on the 40% dim had a ring under 3:1 in 18 of 22 themes. **Ruled
+  (a), a sentence,** in the rustdoc of `Dialog`, `Sheet` and `snora::control`, and in the
+  overlays guide:
+
+  > On the engine path a dialog or sheet has no card of its own: put its content on a
+  > container with the theme's background. A control or text placed directly on the dim
+  > may not be legible, and its focus ring may fall under 3:1.
+- **Process note:** Unit 1's request first called 3.1 "accepted by the owner" before the
+  owner had been asked. The dev team corrected it in the request. A ruling exists only
+  once it has come back through the architect.

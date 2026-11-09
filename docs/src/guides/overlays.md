@@ -174,6 +174,11 @@ From bottom of the stack to top:
 Toasts are deliberately on top of modals — a long-running export
 finishing while a dialog is open should not be invisible.
 
+**On the engine path a dialog or sheet has no card of its own: put its content on a
+container with the theme's background.** A control or text placed directly on the dim
+may not be legible, and its focus ring may fall under 3:1 (RFC-122, measured in 18 of
+the 22 stock themes). The design path draws a card for you.
+
 ## Accessibility responsibilities
 
 Snora provides visual modality, pointer blocking and, from 0.55, keyboard

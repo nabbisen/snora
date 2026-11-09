@@ -46,13 +46,12 @@ primary action.
 
 ## 6. Accessibility notes
 
-- If the entire card is interactive (pressing it selects/opens the item),
-  wrap it in `iced::widget::button` rather than placing a button inside the
-  card. This makes the full card one pointer target. **It is not a tab
-  stop:** an iced `button` takes no keyboard input in iced 0.14, and
-  snora has no public control for content of your own yet (RFC-116's long-term plan). Give selection a keyboard route of its own (a shortcut, or a
-  `button::link` "Open" inside the card). *(Corrected 2026-11-07: in iced
-  0.14 a `button` takes no keyboard input; see RFC-116.)*
+- If the entire card is interactive (pressing it selects or opens the item),
+  wrap it in **`snora::design::control`** rather than placing a button inside
+  the card. The full card is then one target for the pointer **and** a tab
+  stop: Enter and Space press it, and its ring sits outside the card, on the
+  page (0.58, RFC-122). *(Until 0.58 this recipe used iced's `button`, which
+  takes no keyboard input in iced 0.14.)*
 - If the card is display-only with one action button, use
   `button::primary`, `ghost` or `link`: snora controls, reachable from the
   keyboard from 0.55 once the application routes Tab with
@@ -107,17 +106,18 @@ fn result_card<'a, Message: Clone + 'a>(
         content = content.push(tag_row);
     }
 
-    // Wrap the entire card in a button so it is one pointer target.
-    // (Not a tab stop: this is iced's button, which takes no keyboard
-    // input in iced 0.14. Give "select" a keyboard route of its own.)
-    iced::widget::button(
+    // Wrap the entire card in a control: one target for the pointer and
+    // a tab stop for the keyboard (RFC-122).
+    snora::design::control(
+        t,
         if selected {
             card::selected(t, content)
         } else {
             card::surface(t, content)
-        }
+        },
     )
     .on_press(on_select)
+    .padding(0)
     .style(|_theme, _status| iced::widget::button::Style {
         background: None,
         border: iced::Border::default(),
@@ -146,5 +146,5 @@ fn result_card<'a, Message: Clone + 'a>(
 **Recipe.** The outer-button-wrapping-a-card pattern is app-specific enough
 (different apps want different content shapes) that a stable helper would
 be over-parameterized. The recipe documents the key insight (wrap the card
-in `iced::widget::button`, so the whole card is one target) which is not obvious
+in `snora::design::control`, so the whole card is one target for the pointer and the keyboard) which is not obvious
 from the primitives alone.

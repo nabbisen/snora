@@ -113,8 +113,15 @@ if key == iced::keyboard::Key::Named(iced::keyboard::key::Named::Escape) && self
 Details: [Accessibility](accessibility.md), and the
 [overlay interaction semantics](../reference/overlay-interaction-semantics.md).
 
+## Your own content
+
+`snora::control(content)` (engine path) and `snora::design::control(&tokens, content)`
+(design path) make any content of yours a control, under every rule above. They take iced
+`button`'s builder, so a `button` moves over by changing one name (0.58, RFC-122). An iced
+`button` left as it is takes no keyboard input.
+
 ## Keys snora's own controls use
 
-So that you can predict rule 2: a focused snora control uses **Enter and Space**, and
-nothing else. None of the shortcuts above is used by a snora control. A `text_input` or
+So that you can predict rule 2: a focused snora control, `snora::control` included, uses
+**Enter and Space**, and nothing else. None of the shortcuts above is used by a snora control. A `text_input` or
 `text_editor` of yours uses what iced gives it, plus every arrow key, with any modifier.

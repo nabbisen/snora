@@ -100,10 +100,20 @@ button(my_custom_content)
     .style(move |_theme, status| style::button::primary(&tok, status))
 ```
 
-**This is iced's `button`, not snora's control.** In iced 0.14 it is pointer
-and touch only: it is not focusable, it takes no keyboard input, and it draws
-no focus ring. snora has no public control for content of your own yet
-(RFC-116's long-term plan), so give such an action a keyboard shortcut.
+**That is iced's `button`, which is pointer and touch only** in iced 0.14. For
+content of your own, use **`snora::design::control`** (0.58, RFC-122). It takes the
+same builder, so only the name changes, and it is keyboard-reachable, with a ring from
+`Tokens::focus` and the floor from `Tokens::targets.min`:
+
+```rust,ignore
+snora::design::control(&self.tokens, my_custom_content)
+    .on_press(Message::Save)
+    .style(move |_theme, status| style::button::primary(&tok, status))
+```
+
+Without `.style(…)` it looks like `ghost`, so content of your own does not look like a
+call to action unless you say so. On the engine path, `snora::control(content)` is the
+same, with iced's default look and the theme's ring.
 
 ## Accessibility notes
 

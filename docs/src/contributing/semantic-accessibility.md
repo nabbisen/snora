@@ -184,8 +184,10 @@ missing ring.
 `advanced` feature). It registers a focus target when it has a handler, answers
 Enter and Space with the message a click publishes, and draws its own ring in a
 layer above its neighbours. Every control snora draws is one. **An application's
-own iced `button` is still pointer and touch only**: snora has no public control
-for application content yet (RFC-116's long-term plan).
+own content becomes one through `snora::control(content)` or
+`snora::design::control(&tokens, content)`** (0.58, RFC-122). These take iced
+`button`'s builder, so a `button` moves over by changing one name. An iced `button`
+left as it is stays pointer and touch only.
 
 *Corrected 2026-11-04:* this section said that iced's buttons respond to Enter and
 Space when focused, and that the gap was "exclusively" visual. Both were wrong for

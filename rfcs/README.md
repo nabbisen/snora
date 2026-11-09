@@ -178,7 +178,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 122 | [An application's own content cannot be a keyboard-reachable control](./accepted/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control.md) | 0.58.0 — RFC-116's L-4, its trigger fired by aaai's question (2026-11-09): `snora::control(content)` and `snora::design::control(&tokens, content)`, with iced `button`'s builder shape and every snora keyboard rule built in; nothing internal made public — **accepted 2026-11-09** |
+| 122 | [An application's own content cannot be a keyboard-reachable control](./accepted/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control.md) | **merged 2026-11-09, ships 0.58.0** — RFC-116's L-4, its trigger fired by aaai's question (2026-11-09): `snora::control(content)` and `snora::design::control(&tokens, content)`, with iced `button`'s builder shape and every snora keyboard rule built in; nothing internal made public — **accepted 2026-11-09** |
 
 ## Proposed
 
