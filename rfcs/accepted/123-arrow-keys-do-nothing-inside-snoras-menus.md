@@ -1,6 +1,7 @@
 # RFC-123 — Arrow keys do nothing inside snora's menus
 
-**Status.** Proposed 2026-11-09. Awaiting the owner's rulings on Q-1 to Q-5.
+**Status.** Accepted 2026-11-09. Every open question ruled as suggested, as revised (see Rulings).
+**Handoff.** [`handoffs/123-…`](../handoffs/123-arrow-keys-do-nothing-inside-snoras-menus/implementation-handoff.md).
 **Revised** 2026-11-09, before ruling, after the owner asked for a check against the
 fundamental philosophy. R-3 became simpler: no record of how a menu was opened. The
 "held arrow" claim was wrong, and is corrected. See "What the review changed".
@@ -140,3 +141,15 @@ tabs. That changes Tab everywhere, and it is recorded as future wanted.
 2. **Unit 1:** the behaviour, a test and a breakage row per rule, and `every_control.rs`
    covering the menu.
 3. **The book,** by the architect: the keyboard map and the menus guide.
+
+## Rulings, 2026-11-09 (owner)
+
+The revised RFC is accepted as written:
+- **Q-1:** ↓ and ↑ wrap at the ends, on every platform.
+- **Q-2 (R-3):** opening a menu never moves focus. With nothing focused, ↓ starts at the
+  first item and ↑ at the last.
+- **Q-3:** Tab inside an open menu is unchanged.
+- **Q-4:** no type-ahead (RFC-116 L-10).
+- **Q-5:** no tab bar (RFC-116 L-11).
+
+A held arrow keeps moving: RFC-121's held-key rule governs pressing, not moving.
