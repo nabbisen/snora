@@ -18,7 +18,7 @@ mod common;
 use common::aaai_cases::{self, SUGGESTION};
 
 use iced::widget::text;
-use iced::{Element, Rectangle};
+use iced::{Element, Rectangle, Theme};
 use iced_test::selector::Candidate;
 
 use snora::design::Tokens;
@@ -158,4 +158,141 @@ fn the_floor_is_24_by_default_and_44_with_the_token() {
         }
     }
     assert!(off.is_empty(), "under the floor: {off:?}");
+}
+
+// ---- the builder: every method reaches the control ------------------------------------
+
+/// **Each builder method does what `button`'s does, through the wrapper.** The wrapper
+/// stores its settings and hands them to the internal control only when it becomes an
+/// `Element`, so a method that stored its argument and never passed it on would compile
+/// and do nothing; each of these fails if it is not passed on.
+mod builder {
+    use super::*;
+    use iced::Length;
+    use iced::widget::{row, text};
+    use std::cell::Cell;
+    use std::rc::Rc;
+
+    /// Click the label and return what the control published.
+    fn clicked(control: snora::Control<'static, Msg>) -> Vec<Msg> {
+        let element: Element<'static, Msg> = iced::widget::container(control).padding(24).into();
+        let mut ui = iced_test::Simulator::new(element);
+        let _ = ui.click("go");
+        ui.into_messages().collect()
+    }
+
+    fn engine() -> snora::Control<'static, Msg> {
+        snora::control(text("go"))
+    }
+
+    #[test]
+    fn on_press_publishes_its_message_on_a_click() {
+        assert_eq!(clicked(engine().on_press(Msg("a"))), vec![Msg("a")]);
+    }
+
+    #[test]
+    fn on_press_with_makes_its_message_when_the_press_happens() {
+        let made = Rc::new(Cell::new(0));
+        let counter = Rc::clone(&made);
+        let control = snora::control(text("go")).on_press_with(move || {
+            counter.set(counter.get() + 1);
+            Msg("made")
+        });
+        assert_eq!(made.get(), 0, "the message was made before any press");
+        assert_eq!(clicked(control), vec![Msg("made")]);
+        assert_eq!(made.get(), 1, "the message is made once per press");
+    }
+
+    #[test]
+    fn on_press_maybe_some_presses_and_none_is_disabled_and_not_a_focus_target() {
+        assert_eq!(
+            clicked(engine().on_press_maybe(Some(Msg("a")))),
+            vec![Msg("a")]
+        );
+        assert!(
+            clicked(engine().on_press_maybe(None)).is_empty(),
+            "a disabled control published"
+        );
+        let none: Element<'static, Msg> = engine().on_press_maybe(None).into();
+        assert!(
+            boxes(none, 16.0).is_empty(),
+            "a disabled control is a focus target"
+        );
+        let some: Element<'static, Msg> = engine().on_press_maybe(Some(Msg("a"))).into();
+        assert_eq!(boxes(some, 16.0).len(), 1);
+    }
+
+    fn size_of(control: snora::Control<'static, Msg>) -> (f32, f32) {
+        let b = boxes(control.on_press(Msg("a")).into(), 16.0)[0];
+        (b.width, b.height)
+    }
+
+    /// The default is `button`'s `[5, 10]`; `padding` changes the target by exactly the
+    /// difference, both ways.
+    #[test]
+    fn padding_changes_the_target_by_the_difference() {
+        let (w0, h0) = size_of(engine());
+        let (w1, h1) = size_of(engine().padding([20, 40]));
+        assert!(
+            (w1 - w0 - 60.0).abs() < 0.5,
+            "width went {w0:.1} -> {w1:.1}, not +60"
+        );
+        assert!(
+            (h1 - h0 - 30.0).abs() < 0.5,
+            "height went {h0:.1} -> {h1:.1}, not +30"
+        );
+    }
+
+    #[test]
+    fn width_and_height_fix_the_target() {
+        let (w, h) = size_of(
+            engine()
+                .width(Length::Fixed(130.0))
+                .height(Length::Fixed(77.0)),
+        );
+        assert!((w - 130.0).abs() < 0.5, "width {w:.1}, not 130");
+        assert!((h - 77.0).abs() < 0.5, "height {h:.1}, not 77");
+    }
+
+    /// `clip` changes what is drawn when the content overflows, and only then: the same
+    /// frame with it set is the same as without it when nothing overflows.
+    #[test]
+    fn clip_cuts_overflowing_content_at_the_edge() {
+        let dir = std::env::temp_dir().join(format!("snora-public-control-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let frame = |clip: bool| {
+            let long = text("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+                .wrapping(iced::widget::text::Wrapping::None)
+                .size(14);
+            let page: Element<'static, Msg> = iced::widget::container(row![
+                snora::control(long)
+                    .on_press(Msg("a"))
+                    .width(Length::Fixed(60.0))
+                    .height(Length::Fixed(30.0))
+                    .clip(clip)
+            ])
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into();
+            iced_test::Simulator::with_size(
+                iced::Settings::default(),
+                iced::Size::new(300.0, 60.0),
+                page,
+            )
+            .snapshot(&Theme::Light)
+            .expect("a frame")
+        };
+        // The first call records the unclipped frame; the rest compare against it.
+        let free = dir.join("free");
+        assert!(frame(false).matches_hash(&free).expect("hash"));
+        assert!(
+            frame(false).matches_hash(&free).expect("hash"),
+            "the unclipped frame is not repeatable, so the comparison below measures nothing"
+        );
+        assert!(
+            !frame(true).matches_hash(&free).expect("hash"),
+            "clip(true) drew the same frame as clip(false) around overflowing text"
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
