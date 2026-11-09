@@ -160,6 +160,43 @@ fn the_floor_is_24_by_default_and_44_with_the_token() {
     assert!(off.is_empty(), "under the floor: {off:?}");
 }
 
+/// **The floor follows the label's size on the design path, not the host's**
+/// (`1.5 x the text the control carries`, RFC-115): with a label token of 40 the
+/// target is 60, whatever the host's default text is, and with the default label size
+/// it stays at 24 even when the host's text is large.
+#[test]
+fn the_design_floor_follows_the_label_size_not_the_hosts_text() {
+    let mut big = Tokens::light();
+    big.typography.label.size = 40.0;
+    let big = leak(big);
+    let b = boxes(
+        snora::design::control(big, text("x"))
+            .on_press(Msg("a"))
+            .into(),
+        16.0,
+    )[0];
+    assert!(
+        b.height >= 59.9 && b.width >= 59.9,
+        "a 40 px label gave a {:.1} x {:.1} target, under 1.5 x 40",
+        b.width,
+        b.height
+    );
+
+    let normal = leak(Tokens::light());
+    let b = boxes(
+        snora::design::control(normal, text("x").size(14))
+            .on_press(Msg("a"))
+            .into(),
+        40.0,
+    )[0];
+    assert!(
+        b.height < 40.0,
+        "the host's 40 px text raised a design-path target to {:.1}; it follows the \
+         label token",
+        b.height
+    );
+}
+
 // ---- the builder: every method reaches the control ------------------------------------
 
 /// **Each builder method does what `button`'s does, through the wrapper.** The wrapper

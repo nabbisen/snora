@@ -413,6 +413,43 @@ mod tests {
         );
     }
 
+    /// **The fallback itself.** No stock theme or preset ever needs it (their own
+    /// text colour and `Tokens::focus` already read against the page), so the table
+    /// above cannot tell the rule from "always the preferred colour". This can: a
+    /// preferred colour that does not read against what is behind it is replaced by
+    /// a pole that does, and one that does is kept.
+    #[test]
+    fn a_preferred_colour_that_does_not_read_is_replaced_by_a_pole() {
+        let behind = Color::from_rgb(0.5, 0.5, 0.5);
+        let theme = Theme::Light;
+        let weak = RingConfig {
+            width: 2.0,
+            offset: 2.0,
+            preferred: Some(Color::from_rgb(0.55, 0.55, 0.55)),
+            behind: Some(behind),
+        };
+        let chosen = weak.color(&theme);
+        assert!(
+            contrast_ratio(chosen, behind) >= 4.5,
+            "a ring of {chosen:?} on {behind:?} was kept at {:.2}:1",
+            contrast_ratio(chosen, behind)
+        );
+        assert!(chosen == Color::BLACK || chosen == Color::WHITE);
+
+        let strong = RingConfig {
+            preferred: Some(Color::from_rgb(1.0, 0.0, 0.0)),
+            behind: Some(Color::WHITE),
+            ..weak
+        };
+        // Red on white is 4.0:1, under the floor: replaced. Dark red is 9.6:1: kept.
+        assert!(strong.color(&theme) == Color::BLACK);
+        let kept = RingConfig {
+            preferred: Some(Color::from_rgb(0.5, 0.0, 0.0)),
+            ..strong
+        };
+        assert_eq!(kept.color(&theme), Color::from_rgb(0.5, 0.0, 0.0));
+    }
+
     #[cfg(feature = "design")]
     #[test]
     fn the_design_ring_clears_the_page_and_every_neutral_surface() {
