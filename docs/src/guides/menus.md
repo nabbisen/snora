@@ -142,29 +142,21 @@ skeleton regions (RFC-060), and Escape **closes** an open menu or modal
 that has an escape or close message (Law 7; `AppLayout::escape` gives one
 an Escape of its own). Neither moves between items inside one.
 
-**Whether you can implement it today depends on which of the two menu
-paths you use:**
+**What snora's prefab menus do today (0.55 on):**
+- **Every menu item is a focus target,** with a focus ring, and the header's menu trigger is
+  one too. **Tab and Shift+Tab** move between the items of an open menu: with its
+  outside-click backdrop, the page beneath is out of reach (RFC-119). **Enter or Space**
+  presses the focused item. **Escape** closes the menu, and focus returns to the trigger.
+- **Arrow keys do nothing inside a menu yet.** Native menus answer ↓ and ↑, and a keyboard
+  user may reach for them first. RFC-116's long-term plan records it.
+- **Opening a menu from the keyboard leaves focus where it was.** One Tab reaches the first
+  item.
 
-- **You build the dropdown yourself**, passing your own `Node` to
-  `AppLayout::header_menu` / `AppLayout::context_menu` (rather than
-  using `app_header`'s prefab dropdown) — **in-menu keyboard traversal
-  is already possible today, and it is entirely your own.** The
-  content is your own iced widget tree; nothing about snora's overlay
-  wiring restricts you from tracking a highlighted index in your own
-  state and rendering it however you like. This is the application's
-  concern in the same sense window-level shortcut routing is (see
-  [Overlay interaction semantics](../reference/overlay-interaction-semantics.md),
-  Law 7).
-- **You use `snora::widget::app_header`** (the prefab widget shown
-  above, built on `snora_widgets::menu::render_menu`) — **snora draws
-  the menu items, and there is currently no channel for your
-  application to express which item is highlighted.** `render_menu`'s
-  signature takes the `Menu` data, an action callback, and whether the
-  menu is active — nothing that names a highlighted item. This is not
-  deferred and nothing here promises it will change; a highlight
-  channel on `render_menu` is a public API decision with its own
-  design question (a parameter, a builder, or an options struct) and
-  belongs to a separate RFC, not asserted here.
+**If you build the dropdown yourself,** passing your own element to
+`AppLayout::header_menu` or `AppLayout::context_menu`, arrow-key traversal is yours to add:
+track a highlighted index in your own state. `snora::control` (0.58) makes each of your
+items a focus target, with the same rules as snora's.
 
-If you need in-menu arrow-key traversal today, build the dropdown
-yourself.
+*(Corrected 2026-11-09: this section said snora's prefab menus had no way to show a
+highlighted item, and that keyboard traversal meant building your own dropdown. From 0.55,
+the focus ring does that, and Tab reaches every item.)*
