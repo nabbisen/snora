@@ -34,6 +34,10 @@ use std::marker::PhantomData;
 ///
 /// The `Message` type parameter is preserved for future extension (e.g.
 /// per-dialog animations or lifecycle hooks) without breaking API shape.
+///
+/// On the engine path a dialog or sheet has no card of its own: put its content on a
+/// container with the theme's background. A control or text placed directly on the dim may
+/// not be legible, and its focus ring may fall under 3:1.
 pub struct Dialog<Node, Message> {
     /// The dialog body content. The engine centers this in the window and
     /// paints the dim backdrop around it.
@@ -196,6 +200,10 @@ impl SheetSize {
 /// assert_eq!(sheet.edge, SheetEdge::Start);
 /// assert_eq!(sheet.size, SheetSize::Half);
 /// ```
+///
+/// On the engine path a dialog or sheet has no card of its own: put its content on a
+/// container with the theme's background. A control or text placed directly on the dim may
+/// not be legible, and its focus ring may fall under 3:1.
 pub struct Sheet<Node, Message> {
     /// The sheet's body content. The engine wraps this in a styled surface
     /// sized according to `size` and anchored to `edge`.

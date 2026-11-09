@@ -88,6 +88,10 @@ impl RingConfig {
 /// define; on the engine path, against the theme's background tiers except
 /// SolarizedDark's `strongest` (2.91:1). On a coloured fill of your own, check it.
 ///
+/// On the engine path a dialog or sheet has no card of its own: put its content on a
+/// container with the theme's background. A control or text placed directly on the dim may
+/// not be legible, and its focus ring may fall under 3:1.
+///
 /// ## The target
 ///
 /// The target follows the *label's* size, not the size of whatever you put inside.
