@@ -1,6 +1,9 @@
 # RFC-123 — Arrow keys do nothing inside snora's menus
 
 **Status.** Proposed 2026-11-09. Awaiting the owner's rulings on Q-1 to Q-5.
+**Revised** 2026-11-09, before ruling, after the owner asked for a check against the
+fundamental philosophy. R-3 became simpler: no record of how a menu was opened. The
+"held arrow" claim was wrong, and is corrected. See "What the review changed".
 **Raised.** 2026-11-09, architect, from RFC-116's long-term plan item **L-9**, found while
 scoping 0.59. The owner accepted it into 0.59's scope (Q-1 of that scoping), menus only.
 **Release target.** 0.59.0.
@@ -37,15 +40,20 @@ its own, though `snora::control` now gives its items focus.
 ## Proposal
 
 **R-1. ↓ and ↑ move focus between the items of an open snora menu,** in their order,
-skipping disabled items as Tab does. The keys are answered only while focus is on an item
-of that menu, and captured, so nothing else sees them.
+skipping any item Tab skips. They are answered while focus is on an item of that menu, or
+while nothing is focused (R-3), and captured, so nothing else sees them. **A held arrow
+keeps moving,** as in every native menu: moving focus is navigation, and RFC-121's
+"a held key presses once" governs pressing, not moving.
 
 **R-2. Home and End** move focus to the first and last item.
 
-**R-3. Opening a menu from the keyboard moves focus to its first item.** Opening it with the
-pointer does not. That matches RFC-121: a click presses and does not focus, so a mouse user
-never sees a ring they did not ask for. The trigger knows which opened it (a key press or
-a pointer release), and says so.
+**R-3. In an open menu where no item has focus, ↓ goes to the first item and ↑ to the
+last.** Opening a menu never moves focus by itself, however it was opened:
+- by the pointer;
+- by Enter or Space on the trigger;
+- by the application, for a context menu.
+
+So from a focused trigger, **Enter then ↓** reaches the first item.
 
 **R-4. Tab, Enter, Space and Escape are unchanged.**
 
@@ -54,16 +62,27 @@ subject for each.
 
 ## Open questions, with suggested rulings
 
-**Q-1 — do ↓ and ↑ wrap at the ends?** **Suggest yes:** ↓ on the last item goes to the
-first. Windows and GNOME menus wrap; macOS menus stop. WAI-ARIA allows either. Wrapping
+**Q-1 — do ↓ and ↑ wrap at the ends?** **Suggest yes, on every platform:** ↓ on the last
+item goes to the first. Windows and GNOME menus wrap; macOS menus stop; WAI-ARIA allows
+either. One rule everywhere is simpler to state and to test than a per-platform rule. A
+macOS reader who expects a stop meets a wrap, which costs a key press and can do no harm,
+since moving activates nothing. Wrapping
 means a reader can never get stuck at an end. It also matches Ctrl+Tab between tabs
 (RFC-116 R-2). Tab, which moves *focus through the window*, still does not wrap; arrows
 inside one menu do. The keyboard map states both, as it does for Tab and Ctrl+Tab.
 
-**Q-2 — which keys open a menu from its trigger?** **Suggest Enter, Space, and ↓,** all
-three landing on the first item. Enter and Space press the trigger as they press any
-control. ↓ is what a keyboard user presses on a menu-bar entry. **↑ opens it on the last
-item,** as WAI-ARIA describes.
+**Q-2 — how does focus get into a menu? (revised)** **Suggest R-3 as written:** ↓ (or
+↑) inside an open menu with nothing focused. No key on the trigger moves focus into the menu
+by itself.
+- **The first draft** moved focus to the first item when the menu was opened from the
+  keyboard but not from the pointer. That needed a record of *how* the menu was opened.
+- **It could not hold for context menus,** which the application opens. snora cannot know
+  whether the application's own Shift+F10 or a right-click did it. Telling those apart
+  would need a guess about the last input, the "focus-visible" heuristic RFC-121 rejected
+  as unpredictable.
+- **R-3 needs no history,** and works the same for header and context menus. Its cost is
+  one key press (Enter, then ↓) where a native menu bar needs none.
+- **A mouse user is untouched:** no ring appears until they press an arrow.
 
 **Q-3 — does Tab inside an open menu change?** **Suggest no.** Native menus usually close
 on Tab and move on. But in snora, a menu with its backdrop covers the page (RFC-119), so
@@ -84,10 +103,17 @@ tabs. That changes Tab everywhere, and it is recorded as future wanted.
 - **Nobody is confused:** a menu answers the keys every menu answers, and the rules are
   written down beside the rest.
 - **Safe:**
-  - the arrows are captured only while focus is in the menu, so a text field or the page
-    never loses them;
-  - a held arrow moves once per press, by the held-key rule (RFC-121 R-3);
-  - focus on open lands on an item, which does nothing until Enter.
+  - **the arrows are answered only while focus is in the menu, or nowhere.** So a text
+    field, or a page control under a menu without a backdrop, never loses them;
+  - moving focus never presses anything, and Enter and Space still press once
+    (RFC-121 R-3);
+  - opening never moves focus, so nothing is focused that the reader did not move to.
+- **What the review changed (2026-11-09):**
+  - **R-3 no longer depends on how the menu was opened.** That rule could not hold for
+    context menus without a heuristic RFC-121 had already rejected;
+  - **the first draft claimed a held arrow moves once per press.** That misapplied
+    RFC-121's rule, which is about pressing a control. A held arrow keeps moving, as in
+    every menu, and moving activates nothing.
 - **Clean:** no new public API. The behaviour belongs to snora's own menus.
 - **Pointer users are untouched:** opening with the pointer moves no focus and draws no
   ring (R-3, RFC-121).
@@ -101,14 +127,16 @@ tabs. That changes Tab everywhere, and it is recorded as future wanted.
 
 ## Acceptance criteria
 
-1. **Unit 0:** a prototype that measures R-1 to R-3 in `render_menu` and `app_header`'s
-   dropdown:
+1. **Unit 0:** a prototype that measures R-1 to R-3 in `render_menu`, `app_header`'s
+   dropdown and a context menu:
    - wrap;
-   - a disabled item skipped;
-   - keyboard-open versus pointer-open;
-   - ↑ opening on the last item;
+   - an item Tab skips, skipped;
+   - ↓ and ↑ from nothing focused;
+   - opening by pointer, by key and by the application, each moving no focus;
    - the arrows captured, and not seen by the application;
-   - a focused text field elsewhere unaffected.
+   - a focused text field, or a page control under a menu without a backdrop, keeping its
+     arrows;
+   - a held arrow moving repeatedly.
 2. **Unit 1:** the behaviour, a test and a breakage row per rule, and `every_control.rs`
    covering the menu.
 3. **The book,** by the architect: the keyboard map and the menus guide.
