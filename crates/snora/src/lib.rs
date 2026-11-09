@@ -164,6 +164,7 @@ pub use snora_core::focus;
 /// Stable identifiers snora attaches to the surfaces it renders itself
 /// (RFC-047). Private module; the identifier reference page under
 /// `docs/src/reference/` is the public-facing form of this contract.
+mod control;
 mod identifiers;
 /// Keyboard dismissal helper: [`keyboard::dismiss_on_escape`].
 pub mod keyboard;
@@ -176,6 +177,7 @@ pub mod responsive;
 /// ([`subscription`](toast::subscription), [`Holds`](toast::Holds)).
 pub mod toast;
 
+pub use control::{Control, control};
 pub use render::render;
 pub use responsive::responsive_render;
 

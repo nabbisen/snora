@@ -320,20 +320,13 @@ impl<'a, Message> Control<'a, Message> {
     /// wider than the control is cut off at its edge rather than running
     /// on past it. As `button`'s own.
     ///
-    /// **Crate-private on purpose.** This crate's public items are only
-    /// what `snora` and `snora-widgets` use, and neither uses `clip`:
-    /// `button`'s own `clip` has no caller in snora either. It exists for
-    /// parity and is tested. The `expect` below is a tripwire: the day a
-    /// dependent needs it, the expectation goes unfulfilled, the build
-    /// says so, and making it `pub` is a decision rather than a drift.
-    #[cfg_attr(
-        not(test),
-        expect(
-            dead_code,
-            reason = "no dependent uses `clip`; kept for parity with `button`, and tested"
-        )
-    )]
-    pub(crate) fn clip(mut self, clip: bool) -> Self {
+    /// **Public since RFC-122.** Until then no dependent used it and it was
+    /// crate-private, behind an `expect(dead_code)` tripwire: the day a dependent
+    /// needed it, the build would say so and making it `pub` would be a decision
+    /// rather than a drift. `snora::control` is that dependent (its builder is
+    /// `button`'s, and `button` has `clip`), and the decision is taken.
+    #[must_use]
+    pub fn clip(mut self, clip: bool) -> Self {
         self.clip = clip;
         self
     }

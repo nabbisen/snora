@@ -25,6 +25,7 @@
 // Each test binary uses a subset of this module.
 #![allow(dead_code)]
 
+pub mod aaai_cases;
 #[cfg(feature = "widgets")]
 pub mod removal;
 #[cfg(all(feature = "widgets", feature = "design"))]

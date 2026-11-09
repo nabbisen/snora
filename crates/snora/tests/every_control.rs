@@ -189,6 +189,36 @@ fn unstyled() -> Vec<Subject> {
             snora::widget::render_menu(menu(), &ON_MENU, true)
         }),
         subject("toast close", &["dismiss"], || render(toast_layout())),
+        // RFC-122: aaai's cases on the public `snora::control`.
+        subject("control: glyph beside a label", &["open"], || {
+            common::aaai_cases::glyph_label_engine(msg("open"))
+        }),
+        subject("control: file-tree row, Fill", &["tree"], || {
+            common::aaai_cases::tree_row_engine(msg("tree"))
+        }),
+        // **Not reached** (RFC-119): a `snora::control` on the page, under an open
+        // dialog. One focus target, the dialog's; a page control that were reachable
+        // would make the count two and fail.
+        subject(
+            "a snora::control page control under an open dialog is not reached",
+            &["dialog"],
+            || {
+                let body = common::aaai_cases::glyph_label_engine(msg("page"));
+                // On a card of the theme's own `weak` tier, as an application sets a
+                // dialog: bare on the engine's modal dim the ring is under 3:1 in 18
+                // of the 22 themes (the finding in the RFC-122 Unit 1 request), and
+                // this subject is about reach, not about that.
+                let ok: iced::Element<'static, Msg> =
+                    iced::widget::container(common::aaai_cases::glyph_label_engine(msg("dialog")))
+                        .padding(16)
+                        .style(|theme: &iced::Theme| iced::widget::container::Style {
+                            background: Some(theme.extended_palette().background.weak.color.into()),
+                            ..Default::default()
+                        })
+                        .into();
+                render(snora::AppLayout::new(body).dialog(snora::Dialog::new(ok)))
+            },
+        ),
     ]
 }
 
@@ -278,6 +308,38 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
         subject("design toast close", &["dismiss"], move || {
             snora::design::render(toast_layout(), tokens)
         }),
+        // RFC-122: aaai's cases on the public `snora::design::control`.
+        subject(
+            "design control: glyph beside a label, primary",
+            &["open"],
+            move || common::aaai_cases::glyph_label_design(tokens, msg("open")),
+        ),
+        subject(
+            "design control: file-tree row, Fill",
+            &["tree"],
+            move || common::aaai_cases::tree_row_design(tokens, msg("tree")),
+        ),
+        subject(
+            "design control: a suggestion, long data text",
+            &["suggestion"],
+            move || common::aaai_cases::suggestion_design(tokens, msg("suggestion")),
+        ),
+        // A disabled control is not a focus target: Tab skips it.
+        subject("design control: on_press_maybe(None)", &[], move || {
+            common::aaai_cases::disabled_design(tokens)
+        }),
+        subject(
+            "a snora::design::control page control under an open dialog is not reached",
+            &["dialog"],
+            move || {
+                let body = common::aaai_cases::glyph_label_design(tokens, msg("page"));
+                let ok = common::aaai_cases::glyph_label_design(tokens, msg("dialog"));
+                snora::design::render(
+                    snora::AppLayout::new(body).dialog(snora::Dialog::new(ok)),
+                    tokens,
+                )
+            },
+        ),
     ]
 }
 

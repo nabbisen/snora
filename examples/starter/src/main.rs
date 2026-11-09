@@ -12,6 +12,9 @@
 //! * Tab bar for simple view switching.
 //! * Keyboard access: Tab and Shift+Tab move focus between controls, routed
 //!   with `snora::keyboard::traverse` (iced binds no Tab of its own).
+//! * Your own content as a control: `snora::control` around a glyph and a label
+//!   (the "Pin" row on the Home view), reached by Tab and pressed by Enter or
+//!   Space like any `button`, with the focus ring snora draws.
 //!
 //! The workbench example (`snora-example-workbench`) covers every surface
 //! in depth. This starter stays small so you can read it in one sitting.
@@ -60,6 +63,7 @@ struct App {
     // ---- App-managed overlay state ----
     menu_open: bool,
     show_dialog: bool,
+    pinned: bool,
     // ---- App-managed navigation ----
     view: View,
     // ---- App-managed toasts ----
@@ -76,6 +80,7 @@ impl Default for App {
             direction: LayoutDirection::Ltr,
             menu_open: false,
             show_dialog: false,
+            pinned: false,
             view: View::Home,
             toasts: Vec::new(),
             holds: snora::toast::Holds::default(),
@@ -95,6 +100,8 @@ enum Message {
     CloseMenus,
     OpenDialog,
     CloseModals,
+    // ---- Your own control ----
+    TogglePin,
     // ---- Navigation ----
     SelectTab(TabAction<View>),
     // ---- Direction ----
@@ -123,6 +130,7 @@ impl App {
             }
             Message::HeaderAction(_) => {}
             Message::CloseMenus => self.menu_open = false,
+            Message::TogglePin => self.pinned = !self.pinned,
             // Law 2: clear menus before opening a modal.
             Message::OpenDialog => {
                 self.menu_open = false;
@@ -262,7 +270,19 @@ impl App {
             View::Home => column![
                 text("Home view").size(20),
                 text("Use the header to open menus, dialog, and toasts."),
-                text("Press Escape to close overlays.")
+                text("Press Escape to close overlays."),
+                // Your own content, reachable by Tab and pressed by Enter or Space:
+                // the one-line move from `button(...)` is `snora::control(...)`.
+                snora::control(
+                    row![
+                        text(if self.pinned { "★" } else { "☆" }),
+                        text("Pin this view")
+                    ]
+                    .spacing(6)
+                    .align_y(Center)
+                )
+                .on_press(Message::TogglePin)
+                .style(button::secondary),
             ]
             .spacing(8)
             .into(),

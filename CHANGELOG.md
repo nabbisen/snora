@@ -25,7 +25,32 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`snora::control` and `snora::design::control`: your own content as a control the
+  keyboard can reach (RFC-122; closes RFC-116 L-4).** iced 0.14's `button` is not
+  focusable, so a row, a card or an icon-and-label made pressable with `button` could
+  not be reached with Tab. `snora::control(content)` (no feature needed) and
+  `snora::design::control(&tokens, content)` (the `design` feature) take `button`'s
+  builder, so an application changes one name: `on_press`, `on_press_maybe`,
+  `on_press_with`, `padding`, `width`, `height`, `clip` and `style`, which takes
+  iced's own `Fn(&Theme, button::Status) -> button::Style`. Built in, with nothing to
+  set: a focus target, Enter and Space pressing it once, a click that does not focus
+  it, a focus ring (3:1 against the page and every neutral surface snora's tokens
+  define; the rustdoc states the one measured exception), the target floor, being out
+  of reach beneath an overlay, and RFC-120's rule when it goes away. The engine path
+  draws as iced's `button::primary`; the design path takes the ring and the minimum
+  target from `Tokens` and draws as `ghost`. Nothing else is public: the internal
+  `snora_interaction::Control` stays internal.
+
+### Changed
+
+- **`snora-interaction::Control::clip` is public**, the day a dependent needed it
+  (`snora::control`); the `dead_code` tripwire that said so is gone.
+- **The readable-colour rule lives once, in `snora_interaction::contrast`.** The toast
+  (RFC-111) and the widgets (RFC-114) each carried a copy; a third caller would have
+  been a third. No colour changes: every ring and toast colour of the 22 stock themes
+  and the 6 presets is pinned by a test that passed before and after the move.
 
 ## [0.57.0] — 2026-11-08
 

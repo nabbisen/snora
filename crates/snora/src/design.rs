@@ -39,6 +39,39 @@ pub mod style {
     pub use snora_style::text;
 }
 
+/// Your own content as a control the keyboard can reach, on the design path
+/// (RFC-122): the focus ring and the minimum target from `tokens`, and `ghost` until
+/// [`style`](crate::Control::style) says otherwise.
+///
+/// Everything else is [`snora::control`](crate::control())'s, whose documentation lists
+/// what is built in; this function differs only in what it reads from `tokens`:
+///
+/// | | from `tokens` |
+/// |---|---|
+/// | the ring | `Tokens::focus` (kept where it reads against `palette.background`) |
+/// | the target floor | `Tokens::targets.min`, beside `max(24, 1.5 × label size)` |
+/// | the label size the floor is measured against | `typography.label.size` |
+/// | the default style | [`style::button::ghost`] |
+///
+/// ```
+/// # use iced::widget::text;
+/// # use snora::design::Tokens;
+/// # #[derive(Clone)] enum Message { Open }
+/// # fn view<'a>(tokens: &Tokens) -> iced::Element<'a, Message> {
+/// snora::design::control(tokens, text("Open"))
+///     .on_press(Message::Open)
+///     .into()
+/// # }
+/// ```
+///
+/// Needs the `design` feature only, not `widgets`.
+pub fn control<'a, Message: Clone + 'a>(
+    tokens: &Tokens,
+    content: impl Into<iced::Element<'a, Message>>,
+) -> crate::Control<'a, Message> {
+    crate::control::designed(tokens, content)
+}
+
 /// Token-derived `iced::Theme` emission (RFC-038).
 ///
 /// [`theme`] derives a complete `iced::Theme` from a [`Tokens`] bundle so
