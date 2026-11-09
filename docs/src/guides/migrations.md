@@ -10,6 +10,9 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.57 → 0.58](migration-0.57-to-0.58.md) — **additive, nothing breaks**: your
+  own content as a keyboard-reachable control (`snora::control`,
+  `snora::design::control`), with iced `button`'s builder.
 - [0.56 → 0.57](migration-0.56-to-0.57.md) — **one breaking change**:
   `sweep_expired` and `ToastLifetime::DEFAULT` removed (deprecated since 0.54).
   Opt-in keyboard shortcuts (`AppLayout::shortcuts`); an Escape message per overlay

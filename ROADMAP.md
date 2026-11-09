@@ -232,12 +232,10 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.58.0
+## Next — 0.59.0
 
-- **Your own content as a keyboard-reachable control** (RFC-122, merged): `snora::control`
-  and `snora::design::control`, with iced `button`'s builder. This closes RFC-116 L-4,
-  which aaai asked for.
-- `snora-control`'s notice crate leaves the workspace; its 0.57.0 stays published.
+- **The 0.56 deprecations are removed,** under the rule: `on_toast_hover`, `ToastHover`
+  and `Holds::hover`.
 - Nothing else is scheduled. RFC-116's long-term plan (L-5, L-7, L-8) and the future
   wanted items below wait on their triggers.
 
@@ -250,6 +248,11 @@ crate short of the pixels**, and that is RFC-085's real subject.
   L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
+
+- **0.58.0** — your own content as a keyboard-reachable control: `snora::control` and
+  `snora::design::control`, with iced `button`'s builder (RFC-122, asked for by aaai).
+  This closes the last open item of RFC-116's keyboard plan that had an adopter waiting.
+  The `snora-control` notice crate left the workspace.
 
 - **0.57.0** — keyboard shortcuts, and a clearer name.
   - **Opt-in shortcuts** for tabs, sidebar items and the breadcrumb parent (RFC-116

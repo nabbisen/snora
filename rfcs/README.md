@@ -169,6 +169,7 @@ Numbers remain stable forever and are never reused.
 | 120 | [Focus is lost when the focused control goes away](./done/120-focus-is-lost-when-the-focused-control-goes-away.md) | **v0.56.0** — RFC-116's L-1 and L-3: focus moves to the nearest surviving neighbour, after first, within its own group first (revised: the first rule sent focus to the footer after a crumb press); a toast waits while the keyboard is on it, through one attention callback. Today's behaviour measured first — **accepted 2026-11-08** |
 | 121 | [A click gives a control keyboard focus, and a held key presses it again and again](./done/121-a-click-gives-keyboard-focus-and-a-held-key-repeats.md) | **v0.56.0** — found re-reviewing RFC-120: in 0.55.0 every click focuses the control, so a ring appears after every press and Space or Enter presses it again, in every application, contrary to 0.55.0's notes; and a held key repeats the press. Proposed: a click does not focus; Tab carries on from the clicked control if feasible; a held key presses once — **accepted 2026-11-08** |
 | 116 | [No snora control can be reached from the keyboard](./done/116-no-snora-control-can-be-reached-from-the-keyboard.md) | **v0.55.0 (R-1, gate 11 met) and v0.57.0 (R-2); the long-term plan stays live; long-term plan L-1–L-6** — iced 0.14 buttons take no keyboard input (probe); a focusable `control` on `iced_core` (no iced feature), on by default, with snora's focus ring; one `Shortcuts` router (its Escape part and `dismiss_on_escape`'s deprecation reconsidered after RFC-119); a 1.0 gate — **accepted 2026-11-04** (handoff: [`handoffs/116-…`](./handoffs/116-no-snora-control-can-be-reached-from-the-keyboard/implementation-handoff.md)) |
+| 122 | [An application's own content cannot be a keyboard-reachable control](./done/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control.md) | **v0.58.0** — RFC-116's L-4, its trigger fired by aaai's question (2026-11-09): `snora::control(content)` and `snora::design::control(&tokens, content)`, with iced `button`'s builder shape and every snora keyboard rule built in; nothing internal made public — **accepted 2026-11-09** |
 
 ## Accepted
 
@@ -178,7 +179,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 122 | [An application's own content cannot be a keyboard-reachable control](./accepted/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control.md) | **merged 2026-11-09, ships 0.58.0** — RFC-116's L-4, its trigger fired by aaai's question (2026-11-09): `snora::control(content)` and `snora::design::control(&tokens, content)`, with iced `button`'s builder shape and every snora keyboard rule built in; nothing internal made public — **accepted 2026-11-09** |
 
 ## Proposed
 

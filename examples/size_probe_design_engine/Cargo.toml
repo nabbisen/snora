@@ -19,7 +19,7 @@ path = "src/main.rs"
 # the comment on workspace.dependencies.snora in the root Cargo.toml,
 # which must be edited alongside this one on every minor bump.
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.57", default-features = false, features = ["design"] }
+snora = { path = "../../crates/snora", version = "0.58", default-features = false, features = ["design"] }
 # `features = ["default"]` (RFC-112): the workspace iced line no
 # longer carries iced's defaults, and this crate turns snora's off, so
 # without this it would have no renderer and no windowing backend, and

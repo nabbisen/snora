@@ -25,6 +25,25 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.58.0] — 2026-11-09
+
+**Upgrading from 0.57:** read the [0.57 → 0.58 migration guide](docs/src/guides/migration-0.57-to-0.58.md).
+
+> **In short:** your own content can now be a keyboard-reachable control:
+> `snora::control(content)`, or `snora::design::control(&tokens, content)` on the design
+> path. Both take iced `button`'s builder, so a `button` moves over by changing one
+> name, and every snora keyboard rule applies to it.
+>
+> **Code:** no change needed; nothing is deprecated or removed. To make an iced
+> `button` keyboard-reachable, rename it.
+>
+> **Appearance:** unchanged.
+>
+> **Security:** none. The advisory gate is clean, with the same accepted advisories as
+> 0.57.0.
+
 ### Added
 
 - **`snora::control` and `snora::design::control`: your own content as a control the
@@ -44,6 +63,11 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   `snora_interaction::Control` stays internal.
 
 ### Changed
+
+- **`snora-control` is no longer released.** Its last version, 0.57.0, is the notice that
+  it was renamed `snora-interaction`, and it stays on crates.io: 0.55.0, 0.56.0 and
+  0.57.0 are never yanked. The notice crate leaves the workspace, as RFC-116's rename
+  ruling said.
 
 - **`snora-interaction::Control::clip` is public**, the day a dependent needed it
   (`snora::control`); the `dead_code` tripwire that said so is gone.
@@ -1178,7 +1202,8 @@ deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go 
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.57.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.58.0...HEAD
+[0.58.0]: https://github.com/nabbisen/snora/compare/0.57.0...0.58.0
 [0.57.0]: https://github.com/nabbisen/snora/compare/0.56.0...0.57.0
 [0.56.0]: https://github.com/nabbisen/snora/compare/0.55.0...0.56.0
 [0.55.0]: https://github.com/nabbisen/snora/compare/0.54.0...0.55.0

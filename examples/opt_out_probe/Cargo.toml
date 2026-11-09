@@ -23,7 +23,7 @@ publish = false
 # line a consumer writes, resolved against snora's, and inheriting the
 # workspace's would be asserting about snora's line twice.
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.57", default-features = false, features = [
+snora = { path = "../../crates/snora", version = "0.58", default-features = false, features = [
     "widgets",
     "design",
 ] }

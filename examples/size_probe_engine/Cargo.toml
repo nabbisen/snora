@@ -16,7 +16,7 @@ path = "src/main.rs"
 # default-features = false can be set independently of the workspace
 # snora entry, which carries default-features for regular examples.
 [dependencies]
-snora = { path = "../../crates/snora", version = "0.57", default-features = false }
+snora = { path = "../../crates/snora", version = "0.58", default-features = false }
 # `features = ["default"]` (RFC-112): the workspace iced line no
 # longer carries iced's defaults, and this crate turns snora's off, so
 # without this it would have no renderer and no windowing backend, and

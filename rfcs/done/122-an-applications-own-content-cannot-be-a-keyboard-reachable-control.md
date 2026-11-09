@@ -1,6 +1,6 @@
 # RFC-122 — An application's own content cannot be a keyboard-reachable control
 
-**Status.** Accepted 2026-11-09. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.58.0. Accepted 2026-11-09. Every open question ruled as suggested (see Rulings).
 **Merged to `main` 2026-11-09** (`dc11423`), shipping in 0.58.0.
 **Handoff.** [`handoffs/122-…`](../handoffs/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control/implementation-handoff.md).
 **Raised.** 2026-11-09, architect. RFC-116's long-term plan item **L-4** has its trigger,

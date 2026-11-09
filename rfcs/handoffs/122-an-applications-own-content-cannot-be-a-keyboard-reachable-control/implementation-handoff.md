@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-122: `snora::control` and `snora::design::control`
 
-**RFC.** `rfcs/accepted/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control.md`.
+**RFC.** `rfcs/done/122-an-applications-own-content-cannot-be-a-keyboard-reachable-control.md`.
 Read R-1 to R-3 and the Rulings.
 **Release target.** 0.58.0. **Unit 0 first,** as its own review. Then Unit 1.
 **Branch.** `rfc122-control`, off `main`. Land as `main` requires:
