@@ -304,8 +304,6 @@ where
         layout.toast_position,
         layout.direction,
         style.toast,
-        #[expect(deprecated, reason = "still honours the deprecated `on_toast_hover`")]
-        layout.on_toast_hover,
         layout.on_toast_attention,
     ) {
         layers = layers.push(toast_layer);

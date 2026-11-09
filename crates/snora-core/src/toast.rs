@@ -156,50 +156,6 @@ impl ToastPosition {
 /// text does (RFC-113).
 const MINIMUM_READING_SECONDS: usize = 6;
 
-/// Which way the pointer crossed a toast's edge (RFC-113).
-///
-/// What [`AppLayout::on_toast_hover`] hands an application, and what
-/// `snora::toast::Holds::hover` takes back.
-///
-/// # Why this is not a `bool`
-///
-/// It was one, for one review round. Nothing in
-/// `Message::ToastHover(7, true)` says what `true` meant, so a reader
-/// had to leave the line and go and look — and an application that
-/// passed the two the wrong way round would hold the toast it meant to
-/// release and release the one it meant to hold, which no type would
-/// have caught. `ToastHover::Left` says it where it is written.
-///
-/// There is deliberately no `Default`: a pointer either arrived or
-/// left, and neither is the resting state of anything.
-///
-/// ```
-/// use snora_core::ToastHover;
-///
-/// // The whole point: this reads without a lookup.
-/// let crossing = ToastHover::Left;
-/// assert_ne!(crossing, ToastHover::Entered);
-/// ```
-///
-/// [`AppLayout::on_toast_hover`]: crate::AppLayout::on_toast_hover
-#[deprecated(
-    since = "0.56.0",
-    note = "use `ToastAttention`, which also reports keyboard focus: \
-            `AppLayout::on_toast_attention` and `snora::toast::Holds::attend` (RFC-120). \
-            `ToastHover::Entered` is `ToastAttention::PointerEntered` and `Left` is `PointerLeft`. \
-            It is removed in 0.59.0."
-)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ToastHover {
-    /// The pointer came onto the toast. Its countdown is **held**: the
-    /// toast will not expire while the pointer is on it.
-    Entered,
-    /// The pointer left the toast. Its countdown **restarts in full**,
-    /// so the reader gets the whole reading time rather than whatever
-    /// was left when they arrived.
-    Left,
-}
-
 /// What a reader's attention did to a toast: the pointer crossed its edge, or
 /// keyboard focus arrived on or left its controls (RFC-120 R-3).
 ///
@@ -212,9 +168,9 @@ pub enum ToastHover {
 ///   **neither** is left, the countdown **restarts in full**.
 ///
 /// `#[non_exhaustive]`: a third source of attention may come (a screen reader's
-/// cursor, say), and adding it must not break an application's `match`. That is
-/// why this replaces [`ToastHover`], which could not take a focus variant
-/// without breaking every application that matched it.
+/// cursor, say), and adding it must not break an application's `match`. (Its
+/// predecessor, a two-variant pointer enum removed in 0.59, could not take a focus
+/// variant without breaking every application that matched it.)
 ///
 /// ```
 /// use snora_core::ToastAttention;

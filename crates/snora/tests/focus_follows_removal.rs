@@ -317,31 +317,25 @@ use snora::{AppLayout, Toast, ToastAttention, ToastIntent};
 #[derive(Debug, Clone, PartialEq)]
 enum Wired {
     Attention(u64, ToastAttention),
-    Hover(u64),
     Closed(u64),
 }
 
-#[expect(deprecated, reason = "wires the deprecated `on_toast_hover` as well")]
-fn wired_view(both: bool, hover_only: bool) -> iced::Element<'static, Wired> {
+fn wired_view() -> iced::Element<'static, Wired> {
     let tokens: &'static snora::design::Tokens =
         Box::leak(Box::new(snora::design::Tokens::light()));
     let body: iced::Element<'static, Wired> =
         container(button::ghost(tokens, "Page", Wired::Closed(0))).into();
     let toast = Toast::new(7, ToastIntent::Info, "Saved", "All good.", Wired::Closed(7));
-    let mut layout = AppLayout::new(body).toasts(vec![toast]);
-    if both || !hover_only {
-        layout = layout.on_toast_attention(Wired::Attention);
-    }
-    if both || hover_only {
-        layout = layout.on_toast_hover(|id, _| Wired::Hover(id));
-    }
+    let layout = AppLayout::new(body)
+        .toasts(vec![toast])
+        .on_toast_attention(Wired::Attention);
     snora::render(layout)
 }
 
 /// Keyboard focus on a toast's × is reported: gained on Tab, lost on Tab away.
 #[test]
 fn focus_on_a_toasts_close_control_is_reported() {
-    let mut rig = Rig::new(wired_view(false, false));
+    let mut rig = Rig::new(wired_view());
     rig.tab(false); // the page's button
     rig.redraw();
     assert!(
@@ -367,18 +361,20 @@ fn focus_on_a_toasts_close_control_is_reported() {
     );
 }
 
-/// **Both callbacks set: one hold per crossing.** The pointer's crossings go to
-/// `on_toast_attention` only, so a toast is never held twice for one crossing.
+/// **One report per crossing.** The pointer's crossings go to `on_toast_attention`,
+/// once each way, so a toast is held exactly once and released exactly once.
+/// (Until 0.59 this was `with_both_callbacks_set_a_crossing_reports_once`, beside the
+/// deprecated pointer-only callback; the crossing is the same, with one callback.)
 #[test]
-fn with_both_callbacks_set_a_crossing_reports_once() {
-    let mut rig = Rig::new(wired_view(true, false));
+fn a_pointer_crossing_reports_once() {
+    let mut rig = Rig::new(wired_view());
     // Onto the toast's × (it is the last focus target; its box is on the toast).
     let on = rig.targets().last().unwrap().bounds.center();
     rig.point_at(Some(on));
     assert_eq!(
         rig.messages,
         vec![Wired::Attention(7, ToastAttention::PointerEntered)],
-        "one report per crossing, to the new callback only"
+        "one report per crossing"
     );
     rig.messages.clear();
     rig.point_at(None);
@@ -386,13 +382,4 @@ fn with_both_callbacks_set_a_crossing_reports_once() {
         rig.messages,
         vec![Wired::Attention(7, ToastAttention::PointerLeft)]
     );
-}
-
-/// **A deprecated path still works:** `on_toast_hover` alone still reports.
-#[test]
-fn on_toast_hover_alone_still_reports_the_pointer() {
-    let mut rig = Rig::new(wired_view(false, true));
-    let on = rig.targets().last().unwrap().bounds.center();
-    rig.point_at(Some(on));
-    assert_eq!(rig.messages, vec![Wired::Hover(7)]);
 }
