@@ -25,7 +25,23 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Removed
+
+The four items deprecated in 0.56.0 (RFC-120), each of whose notes said "removed in
+0.59.0". **The rule:** a deprecated item is removed in the third minor after the one
+that deprecated it.
+
+- **`AppLayout::on_toast_hover`**, the method, and **the `on_toast_hover` field**
+  (deprecated since 0.56.0). Use `AppLayout::on_toast_attention`, which also reports
+  keyboard focus.
+- **`ToastHover`** (`snora_core::ToastHover`, re-exported from `snora`; deprecated since
+  0.56.0). Use `ToastAttention`: `Entered` is `PointerEntered` and `Left` is
+  `PointerLeft`, and `FocusGained` and `FocusLost` are new.
+- **`snora::toast::Holds::hover`** (deprecated since 0.56.0). Use `Holds::attend`.
+
+With only `on_toast_attention` left, the rule that sent a pointer crossing to it alone
+while both callbacks were set has nothing to decide, and is gone with them. One
+deprecation remains: `keyboard::dismiss_on_escape`, removed in 0.60.0.
 
 ## [0.58.0] — 2026-11-09
 

@@ -69,9 +69,4 @@ pub use shortcuts::{
 };
 pub use sidebar::{SideBar, SideBarItem};
 pub use tab::{Tab, TabAction, TabBar};
-#[expect(
-    deprecated,
-    reason = "`ToastHover` is deprecated and still exported (RFC-120)"
-)]
-pub use toast::ToastHover;
 pub use toast::{Toast, ToastAttention, ToastIntent, ToastLifetime, ToastPosition};

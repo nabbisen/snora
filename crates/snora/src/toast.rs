@@ -34,11 +34,6 @@ use iced::{
     widget::{button, column, container, mouse_area, opaque, row, text},
 };
 
-#[expect(
-    deprecated,
-    reason = "`ToastHover` is deprecated (RFC-120) and still accepted, with `on_toast_hover` and `Holds::hover`"
-)]
-use snora_core::ToastHover;
 use snora_core::{
     LayoutDirection, Toast, ToastAttention, ToastIntent, ToastLifetime, ToastPosition,
 };
@@ -174,13 +169,11 @@ fn render_order_for(position: ToastPosition) -> ToastRenderOrder {
 /// Applications push new toasts to the *back* of their queue in chronological
 /// order (oldest at index 0, newest at the back). This function is responsible
 /// for honoring the anchor-edge invariant regardless of that convention.
-#[expect(deprecated, reason = "still honours the deprecated `on_toast_hover`")]
 pub(crate) fn render_toasts<'a, Message>(
     toasts: Vec<Toast<Message>>,
     position: ToastPosition,
     direction: LayoutDirection,
     style: ToastStyle,
-    on_hover: Option<fn(u64, ToastHover) -> Message>,
     on_attention: Option<fn(u64, ToastAttention) -> Message>,
 ) -> Option<Element<'a, Message>>
 where
@@ -193,23 +186,15 @@ where
     // Only when the application asked for it (RFC-113, RFC-120). An unwired
     // layout gets the tree it got before: no `mouse_area`, so nothing
     // that asserts the toast layer's composition has to change.
-    //
-    // **While both callbacks are set, the pointer's crossings go to
-    // `on_toast_attention` only** (RFC-120), so a toast is never held twice for
-    // one crossing; `on_toast_hover` is called only when it is the sole one.
     let wrap = |toast: Toast<Message>| -> Element<'a, Message> {
         let id = toast.id;
         let single = render_single_toast(toast, style, on_attention);
-        match (on_attention, on_hover) {
-            (Some(f), _) => mouse_area(single)
+        match on_attention {
+            Some(f) => mouse_area(single)
                 .on_enter(f(id, ToastAttention::PointerEntered))
                 .on_exit(f(id, ToastAttention::PointerLeft))
                 .into(),
-            (None, Some(f)) => mouse_area(single)
-                .on_enter(f(id, ToastHover::Entered))
-                .on_exit(f(id, ToastHover::Left))
-                .into(),
-            (None, None) => single,
+            None => single,
         }
     };
 
@@ -780,31 +765,6 @@ impl Holds {
         }
     }
 
-    /// The pointer crossed onto or off the toast with this id.
-    ///
-    /// On [`ToastHover::Left`], that toast's countdown **restarts in
-    /// full** from `now` (when no keyboard focus is on it either).
-    #[deprecated(
-        since = "0.56.0",
-        note = "use `Holds::attend` with `ToastAttention::PointerEntered` and `PointerLeft`, \
-                which also takes keyboard focus (RFC-120). `ToastHover::Entered` is \
-                `PointerEntered` and `Left` is `PointerLeft`. It is removed in 0.59.0."
-    )]
-    #[expect(deprecated, reason = "takes the deprecated `ToastHover`")]
-    pub fn hover<M: Clone>(
-        &mut self,
-        id: u64,
-        crossing: ToastHover,
-        toasts: &mut [Toast<M>],
-        now: Instant,
-    ) {
-        let attention = match crossing {
-            ToastHover::Entered => ToastAttention::PointerEntered,
-            ToastHover::Left => ToastAttention::PointerLeft,
-        };
-        self.attend(id, attention, toasts, now);
-    }
-
     fn is_held(&self, id: u64) -> bool {
         self.pointer.contains(&id) || self.focus.contains(&id)
     }
@@ -1070,48 +1030,10 @@ mod holds_tests {
         assert!(!holds.is_held(1), "a dismissed id stayed held");
     }
 
-    /// The pointer is on it, and the deadline has long gone.
-    #[expect(
-        deprecated,
-        reason = "this test exercises the deprecated `Holds::hover`, which still has to work (RFC-120)"
-    )]
-    #[test]
-    fn a_held_toast_survives_a_sweep_an_hour_later() {
-        let base = Instant::now();
-        let mut toasts = vec![toast(1, base)];
-        let mut holds = Holds::default();
-        holds.hover(1, ToastHover::Entered, &mut toasts, base);
-        holds.sweep(&mut toasts, base + Duration::from_secs(3600));
-        assert_eq!(toasts.len(), 1, "a held toast was swept");
-    }
-
-    /// Left at `t`: it gets its whole lifetime again, from `t`.
-    #[expect(
-        deprecated,
-        reason = "this test exercises the deprecated `Holds::hover`, which still has to work (RFC-120)"
-    )]
-    #[test]
-    fn leaving_restarts_the_countdown_in_full() {
-        let base = Instant::now();
-        let left_at = base + Duration::from_secs(3);
-        let mut toasts = vec![toast(1, base)];
-        let mut holds = Holds::default();
-        holds.hover(1, ToastHover::Entered, &mut toasts, base);
-        holds.hover(1, ToastHover::Left, &mut toasts, left_at);
-
-        let mut nearly = toasts.clone();
-        Holds::default().sweep(&mut nearly, left_at + Duration::from_millis(9_999));
-        assert_eq!(nearly.len(), 1, "it went one millisecond early");
-
-        let mut due = toasts.clone();
-        Holds::default().sweep(&mut due, left_at + Duration::from_secs(10));
-        assert!(due.is_empty(), "it outlived its restarted deadline");
-    }
-
     /// **The case `Holds` exists for.** Held past its deadline, then
     /// left: an immediate sweep must not take it, and a sweep after
     /// its restarted lifetime must. Without the restart inside
-    /// `hover`, it would go the instant the pointer moved away.
+    /// `attend`, it would go the instant the pointer moved away.
     ///
     /// **Both halves are asserted, because one of them alone cannot
     /// fail for the obvious breakage.** Mapping `Left` to the entered
@@ -1120,18 +1042,14 @@ mod holds_tests {
     /// passes, since a held toast is never swept. Only the release
     /// catches it. Measured: with the two arms swapped, the first
     /// assertion alone passes and the second fails.
-    #[expect(
-        deprecated,
-        reason = "this test exercises the deprecated `Holds::hover`, which still has to work (RFC-120)"
-    )]
     #[test]
     fn a_toast_left_after_its_deadline_is_not_swept_immediately() {
         let base = Instant::now();
         let long_past = base + Duration::from_secs(600);
         let mut toasts = vec![toast(1, base)];
         let mut holds = Holds::default();
-        holds.hover(1, ToastHover::Entered, &mut toasts, base);
-        holds.hover(1, ToastHover::Left, &mut toasts, long_past);
+        holds.attend(1, PointerEntered, &mut toasts, base);
+        holds.attend(1, PointerLeft, &mut toasts, long_past);
         holds.sweep(&mut toasts, long_past);
         assert_eq!(
             toasts.len(),
@@ -1149,41 +1067,16 @@ mod holds_tests {
         );
     }
 
-    /// Dismissed while held: the id must not sit in the set for ever.
-    #[expect(
-        deprecated,
-        reason = "this test exercises the deprecated `Holds::hover`, which still has to work (RFC-120)"
-    )]
-    #[test]
-    fn an_id_dismissed_while_held_is_forgotten() {
-        let base = Instant::now();
-        let mut toasts = vec![toast(1, base), toast(2, base)];
-        let mut holds = Holds::default();
-        holds.hover(1, ToastHover::Entered, &mut toasts, base);
-        toasts.retain(|t| t.id != 1); // the user clicked its close button
-        holds.sweep(&mut toasts, base + Duration::from_secs(1));
-        assert!(!holds.is_held(1), "a dismissed id stayed held");
-    }
-
     /// Stack order comes from the vector, so a restart must not move
     /// anything (`snora/src/toast.rs`'s `render_order_for`).
-    #[expect(
-        deprecated,
-        reason = "this test exercises the deprecated `Holds::hover`, which still has to work (RFC-120)"
-    )]
     #[test]
     fn leaving_does_not_reorder_the_queue() {
         let base = Instant::now();
         let mut toasts = vec![toast(1, base), toast(2, base), toast(3, base)];
         let before: Vec<u64> = toasts.iter().map(|t| t.id).collect();
         let mut holds = Holds::default();
-        holds.hover(2, ToastHover::Entered, &mut toasts, base);
-        holds.hover(
-            2,
-            ToastHover::Left,
-            &mut toasts,
-            base + Duration::from_secs(1),
-        );
+        holds.attend(2, PointerEntered, &mut toasts, base);
+        holds.attend(2, PointerLeft, &mut toasts, base + Duration::from_secs(1));
         let after: Vec<u64> = toasts.iter().map(|t| t.id).collect();
         assert_eq!(before, after, "the restart reordered the stack");
     }
@@ -1207,6 +1100,7 @@ mod holds_tests {
 #[cfg(test)]
 mod subscription_tests {
     use super::*;
+    use snora_core::ToastAttention::PointerEntered;
     use snora_core::ToastIntent;
 
     #[derive(Clone, Debug, PartialEq)]
@@ -1246,17 +1140,13 @@ mod subscription_tests {
     /// A held toast is still transient, so the ticks must keep coming:
     /// it has to expire on time once the pointer leaves, and that
     /// needs a sweep to run.
-    #[expect(
-        deprecated,
-        reason = "this test exercises the deprecated `Holds::hover`, which still has to work (RFC-120)"
-    )]
     #[test]
     fn a_held_toast_keeps_the_subscription_alive() {
         let base = Instant::now();
         let mut toasts =
             vec![Toast::new(1, ToastIntent::Info, "t", "m", Msg::Tick).with_created_at(base)];
         let mut holds = Holds::default();
-        holds.hover(1, ToastHover::Entered, &mut toasts, base);
+        holds.attend(1, PointerEntered, &mut toasts, base);
         let has_transient = toasts
             .iter()
             .any(|t| matches!(t.lifetime, ToastLifetime::Transient(_)));
@@ -1270,21 +1160,17 @@ mod subscription_tests {
 }
 
 #[cfg(test)]
-#[expect(
-    deprecated,
-    reason = "this module exercises the deprecated `on_toast_hover`, which still has to work (RFC-120)"
-)]
 mod hover_wiring {
     use crate::{AppLayout, render};
     use iced::Element;
     use iced_test::Simulator;
-    use snora_core::{Toast, ToastHover, ToastIntent};
+    use snora_core::{Toast, ToastAttention, ToastIntent};
 
     #[derive(Debug, Clone, PartialEq)]
     enum Msg {
         Body,
         Dismiss(u64),
-        Hover(u64, ToastHover),
+        Hover(u64, ToastAttention),
     }
 
     fn layout(wired: bool) -> Element<'static, Msg> {
@@ -1294,14 +1180,14 @@ mod hover_wiring {
         let toast = Toast::new(7, ToastIntent::Info, "Saved", "All good.", Msg::Dismiss(7));
         let l = AppLayout::new(body).toasts(vec![toast]);
         render(if wired {
-            l.on_toast_hover(Msg::Hover)
+            l.on_toast_attention(Msg::Hover)
         } else {
             l
         })
     }
 
     /// Wired: moving the pointer onto the toast emits
-    /// `Hover(id, ToastHover::Entered)`.
+    /// `Hover(id, ToastAttention::PointerEntered)`.
     #[test]
     fn hovering_a_toast_reports_the_pointer_when_wired() {
         let mut ui = Simulator::new(layout(true));
@@ -1316,8 +1202,8 @@ mod hover_wiring {
         })]);
         let messages: Vec<Msg> = ui.into_messages().collect();
         assert!(
-            messages.contains(&Msg::Hover(7, ToastHover::Entered)),
-            "no Hover(7, ToastHover::Entered) after the pointer entered the toast: {messages:?}",
+            messages.contains(&Msg::Hover(7, ToastAttention::PointerEntered)),
+            "no Hover(7, ToastAttention::PointerEntered) after the pointer entered the toast: {messages:?}",
         );
     }
 
