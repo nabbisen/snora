@@ -237,8 +237,8 @@ crate short of the pixels**, and that is RFC-085's real subject.
 Scoped by the owner, 2026-11-09:
 - **The 0.56 deprecations are removed,** under the rule: `on_toast_hover`, `ToastHover`
   and `Holds::hover`.
-- **Arrow keys inside snora's menus** (RFC-123, proposed): ↓/↑, Home/End, and focus on the
-  first item when a menu is opened from the keyboard.
+- **Arrow keys inside snora's menus** (RFC-123, proposed): ↓/↑ and Home/End; with nothing
+  focused, ↓ starts at the first item.
 - **1.0 gate 3's evidence refreshed,** and its two words ("third-party",
   "production-grade") put to the owner.
 

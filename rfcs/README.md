@@ -184,7 +184,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 123 | [Arrow keys do nothing inside snora's menus](./proposed/123-arrow-keys-do-nothing-inside-snoras-menus.md) | 0.59.0 — RFC-116's L-9: ↓/↑ and Home/End inside an open snora menu; opening one from the keyboard focuses its first item, opening it with the pointer does not. Menus only; the tab bar and type-ahead are future wanted |
+| 123 | [Arrow keys do nothing inside snora's menus](./proposed/123-arrow-keys-do-nothing-inside-snoras-menus.md) | 0.59.0 — RFC-116's L-9: ↓/↑ and Home/End inside an open snora menu, wrapping; with nothing focused, ↓ starts at the first item and ↑ at the last; opening never moves focus (revised against the principles). Menus only; the tab bar and type-ahead are future wanted |
 
 ## Archive
 
