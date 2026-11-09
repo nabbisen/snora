@@ -460,5 +460,7 @@ It now claims plain Tab and Shift+Tab only.
 
 | # | Gap | Who meets it | Trigger |
 |---|---|---|---|
-| L-8 | **The macOS bindings have not been checked on a Mac** (how `iced_winit` reports Cmd+↑, and whether a field keeps it) | Mac users | the first check on macOS, by the owner or an adopter |
-| L-9 | **Arrow keys do nothing inside snora's menus.** Since 0.55, Tab, Enter and Escape work in an open menu. Native menus also answer ↓/↑ (and Home/End), and opening one from the keyboard moves focus to its first item; snora's do neither (found 2026-11-09, scoping 0.59) | keyboard users of `app_header`'s and `render_menu`'s menus | proposed for 0.59 as an RFC; the owner rules |
+| L-8 | **The macOS bindings have not been checked on a Mac** (how `iced_winit` reports Cmd+↑, and whether a field keeps it) | Mac users | the first check on macOS, by an adopter: the owner has no Mac (2026-11-09) |
+| L-9 | **Arrow keys do nothing inside snora's menus.** Since 0.55, Tab, Enter and Escape work in an open menu. Native menus also answer ↓/↑ (and Home/End), and opening one from the keyboard moves focus to its first item; snora's do neither (found 2026-11-09, scoping 0.59) | keyboard users of `app_header`'s and `render_menu`'s menus | **RFC-123, in 0.59's scope (owner, 2026-11-09)** |
+| L-10 | **Type-ahead in menus** (a letter jumps to the item that starts with it). It needs a timing rule and a matching rule across scripts (RFC-123 Q-4) | keyboard users of long menus | *future wanted*: an adopter asks |
+| L-11 | **Arrow keys in the tab bar,** the "roving" tab pattern, where Tab stops once at the bar. It changes Tab everywhere (RFC-123 Q-5) | keyboard users of tab bars | *future wanted*: an adopter asks |

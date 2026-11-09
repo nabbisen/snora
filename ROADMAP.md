@@ -234,13 +234,18 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.59.0
 
+Scoped by the owner, 2026-11-09:
 - **The 0.56 deprecations are removed,** under the rule: `on_toast_hover`, `ToastHover`
   and `Holds::hover`.
-- Nothing else is scheduled. RFC-116's long-term plan (L-5, L-7, L-8) and the future
-  wanted items below wait on their triggers.
+- **Arrow keys inside snora's menus** (RFC-123, proposed): ↓/↑, Home/End, and focus on the
+  first item when a menu is opened from the keyboard.
+- **1.0 gate 3's evidence refreshed,** and its two words ("third-party",
+  "production-grade") put to the owner.
 
 ## Future wanted
 
+- Type-ahead in menus, and arrow keys in the tab bar (RFC-116 L-10, L-11). Built when an
+  adopter asks.
 - A public way for an application to declare its structure to the focus rule: a
   container that stays when emptied, and controls that go together (RFC-120; owner,
   2026-11-08). Built when an adopter asks.
