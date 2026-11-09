@@ -586,10 +586,10 @@ fn crumb_rule_stays_visible_on_the_hover_fill() {
     assert_no_failures(failures);
 }
 
-/// This crate's copy of the rule, under one name so the table below
-/// reads the same in both crates.
+/// The shared rule (`snora_interaction::contrast`), under the name the table
+/// below uses in both crates.
 mod rule {
-    pub(super) use crate::style::{contrast_ratio, readable_text, stronger_pole};
+    pub(super) use snora_interaction::contrast::{contrast_ratio, readable_text, stronger_pole};
 }
 
 // ---------------------------------------------------------------------
@@ -599,17 +599,13 @@ mod rule {
 /// The cases the readable-text rule must decide identically in
 /// `snora::toast` and in `snora_widgets::style`.
 ///
-/// # Why the table is duplicated instead of shared
+/// # One rule, a table in each crate
 ///
-/// The rule itself is duplicated, and it has to be: `snora` depends on
-/// `snora-widgets`, so `snora-widgets` cannot call the engine's copy,
-/// and `widgets` is an optional feature while the toast is not, so the
-/// engine cannot call the widgets' copy. **This table is the thing that
-/// keeps the two honest.** It is asserted against
-/// `snora_widgets::style`'s copy in `snora_widgets::contrast_tests`
-/// and against `snora::toast`'s copy in `snora::toast::contrast_tests`,
-/// under this same name. If you change one rule and not the other, one
-/// of the two runs fails.
+/// The rule is `snora_interaction::contrast::readable_text`, which both crates
+/// call (RFC-122 Unit 1; until then each carried a twin, and this table was what
+/// kept the two honest). The table stays in both suites because each reads the
+/// themes through its own caller: it fails if either crate stops calling the shared
+/// rule, or wraps it in something that decides differently.
 ///
 /// Each row is `(label, fill, paired, keep_the_theme's_pair)`. The
 /// theme rows read their colours out of `iced::Theme` rather than
@@ -716,7 +712,7 @@ fn readable_text_table() {
     assert!(
         failures.is_empty(),
         "{} readable-text disagreement(s). This table is asserted in both `snora` and \
-         `snora-widgets`; if only one run fails, the two copies of the rule have drifted:\n  {}",
+         `snora-widgets`; if only one run fails, one crate no longer uses the shared rule:\n  {}",
         failures.len(),
         failures.join("\n  "),
     );

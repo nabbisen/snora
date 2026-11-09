@@ -116,84 +116,13 @@ pub fn sidebar_active_color(theme: &Theme) -> Color {
 }
 
 // ---------------------------------------------------------------------
-// The readable-text rule, as a crate-private twin (RFC-114 Unit 3b)
+// The readable-text rule lives in `snora-interaction` (RFC-122 Unit 1)
 // ---------------------------------------------------------------------
 
-/// WCAG 1.4.3 AA for body text.
-///
-/// A sixth in-crate copy of the same number, pinned by
-/// `scripts/check-wcag-floors.sh`, and the second that is **not**
-/// test-only: the rail's active name falls back to the stronger pole
-/// where the theme's own pair misses AA, so the floor has to be readable
-/// at runtime and not only by the suite that checks it.
-pub(crate) const AA_TEXT: f32 = 4.5;
-
-/// Relative luminance, per WCAG 2.x.
-///
-/// # Why this is duplicated
-///
-/// **The twin is `snora::toast`'s copy** (`crates/snora/src/toast.rs`),
-/// which RFC-111 wrote for the toast's own text. `snora-widgets` cannot
-/// call it: `snora` depends on `snora-widgets`, not the other way
-/// round. The engine's toast cannot call this one either, because
-/// `widgets` is an optional feature and the toast is not. So the rule
-/// exists twice on purpose.
-///
-/// **One table of cases is asserted against both copies** —
-/// `readable_text_table` in `crate::contrast_tests` and in
-/// `snora::toast::contrast_tests` — so the two cannot drift in what
-/// they decide, only in where they live. If you change either, change
-/// both, and the table will tell you if you did not.
-pub(crate) fn relative_luminance(c: Color) -> f32 {
-    fn channel(c: f32) -> f32 {
-        if c <= 0.04045 {
-            c / 12.92
-        } else {
-            ((c + 0.055) / 1.055).powf(2.4)
-        }
-    }
-    0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
-}
-
-/// WCAG contrast ratio between two opaque colours. Twin of
-/// `snora::toast`'s copy; see [`relative_luminance`].
-pub(crate) fn contrast_ratio(a: Color, b: Color) -> f32 {
-    let (la, lb) = (relative_luminance(a), relative_luminance(b));
-    (la.max(lb) + 0.05) / (la.min(lb) + 0.05)
-}
-
-/// Black or white, whichever contrasts more with `fill`. Twin of
-/// `snora::toast`'s copy; see [`relative_luminance`].
-///
-/// **This always clears AA.** For any opaque colour with luminance `L`,
-/// black contrasts at `(L + 0.05) / 0.05` and white at
-/// `1.05 / (L + 0.05)`; the two are equal at
-/// `L = √(0.05 × 1.05) − 0.05`, where both are `√(1.05 / 0.05) ≈
-/// 4.583:1`. Every other luminance makes one of them larger, so the
-/// worse case of the better choice is 4.583 — above the floor, for
-/// every fill a theme can produce.
-pub(crate) fn stronger_pole(fill: Color) -> Color {
-    if contrast_ratio(Color::BLACK, fill) >= contrast_ratio(Color::WHITE, fill) {
-        Color::BLACK
-    } else {
-        Color::WHITE
-    }
-}
-
-/// The theme's own paired text when it clears AA against the fill, and
-/// the stronger pole when it does not. Twin of `snora::toast`'s copy;
-/// see [`relative_luminance`].
-///
-/// The theme's choice is kept wherever it holds, because it is the one
-/// that looks deliberate; the fallback only replaces a pairing that
-/// fails.
-pub(crate) fn readable_text(fill: Color, paired: Color) -> Color {
-    if contrast_ratio(paired, fill) >= AA_TEXT {
-        paired
-    } else {
-        stronger_pole(fill)
-    }
-}
+/// The rule that keeps a preferred colour where it reads and takes the stronger
+/// pole where it does not. It used to be a twin of `snora::toast`'s copy; both now
+/// call the one in `snora_interaction::contrast`, which sits below them.
+pub(crate) use snora_interaction::contrast::readable_text;
 
 // ---------------------------------------------------------------------
 // Controls (RFC-116 R-1 Unit 3)
@@ -333,4 +262,91 @@ pub(crate) fn design_control<'a, Message>(
         Some(snora_style::text::label_size(tokens).0),
         move |_| behind,
     )
+}
+
+#[cfg(test)]
+mod ring_pin {
+    //! **The ring's colour, pinned** (RFC-122 review, 3.4). The rule that picks it
+    //! (`readable_text` and `stronger_pole`) moved to `snora-interaction`, below
+    //! every caller; this table is what each caller drew before it moved, in the
+    //! 22 stock themes (the unstyled path) and the 6 presets (the design path), so
+    //! the move cannot change a colour.
+    use super::*;
+
+    fn rgb(c: Color) -> [u8; 3] {
+        [
+            (c.r * 255.0).round() as u8,
+            (c.g * 255.0).round() as u8,
+            (c.b * 255.0).round() as u8,
+        ]
+    }
+
+    const PINNED: &[(&str, &str, [u8; 3])] = &[
+        ("unstyled", "Light", [0, 0, 0]),
+        ("unstyled", "Dark", [230, 230, 230]),
+        ("unstyled", "Dracula", [248, 248, 242]),
+        ("unstyled", "Nord", [236, 239, 244]),
+        ("unstyled", "SolarizedLight", [58, 97, 110]),
+        ("unstyled", "SolarizedDark", [157, 180, 183]),
+        ("unstyled", "GruvboxLight", [40, 40, 40]),
+        ("unstyled", "GruvboxDark", [251, 241, 199]),
+        ("unstyled", "CatppuccinLatte", [76, 79, 105]),
+        ("unstyled", "CatppuccinFrappe", [198, 208, 245]),
+        ("unstyled", "CatppuccinMacchiato", [202, 211, 245]),
+        ("unstyled", "CatppuccinMocha", [205, 214, 244]),
+        ("unstyled", "TokyoNight", [154, 165, 206]),
+        ("unstyled", "TokyoNightStorm", [182, 196, 250]),
+        ("unstyled", "TokyoNightLight", [57, 62, 92]),
+        ("unstyled", "KanagawaWave", [220, 215, 186]),
+        ("unstyled", "KanagawaDragon", [197, 201, 197]),
+        ("unstyled", "KanagawaLotus", [84, 84, 100]),
+        ("unstyled", "Moonfly", [189, 189, 189]),
+        ("unstyled", "Nightfly", [189, 193, 198]),
+        ("unstyled", "Oxocarbon", [208, 208, 208]),
+        ("unstyled", "Ferra", [254, 205, 178]),
+        ("design", "light", [29, 78, 216]),
+        ("design", "dark", [127, 177, 255]),
+        ("design", "light_aaa", [21, 68, 206]),
+        ("design", "dark_aaa", [127, 177, 255]),
+        ("design", "high_contrast_light", [0, 48, 176]),
+        ("design", "high_contrast_dark", [255, 255, 255]),
+    ];
+
+    #[test]
+    fn every_ring_colour_is_what_it_was_before_the_rule_moved() {
+        let mut off = Vec::new();
+        let mut checked = 0;
+        for theme in Theme::ALL {
+            let ring = focus_ring(ControlGeometry::unstyled(), page_background);
+            let got = rgb((ring.color)(theme));
+            let name = format!("{theme:?}");
+            let want = PINNED
+                .iter()
+                .find(|(k, n, _)| *k == "unstyled" && *n == name)
+                .unwrap_or_else(|| panic!("no pinned colour for {name}"))
+                .2;
+            checked += 1;
+            if got != want {
+                off.push(format!("unstyled {name}: {got:?}, was {want:?}"));
+            }
+        }
+        #[cfg(feature = "design")]
+        for (name, tokens) in snora_design::Tokens::presets() {
+            let theme = snora_style::theme::theme(&tokens);
+            let behind = snora_style::color::to_iced_color(tokens.palette.background);
+            let ring = focus_ring(ControlGeometry::from_tokens(&tokens), move |_| behind);
+            let got = rgb((ring.color)(&theme));
+            let want = PINNED
+                .iter()
+                .find(|(k, n, _)| *k == "design" && *n == name)
+                .unwrap_or_else(|| panic!("no pinned colour for {name}"))
+                .2;
+            checked += 1;
+            if got != want {
+                off.push(format!("design {name}: {got:?}, was {want:?}"));
+            }
+        }
+        assert!(checked >= 22, "only {checked} colours checked");
+        assert!(off.is_empty(), "ring colours changed: {off:?}");
+    }
 }

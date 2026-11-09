@@ -58,8 +58,13 @@ cd "$(git rev-parse --show-toplevel)"
 # copies cannot be shared -- `snora` depends on `snora-widgets`, and
 # `snora-widgets` is optional while the toast is not -- so one case
 # table is asserted against both instead.
+#
+# 2026-11-09 (RFC-122 Unit 1): AA_TEXT 6 -> 5. The two runtime copies (the toast's
+# and the widgets') are replaced by one in `crates/snora-interaction/src/contrast.rs`,
+# below both crates: a third caller (the public `snora::control`) would have been a
+# third twin. The single case table is still asserted from both crates' suites.
 declare -A EXPECTED_COUNT=(
-  [AA_TEXT]=6
+  [AA_TEXT]=5
   [NON_TEXT_MIN]=6
   [FOCUS_MIN]=1
   [TEXT_SIZE_MIN]=1

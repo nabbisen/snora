@@ -419,77 +419,10 @@ where
     )
 }
 
-/// WCAG relative luminance, at runtime.
-///
-/// The twin of `contrast_tests::relative_luminance`, which is checked
-/// against the reference identity. Duplicated rather than shared
-/// because that module is `#[cfg(test)]` and this is not; the pair is
-/// small enough to read side by side, and
-/// `toast_fallback_matches_the_tests_contrast` asserts the two agree.
-fn relative_luminance(c: Color) -> f32 {
-    fn channel(c: f32) -> f32 {
-        if c <= 0.04045 {
-            c / 12.92
-        } else {
-            ((c + 0.055) / 1.055).powf(2.4)
-        }
-    }
-    0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
-}
-
-/// WCAG contrast ratio between two opaque colours.
-fn contrast_ratio(a: Color, b: Color) -> f32 {
-    let (la, lb) = (relative_luminance(a), relative_luminance(b));
-    (la.max(lb) + 0.05) / (la.min(lb) + 0.05)
-}
-
-/// Black or white, whichever contrasts more with `fill` (RFC-111).
-///
-/// **This always clears AA.** For any opaque colour with luminance `L`,
-/// black contrasts at `(L + 0.05) / 0.05` and white at
-/// `1.05 / (L + 0.05)`; the two are equal at `L = √(0.05 × 1.05) −
-/// 0.05`, where both are `√(1.05 / 0.05) ≈ 4.583:1`. Every other
-/// luminance makes one of them larger. So the worse case of the better
-/// choice is 4.583, above the 4.5 floor, for every fill a theme can
-/// produce.
-fn stronger_pole(fill: Color) -> Color {
-    if contrast_ratio(Color::BLACK, fill) >= contrast_ratio(Color::WHITE, fill) {
-        Color::BLACK
-    } else {
-        Color::WHITE
-    }
-}
-
-/// The theme's own paired text when it clears AA against the fill, and
-/// the stronger pole when it does not (RFC-111).
-///
-/// iced derives each pair from whatever palette the application set,
-/// and six of its 22 built-in themes produce a pair under 4.5:1 — worst
-/// 2.42 on Kanagawa Dragon. The theme's choice is kept wherever it
-/// holds, because it is the one that looks deliberate; the fallback
-/// only replaces a pairing that fails.
-fn readable_text(fill: Color, paired: Color) -> Color {
-    if contrast_ratio(paired, fill) >= AA_TEXT {
-        paired
-    } else {
-        stronger_pole(fill)
-    }
-}
-
-/// WCAG 1.4.3 AA for body text. One of six in-crate copies of the same
-/// number, pinned by `scripts/check-wcag-floors.sh`; this one is
-/// runtime rather than test-only, because the fallback has to make the
-/// same judgement the tests do.
-///
-/// **`snora_widgets::style` carries a twin of this whole rule**
-/// (RFC-114 Unit 3b), for the sidebar's active name. Neither crate can
-/// call the other's: `snora` depends on `snora-widgets`, and
-/// `snora-widgets` is optional while the toast is not. One table of
-/// cases is asserted against both copies — `readable_text_table`, in
-/// this crate's `toast::contrast_tests` and in
-/// `snora_widgets::contrast_tests` — so they cannot drift in what they
-/// decide. If you change either, change both.
-const AA_TEXT: f32 = 4.5;
+// The readable-text rule is `snora_interaction::contrast`'s (RFC-122 Unit 1). It was a
+// twin of `snora_widgets::style`'s copy until a third caller, `snora::control`, made
+// two copies of one rule untenable; both crates are above `snora-interaction`.
+use snora_interaction::contrast::{contrast_ratio, readable_text, stronger_pole};
 
 /// Returns `(background, text_color)` for a toast intent — the single
 /// derivation both [`toast_style`] (the body) and [`close_button_style`]
@@ -1406,5 +1339,213 @@ mod hover_wiring {
             messages.is_empty(),
             "an unwired layout reported pointer movement: {messages:?}",
         );
+    }
+}
+
+#[cfg(test)]
+mod ring_pin {
+    //! **The toast close mark's ring colour, pinned** (RFC-122 review, 3.4): the
+    //! intent's own text colour, which `readable_text` and `stronger_pole` chose before
+    //! they moved to `snora-interaction`. Five intents in the 22 stock themes (the
+    //! engine path) and in the 6 presets (the design path).
+    use super::*;
+
+    fn rgb(c: Color) -> [u8; 3] {
+        [
+            (c.r * 255.0).round() as u8,
+            (c.g * 255.0).round() as u8,
+            (c.b * 255.0).round() as u8,
+        ]
+    }
+
+    const PINNED: &[(&str, &str, &str, [u8; 3])] = &[
+        ("engine", "Light", "Debug", [0, 0, 0]),
+        ("engine", "Light", "Info", [0, 0, 0]),
+        ("engine", "Light", "Success", [249, 250, 250]),
+        ("engine", "Light", "Warning", [0, 0, 0]),
+        ("engine", "Light", "Error", [252, 250, 250]),
+        ("engine", "Dark", "Debug", [230, 230, 230]),
+        ("engine", "Dark", "Info", [0, 0, 0]),
+        ("engine", "Dark", "Success", [255, 255, 255]),
+        ("engine", "Dark", "Warning", [63, 45, 12]),
+        ("engine", "Dark", "Error", [252, 250, 250]),
+        ("engine", "Dracula", "Debug", [248, 248, 242]),
+        ("engine", "Dracula", "Info", [0, 0, 0]),
+        ("engine", "Dracula", "Success", [13, 62, 25]),
+        ("engine", "Dracula", "Warning", [59, 62, 30]),
+        ("engine", "Dracula", "Error", [63, 14, 14]),
+        ("engine", "Nord", "Debug", [252, 255, 255]),
+        ("engine", "Nord", "Info", [0, 0, 0]),
+        ("engine", "Nord", "Success", [37, 45, 30]),
+        ("engine", "Nord", "Warning", [57, 48, 30]),
+        ("engine", "Nord", "Error", [0, 0, 0]),
+        ("engine", "SolarizedLight", "Debug", [48, 47, 41]),
+        ("engine", "SolarizedLight", "Info", [0, 0, 0]),
+        ("engine", "SolarizedLight", "Success", [28, 34, 0]),
+        ("engine", "SolarizedLight", "Warning", [42, 29, 0]),
+        ("engine", "SolarizedLight", "Error", [255, 255, 255]),
+        ("engine", "SolarizedDark", "Debug", [249, 250, 250]),
+        ("engine", "SolarizedDark", "Info", [0, 0, 0]),
+        ("engine", "SolarizedDark", "Success", [28, 34, 0]),
+        ("engine", "SolarizedDark", "Warning", [42, 29, 0]),
+        ("engine", "SolarizedDark", "Error", [255, 255, 255]),
+        ("engine", "GruvboxLight", "Debug", [40, 40, 40]),
+        ("engine", "GruvboxLight", "Info", [0, 0, 0]),
+        ("engine", "GruvboxLight", "Success", [17, 17, 17]),
+        ("engine", "GruvboxLight", "Warning", [17, 17, 17]),
+        ("engine", "GruvboxLight", "Error", [253, 249, 249]),
+        ("engine", "GruvboxDark", "Debug", [251, 241, 199]),
+        ("engine", "GruvboxDark", "Info", [0, 0, 0]),
+        ("engine", "GruvboxDark", "Success", [34, 33, 2]),
+        ("engine", "GruvboxDark", "Warning", [52, 34, 3]),
+        ("engine", "GruvboxDark", "Error", [253, 249, 249]),
+        ("engine", "CatppuccinLatte", "Debug", [48, 51, 87]),
+        ("engine", "CatppuccinLatte", "Info", [0, 0, 0]),
+        ("engine", "CatppuccinLatte", "Success", [8, 36, 4]),
+        ("engine", "CatppuccinLatte", "Warning", [24, 22, 68]),
+        ("engine", "CatppuccinLatte", "Error", [253, 249, 250]),
+        ("engine", "CatppuccinFrappe", "Debug", [238, 253, 255]),
+        ("engine", "CatppuccinFrappe", "Info", [0, 0, 0]),
+        ("engine", "CatppuccinFrappe", "Success", [38, 50, 29]),
+        ("engine", "CatppuccinFrappe", "Warning", [56, 47, 31]),
+        ("engine", "CatppuccinFrappe", "Error", [56, 27, 28]),
+        ("engine", "CatppuccinMacchiato", "Debug", [232, 244, 255]),
+        ("engine", "CatppuccinMacchiato", "Info", [0, 0, 0]),
+        ("engine", "CatppuccinMacchiato", "Success", [38, 53, 33]),
+        ("engine", "CatppuccinMacchiato", "Warning", [58, 51, 36]),
+        ("engine", "CatppuccinMacchiato", "Error", [58, 29, 33]),
+        ("engine", "CatppuccinMocha", "Debug", [205, 214, 244]),
+        ("engine", "CatppuccinMocha", "Info", [0, 0, 0]),
+        ("engine", "CatppuccinMocha", "Success", [38, 55, 36]),
+        ("engine", "CatppuccinMocha", "Warning", [61, 55, 40]),
+        ("engine", "CatppuccinMocha", "Error", [60, 30, 38]),
+        ("engine", "TokyoNight", "Debug", [210, 228, 255]),
+        ("engine", "TokyoNight", "Info", [0, 0, 0]),
+        ("engine", "TokyoNight", "Success", [35, 49, 20]),
+        ("engine", "TokyoNight", "Warning", [54, 40, 20]),
+        ("engine", "TokyoNight", "Error", [61, 24, 31]),
+        ("engine", "TokyoNightStorm", "Debug", [210, 228, 255]),
+        ("engine", "TokyoNightStorm", "Info", [0, 0, 0]),
+        ("engine", "TokyoNightStorm", "Success", [35, 49, 20]),
+        ("engine", "TokyoNightStorm", "Warning", [54, 40, 20]),
+        ("engine", "TokyoNightStorm", "Error", [61, 24, 31]),
+        ("engine", "TokyoNightLight", "Debug", [30, 34, 74]),
+        ("engine", "TokyoNightLight", "Info", [0, 0, 0]),
+        ("engine", "TokyoNightLight", "Success", [250, 250, 249]),
+        ("engine", "TokyoNightLight", "Warning", [251, 250, 249]),
+        ("engine", "TokyoNightLight", "Error", [251, 250, 250]),
+        ("engine", "KanagawaWave", "Debug", [220, 215, 186]),
+        ("engine", "KanagawaWave", "Info", [0, 0, 0]),
+        ("engine", "KanagawaWave", "Success", [24, 32, 20]),
+        ("engine", "KanagawaWave", "Warning", [63, 35, 7]),
+        ("engine", "KanagawaWave", "Error", [252, 250, 250]),
+        ("engine", "KanagawaDragon", "Debug", [197, 201, 197]),
+        ("engine", "KanagawaDragon", "Info", [255, 255, 255]),
+        ("engine", "KanagawaDragon", "Success", [30, 34, 25]),
+        ("engine", "KanagawaDragon", "Warning", [63, 35, 7]),
+        ("engine", "KanagawaDragon", "Error", [46, 23, 22]),
+        ("engine", "KanagawaLotus", "Debug", [32, 28, 64]),
+        ("engine", "KanagawaLotus", "Info", [0, 0, 0]),
+        ("engine", "KanagawaLotus", "Success", [0, 0, 0]),
+        ("engine", "KanagawaLotus", "Warning", [32, 28, 64]),
+        ("engine", "KanagawaLotus", "Error", [253, 250, 250]),
+        ("engine", "Moonfly", "Debug", [189, 189, 189]),
+        ("engine", "Moonfly", "Info", [0, 0, 0]),
+        ("engine", "Moonfly", "Success", [30, 47, 17]),
+        ("engine", "Moonfly", "Warning", [55, 47, 30]),
+        ("engine", "Moonfly", "Error", [63, 14, 14]),
+        ("engine", "Nightfly", "Debug", [189, 193, 198]),
+        ("engine", "Nightfly", "Info", [0, 0, 0]),
+        ("engine", "Nightfly", "Success", [36, 49, 17]),
+        ("engine", "Nightfly", "Warning", [55, 50, 30]),
+        ("engine", "Nightfly", "Error", [62, 13, 12]),
+        ("engine", "Oxocarbon", "Debug", [241, 241, 241]),
+        ("engine", "Oxocarbon", "Info", [0, 0, 0]),
+        ("engine", "Oxocarbon", "Success", [0, 45, 16]),
+        ("engine", "Oxocarbon", "Warning", [45, 33, 63]),
+        ("engine", "Oxocarbon", "Error", [0, 0, 0]),
+        ("engine", "Ferra", "Debug", [255, 235, 201]),
+        ("engine", "Ferra", "Info", [0, 0, 0]),
+        ("engine", "Ferra", "Success", [41, 42, 33]),
+        ("engine", "Ferra", "Warning", [60, 52, 22]),
+        ("engine", "Ferra", "Error", [54, 21, 24]),
+        ("design", "light", "Debug", [21, 24, 28]),
+        ("design", "light", "Info", [255, 255, 255]),
+        ("design", "light", "Success", [255, 255, 255]),
+        ("design", "light", "Warning", [255, 255, 255]),
+        ("design", "light", "Error", [255, 255, 255]),
+        ("design", "dark", "Debug", [241, 243, 246]),
+        ("design", "dark", "Info", [8, 17, 31]),
+        ("design", "dark", "Success", [6, 33, 15]),
+        ("design", "dark", "Warning", [36, 22, 0]),
+        ("design", "dark", "Error", [42, 6, 6]),
+        ("design", "light_aaa", "Debug", [21, 24, 28]),
+        ("design", "light_aaa", "Info", [255, 255, 255]),
+        ("design", "light_aaa", "Success", [255, 255, 255]),
+        ("design", "light_aaa", "Warning", [255, 255, 255]),
+        ("design", "light_aaa", "Error", [255, 255, 255]),
+        ("design", "dark_aaa", "Debug", [241, 243, 246]),
+        ("design", "dark_aaa", "Info", [8, 17, 31]),
+        ("design", "dark_aaa", "Success", [6, 33, 15]),
+        ("design", "dark_aaa", "Warning", [36, 22, 0]),
+        ("design", "dark_aaa", "Error", [42, 6, 6]),
+        ("design", "high_contrast_light", "Debug", [0, 0, 0]),
+        ("design", "high_contrast_light", "Info", [255, 255, 255]),
+        ("design", "high_contrast_light", "Success", [255, 255, 255]),
+        ("design", "high_contrast_light", "Warning", [255, 255, 255]),
+        ("design", "high_contrast_light", "Error", [255, 255, 255]),
+        ("design", "high_contrast_dark", "Debug", [255, 255, 255]),
+        ("design", "high_contrast_dark", "Info", [0, 0, 0]),
+        ("design", "high_contrast_dark", "Success", [0, 0, 0]),
+        ("design", "high_contrast_dark", "Warning", [0, 0, 0]),
+        ("design", "high_contrast_dark", "Error", [0, 0, 0]),
+    ];
+
+    fn pinned(kind: &str, name: &str, intent: ToastIntent) -> [u8; 3] {
+        PINNED
+            .iter()
+            .find(|(k, n, i, _)| *k == kind && *n == name && *i == format!("{intent:?}"))
+            .unwrap_or_else(|| panic!("no pinned colour for {kind} {name} {intent:?}"))
+            .3
+    }
+
+    #[test]
+    fn every_toast_ring_colour_is_what_it_was_before_the_rule_moved() {
+        let intents = [
+            ToastIntent::Debug,
+            ToastIntent::Info,
+            ToastIntent::Success,
+            ToastIntent::Warning,
+            ToastIntent::Error,
+        ];
+        let mut off = Vec::new();
+        let mut checked = 0;
+        for theme in iced::Theme::ALL {
+            for intent in intents {
+                let got = rgb(intent_colors(theme, intent, None).1);
+                let want = pinned("engine", &format!("{theme:?}"), intent);
+                checked += 1;
+                if got != want {
+                    off.push(format!(
+                        "engine {theme:?} {intent:?}: {got:?}, was {want:?}"
+                    ));
+                }
+            }
+        }
+        #[cfg(feature = "design")]
+        for (name, tokens) in snora_design::Tokens::presets() {
+            let overrides = crate::design::render::toast_intent_colors(&tokens);
+            let theme = snora_style::theme::theme(&tokens);
+            for intent in intents {
+                let got = rgb(intent_colors(&theme, intent, Some(overrides)).1);
+                let want = pinned("design", name, intent);
+                checked += 1;
+                if got != want {
+                    off.push(format!("design {name} {intent:?}: {got:?}, was {want:?}"));
+                }
+            }
+        }
+        assert!(checked >= 110, "only {checked} colours checked");
+        assert!(off.is_empty(), "toast ring colours changed: {off:?}");
     }
 }

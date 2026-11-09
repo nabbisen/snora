@@ -68,6 +68,7 @@
 #![forbid(unsafe_code)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+pub mod contrast;
 mod control;
 mod em;
 mod escape;
