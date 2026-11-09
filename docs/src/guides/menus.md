@@ -149,8 +149,9 @@ an Escape of its own). Neither moves between items inside one.
   presses the focused item. **Escape** closes the menu, and focus returns to the trigger.
 - **Arrow keys do nothing inside a menu yet.** Native menus answer ↓ and ↑, and a keyboard
   user may reach for them first. RFC-116's long-term plan records it.
-- **Opening a menu from the keyboard leaves focus where it was.** One Tab reaches the first
-  item.
+- **Opening a menu from the keyboard does not move focus into it.** The trigger's focus
+  is set aside while the menu covers the page, and comes back when it closes. One Tab
+  reaches the menu's first item.
 
 **If you build the dropdown yourself,** passing your own element to
 `AppLayout::header_menu` or `AppLayout::context_menu`, arrow-key traversal is yours to add:
