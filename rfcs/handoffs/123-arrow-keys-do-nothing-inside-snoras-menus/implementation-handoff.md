@@ -2,7 +2,9 @@
 
 **RFC.** `rfcs/accepted/123-arrow-keys-do-nothing-inside-snoras-menus.md`. Read R-1 to R-5,
 the revision note and the Rulings.
-**Release target.** 0.59.0. **Unit 0 first,** as its own review, then Unit 1. If Unit 0 is
+**Release target.** 0.59.0, **after RFC-124** (owner, 2026-11-10): Unit 1's header scenes are
+built on RFC-124's anchored dropdown. Unit 0's review (`.git-exclude/reviewed/123-unit0/`)
+settled 3.2 to 3.5. **Unit 0 first,** as its own review, then Unit 1. If Unit 0 is
 small and clean, the review may let Unit 1 follow on the same branch.
 **Branch.** `rfc123-menu-arrows`, off `main`. Land as `main` requires:
 1. rebase onto `main`;

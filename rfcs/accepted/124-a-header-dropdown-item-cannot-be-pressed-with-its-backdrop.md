@@ -1,6 +1,7 @@
 # RFC-124 — A header dropdown's items cannot be pressed when its backdrop is up
 
-**Status.** Proposed 2026-11-10. Awaiting the owner's rulings on Q-1 to Q-5.
+**Status.** Accepted 2026-11-10. Every open question ruled as suggested, as revised (see Rulings).
+**Handoff.** [`handoffs/124-…`](../handoffs/124-a-header-dropdown-item-cannot-be-pressed-with-its-backdrop/implementation-handoff.md).
 **Revised** 2026-11-10, before ruling. The owner asked for a review against the
 fundamental philosophy, with "the initial cost is not the only factor and not the
 strongest". The first draft chose the smallest change: leave the header live under its own
@@ -166,3 +167,14 @@ it likes, dropping the empty `Space`. No separate letter: we know of no adopter 
    - `menus.md`: the wiring, and the "Why `header_menu` takes an empty `Space`" section
      corrected;
    - the release's guide.
+
+## Rulings, 2026-11-10 (owner)
+
+All approved, as revised:
+- **Q-1:** the dropdown becomes an overlay anchored to its trigger. The first draft's
+  header exception is rejected.
+- **Q-2:** stop teaching the empty-`Space` idiom, and deprecate nothing.
+- **Q-3:** the open menu's own overlay passes `Inert`, proved in Unit 0, or the top-level
+  host measured instead. Anything that needs a new exception to Law 8 returns to the owner.
+- **Q-4:** 0.59 or 0.60, decided at Unit 0's review. No stop-gap.
+- **Q-5:** stated in the release's guide, with no letter.
