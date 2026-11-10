@@ -99,6 +99,15 @@ fn view(state: &State) -> iced::Element<'_, Message> {
 }
 ```
 
+> **Known defect (found 2026-11-10, RFC-124).** With this wiring, the backdrop covers
+> the header as well. **A click on a dropdown item closes the menu instead of pressing the
+> item,** and since 0.55 the items cannot be reached by keyboard either. Until RFC-124
+> ships, either:
+> - leave out `header_menu(space())`, so that there is no backdrop and the items work. The
+>   menu then does not close on a click outside, so close it from your own `update`; or
+> - put your menu's content in `header_menu` yourself, as the `starter` example does,
+>   with an empty `items` list in `app_header`.
+
 ## Handling the actions
 
 `MenuAction` has two variants:
@@ -145,7 +154,8 @@ an Escape of its own). Neither moves between items inside one.
 **What snora's prefab menus do today (0.55 on):**
 - **Every menu item is a focus target,** with a focus ring, and the header's menu trigger is
   one too. **Tab and Shift+Tab** move between the items of an open menu: with its
-  outside-click backdrop, the page beneath is out of reach (RFC-119). **Enter or Space**
+  outside-click backdrop, the page beneath is out of reach (RFC-119). *Except*
+  `app_header`'s own dropdown under the backdrop: see the known defect above (RFC-124). **Enter or Space**
   presses the focused item. **Escape** closes the menu, and focus returns to the trigger.
 - **Arrow keys do nothing inside a menu yet.** Native menus answer ↓ and ↑, and a keyboard
   user may reach for them first. RFC-116's long-term plan records it.
