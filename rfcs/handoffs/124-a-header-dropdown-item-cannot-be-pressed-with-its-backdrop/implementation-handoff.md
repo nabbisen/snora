@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-124: the header dropdown becomes an anchored overlay
 
-**RFC.** `rfcs/accepted/124-a-header-dropdown-item-cannot-be-pressed-with-its-backdrop.md`.
+**RFC.** `rfcs/done/124-a-header-dropdown-item-cannot-be-pressed-with-its-backdrop.md`.
 Read the finding (four problems, one false premise), R-1 to R-4, and the Rulings.
 **Release target.** 0.59 or 0.60, **decided at Unit 0's review** (Q-4). No stop-gap.
 **Order.** Before RFC-123's Unit 1, which builds its header scenes on this. The 0.59

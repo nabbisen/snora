@@ -187,20 +187,19 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of **0.58.0**, re-counted at the cut (`cargo test --workspace --all-features
---doc`). Against the table's previous figures: `snora` +3 (`snora::control` and
-`snora::design::control`, RFC-122). `snora-control`, the notice crate, has left the
-workspace. No new `ignore`.
+As of **0.59.0**, re-counted at the cut (`cargo test --workspace --all-features
+--doc`). Against the table's previous figures: `snora-core` −2 (`ToastHover` and
+`on_toast_hover`, removed under the deprecation rule). No new `ignore`.
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|
-| `snora-core` | 28 | 0 |
+| `snora-core` | 26 | 0 |
 | `snora-design` | 10 | 0 |
 | `snora-style` | 3 | 1 |
 | `snora-interaction` | 0 | 0 |
 | `snora-widgets` | 6 | 0 |
 | `snora` | 12 | 3 |
-| **Total** | **59** | **4** |
+| **Total** | **57** | **4** |
 
 Tracked in the [release checklist](release-process.md). Do not
 accidentally break these by changing vocabulary without updating the

@@ -10,6 +10,10 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.58 → 0.59](migration-0.58-to-0.59.md) — **one breaking change**: the 0.56
+  toast-hover items removed (`on_toast_hover`, `ToastHover`, `Holds::hover`).
+  `app_header`'s dropdown fixed: its items press, by pointer and keyboard, and it
+  floats over the page; the empty `Space` in `header_menu` is no longer needed.
 - [0.57 → 0.58](migration-0.57-to-0.58.md) — **additive, nothing breaks**: your
   own content as a keyboard-reachable control (`snora::control`,
   `snora::design::control`), with iced `button`'s builder.

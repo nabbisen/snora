@@ -232,16 +232,7 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.59.0
-
-- **Done on `main`:** the 0.56 deprecations removed (`on_toast_hover`, `ToastHover`,
-  `Holds::hover`).
-- **The header dropdown, fixed** (RFC-124, merged): an overlay anchored to its trigger. Its items
-  press, by pointer and keyboard; the page no longer shifts when a menu opens; the
-  empty-`Space` idiom is no longer needed.
-- **1.0 gate 3:** its evidence is refreshed, and its two words wait for the owner.
-
-## Then — 0.60.0
+## Next — 0.60.0
 
 - **Arrow keys inside snora's menus** (RFC-123), re-planned on RFC-124's dropdown.
 - **A page under a dialog shows no hover,** as a page under an open menu already does
@@ -259,6 +250,11 @@ crate short of the pixels**, and that is RFC-085's real subject.
   L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
+
+- **0.59.0** — `app_header`'s dropdown, fixed (RFC-124). With the documented wiring its
+  items could not be pressed (at least since 0.54), the keyboard could not reach them (from
+  0.55), and opening a menu pushed the page down. It now floats over the page, anchored to
+  its trigger, and the empty `Space` idiom is gone. The 0.56 toast-hover items were removed.
 
 - **0.58.0** — your own content as a keyboard-reachable control: `snora::control` and
   `snora::design::control`, with iced `button`'s builder (RFC-122, asked for by aaai).

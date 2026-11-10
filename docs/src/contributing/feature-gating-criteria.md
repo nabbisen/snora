@@ -356,7 +356,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.58.0, re-derived 2026-11-09, RFC-062)
+## Current status (snora 0.59.0, re-derived 2026-11-10, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -367,8 +367,8 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Measured 2026-09-12, no longer unassessed.** **~0.2 s marginal** (`snora-widgets` alone, closure warm; 181–222 ms over four runs on a 16-core desktop) — **~150× under**. The cold-closure reading is 29 523 ms on the same machine, but that cost is `iced`'s and is paid by every snora consumer whether or not a widget is enabled, so per-widget gating cannot reduce it; the marginal number is the one this indicator's own purpose needs. **The procedure printed here until today measured a no-op** (393 ms — `cargo clean -p <pkg>` does not reach the release profile); corrected above. The threshold's magnitude fits the cold-closure quantity rather than the marginal one — flagged for the owner, not silently rewritten | **No** |
 | 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **55,296 B (~54 KB)**, from `binary-size.csv`'s 0.58.0 row, read back after the tag. **36% of a 150 KB bar.** It moved **−384 B** from 0.57.0's 55,680, a **clean comparison**: both rows were built with rustc 1.99.1 on `ubuntu-latest`. `engine_bytes` did not move; `widgets_bytes` fell 384. **The cause is not established**, so it is recorded, not explained | **No** |
-| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked for 0.58.0 against the manifests: no new dependency. `snora::control` and `snora::design::control` are built on `snora-interaction` (which depends on `iced` and `iced_core` only), and the design one on `snora-design` and `snora-style`, already in that path. The `snora-control` notice crate left the workspace | **No** |
-| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.58.0: the only change to `Cargo.lock` since 0.57.0 is `snora-control` leaving it; nothing was added | **No** |
+| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked for 0.59.0 against the manifests: no new dependency. The anchored dropdown is built on `iced_core`'s overlay, already in every graph | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.59.0: no package was added to or removed from `Cargo.lock` since 0.58.0; only snora's own versions moved | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
 **No indicator is met, and that is now measured rather than open.**

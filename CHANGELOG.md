@@ -25,6 +25,33 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.59.0] — 2026-11-10
+
+**Upgrading from 0.58:** read the [0.58 → 0.59 migration guide](docs/src/guides/migration-0.58-to-0.59.md).
+
+> **In short:** `app_header`'s dropdown is fixed. With the documented wiring, a click on
+> one of its items closed the menu instead of pressing the item; from 0.55 the keyboard
+> could not reach the items; and opening a menu pushed the page down. The dropdown now
+> floats over the page, anchored to its trigger, and the empty `Space` in `header_menu`
+> is no longer needed. Three items deprecated since 0.56 are removed.
+>
+> **Code:** **one breaking change:** `on_toast_hover`, `ToastHover` and `Holds::hover` are
+> removed. Use `on_toast_attention`, `ToastAttention` and `Holds::attend`. You may drop
+> `header_menu(space())`; it is harmless if kept.
+>
+> **Appearance:** changes on the default path:
+>
+> - an open header menu floats over the page in a card of its own, a few pixels below its
+>   trigger, instead of growing the header;
+> - while it is open, the page beneath shows no hover.
+>
+> Colours and presets are unchanged.
+>
+> **Security:** none. The advisory gate is clean, with the same accepted advisories as
+> 0.58.0.
+
 ### Changed
 
 - **`app_header`'s dropdown is an overlay anchored to its trigger (RFC-124).** It was
@@ -1249,7 +1276,8 @@ deprecated it. Items deprecated in 0.54 go in 0.57; items deprecated in 0.56 go 
   does not reach yours — check your own with `cargo tree -i anyhow
   --target all`.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.58.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.59.0...HEAD
+[0.59.0]: https://github.com/nabbisen/snora/compare/0.58.0...0.59.0
 [0.58.0]: https://github.com/nabbisen/snora/compare/0.57.0...0.58.0
 [0.57.0]: https://github.com/nabbisen/snora/compare/0.56.0...0.57.0
 [0.56.0]: https://github.com/nabbisen/snora/compare/0.55.0...0.56.0
