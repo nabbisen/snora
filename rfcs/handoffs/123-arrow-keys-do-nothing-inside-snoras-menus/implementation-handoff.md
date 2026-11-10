@@ -1,5 +1,8 @@
 # Implementation handoff — RFC-123: arrow keys inside snora's menus
 
+> **Superseded for Unit 1 (2026-11-11):** see [`implementation-handoff-0-60.md`](implementation-handoff-0-60.md),
+> re-planned on RFC-124's anchored dropdown. Unit 0 below is done and reviewed.
+
 **RFC.** `rfcs/accepted/123-arrow-keys-do-nothing-inside-snoras-menus.md`. Read R-1 to R-5,
 the revision note and the Rulings.
 **Release target.** 0.59.0, **after RFC-124** (owner, 2026-11-10): Unit 1's header scenes are

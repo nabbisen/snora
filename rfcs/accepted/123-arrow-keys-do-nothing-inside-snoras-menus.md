@@ -1,14 +1,16 @@
 # RFC-123 — Arrow keys do nothing inside snora's menus
 
 **Status.** Accepted 2026-11-09. Every open question ruled as suggested, as revised (see Rulings).
-**Handoff.** [`handoffs/123-…`](../handoffs/123-arrow-keys-do-nothing-inside-snoras-menus/implementation-handoff.md).
+**Handoff.** [`handoffs/123-…`](../handoffs/123-arrow-keys-do-nothing-inside-snoras-menus/implementation-handoff.md);
+**for 0.60, re-planned on the anchored dropdown:** [`implementation-handoff-0-60.md`](../handoffs/123-arrow-keys-do-nothing-inside-snoras-menus/implementation-handoff-0-60.md) (2026-11-11).
 **Revised** 2026-11-09, before ruling, after the owner asked for a check against the
 fundamental philosophy. R-3 became simpler: no record of how a menu was opened. The
 "held arrow" claim was wrong, and is corrected. See "What the review changed".
 **Raised.** 2026-11-09, architect, from RFC-116's long-term plan item **L-9**, found while
 scoping 0.59. The owner accepted it into 0.59's scope (Q-1 of that scoping), menus only.
 **Release target.** **0.60.0** (owner, 2026-11-10; it was 0.59.0). Its Unit 1 is re-planned on
-RFC-124's anchored dropdown, whose overlay a window-level `operate` cannot see.
+RFC-124's anchored dropdown, whose overlay a widget's own `operate` cannot see. It follows
+RFC-125 in 0.60 (owner, 2026-11-11, Q-2).
 **Priority.** WCAG 2.1.1 is met through Tab. This is about what a keyboard user expects
 in a menu: the owner's "nobody is confused".
 

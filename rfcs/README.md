@@ -181,6 +181,7 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 | 123 | [Arrow keys do nothing inside snora's menus](./accepted/123-arrow-keys-do-nothing-inside-snoras-menus.md) | **0.60.0** (moved from 0.59, owner 2026-11-10) — RFC-116's L-9: ↓/↑ and Home/End inside an open snora menu, wrapping; with nothing focused, ↓ starts at the first item and ↑ at the last; opening never moves focus (revised against the principles). Menus only; the tab bar and type-ahead are future wanted — **accepted 2026-11-09** |
+| 125 | [A page under a dialog still answers the pointer](./accepted/125-a-page-under-a-dialog-still-answers-the-pointer.md) | **0.60.0, first** — a page under a dialog's dim shows hover, and a wheel scroll over the dim closes the dialog, once per wheel event (never ruled; since 0.41). Proposed: a covered layer gets no pointer, as under an open header dropdown since 0.59: no hover, pointer shape, tooltip or wheel; only a press or Escape closes — **accepted 2026-11-11** (owner, scoping 0.60) |
 
 ## Proposed
 

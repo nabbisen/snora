@@ -33,10 +33,13 @@ These constrain what *can* be on the roadmap:
 
 ## Post-0.17: toward 1.0
 
-**Eight** of ten 1.0 gates are satisfied. The remaining path:
+**Nine** of eleven 1.0 gates are satisfied; gates 1 and 3 are open. The register is
+[`api-freeze-review.md`](docs/src/contributing/api-freeze-review.md), and all eleven are
+summarised at the end of this page. *(Corrected 2026-11-11: this line said "eight of
+ten" after gate 11 was added and met.)* The gates with a history:
 
 1. One iced major upgrade completed. ⬜
-3. At least one third-party or production-grade app. ⬜
+3. At least one third-party or production-grade app. ⬜ The owner defines the two words.
 7. Public API freeze review completed. ✅ v0.18
 9. Binary-size and compile-time trends (≥2 data points). ✅ **v0.37.0** —
    split into 9a/9b at v0.29.0 and both now satisfied. 9a (binary size) on
@@ -234,10 +237,15 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.60.0
 
-- **Arrow keys inside snora's menus** (RFC-123), re-planned on RFC-124's dropdown.
-- **A page under a dialog shows no hover,** as a page under an open menu already does
-  (RFC-124 Unit 1's measurement; one meaning of "covered").
-- `dismiss_on_escape` is removed (deprecated in 0.57).
+Scoped 2026-11-11 (owner). The release waits for all three, in this order:
+1. **A covered layer gets no pointer** (RFC-125). A page under a dialog or a sheet shows no
+   hover, pointer shape or tooltip, as a page under an open menu already does, and **a wheel
+   scroll over the dim no longer closes the dialog**.
+2. **Arrow keys, Home and End inside snora's menus** (RFC-123), re-planned on RFC-124's
+   dropdown. If its rule for a focused text field cannot hold, it returns to the owner first.
+3. `dismiss_on_escape` is removed (deprecated in 0.57).
+
+Also before the cut: what made the widgets 46 KB larger in 0.59.0 is measured (indicator 2).
 
 ## Future wanted
 
@@ -729,7 +737,8 @@ The full readiness checklist is in
    written down 2026-09-12, having been undefined until then)
 3. At least one third-party or production-grade app. ⬜
 4. AppLayout construction policy decided. ✅ v0.11
-5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.17
+5. Render-semantics tests cover z-stack, dismissal, toast, RTL. ✅ v0.43.0
+   (ticked at v0.17 before any test asserted blocking; re-ticked on evidence, RFC-084)
 6. Feature-matrix CI stable. ✅ v0.11
 7. Public API freeze review completed. ✅ v0.18
 8. Showcase/workbench example exercises all major surfaces. ✅ v0.12
@@ -738,10 +747,13 @@ The full readiness checklist is in
    its measured sensitivity stated (see `api-freeze-review.md`).
    (reopened v0.25.3 — see above and RFC-041 / RFC-043)
 10. No hidden feature-combination failures. ✅ (CI gate)
+11. Every snora control is reachable, operable and visibly focused from the
+    keyboard. ✅ v0.55.0 (RFC-116; added 2026-11-04 by the owner's ruling)
 
 We are explicitly **not** rushing to 1.0. Pre-1.0 SemVer is serving
 snora well; minor versions can carry small breaking changes when
-justified, with deprecation bridges across two releases.
+justified. A deprecated item is removed in the third minor after the one that
+deprecated it, and its note names that version (0.57).
 
 ## Off the roadmap (deliberately not pursued)
 
