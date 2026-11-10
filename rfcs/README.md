@@ -185,7 +185,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 124 | [A header dropdown's items cannot be pressed when its backdrop is up](./proposed/124-a-header-dropdown-item-cannot-be-pressed-with-its-backdrop.md) | 0.59.0, before RFC-123 Unit 1 — **a defect in the documented wiring**: the full-window backdrop takes the click (since at least 0.54), and RFC-119's inert skeleton hides the items from the keyboard (since 0.55). Proposed: the menu covers the page below the header, not the header |
+| 124 | [A header dropdown's items cannot be pressed when its backdrop is up](./proposed/124-a-header-dropdown-item-cannot-be-pressed-with-its-backdrop.md) | 0.59 or 0.60, decided at Unit 0's review (revised against the principles) — **a defect in the documented wiring**, four problems with one false premise: the backdrop takes the click (since at least 0.54), the keyboard cannot reach the items (since 0.55), opening a menu pushes the page down, and the empty-`Space` idiom. Proposed: the dropdown becomes an overlay anchored to its trigger, as native menus are, and the engine learns from the tree that a menu is open |
 
 ## Archive
 
