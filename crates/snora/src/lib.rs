@@ -161,7 +161,7 @@ pub use snora_core::focus;
 /// `docs/src/reference/` is the public-facing form of this contract.
 mod control;
 mod identifiers;
-/// Keyboard dismissal helper: [`keyboard::dismiss_on_escape`].
+/// Keyboard helpers and the shortcuts router: [`keyboard::traverse`], [`keyboard::cycle_zones`].
 pub mod keyboard;
 mod overlay;
 /// The single rendering entry point: [`render()`].

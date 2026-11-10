@@ -335,7 +335,8 @@ impl<Message: Clone> Shortcuts<Message> {
 /// click-outside message still answers clicks. An overlay with neither is left for
 /// the application, and the key stays `Ignored`.
 ///
-/// It replaces `snora::keyboard::dismiss_on_escape`, whose two `bool`s and two
+/// It replaced `snora::keyboard::dismiss_on_escape` (deprecated in 0.57.0, removed in
+/// 0.60.0), whose two `bool`s and two
 /// `Option`s in a row were easy to pass in the wrong order with no compiler error.
 /// The field answers on the overlay's own layer, so it works while the overlay is
 /// open; and **Escape does not dismiss toasts**, so a stray key cannot clear an
