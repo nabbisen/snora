@@ -7,7 +7,8 @@ fundamental philosophy. R-3 became simpler: no record of how a menu was opened. 
 "held arrow" claim was wrong, and is corrected. See "What the review changed".
 **Raised.** 2026-11-09, architect, from RFC-116's long-term plan item **L-9**, found while
 scoping 0.59. The owner accepted it into 0.59's scope (Q-1 of that scoping), menus only.
-**Release target.** 0.59.0.
+**Release target.** **0.60.0** (owner, 2026-11-10; it was 0.59.0). Its Unit 1 is re-planned on
+RFC-124's anchored dropdown, whose overlay a window-level `operate` cannot see.
 **Priority.** WCAG 2.1.1 is met through Tab. This is about what a keyboard user expects
 in a menu: the owner's "nobody is confused".
 

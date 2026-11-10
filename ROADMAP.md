@@ -234,13 +234,17 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.59.0
 
-Scoped by the owner, 2026-11-09:
-- **The 0.56 deprecations are removed,** under the rule: `on_toast_hover`, `ToastHover`
-  and `Holds::hover`.
-- **Arrow keys inside snora's menus** (RFC-123, proposed): ↓/↑ and Home/End; with nothing
-  focused, ↓ starts at the first item.
-- **1.0 gate 3's evidence refreshed,** and its two words ("third-party",
-  "production-grade") put to the owner.
+- **Done on `main`:** the 0.56 deprecations removed (`on_toast_hover`, `ToastHover`,
+  `Holds::hover`).
+- **The header dropdown, fixed** (RFC-124): an overlay anchored to its trigger. Its items
+  press, by pointer and keyboard; the page no longer shifts when a menu opens; the
+  empty-`Space` idiom is no longer needed.
+- **1.0 gate 3:** its evidence is refreshed, and its two words wait for the owner.
+
+## Then — 0.60.0
+
+- **Arrow keys inside snora's menus** (RFC-123), re-planned on RFC-124's dropdown.
+- `dismiss_on_escape` is removed (deprecated in 0.57).
 
 ## Future wanted
 

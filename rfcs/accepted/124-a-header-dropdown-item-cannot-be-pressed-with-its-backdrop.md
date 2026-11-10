@@ -10,7 +10,7 @@ rested on a premise that is false. This draft proposes the design a menu should 
 **Raised.** 2026-11-10, architect. The dev team found the keyboard half while measuring
 RFC-123 (`.git-exclude/review-request/123-unit0/`, 3.1). The architect measured the
 pointer half (`.git-exclude/reviewed/123-unit0/`).
-**Release target.** Q-4. RFC-123's Unit 1 builds on this either way.
+**Release target.** **0.59.0** (owner, 2026-11-10, Q-4, at Unit 0's review). RFC-123 moves to 0.60.
 **Priority.** **A defect in the documented wiring.** `menus.md` shows it, and it does not
 work.
 
@@ -178,3 +178,14 @@ All approved, as revised:
   host measured instead. Anything that needs a new exception to Law 8 returns to the owner.
 - **Q-4:** 0.59 or 0.60, decided at Unit 0's review. No stop-gap.
 - **Q-5:** stated in the release's guide, with no letter.
+
+## Ruling, 2026-11-10 (owner): Q-4, at Unit 0's review
+
+**0.59.0.** Unit 0 proved the design (`.git-exclude/reviewed/124-unit0/`). Unit 1 follows
+with the architect's four rulings:
+- Escape follows Law 7;
+- a gap between the trigger and the card equal to the ring's reach;
+- a covered page gets no pointer;
+- a dropdown taller than the window scrolls, and the focused item is kept in view.
+
+**RFC-123 moves to 0.60.0,** re-planned on the anchored dropdown.
