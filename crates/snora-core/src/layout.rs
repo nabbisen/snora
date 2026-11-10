@@ -116,9 +116,14 @@ where
     // These render above the skeleton but below the modal dim layer.
     // Outside-click dismissal is wired via `on_close_menus`.
     // -----------------------------------------------------------------
-    /// Optional header-attached dropdown (e.g. File menu's item list).
-    /// When `Some`, the engine installs a transparent backdrop that
-    /// dispatches [`Self::on_close_menus`] on any outside click.
+    /// Optional menu content of the application's own, under the header. When
+    /// `Some`, the engine installs a transparent backdrop that dispatches
+    /// [`Self::on_close_menus`] on any outside click.
+    ///
+    /// **`app_header`'s own dropdown does not need this:** it floats over the page
+    /// from its trigger, and the engine learns that it is open from the tree, so
+    /// setting [`Self::on_close_menus`] is enough (an empty element here, which
+    /// older guides taught, is harmless and no longer needed).
     pub header_menu: Option<Node>,
     /// Optional floating context menu (right-click menu). Same backdrop
     /// behavior as `header_menu`.

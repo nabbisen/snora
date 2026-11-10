@@ -82,6 +82,10 @@ struct Subject {
     name: &'static str,
     build: Box<dyn Fn() -> Element<'static, Msg>>,
     publishes: Vec<Msg>,
+    /// Some of its controls are in an **overlay** (RFC-124: a header menu's dropdown).
+    /// A widget's `operate` does not reach an overlay, so the simulator and `tab_router`
+    /// never see those controls: their ring is measured on the runtime's own interface.
+    hosts_overlay: bool,
 }
 
 impl Subject {
@@ -103,6 +107,14 @@ fn subject(
         name,
         build: Box::new(build),
         publishes: publishes.iter().map(|m| msg(m)).collect(),
+        hosts_overlay: false,
+    }
+}
+
+impl Subject {
+    fn hosting_overlay(mut self) -> Self {
+        self.hosts_overlay = true;
+        self
     }
 }
 
@@ -184,7 +196,8 @@ fn unstyled() -> Vec<Subject> {
                 None,
                 LayoutDirection::Ltr,
             )
-        }),
+        })
+        .hosting_overlay(),
         subject("render_menu (trigger and items)", &MENU_MESSAGES, || {
             snora::widget::render_menu(menu(), &ON_MENU, true)
         }),
@@ -253,7 +266,8 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
                 None,
                 LayoutDirection::Ltr,
             )
-        }),
+        })
+        .hosting_overlay(),
         subject("button::primary", &["primary"], move || {
             button::primary(tokens, "Save", msg("primary"))
         }),
@@ -396,6 +410,74 @@ impl Rig {
             &mut clipboard::Null,
             &mut self.messages,
         );
+    }
+
+    /// A rig that draws on the renderer the run asked for (`ICED_TEST_BACKEND`, default
+    /// tiny-skia), for the ring tests, which follow it.
+    fn for_frames(root: Element<'static, Msg>) -> Self {
+        let wanted = std::env::var("ICED_TEST_BACKEND").unwrap_or_else(|_| "tiny-skia".to_owned());
+        let mut renderer = iced::futures::executor::block_on(<iced::Renderer as Headless>::new(
+            Font::DEFAULT,
+            Pixels(16.0),
+            Some(&wanted),
+        ))
+        .expect("the requested renderer starts");
+        assert_eq!(
+            Headless::name(&renderer),
+            wanted,
+            "another renderer drew: not the pixels under test"
+        );
+        let ui = UserInterface::build(
+            root,
+            WINDOW,
+            user_interface::Cache::default(),
+            &mut renderer,
+        );
+        let mut rig = Self {
+            ui,
+            renderer,
+            messages: Vec::new(),
+            cursor: mouse::Cursor::Unavailable,
+        };
+        // What the runtime sends before every draw: it is also what lets the overlay's
+        // layout exist before the first frame.
+        rig.deliver(&[Event::Window(
+            iced_runtime::core::window::Event::RedrawRequested(
+                iced_runtime::core::time::Instant::now(),
+            ),
+        )]);
+        rig
+    }
+
+    /// The frame as drawn now, in the units [`Frame`] uses (scale 2).
+    fn frame(&mut self, theme: &Theme) -> Frame {
+        use iced::theme::Base;
+        let base = theme.base();
+        self.ui.draw(
+            &mut self.renderer,
+            theme,
+            &iced_runtime::core::renderer::Style {
+                text_color: base.text_color,
+            },
+            self.cursor,
+        );
+        let scale = Frame::SCALE;
+        let (width, height) = (
+            (WINDOW.width * scale) as u32,
+            (WINDOW.height * scale) as u32,
+        );
+        let rgba = Headless::screenshot(
+            &mut self.renderer,
+            Size::new(width, height),
+            scale,
+            base.background_color,
+        );
+        Frame {
+            renderer: Headless::name(&self.renderer),
+            width,
+            height,
+            rgba,
+        }
     }
 
     fn key(&mut self, key: iced::keyboard::key::Named) {
@@ -669,9 +751,48 @@ fn ring_contrast(
     Ok(weakest)
 }
 
+/// The ring of a subject whose controls are in an overlay, on the runtime's own
+/// interface (the simulator and `tab_router` cannot reach an overlay). Same method as
+/// [`ring_failures`]: Tab to the control, two frames, the changed pixels are the ring.
+fn ring_failures_on_the_runtime(
+    context: &str,
+    theme: &Theme,
+    subject: &Subject,
+    out: &mut Vec<String>,
+) {
+    let mut plain_rig = Rig::for_frames(subject.element());
+    let bounds: Vec<Rectangle> = plain_rig.targets().iter().map(|t| t.bounds).collect();
+    assert_eq!(
+        bounds.len(),
+        subject.publishes.len(),
+        "{context} / {}: the runtime rig finds {} focus targets, expected {}",
+        subject.name,
+        bounds.len(),
+        subject.publishes.len()
+    );
+    let plain = plain_rig.frame(theme);
+    for (k, target) in bounds.iter().enumerate() {
+        let mut rig = Rig::for_frames(subject.element());
+        rig.tab(k + 1);
+        let focused = rig.frame(theme);
+        match ring_contrast(&plain, &focused, *target, 10.0) {
+            Err(why) => out.push(format!("{context} / {} #{k}: {why}", subject.name)),
+            Ok(ratio) if ratio < NON_TEXT_MIN => out.push(format!(
+                "{context} / {} #{k}: the ring is {ratio:.2}:1 against what it covers, \
+                 under {NON_TEXT_MIN}",
+                subject.name
+            )),
+            Ok(_) => {}
+        }
+    }
+}
+
 fn ring_failures(context: &str, theme: &Theme, subject: &Subject, out: &mut Vec<String>) {
     if subject.publishes.is_empty() {
         return;
+    }
+    if subject.hosts_overlay {
+        return ring_failures_on_the_runtime(context, theme, subject, out);
     }
     // Where the controls are **in the simulator's own layout**. The runtime
     // rig lays out with its own headless renderer, and text widths differ

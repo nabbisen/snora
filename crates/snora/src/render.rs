@@ -10,7 +10,9 @@
 //! ```text
 //! 0. skeleton          — header + (side_bar | body) + footer
 //! 1. menu backdrop     — transparent mouse_area, dispatches on_close_menus
-//! 2. header_menu       — dropdown under the header bar
+//! 2. header_menu       — the application's own menu content under the header
+//!                        (`app_header`'s dropdown is not a layer: it floats over
+//!                        the page from its trigger, and covers the page while open)
 //! 3. context_menu      — floating menu at click point
 //! 4. modal backdrop    — 40%-dim mouse_area, dispatches on_close_modals
 //! 5. dialog            — centered; token-styled card via `design::render`
@@ -232,7 +234,17 @@ where
         .unwrap_or_default();
     let skeleton = Router::new(skeleton, routes);
 
-    let mut layers = stack![Inert::new(skeleton, skeleton_inert)];
+    // A menu open in the page (found in the tree, not told by a slot) covers it too,
+    // unless a modal does (RFC-124). Escape closes it with the application's escape
+    // message for menus if it set one, else the close message (Law 7).
+    let menu_cover = if has_modal {
+        None
+    } else {
+        layout.on_close_menus.clone()
+    };
+    let mut layers = stack![
+        Inert::new(skeleton, skeleton_inert).beneath_menus(menu_cover, layout.escape.menu.clone())
+    ];
 
     // -----------------------------------------------------------------
     // Layers 1-3 — light overlays (menus).

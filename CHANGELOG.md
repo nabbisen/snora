@@ -25,6 +25,28 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`app_header`'s dropdown is an overlay anchored to its trigger (RFC-124).** It was
+  drawn inside the header, so opening a menu made the header taller and pushed the whole
+  page down (46.8 → 139.2 px with three items, measured). It now floats over the page,
+  below its trigger at the start edge (the end edge under RTL), **one focus ring's reach
+  lower** (`Tokens::focus` ring offset on the design path, 2 px on the engine path) so the
+  card never covers the trigger's ring, and the header does not change size. A dropdown
+  taller than the window is capped to the room below the trigger and scrolls, and **the
+  item that takes keyboard focus is scrolled into view**, so no item is out of reach.
+  `render_menu` and the context menu are unchanged.
+- **The engine learns that a header menu is open from the tree.** Setting
+  `AppLayout::on_close_menus` is all `app_header`'s dropdown needs; the empty element in
+  `AppLayout::header_menu` that older guides taught is harmless and no longer needed.
+  `header_menu` keeps its use for menu content of your own.
+- **While a menu is open, the page under it is covered for the pointer as well as the
+  keyboard:** a press outside closes the menu and reaches nothing, and the page gets no
+  cursor, so it shows no hover and no pointer cursor (where it used to, promising a click
+  that only closed the menu), and a tooltip already showing goes away. Escape closes the
+  menu with `AppLayout::escape`'s menu message if one is set, else `on_close_menus`.
+  With no `on_close_menus` there is no cover, as before.
+
 ### Removed
 
 The four items deprecated in 0.56.0 (RFC-120), each of whose notes said "removed in
@@ -42,6 +64,15 @@ that deprecated it.
 With only `on_toast_attention` left, the rule that sent a pointer crossing to it alone
 while both callbacks were set has nothing to decide, and is gone with them. One
 deprecation remains: `keyboard::dismiss_on_escape`, removed in 0.60.0.
+
+### Fixed
+
+- **A dropdown item of `app_header` could not be pressed with the documented
+  `on_close_menus` wiring (RFC-124).** The click-outside backdrop lay over the header and
+  took the click, so a click on an item closed the menu and pressed nothing (measured at
+  0.54.0 as well), and since 0.55 the page being covered by RFC-119 also hid the items
+  from Tab, so the keyboard could not reach them either. A click, and Tab then Enter, now
+  publish `MenuItemPressed`, and nothing else.
 
 ## [0.58.0] — 2026-11-09
 

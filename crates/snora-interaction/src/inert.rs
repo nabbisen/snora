@@ -99,7 +99,8 @@
 //! opened would therefore stay **above the dim** and keep taking the pointer and
 //! the keys. While inert, `Inert` reports **no overlay**; the content's state is
 //! untouched, so the overlay returns if it is still open when the layer is
-//! uncovered.
+//! uncovered. **The one exception is the overlay of a menu that covers the layer
+//! itself** (RFC-124): see [`beneath_menus`](Inert::beneath_menus).
 //!
 //! **When it runs: on the `RedrawRequested` event,** which the runtime sends
 //! before every draw (`iced_winit` loops `update(RedrawRequested)` and then
@@ -125,6 +126,8 @@ struct State {
     /// A press of the focused control, waiting for the application's rebuild
     /// (RFC-120).
     pending: Option<Pending>,
+    /// What the last survey for an open menu found (RFC-124).
+    menu: menu_cover::Seen,
 }
 
 /// What `observe` remembers across the application's rebuild.
@@ -203,6 +206,9 @@ impl Operation for Track {
 pub struct Inert<'a, Message> {
     content: Element<'a, Message>,
     inert: bool,
+    /// The cover an open menu in the content puts over it, if this layer has one
+    /// (RFC-124): see [`beneath_menus`](Self::beneath_menus).
+    menu: Option<menu_cover::Cover<Message>>,
 }
 
 impl<'a, Message> Inert<'a, Message> {
@@ -211,6 +217,7 @@ impl<'a, Message> Inert<'a, Message> {
         Self {
             content: content.into(),
             inert,
+            menu: None,
         }
     }
 }
@@ -359,7 +366,7 @@ fn nearest_in_group(
     None
 }
 
-impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
+impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
     fn tag(&self) -> tree::Tag {
         tree::Tag::of::<State>()
     }
@@ -373,6 +380,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
     }
 
     fn diff(&self, tree: &mut Tree) {
+        tree.state.downcast_mut::<State>().menu.current = false;
         tree.diff_children(std::slice::from_ref(&self.content));
     }
 
@@ -409,9 +417,10 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         // before the redraw that would resolve a pending removal, if the key
         // events came in one batch. It must see where focus has gone, not the
         // gap, so the pending removal is resolved first (RFC-120).
+        self.refresh_menu(tree, layout, renderer);
         self.resolve(tree, layout, renderer);
 
-        if self.inert {
+        if self.covered(tree) {
             let mut hidden = Hide(operation);
             self.content.as_widget_mut().operate(
                 &mut tree.children[0],
@@ -440,16 +449,25 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
     ) {
+        self.refresh_menu(tree, layout, renderer);
         if let Event::Window(window::Event::RedrawRequested(_)) = event {
             self.sync(tree, layout, renderer);
             self.resolve(tree, layout, renderer);
         }
 
-        // The keyboard does not reach a covered layer, and neither does text
-        // input. Everything else does: window events, redraws, the pointer.
-        if self.inert && matches!(event, Event::Keyboard(_) | Event::InputMethod(_)) {
+        // Covered by an open menu: the menu's own overlay was offered the event first
+        // (the runtime does that), so what reaches here is outside it.
+        if self.answer_menu(tree, event, shell) {
             return;
         }
+
+        // The keyboard does not reach a covered layer, and neither does text
+        // input. Everything else does: window events, redraws, the pointer.
+        if self.covered(tree) && matches!(event, Event::Keyboard(_) | Event::InputMethod(_)) {
+            return;
+        }
+
+        let cursor = self.cursor_for_content(tree, cursor);
 
         self.content.as_widget_mut().update(
             &mut tree.children[0],
@@ -478,7 +496,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
             | Event::Touch(touch::Event::FingerLifted { .. }) => true,
             _ => false,
         };
-        if publishes && !self.inert {
+        if publishes && !self.covered(tree) {
             self.observe(tree, layout, renderer);
         }
     }
@@ -512,6 +530,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         viewport: &Rectangle,
         renderer: &iced::Renderer,
     ) -> mouse::Interaction {
+        let cursor = self.cursor_for_content(tree, cursor);
         self.content.as_widget().mouse_interaction(
             &tree.children[0],
             layout,
@@ -529,8 +548,10 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         viewport: &Rectangle,
         translation: Vector,
     ) -> Option<overlay::Element<'b, Message, Theme, iced::Renderer>> {
-        // A covered layer has no overlay: it would float above the dim.
-        if self.inert {
+        // A covered layer has no overlay: it would float above the dim. **Except** the
+        // menu that covers it (RFC-124): the cover is its own.
+        self.refresh_menu(tree, layout, renderer);
+        if self.inert && !self.covered_by_menu(tree) {
             return None;
         }
 
@@ -544,7 +565,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
     }
 }
 
-impl<Message> Inert<'_, Message> {
+impl<Message: Clone> Inert<'_, Message> {
     /// After a press: if the **focused** control was the one pressed, remember
     /// the survey (RFC-120). Focus is left alone until the rebuild, so a second
     /// press in the same batch of events still finds its control focused.
@@ -575,7 +596,7 @@ impl<Message> Inert<'_, Message> {
         let Some(pending) = tree.state.downcast_mut::<State>().pending.take() else {
             return;
         };
-        if self.inert {
+        if self.covered(tree) {
             return;
         }
         let mut track = Track::default();
@@ -626,9 +647,10 @@ impl<Message> Inert<'_, Message> {
     /// Brings the content's focus in line with the flag: park it on the way
     /// in, give it back on the way out.
     fn sync(&mut self, tree: &mut Tree, layout: Layout<'_>, renderer: &iced::Renderer) {
+        let inert = self.covered(tree);
         let state = tree.state.downcast_mut::<State>();
 
-        if self.inert && !state.engaged {
+        if inert && !state.engaged {
             let mut survey = Survey::default();
             self.content.as_widget_mut().operate(
                 &mut tree.children[0],
@@ -645,7 +667,7 @@ impl<Message> Inert<'_, Message> {
             let state = tree.state.downcast_mut::<State>();
             state.parked = survey.focused.map(|at| (at, survey.seen));
             state.engaged = true;
-        } else if !self.inert && state.engaged {
+        } else if !inert && state.engaged {
             let parked = state.parked.take();
             state.engaged = false;
             if let Some((at, count)) = parked {
@@ -672,11 +694,12 @@ impl<Message> Inert<'_, Message> {
     }
 }
 
-impl<'a, Message: 'a> From<Inert<'a, Message>> for Element<'a, Message> {
+impl<'a, Message: Clone + 'a> From<Inert<'a, Message>> for Element<'a, Message> {
     fn from(inert: Inert<'a, Message>) -> Self {
         Element::new(inert)
     }
 }
 
+mod menu_cover;
 #[cfg(test)]
 mod tests;

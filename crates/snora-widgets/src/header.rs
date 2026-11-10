@@ -149,6 +149,7 @@ where
                 gap: geometry.menu_gap,
                 label_size: geometry.menu_label_size,
                 control: geometry.control,
+                anchored: Some(direction == LayoutDirection::Rtl),
             },
         ));
     }

@@ -4,9 +4,10 @@
 //!
 //! * `Menu` / `MenuItem` / `MenuAction` vocabulary from `snora-core`.
 //! * The `snora::widget::app_header` helper consuming `Vec<Menu<_, _>>`.
-//! * How to install the transparent click-outside backdrop for the
-//!   header dropdown by populating `AppLayout::header_menu` whenever any
-//!   menu is open.
+//! * How to close an open header dropdown on a click outside it, or Escape:
+//!   set `AppLayout::on_close_menus`. `app_header`'s dropdown floats over the
+//!   page, and snora covers the page while it is open; there is nothing else
+//!   to wire.
 //! * Application-defined `MenuId` and `MenuItemId` enums.
 //!
 //! Run with:
@@ -133,8 +134,8 @@ impl App {
             text("Header menu demo").size(28),
             text(
                 "Open any menu from the bar above. Picking an item updates \
-                 the status line. Clicking outside an open menu closes it — \
-                 that happens because we populated `header_menu` and \
+                 the status line. Clicking outside an open menu, or pressing \
+                 Escape, closes it — that happens because we set \
                  `on_close_menus` on the AppLayout.",
             )
             .size(13),
@@ -161,18 +162,9 @@ impl App {
             .width(Length::Fill)
             .height(Length::Fill);
 
-        let mut layout = AppLayout::new(body.into())
+        let layout = AppLayout::new(body.into())
             .header(header)
             .on_close_menus(Message::CloseMenus);
-
-        // Installing the transparent click-outside backdrop is snora's job,
-        // but snora only installs it when `header_menu` is populated. The
-        // actual dropdown items are drawn inline by `render_menu` inside the
-        // header bar; all we need here is an opt-in signal that a menu is
-        // open. An empty element suffices.
-        if self.active.is_some() {
-            layout = layout.header_menu(space().into());
-        }
 
         render(layout)
     }
