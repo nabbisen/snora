@@ -1,6 +1,7 @@
 # RFC-124 — A header dropdown's items cannot be pressed when its backdrop is up
 
 **Status.** Accepted 2026-11-10. Every open question ruled as suggested, as revised (see Rulings).
+**Merged to `main` 2026-11-10** (`eef0c44`), shipping in 0.59.0.
 **Handoff.** [`handoffs/124-…`](../handoffs/124-a-header-dropdown-item-cannot-be-pressed-with-its-backdrop/implementation-handoff.md).
 **Revised** 2026-11-10, before ruling. The owner asked for a review against the
 fundamental philosophy, with "the initial cost is not the only factor and not the

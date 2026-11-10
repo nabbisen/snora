@@ -84,29 +84,31 @@ fn view(state: &State) -> iced::Element<'_, Message> {
         LayoutDirection::Ltr,
     );
 
-    let mut layout = AppLayout::new(state.body())
+    // From 0.59 that is all: snora sees the open dropdown in the tree, covers the
+    // page beneath it, and publishes `CloseMenus` on a click outside or Escape.
+    let layout = AppLayout::new(state.body())
         .header(header)
         .on_close_menus(Message::CloseMenus);
-
-    // Snora installs the click-outside backdrop only when
-    // `header_menu` is `Some`. The actual dropdown is drawn inline by
-    // `app_header`; this slot just opts the backdrop in.
-    if state.active_menu.is_some() {
-        layout = layout.header_menu(iced::widget::space().into());
-    }
 
     render(layout)
 }
 ```
 
-> **Known defect (found 2026-11-10, RFC-124).** With this wiring, the backdrop covers
-> the header as well. **A click on a dropdown item closes the menu instead of pressing the
-> item,** and since 0.55 the items cannot be reached by keyboard either. Until RFC-124
-> ships, either:
-> - leave out `header_menu(space())`, so that there is no backdrop and the items work. The
->   menu then does not close on a click outside, so close it from your own `update`; or
-> - put your menu's content in `header_menu` yourself, as the `starter` example does,
->   with an empty `items` list in `app_header`.
+**How the open dropdown behaves (0.59, RFC-124):** it floats over the page, anchored
+below its trigger, at the trigger's start edge (the end edge under RTL), and kept inside
+the window.
+- **It takes no room,** so opening it moves nothing.
+- **A dropdown taller than the window scrolls,** and the item with keyboard focus is kept
+  in view.
+- **While it is open,** the page beneath it, the header included, is covered for the
+  pointer and the keyboard: no click, no key, no hover.
+- **A click outside, on the trigger too, or Escape** publishes `CloseMenus`, or your
+  `AppLayout::escape` message for Escape if you set one.
+
+*(Fixed in 0.59.0: with the old wiring, a click on a dropdown item closed the menu instead
+of pressing the item, and from 0.55 the keyboard could not reach the items. Opening a
+menu also pushed the page down. An empty `Space` in `header_menu`, which that wiring
+needed, is now harmless and no longer needed.)*
 
 ## Handling the actions
 
@@ -129,17 +131,16 @@ The "click the button to toggle, click an item to close" pattern is the
 most common; you are free to use a different model (e.g. hover-to-open)
 since snora only emits the events.
 
-## Why `header_menu` takes an empty `Space`
+## What `header_menu` is for
 
-iced 0.14's element tree does not expose absolute positioning at the
-overlay layer; the dropdown is drawn *inside* `app_header` and what
-populates `AppLayout::header_menu` is just the opt-in signal that "a
-menu is open, please install the click-outside backdrop". Using
-`Space` (zero-sized, transparent) is the canonical idiom.
+`AppLayout::header_menu` holds **menu content of your own** in its own layer above the
+page, as the `starter` example does: the starter passes `app_header` an empty `items` list,
+and draws its menu itself. `app_header`'s own dropdown does not use the slot.
 
-This may become an actual element in a future version if iced exposes
-absolute overlay positioning. The application-facing shape stays the
-same.
+*(Corrected 2026-11-10: this section said `header_menu` took an empty `Space` because
+"iced 0.14's element tree does not expose absolute positioning at the overlay layer". That
+was false: `iced_core::overlay` is public, and from 0.59 the dropdown is an overlay
+anchored to its trigger. The idiom it taught caused the defect fixed in 0.59 (RFC-124).)*
 
 ## Keyboard navigation within an open menu (RFC-082)
 
@@ -154,11 +155,10 @@ an Escape of its own). Neither moves between items inside one.
 **What snora's prefab menus do today (0.55 on):**
 - **Every menu item is a focus target,** with a focus ring, and the header's menu trigger is
   one too. **Tab and Shift+Tab** move between the items of an open menu: with its
-  outside-click backdrop, the page beneath is out of reach (RFC-119). *Except*
-  `app_header`'s own dropdown under the backdrop: see the known defect above (RFC-124). **Enter or Space**
+  outside-click close, the page beneath is out of reach (RFC-119). **Enter or Space**
   presses the focused item. **Escape** closes the menu, and focus returns to the trigger.
 - **Arrow keys do nothing inside a menu yet.** Native menus answer ↓ and ↑, and a keyboard
-  user may reach for them first. RFC-116's long-term plan records it.
+  user may reach for them first. RFC-123 adds them, in 0.60.
 - **Opening a menu from the keyboard does not move focus into it.** The trigger's focus
   is set aside while the menu covers the page, and comes back when it closes. One Tab
   reaches the menu's first item.
