@@ -14,6 +14,7 @@ use iced::{
 };
 
 use snora_core::{Menu, MenuAction};
+use snora_interaction::menu_keys::{MenuPart, Part};
 
 use crate::icon::icon_beside_label;
 use crate::style::{
@@ -95,7 +96,7 @@ where
     // RFC-116: `control` in place of `button`, so the trigger is a focus
     // target and Enter and Space open the menu. Padding is `button`'s own
     // default, set explicitly because `control` has none.
-    stack = stack.push(
+    stack = stack.push(MenuPart::new(
         control(
             header_content,
             menu_button_style,
@@ -105,13 +106,15 @@ where
         )
         .padding(BUTTON_DEFAULT_PADDING)
         .on_press(trigger_msg),
-    );
+        Part::Trigger,
+    ));
 
     if !is_active {
         return container(stack).into();
     }
 
     // Dropdown — only rendered when this menu is active.
+    let mut dropdown = column![];
     for item in menu.items {
         let mut btn_content = row![].spacing(geometry.gap).align_y(Center);
         if let Some(ref ic) = item.icon {
@@ -128,7 +131,7 @@ where
             menu_item_id: item.id.clone(),
         });
 
-        stack = stack.push(
+        dropdown = dropdown.push(
             control(
                 btn_content,
                 menu_button_style,
@@ -140,6 +143,7 @@ where
             .on_press(msg),
         );
     }
+    stack = stack.push(MenuPart::new(dropdown, Part::Items));
 
     container(stack).into()
 }

@@ -178,6 +178,30 @@ impl<M: Clone + 'static> Rig<M> {
         statuses[0]
     }
 
+    /// A named key, with `repeat` (a held key), and the `Status` the interface gave it.
+    pub fn named(&mut self, key: Named, repeat: bool) -> iced_runtime::core::event::Status {
+        let key = iced::keyboard::Key::Named(key);
+        let event = Event::Keyboard(iced::keyboard::Event::KeyPressed {
+            key: key.clone(),
+            modified_key: key,
+            physical_key: iced::keyboard::key::Physical::Unidentified(
+                iced::keyboard::key::NativeCode::Unidentified,
+            ),
+            location: iced::keyboard::Location::Standard,
+            modifiers: iced::keyboard::Modifiers::empty(),
+            repeat,
+            text: None,
+        });
+        let (_, statuses) = self.ui.update(
+            &[event],
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        statuses[0]
+    }
+
     pub fn key(&mut self, key: Named) {
         self.deliver(&[iced_test::simulator::press_key(key, None)]);
     }

@@ -311,7 +311,8 @@ where
         layers = layers.push(toast_layer);
     }
 
-    layers.into()
+    // PROTOTYPE (RFC-123 Unit 0): arrows in an open menu, answered after the layers.
+    snora_interaction::menu_keys::MenuKeys::new(layers).into()
 }
 
 // -----------------------------------------------------------------------

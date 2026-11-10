@@ -75,6 +75,7 @@ mod escape;
 mod group;
 mod inert;
 mod keyed;
+pub mod menu_keys;
 mod router;
 mod sequence;
 mod tag;
