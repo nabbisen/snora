@@ -111,9 +111,10 @@ moves focus to the next toast's ×, or else the previous one's. With no toast
 left, nothing is focused. A toast that expires or is closed elsewhere leaves
 your focus where it was, because snora follows toasts by their id.
 
-*Moving from 0.54 or 0.55:* `on_toast_hover`, `ToastHover` and `Holds::hover`
-are deprecated since 0.56.0 and still work. Replace them with
-`on_toast_attention`, `ToastAttention` and `Holds::attend`, as above.
+*Moving from 0.54 to 0.58:* `on_toast_hover`, `ToastHover` and `Holds::hover` were
+removed in 0.59.0 (deprecated since 0.56.0). Replace them with `on_toast_attention`,
+`ToastAttention` and `Holds::attend`, as above: `ToastHover::Entered` is
+`ToastAttention::PointerEntered`, and `Left` is `PointerLeft`.
 
 Persistent is for messages the user must acknowledge — completed
 exports, failures. Errors are persistent by default.

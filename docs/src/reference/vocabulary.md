@@ -51,9 +51,9 @@ pub enum ToastPosition {
   the reader's attention coming to or leaving a toast, by pointer or keyboard,
   as `AppLayout::on_toast_attention` reports it and
   `snora::toast::Holds::attend` takes it (0.56, RFC-120). `#[non_exhaustive]`.
-- `ToastHover::{Entered, Left}` — **deprecated since 0.56.0**, superseded by
-  `ToastAttention`; still reported by `AppLayout::on_toast_hover` and taken by
-  `Holds::hover`.
+- `ToastHover::{Entered, Left}` — **removed in 0.59.0** (deprecated since 0.56.0), with
+  `AppLayout::on_toast_hover` and `Holds::hover`. Use `ToastAttention`, `on_toast_attention`
+  and `Holds::attend`.
 - `ToastLifetime::seconds(n)` / `ToastLifetime::millis(ms)`.
 - `ToastPosition::is_top()` / `is_bottom()` — partition helpers.
 
