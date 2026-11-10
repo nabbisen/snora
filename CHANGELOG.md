@@ -25,7 +25,16 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Removed
+
+The one item deprecated in 0.57.0 (RFC-116 R-2), whose note said "removed in 0.60.0".
+**The rule:** a deprecated item is removed in the third minor after the one that
+deprecated it.
+
+- **`snora::keyboard::dismiss_on_escape`** (deprecated since 0.57.0). Use
+  `AppLayout::escape(Escape { modal, menu })`, which answers Escape on the overlay's own
+  layer with named fields. An overlay of your own, outside `AppLayout`, needs a three-line
+  `match` on `Key::Named(Named::Escape)`. No `#[deprecated]` item remains in snora.
 
 ## [0.59.0] — 2026-11-10
 

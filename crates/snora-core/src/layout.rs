@@ -345,7 +345,7 @@ where
     /// What Escape does on each overlay, with named fields (RFC-116 R-2). Escape
     /// publishes the overlay's escape message if one is set, and otherwise its
     /// click-outside message; the click-outside message still answers clicks.
-    /// Replaces `snora::keyboard::dismiss_on_escape`. See [`Escape`].
+    /// Replaced `snora::keyboard::dismiss_on_escape`, removed in 0.60.0. See [`Escape`].
     ///
     /// ```
     /// use snora_core::{AppLayout, Escape};
@@ -422,8 +422,8 @@ where
     ///
     /// **Also published on Escape** (RFC-119), as for [`Self::on_close_menus`].
     /// With no handler here, neither a click outside nor Escape closes the
-    /// modal: Escape is then the application's, through
-    /// `snora::keyboard::dismiss_on_escape`.
+    /// modal: Escape is then the application's, through its own `keyboard::listen()`
+    /// (the function that used to wrap that, `dismiss_on_escape`, was removed in 0.60.0).
     #[must_use]
     pub fn on_close_modals(mut self, msg: Message) -> Self {
         self.on_close_modals = Some(msg);

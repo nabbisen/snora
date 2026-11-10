@@ -16,8 +16,7 @@
 //!   companion helper.
 //! * **Not event capture.** No subscription is installed by this crate
 //!   or by `snora`. The application wires `iced::keyboard::listen()`
-//!   itself and calls this pure function — the same shape as
-//!   `snora::keyboard::dismiss_on_escape`.
+//!   itself and calls this pure function.
 //! * **Not modal focus trapping.** `next_zone` reports when cycling is
 //!   suspended because a modal is open; it does not enumerate or bound
 //!   the modal's contents. Trapping is a separate, staged decision — see
@@ -137,9 +136,8 @@ const ORDER: [FocusZone; 4] = [
 /// result is always `Some(FocusZone::Body)` — cycling has nowhere else
 /// to go, which is the correct behaviour rather than a special case.
 ///
-/// **Overlay containment**, mirroring
-/// `snora::keyboard::dismiss_on_escape`'s modal-before-menu precedence
-/// exactly — same two flags, same priority:
+/// **Overlay containment**, with a modal-before-menu precedence (the one
+/// `AppLayout::escape` uses for Escape) — two flags, one priority:
 /// * `has_modal == true` — cycling is **suspended** (`None`), regardless
 ///   of `has_menu`. Focus belongs inside the modal, whose contents are
 ///   an application-supplied `Node` this function cannot enumerate; it
@@ -147,8 +145,8 @@ const ORDER: [FocusZone; 4] = [
 /// * `has_modal == false && has_menu == true` — cycling proceeds
 ///   **unaffected**. Menus are light-weight, dismissible on outside
 ///   click, and do not own focus, so `has_menu` never changes the
-///   result — it is accepted only to mirror `dismiss_on_escape`'s shape
-///   and to make that non-effect directly testable.
+///   result — it is accepted only to keep the two flags together, as Escape's
+///   precedence has them, and to make that non-effect directly testable.
 ///
 /// # Example
 ///
@@ -176,8 +174,9 @@ pub fn next_zone(
     has_menu: bool,
 ) -> Option<FocusZone> {
     // Deliberately does not affect the result — see the doc comment's
-    // containment section. Accepted only to mirror `dismiss_on_escape`'s
-    // shape and to make "menu alone is unaffected" directly testable.
+    // containment section. Accepted only to keep the two flags together, as
+    // Escape's precedence has them, and to make "menu alone is unaffected"
+    // directly testable.
     let _ = has_menu;
 
     if has_modal {
@@ -392,7 +391,7 @@ mod tests {
 
     #[test]
     fn both_modal_and_menu_open_modal_wins() {
-        // Mirrors dismiss_on_escape's both_open_modal_takes_priority.
+        // The modal takes priority over the menu, as it does for Escape.
         assert_eq!(
             next_zone(
                 FocusZone::Header,

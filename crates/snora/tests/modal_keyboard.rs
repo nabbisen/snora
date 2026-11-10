@@ -590,7 +590,7 @@ fn escape_closes_the_modal_and_the_menu_beneath_it_stays_open() {
 /// **A modal that cannot be closed by a click outside is not closed by
 /// Escape either**, and the menu beneath it must not answer in its place: the
 /// message is nothing, and the status is `Ignored`, so the application's own
-/// `dismiss_on_escape` still sees it.
+/// Escape handling still sees it.
 #[test]
 fn escape_without_on_close_modals_publishes_nothing_and_is_ignored() {
     let scene = Scene::buttons()
