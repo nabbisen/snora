@@ -14,10 +14,12 @@ use iced::{
 };
 
 use snora_core::{Menu, MenuAction};
+use snora_interaction::MenuAnchor;
 
 use crate::icon::icon_beside_label;
 use crate::style::{
-    BUTTON_DEFAULT_PADDING, ControlGeometry, control, menu_button_style, page_background,
+    BUTTON_DEFAULT_PADDING, ControlGeometry, chrome_container_style, control, menu_button_style,
+    page_background,
 };
 
 /// Geometry parameter [`build_menu`] takes, letting [`render_menu`]
@@ -32,6 +34,10 @@ pub(crate) struct MenuGeometry {
     pub(crate) label_size: Option<f32>,
     /// The minimum-target token and the focus ring (RFC-116).
     pub(crate) control: ControlGeometry,
+    /// PROTOTYPE (RFC-124): `Some(end_aligned)` floats the dropdown as an overlay
+    /// anchored to the trigger (the header's menus); `None` draws it inline below the
+    /// trigger (a menu in a layer of its own: the context menu, RFC-124 R-4).
+    pub(crate) anchored: Option<bool>,
 }
 
 impl MenuGeometry {
@@ -41,6 +47,7 @@ impl MenuGeometry {
             gap: 6.0,
             label_size: None,
             control: ControlGeometry::unstyled(),
+            anchored: None,
         }
     }
 }
@@ -91,55 +98,75 @@ where
 
     let trigger_msg = on_action(MenuAction::MenuPressed(menu.id.clone()));
 
-    let mut stack = column![];
     // RFC-116: `control` in place of `button`, so the trigger is a focus
     // target and Enter and Space open the menu. Padding is `button`'s own
     // default, set explicitly because `control` has none.
-    stack = stack.push(
-        control(
-            header_content,
-            menu_button_style,
-            geometry.control,
-            geometry.label_size,
-            page_background,
-        )
-        .padding(BUTTON_DEFAULT_PADDING)
-        .on_press(trigger_msg),
-    );
+    let trigger = control(
+        header_content,
+        menu_button_style,
+        geometry.control,
+        geometry.label_size,
+        page_background,
+    )
+    .padding(BUTTON_DEFAULT_PADDING)
+    .on_press(trigger_msg);
 
-    if !is_active {
-        return container(stack).into();
+    // Dropdown items — only built when this menu is active.
+    let mut items: Vec<Element<'a, Message>> = Vec::new();
+    if is_active {
+        for item in menu.items {
+            let mut btn_content = row![].spacing(geometry.gap).align_y(Center);
+            if let Some(ref ic) = item.icon {
+                btn_content = btn_content.push(icon_beside_label(ic, geometry.label_size));
+            }
+            let mut item_label = text(item.label);
+            if let Some(size) = geometry.label_size {
+                item_label = item_label.size(size);
+            }
+            btn_content = btn_content.push(item_label);
+
+            let msg = on_action(MenuAction::MenuItemPressed {
+                menu_id: item.menu_id.clone(),
+                menu_item_id: item.id.clone(),
+            });
+
+            items.push(
+                control(
+                    btn_content,
+                    menu_button_style,
+                    geometry.control,
+                    geometry.label_size,
+                    page_background,
+                )
+                .padding(BUTTON_DEFAULT_PADDING)
+                .on_press(msg)
+                .into(),
+            );
+        }
     }
 
-    // Dropdown — only rendered when this menu is active.
-    for item in menu.items {
-        let mut btn_content = row![].spacing(geometry.gap).align_y(Center);
-        if let Some(ref ic) = item.icon {
-            btn_content = btn_content.push(icon_beside_label(ic, geometry.label_size));
+    match geometry.anchored {
+        None => {
+            let mut stack = column![trigger];
+            for item in items {
+                stack = stack.push(item);
+            }
+            container(stack).into()
         }
-        let mut item_label = text(item.label);
-        if let Some(size) = geometry.label_size {
-            item_label = item_label.size(size);
+        Some(end_aligned) => {
+            // A menu with no items opens nothing: there is no empty card.
+            let dropdown =
+                (!items.is_empty()).then(|| container(column(items)).style(dropdown_card).into());
+            MenuAnchor::new(trigger, dropdown, end_aligned).into()
         }
-        btn_content = btn_content.push(item_label);
-
-        let msg = on_action(MenuAction::MenuItemPressed {
-            menu_id: item.menu_id.clone(),
-            menu_item_id: item.id.clone(),
-        });
-
-        stack = stack.push(
-            control(
-                btn_content,
-                menu_button_style,
-                geometry.control,
-                geometry.label_size,
-                page_background,
-            )
-            .padding(BUTTON_DEFAULT_PADDING)
-            .on_press(msg),
-        );
     }
+}
 
-    container(stack).into()
+/// The dropdown's own surface: it floats over the page, so it has a fill of its own
+/// (inline, it sat on the header's).
+fn dropdown_card(theme: &iced::Theme) -> container::Style {
+    container::Style {
+        background: Some(iced::Background::Color(page_background(theme))),
+        ..chrome_container_style(theme)
+    }
 }

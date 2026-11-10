@@ -125,6 +125,12 @@ struct State {
     /// A press of the focused control, waiting for the application's rebuild
     /// (RFC-120).
     pending: Option<Pending>,
+    /// PROTOTYPE (RFC-124): the last survey found a menu open in the content.
+    menu_open: bool,
+    /// That survey is of this build of the tree. A menu opens or closes only when the
+    /// application rebuilds its view (`diff` clears this), so the survey runs once per
+    /// rebuild, at the first call that has a layout and a renderer.
+    menu_current: bool,
 }
 
 /// What `observe` remembers across the application's rebuild.
@@ -203,6 +209,9 @@ impl Operation for Track {
 pub struct Inert<'a, Message> {
     content: Element<'a, Message>,
     inert: bool,
+    /// PROTOTYPE (RFC-124): while a menu is open in the content, the layer is covered
+    /// by that menu, and this is what a press outside it, or Escape, publishes.
+    menu_close: Option<Message>,
 }
 
 impl<'a, Message> Inert<'a, Message> {
@@ -211,6 +220,35 @@ impl<'a, Message> Inert<'a, Message> {
         Self {
             content: content.into(),
             inert,
+            menu_close: None,
+        }
+    }
+
+    /// PROTOTYPE (RFC-124): **while a menu is open in the content** (found by a survey
+    /// of the tree, not told by the caller), this layer is covered by it: it is inert,
+    /// the open menu's overlay is let through, and a press anywhere that the menu did
+    /// not take, or Escape, publishes `close`.
+    ///
+    /// `None` switches this off, which is what a modal above does: nothing of a covered
+    /// layer floats above the dim.
+    pub fn beneath_menus(mut self, close: Option<Message>) -> Self {
+        self.menu_close = close;
+        self
+    }
+}
+
+/// Is a menu open in the content? (reported by [`crate::MenuAnchor`])
+#[derive(Default)]
+struct FindOpenMenu(bool);
+
+impl Operation for FindOpenMenu {
+    fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation)) {
+        operate(self);
+    }
+
+    fn custom(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn std::any::Any) {
+        if state.is::<crate::menu_anchor::OpenMenu>() {
+            self.0 = true;
         }
     }
 }
@@ -359,7 +397,7 @@ fn nearest_in_group(
     None
 }
 
-impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
+impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
     fn tag(&self) -> tree::Tag {
         tree::Tag::of::<State>()
     }
@@ -373,6 +411,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
     }
 
     fn diff(&self, tree: &mut Tree) {
+        tree.state.downcast_mut::<State>().menu_current = false;
         tree.diff_children(std::slice::from_ref(&self.content));
     }
 
@@ -409,9 +448,10 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         // before the redraw that would resolve a pending removal, if the key
         // events came in one batch. It must see where focus has gone, not the
         // gap, so the pending removal is resolved first (RFC-120).
+        self.refresh_menu(tree, layout, renderer);
         self.resolve(tree, layout, renderer);
 
-        if self.inert {
+        if self.covered(tree) {
             let mut hidden = Hide(operation);
             self.content.as_widget_mut().operate(
                 &mut tree.children[0],
@@ -440,16 +480,50 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
     ) {
+        self.refresh_menu(tree, layout, renderer);
         if let Event::Window(window::Event::RedrawRequested(_)) = event {
             self.sync(tree, layout, renderer);
             self.resolve(tree, layout, renderer);
         }
 
+        // PROTOTYPE (RFC-124): the layer is covered by an open menu. The menu's own
+        // overlay was offered the event first (the runtime does that), so what reaches
+        // here is outside it: a press closes the menu and goes no further, as a click
+        // on the backdrop does, and Escape closes it.
+        if self.covered_by_menu(tree) {
+            let closes = matches!(
+                event,
+                Event::Keyboard(keyboard::Event::KeyPressed {
+                    key: keyboard::Key::Named(keyboard::key::Named::Escape),
+                    repeat: false,
+                    ..
+                }) | Event::Mouse(mouse::Event::ButtonPressed(_))
+                    | Event::Touch(touch::Event::FingerPressed { .. })
+            );
+            if closes {
+                if let Some(close) = self.menu_close.clone() {
+                    shell.publish(close);
+                }
+                shell.capture_event();
+                return;
+            }
+        }
+
         // The keyboard does not reach a covered layer, and neither does text
         // input. Everything else does: window events, redraws, the pointer.
-        if self.inert && matches!(event, Event::Keyboard(_) | Event::InputMethod(_)) {
+        if self.covered(tree) && matches!(event, Event::Keyboard(_) | Event::InputMethod(_)) {
             return;
         }
+
+        // PROTOTYPE (RFC-124): the pointer is on the menu, not on the page beneath it:
+        // no hover, and a tooltip already showing goes with it. (`Inert` cannot pick the
+        // menu's overlay out of a group, so it cannot hide the page's and keep the menu's;
+        // a page that sees no pointer has none to show.)
+        let cursor = if self.covered_by_menu(tree) {
+            mouse::Cursor::Unavailable
+        } else {
+            cursor
+        };
 
         self.content.as_widget_mut().update(
             &mut tree.children[0],
@@ -478,7 +552,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
             | Event::Touch(touch::Event::FingerLifted { .. }) => true,
             _ => false,
         };
-        if publishes && !self.inert {
+        if publishes && !self.covered(tree) {
             self.observe(tree, layout, renderer);
         }
     }
@@ -512,6 +586,11 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         viewport: &Rectangle,
         renderer: &iced::Renderer,
     ) -> mouse::Interaction {
+        let cursor = if self.covered_by_menu(tree) {
+            mouse::Cursor::Unavailable
+        } else {
+            cursor
+        };
         self.content.as_widget().mouse_interaction(
             &tree.children[0],
             layout,
@@ -529,8 +608,10 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
         viewport: &Rectangle,
         translation: Vector,
     ) -> Option<overlay::Element<'b, Message, Theme, iced::Renderer>> {
-        // A covered layer has no overlay: it would float above the dim.
-        if self.inert {
+        // A covered layer has no overlay: it would float above the dim. **Except** the
+        // menu that covers it (RFC-124 Q-3): its backdrop is this layer's cover.
+        self.refresh_menu(tree, layout, renderer);
+        if self.inert && !self.covered_by_menu(tree) {
             return None;
         }
 
@@ -544,7 +625,30 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for Inert<'_, Message> {
     }
 }
 
-impl<Message> Inert<'_, Message> {
+impl<Message: Clone> Inert<'_, Message> {
+    /// Covered: by the flag, or by a menu open in the content.
+    fn covered(&self, tree: &Tree) -> bool {
+        self.inert || self.covered_by_menu(tree)
+    }
+
+    fn covered_by_menu(&self, tree: &Tree) -> bool {
+        self.menu_close.is_some() && tree.state.downcast_ref::<State>().menu_open
+    }
+
+    /// Looks for an open menu in the content (a survey of the tree).
+    fn refresh_menu(&mut self, tree: &mut Tree, layout: Layout<'_>, renderer: &iced::Renderer) {
+        if self.menu_close.is_none() || tree.state.downcast_ref::<State>().menu_current {
+            return;
+        }
+        let mut find = FindOpenMenu::default();
+        self.content
+            .as_widget_mut()
+            .operate(&mut tree.children[0], layout, renderer, &mut find);
+        let state = tree.state.downcast_mut::<State>();
+        state.menu_open = find.0;
+        state.menu_current = true;
+    }
+
     /// After a press: if the **focused** control was the one pressed, remember
     /// the survey (RFC-120). Focus is left alone until the rebuild, so a second
     /// press in the same batch of events still finds its control focused.
@@ -575,7 +679,7 @@ impl<Message> Inert<'_, Message> {
         let Some(pending) = tree.state.downcast_mut::<State>().pending.take() else {
             return;
         };
-        if self.inert {
+        if self.covered(tree) {
             return;
         }
         let mut track = Track::default();
@@ -626,9 +730,10 @@ impl<Message> Inert<'_, Message> {
     /// Brings the content's focus in line with the flag: park it on the way
     /// in, give it back on the way out.
     fn sync(&mut self, tree: &mut Tree, layout: Layout<'_>, renderer: &iced::Renderer) {
+        let inert = self.covered(tree);
         let state = tree.state.downcast_mut::<State>();
 
-        if self.inert && !state.engaged {
+        if inert && !state.engaged {
             let mut survey = Survey::default();
             self.content.as_widget_mut().operate(
                 &mut tree.children[0],
@@ -645,7 +750,7 @@ impl<Message> Inert<'_, Message> {
             let state = tree.state.downcast_mut::<State>();
             state.parked = survey.focused.map(|at| (at, survey.seen));
             state.engaged = true;
-        } else if !self.inert && state.engaged {
+        } else if !inert && state.engaged {
             let parked = state.parked.take();
             state.engaged = false;
             if let Some((at, count)) = parked {
@@ -672,7 +777,7 @@ impl<Message> Inert<'_, Message> {
     }
 }
 
-impl<'a, Message: 'a> From<Inert<'a, Message>> for Element<'a, Message> {
+impl<'a, Message: Clone + 'a> From<Inert<'a, Message>> for Element<'a, Message> {
     fn from(inert: Inert<'a, Message>) -> Self {
         Element::new(inert)
     }

@@ -232,7 +232,14 @@ where
         .unwrap_or_default();
     let skeleton = Router::new(skeleton, routes);
 
-    let mut layers = stack![Inert::new(skeleton, skeleton_inert)];
+    // PROTOTYPE (RFC-124): a menu open in the page (found in the tree, not told by a
+    // slot) covers it too, unless a modal does.
+    let menu_close = if has_modal {
+        None
+    } else {
+        layout.on_close_menus.clone()
+    };
+    let mut layers = stack![Inert::new(skeleton, skeleton_inert).beneath_menus(menu_close)];
 
     // -----------------------------------------------------------------
     // Layers 1-3 — light overlays (menus).
