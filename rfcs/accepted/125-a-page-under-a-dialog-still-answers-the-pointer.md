@@ -39,15 +39,21 @@ Under a dialog or a sheet it means something else.
    - **And once is not once.** A swipe sends many wheel events, and each one publishes the
      close message. An application whose close handler toggles would reopen the dialog,
      then close it again.
-3. **Inferred from the code, to be measured:**
-   - the pointer shape over a page control under the dim, since the dim's `mouse_area` sets
-     no interaction;
-   - a page tooltip under the dim;
-   - the same three for a page under a **context menu, or an application's `header_menu`,
-     with its backdrop**. That page is covered by `Inert`'s flag, and only the header
-     dropdown's cover withholds the pointer (`inert/menu_cover.rs`). If it does show
-     hover, the book's Law 8 row overclaims: *"A page covered by an open menu also gets no
-     pointer"* was measured only for the header dropdown.
+3. **The hand cursor shows over a page control under the dim** (measured in Unit 0).
+4. **Under a context menu, or an application's `header_menu`, with its backdrop, the page
+   answers the pointer as if nothing covered it** (measured in Unit 0): the full hover, the
+   hand cursor, and **a wheel over the backdrop scrolls the page.** That page is covered by
+   `Inert`'s flag, and only the header dropdown's cover withholds the pointer
+   (`inert/menu_cover.rs`). The book's Law 8 row overclaimed for these two, and was corrected
+   on 2026-11-11.
+5. **A drag that began on the page keeps moving under a cover** (measured in Unit 0: a
+   slider, under a dialog and under a context menu). The release does end it.
+
+**What is already right** (measured in Unit 0):
+- **a page tooltip is not drawn under any cover,** because `Inert` hides a covered layer's
+  overlays;
+- **a dialog with no close message** already gives the page no hover and the default cursor,
+  because its dim is `opaque`. Its wheel status is `Ignored`, though, not `Captured`.
 
 ## The rule
 
@@ -83,7 +89,23 @@ as a press on it is.
 **R-4. Nothing beneath acts on the pointer once it is covered.** A pointer resting on a page
 control when an application opens a dialog shows no hover from the first frame under the
 dim. A drag that started on the page before the cover appeared does not move anything while
-covered, and ends at the release.
+covered. It ends at the release, as it already does.
+
+**Where R-2 lives** (architect, at Unit 0's review): in `Inert`'s cover, beside the rule that
+withholds the cursor. A covered layer captures a wheel that nothing above it took. The layer
+above (a dialog's card, a menu's list) is offered the wheel first. From outside, this is R-2:
+nothing beneath moves, nothing is published, and the status is `Captured`. That includes the
+dim with no close message.
+
+## What Unit 0 changed (2026-11-11)
+
+- **The tooltip inference was wrong:** no page tooltip is drawn under any cover. It is now
+  under "already right".
+- **Under a menu's backdrop the page scrolls.** That is stronger than hover, and it is now
+  finding 4.
+- **R-4's release half already holds.** Only "does not move while covered" is new.
+
+None of the rules changed.
 
 ## Review against snora's principles
 
