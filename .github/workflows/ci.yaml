@@ -408,6 +408,26 @@ jobs:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+      - name: PROBE (throwaway) what mesa-vulkan-drivers pulls in
+        run: |
+          set +e
+          cat /etc/os-release | head -3
+          sudo apt-get update
+          apt-cache policy mesa-vulkan-drivers
+          echo "--- print-uris"
+          apt-get -y --print-uris install mesa-vulkan-drivers | tee uris.txt
+          echo "--- reachability, mirror and snapshot"
+          ts=$(date -u +%Y%m%dT%H%M%SZ)
+          grep "^'" uris.txt | while read -r uri file size sum; do
+            url=${uri//\'/}
+            path=${url#*ubuntu/pool/}
+            m=$(curl -s -o /dev/null -w '%{http_code}' -I --max-time 20 "$url")
+            s=$(curl -s -o /dev/null -w '%{http_code}' -I -L --max-time 20 "https://snapshot.ubuntu.com/ubuntu/$ts/pool/$path")
+            echo "mirror=$m snapshot=$s $file $size $sum $url"
+          done
+          echo "--- apt sources"
+          cat /etc/apt/sources.list.d/* 2>/dev/null | head -20
+          dpkg -l | grep -E 'llvm|vulkan|libdrm|mesa' | awk '{print $2, $3}'
       - name: Install lavapipe (Mesa's software Vulkan)
         # The default runner has no GPU. lavapipe rasterises in
         # software, which is slow but is the real wgpu pipeline — and
