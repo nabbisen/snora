@@ -480,7 +480,8 @@ impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for Inert<'_, Messag
         }
 
         // The keyboard does not reach a covered layer, and neither does text
-        // input. Everything else does: window events, redraws, the pointer.
+        // input. Window events and redraws do reach it, and so does the pointer,
+        // but without a cursor (RFC-125 R-1); a wheel does not (above).
         if self.covered(tree) && matches!(event, Event::Keyboard(_) | Event::InputMethod(_)) {
             return;
         }
