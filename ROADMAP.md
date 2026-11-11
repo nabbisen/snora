@@ -237,7 +237,16 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.61.0
 
-Not yet scoped.
+Not yet scoped. Candidates recorded at the 0.60.0 cut:
+- **The build-cost ratio moved +18%** (`design_overhead_ratio` 0.047555 → 0.056221, same
+  compiler and runner), above its ~10% investigate threshold, with no dependency change.
+  `example_hello_ms` fell 20% and `example_workbench_ms` 5%. The cause is not established:
+  measure before calling it signal or noise (`build-cost-budget.md`).
+- **CI downloaded Mesa from Ubuntu's mirrors, and they were unreachable for about three
+  hours** on 2026-11-11, which held the release. Workflow lint survives the same kind of
+  outage by caching what it downloads.
+- **F6 zone navigation under a menu with its backdrop** (`next_zone`'s `has_menu`), found
+  while scoping 0.60. Awaiting the owner.
 
 ## Future wanted
 
