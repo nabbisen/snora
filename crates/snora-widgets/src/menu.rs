@@ -14,7 +14,7 @@ use iced::{
 };
 
 use snora_core::{Menu, MenuAction};
-use snora_interaction::MenuAnchor;
+use snora_interaction::{MenuAnchor, MenuPart};
 
 use crate::icon::icon_beside_label;
 use crate::style::{
@@ -147,9 +147,9 @@ where
 
     match geometry.anchored {
         None => {
-            let mut stack = column![trigger];
-            for item in items {
-                stack = stack.push(item);
+            let mut stack = column![MenuPart::trigger(trigger)];
+            if !items.is_empty() {
+                stack = stack.push(MenuPart::items(column(items)));
             }
             container(stack).into()
         }
