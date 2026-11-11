@@ -40,6 +40,8 @@ use iced_core::widget::operation::scrollable::AbsoluteOffset;
 use iced_core::widget::{Id, Operation, Tree, tree};
 use iced_core::{Clipboard, Event, Shell, Widget, mouse, overlay, renderer};
 
+use crate::menu_keys::{Part, marked};
+
 /// What an anchor reports while its dropdown is open: "a menu is open here".
 #[derive(Debug)]
 pub(crate) struct OpenMenu;
@@ -219,9 +221,11 @@ impl<Message> overlay::Overlay<Message, Theme, iced::Renderer> for Dropdown<'_, 
         renderer: &iced::Renderer,
         operation: &mut dyn Operation,
     ) {
-        self.content
-            .as_widget_mut()
-            .operate(self.tree, layout, renderer, operation);
+        marked(Part::Items, layout.bounds(), operation, |operation| {
+            self.content
+                .as_widget_mut()
+                .operate(self.tree, layout, renderer, operation);
+        });
 
         // Whatever the operation was (a Tab is one), an item that holds focus is
         // brought into view. Run directly on the content, not through this method.
@@ -322,12 +326,12 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for MenuAnchor<'_, Message>
         if self.elements.len() > 1 {
             operation.custom(None, layout.bounds(), &mut OpenMenu);
         }
-        self.elements[0].as_widget_mut().operate(
-            &mut tree.children[0],
-            layout,
-            renderer,
-            operation,
-        );
+        let trigger = &mut self.elements[0];
+        marked(Part::Trigger, layout.bounds(), operation, |operation| {
+            trigger
+                .as_widget_mut()
+                .operate(&mut tree.children[0], layout, renderer, operation);
+        });
     }
 
     fn update(

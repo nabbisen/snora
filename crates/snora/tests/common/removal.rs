@@ -226,6 +226,29 @@ impl<M: Clone + 'static> Rig<M> {
         statuses[0]
     }
 
+    /// A plain named key, with `repeat` (a held key), and the `Status` the interface gave it.
+    pub fn named(&mut self, key: Named, repeat: bool) -> iced_runtime::core::event::Status {
+        self.batch(&[key_event(key, repeat, iced::keyboard::Modifiers::empty())])[0]
+    }
+
+    /// Several events in **one** `UserInterface::update`, as the window loop hands them
+    /// over between two redraws: the statuses, one per event.
+    pub fn batch(&mut self, events: &[Event]) -> Vec<iced_runtime::core::event::Status> {
+        let (_, statuses) = self.ui.update(
+            events,
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        statuses
+    }
+
+    /// The pointer position the rig holds.
+    pub fn set_cursor(&mut self, at: Point) {
+        self.cursor = mouse::Cursor::Available(at);
+    }
+
     pub fn key(&mut self, key: Named) {
         self.deliver(&[iced_test::simulator::press_key(key, None)]);
     }
@@ -394,6 +417,22 @@ impl Operation for FocusAt {
         }
         self.seen += 1;
     }
+}
+
+/// A key press event.
+pub fn key_event(key: Named, repeat: bool, modifiers: iced::keyboard::Modifiers) -> Event {
+    let key = iced::keyboard::Key::Named(key);
+    Event::Keyboard(iced::keyboard::Event::KeyPressed {
+        key: key.clone(),
+        modified_key: key,
+        physical_key: iced::keyboard::key::Physical::Unidentified(
+            iced::keyboard::key::NativeCode::Unidentified,
+        ),
+        location: iced::keyboard::Location::Standard,
+        modifiers,
+        repeat,
+        text: None,
+    })
 }
 
 /// `focus_next`, for tests that want the runtime's own operation.
