@@ -39,7 +39,7 @@ summarised at the end of this page. *(Corrected 2026-11-11: this line said "eigh
 ten" after gate 11 was added and met.)* The gates with a history:
 
 1. One iced major upgrade completed. ⬜
-3. At least one third-party or production-grade app. ⬜ The owner defines the two words.
+3. At least one third-party or production-grade app. ⬜
 7. Public API freeze review completed. ✅ v0.18
 9. Binary-size and compile-time trends (≥2 data points). ✅ **v0.37.0** —
    split into 9a/9b at v0.29.0 and both now satisfied. 9a (binary size) on
@@ -55,7 +55,8 @@ ten" after gate 11 was added and met.)* The gates with a history:
    reopened or clock-reset four times since v0.25.3.
 
 Work on these proceeds alongside any v0.18+ feature work. There is no
-scheduled date for 1.0.
+scheduled date for 1.0: **declaring it is the owner's explicit judgment** (2026-11-12), and
+the gates are its evidence.
 
 ## Snora Design System (complete — RFC-020 … RFC-040)
 
@@ -237,8 +238,8 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.61.0
 
-Proposed 2026-11-12, waiting for the owner: RFC-126 (F6 moves focus between zones itself) and
-RFC-127 (a snora control can be given an id). Candidates recorded at the 0.60.0 cut:
+Accepted 2026-11-12 (owner): RFC-126 (F6 moves focus between zones itself) and RFC-127 (a
+snora control can be given an id), with the housekeeping below. Candidates recorded at the 0.60.0 cut:
 - **The build-cost ratio moved +18%** (`design_overhead_ratio` 0.047555 → 0.056221, same
   compiler and runner), above its ~10% investigate threshold, with no dependency change.
   `example_hello_ms` fell 20% and `example_workbench_ms` 5%. The cause is not established:

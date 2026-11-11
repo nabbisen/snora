@@ -1,6 +1,7 @@
 # RFC-127 — An application cannot put focus on a snora control
 
-**Status.** Proposed 2026-11-12.
+**Status.** Accepted 2026-11-12. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/127-…`](../handoffs/127-a-snora-control-cannot-be-given-focus/implementation-handoff.md).
 **Raised.** 2026-11-12, architect, scoping 0.61, found while reading RFC-126's finding 1.
 **Release target.** 0.61.0, with RFC-126.
 **Priority.** The book gives advice that cannot be followed with snora's own controls.
@@ -111,3 +112,12 @@ none of their callers has asked. Recorded as future wanted.
 2. **Unit 1:** R-1 to R-3, with a test and a breakage row each. `every_control.rs`'s subjects
    gain an id case.
 3. **The book,** by the architect (R-4).
+
+## Rulings, 2026-11-12 (owner)
+
+The RFC is accepted as written:
+- **Q-1:** Unit 0 measures whether a focus task returned with the dialog's opening lands, and
+  R-4's pattern says what works.
+- **Q-2:** the `design::button` variants are unchanged. A control that needs an id is built
+  with `snora::design::control` and the same style. An id on the variants is future wanted.
+- **Q-3:** no ids on prefab controls. Future wanted.

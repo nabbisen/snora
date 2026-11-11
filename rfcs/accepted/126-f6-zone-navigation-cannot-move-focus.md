@@ -1,6 +1,7 @@
 # RFC-126 — F6 zone navigation cannot move focus, and does not know where focus is
 
-**Status.** Proposed 2026-11-12.
+**Status.** Accepted 2026-11-12. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/126-…`](../handoffs/126-f6-zone-navigation-cannot-move-focus/implementation-handoff.md).
 **Raised.** 2026-11-12, architect, scoping 0.61. It began as one finding while scoping 0.60:
 `next_zone` ignores an open menu. Reading the whole feature found that it cannot work as
 documented.
@@ -155,3 +156,13 @@ that ruling: keeping a superseded API alive to protect a tick would be the wrong
 2. **Unit 1:** R-1 to R-4, with a test and a breakage row for each rule. `render_semantics.rs` is
    unmodified, and `every_control.rs` takes a subject per zone.
 3. **The book,** by the architect (R-5).
+
+## Rulings, 2026-11-12 (owner)
+
+The RFC is accepted as written:
+- **Q-1:** the action is `snora::keyboard::focus_zone(cycle)`.
+- **Q-2:** F6 lands on a zone's first control. A memory of the last control per zone is
+  future wanted.
+- **Q-3:** **withdrawn, not ruled.** Declaring 1.0 is the owner's explicit judgment, and the
+  gates' definitions are not the architect's to raise (owner, 2026-11-12). R-4's deprecation
+  goes ahead under the deprecation rule, as the RFC said it would.
