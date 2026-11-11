@@ -1053,3 +1053,35 @@ fn a_wheel_and_an_arrow_in_one_batch_keep_the_item_in_view() {
         centre.y
     );
 }
+
+/// A dialog that opens **over a menu whose dropdown has been laid out**: the view still says the
+/// menu is open, the overlay is gone (a covered layer has none), and the arrows are not
+/// answered. (The scene with a dialog built from the start never lays the dropdown out, so it
+/// cannot tell a silent menu from one that was never asked.)
+#[test]
+fn a_dialog_opened_over_a_laid_out_dropdown_silences_it() {
+    for close in [true, false] {
+        let c = Counts::default();
+        let mut rig = Rig::new(Scene::new(Host::Dropdown, close).build(&c));
+        assert_eq!(
+            rig.named(ArrowDown, false),
+            Status::Captured,
+            "close {close}"
+        );
+        let mut rig = rig.rebuilt(
+            Scene {
+                dialog: true,
+                ..Scene::new(Host::Dropdown, close)
+            }
+            .build(&c),
+        );
+        for key in [ArrowDown, ArrowUp, Home, End] {
+            let status = rig.named(key, false);
+            assert_eq!(
+                status,
+                Status::Ignored,
+                "close {close}: {key:?} under a dialog"
+            );
+        }
+    }
+}
