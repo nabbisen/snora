@@ -123,6 +123,54 @@ impl<M: Clone + 'static> Rig<M> {
         }
     }
 
+    /// `times` wheel events with the pointer at `at` (one line each, scrolling down):
+    /// what `UserInterface::update` returned for each.
+    pub fn wheel(&mut self, at: Point, times: usize) -> Vec<iced_runtime::core::event::Status> {
+        self.point_at(Some(at));
+        (0..times)
+            .map(|_| {
+                let (_, statuses) = self.ui.update(
+                    &[Event::Mouse(mouse::Event::WheelScrolled {
+                        delta: mouse::ScrollDelta::Lines { x: 0.0, y: -1.0 },
+                    })],
+                    self.cursor,
+                    &mut self.renderer,
+                    &mut clipboard::Null,
+                    &mut self.messages,
+                );
+                statuses[0]
+            })
+            .collect()
+    }
+
+    /// The pointer shape the interface reports with the pointer at `at`.
+    pub fn interaction_at(&mut self, at: Point) -> mouse::Interaction {
+        self.cursor = mouse::Cursor::Available(at);
+        let (state, _) = self.ui.update(
+            &[Event::Mouse(mouse::Event::CursorMoved { position: at })],
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        match state {
+            user_interface::State::Updated {
+                mouse_interaction, ..
+            } => mouse_interaction,
+            user_interface::State::Outdated => panic!("the interface is outdated"),
+        }
+    }
+
+    /// The left button goes down, or up, where the pointer is.
+    pub fn left_button(&mut self, down: bool) {
+        let button = mouse::Button::Left;
+        self.deliver(&[Event::Mouse(if down {
+            mouse::Event::ButtonPressed(button)
+        } else {
+            mouse::Event::ButtonReleased(button)
+        })]);
+    }
+
     /// A left click at `at`: the pointer moves there, presses and releases.
     pub fn click_at(&mut self, at: Point) {
         self.point_at(Some(at));

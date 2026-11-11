@@ -475,6 +475,8 @@ where
 
 /// A full-window, fully transparent click target. Used above the skeleton
 /// and below menus so that any click outside an open menu dismisses it.
+/// **A press and Escape publish `on_press`; a wheel over it does not** (RFC-125
+/// R-2): the covered layer beneath captures the wheel, without publishing.
 fn transparent_backdrop<'a, Message>(on_press: Message) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -494,9 +496,12 @@ where
 /// dismisses it and signals "this is modal" by dimming the background
 /// content.
 ///
-/// Also captures wheel-scroll input with the same message (RFC-084 F-03):
-/// scrolling over the dim is the same intent as clicking it, and either
-/// should dismiss rather than reach whatever is beneath the modal.
+/// **A press on it, and Escape, publish `on_press`; a wheel over it does not**
+/// (RFC-125 R-2). RFC-084 F-03 asked that the dim block the wheel, and it was
+/// built by publishing the close message on every wheel event, so a stray scroll
+/// closed a dialog, once per event, with whatever the reader had typed. It is now
+/// the covered layer beneath that captures the wheel (`Inert`), without
+/// publishing: the dim has no `on_scroll`.
 fn dim_backdrop<'a, Message>(on_press: Message, fill: DimFill) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -511,15 +516,8 @@ where
             background: Some(Background::Color(fill.resolve(theme))),
             ..Default::default()
         });
-    let on_scroll = on_press.clone();
     // Escape closes the modal as a click on the dim does (RFC-119 R-4).
-    OnEscape::new(
-        mouse_area(dim)
-            .on_press(on_press.clone())
-            .on_scroll(move |_delta| on_scroll.clone()),
-        on_press,
-    )
-    .into()
+    OnEscape::new(mouse_area(dim).on_press(on_press.clone()), on_press).into()
 }
 
 /// Same visual as [`dim_backdrop`] but without the click sink — used when

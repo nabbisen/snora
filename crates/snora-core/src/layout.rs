@@ -181,10 +181,17 @@ where
     /// context). If `None`, menus still render but the click-outside-to-
     /// close backdrop is not installed — the application must then
     /// provide explicit close buttons inside its menu content.
+    ///
+    /// **Published on a press, and on Escape. Not on a wheel** (RFC-125): a scroll
+    /// over the backdrop is captured and does nothing.
     pub on_close_menus: Option<Message>,
 
     /// Dispatched when the user clicks the dim backdrop of a dialog or
     /// bottom sheet. Semantics mirror [`Self::on_close_menus`].
+    ///
+    /// **Published on a press, and on Escape. Not on a wheel** (RFC-125): before 0.60 a
+    /// wheel scroll over the dim published it too, once per wheel event, so a scroll that
+    /// strayed off a dialog closed it.
     pub on_close_modals: Option<Message>,
 
     /// `f(toast_id, attention)`: what the reader's pointer and keyboard focus
@@ -411,7 +418,7 @@ where
     /// "outside", because an open menu's backdrop covers the page, so Escape
     /// closes the menu as a click outside does. The event is captured, so an
     /// application's own `iced::keyboard::listen()` does not also receive it:
-    /// there is one message, not two.
+    /// there is one message, not two. **Not published on a wheel** (RFC-125).
     #[must_use]
     pub fn on_close_menus(mut self, msg: Message) -> Self {
         self.on_close_menus = Some(msg);
@@ -424,6 +431,7 @@ where
     /// With no handler here, neither a click outside nor Escape closes the
     /// modal: Escape is then the application's, through its own `keyboard::listen()`
     /// (the function that used to wrap that, `dismiss_on_escape`, was removed in 0.60.0).
+    /// **Not published on a wheel** (RFC-125).
     #[must_use]
     pub fn on_close_modals(mut self, msg: Message) -> Self {
         self.on_close_modals = Some(msg);

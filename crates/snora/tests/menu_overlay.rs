@@ -881,60 +881,6 @@ fn a_dropdown_that_fits_does_not_scroll() {
     assert!(at.y < 80.0, "item 0 moved: ring at {at:?}");
 }
 
-// ---------------------------------------------------------------------------
-// Measured for the architect: does a page under a modal's dim show hover today?
-// ---------------------------------------------------------------------------
-
-#[test]
-fn does_a_page_under_a_modal_dim_show_hover() {
-    let scene = |dialog: bool| -> Element<'static, Msg> {
-        let mut layout = AppLayout::new(
-            iced::widget::button(text("page button"))
-                .on_press(Msg::Page)
-                .into(),
-        );
-        if dialog {
-            layout = layout
-                .dialog(snora::Dialog::new(text("dialog").into()))
-                .on_close_modals(Msg::Close);
-        }
-        snora::render(layout)
-    };
-    let differing = |dialog: bool| {
-        let mut away = Rig::new(scene(dialog));
-        away.point_at(Some(iced::Point::new(700.0, 500.0)));
-        // iced 0.14 widgets take their hover status on the redraw request the runtime
-        // sends before a draw, not on the pointer move.
-        away.redraw();
-        let mut over = Rig::new(scene(dialog));
-        over.point_at(Some(iced::Point::new(20.0, 15.0)));
-        over.redraw();
-        let (a, b) = (away.frame(), over.frame());
-        a.as_chunks::<4>()
-            .0
-            .iter()
-            .zip(b.as_chunks::<4>().0)
-            .filter(|(x, y)| x != y)
-            .count()
-    };
-    // The premise: with no dim, hovering the button changes pixels at all.
-    let without = differing(false);
-    assert!(
-        without > 0,
-        "premise: a hovered iced button shows hover on this page"
-    );
-    let under = differing(true);
-    println!(
-        "\npage button, pointer over it vs away: {without} px differ with no dialog; \
-         {under} px differ under a dialog's dim ({})",
-        if under == 0 {
-            "no hover shows under the dim"
-        } else {
-            "HOVER SHOWS under the dim"
-        }
-    );
-}
-
 /// Ruling 3: a page covered by a menu gets no pointer. A hover tint on a control a click
 /// cannot reach would promise a click that does not happen.
 #[test]

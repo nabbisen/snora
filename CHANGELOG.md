@@ -25,6 +25,29 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Changed
+
+- **A page under a dialog, a sheet, or a menu with its backdrop shows no hover, no pointer
+  shape and no tooltip (RFC-125).** One rule for every cover: *a covered layer gets no
+  pointer.* Whatever the keyboard cannot reach (RFC-119), the pointer cannot reach either.
+  It was already so under an open header dropdown (0.59); it is now so under a dialog, a
+  sheet, a context menu and an application's `header_menu` with its backdrop, where the page
+  showed hover and the hand cursor, promising a click the cover would not let through. A
+  slider dragged when a dialog opens no longer moves while covered, and the release still
+  ends the drag. Toasts are never covered, and window events and redraws still reach a
+  covered layer, so an animation beneath keeps running.
+
+### Fixed
+
+- **A wheel scroll over a dialog's or a sheet's dim closed it, once per wheel event
+  (RFC-125).** The dim published `on_close_modals` on a wheel, so a two-finger swipe that
+  strayed off a long dialog closed it, with whatever the reader had typed, and a swipe's many
+  events published many close messages. A wheel over the dim, or a menu's backdrop, now
+  publishes nothing, scrolls nothing beneath and is captured. A wheel over the dialog's own
+  card still scrolls the card.
+- **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
+  page beneath it.** It no longer does.
+
 ### Removed
 
 The one item deprecated in 0.57.0 (RFC-116 R-2), whose note said "removed in 0.60.0".

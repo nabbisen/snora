@@ -152,12 +152,34 @@ impl<Message: Clone> Inert<'_, Message> {
         true
     }
 
-    /// The pointer the content is given: none, while a menu covers it.
+    /// The pointer the content is given: **none, while the layer is covered**, by a modal, by
+    /// a menu's backdrop or by an open menu (RFC-125 R-1). It is what the keyboard cannot
+    /// reach that the pointer cannot reach either: no hover, no pointer shape, no drag.
     pub(super) fn cursor_for_content(&self, tree: &Tree, cursor: mouse::Cursor) -> mouse::Cursor {
-        if self.covered_by_menu(tree) {
+        if self.covered(tree) {
             mouse::Cursor::Unavailable
         } else {
             cursor
+        }
+    }
+
+    /// A wheel event that reaches a covered layer is **captured and never acted on**
+    /// (RFC-125 R-2). The layer above it (a dialog's card, a menu's own list) was offered the
+    /// wheel first, so a scroll over the card still scrolls the card; what falls through to a
+    /// covered layer is a wheel over the dim or a backdrop, and it does nothing: it does not
+    /// publish, it does not close what is open, and it does not scroll the page beneath.
+    /// `true` if it did.
+    pub(super) fn swallow_wheel(
+        &self,
+        tree: &Tree,
+        event: &Event,
+        shell: &mut Shell<'_, Message>,
+    ) -> bool {
+        if self.covered(tree) && matches!(event, Event::Mouse(mouse::Event::WheelScrolled { .. })) {
+            shell.capture_event();
+            true
+        } else {
+            false
         }
     }
 }

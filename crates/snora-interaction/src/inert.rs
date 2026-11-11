@@ -12,8 +12,21 @@
 //!   `focusable`; `container`, `text`, `scrollable` and the rest still pass, so
 //!   selectors and tests still find the content);
 //! - delivers **no keyboard or input-method event** to its content;
-//! - leaves drawing, layout and the pointer alone: pointer blocking is the
-//!   backdrops' job, and an animation beneath must keep running.
+//! - gives its content **no pointer** (RFC-125): whatever the keyboard cannot
+//!   reach, the pointer cannot reach either, so a covered layer shows no hover
+//!   and no pointer shape, a drag that began before it was covered does not move
+//!   anything, and a tooltip on it is not drawn. A wheel that falls through to it
+//!   is **captured and does nothing** (it does not close what is open, it does
+//!   not scroll the page). What covers it is a surface: a press on it and Escape
+//!   close what is open (Law 7), and the backdrops publish that, not `Inert`
+//!   (except for a menu's own cover, see
+//!   [`beneath_menus`](Inert::beneath_menus));
+//! - leaves drawing and layout alone, and **still delivers window events and
+//!   redraws**, so an animation beneath keeps running.
+//!
+//! Before 0.60 this said the pointer was the backdrops' job. That has not been
+//! true of a layer covered by an open header menu since 0.59, and is now true of
+//! every covered layer.
 //!
 //! # Its public surface
 //!
@@ -458,6 +471,11 @@ impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for Inert<'_, Messag
         // Covered by an open menu: the menu's own overlay was offered the event first
         // (the runtime does that), so what reaches here is outside it.
         if self.answer_menu(tree, event, shell) {
+            return;
+        }
+
+        // A wheel that falls through to a covered layer does nothing (RFC-125 R-2).
+        if self.swallow_wheel(tree, event, shell) {
             return;
         }
 
