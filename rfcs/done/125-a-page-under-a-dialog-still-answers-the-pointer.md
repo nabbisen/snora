@@ -1,6 +1,6 @@
 # RFC-125 — A page under a dialog still answers the pointer
 
-**Status.** Accepted 2026-11-11 (owner, scoping 0.60: the proposal, Q-1 and Q-2 as
+**Status.** Done — shipped v0.60.0. Accepted 2026-11-11 (owner, scoping 0.60: the proposal, Q-1 and Q-2 as
 recommended).
 **Handoff.** [`handoffs/125-…`](../handoffs/125-a-page-under-a-dialog-still-answers-the-pointer/implementation-handoff.md).
 **Raised.** 2026-11-11, architect, while scoping 0.60. The hover half was measured by the dev

@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-123 for 0.60: arrow keys, on the anchored dropdown
 
-**RFC.** `rfcs/accepted/123-arrow-keys-do-nothing-inside-snoras-menus.md`. Read R-1 to R-5,
+**RFC.** `rfcs/done/123-arrow-keys-do-nothing-inside-snoras-menus.md`. Read R-1 to R-5,
 the revision note and the Rulings.
 **This replaces** the first handoff's Unit 1
 ([`implementation-handoff.md`](implementation-handoff.md)). Its rules, and Unit 0's review

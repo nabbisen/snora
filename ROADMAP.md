@@ -235,17 +235,9 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.60.0
+## Next — 0.61.0
 
-Scoped 2026-11-11 (owner). The release waits for all three, in this order:
-1. **A covered layer gets no pointer** (RFC-125). A page under a dialog or a sheet shows no
-   hover, pointer shape or tooltip, as a page under an open menu already does, and **a wheel
-   scroll over the dim no longer closes the dialog**.
-2. **Arrow keys, Home and End inside snora's menus** (RFC-123), re-planned on RFC-124's
-   dropdown. If its rule for a focused text field cannot hold, it returns to the owner first.
-3. `dismiss_on_escape` is removed (deprecated in 0.57).
-
-Also before the cut: what made the widgets 46 KB larger in 0.59.0 is measured (indicator 2).
+Not yet scoped.
 
 ## Future wanted
 
@@ -258,6 +250,15 @@ Also before the cut: what made the widgets 46 KB larger in 0.59.0 is measured (i
   L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
+
+- **0.60.0** — the keyboard inside a menu, and one meaning of "covered".
+  - **↓ ↑ Home and End inside snora's menus** (RFC-123), wrapping. They are answered only
+    while focus is on the menu or nowhere, so a text field keeps its arrows. Nothing to wire.
+  - **A covered layer gets no pointer** (RFC-125): no hover, pointer shape or tooltip under a
+    dialog, a sheet, or a menu with its backdrop. **A wheel over a dialog's dim no longer
+    closes it,** which it did once per wheel event since 0.41.
+  - `dismiss_on_escape` was removed. No deprecated item remains.
+  - 0.59's binary-size jump was attributed: the dropdown's scrollable, kept.
 
 - **0.59.0** — `app_header`'s dropdown, fixed (RFC-124). With the documented wiring its
   items could not be pressed (at least since 0.54), the keyboard could not reach them (from

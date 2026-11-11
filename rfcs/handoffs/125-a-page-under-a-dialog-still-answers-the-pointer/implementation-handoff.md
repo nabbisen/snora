@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-125: a covered layer gets no pointer
 
-**RFC.** `rfcs/accepted/125-a-page-under-a-dialog-still-answers-the-pointer.md`. Read the
+**RFC.** `rfcs/done/125-a-page-under-a-dialog-still-answers-the-pointer.md`. Read the
 finding, the rule, R-1 to R-4 and the Rulings.
 **Release target.** 0.60.0, **first of its three items** (owner, Q-2). RFC-123 starts after
 this lands, because both change `Inert`'s cover. The 0.60 housekeeping is independent

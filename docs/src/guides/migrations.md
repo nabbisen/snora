@@ -1,8 +1,9 @@
 # Migrating between versions
 
 Snora is in pre-1.0 SemVer: minor version bumps may carry small
-breaking changes when justified, with deprecation aliases bridging
-two consecutive releases where possible. Each minor release ships a
+breaking changes when justified. A deprecated item is removed in the
+third minor after the one that deprecated it, and its note names that
+version from the start. Each minor release ships a
 focused migration guide describing exactly what to change and why.
 
 This page is the index — pick the guide that matches your jump.
@@ -10,6 +11,10 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.59 → 0.60](migration-0.59-to-0.60.md) — **one breaking change**:
+  `dismiss_on_escape` removed (deprecated since 0.57). ↓ ↑ Home End inside snora's
+  menus; a covered page gets no pointer, and a wheel over a dialog's dim no longer
+  closes it.
 - [0.58 → 0.59](migration-0.58-to-0.59.md) — **one breaking change**: the 0.56
   toast-hover items removed (`on_toast_hover`, `ToastHover`, `Holds::hover`).
   `app_header`'s dropdown fixed: its items press, by pointer and keyboard, and it

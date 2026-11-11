@@ -1,6 +1,6 @@
 # RFC-123 — Arrow keys do nothing inside snora's menus
 
-**Status.** Accepted 2026-11-09. Every open question ruled as suggested, as revised (see Rulings).
+**Status.** Done — shipped v0.60.0. Accepted 2026-11-09. Every open question ruled as suggested, as revised (see Rulings).
 **Handoff.** [`handoffs/123-…`](../handoffs/123-arrow-keys-do-nothing-inside-snoras-menus/implementation-handoff.md);
 **for 0.60, re-planned on the anchored dropdown:** [`implementation-handoff-0-60.md`](../handoffs/123-arrow-keys-do-nothing-inside-snoras-menus/implementation-handoff-0-60.md) (2026-11-11).
 **Revised** 2026-11-09, before ruling, after the owner asked for a check against the
