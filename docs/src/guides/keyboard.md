@@ -45,13 +45,15 @@ A route you leave out answers nothing. Without `.digits(…)`, no digit key does
 | `Tab` / `Shift+Tab` | the same | Moves focus to the next / previous control. **Past the last, focus leaves the group**: it does not wrap | `traverse` |
 | `Enter`, `Space` | the same | Presses the focused control, publishing exactly what a click publishes. **Held, it presses once** | nothing |
 | `Escape` | the same | Closes the open overlay (a dialog, a sheet, then a menu) | a close message (below) |
+| `↓` / `↑`, `Home` / `End` | the same | **Inside an open snora menu:** the next / previous item (wrapping), the first / last. With nothing focused, ↓ is the first item and ↑ the last ([Menus](menus.md#the-keyboard-inside-an-open-menu-060-rfc-123)) | nothing (0.60) |
 | `Ctrl+Tab` / `Ctrl+Shift+Tab`, and `Ctrl+PgDn` / `Ctrl+PgUp` | `Control+Tab` / `Control+Shift+Tab`, and `Shift+Cmd+]` / `Shift+Cmd+[` | Next / previous **tab**. **Wraps** from the last to the first, as browsers do | `.tabs(…)` |
 | `Ctrl+1`…`Ctrl+9` | `Cmd+1`…`Cmd+9` | Tab *n*, or sidebar item *n*: whichever you chose with `.digits(…)`. `9` is the last; a digit beyond the count does nothing | `.digits(…)` and that destination |
 | `Alt+↑` | `Cmd+↑` | The breadcrumb's parent: the crumb just before the current page | `.crumbs(…)` |
 
 **Tab does not wrap, and Ctrl+Tab does.** They are different things. Tab moves *focus*
 through the controls, and leaves the group at its end so a keyboard user is never trapped.
-Ctrl+Tab changes the *selected tab*, and wraps, as every browser does.
+Ctrl+Tab changes the *selected tab*, and wraps, as every browser does. **↓ and ↑ inside a menu wrap too:** they move within one
+list, and wrapping means a reader can never get stuck at an end.
 
 **The digits are the number row's physical keys,** so they work on every keyboard layout.
 On a French AZERTY keyboard, `Ctrl+&`, the key marked 1, goes to destination 1. Named keys

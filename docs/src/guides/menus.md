@@ -143,31 +143,54 @@ and draws its menu itself. `app_header`'s own dropdown does not use the slot.
 was false: `iced_core::overlay` is public, and from 0.59 the dropdown is an overlay
 anchored to its trigger. The idiom it taught caused the defect fixed in 0.59 (RFC-124).)*
 
-## Keyboard navigation within an open menu (RFC-082)
+## The keyboard inside an open menu (0.60, RFC-123)
 
-Arrow-key traversal **between items inside an open menu** — moving the
-highlighted item down the list with `↓`, wrapping, picking with
-`Enter` — is a different concern from the two keyboard axes snora
-already owns: `snora::keyboard::cycle_zones` moves **between**
-skeleton regions (RFC-060), and Escape **closes** an open menu or modal
-that has an escape or close message (Law 7; `AppLayout::escape` gives one
-an Escape of its own). Neither moves between items inside one.
+snora's own menus, `app_header`'s dropdown and a `render_menu` context menu, answer the keys
+every desktop menu answers:
 
-**What snora's prefab menus do today (0.55 on):**
-- **Every menu item is a focus target,** with a focus ring, and the header's menu trigger is
-  one too. **Tab and Shift+Tab** move between the items of an open menu: with its
-  outside-click close, the page beneath is out of reach (RFC-119). **Enter or Space**
-  presses the focused item. **Escape** closes the menu, and focus returns to the trigger.
-- **Arrow keys do nothing inside a menu yet.** Native menus answer ↓ and ↑, and a keyboard
-  user may reach for them first. RFC-123 adds them, in 0.60.
-- **Opening a menu from the keyboard does not move focus into it.** The trigger's focus
-  is set aside while the menu covers the page, and comes back when it closes. One Tab
-  reaches the menu's first item.
+| Key | What it does |
+|---|---|
+| `↓` / `↑` | The next / previous item. **Wraps** from the last to the first, and back. Held, it keeps moving |
+| `Home` / `End` | The first / last item |
+| `↓` / `↑` with **nothing focused** | The first / last item |
+| `Tab` / `Shift+Tab` | As everywhere: the next / previous control. With the menu's outside-click close, the page beneath is out of reach (RFC-119) |
+| `Enter`, `Space` | Presses the focused item, publishing what a click publishes. **Moving never presses** |
+| `Escape` | Closes the menu, and focus returns to the trigger |
+
+**The rules a reader can rely on:**
+- **Opening a menu never moves focus,** however it was opened: by the pointer, by Enter on the
+  trigger, or by your application for a context menu. So from a focused trigger, **Enter then
+  ↓** reaches the first item. A mouse user never sees a ring they did not ask for.
+- **The arrows are the menu's only while focus is on its trigger or one of its items, or
+  nowhere.** A focused text field keeps its arrows, as does a page control under a menu
+  without a backdrop, or a toast's ×. Then the key goes on as if no menu were open.
+- **Only the plain keys.** `Shift+↓` and `Ctrl+Home` are left alone, since a text field uses
+  them to select.
+- **An arrow the menu answers is captured,** so your `iced::keyboard::listen()` never receives
+  it.
+- **A long dropdown scrolls** to keep the focused item in view.
+- **The arrows are not mirrored under RTL:** a menu is a vertical list. Home and End are first and
+  last in reading order.
+- **Under a dialog, an open menu answers nothing,** as it answers no click.
+
+**What it needs:** nothing to wire. The arrows come with `snora::render` (or
+`snora::design::render`), as Escape does. **A `render_menu` you draw outside `snora::render`
+gets Tab, Enter and Space, but no arrows.**
+
+**Not in 0.60:**
+- **type-ahead** (a letter jumping to the item that starts with it);
+- **arrow keys in the tab bar.**
+
+Both are "future wanted" (RFC-116's long-term plan, L-10 and L-11).
 
 **If you build the dropdown yourself,** passing your own element to
 `AppLayout::header_menu` or `AppLayout::context_menu`, arrow-key traversal is yours to add:
 track a highlighted index in your own state. `snora::control` (0.58) makes each of your
 items a focus target, with the same rules as snora's.
+
+*History.* RFC-082 recorded arrow-key traversal inside a menu as a concern separate from the
+two keyboard axes snora owned: zone cycling between skeleton regions (`cycle_zones`,
+RFC-060) and Escape. Until 0.60, the arrows did nothing inside a snora menu.
 
 *(Corrected 2026-11-09: this section said snora's prefab menus had no way to show a
 highlighted item, and that keyboard traversal meant building your own dropdown. From 0.55,
