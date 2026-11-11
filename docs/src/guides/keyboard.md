@@ -90,7 +90,7 @@ An escape message lets an overlay close on Escape but **not** on a stray click o
 which is right for a destructive confirmation. A focused text field in a dialog takes the
 first Escape itself; the second closes the dialog.
 
-`snora::keyboard::dismiss_on_escape` is **deprecated since 0.57.0**, and removed in 0.60.0.
+`snora::keyboard::dismiss_on_escape` was deprecated in 0.57.0, and is **removed in 0.60.0**.
 Use `AppLayout::escape`. For an overlay of your own outside `AppLayout`, match the key
 yourself:
 

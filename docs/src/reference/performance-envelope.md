@@ -13,7 +13,6 @@ contribution to build and runtime cost.
 | Direction helpers (`row_dir`, `horizontal_align`) | Constant or linear in child count |
 | Prefab widgets | No hidden background work; pure view functions |
 | `Holds::sweep` | Linear in toast queue length |
-| `dismiss_on_escape` | O(1) — three comparisons |
 
 None of these should ever grow superlinearly. If a regression appears
 (e.g. a toast loop that clones the queue O(n) times per render), it is a

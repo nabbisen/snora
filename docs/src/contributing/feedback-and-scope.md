@@ -11,8 +11,8 @@ Snora's value is in these areas:
   `LayoutDirection`-aware composition.
 - **Overlay stacking** — deterministic z-stack (menus, modal dim, dialog,
   sheet, toasts), close sinks, and graceful degradation.
-- **Close behavior** — `on_close_menus`, `on_close_modals`, and the
-  `dismiss_on_escape` helper.
+- **Close behavior** — `on_close_menus`, `on_close_modals`, and
+  `AppLayout::escape`.
 - **Layout direction (ABDD)** — logical `Edge::Start`/`End`, `LayoutDirection`,
   and automatic mirroring for sidebars, sheets, and toast anchors.
 - **Operational quality** — toast lifecycle helpers, render-semantics

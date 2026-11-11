@@ -101,7 +101,8 @@ the window.
 - **A dropdown taller than the window scrolls,** and the item with keyboard focus is kept
   in view.
 - **While it is open,** the page beneath it, the header included, is covered for the
-  pointer and the keyboard: no click, no key, no hover.
+  pointer and the keyboard: no click, no key, no hover, no wheel. From 0.60 the same holds
+  for a context menu or a `header_menu` with its backdrop.
 - **A click outside, on the trigger too, or Escape** publishes `CloseMenus`, or your
   `AppLayout::escape` message for Escape if you set one.
 

@@ -22,6 +22,11 @@ These are the **only** two close sinks. Individual `Dialog` and `Sheet`
 values do not carry their own close messages — there is exactly one
 place per channel.
 
+**A press outside (a click or a tap) and Escape publish them. A wheel does not** (0.60):
+a scroll that strays off a dialog's card does nothing, and the page beneath a dialog or an
+open menu shows no hover and does not scroll. Until 0.60, a wheel over the dim closed the
+dialog.
+
 If you set an overlay but leave its sink `None`, the overlay still
 renders. The framework simply omits the click-outside-to-close
 backdrop, and you must provide an explicit close button inside the
@@ -195,8 +200,7 @@ check:
     Escape then closes the overlay too, with nothing to wire (Law 7).
 [ ] With no `on_close_modals`: the visible close button above is the only
     way out, for pointer and keyboard alike. If Escape should close it,
-    set AppLayout::escape(Escape { modal, .. }) (0.57). dismiss_on_escape
-    is deprecated.
+    set AppLayout::escape(Escape { modal, .. }) (0.57).
 [ ] Destructive actions have explicit labels; they are not triggered
     by backdrop click alone.
 [ ] If initial keyboard focus inside the dialog matters, set it with

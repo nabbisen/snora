@@ -184,8 +184,7 @@ dismiss click instead of the toast's own button receiving it.
 **Changed in 0.55 (RFC-119).** When a menu's backdrop or a modal's dim has a close
 message (`on_close_menus`, `on_close_modals`), **Escape publishes it**, exactly as a
 click on the backdrop does. The engine captures that Escape, so the application's
-`iced::keyboard::listen()` never receives it, and an application that also calls
-`dismiss_on_escape` gets no second message. Order is Law 1's, from the top: an open
+`iced::keyboard::listen()` never receives it. Order is Law 1's, from the top: an open
 modal closes before a menu beneath it. A focused `text_input` inside a dialog takes
 the first Escape itself, as iced does; the second closes the dialog.
 
@@ -205,8 +204,14 @@ confirmation. The rule:
 It is answered on the overlay's own layer, after the overlay's content, so a focused field
 still takes the first Escape. With neither message set, Escape does nothing, and the
 overlay's own close button is the way out, for the pointer and the keyboard alike.
-`snora::keyboard::dismiss_on_escape` is **deprecated since 0.57.0, and removed in 0.60.0**.
-Snora installs no subscription. Its other keys are the shortcuts the application opts into
+`snora::keyboard::dismiss_on_escape` was deprecated in 0.57.0, and is **removed in 0.60.0**.
+Snora installs no subscription.
+
+**A wheel closes nothing (0.60, RFC-125).** What closes an overlay is a press outside it (a
+click or a tap) and Escape. A wheel over a dim or a backdrop does nothing at all. *Until
+0.60, a wheel over a dialog's or a sheet's dim published `on_close_modals`, once per wheel
+event: a scroll that strayed off the card closed the dialog, with whatever had been typed in
+it. That was never a ruled behaviour. RFC-084 had asked only that the dim block the wheel.* Its other keys are the shortcuts the application opts into
 ([Keyboard map](../guides/keyboard.md)).
 
 *History.* Until 0.55 this law read "Keyboard dismissal is application-owned", and
@@ -216,8 +221,8 @@ F6/Shift+F6 via `snora::keyboard::cycle_zones`).
 
 RFC-014-A added a documented recipe and a small opt-in helper,
 `snora::keyboard::dismiss_on_escape` (see [Keyboard
-dismissal](#keyboard-dismissal) below). It remains opt-in and does not
-change the existing two-sink model.
+dismissal](#keyboard-dismissal) below). It was superseded by `AppLayout::escape` in 0.57
+and removed in 0.60.0.
 
 **Checked (RFC-119, 2026-11-07): the engine's Escape is guarded** in
 `crates/snora/tests/modal_keyboard.rs`: once, and `Captured`, for a menu
@@ -237,7 +242,8 @@ testable and tested: `dismiss_on_escape` itself
 table below exactly (modal-before-menu priority, no-op with no overlay,
 no-op with no sink). Demonstrated failing this session by reversing the
 modal-before-menu priority: `both_open_modal_takes_priority` caught it
-immediately (`Some("menu")` where `Some("modal")` was expected).
+immediately (`Some("menu")` where `Some("modal")` was expected). *Those tests went with
+the function in 0.60.0. The engine's Escape is guarded as above.*
 
 <a id="law-8--modal-focus-trapping-is-staged-not-shipped"></a>
 
@@ -250,8 +256,8 @@ semantics are not provided: iced 0.14 has no accessibility tree.
 | Concern | Snora provides? |
 |---|:--:|
 | Visual modality (dim layer) | yes |
-| Pointer blocking (backdrop capture) | yes — the backdrop, the dialog, the sheet, and toasts each capture pointer input over their own bounds, so nothing beneath a modal or a toast is reachable through it (RFC-084; negative assertions in `crates/snora/tests/render_semantics.rs`). Covers both clicks and wheel-scroll. Independent of whether a close sink is provided (Law 5). |
-| **Keyboard blocking** (what Tab and Enter reach) | **yes, from 0.55 (RFC-119).** Everything beneath the topmost backdrop is out of the keyboard's reach: no focus target, no key press, no text input, and no overlay of its own drawn above it. With a modal up, that is the skeleton and any menu. With a menu up **and** its backdrop (`on_close_menus`), it is the skeleton. A menu **without** a backdrop leaves the page reachable, by pointer and keyboard alike. An open **`app_header` dropdown** covers the page the same way, header included (0.59, RFC-124). The engine sees the open dropdown in the tree, so no empty `header_menu` is needed, and the dropdown floats above the page, anchored to its trigger. **A page covered by an open menu also gets no pointer:** no hover and no tooltip, as no click reaches it. *(Corrected 2026-11-11: in 0.59 this holds for the `app_header` dropdown only. A page under a dialog's or a sheet's dim, or under a context menu or an application's `header_menu` with its backdrop, still shows hover and the hand cursor. Under those two menus, a wheel over the backdrop scrolls the page; over a dialog's dim, it closes the dialog, once per wheel event. All of it is fixed in 0.60, RFC-125. Measured in RFC-125's Unit 0.)* Toasts stay reachable (Law 6). Independent of whether the modal has a close sink. Guarded in `crates/snora/tests/modal_keyboard.rs` |
+| **Pointer blocking** | **yes, and from 0.60 the same as the keyboard's (RFC-125): whatever the keyboard cannot reach, the pointer cannot reach either.** A covered layer gets no cursor: no hover, no hand cursor, no tooltip, and a drag that began before it was covered stops moving (the release still ends it). A wheel that falls through to a covered layer is captured and does nothing: it scrolls nothing beneath and closes nothing (Law 7). A press outside (a click or a tap) still closes what is open. The dialog, the sheet, an open menu and the toasts get the pointer over their own bounds. That holds under a dialog or sheet, with or without a close message (Law 5), under a menu with its backdrop, and under an open `app_header` dropdown. *(Until 0.60 it held for the `app_header` dropdown only, from 0.59. Under a dim or a menu's backdrop the page showed hover and the hand cursor. Under a context menu or an application's `header_menu`, a wheel scrolled the page. Over a dialog's dim, a wheel closed the dialog.)* Guarded in `crates/snora/tests/render_semantics.rs` (RFC-084) and `covered_pointer.rs` (RFC-125) |
+| **Keyboard blocking** (what Tab and Enter reach) | **yes, from 0.55 (RFC-119).** Everything beneath the topmost backdrop is out of the keyboard's reach: no focus target, no key press, no text input, and no overlay of its own drawn above it. With a modal up, that is the skeleton and any menu. With a menu up **and** its backdrop (`on_close_menus`), it is the skeleton. A menu **without** a backdrop leaves the page reachable, by pointer and keyboard alike. An open **`app_header` dropdown** covers the page the same way, header included (0.59, RFC-124). The engine sees the open dropdown in the tree, so no empty `header_menu` is needed, and the dropdown floats above the page, anchored to its trigger. **The pointer follows the same rule** (the row above). Toasts stay reachable (Law 6). Independent of whether the modal has a close sink. Guarded in `crates/snora/tests/modal_keyboard.rs` |
 | Keyboard dismissal (Escape) | yes: the overlay's escape message, or else its click-outside close message (Law 7; the escape field from 0.57) |
 | **Where focus goes** | **When a modal closes, focus returns to the control that had it**, unless the page now has a different number of controls, or the application has focused something itself. Then focus is wherever the application put it, or **nowhere** (not the first control): the next Tab starts from the top. While the dim is up, a covered control shows no focus ring, and a covered `text_input` has no cursor; both come back on closing |
 | **The page's state** | **Kept.** Opening and closing a modal or a menu does not rebuild the page: scroll offsets, a text input's cursor and every widget's state survive |
@@ -372,8 +378,8 @@ let layout = snora::AppLayout::new(body)
 | an overlay with neither message | nothing |
 | nothing | nothing |
 
-`dismiss_on_escape`, the recipe this section used to show, is **deprecated since 0.57.0
-and removed in 0.60.0**. For an overlay of your own outside `AppLayout`, match the Escape key
+`dismiss_on_escape`, the helper this section used to show, was deprecated in 0.57.0 and
+is **removed in 0.60.0**. For an overlay of your own outside `AppLayout`, match the Escape key
 in your `update`; the [Keyboard map](../guides/keyboard.md#escape) shows it.
 
 ## What Snora does not do
