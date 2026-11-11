@@ -14,7 +14,7 @@ use iced::{
 };
 
 use snora_core::{Menu, MenuAction};
-use snora_interaction::MenuAnchor;
+use snora_interaction::{MenuAnchor, MenuPart};
 
 use crate::icon::icon_beside_label;
 use crate::style::{
@@ -58,6 +58,14 @@ impl MenuGeometry {
 /// [`MenuAction`] into the application's message type. A plain function
 /// item works well here because it has a zero-sized `'static` type and
 /// can be passed by reference.
+///
+/// # Keyboard
+///
+/// Tab reaches the trigger and each item; Enter and Space press the focused one. **↓, ↑, Home
+/// and End move between the items** (RFC-123), but only when the menu is rendered through
+/// `snora::render` (as the header's menus and `AppLayout::context_menu` are): the engine's
+/// layer stack answers them. A `render_menu` placed in an application's own widget tree gets
+/// Tab, Enter and Space and **no arrows**.
 pub fn render_menu<'a, Message, MenuId, MenuItemId, F>(
     menu: Menu<MenuId, MenuItemId>,
     on_action: &'a F,
@@ -147,9 +155,9 @@ where
 
     match geometry.anchored {
         None => {
-            let mut stack = column![trigger];
-            for item in items {
-                stack = stack.push(item);
+            let mut stack = column![MenuPart::trigger(trigger)];
+            if !items.is_empty() {
+                stack = stack.push(MenuPart::items(column(items)));
             }
             container(stack).into()
         }

@@ -31,6 +31,20 @@
 //! container that covers the page ([`Inert`](crate::Inert)) learns **from the tree**
 //! that a menu is open, with no signal from the application.
 //!
+//! # What the arrows' walk learns from it (RFC-123)
+//!
+//! The dropdown is an overlay, so the anchor's `operate` does not reach it: Tab and a focus
+//! task meet its items through the overlay, once. The arrows are decided at the root, with the
+//! page's controls in view too, so the anchor offers every operation passing it a [`Reach`]
+//! and **only the arrows' walk answers**. It then operates its dropdown itself, with a layout
+//! it **computes at the walk**, by the same function the overlay is laid out with
+//! (`place`): from the trigger's bounds as the walk is given them (fresh, even if an earlier
+//! event of the same batch moved the trigger), and from the one thing the walk is not given,
+//! **the window's size** (and the translation of any scrolling ancestor), which the overlay
+//! was last laid out with. That is kept in the anchor's tree state (`AnchorState`) and dropped
+//! when the view is rebuilt. The window cannot change size inside an `update`: a resize
+//! reaches the interface as a rebuild, between updates.
+//!
 //! Public because the widgets crate builds it; not for applications.
 
 use iced::{Element, Length, Point, Rectangle, Size, Theme, Vector};
@@ -40,9 +54,80 @@ use iced_core::widget::operation::scrollable::AbsoluteOffset;
 use iced_core::widget::{Id, Operation, Tree, tree};
 use iced_core::{Clipboard, Event, Shell, Widget, mouse, overlay, renderer};
 
+use crate::menu_keys::{Part, Reach, Wants, marked};
+
 /// What an anchor reports while its dropdown is open: "a menu is open here".
 #[derive(Debug)]
 pub(crate) struct OpenMenu;
+
+/// What the overlay was last laid out in: the one input to the dropdown's placement that an
+/// `operate` call is not given.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct Placed {
+    /// The window.
+    window: Size,
+    /// What the trigger's ancestors have scrolled it by (`overlay()`'s `translation`).
+    translation: Vector,
+}
+
+/// What the anchor keeps between frames.
+///
+/// **What is stored:** the window's size and the translation of the trigger's scrolling
+/// ancestors, as the overlay was last laid out in them (`Placed`), and nothing else. The arrows'
+/// walk places the dropdown with them, by the same `place` the overlay uses, from the trigger's
+/// bounds as the walk is given them.
+///
+/// **Why `operate` cannot get them fresh:** an `operate` call is given the trigger's untranslated
+/// bounds and no window, while the overlay is given the window and a translation. The window
+/// cannot change inside an `update` (a resize is a rebuild, which drops this state).
+///
+/// **When the translation can be stale:** only for a trigger inside a scrollable of the
+/// application's own, and only if an earlier event of the same batch scrolls that ancestor. In
+/// `snora::render` the header has no scrolling ancestor, so the translation is zero there. A stale
+/// one affects where the dropdown is placed (the room below it, so the margin of its scroll),
+/// never which item is focused; the next operation on the overlay brings the focused item into
+/// view with the layout it is then given.
+#[derive(Default)]
+struct AnchorState {
+    /// Where the overlay was last laid out (RFC-123). `None` until it has been laid out since the
+    /// view was rebuilt.
+    placed: Option<Placed>,
+}
+
+/// Reports which of the dropdown's items hold focus, in order.
+#[derive(Default)]
+struct Collect(Vec<bool>);
+
+impl Operation for Collect {
+    fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation)) {
+        operate(self);
+    }
+
+    fn focusable(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
+        self.0.push(state.is_focused());
+    }
+}
+
+/// Focuses the `at`-th item and no other.
+struct FocusItem {
+    at: usize,
+    seen: usize,
+}
+
+impl Operation for FocusItem {
+    fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation)) {
+        operate(self);
+    }
+
+    fn focusable(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
+        if self.seen == self.at {
+            state.focus();
+        } else {
+            state.unfocus();
+        }
+        self.seen += 1;
+    }
+}
 
 /// `trigger`, with `dropdown` floating below it while there is one.
 pub struct MenuAnchor<'a, Message> {
@@ -152,6 +237,35 @@ fn offset_to_show(offset: f32, viewport: f32, top: f32, height: f32, margin: f32
     }
 }
 
+/// `operation` on the dropdown, and then, whatever the operation was (a Tab is one), an item
+/// that holds focus is brought into view. The scroll is run directly on the content, not
+/// through this function.
+fn operate_dropdown<Message>(
+    content: &mut Element<'_, Message>,
+    tree: &mut Tree,
+    gap: f32,
+    layout: Layout<'_>,
+    renderer: &iced::Renderer,
+    operation: &mut dyn Operation,
+) {
+    content
+        .as_widget_mut()
+        .operate(tree, layout, renderer, operation);
+
+    let mut probe = Probe::default();
+    content
+        .as_widget_mut()
+        .operate(tree, layout, renderer, &mut probe);
+    if let (Some(viewport), Some((top, height))) = (probe.viewport, probe.focused) {
+        let to = offset_to_show(probe.offset, viewport.height, top, height, gap);
+        if (to - probe.offset).abs() > f32::EPSILON {
+            content
+                .as_widget_mut()
+                .operate(tree, layout, renderer, &mut ScrollTo(to));
+        }
+    }
+}
+
 struct Dropdown<'a, 'b, Message> {
     content: &'b mut Element<'a, Message>,
     tree: &'b mut Tree,
@@ -160,38 +274,68 @@ struct Dropdown<'a, 'b, Message> {
     gap: f32,
     /// The window, as the overlay path was given it.
     viewport: Rectangle,
+    translation: Vector,
+    /// Where the overlay's placement inputs are kept for the arrows' walk.
+    placed: &'b mut Option<Placed>,
+}
+
+/// The dropdown's node: below the trigger (`anchor`, in window coordinates) and one ring's reach
+/// beyond it, at its start edge (the end edge under RTL), inside the window (`bounds`), and no
+/// taller than the room below it. **The one function** the overlay is laid out with and the
+/// arrows' walk computes its node with, so the two cannot differ.
+fn place<Message>(
+    content: &mut Element<'_, Message>,
+    tree: &mut Tree,
+    renderer: &iced::Renderer,
+    anchor: Rectangle,
+    bounds: Size,
+    end_aligned: bool,
+    gap: f32,
+) -> layout::Node {
+    // Below the trigger and one ring's reach beyond it.
+    let top = anchor.y + anchor.height + gap;
+    let room = (bounds.height - top).max(0.0);
+    let natural =
+        content
+            .as_widget_mut()
+            .layout(tree, renderer, &layout::Limits::new(Size::ZERO, bounds));
+    // Taller than the room: laid out again at the room's height, which is what
+    // makes its scrollable scroll.
+    let node = if natural.bounds().height > room {
+        content.as_widget_mut().layout(
+            tree,
+            renderer,
+            &layout::Limits::new(Size::ZERO, Size::new(bounds.width, room)),
+        )
+    } else {
+        natural
+    };
+    let drawn = node.bounds();
+    // At the start edge (the end edge under RTL), and inside the window.
+    let x = if end_aligned {
+        anchor.x + anchor.width - drawn.width
+    } else {
+        anchor.x
+    };
+    let x = x.min(bounds.width - drawn.width).max(0.0);
+    node.move_to(Point::new(x, top))
 }
 
 impl<Message> overlay::Overlay<Message, Theme, iced::Renderer> for Dropdown<'_, '_, Message> {
     fn layout(&mut self, renderer: &iced::Renderer, bounds: Size) -> layout::Node {
-        // Below the trigger and one ring's reach beyond it.
-        let top = self.anchor.y + self.anchor.height + self.gap;
-        let room = (bounds.height - top).max(0.0);
-        let natural = self.content.as_widget_mut().layout(
+        *self.placed = Some(Placed {
+            window: bounds,
+            translation: self.translation,
+        });
+        place(
+            self.content,
             self.tree,
             renderer,
-            &layout::Limits::new(Size::ZERO, bounds),
-        );
-        // Taller than the room: laid out again at the room's height, which is what
-        // makes its scrollable scroll.
-        let node = if natural.bounds().height > room {
-            self.content.as_widget_mut().layout(
-                self.tree,
-                renderer,
-                &layout::Limits::new(Size::ZERO, Size::new(bounds.width, room)),
-            )
-        } else {
-            natural
-        };
-        let drawn = node.bounds();
-        // At the start edge (the end edge under RTL), and inside the window.
-        let x = if self.end_aligned {
-            self.anchor.x + self.anchor.width - drawn.width
-        } else {
-            self.anchor.x
-        };
-        let x = x.min(bounds.width - drawn.width).max(0.0);
-        node.move_to(Point::new(x, top))
+            self.anchor,
+            bounds,
+            self.end_aligned,
+            self.gap,
+        )
     }
 
     fn draw(
@@ -219,27 +363,14 @@ impl<Message> overlay::Overlay<Message, Theme, iced::Renderer> for Dropdown<'_, 
         renderer: &iced::Renderer,
         operation: &mut dyn Operation,
     ) {
-        self.content
-            .as_widget_mut()
-            .operate(self.tree, layout, renderer, operation);
-
-        // Whatever the operation was (a Tab is one), an item that holds focus is
-        // brought into view. Run directly on the content, not through this method.
-        let mut probe = Probe::default();
-        self.content
-            .as_widget_mut()
-            .operate(self.tree, layout, renderer, &mut probe);
-        if let (Some(viewport), Some((top, height))) = (probe.viewport, probe.focused) {
-            let to = offset_to_show(probe.offset, viewport.height, top, height, self.gap);
-            if (to - probe.offset).abs() > f32::EPSILON {
-                self.content.as_widget_mut().operate(
-                    self.tree,
-                    layout,
-                    renderer,
-                    &mut ScrollTo(to),
-                );
-            }
-        }
+        operate_dropdown(
+            self.content,
+            self.tree,
+            self.gap,
+            layout,
+            renderer,
+            operation,
+        );
     }
 
     fn update(
@@ -281,7 +412,11 @@ impl<Message> overlay::Overlay<Message, Theme, iced::Renderer> for Dropdown<'_, 
 
 impl<Message> Widget<Message, Theme, iced::Renderer> for MenuAnchor<'_, Message> {
     fn tag(&self) -> tree::Tag {
-        tree::Tag::stateless()
+        tree::Tag::of::<AnchorState>()
+    }
+
+    fn state(&self) -> tree::State {
+        tree::State::new(AnchorState::default())
     }
 
     fn children(&self) -> Vec<Tree> {
@@ -289,6 +424,8 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for MenuAnchor<'_, Message>
     }
 
     fn diff(&self, tree: &mut Tree) {
+        // What the overlay was laid out in belongs to the build it was made for.
+        tree.state.downcast_mut::<AnchorState>().placed = None;
         tree.diff_children(&self.elements);
     }
 
@@ -322,12 +459,15 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for MenuAnchor<'_, Message>
         if self.elements.len() > 1 {
             operation.custom(None, layout.bounds(), &mut OpenMenu);
         }
-        self.elements[0].as_widget_mut().operate(
-            &mut tree.children[0],
-            layout,
-            renderer,
-            operation,
-        );
+        let trigger = &mut self.elements[0];
+        marked(Part::Trigger, layout.bounds(), operation, |operation| {
+            trigger
+                .as_widget_mut()
+                .operate(&mut tree.children[0], layout, renderer, operation);
+        });
+        if self.elements.len() > 1 {
+            self.reach(tree, layout.bounds(), renderer, operation);
+        }
     }
 
     fn update(
@@ -400,7 +540,10 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for MenuAnchor<'_, Message>
         translation: Vector,
     ) -> Option<overlay::Element<'b, Message, Theme, iced::Renderer>> {
         let (trigger, rest) = self.elements.split_at_mut(1);
-        let (trigger_tree, rest_trees) = tree.children.split_at_mut(1);
+        let Tree {
+            state, children, ..
+        } = tree;
+        let (trigger_tree, rest_trees) = children.split_at_mut(1);
         let mut found = Vec::new();
         found.extend(trigger[0].as_widget_mut().overlay(
             &mut trigger_tree[0],
@@ -422,12 +565,74 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for MenuAnchor<'_, Message>
                 end_aligned: self.end_aligned,
                 gap: self.gap,
                 viewport: *viewport,
+                translation,
+                placed: &mut state.downcast_mut::<AnchorState>().placed,
             })));
         }
         match found.len() {
             0 => None,
             1 => found.pop(),
             _ => Some(overlay::Group::with_children(found).overlay()),
+        }
+    }
+}
+
+impl<Message> MenuAnchor<'_, Message> {
+    /// Offers the dropdown to the operation passing, which only the arrows' walk takes up.
+    fn reach(
+        &mut self,
+        tree: &mut Tree,
+        bounds: Rectangle,
+        renderer: &iced::Renderer,
+        operation: &mut dyn Operation,
+    ) {
+        let mut reach = Reach::default();
+        operation.custom(None, bounds, &mut reach);
+        if reach.wants == Wants::Nothing {
+            return;
+        }
+        let Tree {
+            state, children, ..
+        } = tree;
+        // Not laid out since the rebuild: the dropdown is not there to be asked.
+        let Some(placed) = state.downcast_ref::<AnchorState>().placed else {
+            return;
+        };
+        let content = &mut self.elements[1];
+        // Placed as the overlay is, from the trigger as it is now.
+        let node = place(
+            content,
+            &mut children[1],
+            renderer,
+            Rectangle {
+                x: bounds.x + placed.translation.x,
+                y: bounds.y + placed.translation.y,
+                ..bounds
+            },
+            placed.window,
+            self.end_aligned,
+            self.gap,
+        );
+        let layout = Layout::new(&node);
+        match reach.wants {
+            Wants::Nothing => {}
+            Wants::Survey => {
+                let mut collect = Collect::default();
+                content
+                    .as_widget_mut()
+                    .operate(&mut children[1], layout, renderer, &mut collect);
+                reach.items = collect.0;
+                reach.answered = true;
+                operation.custom(None, bounds, &mut reach);
+            }
+            Wants::Focus(at) => operate_dropdown(
+                content,
+                &mut children[1],
+                self.gap,
+                layout,
+                renderer,
+                &mut FocusItem { at, seen: 0 },
+            ),
         }
     }
 }
@@ -440,7 +645,32 @@ impl<'a, Message: 'a> From<MenuAnchor<'a, Message>> for Element<'a, Message> {
 
 #[cfg(test)]
 mod tests {
-    use super::offset_to_show;
+    use super::{AnchorState, MenuAnchor, Placed, offset_to_show};
+    use iced::widget::space;
+    use iced::{Element, Size, Vector};
+    use iced_core::widget::Tree;
+
+    /// RFC-123 ruling 2: what the overlay was laid out in belongs to the build it was made for.
+    /// (Nothing else makes a dialog over an open menu silent *alone*: the `Hide` boolean has its
+    /// own row in `inert`'s tests, and this is the other guard's.)
+    #[test]
+    fn a_rebuild_drops_what_the_overlay_was_laid_out_in() {
+        let element: Element<'_, ()> =
+            MenuAnchor::new(space(), Some(space().into()), false, 2.0).into();
+        let mut tree = Tree::new(&element);
+        tree.state.downcast_mut::<AnchorState>().placed = Some(Placed {
+            window: Size::new(100.0, 100.0),
+            translation: Vector::ZERO,
+        });
+        assert!(tree.state.downcast_ref::<AnchorState>().placed.is_some());
+
+        element.as_widget().diff(&mut tree);
+
+        assert!(
+            tree.state.downcast_ref::<AnchorState>().placed.is_none(),
+            "a rebuild kept the old placement"
+        );
+    }
 
     #[test]
     fn an_item_in_view_does_not_move_the_scroll() {

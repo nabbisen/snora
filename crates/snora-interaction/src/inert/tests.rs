@@ -483,3 +483,125 @@ fn the_modal_answers_escape_before_the_menu_beneath_it() {
 
 #[allow(dead_code)]
 fn _use(_: Color) {}
+
+// ---------------------------------------------------------------------------
+// RFC-123 Unit 0b: which covered layers still answer the arrows' request for a dropdown
+// ---------------------------------------------------------------------------
+
+mod reach {
+    use super::*;
+    use crate::menu_anchor::OpenMenu;
+    use crate::menu_keys::{Reach, Wants};
+    use std::cell::Cell;
+    use std::rc::Rc;
+
+    /// What an open anchor does to an operation, and nothing else: offers it a `Reach`
+    /// (after saying a menu is open, if it is) and records what the operation wanted.
+    struct Anchor {
+        open: bool,
+        wanted: Rc<Cell<Wants>>,
+    }
+
+    impl Widget<Msg, Theme, iced::Renderer> for Anchor {
+        fn tag(&self) -> tree::Tag {
+            tree::Tag::stateless()
+        }
+        fn size(&self) -> Size<Length> {
+            Size::new(Length::Fixed(10.0), Length::Fixed(10.0))
+        }
+        fn layout(
+            &mut self,
+            _t: &mut Tree,
+            _r: &iced::Renderer,
+            _l: &layout::Limits,
+        ) -> layout::Node {
+            layout::Node::new(Size::new(10.0, 10.0))
+        }
+        fn operate(
+            &mut self,
+            _t: &mut Tree,
+            layout: Layout<'_>,
+            _r: &iced::Renderer,
+            operation: &mut dyn Operation,
+        ) {
+            if self.open {
+                operation.custom(None, layout.bounds(), &mut OpenMenu);
+            }
+            let mut reach = Reach::default();
+            operation.custom(None, layout.bounds(), &mut reach);
+            self.wanted.set(reach.wants);
+        }
+        fn draw(
+            &self,
+            _t: &Tree,
+            _r: &mut iced::Renderer,
+            _th: &Theme,
+            _s: &renderer::Style,
+            _l: Layout<'_>,
+            _c: mouse::Cursor,
+            _v: &Rectangle,
+        ) {
+        }
+    }
+
+    /// The arrows' walk, as far as the request goes.
+    struct Ask;
+
+    impl Operation for Ask {
+        fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation)) {
+            operate(self);
+        }
+        fn custom(&mut self, _id: Option<&Id>, _b: Rectangle, state: &mut dyn std::any::Any) {
+            if let Some(reach) = state.downcast_mut::<Reach>() {
+                reach.wants = Wants::Survey;
+            }
+        }
+    }
+
+    /// What the walk got, from an anchor in an `Inert` built like this.
+    fn wanted_through(inert: bool, cover: bool, open: bool) -> Wants {
+        let wanted = Rc::new(Cell::new(Wants::Nothing));
+        let anchor = Anchor {
+            open,
+            wanted: wanted.clone(),
+        };
+        let layer = Inert::new(Element::new(anchor), inert)
+            .beneath_menus(cover.then_some(Msg::CloseMenu), None);
+        let mut rig = Rig::new(layer.into());
+        rig.redraw_requested();
+        let mut ask = Ask;
+        rig.ui.operate(&rig.renderer, &mut ask);
+        wanted.get()
+    }
+
+    /// Where the walk gets its dropdown, and where it must not (a dialog over a menu).
+    #[test]
+    fn a_menu_cover_lets_the_arrows_request_through_and_a_modal_drops_it() {
+        // Not covered at all: it reaches the anchor.
+        assert_eq!(
+            wanted_through(false, true, false),
+            Wants::Survey,
+            "not covered"
+        );
+        // Covered by its own open menu (the cover is on, no modal): it still does.
+        assert_eq!(
+            wanted_through(false, true, true),
+            Wants::Survey,
+            "menu cover"
+        );
+        // The flag set too (a menu's backdrop slot) with the menu cover on: still the menu's.
+        assert_eq!(
+            wanted_through(true, true, true),
+            Wants::Survey,
+            "flag + menu cover"
+        );
+        // Under a modal the engine switches the menu cover off: the request is dropped.
+        assert_eq!(
+            wanted_through(true, false, true),
+            Wants::Nothing,
+            "under a modal"
+        );
+        // A layer that is merely inert: dropped.
+        assert_eq!(wanted_through(true, false, false), Wants::Nothing, "inert");
+    }
+}

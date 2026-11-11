@@ -226,6 +226,29 @@ impl<M: Clone + 'static> Rig<M> {
         statuses[0]
     }
 
+    /// A plain named key, with `repeat` (a held key), and the `Status` the interface gave it.
+    pub fn named(&mut self, key: Named, repeat: bool) -> iced_runtime::core::event::Status {
+        self.batch(&[key_event(key, repeat, iced::keyboard::Modifiers::empty())])[0]
+    }
+
+    /// Several events in **one** `UserInterface::update`, as the window loop hands them
+    /// over between two redraws: the statuses, one per event.
+    pub fn batch(&mut self, events: &[Event]) -> Vec<iced_runtime::core::event::Status> {
+        let (_, statuses) = self.ui.update(
+            events,
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        statuses
+    }
+
+    /// The pointer position the rig holds.
+    pub fn set_cursor(&mut self, at: Point) {
+        self.cursor = mouse::Cursor::Available(at);
+    }
+
     pub fn key(&mut self, key: Named) {
         self.deliver(&[iced_test::simulator::press_key(key, None)]);
     }
@@ -291,6 +314,13 @@ impl<M: Clone + 'static> Rig<M> {
     }
 
     /// The frame as the renderer draws it now, at scale 1.
+    ///
+    /// **After a key that a widget at the root captured, call [`redraw`](Self::redraw)
+    /// first.** iced drops its cached overlay when the root captures an event
+    /// (`UserInterface::update`), and `draw` returns before drawing overlays, so a frame drawn
+    /// straight after shows no dropdown, tooltip or other overlay until the next `update` sets
+    /// it again. The window loop always sends that redraw request before a draw; the rig does
+    /// not, so a test that reads pixels must (`shot()` in `menu_arrows_unit0b.rs`).
     pub fn frame(&mut self) -> Vec<u8> {
         use iced::theme::Base;
         let theme = Theme::Light;
@@ -394,6 +424,22 @@ impl Operation for FocusAt {
         }
         self.seen += 1;
     }
+}
+
+/// A key press event.
+pub fn key_event(key: Named, repeat: bool, modifiers: iced::keyboard::Modifiers) -> Event {
+    let key = iced::keyboard::Key::Named(key);
+    Event::Keyboard(iced::keyboard::Event::KeyPressed {
+        key: key.clone(),
+        modified_key: key,
+        physical_key: iced::keyboard::key::Physical::Unidentified(
+            iced::keyboard::key::NativeCode::Unidentified,
+        ),
+        location: iced::keyboard::Location::Standard,
+        modifiers,
+        repeat,
+        text: None,
+    })
 }
 
 /// `focus_next`, for tests that want the runtime's own operation.

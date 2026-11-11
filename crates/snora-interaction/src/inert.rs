@@ -236,12 +236,19 @@ impl<'a, Message> Inert<'a, Message> {
 }
 
 /// An operation that does not see focus targets.
-struct Hide<'a>(&'a mut dyn Operation);
+///
+/// The second field is whether a menu's **dropdown** is still offered to it (RFC-123): a layer
+/// whose menu cover is on (`true`; the engine passes none under a modal) leaves the menu
+/// answerable to the arrows' walk, whose dropdown is an overlay and so is not in this layer's
+/// `operate`; any other covered layer (`false`) answers nothing, so the menu is silent under a
+/// dialog.
+struct Hide<'a>(&'a mut dyn Operation, bool);
 
 impl Operation for Hide<'_> {
     fn traverse(&mut self, operate: &mut dyn FnMut(&mut dyn Operation)) {
+        let reach = self.1;
         self.0.traverse(&mut |inner| {
-            let mut hidden = Hide(inner);
+            let mut hidden = Hide(inner, reach);
             operate(&mut hidden);
         });
     }
@@ -278,6 +285,9 @@ impl Operation for Hide<'_> {
     }
 
     fn custom(&mut self, id: Option<&Id>, bounds: Rectangle, state: &mut dyn std::any::Any) {
+        if !self.1 && state.is::<crate::menu_keys::Reach>() {
+            return;
+        }
         self.0.custom(id, bounds, state);
     }
 }
@@ -434,7 +444,9 @@ impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for Inert<'_, Messag
         self.resolve(tree, layout, renderer);
 
         if self.covered(tree) {
-            let mut hidden = Hide(operation);
+            // A layer with a menu cover on (the engine switches it off under a modal) leaves the
+            // menu's dropdown reachable to the arrows; one without it answers nothing.
+            let mut hidden = Hide(operation, self.menu.is_some());
             self.content.as_widget_mut().operate(
                 &mut tree.children[0],
                 layout,

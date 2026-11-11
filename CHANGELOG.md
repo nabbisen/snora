@@ -25,6 +25,18 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Added
+
+- **Arrow keys, Home and End in snora's menus (RFC-123).** In an open header menu or context
+  menu, ↓ and ↑ move focus between the items and wrap at both ends, and Home and End go to the
+  first and the last. With nothing focused, ↓ starts at the first item and ↑ at the last (opening
+  a menu still moves no focus). They are answered only while focus is on an item, on the menu's
+  trigger or nowhere, so a text field, a page control or a toast's close control keeps its keys;
+  an answered key is captured; Shift, Ctrl and Alt with an arrow are left alone; a menu under a
+  dialog stays silent. No wiring: an application that renders through `snora::render` has them,
+  as it has Escape. `render_menu` placed outside `snora::render` still gets Tab, Enter and Space
+  only.
+
 ### Changed
 
 - **A page under a dialog, a sheet, or a menu with its backdrop shows no hover, no pointer
