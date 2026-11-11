@@ -484,6 +484,37 @@ impl Rig {
         self.deliver(&[iced_test::simulator::press_key(key, None)]);
     }
 
+    /// A plain named key, and the `Status` the interface gave it.
+    fn press(&mut self, key: iced::keyboard::key::Named) -> iced_runtime::core::event::Status {
+        self.press_with(key, iced::keyboard::Modifiers::empty())
+    }
+
+    fn press_with(
+        &mut self,
+        key: iced::keyboard::key::Named,
+        modifiers: iced::keyboard::Modifiers,
+    ) -> iced_runtime::core::event::Status {
+        let event = Event::Keyboard(iced::keyboard::Event::KeyPressed {
+            key: iced::keyboard::Key::Named(key),
+            modified_key: iced::keyboard::Key::Named(key),
+            physical_key: iced::keyboard::key::Physical::Unidentified(
+                iced::keyboard::key::NativeCode::Unidentified,
+            ),
+            location: iced::keyboard::Location::Standard,
+            modifiers,
+            text: None,
+            repeat: false,
+        });
+        let (_, statuses) = self.ui.update(
+            &[event],
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        statuses[0]
+    }
+
     fn click(&mut self, at: Point) {
         self.cursor = mouse::Cursor::Available(at);
         self.deliver(&[Event::Mouse(mouse::Event::CursorMoved { position: at })]);
@@ -635,6 +666,183 @@ fn keyboard_failures(context: &str, subject: &Subject) -> Vec<String> {
         }
     }
     failures
+}
+
+// ---- the arrows (RFC-123) ---------------------------------------------------
+
+/// A menu rendered **through the engine** (`snora::render`), which is what answers the arrows:
+/// the subjects above are the widgets alone, and a `render_menu` outside the engine gets Tab,
+/// Enter and Space only. The menu has a trigger and two items, in that order among its focus
+/// targets (the page is empty), so the items are the last two.
+struct MenuSubject {
+    name: &'static str,
+    build: Box<dyn Fn() -> Element<'static, Msg>>,
+    /// How many items the menu has: they are the last focus targets (after the trigger).
+    items: usize,
+}
+
+fn engine_body() -> Element<'static, Msg> {
+    space().width(Length::Fill).height(Length::Fill).into()
+}
+
+fn menu_subjects() -> Vec<MenuSubject> {
+    vec![
+        MenuSubject {
+            name: "header menu (dropdown)",
+            build: Box::new(|| {
+                render(
+                    AppLayout::new(engine_body())
+                        .header(snora::widget::app_header(
+                            "App",
+                            vec![menu()],
+                            &ON_MENU,
+                            Some(&0),
+                            None,
+                            LayoutDirection::Ltr,
+                        ))
+                        .on_close_menus(msg("close")),
+                )
+            }),
+            items: 2,
+        },
+        MenuSubject {
+            name: "context menu (inline)",
+            build: Box::new(|| {
+                render(
+                    AppLayout::new(engine_body())
+                        .context_menu(snora::widget::render_menu(menu(), &ON_MENU, true))
+                        .on_close_menus(msg("close")),
+                )
+            }),
+            items: 2,
+        },
+    ]
+}
+
+#[cfg(feature = "design")]
+fn designed_menu_subjects(tokens: &'static snora::design::Tokens) -> Vec<MenuSubject> {
+    vec![MenuSubject {
+        name: "design header menu (dropdown)",
+        build: Box::new(move || {
+            snora::design::render(
+                AppLayout::new(engine_body())
+                    .header(snora::design::widget::app_header(
+                        tokens,
+                        "App",
+                        vec![menu()],
+                        &ON_MENU,
+                        Some(&0),
+                        None,
+                        LayoutDirection::Ltr,
+                    ))
+                    .on_close_menus(msg("close")),
+                tokens,
+            )
+        }),
+        items: 2,
+    }]
+}
+
+/// The arrow rules for one menu: ↓ from nothing is the first item, then the next, wrapping;
+/// ↑ from the first is the last; Home and End; every answered key is captured; Enter then
+/// presses the focused item and publishes what a click on it does; Shift+↓ is not answered.
+fn arrow_failures(context: &str, subject: &MenuSubject) -> Vec<String> {
+    use iced::keyboard::key::Named::{ArrowDown, ArrowUp, End, Home};
+
+    let mut failures = Vec::new();
+    let mut rig = Rig::new((subject.build)());
+    let n = rig.targets().len();
+    let first = n - subject.items;
+    let focus_flags = |rig: &mut Rig| -> Vec<usize> {
+        rig.targets()
+            .iter()
+            .enumerate()
+            .filter(|(_, t)| t.focused)
+            .map(|(i, _)| i)
+            .collect()
+    };
+    if !focus_flags(&mut rig).is_empty() {
+        failures.push(format!(
+            "{context} / {}: focused before any key",
+            subject.name
+        ));
+    }
+    // Each step: the key, and the item (0-based among the items) that must hold focus.
+    let steps = [
+        (ArrowDown, 0usize, "↓ from nothing"),
+        (ArrowDown, 1, "↓"),
+        (ArrowDown, 0, "↓ wraps to the first"),
+        (ArrowUp, 1, "↑ wraps to the last"),
+        (ArrowUp, 0, "↑"),
+        (End, 1, "End"),
+        (Home, 0, "Home"),
+    ];
+    for (key, item, label) in steps {
+        let status = rig.press(key);
+        let got = focus_flags(&mut rig);
+        if got != vec![first + item] {
+            failures.push(format!(
+                "{context} / {} {label}: focus is {got:?}, expected [{}]",
+                subject.name,
+                first + item
+            ));
+        }
+        if status != iced_runtime::core::event::Status::Captured {
+            failures.push(format!(
+                "{context} / {} {label}: the key was {status:?}, not Captured",
+                subject.name
+            ));
+        }
+    }
+    // Enter presses the focused item (Home left it on the first): what a click on it publishes.
+    rig.messages.clear();
+    rig.key(iced::keyboard::key::Named::Enter);
+    if rig.messages != vec![msg(MENU_MESSAGES[1])] {
+        failures.push(format!(
+            "{context} / {}: Enter on the first item published {:?}, expected {:?}",
+            subject.name, rig.messages, MENU_MESSAGES[1]
+        ));
+    }
+    // Moving never presses.
+    let mut rig = Rig::new((subject.build)());
+    rig.press(ArrowDown);
+    rig.press(ArrowDown);
+    if !rig.messages.is_empty() {
+        failures.push(format!(
+            "{context} / {}: moving published {:?}",
+            subject.name, rig.messages
+        ));
+    }
+    // Shift+↓ is not answered.
+    let shifted = rig.press_with(ArrowDown, iced::keyboard::Modifiers::SHIFT);
+    if shifted != iced_runtime::core::event::Status::Ignored {
+        failures.push(format!(
+            "{context} / {}: Shift+↓ was {shifted:?}, not Ignored",
+            subject.name
+        ));
+    }
+    failures
+}
+
+#[test]
+fn every_unstyled_menu_answers_the_arrows() {
+    let mut failures = Vec::new();
+    for s in menu_subjects() {
+        failures.extend(arrow_failures("unstyled", &s));
+    }
+    assert_no_failures("arrow", failures);
+}
+
+#[cfg(feature = "design")]
+#[test]
+fn every_design_menu_answers_the_arrows_in_every_preset() {
+    let mut failures = Vec::new();
+    for (preset, tokens) in presets() {
+        for s in designed_menu_subjects(tokens) {
+            failures.extend(arrow_failures(preset, &s));
+        }
+    }
+    assert_no_failures("arrow", failures);
 }
 
 fn assert_no_failures(what: &str, failures: Vec<String>) {

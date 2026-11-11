@@ -321,7 +321,9 @@ where
         layers = layers.push(toast_layer);
     }
 
-    // PROTOTYPE (RFC-123 Unit 0): arrows in an open menu.
+    // ↓ ↑ Home End in an open menu (RFC-123): answered here, around the whole stack, so an
+    // application that renders through `snora::render` gets them with no wiring, as it gets
+    // Escape.
     snora_interaction::MenuKeys::new(layers).into()
 }
 

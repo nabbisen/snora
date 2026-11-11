@@ -1,28 +1,50 @@
-//! **PROTOTYPE (RFC-123 Unit 0b).** Arrow keys inside snora's menus: one stage, one survey,
-//! taken when the key reaches the root. Not for landing as it stands.
+//! [`MenuKeys`]: ↓ ↑ Home and End inside snora's menus (RFC-123).
 //!
-//! # The problem
+//! # The rules
 //!
-//! The header's dropdown is an overlay (RFC-124), and iced's `UserInterface::update` offers
-//! every event to the overlay **before** the widget tree. Rule 4 ("answered only while focus is
-//! on this menu, or nowhere in the window") needs the dropdown's items *and* the page's
-//! controls in one view. The first plan (Unit 0) got there with two stages, a counted move and
-//! a repair; this one has no stage in the overlay at all.
+//! 1. **↓ and ↑ move focus between a menu's items, and wrap** (↓ on the last goes to the
+//!    first, ↑ on the first to the last). Home and End go to the first and the last.
+//! 2. **With nothing focused, ↓ starts at the first item and ↑ at the last.** Opening a menu
+//!    never moves focus (a press that opens it, or Enter on its trigger, leaves it where it
+//!    was), so the first arrow is what puts focus in the menu.
+//! 3. **The arrows are answered only while focus is on an item of the menu, on its trigger,
+//!    or nowhere.** A text field, a page control, a toast's close control: whatever holds
+//!    focus keeps its keys. This is decided when the key arrives, not as of an earlier frame:
+//!    an application that moves focus with a task between two events is seen.
+//! 4. **An answered key is captured**: the application never receives it, so
+//!    `keyboard::listen()` (which passes only keys nobody captured) does not either. A key
+//!    that is not answered goes on as if no menu were open.
+//! 5. **A held arrow keeps moving; moving never presses.** Enter and Space press the focused
+//!    item, as they always have.
+//! 6. **Only the plain keys.** Shift, Ctrl, Alt or Logo with an arrow is not answered. ←
+//!    and → are not (menus are vertical lists, and RTL does not mirror ↓ and ↑).
+//! 7. **A menu under a dialog is silent**, and is not a Tab target.
 //!
-//! # One stage
+//! These hold wherever `snora::render` is used, with no wiring by the application, for the
+//! header's dropdown (an overlay anchored to its trigger, RFC-124) and the context menu (a
+//! layer of the stack). `render_menu` used **outside** `snora::render` gets no arrows: the
+//! engine's layer stack is what answers them.
 //!
-//! [`MenuKeys`] wraps the engine's layer stack. For a plain ↓ ↑ Home End it runs **one walk**
-//! over the tree **as it is when the key reaches the root** (events of a batch reach the root
-//! one at a time, each after the one before has been handled), decides, and, if the key is
-//! ours, runs a second walk that moves focus. A key that is not ours costs nothing.
+//! # Why one walk at the root, and why through the anchor
+//!
+//! Rule 3 needs the dropdown's items *and* the page's controls in one view. The header's
+//! dropdown is an overlay, and iced's `UserInterface::update` offers every event to the
+//! overlay **before** the widget tree, so neither the overlay nor a widget over the tree sees
+//! both. [`MenuKeys`] therefore does nothing in the overlay. For a plain arrow it runs **one
+//! walk** over the tree **as it is when the key reaches the root** (the events of a batch
+//! reach the root one at a time, each after the one before has been handled), decides, and,
+//! if the key is ours, runs a second walk that moves focus. Every other event costs nothing.
 //!
 //! The overlay is dropped before the root is updated, so the root's `operate` is free to reach
-//! the dropdown: **through [`MenuAnchor`](crate::MenuAnchor)**, which keeps the layout its
-//! overlay was last given and, when the walk asks ([`Reach`]), operates its dropdown with it.
-//! Any other operation (a Tab, a focus task) never asks, so it sees each dropdown item exactly
-//! once, through the overlay, as before.
+//! the dropdown: **through [`MenuAnchor`](crate::MenuAnchor)**, whose `operate` is where the
+//! dropdown's tree lives. The anchor offers every operation passing it a [`Reach`] and **only
+//! this walk answers it**, so Tab, Shift+Tab, a focus task and the focus rule after a removal
+//! meet each dropdown item once, through the overlay, as they always did.
 //!
 //! [`decide`] is the single rule, a pure function of the focus targets in order.
+//!
+//! Public because `snora` builds [`MenuKeys`] and `snora-widgets` builds [`MenuPart`]; not
+//! for applications, which get this behaviour from `snora::render`.
 
 use iced::{Element, Length, Rectangle, Size, Theme, Vector};
 use iced_core::layout::{self, Layout};
@@ -74,7 +96,7 @@ pub(crate) enum Wants {
 }
 
 /// Offered by an open [`MenuAnchor`](crate::MenuAnchor) to **every** operation passing it, and
-/// answered by the arrows' walk alone: the dropdown is an overlay, so the anchor's `operate`
+/// answered by the arrows' walk alone (see the module's last section): the dropdown is an overlay, so the anchor's `operate`
 /// does not reach it. Plain data, so it passes `Inert`'s `Hide` (which forwards `custom`);
 /// `Inert` drops it when a modal covers the layer, which is what keeps the menu silent under a
 /// dialog.
@@ -88,8 +110,13 @@ pub(crate) struct Reach {
     pub(crate) answered: bool,
 }
 
-/// A menu's trigger, or its items, marked as such (for a menu that is not anchored: the
-/// context menu is drawn inline).
+/// A menu's trigger, or its items, marked as such, so that the arrows' walk can tell them from
+/// the page's controls. For a menu that is not anchored: the context menu is drawn inline, as a
+/// layer of the stack, and its controls are in the tree the walk already reaches. (The
+/// header's dropdown is marked by [`MenuAnchor`](crate::MenuAnchor) itself.)
+///
+/// Built by `snora-widgets`; not for applications. The mark is invisible: layout, drawing and
+/// events are the content's own.
 pub struct MenuPart<'a, Message> {
     content: Element<'a, Message>,
     part: Part,
@@ -266,7 +293,8 @@ fn ours(event: &Event) -> Option<keyboard::key::Named> {
     .map(|()| *named)
 }
 
-/// `content`, with ↓ ↑ Home End answered for an open menu.
+/// The engine's layer stack, with ↓ ↑ Home End answered for an open menu (see the module's
+/// rules). Built by `snora::render` around the whole stack; not for applications.
 pub struct MenuKeys<'a, Message> {
     content: Element<'a, Message>,
 }

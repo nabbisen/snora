@@ -1,13 +1,15 @@
-//! RFC-123 Unit 0b: arrow keys in snora's menus, on the anchored dropdown, measured on a
-//! PROTOTYPE with **one stage** (`snora-interaction/src/menu_keys.rs`, wired in `render.rs`,
-//! `menu.rs`, `menu_anchor.rs` and `inert.rs`). Prints the table (`--nocapture`) and asserts
-//! each row.
+//! RFC-123: ↓ ↑ Home End in snora's menus, on the header's dropdown (an overlay) and the context
+//! menu (a layer of the stack), through the real engine and the runtime's own interface.
+//! Prints the table (`--nocapture`) and asserts each row. The rules are in
+//! `snora-interaction/src/menu_keys.rs`.
+//!
+//! **After a key the root captured, redraw before reading pixels** (`shot()`): see `Rig::frame`.
 //!
 //! Renderer follows `ICED_TEST_BACKEND` (default tiny-skia); wgpu needs `--test-threads=1`.
 #![cfg(feature = "widgets")]
 mod common;
 
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 
 use common::removal::{Rig, key_event};
@@ -143,6 +145,61 @@ struct Scene {
     dir: LayoutDirection,
     toast: bool,
     dialog: bool,
+    /// A block above the dropdown's trigger whose height an `F5` key press changes, so that
+    /// an event moves the trigger (the dropdown host only).
+    grow: Option<Arc<AtomicBool>>,
+}
+
+/// A block of no height until it sees `F5`, then 300 px: it asks for a new layout when it
+/// does, as a widget that changed its size would.
+struct Grow(Arc<AtomicBool>);
+
+impl Widget<Msg, Theme, iced::Renderer> for Grow {
+    fn tag(&self) -> tree::Tag {
+        tree::Tag::stateless()
+    }
+    fn size(&self) -> Size<Length> {
+        Size::new(Length::Fixed(10.0), Length::Shrink)
+    }
+    fn layout(&mut self, _t: &mut Tree, _r: &iced::Renderer, _l: &layout::Limits) -> layout::Node {
+        let height = if self.0.load(Ordering::SeqCst) {
+            300.0
+        } else {
+            0.0
+        };
+        layout::Node::new(Size::new(10.0, height))
+    }
+    fn update(
+        &mut self,
+        _t: &mut Tree,
+        event: &Event,
+        _l: Layout<'_>,
+        _c: mouse::Cursor,
+        _r: &iced::Renderer,
+        _cb: &mut dyn Clipboard,
+        shell: &mut Shell<'_, Msg>,
+        _v: &Rectangle,
+    ) {
+        if let Event::Keyboard(keyboard::Event::KeyPressed {
+            key: keyboard::Key::Named(keyboard::key::Named::F5),
+            ..
+        }) = event
+        {
+            self.0.store(true, Ordering::SeqCst);
+            shell.invalidate_layout();
+        }
+    }
+    fn draw(
+        &self,
+        _t: &Tree,
+        _r: &mut iced::Renderer,
+        _th: &Theme,
+        _s: &renderer::Style,
+        _l: Layout<'_>,
+        _c: mouse::Cursor,
+        _v: &Rectangle,
+    ) {
+    }
 }
 
 impl Scene {
@@ -155,6 +212,7 @@ impl Scene {
             dir: LTR,
             toast: false,
             dialog: false,
+            grow: None,
         }
     }
     fn build(&self, c: &Counts) -> Element<'static, Msg> {
@@ -162,14 +220,18 @@ impl Scene {
         match self.host {
             Host::Dropdown => {
                 let active = self.open.then_some(&0u8);
-                l = l.header(snora::widget::app_header(
+                let header = snora::widget::app_header(
                     "App",
                     vec![menu(self.items)],
                     &ON_MENU,
                     active,
                     None,
                     self.dir,
-                ));
+                );
+                l = l.header(match &self.grow {
+                    Some(flag) => column![Element::new(Grow(flag.clone())), header].into(),
+                    None => header,
+                });
             }
             Host::Context => {
                 l = l.context_menu(snora::widget::render_menu(
@@ -631,9 +693,16 @@ fn forty_items_end_then_down_wraps_and_each_focused_item_is_in_view() {
     };
     println!("\n## 40 items: End, ↓ (wrap), then ↑ ↑ and a run of ↓\n");
     let check = |rig: &mut Rig<Msg>, label: &str, want: usize| {
+        // The frame as the key left it, before any operation (an operation on the overlay
+        // brings the focused item into view again, which would hide a walk that did not).
+        let as_left = shot(rig);
         let at = focused(rig)[0];
         assert_eq!(at, want, "{label}: item {at}, wanted {want}");
         let shown = shot(rig);
+        assert!(
+            as_left == shown,
+            "{label}: the key left the focused item where an operation then had to move it"
+        );
         rig.focus_at(usize::MAX);
         let plain = shot(rig);
         rig.focus_at(at);
@@ -1084,4 +1153,62 @@ fn a_dialog_opened_over_a_laid_out_dropdown_silences_it() {
             );
         }
     }
+}
+
+/// RFC-123 ruling 3: an event **earlier in the same batch moves the trigger**, then End. The
+/// dropdown's node is computed at the walk from the trigger as it then is, so its room is the
+/// real one and the focused item is in view **as the walk left it**, by pixels.
+///
+/// Every operation on the overlay (this rig's `targets()` is one) brings the focused item into
+/// view again with the layout it is then given, so a stale answer from the walk is mended by
+/// the next operation. The test therefore reads the frame **before** any operation, and then
+/// the frame after one: they must be the same pixels. (A node stored at the overlay's last
+/// layout gives the walk the old room, 300 px more: the first frame has the item out of view,
+/// and the second moves it in.) Without a close message: with one, the page is covered and the
+/// key never reaches the block that moves the trigger.
+#[test]
+fn an_earlier_event_that_moves_the_trigger_leaves_the_focused_item_in_view() {
+    const ITEMS: u8 = 40;
+    let flag = Arc::new(AtomicBool::new(false));
+    let (mut rig, _) = Scene {
+        items: ITEMS,
+        grow: Some(flag.clone()),
+        ..Scene::new(Host::Dropdown, false)
+    }
+    .rig();
+    rig.named(Home, false);
+    let statuses = rig.batch(&[
+        key_event(keyboard::key::Named::F5, false, Modifiers::empty()),
+        key_event(End, false, Modifiers::empty()),
+    ]);
+    println!("[F5 (moves the trigger by 300 px), End] in one batch: {statuses:?}");
+    assert!(flag.load(Ordering::SeqCst), "the trigger did not move");
+    assert_eq!(statuses, vec![Status::Ignored, Status::Captured]);
+
+    // The frame as the walk left it (a redraw first, as the window loop sends; no operation).
+    let as_left = shot(&mut rig);
+    // Any operation mends the scroll with the layout it is given; then the frame again.
+    assert_eq!(
+        item_of(&mut rig, usize::from(ITEMS)),
+        Some(usize::from(ITEMS) - 1)
+    );
+    let mended = shot(&mut rig);
+    assert!(
+        as_left == mended,
+        "the walk left the focused item where an operation then had to move it"
+    );
+
+    // And it is in view, the whole ring, inside the room below the moved trigger.
+    let at = focused(&mut rig)[0];
+    rig.focus_at(usize::MAX);
+    let plain = shot(&mut rig);
+    rig.focus_at(at);
+    let (centre, _) = changed_box(&mended, &plain)
+        .expect("the last item is focused and no ring is drawn: it is out of view");
+    println!("the last item's ring is at y = {:.0}", centre.y);
+    assert!(
+        (300.0..600.0).contains(&centre.y),
+        "the ring is at y = {:.0}: not inside the room below the moved trigger (300..600)",
+        centre.y
+    );
 }
