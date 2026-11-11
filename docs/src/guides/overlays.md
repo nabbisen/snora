@@ -204,8 +204,12 @@ check:
 [ ] Destructive actions have explicit labels; they are not triggered
     by backdrop click alone.
 [ ] If initial keyboard focus inside the dialog matters, set it with
-    iced's widget::Id and a focus operation. Snora bounds Tab to the
-    modal and the toasts, but does not choose where focus starts.
+    iced's widget::Id and a focus operation. That works for an iced
+    widget that takes an id (text_input). A snora control cannot be
+    given an id yet (RFC-127, proposed for 0.61), so with snora's
+    controls the first Tab reaches the dialog's first control. Snora
+    bounds Tab to the modal and the toasts, but does not choose where
+    focus starts.
 ```
 
 ABDD is a layout discipline, not a complete accessibility or localization

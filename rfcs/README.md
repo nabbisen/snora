@@ -187,6 +187,8 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 126 | [F6 zone navigation cannot move focus, and does not know where focus is](./proposed/126-f6-zone-navigation-cannot-move-focus.md) | **0.61.0** — RFC-060's F6 is a pure decision an application cannot act on: no snora control can be focused by id, the current zone is a variable that goes stale after Tab, an open menu is ignored, empty zones are stops. Proposed: snora moves focus itself (`keyboard::focus_zone(cycle)`), from the zone that holds focus, skipping zones with no control, and nothing under a cover; the application's zone vocabulary deprecated, removed in 0.64.0 |
+| 127 | [An application cannot put focus on a snora control](./proposed/127-a-snora-control-cannot-be-given-focus.md) | **0.61.0** — the book says to set a dialog's initial focus with `widget::Id`, but a snora control's id cannot be set. Proposed: `.id()` on `snora::control` and `snora::design::control`, used with iced's own `focus(id)` |
 
 ## Archive
 

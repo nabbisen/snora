@@ -96,7 +96,19 @@ contributor-facing documents linked below, not duplicated here.
   no subscription: your application wires `iced::keyboard::listen()`
   and calls the pure function itself. Cycling is automatically
   suspended while a dialog or sheet is open (focus belongs inside the
-  modal), and unaffected by an open menu.
+  modal).
+
+  > **Known gap (corrected 2026-11-12): this decides a zone, and moves no focus.**
+  > The example above changes a variable. Moving focus into the zone is left to your
+  > application, and with snora's own controls it cannot be done: their `widget::Id`
+  > cannot be set, and iced 0.14 cannot focus "the first control inside" a region
+  > without its `advanced` feature. Three more limits:
+  > - the current zone is your variable, so after a Tab or a click into another zone, F6
+  >   counts from the wrong one;
+  > - a menu with its backdrop covers the page (Law 8), but `next_zone` ignores it;
+  > - a zone with nothing focusable is still a stop.
+  >
+  > **RFC-126 (proposed for 0.61) moves focus itself.** Until then, rely on Tab.
 
 ## If your application serves older readers (RFC-115)
 
