@@ -94,3 +94,51 @@ pub fn disabled_design<M: Clone + 'static>(tokens: &'static Tokens) -> Element<'
         .on_press_maybe(None)
         .into()
 }
+
+// ---- the same controls given an id (RFC-127) ---------------------------------
+
+pub fn glyph_label_engine_id<M: Clone + 'static>(m: M, id: &'static str) -> Element<'static, M> {
+    control(glyph_and_label()).on_press(m).id(id).into()
+}
+
+#[cfg(feature = "design")]
+pub fn glyph_label_design_id<M: Clone + 'static>(
+    tokens: &'static Tokens,
+    m: M,
+    id: &'static str,
+) -> Element<'static, M> {
+    design_control(tokens, glyph_and_label())
+        .on_press(m)
+        .id(id)
+        .style(move |_theme, status| snora::design::style::button::primary(tokens, status))
+        .into()
+}
+
+pub fn tree_row_engine_id<M: Clone + 'static>(m: M, id: &'static str) -> Element<'static, M> {
+    container(
+        control(tree_row_content())
+            .on_press(m)
+            .id(id)
+            .width(Length::Fill)
+            .padding([6, 12]),
+    )
+    .width(Length::Fixed(320.0))
+    .into()
+}
+
+#[cfg(feature = "design")]
+pub fn tree_row_design_id<M: Clone + 'static>(
+    tokens: &'static Tokens,
+    m: M,
+    id: &'static str,
+) -> Element<'static, M> {
+    container(
+        design_control(tokens, tree_row_content())
+            .on_press(m)
+            .id(id)
+            .width(Length::Fill)
+            .padding([6, 12]),
+    )
+    .width(Length::Fixed(320.0))
+    .into()
+}

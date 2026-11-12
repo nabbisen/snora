@@ -1,7 +1,7 @@
 //! The public control: [`Control`], and the two functions that make one. The
 //! documentation is on the type, because this module is private.
 
-use iced::widget::button;
+use iced::widget::{self, button};
 use iced::{Color, Element, Length, Padding, Theme};
 use snora_interaction::contrast::readable_text;
 use snora_interaction::{Ring, StyleFn};
@@ -127,6 +127,8 @@ pub struct Control<'a, Message> {
     ring: RingConfig,
     min_target: f32,
     text_size: Option<f32>,
+    /// Chosen by the application (RFC-127); `None` keeps the one the control makes.
+    id: Option<widget::Id>,
 }
 
 /// Make `content` a control the keyboard can reach. The **engine path**: no tokens.
@@ -167,6 +169,7 @@ pub fn control<'a, Message: Clone + 'a>(
         },
         min_target: 0.0,
         text_size: None,
+        id: None,
     }
 }
 
@@ -196,6 +199,7 @@ pub(crate) fn designed<'a, Message: Clone + 'a>(
         // The target is measured against the text the control carries, which on
         // this path is drawn at the label size.
         text_size: Some(tokens.typography.label.size),
+        id: None,
     }
 }
 
@@ -218,6 +222,59 @@ impl<'a, Message: Clone + 'a> Control<'a, Message> {
     /// happens, for a message that is costly to build.
     pub fn on_press_with(mut self, message: impl Fn() -> Message + 'a) -> Self {
         self.on_press = Some(OnPress::With(Box::new(message)));
+        self
+    }
+
+    /// The control's `widget::Id`, so that iced's own tasks can reach it: `focus(id)` puts focus
+    /// on it, and `is_focused(id)` reports whether it has it (RFC-127). snora adds no focus API of
+    /// its own; this is the pattern `text_input` already has. Without an id, the control makes
+    /// its own, which nothing outside can name.
+    ///
+    /// A control focused this way behaves as one reached by Tab: its ring is drawn, Enter and
+    /// Space press it, and Tab carries on from it.
+    ///
+    /// # Choosing where focus starts when a dialog opens
+    ///
+    /// ```
+    /// # use iced::widget::{operation, text};
+    /// # #[derive(Clone)] enum Message { Cancel }
+    /// # struct App { confirm: bool }
+    /// # impl App {
+    /// // view: the dialog's safe choice has an id.
+    /// fn cancel<'a>(&self) -> iced::Element<'a, Message> {
+    ///     snora::control(text("Cancel"))
+    ///         .id("confirm-cancel")
+    ///         .on_press(Message::Cancel)
+    ///         .into()
+    /// }
+    ///
+    /// // update: the same update that opens the dialog asks for the focus.
+    /// fn open_dialog(&mut self) -> iced::Task<Message> {
+    ///     self.confirm = true;
+    ///     operation::focus("confirm-cancel")
+    /// }
+    /// # }
+    /// ```
+    ///
+    /// **The task runs on the new view, so it can name a control in the dialog that the same
+    /// update opens.** The window loop builds the interface from the new `view` first and runs the
+    /// update's tasks on it afterwards. A task that runs *before* the dialog is in the view
+    /// (returned by an earlier message, say) finds no such control.
+    ///
+    /// # What `focus(id)` does when it finds nothing
+    ///
+    /// - **The id must be unique in the window**, as for iced's `text_input`: `focus(id)` focuses
+    ///   every control that has it, and `is_focused(id)` answers for the last one in tree order.
+    /// - **An id that no reachable control has** focuses nothing and **leaves nothing focused**:
+    ///   iced's `focus` unfocuses every control it reaches that does not have the id, even one that
+    ///   held focus a moment ago. `is_focused(id)` then **gives no answer at all** (not `false`),
+    ///   so an application that waits for its message waits forever.
+    /// - **A control that is covered is such an id.** Under an open dialog or sheet, or a menu
+    ///   with its backdrop, the page is out of reach of the keyboard (RFC-119), so `focus(id)` for
+    ///   one of its controls cannot put focus beneath the cover. It focuses nothing, and
+    ///   leaves nothing focused: Tab starts again inside the dialog.
+    pub fn id(mut self, id: impl Into<widget::Id>) -> Self {
+        self.id = Some(id.into());
         self
     }
 
@@ -279,6 +336,9 @@ impl<'a, Message: Clone + 'a> From<Control<'a, Message>> for Element<'a, Message
         .clip(control.clip);
         if let Some(size) = control.text_size {
             inner = inner.text_size(size);
+        }
+        if let Some(id) = control.id {
+            inner = inner.id(id);
         }
         inner = match control.on_press {
             Some(OnPress::Direct(message)) => inner.on_press(message),

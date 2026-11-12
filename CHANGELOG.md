@@ -26,7 +26,16 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`.id()` on `snora::control` and `snora::design::control` (RFC-127).** An application can
+  now choose where focus starts: give a control a `widget::Id` and return iced's own
+  `iced::widget::operation::focus(id)` (`is_focused(id)` reports it). The book had said to do
+  this, and a snora control could not take an id. A control focused this way behaves as one
+  reached by Tab: its ring is drawn, Enter and Space press it, and Tab carries on from it. The
+  task can come from the same `update` that opens a dialog. An id that no reachable control has,
+  and so a control under a dialog, a sheet or a menu's backdrop, focuses nothing and leaves
+  nothing focused. No snora-specific focus API is added.
 
 ## [0.60.0] — 2026-11-11
 

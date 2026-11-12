@@ -668,6 +668,174 @@ fn keyboard_failures(context: &str, subject: &Subject) -> Vec<String> {
     failures
 }
 
+// ---- an id (RFC-127) ---------------------------------------------------------
+
+/// A `snora::control` given an id: iced's `focus(id)` must focus it, show its ring (at the same
+/// 3:1 floor as for Tab), and Enter must then press it once.
+struct IdSubject {
+    name: &'static str,
+    id: &'static str,
+    publishes: &'static str,
+    build: Box<dyn Fn() -> Element<'static, Msg>>,
+}
+
+fn id_subjects() -> Vec<IdSubject> {
+    vec![
+        IdSubject {
+            name: "control: plain text",
+            id: "plain",
+            publishes: "plain",
+            build: Box::new(|| {
+                iced::widget::container(
+                    snora::control(iced::widget::text("Open"))
+                        .on_press(msg("plain"))
+                        .id("plain"),
+                )
+                .padding(24)
+                .into()
+            }),
+        },
+        IdSubject {
+            name: "control: glyph beside a label",
+            id: "glyph",
+            publishes: "open",
+            build: Box::new(|| {
+                iced::widget::container(common::aaai_cases::glyph_label_engine_id(
+                    msg("open"),
+                    "glyph",
+                ))
+                .padding(24)
+                .into()
+            }),
+        },
+        IdSubject {
+            name: "control: file-tree row, Fill",
+            id: "tree",
+            publishes: "tree",
+            build: Box::new(|| {
+                iced::widget::container(common::aaai_cases::tree_row_engine_id(msg("tree"), "tree"))
+                    .padding(24)
+                    .into()
+            }),
+        },
+    ]
+}
+
+#[cfg(feature = "design")]
+fn designed_id_subjects(tokens: &'static snora::design::Tokens) -> Vec<IdSubject> {
+    vec![
+        IdSubject {
+            name: "design control: plain text",
+            id: "plain",
+            publishes: "plain",
+            build: Box::new(move || {
+                iced::widget::container(
+                    snora::design::control(tokens, iced::widget::text("Open"))
+                        .on_press(msg("plain"))
+                        .id("plain"),
+                )
+                .padding(24)
+                .into()
+            }),
+        },
+        IdSubject {
+            name: "design control: glyph beside a label, primary",
+            id: "glyph",
+            publishes: "open",
+            build: Box::new(move || {
+                iced::widget::container(common::aaai_cases::glyph_label_design_id(
+                    tokens,
+                    msg("open"),
+                    "glyph",
+                ))
+                .padding(24)
+                .into()
+            }),
+        },
+        IdSubject {
+            name: "design control: file-tree row, Fill",
+            id: "tree",
+            publishes: "tree",
+            build: Box::new(move || {
+                iced::widget::container(common::aaai_cases::tree_row_design_id(
+                    tokens,
+                    msg("tree"),
+                    "tree",
+                ))
+                .padding(24)
+                .into()
+            }),
+        },
+    ]
+}
+
+/// Focused by `focus(id)`: one focus target, focused; Enter publishes what a click does, once;
+/// and the ring clears the non-text floor against what it covers (the same method as for Tab).
+fn id_failures(context: &str, theme: &Theme, subject: &IdSubject) -> Vec<String> {
+    let mut failures = Vec::new();
+    let mut plain_rig = Rig::for_frames((subject.build)());
+    let targets = plain_rig.targets();
+    if targets.len() != 1 {
+        return vec![format!(
+            "{context} / {}: {} focus targets, expected 1",
+            subject.name,
+            targets.len()
+        )];
+    }
+    let target = targets[0].bounds;
+    let plain = plain_rig.frame(theme);
+
+    let mut rig = Rig::for_frames((subject.build)());
+    rig.run(focusable::focus::<()>(Id::from(subject.id)));
+    if !rig.targets()[0].focused {
+        return vec![format!(
+            "{context} / {}: focus(id) did not focus the control",
+            subject.name
+        )];
+    }
+    let focused = rig.frame(theme);
+    match ring_contrast(&plain, &focused, target, 10.0) {
+        Err(why) => failures.push(format!("{context} / {}: {why}", subject.name)),
+        Ok(ratio) if ratio < NON_TEXT_MIN => failures.push(format!(
+            "{context} / {}: the ring is {ratio:.2}:1 against what it covers, under {NON_TEXT_MIN}",
+            subject.name
+        )),
+        Ok(_) => {}
+    }
+    rig.key(iced::keyboard::key::Named::Enter);
+    if rig.messages != vec![msg(subject.publishes)] {
+        failures.push(format!(
+            "{context} / {}: Enter after focus(id) published {:?}, expected {:?}",
+            subject.name, rig.messages, subject.publishes
+        ));
+    }
+    failures
+}
+
+#[test]
+fn every_unstyled_control_given_an_id_is_focused_by_it_with_its_ring() {
+    let mut failures = Vec::new();
+    for theme in Theme::ALL {
+        for s in id_subjects() {
+            failures.extend(id_failures(&format!("stock {theme}"), theme, &s));
+        }
+    }
+    assert_no_failures("id", failures);
+}
+
+#[cfg(feature = "design")]
+#[test]
+fn every_design_control_given_an_id_is_focused_by_it_with_its_ring() {
+    let mut failures = Vec::new();
+    for (preset, tokens) in presets() {
+        let theme = snora::design::theme(tokens);
+        for s in designed_id_subjects(tokens) {
+            failures.extend(id_failures(preset, &theme, &s));
+        }
+    }
+    assert_no_failures("id", failures);
+}
+
 // ---- the arrows (RFC-123) ---------------------------------------------------
 
 /// A menu rendered **through the engine** (`snora::render`), which is what answers the arrows:

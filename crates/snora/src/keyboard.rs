@@ -124,7 +124,9 @@ mod tests {
 /// reach: Tab moves between the overlay and the toasts (dialog, then sheet,
 /// then toasts), and nothing beneath takes focus or key presses. A menu with no
 /// backdrop leaves the page pressable, so Tab reaches it. Where focus starts
-/// when an overlay opens is still yours (`widget::Id` and `operate`).
+/// when an overlay opens is still yours: give the control an id with
+/// [`Control::id`](crate::Control::id) and return iced's
+/// `iced::widget::operation::focus(id)` from the same `update` that opens it.
 ///
 /// # Why an application has to call this at all
 ///
