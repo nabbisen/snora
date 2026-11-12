@@ -22,7 +22,8 @@ requires:
 4. **An open menu's dropdown belongs to its trigger's zone.**
 5. **While the page is covered, F6 does nothing:** under a dialog or a sheet, a menu with its
    backdrop, or an open `app_header` dropdown with a close message.
-6. **F6 never presses anything.** A held F6 moves once per press.
+6. **F6 never presses anything.** Held, it keeps moving, one zone per repeat, as Tab does
+   (corrected at Unit 0's review).
 7. **The application routes the key, as it routes Tab:**
 
 ```rust,ignore

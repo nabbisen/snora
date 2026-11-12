@@ -66,7 +66,12 @@ counted from **the zone that holds focus now**, read from the tree when the key 
 - **With focus in no zone** (nothing focused, or a toast): F6 goes to the first zone that has
   a control, and Shift+F6 to the last.
 - **An open menu's dropdown belongs to its trigger's zone.**
-- **F6 never presses anything.** A held F6 moves once per press, as Tab does.
+- **F6 never presses anything. Held, it keeps moving, one zone per repeat, as Tab does.**
+  *(Corrected 2026-11-12 at Unit 0's review: this read "moves once per press". A held Tab
+  keeps moving, and moving is navigation (RFC-123). RFC-121's held-key rule governs pressing.)*
+- **F6 lands only on a zone's own controls, never inside an open menu** (Unit 0's review,
+  ruling 1). A context menu is in no zone; a dropdown counts in its trigger's zone, but only to
+  find where focus is.
 
 **R-2. While the page is covered, F6 does nothing:** under a dialog or a sheet, a menu with its
 backdrop, or an open `app_header` dropdown with a close message. That is "the keyboard does
