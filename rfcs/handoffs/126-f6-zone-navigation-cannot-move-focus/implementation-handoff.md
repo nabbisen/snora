@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-126: F6 moves focus between zones, from where focus is
 
-**RFC.** `rfcs/accepted/126-f6-zone-navigation-cannot-move-focus.md`. Read the finding, R-1 to
+**RFC.** `rfcs/done/126-f6-zone-navigation-cannot-move-focus.md`. Read the finding, R-1 to
 R-5 and the Rulings.
 **Release target.** 0.61.0, **after RFC-127 lands**: Unit 0's first measure uses its ids.
 **Branch.** `rfc126-zones`, off `main` after RFC-127. Unit 0 is its own review. Land as `main`

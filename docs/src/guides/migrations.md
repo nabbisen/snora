@@ -11,6 +11,9 @@ This page is the index — pick the guide that matches your jump.
 ## Per-version guides
 
 
+- [0.60 → 0.61](migration-0.60-to-0.61.md) — **nothing breaks**: F6 moves focus between
+  zones (`keyboard::focus_zone`), and `next_zone`, `FocusZone` and `ZonePresence` are
+  deprecated; a snora control takes `.id()`, so a dialog can choose where focus starts.
 - [0.59 → 0.60](migration-0.59-to-0.60.md) — **one breaking change**:
   `dismiss_on_escape` removed (deprecated since 0.57). ↓ ↑ Home End inside snora's
   menus; a covered page gets no pointer, and a wheel over a dialog's dim no longer

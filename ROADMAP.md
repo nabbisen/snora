@@ -236,17 +236,9 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.61.0
+## Next — 0.62.0
 
-Accepted 2026-11-12 (owner): RFC-126 (F6 moves focus between zones itself) and RFC-127 (a
-snora control can be given an id), with the housekeeping below. Candidates recorded at the 0.60.0 cut:
-- **The build-cost ratio's +18% was investigated:** about 4% is `MenuKeys`' generic code,
-  measured, and the rest is the runner, inferred. No action (`build-cost-budget.md`).
-- **CI downloaded Mesa from Ubuntu's mirrors, and they were unreachable for about three
-  hours** on 2026-11-11, which held the release. Workflow lint survives the same kind of
-  outage by caching what it downloads.
-- **F6 zone navigation** became RFC-126: reading the whole feature found that it cannot move
-  focus as documented.
+Not yet scoped.
 
 ## Future wanted
 
@@ -259,6 +251,17 @@ snora control can be given an id), with the housekeeping below. Candidates recor
   L-5; owner, 2026-11-08). Not scheduled.
 
 ## Recently shipped
+
+- **0.61.0** — the keyboard between zones, and where focus starts.
+  - **F6 moves focus between the frame's zones** (RFC-126), counted from where focus is,
+    skipping zones with nothing to focus, and never under a cover. Before 0.61 the documented
+    pattern moved no focus at all. `next_zone`, `FocusZone` and `ZonePresence` are deprecated,
+    and removed in 0.64.0.
+  - **A snora control takes `.id()`** (RFC-127), so iced's `focus(id)` can choose where focus
+    starts, for example on a dialog's "Cancel".
+  - CI installs the rendered jobs' Mesa from pinned, verified packages, so a mirror outage no
+    longer blocks a release, and runs clippy with default features too. 0.60's build-cost move
+    was investigated: mostly the runner.
 
 - **0.60.0** — the keyboard inside a menu, and one meaning of "covered".
   - **↓ ↑ Home and End inside snora's menus** (RFC-123), wrapping. They are answered only

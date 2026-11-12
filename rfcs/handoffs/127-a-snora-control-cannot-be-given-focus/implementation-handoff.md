@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-127: a snora control can be given an id
 
-**RFC.** `rfcs/accepted/127-a-snora-control-cannot-be-given-focus.md`. Read R-1 to R-4 and the
+**RFC.** `rfcs/done/127-a-snora-control-cannot-be-given-focus.md`. Read R-1 to R-4 and the
 Rulings.
 **Release target.** 0.61.0. **Before RFC-126,** which is larger, and whose Unit 0 can then
 measure with ids available. Independent of the 0.61 housekeeping.

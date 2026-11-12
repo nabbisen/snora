@@ -26,6 +26,25 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.61.0] — 2026-11-12
+
+**Upgrading from 0.60:** read the [0.60 → 0.61 migration guide](docs/src/guides/migration-0.60-to-0.61.md).
+
+> **In short:** F6 and Shift+F6 now move focus between the frame's zones (header, sidebar,
+> body, footer), from wherever focus is. Before 0.61 the documented pattern moved no focus at
+> all. A snora control can be given an id, so an application can choose where focus starts,
+> for example on a dialog's "Cancel".
+>
+> **Code:** **nothing breaks.** `next_zone`, `FocusZone` and `ZonePresence` are deprecated (they
+> warn, still work, and are removed in 0.64.0). Replace them with `snora::keyboard::focus_zone`.
+>
+> **Appearance:** unchanged.
+>
+> **Security:** none. No dependency changed since 0.60.0; the advisory gate is clean, with the
+> same accepted advisories.
+
 ### Added
 
 - **`.id()` on `snora::control` and `snora::design::control` (RFC-127).** An application can
@@ -128,5 +147,6 @@ deprecated it.
 - **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
   page beneath it.** It no longer does.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.60.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.61.0...HEAD
+[0.61.0]: https://github.com/nabbisen/snora/compare/0.60.0...0.61.0
 [0.60.0]: https://github.com/nabbisen/snora/compare/0.59.0...0.60.0

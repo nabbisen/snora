@@ -1,6 +1,6 @@
 # RFC-126 — F6 zone navigation cannot move focus, and does not know where focus is
 
-**Status.** Accepted 2026-11-12. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.61.0. Accepted 2026-11-12. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/126-…`](../handoffs/126-f6-zone-navigation-cannot-move-focus/implementation-handoff.md).
 **Raised.** 2026-11-12, architect, scoping 0.61. It began as one finding while scoping 0.60:
 `next_zone` ignores an open menu. Reading the whole feature found that it cannot work as

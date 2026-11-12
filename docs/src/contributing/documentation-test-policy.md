@@ -187,9 +187,10 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of **0.60.0**, re-counted at the cut (`cargo test --workspace --all-features
---doc`). Against the table's previous figures: `snora` `ignore` −1 (`dismiss_on_escape`'s
-example, removed with the function under the deprecation rule). No new `ignore`.
+As of **0.61.0**, re-counted at the cut (`cargo test --workspace --all-features
+--doc`). Against the table's previous figures: `snora` +3 run (`Control::id` and
+`keyboard::focus_zone`, new; `cycle_zones`'s example, which was `ignore` and now compiles) and
+`ignore` −1. No new `ignore`.
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|
@@ -198,8 +199,8 @@ example, removed with the function under the deprecation rule). No new `ignore`.
 | `snora-style` | 3 | 1 |
 | `snora-interaction` | 0 | 0 |
 | `snora-widgets` | 6 | 0 |
-| `snora` | 12 | 2 |
-| **Total** | **57** | **3** |
+| `snora` | 15 | 1 |
+| **Total** | **60** | **2** |
 
 Tracked in the [release checklist](release-process.md). Do not
 accidentally break these by changing vocabulary without updating the

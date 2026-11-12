@@ -1,6 +1,6 @@
 # RFC-127 — An application cannot put focus on a snora control
 
-**Status.** Accepted 2026-11-12. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.61.0. Accepted 2026-11-12. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/127-…`](../handoffs/127-a-snora-control-cannot-be-given-focus/implementation-handoff.md).
 **Raised.** 2026-11-12, architect, scoping 0.61, found while reading RFC-126's finding 1.
 **Release target.** 0.61.0, with RFC-126.
