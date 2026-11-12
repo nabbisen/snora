@@ -23,44 +23,30 @@ use snora_core::focus::Cycle;
 
 pub use snora_core::{Digits, Escape, Platform, ShortcutAction, Shortcuts};
 
-/// Returns the [`Cycle`] direction for `F6` / `Shift+F6`, snora's
-/// recommended binding for frame-level zone navigation
-/// ([`crate::focus::next_zone`]).
+/// Returns the [`Cycle`] direction for `F6` / `Shift+F6`, snora's recommended binding for
+/// frame-level zone navigation. Pass it to [`focus_zone`], which moves focus.
 ///
-/// **Not the only legitimate binding.** F6 / Shift+F6 is the desktop
-/// convention for region cycling (Tab already means "next control," so
-/// snora does not claim it). An application is free to
-/// bind a different key to [`crate::focus::next_zone`] directly;
-/// this helper exists so the common case does not require re-deriving
-/// which modifier means "backward."
+/// **Not the only legitimate binding.** F6 / Shift+F6 is the desktop convention for region
+/// cycling (Tab already means "next control," so snora does not claim it). An application that
+/// wants another key maps that key to a [`Cycle`] itself and calls [`focus_zone`]; this helper
+/// exists so the common case does not require re-deriving which modifier means "backward."
 ///
-/// Returns `None` for any other key, so it composes with the application's
-/// own key handling in the same `if let Some(...) = ... else if
-/// let Some(...) = ...` chain without either needing to know about the
-/// other.
+/// Returns `None` for any other key, so it composes with the application's own key handling in
+/// the same `if let Some(...) = ... else if let Some(...) = ...` chain without either needing to
+/// know about the other.
 ///
 /// # Example
 ///
-/// `ignore` (RFC-064): a bare `match` arm fragment referencing
-/// application-owned methods (`self.focus_zone`, `self.zone_presence()`,
-/// `self.focus_task_for`) — not a standalone item.
+/// Two lines in your key handler, with no state of your own:
 ///
-/// ```rust,ignore
-/// // In your update, alongside your Escape handling (`AppLayout::escape`):
-/// Message::KeyPressed(key, modifiers) => {
+/// ```
+/// # use iced::keyboard::{Key, Modifiers};
+/// # #[derive(Clone)] enum Message {}
+/// fn on_key(key: Key, modifiers: Modifiers) -> iced::Task<Message> {
 ///     if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
-///         let next = snora::focus::next_zone(
-///             self.focus_zone,
-///             cycle,
-///             self.zone_presence(),
-///             self.show_dialog || self.show_sheet,
-///             self.open_menu.is_some(),
-///         );
-///         if let Some(zone) = next {
-///             self.focus_zone = zone;
-///             return self.focus_task_for(zone); // application-owned iced::Task
-///         }
+///         return snora::keyboard::focus_zone(cycle);
 ///     }
+///     iced::Task::none()
 /// }
 /// ```
 #[must_use]
@@ -73,6 +59,69 @@ pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
     } else {
         Some(Cycle::Forward)
     }
+}
+
+/// Moves focus to the first control of the next zone (`Cycle::Forward`) or the previous one
+/// (`Cycle::Backward`), counted from **the zone that holds focus when it runs**, read from the
+/// tree at that moment (RFC-126). The application routes the key, as it routes Tab
+/// ([`traverse`]):
+///
+/// ```
+/// # use iced::keyboard::{Key, Modifiers};
+/// # #[derive(Clone)] enum Message {}
+/// # fn on_key(key: Key, modifiers: Modifiers) -> iced::Task<Message> {
+/// if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
+///     return snora::keyboard::focus_zone(cycle);
+/// }
+/// # iced::Task::none()
+/// # }
+/// ```
+///
+/// snora does not answer F6 by itself: an application may already use F6 (a debugger's "step
+/// over"), and an upgrade must not take a key away silently. The rule a reader can predict:
+/// **snora answers keys inside its own controls and overlays (Enter, Space, the arrows in a menu,
+/// Escape). Keys that move between controls (Tab, F6) are routed to it by the application.**
+///
+/// # The rules
+///
+/// The four zones are the header, the sidebar, the body and the footer of
+/// [`AppLayout`](snora_core::AppLayout), in that order, wrapping. The order is **logical**: it does
+/// not mirror under RTL.
+///
+/// 1. **Forward and backward.** F6 goes to the next zone, Shift+F6 to the previous, and lands on
+///    the zone's **first control** (a memory of the last control per zone is not kept).
+/// 2. **A zone with no control that can take focus is skipped**, whether it is absent or holds
+///    none (a footer of plain text).
+/// 3. **With focus in no zone** (nothing focused, a toast, a control of a dialog or sheet, an
+///    inline context menu), F6 goes to the first zone that has a control, and Shift+F6 to the last.
+/// 4. **F6 lands only on a zone's own controls, never inside an open menu.** An open
+///    `app_header` dropdown **belongs to its trigger's zone** for finding where focus is: with
+///    focus on one of its items, F6 moves on to the next zone. A context menu
+///    (`AppLayout::context_menu`) is in **no zone** by comparison: the application opens it at a
+///    point, and snora does not know which zone that point means. So F6 from a context menu's
+///    control is "focus in no zone" (rule 3). The dropdown differs because it has a trigger, and
+///    the trigger's zone is known.
+/// 5. **While the page is covered, F6 does nothing:** under a dialog or a sheet, a menu with its
+///    backdrop, or an open `app_header` dropdown with a close message. The zones are beneath the
+///    cover, and the keyboard does what the pointer can.
+/// 6. **F6 never presses anything.** Held, it keeps moving, one zone per repeat, as Tab does.
+///
+/// The decision is made when the key is pressed, from the tree: nothing is remembered between
+/// presses, so a position held by the application cannot go stale, and a focus moved by Tab, a
+/// click's starting point or a task is where the next F6 counts from.
+///
+/// Replaces `snora_core::focus::next_zone` with `FocusZone` and `ZonePresence`, which are
+/// deprecated: an application no longer passes a stale answer, and has nothing left to pass.
+///
+/// [`traverse`]: crate::keyboard::traverse
+pub fn focus_zone<Message: 'static>(cycle: Cycle) -> iced::Task<Message> {
+    use crate::identifiers::{BODY_REGION, FOOTER_REGION, HEADER_REGION, SIDEBAR_REGION};
+    iced_runtime::task::effect(iced_runtime::Action::widget(
+        snora_interaction::zone_focus::<()>(
+            [HEADER_REGION, SIDEBAR_REGION, BODY_REGION, FOOTER_REGION],
+            matches!(cycle, Cycle::Forward),
+        ),
+    ))
 }
 
 #[cfg(test)]

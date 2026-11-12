@@ -668,6 +668,145 @@ fn keyboard_failures(context: &str, subject: &Subject) -> Vec<String> {
     failures
 }
 
+// ---- the zones (RFC-126) -----------------------------------------------------
+
+/// One control in each of the four zones of the frame, inset so that a ring is not cut by the window.
+/// F6 must reach each in turn, with the ring at the same 3:1 floor as for Tab.
+fn zone_layout(
+    control: impl Fn(&'static str) -> Element<'static, Msg>,
+) -> AppLayout<Element<'static, Msg>, Msg> {
+    let boxed = |label: &'static str| -> Element<'static, Msg> {
+        iced::widget::container(control(label)).padding(24).into()
+    };
+    AppLayout::new(boxed("body"))
+        .header(boxed("header"))
+        .side_bar(boxed("sidebar"))
+        .footer(boxed("footer"))
+}
+
+impl Rig {
+    /// F6 (or Shift+F6) through the public binding, as an application routes it.
+    fn f6(&mut self, shift: bool) {
+        use iced::futures::StreamExt;
+        let modifiers = if shift {
+            iced::keyboard::Modifiers::SHIFT
+        } else {
+            iced::keyboard::Modifiers::empty()
+        };
+        let cycle = snora::keyboard::cycle_zones(
+            iced::keyboard::Key::Named(iced::keyboard::key::Named::F6),
+            modifiers,
+        )
+        .expect("F6 is claimed");
+        let task = snora::keyboard::focus_zone::<Msg>(cycle);
+        let mut stream = iced_runtime::task::into_stream(task).expect("a task with work in it");
+        while let Some(action) = iced::futures::executor::block_on(stream.next()) {
+            let iced_runtime::Action::Widget(mut op) = action else {
+                panic!("focus_zone produced something other than a widget operation");
+            };
+            loop {
+                self.ui
+                    .operate(&self.renderer, &mut operation::black_box(op.as_mut()));
+                match op.finish() {
+                    Outcome::None | Outcome::Some(()) => break,
+                    Outcome::Chain(next) => op = next,
+                }
+            }
+        }
+    }
+}
+
+fn zone_failures(
+    context: &str,
+    theme: &Theme,
+    scene: &dyn Fn() -> Element<'static, Msg>,
+) -> Vec<String> {
+    // Logical order: header, sidebar, body, footer; the tree's order differs (the sidebar is
+    // beside the body), so find each control by its place in the tree.
+    let mut failures = Vec::new();
+    let mut plain_rig = Rig::for_frames(scene());
+    let targets = plain_rig.targets();
+    if targets.len() != 4 {
+        return vec![format!(
+            "{context} / zones: {} focus targets, expected 4",
+            targets.len()
+        )];
+    }
+    let plain = plain_rig.frame(theme);
+    // Tree order is header, sidebar, body, footer in LTR.
+    for (k, zone) in ["header", "sidebar", "body", "footer"].iter().enumerate() {
+        let mut rig = Rig::for_frames(scene());
+        for _ in 0..=k {
+            rig.f6(false);
+        }
+        let flags: Vec<bool> = rig.targets().iter().map(|t| t.focused).collect();
+        let expected: Vec<bool> = (0..4).map(|i| i == k).collect();
+        if flags != expected {
+            failures.push(format!(
+                "{context} / {zone}: after {} F6 the focus flags are {flags:?}, expected {expected:?}",
+                k + 1
+            ));
+            continue;
+        }
+        let focused = rig.frame(theme);
+        match ring_contrast(&plain, &focused, targets[k].bounds, 10.0) {
+            Err(why) => failures.push(format!("{context} / {zone}: {why}")),
+            Ok(ratio) if ratio < NON_TEXT_MIN => failures.push(format!(
+                "{context} / {zone}: the ring is {ratio:.2}:1 against what it covers, under {NON_TEXT_MIN}"
+            )),
+            Ok(_) => {}
+        }
+    }
+    // Shift+F6 from nothing is the last zone; and it never presses.
+    let mut rig = Rig::for_frames(scene());
+    rig.f6(true);
+    let last: Vec<bool> = rig.targets().iter().map(|t| t.focused).collect();
+    if last != vec![false, false, false, true] {
+        failures.push(format!(
+            "{context} / Shift+F6 from nothing focused {last:?}, expected the footer"
+        ));
+    }
+    if !rig.messages.is_empty() {
+        failures.push(format!("{context}: F6 published {:?}", rig.messages));
+    }
+    failures
+}
+
+#[test]
+fn every_zone_is_reached_by_f6_with_its_ring_on_every_stock_theme() {
+    let mut failures = Vec::new();
+    for theme in Theme::ALL {
+        failures.extend(zone_failures(&format!("stock {theme}"), theme, &|| {
+            render(zone_layout(|label| {
+                snora::control(iced::widget::text(label))
+                    .on_press(msg(label))
+                    .into()
+            }))
+        }));
+    }
+    assert_no_failures("zone", failures);
+}
+
+#[cfg(feature = "design")]
+#[test]
+fn every_zone_is_reached_by_f6_with_its_ring_in_every_preset() {
+    let mut failures = Vec::new();
+    for (preset, tokens) in presets() {
+        let theme = snora::design::theme(tokens);
+        failures.extend(zone_failures(preset, &theme, &|| {
+            snora::design::render(
+                zone_layout(move |label| {
+                    snora::design::control(tokens, iced::widget::text(label))
+                        .on_press(msg(label))
+                        .into()
+                }),
+                tokens,
+            )
+        }));
+    }
+    assert_no_failures("zone", failures);
+}
+
 // ---- an id (RFC-127) ---------------------------------------------------------
 
 /// A `snora::control` given an id: iced's `focus(id)` must focus it, show its ring (at the same

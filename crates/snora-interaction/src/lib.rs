@@ -81,6 +81,7 @@ mod router;
 mod sequence;
 mod tag;
 mod underlined;
+mod zones;
 
 pub use control::{Control, Ring, StyleFn};
 pub use em::{EmBox, Glyph};
@@ -94,3 +95,4 @@ pub use router::{KeyMatch, Route, Router};
 pub use sequence::sequential_focus;
 pub use tag::{Role, Tag};
 pub use underlined::Underlined;
+pub use zones::zone_focus;

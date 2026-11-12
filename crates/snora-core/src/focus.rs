@@ -1,6 +1,12 @@
 //! Frame-level keyboard zone navigation — pure, iced-free decision
 //! vocabulary (RFC-060).
 //!
+//! **`FocusZone`, `ZonePresence` and `next_zone` are deprecated since 0.61.0 and removed in
+//! 0.64.0 (RFC-126).** `next_zone` only returned a zone, from a zone the application held; it
+//! could not move focus, and it did not know where focus was, that a menu covered the page, or
+//! that a zone had nothing to focus. Use `snora::keyboard::focus_zone`, which reads all of that
+//! from the tree when the key is pressed. [`Cycle`] stays: it is the binding's direction.
+//!
 //! Snora owns the frame (the four skeleton slots [`crate::AppLayout`]
 //! composes); applications own what is inside a pane. This module
 //! supplies snora's half of keyboard navigation between those slots:
@@ -36,6 +42,12 @@
 ///
 /// Tabs and breadcrumbs are **not** zones — [`crate::Tab`] and
 /// [`crate::Crumb`] are content an application places *inside* a zone.
+#[deprecated(
+    since = "0.61.0",
+    note = "use `snora::keyboard::focus_zone(cycle)`, which finds the zone that holds focus in the tree \
+            when the key is pressed and moves focus to the next one: an application no longer holds a \
+            zone, and has none to pass (RFC-126). This is removed in 0.64.0."
+)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FocusZone {
     /// The header slot (`AppLayout::header`).
@@ -62,6 +74,12 @@ pub enum Cycle {
 ///
 /// `body` is required by [`crate::AppLayout`] and is always present, so
 /// it has no field here — it cannot be expressed as absent.
+#[deprecated(
+    since = "0.61.0",
+    note = "use `snora::keyboard::focus_zone(cycle)`, which skips a zone with no control that can take \
+            focus, read from the tree: an application no longer says which slots it filled (RFC-126). \
+            This is removed in 0.64.0."
+)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct ZonePresence {
     /// Whether `AppLayout::header` is `Some`.
@@ -166,6 +184,14 @@ const ORDER: [FocusZone; 4] = [
 /// assert_eq!(result, Some(FocusZone::SideBar));
 /// ```
 #[must_use]
+#[deprecated(
+    since = "0.61.0",
+    note = "use `snora::keyboard::focus_zone(cycle)`, which moves focus to the first control of the next \
+            zone, counted from the zone that holds focus when the key is pressed, and does nothing under \
+            a cover (RFC-126). `next_zone` only returned a zone: it could not move focus, counted from a \
+            variable your application held, ignored an open menu, and stopped on empty zones. This is \
+            removed in 0.64.0."
+)]
 pub fn next_zone(
     current: FocusZone,
     cycle: Cycle,
