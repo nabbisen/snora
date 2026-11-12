@@ -433,6 +433,7 @@ jobs:
       - name: Install lavapipe (Mesa's software Vulkan), pinned and verified
         env:
           SNORA_LAVAPIPE_CACHE: ${{ runner.temp }}/lavapipe-cache
+          SNORA_LAVAPIPE_SOURCES: http://127.0.0.1:9 http://127.0.0.1:9
         run: scripts/install-lavapipe.sh
       - name: Rendered tests on wgpu
         # `--tests` and not the whole target set: the doctests include
