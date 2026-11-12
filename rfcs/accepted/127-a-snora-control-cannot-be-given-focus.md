@@ -45,9 +45,11 @@ snora-specific focus API is added: an application uses the iced pattern it alrea
 - Enter and Space press it.
 - Tab carries on from it.
 
-**R-3. Focusing a control that is covered does nothing** (RFC-119): `Inert` hides covered
-controls from every operation, so `focus(id)` cannot put focus beneath a dialog. **Unit 0
-measures it.**
+**R-3. Focusing a control that is covered focuses nothing beneath** (RFC-119): `Inert` hides
+covered controls from every operation. Like any `focus(id)` that reaches no control, it
+**leaves nothing focused**, and `is_focused(id)` gives no answer. *(Corrected 2026-11-12 from
+Unit 0's measurement: it read "does nothing", but a control above that held focus loses it.
+That is iced's one rule for `focus(id)`, and it is kept.)*
 
 **R-4. The book:** `overlays.md`'s checklist and `traverse`'s rustdoc show the working
 pattern, with a snora control:

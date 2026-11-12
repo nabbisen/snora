@@ -240,10 +240,8 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 Accepted 2026-11-12 (owner): RFC-126 (F6 moves focus between zones itself) and RFC-127 (a
 snora control can be given an id), with the housekeeping below. Candidates recorded at the 0.60.0 cut:
-- **The build-cost ratio moved +18%** (`design_overhead_ratio` 0.047555 → 0.056221, same
-  compiler and runner), above its ~10% investigate threshold, with no dependency change.
-  `example_hello_ms` fell 20% and `example_workbench_ms` 5%. The cause is not established:
-  measure before calling it signal or noise (`build-cost-budget.md`).
+- **The build-cost ratio's +18% was investigated:** about 4% is `MenuKeys`' generic code,
+  measured, and the rest is the runner, inferred. No action (`build-cost-budget.md`).
 - **CI downloaded Mesa from Ubuntu's mirrors, and they were unreachable for about three
   hours** on 2026-11-11, which held the release. Workflow lint survives the same kind of
   outage by caching what it downloads.

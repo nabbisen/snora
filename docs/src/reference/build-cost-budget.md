@@ -332,6 +332,26 @@ per-measurement `cargo clean` reaching a truly cold iced rebuild) is a
 smoke test of the *arithmetic*, not a data point for the series — do
 not compare it against the CSV's CI-produced rows.
 
+### The 0.60.0 move (+18.2%), investigated
+
+`design_overhead_ratio` went from 0.047555 (0.59.0) to **0.056221 (0.60.0), +18.2%**, above
+the ~10% threshold. No dependency changed. It was investigated in the 0.61 housekeeping, with
+ten interleaved cold builds per tag, on one machine, compared tag with tag only:
+
+- **Measured: about +85 ms (+3.9%) in the workbench step,** from `MenuKeys`' generic code (the
+  menus' arrow keys, RFC-123). `snora::render` instantiates it for the application's `Message`,
+  in the application's crate. With `MenuKeys` taken out of `render.rs`, 0.60.0 returned to
+  0.59.0's number. Locally the ratio's median rose 9%, with the two tags' ranges overlapping.
+- **Inferred, not reproduced: the rest is the runner.** In CI, `example_hello_ms`, the cold
+  build of the whole graph, fell 20% with no dependency change. Locally it did not fall.
+- **No action:** about 85 ms of an application's own compile is what the arrow keys cost
+  (architect, 2026-11-12).
+
+**What this teaches about the signal:** the ratio divides out a run-wide speed change only when
+both builds move together. Here the denominator, a cold whole-graph build, moved more than the
+numerator, a single crate. A large move in the ratio with no code to explain it should be read
+against both columns, not the ratio alone.
+
 ### Watch points
 
 No CI failures are triggered by compile time in the first iteration.
