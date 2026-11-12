@@ -381,13 +381,14 @@ fn rule_1_after_a_tab_into_another_zone_f6_counts_from_there() {
 /// Rule 2: a zone with no control is skipped: a footer of plain text, an absent sidebar.
 #[test]
 fn rule_2_a_zone_without_a_control_is_skipped() {
-    for (name, scene) in [
+    for (name, scene, want) in [
         (
             "footer is plain text",
             Scene {
                 footer: Footer::Text,
                 ..Scene::new()
             },
+            vec!["H1", "S1", "B1", "H1"],
         ),
         (
             "no footer",
@@ -395,6 +396,7 @@ fn rule_2_a_zone_without_a_control_is_skipped() {
                 footer: Footer::None,
                 ..Scene::new()
             },
+            vec!["H1", "S1", "B1", "H1"],
         ),
         (
             "no sidebar",
@@ -402,6 +404,7 @@ fn rule_2_a_zone_without_a_control_is_skipped() {
                 side: false,
                 ..Scene::new()
             },
+            vec!["H1", "B1", "F1", "H1"],
         ),
     ] {
         let names = scene.names();
@@ -412,21 +415,26 @@ fn rule_2_a_zone_without_a_control_is_skipped() {
             walk.push(held(&mut rig, &names)[0]);
         }
         println!("{name}: F6 x4 -> {walk:?}");
-        assert!(!walk.contains(&"F1") || scene.footer == Footer::Control);
-        assert_eq!(walk.len(), 4);
+        assert_eq!(walk, want, "{name}");
     }
+    // Backwards, from the body, over the skipped one.
     let scene = Scene {
         footer: Footer::Text,
         ..Scene::new()
     };
     let names = scene.names();
     let mut rig = scene.rig();
-    let _ = rig.task::<Msg>(focus("none"));
-    press_f6(&mut rig, false); // H1
-    press_f6(&mut rig, false); // S1
-    press_f6(&mut rig, false); // B1
-    press_f6(&mut rig, false); // wraps past the text footer to H1
-    assert_eq!(held(&mut rig, &names), vec!["H1"]);
+    rig.focus_at(names.iter().position(|n| *n == "H1").unwrap());
+    press_f6(&mut rig, true);
+    println!(
+        "H1, Shift+F6 over a plain-text footer -> {:?}",
+        held(&mut rig, &names)
+    );
+    assert_eq!(
+        held(&mut rig, &names),
+        vec!["B1"],
+        "the footer has no control: back to the body"
+    );
 }
 
 /// Rule 3: with focus in no zone (nothing focused, or a toast): F6 goes to the first zone with a
