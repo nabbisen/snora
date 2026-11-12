@@ -44,6 +44,12 @@ jobs:
         run: cargo check --workspace --all-features
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Clippy, default features
+        # The step above sees only what `--all-features` compiles. A lint that fires only
+        # when a feature is off (a `mut` that only `design` needs, an import that only
+        # `widgets` uses) is invisible there: `toast/contrast_tests.rs` carried one through
+        # 0.60. This is the feature set a plain `cargo add snora` gets.
+        run: cargo clippy -p snora --all-targets -- -D warnings
       - name: Rustdoc (F-38, RFC-089)
         # RFC-083 shipped because a docs.rs build failed on a published crate.
         # 46 warnings (44 by our own 2026-09-01 recount) is the state that came
