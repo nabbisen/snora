@@ -347,6 +347,11 @@ ten interleaved cold builds per tag, on one machine, compared tag with tag only:
 - **No action:** about 85 ms of an application's own compile is what the arrow keys cost
   (architect, 2026-11-12).
 
+**The next row, 0.61.0: 0.04963, −11.7%,** close to 0.59.0's 0.047555. `example_hello_ms` rose
+39% (90,465 → 125,427) and `example_workbench_ms` 22%. 0.61.0 changed no dependency, and has no
+code that would make the workbench step cheaper. A fall of this size, with the cold build moving
+most, fits the reading above: 0.60.0's rise was mostly the runner. This is still inferred.
+
 **What this teaches about the signal:** the ratio divides out a run-wide speed change only when
 both builds move together. Here the denominator, a cold whole-graph build, moved more than the
 numerator, a single crate. A large move in the ratio with no code to explain it should be read
