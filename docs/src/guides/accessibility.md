@@ -65,50 +65,37 @@ contributor-facing documents linked below, not duplicated here.
   `SideBarLabels::Tooltip`, and says what it costs.
 - **A typography scale with usable line-height**, for text you write on top
   of snora. See [Readability](readability.md) for how to pick a role.
-- **Frame-level keyboard zone navigation.** snora supplies the decision
-  logic to move between skeleton regions — header, sidebar, body,
-  footer — as pure vocabulary in `snora_core::focus`:
+- **F6 moves between the frame's zones (0.61, RFC-126):** the header, the sidebar, the body
+  and the footer. Route the key, as you route Tab:
 
   ```rust,ignore
-  use snora_core::focus::{next_zone, Cycle, ZonePresence};
-
-  let next = next_zone(
-      self.focus_zone,
-      Cycle::Forward,
-      ZonePresence::none().header(true).side_bar(true).footer(true),
-      self.show_dialog || self.show_sheet,
-      self.open_menu.is_some(),
-  );
-  if let Some(zone) = next {
-      self.focus_zone = zone;
+  if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
+      return snora::keyboard::focus_zone(cycle);
   }
   ```
 
-  **snora does not take Tab or Shift+Tab** for zone cycling. Tab means
-  "next control" to users, and to every application that wires focus
-  traversal. iced 0.14 itself binds no Tab: an application calls
-  `iced::widget::operation::focus_next()`. Claiming it for zones would
-  break in-pane navigation. *(Corrected 2026-11-07: this said Tab
-  already means "next control" to iced.)* Instead, snora recommends the desktop convention —
-  **F6 / Shift+F6** — and supplies a matching key helper,
-  `snora::keyboard::cycle_zones`, so you don't have to re-derive which
-  modifier means "backward." As with `traverse`, snora installs
-  no subscription: your application wires `iced::keyboard::listen()`
-  and calls the pure function itself. Cycling is automatically
-  suspended while a dialog or sheet is open (focus belongs inside the
-  modal).
+  - **F6 / Shift+F6** move focus to the first control of the next / previous zone, **counted
+    from the zone that holds focus when you press the key.** After a Tab or a click into the
+    sidebar, F6 goes to the body.
+  - **A zone with nothing to focus is skipped.** The order wraps, and it does not mirror under
+    RTL: the sidebar follows the header in either direction.
+  - **With focus in no zone** (nothing focused, a toast, a context menu), F6 goes to the first
+    zone and Shift+F6 to the last.
+  - **F6 lands only on a zone's own controls, never inside an open menu.** An `app_header`
+    dropdown counts in its trigger's zone, so F6 from one of its items moves on.
+  - **Under a dialog, a sheet, or a menu with its backdrop, F6 does nothing:** the zones are
+    beneath it.
+  - **F6 never presses anything.** Held, it keeps moving, one zone per repeat, as Tab does.
 
-  > **Known gap (corrected 2026-11-12): this decides a zone, and moves no focus.**
-  > The example above changes a variable. Moving focus into the zone is left to your
-  > application, and with snora's own controls it cannot be done: their `widget::Id`
-  > cannot be set, and iced 0.14 cannot focus "the first control inside" a region
-  > without its `advanced` feature. Three more limits:
-  > - the current zone is your variable, so after a Tab or a click into another zone, F6
-  >   counts from the wrong one;
-  > - a menu with its backdrop covers the page (Law 8), but `next_zone` ignores it;
-  > - a zone with nothing focusable is still a stop.
-  >
-  > **RFC-126 (proposed for 0.61) moves focus itself.** Until then, rely on Tab.
+  **Why you route it, when snora answers Escape by itself:** your application may already use
+  F6, a debugger's "step over" for instance, and an upgrade must not take a key away. snora
+  answers the keys inside its own controls and overlays (Enter, Space, the arrows in a menu,
+  Escape). The keys that move between controls (Tab, F6) are yours to route to it.
+
+  *Until 0.61, snora offered only `next_zone`, a decision your application had to act on. With
+  snora's controls it could not: it moved no focus, counted from a variable, and ignored a
+  covering menu. `next_zone`, `FocusZone` and `ZonePresence` are deprecated in 0.61, and removed
+  in 0.64.0.*
 
 ## If your application serves older readers (RFC-115)
 

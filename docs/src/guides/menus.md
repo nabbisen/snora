@@ -189,8 +189,8 @@ track a highlighted index in your own state. `snora::control` (0.58) makes each 
 items a focus target, with the same rules as snora's.
 
 *History.* RFC-082 recorded arrow-key traversal inside a menu as a concern separate from the
-two keyboard axes snora owned: zone cycling between skeleton regions (`cycle_zones`,
-RFC-060) and Escape. Until 0.60, the arrows did nothing inside a snora menu.
+two keyboard axes snora owned: zone cycling between skeleton regions (F6,
+RFC-060, which moves focus itself from 0.61, RFC-126) and Escape. Until 0.60, the arrows did nothing inside a snora menu.
 
 *(Corrected 2026-11-09: this section said snora's prefab menus had no way to show a
 highlighted item, and that keyboard traversal meant building your own dropdown. From 0.55,

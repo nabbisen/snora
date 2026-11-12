@@ -162,35 +162,23 @@ Helpers:
 ## Zone navigation
 
 ```rust,ignore
-pub enum FocusZone { Header, SideBar, Body, Footer }
-pub enum Cycle     { Forward, Backward }
-
-pub struct ZonePresence { header: bool, side_bar: bool, footer: bool }
+pub enum Cycle { Forward, Backward }
 ```
 
-`FocusZone` names the four skeleton slots in **logical** cycle order —
-`Header → SideBar → Body → Footer`, wrapping. The order needs no
-direction-dependent mirroring: under RTL the sidebar renders on the
-opposite physical edge but is still the start-edge rail following the
-header, so unlike `ToastPosition` there is no RTL variant of this
-sequence.
+**`Cycle`** is the direction F6 moves in: `Forward` / `Backward`, in the logical order Header →
+SideBar → Body → Footer, wrapping. It does not mirror under RTL: the sidebar is the start-edge
+rail after the header in either direction. `snora::keyboard::cycle_zones(key, modifiers)` turns
+F6 and Shift+F6 into one, and `snora::keyboard::focus_zone(cycle)` moves focus (RFC-126). See
+[Accessibility](../guides/accessibility.md).
 
-`Cycle` is the direction to move in — `Forward`/`Backward`, not
-next/previous *physical* position, for the same reason.
+**Deprecated in 0.61.0, removed in 0.64.0:** `FocusZone`, `ZonePresence` and
+`focus::next_zone`. They let an application hold the current zone and the slots it filled, so
+that `next_zone` could decide where F6 goes. From 0.61, snora reads both from the tree when the
+key is pressed, so there is nothing left for the application to hold.
 
-`ZonePresence` says which optional slots the current layout populated,
-so `focus::next_zone` can skip absent ones. `body` has no field: it is
-required by `AppLayout` and cannot be absent. `ZonePresence::none()` is
-the body-only case every `AppLayout::new` application starts from;
-`::all()` is the full skeleton.
-
-`Tab` and `Crumb` are **not** zones — they are content an application
-places *inside* a zone.
-
-See [`keyboard::cycle_zones`](../guides/accessibility.md) for the key
-binding that produces a `Cycle`, and the
-[0.38 → 0.39 migration guide](../guides/migration-0.38-to-0.39.md) for
-why this vocabulary arrived (RFC-060).
+`Tab` and `Crumb` are **not** zones: they are content an application places *inside* a zone.
+The [0.38 → 0.39 migration guide](../guides/migration-0.38-to-0.39.md) says why the vocabulary
+arrived (RFC-060).
 
 ## Defaults at a glance
 

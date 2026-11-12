@@ -205,7 +205,7 @@ beside a new one.
 |---|---|
 | Moving focus between controls (Tab / Shift+Tab) | **Application, in one line**: iced binds no Tab key, so `update` calls `snora::keyboard::traverse(key, modifiers)`. Tab past the last control leaves the group; it does not wrap |
 | Activation via Enter / Space | **Snora**, for every control it draws (`control`, from 0.55). **Nobody** for an application's own iced `button`, which takes no keyboard input in iced 0.14. *(Corrected 2026-11-04: this row said "iced (inherited)".)* |
-| Frame-level zone navigation (Header/SideBar/Body/Footer) | **Snora** — `snora_core::focus::next_zone`, a pure decision function; the application wires the key (`snora::keyboard::cycle_zones`, F6/Shift+F6 recommended) and owns the current zone as its own state (RFC-060). Snora installs no subscription. |
+| Frame-level zone navigation (Header/SideBar/Body/Footer) | **Snora**, from 0.61 (RFC-126): `snora::keyboard::focus_zone(cycle)` moves focus, from the zone that holds focus, read from the tree. The application routes the key (`cycle_zones`, F6 / Shift+F6), as it routes Tab, and keeps no zone state. Snora installs no subscription. *(Until 0.61: `next_zone`, a decision the application held state for, which moved no focus; deprecated, removed in 0.64.0.)* |
 | Snora visual focus ring | **Snora**: `control` draws it, from `Tokens::focus` on the design path, at ≥ 3:1 (0.55). An application that owns focus as its own state can still style its own `container` with `FocusTokens` (RFC-059). |
 | Application keyboard shortcuts | Application |
 | Escape-key overlay dismissal | **Snora**: the overlay's escape message (`AppLayout::escape`, 0.57), or else its click-outside close message (Law 7, RFC-119). `dismiss_on_escape` was removed in 0.60.0 |

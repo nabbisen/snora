@@ -32,6 +32,39 @@ renders. The framework simply omits the click-outside-to-close
 backdrop, and you must provide an explicit close button inside the
 overlay content. snora never silently drops a populated overlay.
 
+## Where focus starts in a dialog (0.61, RFC-127)
+
+When a dialog opens, the page's focus is set aside and nothing in the dialog is focused, so the
+first Tab reaches its first control. To start somewhere else, for example on "Cancel" in a
+destructive confirmation, give that control an id and focus it from the update that opens
+the dialog:
+
+```rust,ignore
+const CANCEL: &str = "confirm-cancel";
+
+// view
+snora::design::control(&t, text("Cancel"))
+    .id(CANCEL)
+    .on_press(Message::Cancel)
+    .style(move |_, status| style::button::secondary(&tok, status))
+
+// update
+Message::AskToDelete => {
+    self.confirm = true;
+    return iced::widget::operation::focus(CANCEL);
+}
+```
+
+- **The task runs on the new view,** so it can name a control in the dialog that the same
+  update opens. A task that runs before the dialog is in the view finds nothing.
+- **The control shows its ring,** and Enter or Space presses it, as if Tab had reached it.
+- **An id must be unique in the window,** as for `text_input`: `focus(id)` focuses every
+  control that has it.
+- **An id that no reachable control has,** including one under the dialog, focuses nothing and
+  **leaves nothing focused.** `is_focused(id)` then gives no answer at all, so do not wait on it.
+- **The `design::button` variants take no id.** Build the control with
+  `snora::design::control` and the same style function, as above: it looks identical.
+
 ## Dialog
 
 Snora paints the dim backdrop and centers your content. On the
@@ -203,13 +236,13 @@ check:
     set AppLayout::escape(Escape { modal, .. }) (0.57).
 [ ] Destructive actions have explicit labels; they are not triggered
     by backdrop click alone.
-[ ] If initial keyboard focus inside the dialog matters, set it with
-    iced's widget::Id and a focus operation. That works for an iced
-    widget that takes an id (text_input). A snora control cannot be
-    given an id yet (RFC-127, proposed for 0.61), so with snora's
-    controls the first Tab reaches the dialog's first control. Snora
+[ ] If initial keyboard focus inside the dialog matters, give the control
+    an id (snora::control(…).id(…), or design::control, 0.61) and return
+    iced's operation::focus(id) from the update that opens the dialog.
+    The task runs on the new view, so it reaches the dialog. Snora
     bounds Tab to the modal and the toasts, but does not choose where
-    focus starts.
+    focus starts: without this, the first Tab reaches the dialog's first
+    control.
 ```
 
 ABDD is a layout discipline, not a complete accessibility or localization

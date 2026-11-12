@@ -261,7 +261,7 @@ semantics are not provided: iced 0.14 has no accessibility tree.
 | Keyboard dismissal (Escape) | yes: the overlay's escape message, or else its click-outside close message (Law 7; the escape field from 0.57) |
 | **Where focus goes** | **When a modal closes, focus returns to the control that had it**, unless the page now has a different number of controls, or the application has focused something itself. Then focus is wherever the application put it, or **nowhere** (not the first control): the next Tab starts from the top. While the dim is up, a covered control shows no focus ring, and a covered `text_input` has no cursor; both come back on closing |
 | **The page's state** | **Kept.** Opening and closing a modal or a menu does not rebuild the page: scroll offsets, a text input's cursor and every widget's state survive |
-| Frame-level zone navigation | **a decision only (RFC-060)** — `snora_core::focus::next_zone`; **suspended** while a modal is open. *(Corrected 2026-11-12: it moves no focus, and an application cannot move focus into a zone of snora's controls. It ignores a menu with its backdrop, although that covers the page. RFC-126, proposed for 0.61, has snora move focus itself.)* |
+| Frame-level zone navigation | **yes, from 0.61 (RFC-126):** `snora::keyboard::focus_zone(cycle)`, routed by the application with `cycle_zones` (F6 / Shift+F6). It moves focus to the first control of the next or previous zone, counted from the zone that holds focus, and skips a zone with nothing to focus. **F6 lands only on a zone's own controls, never inside an open menu.** **Under a cover it does nothing:** a dialog, a sheet, a menu with its backdrop, an open `app_header` dropdown with a close message. That is this law's rule, since `Inert` hides the zones' controls. *(Until 0.61 this was a decision only (`next_zone`), which moved no focus and ignored a covering menu. It is deprecated, and removed in 0.64.0.)* |
 | Tab inside an open modal | **bounded (RFC-119):** Tab moves through the dialog, the sheet and the toasts, in that order. Past the last, nothing is focused for one press, then Tab starts again from the modal's first control. This meets the need focus trapping was for; RFC-060 Q-1's strict trap (a wrap with no gap) is not built |
 
 ABDD is a **layout discipline**, not a complete accessibility or
@@ -294,13 +294,11 @@ localization stack.
   frames; a covered overlay is not drawn; scroll offset and a text input's
   focus survive. Fourteen breakage rows, each shown failing.
   `render_semantics.rs` is unmodified.
-- **Frame-level zone navigation** — guarded.
-  `modal_open_suspends_cycling`, `menu_alone_does_not_affect_cycling`,
-  and `both_modal_and_menu_open_modal_wins`
-  (`crates/snora-core/src/focus.rs`) match this row's claims exactly.
-  Demonstrated failing this session by removing `next_zone`'s
-  modal-suspend guard: both the suspend test and the modal-wins-over-menu
-  test caught it.
+- **Frame-level zone navigation** — guarded from 0.61 in
+  `crates/snora/tests/f6_zones.rs`: every rule, every cover, RTL and the design path, with
+  nine breakage rows each shown failing (RFC-126). `every_control.rs` reaches every zone by F6
+  with its ring. *The deprecated `next_zone`'s own tests in `snora-core` still pass. They
+  guarded a decision that moved no focus.*
 - **Tab inside an open modal** — guarded: the Tab order is dialog, sheet,
   toasts (`modal_keyboard.rs`).
 

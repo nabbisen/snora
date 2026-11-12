@@ -45,6 +45,7 @@ A route you leave out answers nothing. Without `.digits(…)`, no digit key does
 | `Tab` / `Shift+Tab` | the same | Moves focus to the next / previous control. **Past the last, focus leaves the group**: it does not wrap | `traverse` |
 | `Enter`, `Space` | the same | Presses the focused control, publishing exactly what a click publishes. **Held, it presses once** | nothing |
 | `Escape` | the same | Closes the open overlay (a dialog, a sheet, then a menu) | a close message (below) |
+| `F6` / `Shift+F6` | the same | Moves focus to the first control of the next / previous **zone** (header, sidebar, body, footer), from the zone that holds focus; wraps; nothing under a cover ([Accessibility](accessibility.md)) | `cycle_zones` and `focus_zone` (0.61) |
 | `↓` / `↑`, `Home` / `End` | the same | **Inside an open snora menu:** the next / previous item (wrapping), the first / last. With nothing focused, ↓ is the first item and ↑ the last ([Menus](menus.md#the-keyboard-inside-an-open-menu-060-rfc-123)) | nothing (0.60) |
 | `Ctrl+Tab` / `Ctrl+Shift+Tab`, and `Ctrl+PgDn` / `Ctrl+PgUp` | `Control+Tab` / `Control+Shift+Tab`, and `Shift+Cmd+]` / `Shift+Cmd+[` | Next / previous **tab**. **Wraps** from the last to the first, as browsers do | `.tabs(…)` |
 | `Ctrl+1`…`Ctrl+9` | `Cmd+1`…`Cmd+9` | Tab *n*, or sidebar item *n*: whichever you chose with `.digits(…)`. `9` is the last; a digit beyond the count does nothing | `.digits(…)` and that destination |

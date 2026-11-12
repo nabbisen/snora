@@ -112,7 +112,10 @@ snora::design::control(&self.tokens, my_custom_content)
 ```
 
 Without `.style(…)` it looks like `ghost`, so content of your own does not look like a
-call to action unless you say so. On the engine path, `snora::control(content)` is the
+call to action unless you say so. **`.id(…)`** (0.61) lets iced's `operation::focus(id)` focus it,
+for a dialog's starting focus say ([Overlays](../guides/overlays.md#where-focus-starts-in-a-dialog-061-rfc-127)).
+The variants above take no id: when you need one, build the button this way with the same style
+function. On the engine path, `snora::control(content)` is the
 same, with iced's default look and the theme's ring.
 
 ## Accessibility notes
