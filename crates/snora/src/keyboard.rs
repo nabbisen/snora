@@ -76,7 +76,6 @@ pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
 }
 
 /// PROTOTYPE (RFC-126 Unit 0): moves focus to the first control of the next (or previous) zone.
-#[must_use]
 pub fn focus_zone<Message: 'static>(cycle: Cycle) -> iced::Task<Message> {
     use crate::identifiers::{BODY_REGION, FOOTER_REGION, HEADER_REGION, SIDEBAR_REGION};
     iced_runtime::task::effect(iced_runtime::Action::widget(
