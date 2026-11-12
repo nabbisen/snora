@@ -42,7 +42,7 @@ set -euo pipefail
 # `<sha256>  <path under /ubuntu/>`; the file name is the path's last part. Taken from the ubuntu-latest
 # runner on 2026-11-12 (`apt-cache show` and `sha256sum`, both agree).
 PINNED="
-8248d972009babae14d67275e290e024fa4af6040d2ecbc8be56d8c75341c6c1  pool/main/libd/libdisplay-info/libdisplay-info3_0.3.0-1_amd64v3.deb
+000000000000000014d67275e290e024fa4af6040d2ecbc8be56d8c75341c6c1  pool/main/libd/libdisplay-info/libdisplay-info3_0.3.0-1_amd64v3.deb
 fc21b44a0b55c2c2b076ad3e95667e1d870f4826bb85d885757f701fbb7295a9  pool/main/m/mesa/mesa-vulkan-drivers_26.0.8-1ubuntu0.3_amd64v3.deb
 "
 PINNED="${SNORA_LAVAPIPE_PINNED:-$PINNED}"
