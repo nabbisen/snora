@@ -36,6 +36,33 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   task can come from the same `update` that opens a dialog. An id that no reachable control has,
   and so a control under a dialog, a sheet or a menu's backdrop, focuses nothing and leaves
   nothing focused. No snora-specific focus API is added.
+- **`snora::keyboard::focus_zone(cycle)` (RFC-126).** F6 and Shift+F6 now move focus. Route the
+  key as you route Tab, in two lines and with no state of your own:
+  `if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) { return
+  snora::keyboard::focus_zone(cycle); }`. Focus goes to the first control of the next (or
+  previous) zone of the frame (header, sidebar, body, footer, wrapping, in logical order under
+  RTL too), counted from the zone that holds focus when the key is pressed. A zone with no
+  control that can take focus is skipped; with focus in no zone (nothing focused, a toast, an
+  inline context menu) F6 goes to the first zone and Shift+F6 to the last. **F6 lands only on a
+  zone's own controls, never inside an open menu**; an open header dropdown belongs to its
+  trigger's zone, so F6 from one of its items moves on. Under a dialog or sheet, a menu with its
+  backdrop, or an open header dropdown with a close message, F6 does nothing. It never presses
+  anything; held, it keeps moving, one zone per repeat, as Tab does.
+
+### Deprecated
+
+- **`snora::focus::next_zone`, `FocusZone` and `ZonePresence` (RFC-126), removed in 0.64.0.**
+  Use `snora::keyboard::focus_zone`. `next_zone` only returned a zone: it could not move focus,
+  it counted from a zone your application held (so it was wrong after a Tab or a click), it
+  ignored an open menu, and it stopped on a zone with nothing to focus. `Cycle` and
+  `cycle_zones` stay: they are the binding.
+
+### Fixed
+
+- **F6 zone navigation moved no focus (RFC-126).** Following the book, F6 changed a variable and
+  focus stayed where it was; an application could not write the move, because a snora control
+  had no id to name. It also counted from a stale zone, ignored a covering menu, and stopped on
+  zones with nothing to focus. All four are fixed by `focus_zone`.
 
 ## [0.60.0] — 2026-11-11
 

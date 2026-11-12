@@ -135,8 +135,10 @@ pub use snora_core::{
     ToastAttention, ToastIntent, ToastLifetime, ToastPosition,
 };
 
-/// Zone-navigation vocabulary (RFC-060): [`focus::Cycle`], [`focus::FocusZone`],
-/// [`focus::ZonePresence`], and [`focus::next_zone`].
+/// Zone-navigation vocabulary (RFC-060): [`focus::Cycle`] is the binding's direction, passed to
+/// [`keyboard::focus_zone`], which moves focus (RFC-126). `FocusZone`, `ZonePresence` and
+/// `next_zone` are **deprecated since 0.61.0 and removed in 0.64.0**: `focus_zone` reads the zone
+/// that holds focus from the tree, so an application holds and passes nothing.
 ///
 /// Re-exported as a module, not as individual names (RFC-076 Q-1) — `focus` is
 /// a coherent unit, matching how [`keyboard`] already appears as a module.

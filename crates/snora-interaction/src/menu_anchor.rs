@@ -60,6 +60,13 @@ use crate::menu_keys::{Part, Reach, Wants, marked};
 #[derive(Debug)]
 pub(crate) struct OpenMenu;
 
+/// The dropdown's own controls, entered and left (reported by the overlay's `operate`): the
+/// dropdown is outside the header's container, and F6 needs to know whose it is (RFC-126).
+#[derive(Debug)]
+pub(crate) struct DropdownMark {
+    pub(crate) enter: bool,
+}
+
 /// What the overlay was last laid out in: the one input to the dropdown's placement that an
 /// `operate` call is not given.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -363,6 +370,7 @@ impl<Message> overlay::Overlay<Message, Theme, iced::Renderer> for Dropdown<'_, 
         renderer: &iced::Renderer,
         operation: &mut dyn Operation,
     ) {
+        operation.custom(None, layout.bounds(), &mut DropdownMark { enter: true });
         operate_dropdown(
             self.content,
             self.tree,
@@ -371,6 +379,7 @@ impl<Message> overlay::Overlay<Message, Theme, iced::Renderer> for Dropdown<'_, 
             renderer,
             operation,
         );
+        operation.custom(None, layout.bounds(), &mut DropdownMark { enter: false });
     }
 
     fn update(
