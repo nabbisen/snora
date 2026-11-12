@@ -238,7 +238,10 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.62.0
 
-Not yet scoped.
+**An audit first** (owner, 2026-11-12): is every keyboard and overlay claim in the book guarded
+by a test? Three times a claim nothing tested turned out false (the old Enter and Space claim, F6,
+the dialog-focus advice). What the audit finds decides 0.62. Handoff:
+[`audit-0-62-…`](rfcs/handoffs/audit-0-62-keyboard-and-overlay-claims/implementation-handoff.md).
 
 ## Future wanted
 
