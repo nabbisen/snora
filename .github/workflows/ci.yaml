@@ -408,13 +408,32 @@ jobs:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Install lavapipe (Mesa's software Vulkan)
-        # The default runner has no GPU. lavapipe rasterises in
-        # software, which is slow but is the real wgpu pipeline — and
-        # it is the pipeline applications get, which tiny-skia is not.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mesa-vulkan-drivers
+      # The default runner has no GPU. lavapipe rasterises in software, which is slow but is
+      # the real wgpu pipeline, and it is the pipeline applications get, which tiny-skia is not.
+      #
+      # It used to be `apt-get install mesa-vulkan-drivers`. On 2026-11-11 Ubuntu's mirrors could
+      # not be reached for about three hours: four runs failed with no snora test run, and the
+      # 0.60.0 release waited. It also took whatever version the mirror served that day, and the
+      # rendered output (and so parity) depends on the version. So the two .deb files it needs
+      # (`mesa-vulkan-drivers` and `libdisplay-info3`) are **pinned in `scripts/install-lavapipe.sh`
+      # by SHA-256**, cached, and installed with `dpkg -i`, as workflow-lint caches actionlint's
+      # archive: the cache is the primary source, the network (Canonical's archive, the runner's
+      # mirror, then the snapshot service) is the fallback only when the cache is empty, and **a
+      # file is used only if its SHA-256 is the pinned one, every run, cached or just fetched**.
+      # A mismatch fails the step and installs nothing.
+      #
+      # **Bumping the pin is the commit that changes the checksums in that script**, and the
+      # cache key is its hash (so a bump fetches once and caches). Whoever bumps it reads the
+      # script's header for how, and runs both rendered jobs and parity on the new version: if
+      # the pixels differ, that is a baseline change and its own decision.
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/lavapipe-cache
+          key: lavapipe-debs-${{ hashFiles('scripts/install-lavapipe.sh') }}
+      - name: Install lavapipe (Mesa's software Vulkan), pinned and verified
+        env:
+          SNORA_LAVAPIPE_CACHE: ${{ runner.temp }}/lavapipe-cache
+        run: scripts/install-lavapipe.sh
       - name: Rendered tests on wgpu
         # `--tests` and not the whole target set: the doctests include
         # two illustrative fragments in `keyboard.rs` that are
