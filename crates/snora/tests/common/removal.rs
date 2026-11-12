@@ -446,3 +446,22 @@ pub fn key_event(key: Named, repeat: bool, modifiers: iced::keyboard::Modifiers)
 pub fn focus_next() -> Box<dyn Operation<()>> {
     Box::new(focusable::focus_next::<()>())
 }
+
+impl<M: Clone + 'static> Rig<M> {
+    /// Runs a `Task` the way the window loop does: its widget operation on this interface, and
+    /// whatever it outputs (an `is_focused` answers with a `bool`) collected. A task with other
+    /// kinds of action is a test mistake.
+    pub fn task<T: Send + 'static>(&mut self, task: iced::Task<T>) -> Vec<T> {
+        use iced::futures::StreamExt;
+        let mut stream = iced_runtime::task::into_stream(task).expect("a task with work in it");
+        let mut out = Vec::new();
+        while let Some(action) = iced::futures::executor::block_on(stream.next()) {
+            match action {
+                iced_runtime::Action::Widget(operation) => self.run(operation),
+                iced_runtime::Action::Output(value) => out.push(value),
+                _ => panic!("a task with an action the rig does not run"),
+            }
+        }
+        out
+    }
+}

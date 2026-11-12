@@ -1,7 +1,7 @@
 //! The public control: [`Control`], and the two functions that make one. The
 //! documentation is on the type, because this module is private.
 
-use iced::widget::button;
+use iced::widget::{self, button};
 use iced::{Color, Element, Length, Padding, Theme};
 use snora_interaction::contrast::readable_text;
 use snora_interaction::{Ring, StyleFn};
@@ -127,6 +127,8 @@ pub struct Control<'a, Message> {
     ring: RingConfig,
     min_target: f32,
     text_size: Option<f32>,
+    /// Chosen by the application (RFC-127); `None` keeps the one the control makes.
+    id: Option<widget::Id>,
 }
 
 /// Make `content` a control the keyboard can reach. The **engine path**: no tokens.
@@ -167,6 +169,7 @@ pub fn control<'a, Message: Clone + 'a>(
         },
         min_target: 0.0,
         text_size: None,
+        id: None,
     }
 }
 
@@ -196,6 +199,7 @@ pub(crate) fn designed<'a, Message: Clone + 'a>(
         // The target is measured against the text the control carries, which on
         // this path is drawn at the label size.
         text_size: Some(tokens.typography.label.size),
+        id: None,
     }
 }
 
@@ -218,6 +222,13 @@ impl<'a, Message: Clone + 'a> Control<'a, Message> {
     /// happens, for a message that is costly to build.
     pub fn on_press_with(mut self, message: impl Fn() -> Message + 'a) -> Self {
         self.on_press = Some(OnPress::With(Box::new(message)));
+        self
+    }
+
+    /// The control's `widget::Id` (PROTOTYPE, RFC-127 Unit 0), so that iced's
+    /// `focus(id)` can put focus on it.
+    pub fn id(mut self, id: impl Into<widget::Id>) -> Self {
+        self.id = Some(id.into());
         self
     }
 
@@ -279,6 +290,9 @@ impl<'a, Message: Clone + 'a> From<Control<'a, Message>> for Element<'a, Message
         .clip(control.clip);
         if let Some(size) = control.text_size {
             inner = inner.text_size(size);
+        }
+        if let Some(id) = control.id {
+            inner = inner.id(id);
         }
         inner = match control.on_press {
             Some(OnPress::Direct(message)) => inner.on_press(message),

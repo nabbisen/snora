@@ -320,6 +320,15 @@ impl<'a, Message> Control<'a, Message> {
     /// wider than the control is cut off at its edge rather than running
     /// on past it. As `button`'s own.
     ///
+    /// The control's `widget::Id`, chosen by the caller instead of made when it is built
+    /// (RFC-127), so that iced's `focus(id)` can reach it. Without one it keeps the unique
+    /// id it was made with.
+    #[must_use]
+    pub fn id(mut self, id: Id) -> Self {
+        self.id = id;
+        self
+    }
+
     /// **Public since RFC-122.** Until then no dependent used it and it was
     /// crate-private, behind an `expect(dead_code)` tripwire: the day a dependent
     /// needed it, the build would say so and making it `pub` would be a decision
