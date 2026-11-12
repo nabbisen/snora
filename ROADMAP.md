@@ -249,6 +249,11 @@ Not yet scoped.
   2026-11-08). Built when an adopter asks.
 - A name shown when the keyboard reaches an icon-only (`Tooltip`) rail item (RFC-116
   L-5; owner, 2026-11-08). Not scheduled.
+- F6 returning to the control last focused in a zone, rather than its first (RFC-126 Q-2).
+  Built when an adopter asks.
+- An id on the `design::button` variants and on snora's prefab controls (tabs, sidebar items,
+  the header's trigger) (RFC-127 Q-2, Q-3). Built when an adopter asks; until then,
+  `design::control` with the same style takes one.
 
 ## Recently shipped
 
