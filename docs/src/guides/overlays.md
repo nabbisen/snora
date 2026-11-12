@@ -63,7 +63,10 @@ Message::AskToDelete => {
 - **An id that no reachable control has,** including one under the dialog, focuses nothing and
   **leaves nothing focused.** `is_focused(id)` then gives no answer at all, so do not wait on it.
 - **The `design::button` variants take no id.** Build the control with
-  `snora::design::control` and the same style function, as above: it looks identical.
+  `snora::design::control` and the same style function, as above. It has the variant's colours.
+  Its padding is iced's button's unless you set `.padding(…)`, so it is a little smaller than the
+  variant. *(Corrected 2026-11-13, from the 0.62 audit: this said it looked identical. 0.62 states the
+  padding that makes it so.)*
 
 ## Dialog
 
@@ -91,21 +94,17 @@ unstyled centered content is easy to lose. See [Token-derived engine
 surfaces](../design/engine-surfaces.md) for the mapping and how to opt
 in.
 
-### The token card only helps if you let it draw
+### The token card, around a styled container of your own
 
-**If your own dialog content is a styled container, snora's card is
-behind yours and its border never renders.** On the default path snora
-draws no card at all; on `snora::design::render` it draws one, and your
-own container is drawn inside it — so a content container with its own
-fill and radius overpaints the card whose border the tokens supply.
+**On `snora::design::render` the card pads its content, so its fill and its border show around a
+container of yours.** Across the card's edge, the pixels are the same with or without a filled,
+rounded container as content. On the default path snora draws no card at all.
 
-This is worth knowing because **the `palette.border` repair in v0.34.0
-does not reach you in that case, in any preset.** It landed for
-consumers who let the token card draw its own chrome; if you paint your
-own, you are supplying the card's separation yourself and the token's
-contrast guarantee is not the one in effect.
+*(Corrected 2026-11-13, from the 0.62 audit: this section said the card's border never rendered
+under a styled container of yours, and that the v0.34.0 `palette.border` repair did not reach
+you. Measured on 0.61, both were false.)*
 
-Reported by a consumer who measured it: scanning across their card's
+*History.* Reported by a consumer who measured it: scanning across their card's
 edge at v0.28.0 and v0.42.0 — spanning the repair — produced
 byte-identical pixels, because the falloff they were looking at was
 their own shadow and there was no border pixel at all.
@@ -147,6 +146,11 @@ let layout = AppLayout::new(body)
 `Start` and `End` mirror automatically under
 [`LayoutDirection::Rtl`](direction.md), like every other axis-aligned
 piece of snora vocabulary.
+
+> **Known defect, 0.4 to 0.61, fixed in 0.62:** a sheet on the **right** (`End` under LTR,
+> `Start` under RTL) is given the spacer's share of the width. `OneThird` draws two thirds, and
+> `TwoThirds` draws one third. `Half` and `Pixels` are right, and so are `Top`, `Bottom` and a
+> sheet on the left. Found by the 0.62 audit.
 
 The engine rounds only the *inside-facing* corners — the corners that
 sit against the application content, not against the window edge. So
@@ -203,7 +207,7 @@ From bottom of the stack to top:
 1. menu backdrop      transparent click sink (if any menu is open)
 2. header_menu        header-attached dropdown
 3. context_menu       floating context menu
-4. modal dim          40 % dim click sink (if a modal is present)
+4. modal dim          44 % dim click sink (if a modal is present)
 5. dialog             centered; token-styled card via design::render
 6. sheet              edge-anchored panel
 7. toasts             always on top so they survive over modals
@@ -212,8 +216,9 @@ From bottom of the stack to top:
 Toasts are deliberately on top of modals — a long-running export
 finishing while a dialog is open should not be invisible.
 
-**On the engine path a dialog or sheet has no card of its own: put its content on a
-container with the theme's background.** A control or text placed directly on the dim
+**On the engine path a dialog has no card of its own: put its content on a container with the
+theme's background.** A sheet has one: a surface, a 1 px border and inside-facing corners.
+*(Corrected 2026-11-13, from the 0.62 audit: this said a sheet had none.)* A control or text placed directly on the dim
 may not be legible, and its focus ring may fall under 3:1 (RFC-122, measured in 18 of
 the 22 stock themes). The design path draws a card for you.
 

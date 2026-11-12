@@ -3,8 +3,8 @@
 snora has two menu shapes:
 
 - **Header menu** — drop-down attached to the header bar (File / Edit /
-  View). Triggered by clicking a labeled button. Item list renders
-  inline below the button.
+  View). Triggered by clicking a labeled button. Its items float below the button, over the
+  page, and take no room (0.59).
 - **Context menu** — floating menu, typically right-click. Renders at a
   caller-chosen point. See [overlays](overlays.md#context-menu).
 

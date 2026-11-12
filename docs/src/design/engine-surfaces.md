@@ -127,7 +127,8 @@ in addition to `card_raised`'s own coverage.
 ### The modal dim
 
 Unstyled default: `iced::Color::from_rgba(0.0, 0.0, 0.0, 0.4)` — opaque
-black at 40% alpha, unchanged by this RFC.
+black at 40% alpha, unchanged by this RFC. *(Corrected 2026-11-13, from the 0.62 audit: since
+`eb6a544` the unstyled dim is 44%, the same as `DIM_ALPHA`.)*
 
 Composited over a **dark** page background, black-on-black is close to a
 no-op — the same class of defect RFC-038's `shift_away_from` was built

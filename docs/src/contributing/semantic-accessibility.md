@@ -28,9 +28,10 @@ and from the CI acceptance criteria.
 > in the interim.
 
 This is snora's stated position, citable directly rather than inferred from
-silence. The gap is real: there is no accessibility tree, no AccessKit
-integration, and no semantic identifiers anywhere in the crates, and a screen
-reader sees nothing an application does not supply itself. That gap is not a
+silence. The gap is real: there is no accessibility tree and no AccessKit
+integration. snora's only identifiers are the public `snora-*` container ids of the surfaces it
+draws (RFC-047), which name nothing to a screen reader. A screen reader sees nothing an
+application does not supply itself. That gap is not a
 snora oversight — an accessibility tree requires the widget toolkit to expose
 one, and iced 0.14 does not. It is recorded as a decision, with a
 reconsideration trigger, in
@@ -45,8 +46,9 @@ reconsideration trigger, in
 > `container` — when an iced-native control (button, checkbox, pick_list,
 > slider, …) covers the use case.
 
-Native iced controls inherit iced's event routing, keyboard handling, and any
-accessibility-tree information iced exposes to the OS. A visual-only container
+Native iced controls inherit iced's event routing, and any accessibility-tree information iced
+exposes to the OS. Keyboard handling depends on the control: iced 0.14's `button` takes none,
+which is why snora's controls are its own `control`. A visual-only container
 with a `mouse_area` loses all of that.
 
 ---

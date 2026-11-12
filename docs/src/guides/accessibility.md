@@ -76,7 +76,8 @@ contributor-facing documents linked below, not duplicated here.
 
   - **F6 / Shift+F6** move focus to the first control of the next / previous zone, **counted
     from the zone that holds focus when you press the key.** After a Tab or a click into the
-    sidebar, F6 goes to the body.
+    sidebar, F6 goes to the body. *(After a click, from 0.62. In 0.61, a click focuses nothing,
+    so F6 counted from no zone and went to the header. Found by the 0.62 audit.)*
   - **A zone with nothing to focus is skipped.** The order wraps, and it does not mirror under
     RTL: the sidebar follows the header in either direction.
   - **With focus in no zone** (nothing focused, a toast, a context menu), F6 goes to the first
@@ -208,7 +209,8 @@ them.
   Removing a chip moves focus to the next chip's label, not its ×, so pressing
   Enter again cannot chain into removing more. Dismissing a notice moves focus
   to the control after it. Closing a toast moves focus to the next toast's ×.
-  Pressing an ancestor breadcrumb keeps focus in the breadcrumb bar.
+  Pressing an ancestor breadcrumb other than the root keeps focus in the breadcrumb bar.
+  Pressing the root, which becomes the only crumb, leaves nothing focused.
 
   **For application authors, what the two sentences mean exactly:**
   - **"The same group"** is the innermost container that held the control and

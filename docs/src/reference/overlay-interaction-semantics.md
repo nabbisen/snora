@@ -19,13 +19,16 @@ framework contract; it must not change without an RFC.
 1. menu backdrop  — transparent click sink (if a menu is open)
 2. header_menu    — dropdown under the header bar
 3. context_menu   — floating menu at click point
-4. modal dim      — dim click sink (if a modal is present): 40% via
-                     `snora::render` (unstyled), 44% via
-                     `snora::design::render` (`DIM_ALPHA`, RFC-065)
+4. modal dim      — dim click sink (if a modal is present): 44% on
+                     both paths (`snora::render` and
+                     `snora::design::render`, `DIM_ALPHA`, RFC-065)
 5. dialog         — centered; token-styled card via design::render
 6. sheet          — edge-anchored panel
 7. toasts         — always on top, RTL-aware anchor
 ```
+
+*(Corrected 2026-11-13, from the 0.62 audit: this said 40% on `snora::render`. Both paths have
+drawn 44% since `eb6a544`: an empty page pixel goes from 255 to 143.)*
 
 Layers 1–6 are conditional on the corresponding `AppLayout` fields being
 populated. Layer 7 is always evaluated but emits nothing when the toast
@@ -382,16 +385,20 @@ in your `update`; the [Keyboard map](../guides/keyboard.md#escape) shows it.
 
 ## What Snora does not do
 
-- **Keys beyond Law 7 and the shortcuts** — Snora answers Escape for its
-  overlays (Law 7), Tab through `traverse`, and the shortcuts the
-  application opts into (RFC-116 R-2, the [Keyboard map](../guides/keyboard.md)).
-  Every other key is the application's, and snora installs no subscription.
+- **Keys beyond these** — Snora answers Enter and Space on its own controls, ↓ ↑ Home and End
+  inside its open menus (0.60), and Escape for its overlays (Law 7). It answers Tab through
+  `traverse`, F6 through `focus_zone` (0.61), and the shortcuts, only when the application routes
+  or opts into them (RFC-116 R-2, the [Keyboard map](../guides/keyboard.md)). Every other key is
+  the application's, and snora installs no subscription. *(Corrected 2026-11-13, from the 0.62
+  audit: this listed Escape, Tab and the shortcuts only.)*
 - **A strict focus trap** — Tab inside an open modal is bounded to the modal
   and the toasts (Law 8, RFC-119), with one empty press between the last
   control and the first, which is iced's `focus_next`. A wrap with no gap is
   not built. Where focus *starts* when a modal opens stays the application's:
-  `widget::Id` and an iced focus operation.
+  `.id(…)` on a control and iced's `operation::focus(id)` (0.61, RFC-127).
 - **Per-overlay close hooks** — There is no `on_close` on `Dialog` or
   `Sheet`. Use `AppLayout::on_close_modals` (Law 4).
-- **Collision detection for popovers** — Not yet a Snora concept.
-  (RFC-013-A is the design study.)
+- **Collision detection for popovers in general** — Not a Snora concept. `app_header`'s dropdown
+  is the one exception: it is kept inside the window, its height is capped to the room below,
+  and the rest scrolls (0.59). (RFC-013-A is the general design study.) *(Corrected 2026-11-13,
+  from the 0.62 audit.)*

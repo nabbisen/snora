@@ -55,4 +55,7 @@ if self.show_notice {
   container, or else before it (RFC-120).
   *(Corrected 2026-11-07: up to 0.54 they were iced buttons, which take no
   keyboard input; this page had said "keyboard-reachable".)*
-- Tone colors all pass WCAG AA (verified by automated contrast tests).
+- Each palette pair a notice uses meets the contrast its declared class requires, tested by the
+  palette's own contrast suite. The colour a notice's action label is drawn in is measured in
+  0.62. *(Corrected 2026-11-13, from the 0.62 audit: this said all tone colours pass AA, which no
+  notice-level test checked.)*

@@ -238,10 +238,15 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.62.0
 
-**An audit first** (owner, 2026-11-12): is every keyboard and overlay claim in the book guarded
-by a test? Three times a claim nothing tested turned out false (the old Enter and Space claim, F6,
-the dialog-focus advice). What the audit finds decides 0.62. Handoff:
-[`audit-0-62-…`](rfcs/handoffs/audit-0-62-keyboard-and-overlay-claims/implementation-handoff.md).
+**From the audit** (2026-11-13): of 508 keyboard and overlay claims in the book and the public
+rustdoc, 15 were false. Handoff:
+[`follow-up-0-62.md`](rfcs/handoffs/audit-0-62-keyboard-and-overlay-claims/follow-up-0-62.md).
+- **A sheet on the right has had the wrong width since 0.4:** `OneThird` drew two thirds. Fixed.
+- **F6 after a click counted from no zone.** It counts from where the click left Tab. Fixed.
+- The book's other false sentences are corrected already. Tests pin them, and close the holes
+  the audit found: the 24 px floor alone, a disabled status, two source gates.
+- **The overlay laws, the keyboard map and the public keyboard rustdoc are guarded in full.** The
+  guides' remaining partial rows are a backlog, in the audit's tables.
 
 ## Future wanted
 
