@@ -148,24 +148,28 @@ fn intent_label(intent: ToastIntent) -> &'static str {
 /// combination is where the dev team first found this (RFC-108's
 /// review), and it is the one iced's own 22 do not cover.
 fn unstyled_theme_contexts() -> Vec<(String, Theme)> {
-    let mut contexts: Vec<(String, Theme)> = Theme::ALL
+    let contexts: Vec<(String, Theme)> = Theme::ALL
         .iter()
         .map(|theme| (theme.to_string(), theme.clone()))
         .collect();
 
     // RFC-118: every preset, from the one public source, labelled by the
-    // preset's own name.
+    // preset's own name. (`mut` only where `design` adds to the list.)
     #[cfg(feature = "design")]
-    contexts.extend(
-        snora_design::Tokens::presets()
-            .into_iter()
-            .map(|(name, tokens)| {
-                (
-                    format!("token theme: {name}"),
-                    snora_style::theme::theme(&tokens),
-                )
-            }),
-    );
+    let contexts = {
+        let mut contexts = contexts;
+        contexts.extend(
+            snora_design::Tokens::presets()
+                .into_iter()
+                .map(|(name, tokens)| {
+                    (
+                        format!("token theme: {name}"),
+                        snora_style::theme::theme(&tokens),
+                    )
+                }),
+        );
+        contexts
+    };
 
     contexts
 }
