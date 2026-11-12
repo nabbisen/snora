@@ -46,6 +46,7 @@ fn render_page(dup: bool) -> Element<'static, Msg> {
     snora::render(AppLayout::new(page(dup)))
 }
 
+#[cfg(feature = "design")]
 fn tokens() -> &'static snora::design::Tokens {
     Box::leak(Box::new(snora::design::Tokens::light()))
 }
@@ -71,6 +72,9 @@ fn with_dialog(open: bool) -> Element<'static, Msg> {
     snora::render(layout)
 }
 
+/// A view, built again for each rig.
+type Build = Box<dyn Fn() -> Element<'static, Msg>>;
+
 fn focused(rig: &mut Rig<Msg>) -> Vec<usize> {
     rig.focused()
 }
@@ -79,28 +83,30 @@ fn focused(rig: &mut Rig<Msg>) -> Vec<usize> {
 /// the next Tab goes to the control after it. Both paths.
 #[test]
 fn focus_by_id_reaches_one_control_with_its_ring_and_tab_carries_on() {
-    let t = tokens();
-    let design_page = move || -> Element<'static, Msg> {
-        snora::design::render(
-            AppLayout::new(Element::from(column![
-                Element::from(snora::design::control(t, text("A")).on_press(Msg::A)),
-                Element::from(
-                    snora::design::control(t, text("B"))
-                        .on_press(Msg::B)
-                        .id("b")
-                ),
-                Element::from(snora::design::control(t, text("C")).on_press(Msg::C)),
-            ])),
-            t,
-        )
-    };
-    for (path, build) in [
-        (
-            "engine",
-            Box::new(|| render_page(false)) as Box<dyn Fn() -> Element<'static, Msg>>,
-        ),
-        ("design", Box::new(design_page)),
-    ] {
+    #[cfg_attr(not(feature = "design"), allow(unused_mut))]
+    let mut paths: Vec<(&str, Build)> = vec![("engine", Box::new(|| render_page(false)))];
+    #[cfg(feature = "design")]
+    {
+        let t = tokens();
+        paths.push((
+            "design",
+            Box::new(move || {
+                snora::design::render(
+                    AppLayout::new(Element::from(column![
+                        Element::from(snora::design::control(t, text("A")).on_press(Msg::A)),
+                        Element::from(
+                            snora::design::control(t, text("B"))
+                                .on_press(Msg::B)
+                                .id("b")
+                        ),
+                        Element::from(snora::design::control(t, text("C")).on_press(Msg::C)),
+                    ])),
+                    t,
+                )
+            }),
+        ));
+    }
+    for (path, build) in paths {
         let mut rig = Rig::new(build());
         let mut clean = Rig::new(build());
         assert_eq!(rig.task(is_focused("b")), vec![false], "{path}: before");
