@@ -408,26 +408,31 @@ jobs:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: PROBE (throwaway) what mesa-vulkan-drivers pulls in
+      - name: PROBE 2 (throwaway) sources, checksums, an offline install
         run: |
           set +e
-          cat /etc/os-release | head -3
-          sudo apt-get update
-          apt-cache policy mesa-vulkan-drivers
-          echo "--- print-uris"
-          apt-get -y --print-uris install mesa-vulkan-drivers | tee uris.txt
-          echo "--- reachability, mirror and snapshot"
-          ts=$(date -u +%Y%m%dT%H%M%SZ)
-          grep "^'" uris.txt | while read -r uri file size sum; do
-            url=${uri//\'/}
-            path=${url#*ubuntu/pool/}
-            m=$(curl -s -o /dev/null -w '%{http_code}' -I --max-time 20 "$url")
-            s=$(curl -s -o /dev/null -w '%{http_code}' -I -L --max-time 20 "https://snapshot.ubuntu.com/ubuntu/$ts/pool/$path")
-            echo "mirror=$m snapshot=$s $file $size $sum $url"
+          sudo apt-get update > /dev/null
+          echo "--- apt-cache show"
+          apt-cache show mesa-vulkan-drivers libdisplay-info3 | grep -E '^(Package|Version|Architecture|Filename|Size|SHA256|Depends):' | cut -c1-200
+          echo "--- download"
+          mkdir -p /tmp/debs && cd /tmp/debs
+          apt-get download mesa-vulkan-drivers libdisplay-info3
+          sha256sum *.deb
+          for f in *.deb; do echo "$f: $(dpkg-deb -f "$f" Package Version Architecture | tr '\n' ' ')"; done
+          echo "--- sources, by plain HTTP(S) on the pinned Filename"
+          for f in $(apt-cache show mesa-vulkan-drivers libdisplay-info3 | sed -n 's/^Filename: //p' | sort -u); do
+            for base in http://azure.archive.ubuntu.com/ubuntu http://archive.ubuntu.com/ubuntu https://snapshot.ubuntu.com/ubuntu/20261112T000000Z; do
+              code=$(curl -sIL -o /dev/null -w '%{http_code}' --max-time 30 "$base/$f")
+              echo "$code $base/$f"
+            done
           done
-          echo "--- apt sources"
-          cat /etc/apt/sources.list.d/* 2>/dev/null | head -20
-          dpkg -l | grep -E 'llvm|vulkan|libdrm|mesa' | awk '{print $2, $3}'
+          echo "--- mirrors file"; cat /etc/apt/apt-mirrors.txt
+          echo "--- offline dpkg of exactly those two files"
+          sudo dpkg -i /tmp/debs/*.deb
+          echo "dpkg rc=$?"
+          ls /usr/share/vulkan/icd.d /etc/vulkan/icd.d 2>/dev/null
+          dpkg --print-architecture; dpkg --print-foreign-architectures; uname -m
+          grep -m1 'model name' /proc/cpuinfo; grep -m1 -o 'avx2' /proc/cpuinfo
       - name: Install lavapipe (Mesa's software Vulkan)
         # The default runner has no GPU. lavapipe rasterises in
         # software, which is slow but is the real wgpu pipeline — and
