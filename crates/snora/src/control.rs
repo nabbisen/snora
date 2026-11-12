@@ -225,8 +225,54 @@ impl<'a, Message: Clone + 'a> Control<'a, Message> {
         self
     }
 
-    /// The control's `widget::Id` (PROTOTYPE, RFC-127 Unit 0), so that iced's
-    /// `focus(id)` can put focus on it.
+    /// The control's `widget::Id`, so that iced's own tasks can reach it: `focus(id)` puts focus
+    /// on it, and `is_focused(id)` reports whether it has it (RFC-127). snora adds no focus API of
+    /// its own; this is the pattern `text_input` already has. Without an id, the control makes
+    /// its own, which nothing outside can name.
+    ///
+    /// A control focused this way behaves as one reached by Tab: its ring is drawn, Enter and
+    /// Space press it, and Tab carries on from it.
+    ///
+    /// # Choosing where focus starts when a dialog opens
+    ///
+    /// ```
+    /// # use iced::widget::{operation, text};
+    /// # #[derive(Clone)] enum Message { Cancel }
+    /// # struct App { confirm: bool }
+    /// # impl App {
+    /// // view: the dialog's safe choice has an id.
+    /// fn cancel<'a>(&self) -> iced::Element<'a, Message> {
+    ///     snora::control(text("Cancel"))
+    ///         .id("confirm-cancel")
+    ///         .on_press(Message::Cancel)
+    ///         .into()
+    /// }
+    ///
+    /// // update: the same update that opens the dialog asks for the focus.
+    /// fn open_dialog(&mut self) -> iced::Task<Message> {
+    ///     self.confirm = true;
+    ///     operation::focus("confirm-cancel")
+    /// }
+    /// # }
+    /// ```
+    ///
+    /// **The task runs on the new view, so it can name a control in the dialog that the same
+    /// update opens.** The window loop builds the interface from the new `view` first and runs the
+    /// update's tasks on it afterwards. A task that runs *before* the dialog is in the view
+    /// (returned by an earlier message, say) finds no such control.
+    ///
+    /// # What `focus(id)` does when it finds nothing
+    ///
+    /// - **The id must be unique in the window**, as for iced's `text_input`: `focus(id)` focuses
+    ///   every control that has it, and `is_focused(id)` answers for the last one in tree order.
+    /// - **An id that no reachable control has** focuses nothing and **leaves nothing focused**:
+    ///   iced's `focus` unfocuses every control it reaches that does not have the id, even one that
+    ///   held focus a moment ago. `is_focused(id)` then **gives no answer at all** (not `false`),
+    ///   so an application that waits for its message waits forever.
+    /// - **A control that is covered is such an id.** Under an open dialog or sheet, or a menu
+    ///   with its backdrop, the page is out of reach of the keyboard (RFC-119), so `focus(id)` for
+    ///   one of its controls cannot put focus beneath the cover. It focuses nothing, and
+    ///   leaves nothing focused: Tab starts again inside the dialog.
     pub fn id(mut self, id: impl Into<widget::Id>) -> Self {
         self.id = Some(id.into());
         self
