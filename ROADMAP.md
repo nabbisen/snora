@@ -243,6 +243,9 @@ rustdoc, 15 were false. Handoff:
 [`follow-up-0-62.md`](rfcs/handoffs/audit-0-62-keyboard-and-overlay-claims/follow-up-0-62.md).
 - **A sheet on the right has had the wrong width since 0.4:** `OneThird` drew two thirds. Fixed.
 - **F6 after a click counted from no zone.** It counts from where the click left Tab. Fixed.
+- **A notice's action label was drawn in its tone colour** (RFC-128, accepted 2026-11-14): Neutral's
+  read 3.1:1, and the AAA presets' were under 7:1. It becomes a ghost in the accent, and drawn text
+  gets a guard.
 - The book's other false sentences are corrected already. Tests pin them, and close the holes
   the audit found: the 24 px floor alone, a disabled status, two source gates.
 - **The overlay laws, the keyboard map and the public keyboard rustdoc are guarded in full.** The

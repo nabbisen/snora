@@ -1,6 +1,7 @@
 # RFC-128 — A notice's action label is drawn in a colour that is not a text colour
 
-**Status.** Proposed 2026-11-14.
+**Status.** Accepted 2026-11-14. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/128-…`](../handoffs/128-a-notices-action-label-is-drawn-in-a-non-text-colour/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from the 0.62 audit's follow-up (Unit 2, H-5), which measured
 it and stopped, as its handoff said to.
 **Release target.** 0.62.0.
@@ -95,3 +96,9 @@ baselines of notices with actions), and it ships in the same release as the shee
    `main`, which must fail on the four Neutral cells and the AAA cells above.
 2. **Unit 1:** R-1 and R-2, each with a breakage row (put the override back).
 3. **The book,** by the architect (R-3).
+
+## Rulings, 2026-11-14 (owner)
+
+The RFC is accepted as written:
+- **Q-1:** the action's label is the ghost's own colour, `palette.accent`, for every tone.
+- **Q-2:** not breaking: **Changed**, with a migration-guide row, in 0.62.0.
