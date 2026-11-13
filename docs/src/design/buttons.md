@@ -115,8 +115,8 @@ Without `.style(…)` it looks like `ghost`, so content of your own does not loo
 call to action unless you say so. **`.id(…)`** (0.61) lets iced's `operation::focus(id)` focus it,
 for a dialog's starting focus say ([Overlays](../guides/overlays.md#where-focus-starts-in-a-dialog-061-rfc-127)).
 The variants above take no id: when you need one, build the button this way with the same style
-function. It has the variant's colours. Set `.padding(…)` to match the variant's size: iced's default
-padding is a little smaller. On the engine path, `snora::control(content)` is the
+function, and draw its label at the label size, `text(label).size(t.typography.label.size)`. It then
+draws exactly as the variant does. The padding is already the same. On the engine path, `snora::control(content)` is the
 same, with iced's default look and the theme's ring.
 
 ## Accessibility notes

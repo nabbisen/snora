@@ -43,7 +43,7 @@ the dialog:
 const CANCEL: &str = "confirm-cancel";
 
 // view
-snora::design::control(&t, text("Cancel"))
+snora::design::control(&t, text("Cancel").size(t.typography.label.size))
     .id(CANCEL)
     .on_press(Message::Cancel)
     .style(move |_, status| style::button::secondary(&tok, status))
@@ -63,10 +63,12 @@ Message::AskToDelete => {
 - **An id that no reachable control has,** including one under the dialog, focuses nothing and
   **leaves nothing focused.** `is_focused(id)` then gives no answer at all, so do not wait on it.
 - **The `design::button` variants take no id.** Build the control with
-  `snora::design::control` and the same style function, as above. It has the variant's colours.
-  Its padding is iced's button's unless you set `.padding(…)`, so it is a little smaller than the
-  variant. *(Corrected 2026-11-13, from the 0.62 audit: this said it looked identical. 0.62 states the
-  padding that makes it so.)*
+  `snora::design::control` and the same style function, as above. **It draws exactly as the variant
+  does when its label is drawn at the label size,** `text(label).size(t.typography.label.size)`, as
+  above. The padding is already the same. At iced's default text size the control is a little
+  larger. *(Corrected 2026-11-13, twice: this first said it looked identical with no condition, and
+  the 0.62 audit's correction then blamed the padding, which was wrong. The label's size is the
+  difference, tested in 0.62.)*
 
 ## Dialog
 
