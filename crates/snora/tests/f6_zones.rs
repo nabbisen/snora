@@ -615,3 +615,152 @@ fn rule_6_a_held_f6_keeps_moving_one_zone_per_repeat() {
     assert_eq!(walk, vec!["H1", "S1", "B1", "F1"]);
     assert!(rig.messages.is_empty(), "a held F6 pressed something");
 }
+
+// ---------------------------------------------------------------------------
+// 0.62 (the audit's A-2): F6 after a click counts from Tab's starting point
+// ---------------------------------------------------------------------------
+
+/// A click on the target named `name`: it presses (its message is published) and focuses nothing
+/// (RFC-121 R-1), and the control becomes Tab's starting point (R-2).
+fn click(rig: &mut Rig<Msg>, names: &[&'static str], name: &'static str) {
+    let i = names.iter().position(|n| *n == name).unwrap();
+    let at = rig.targets()[i].bounds.center();
+    rig.click_at(at);
+    assert_eq!(
+        rig.messages.last(),
+        Some(&Msg::Press(name)),
+        "premise: the click pressed {name}"
+    );
+    assert!(
+        rig.focused().is_empty(),
+        "premise: a click focuses nothing (RFC-121)"
+    );
+}
+
+/// A press on a point where no control is: the body's empty right-hand side.
+const NOWHERE: iced::Point = iced::Point::new(700.0, 450.0);
+
+/// Rule 1: with nothing focused, F6 counts from the zone of the control last clicked, as Tab
+/// carries on from it. Sidebar -> body; Shift+F6 from the same click -> the header.
+#[test]
+fn rule_1_after_a_click_f6_counts_from_the_clicked_controls_zone() {
+    let scene = Scene::new();
+    let names = scene.names();
+    for (shift, want) in [(false, "B1"), (true, "H1")] {
+        let mut rig = scene.rig();
+        click(&mut rig, &names, "S2");
+        press_f6(&mut rig, shift);
+        println!("click S2, shift {shift} -> {:?}", held(&mut rig, &names));
+        assert_eq!(held(&mut rig, &names), vec![want], "shift {shift}");
+    }
+    // From the body: the footer, and back, the sidebar.
+    for (shift, want) in [(false, "F1"), (true, "S1")] {
+        let mut rig = scene.rig();
+        click(&mut rig, &names, "B2");
+        press_f6(&mut rig, shift);
+        assert_eq!(
+            held(&mut rig, &names),
+            vec![want],
+            "from the body, shift {shift}"
+        );
+    }
+}
+
+/// Rule 3: a press that is not on a control clears the starting point, so F6 is "from no zone"
+/// again: the header (the first zone with a control), as with no click at all.
+#[test]
+fn rule_3_a_press_elsewhere_clears_the_starting_point() {
+    let scene = Scene::new();
+    let names = scene.names();
+    let mut rig = scene.rig();
+    click(&mut rig, &names, "S2");
+    let before = rig.messages.len();
+    rig.click_at(NOWHERE);
+    assert_eq!(
+        rig.messages.len(),
+        before,
+        "premise: the press landed on no control"
+    );
+    press_f6(&mut rig, false);
+    assert_eq!(held(&mut rig, &names), vec!["H1"]);
+    // And backwards: the last zone.
+    let mut rig = scene.rig();
+    click(&mut rig, &names, "S2");
+    rig.click_at(NOWHERE);
+    press_f6(&mut rig, true);
+    assert_eq!(held(&mut rig, &names), vec!["F1"]);
+}
+
+/// Rule 1: once F6 has moved focus the starting point is spent, as Tab spends it: if focus is lost
+/// later, the next F6 does not count from the old click.
+#[test]
+fn rule_1_moving_focus_spends_the_starting_point() {
+    let scene = Scene::new();
+    let names = scene.names();
+    let mut rig = scene.rig();
+    click(&mut rig, &names, "S2");
+    press_f6(&mut rig, false);
+    assert_eq!(held(&mut rig, &names), vec!["B1"]);
+    // Focus is lost without a press (an application's task, here the one that takes it away).
+    rig.run(Box::new(Blur));
+    assert!(rig.focused().is_empty(), "premise: focus was taken away");
+    press_f6(&mut rig, false);
+    assert_eq!(
+        held(&mut rig, &names),
+        vec!["H1"],
+        "from no zone, not from the sidebar click that came before the last F6"
+    );
+}
+
+/// Takes focus from every control, as an application's `unfocus` would.
+struct Blur;
+impl iced_runtime::core::widget::Operation<()> for Blur {
+    fn traverse(
+        &mut self,
+        operate: &mut dyn FnMut(&mut dyn iced_runtime::core::widget::Operation<()>),
+    ) {
+        operate(self);
+    }
+    fn focusable(
+        &mut self,
+        _id: Option<&iced_runtime::core::widget::Id>,
+        _bounds: iced::Rectangle,
+        state: &mut dyn iced_runtime::core::widget::operation::Focusable,
+    ) {
+        state.unfocus();
+    }
+}
+
+/// Rule 5: a click on the dialog's own control, then F6: nothing moves. The page under the dialog
+/// has a starting point of its own from before it opened (a click on the sidebar), and it is
+/// covered, so it names no target.
+#[test]
+fn rule_5_a_click_in_a_dialog_then_f6_moves_nothing() {
+    let page = Scene::new();
+    let page_names = page.names();
+    let mut rig = page.rig();
+    click(&mut rig, &page_names, "S2");
+    let with_dialog = Scene {
+        dialog: true,
+        ..Scene::new()
+    };
+    let names = with_dialog.names();
+    let mut rig = rig.rebuilt(with_dialog.build());
+    assert_eq!(
+        rig.targets().len(),
+        names.len(),
+        "premise: only the dialog's controls are targets"
+    );
+    click(&mut rig, &names, "D1");
+    press_f6(&mut rig, false);
+    assert!(
+        rig.focused().is_empty(),
+        "F6 moved focus under a dialog: {:?}",
+        held(&mut rig, &names)
+    );
+    press_f6(&mut rig, true);
+    assert!(
+        rig.focused().is_empty(),
+        "Shift+F6 moved focus under a dialog"
+    );
+}

@@ -14,7 +14,7 @@
 //!                        (`app_header`'s dropdown is not a layer: it floats over
 //!                        the page from its trigger, and covers the page while open)
 //! 3. context_menu      — floating menu at click point
-//! 4. modal backdrop    — 40%-dim mouse_area, dispatches on_close_modals
+//! 4. modal backdrop    — 44%-dim mouse_area, dispatches on_close_modals
 //! 5. dialog            — centered; token-styled card via `design::render`
 //! 6. sheet             — edge-anchored panel, size per SheetSize
 //! 7. toasts            — stacked at the configured ToastPosition (RTL-aware),

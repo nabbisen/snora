@@ -41,12 +41,19 @@ pub struct Rig<M: 'static> {
     /// What the interface published, as the runtime would collect it.
     pub messages: Vec<M>,
     cursor: mouse::Cursor,
+    /// The window the interface is laid out in ([`WINDOW`] unless built with [`Rig::sized`]).
+    size: Size,
 }
 
 impl<M: Clone + 'static> Rig<M> {
     /// A first build, and the redraw request the runtime sends before the
     /// first draw.
     pub fn new(root: Element<'static, M>) -> Self {
+        Self::sized(root, WINDOW)
+    }
+
+    /// The same, in a window of another size.
+    pub fn sized(root: Element<'static, M>, size: Size) -> Self {
         let wanted = backend();
         let mut renderer = iced::futures::executor::block_on(<iced::Renderer as Headless>::new(
             Font::DEFAULT,
@@ -59,17 +66,13 @@ impl<M: Clone + 'static> Rig<M> {
             wanted,
             "another renderer drew: not the pixels under test"
         );
-        let ui = UserInterface::build(
-            root,
-            WINDOW,
-            user_interface::Cache::default(),
-            &mut renderer,
-        );
+        let ui = UserInterface::build(root, size, user_interface::Cache::default(), &mut renderer);
         let mut rig = Self {
             ui,
             renderer,
             messages: Vec::new(),
             cursor: mouse::Cursor::Unavailable,
+            size,
         };
         rig.redraw();
         rig
@@ -87,12 +90,13 @@ impl<M: Clone + 'static> Rig<M> {
     /// the redraw, in which a task (a focus operation) may run.
     pub fn rebuilt_quiet(self, root: Element<'static, M>) -> Self {
         let mut renderer = self.renderer;
-        let ui = UserInterface::build(root, WINDOW, self.ui.into_cache(), &mut renderer);
+        let ui = UserInterface::build(root, self.size, self.ui.into_cache(), &mut renderer);
         Self {
             ui,
             renderer,
             messages: self.messages,
             cursor: self.cursor,
+            size: self.size,
         }
     }
 
@@ -335,7 +339,7 @@ impl<M: Clone + 'static> Rig<M> {
         );
         Headless::screenshot(
             &mut self.renderer,
-            Size::new(WINDOW.width as u32, WINDOW.height as u32),
+            Size::new(self.size.width as u32, self.size.height as u32),
             1.0,
             base.background_color,
         )

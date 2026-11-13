@@ -26,7 +26,22 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- **A sheet on the right had the spacer's width, not the width you asked for.** A sheet whose edge
+  is on the right (`SheetEdge::End` under left-to-right, `SheetEdge::Start` under right-to-left)
+  has been laid out with the width of the empty space beside it since 0.4.0. So `OneThird` drew
+  two thirds of the window and `TwoThirds` drew one third; `Half` hid it, and `Pixels(…)`, the
+  top and the bottom were right. It is fixed: **a right-side sheet now has the width you asked
+  for.** If you chose `TwoThirds` to get a third of the window on the right, or `OneThird` to get
+  two thirds, you compensated for the bug; change the size back to the one you meant. A sheet on
+  the left, at the top or at the bottom is unchanged. (Found by the 0.62 audit.)
+- **F6 after a click counted from no zone.** With nothing focused, F6 and Shift+F6 went to the
+  first (or last) zone with a control, even right after a click on a control in another zone,
+  though Tab carries on from that click (RFC-121). F6 now counts from the zone of the control
+  last clicked, as Tab does: click in the sidebar, press F6, and focus goes to the body. A press
+  anywhere that is not a control, or a move of focus by F6, ends the starting point as it does
+  for Tab. (Found by the 0.62 audit.)
 
 ## [0.61.0] — 2026-11-12
 

@@ -37,11 +37,14 @@
 //!
 //! ## The modal dim
 //!
-//! `iced::Color::from_rgba(0.0, 0.0, 0.0, 0.4)` — opaque black at 40%
-//! alpha — is the unstyled default. Composited over a **dark** page
-//! background, black-on-black is close to a no-op: the exact class of
-//! defect RFC-038's `shift_away_from` was built to prevent for derived
-//! theme tiers, here for a fixed constant instead of a derived one.
+//! The dim is **44% opaque on both paths**: [`snora_design::surfaces::DIM_ALPHA`]
+//! here, and the same number on the unstyled path (`snora::render`), which
+//! cannot reach this crate's constant. `tests/overlay_laws.rs` pins it as a
+//! pixel on each. (Until RFC-110 the unstyled dim was a literal black at 40%.
+//! Composited over a **dark** page background, black-on-black is close to a
+//! no-op: the exact class of defect RFC-038's `shift_away_from` was built to
+//! prevent for derived theme tiers, here for a fixed constant instead of a
+//! derived one.)
 //!
 //! `dim_color` instead picks the dim's base color from
 //! **`background`'s own darkness**, not a fixed pole — `Color::WHITE` if
@@ -58,11 +61,10 @@
 //!
 //! **The derivation itself lives in [`snora_design::surfaces::modal_dim`]
 //! (RFC-065), not here.** `dim_color` is a thin adapter: it calls that
-//! function and converts the result to [`iced::Color`]. This is not the
-//! same alpha as the unstyled path's `0.4` any more —
-//! [`snora_design::surfaces::DIM_ALPHA`] is `0.44`, repaired because the
-//! `light` preset's dialog card was measured at 2.85:1 against its own
-//! dimmed backdrop, below SC 1.4.11's 3:1 floor. **That measurement
+//! function and converts the result to [`iced::Color`].
+//! [`snora_design::surfaces::DIM_ALPHA`] is `0.44`, repaired from `0.40`
+//! because the `light` preset's dialog card was measured at 2.85:1 against
+//! its own dimmed backdrop, below SC 1.4.11's 3:1 floor. **That measurement
 //! describes the pre-repair state at alpha `0.40`**, where neither signal
 //! cleared: fill|dim 2.85:1 and border|dim 1.00:1. It is not the claim
 //! the 0.38→0.39 guide withdrew — that one said the border is what
@@ -70,8 +72,8 @@
 //! fill-defined against the dim and border-defined against its own
 //! surface. Reported as a stale withdrawn claim twice (aaai, 2026-08 and
 //! 2026-09) and re-measured both times; the sentence is accurate and the
-//! wording, not the fact, is what was fixed here. The two paths were symmetric at `0.40` by coincidence, not
-//! design; RFC-065 lets them diverge on purpose. See
+//! wording, not the fact, is what was fixed here. The unstyled path
+//! took the same `0.44` (`UNSTYLED_DIM_ALPHA`), so the two paths agree again. See
 //! `crates/snora-design/src/tests.rs` for the either-signal assertion
 //! this repair answers, and `render/tests.rs` for the alpha and pole
 //! tests on this crate's own adapter.

@@ -152,14 +152,10 @@ where
         }
         _ => {
             let ratio = size.as_ratio().unwrap_or(1.0 / 3.0);
-            let (sheet_pct, spacer_pct) = if on_left {
-                let (a, b) = portions(ratio);
-                // portions returns (spacer, sheet); for left-anchored we
-                // want sheet first, so swap.
-                (b, a)
-            } else {
-                portions(ratio)
-            };
+            // `portions` returns (spacer, sheet), whichever side the sheet is on.
+            // 0.4.0 to 0.61.0 bound that pair to (sheet, spacer) unswapped when the
+            // sheet was on the right, so a right-hand sheet had the spacer's width.
+            let (spacer_pct, sheet_pct) = portions(ratio);
             // Always put the sheet on the chosen side.
             if on_left {
                 (
@@ -288,5 +284,55 @@ mod tests {
         assert!(a > 0 && b > 0);
         let (a, b) = portions(1.0);
         assert!(a > 0 && b > 0);
+    }
+
+    /// O-038 (the 0.62 audit): only the corners that face the application are rounded, for
+    /// every edge in both directions. Written as a table by the side of the **window** the
+    /// sheet is against, not derived from the style function.
+    #[test]
+    fn only_the_inside_facing_corners_are_rounded() {
+        const R: f32 = 12.0;
+        // (edge, direction, [top_left, top_right, bottom_right, bottom_left])
+        let table = [
+            (SheetEdge::Bottom, LayoutDirection::Ltr, [R, R, 0.0, 0.0]),
+            (SheetEdge::Bottom, LayoutDirection::Rtl, [R, R, 0.0, 0.0]),
+            (SheetEdge::Top, LayoutDirection::Ltr, [0.0, 0.0, R, R]),
+            (SheetEdge::Top, LayoutDirection::Rtl, [0.0, 0.0, R, R]),
+            // Against the left edge: the right-hand corners face the page.
+            (SheetEdge::Start, LayoutDirection::Ltr, [0.0, R, R, 0.0]),
+            (SheetEdge::End, LayoutDirection::Rtl, [0.0, R, R, 0.0]),
+            // Against the right edge: the left-hand corners face the page.
+            (SheetEdge::End, LayoutDirection::Ltr, [R, 0.0, 0.0, R]),
+            (SheetEdge::Start, LayoutDirection::Rtl, [R, 0.0, 0.0, R]),
+        ];
+        for (edge, direction, [tl, tr, br, bl]) in table {
+            let radius = sheet_surface_style(&iced::Theme::Light, edge, direction)
+                .border
+                .radius;
+            assert_eq!(
+                [
+                    radius.top_left,
+                    radius.top_right,
+                    radius.bottom_right,
+                    radius.bottom_left
+                ],
+                [tl, tr, br, bl],
+                "{edge:?} under {direction:?}"
+            );
+        }
+    }
+
+    /// The same style has a fill and a 1 px border (O-049, as the surface the sheet is drawn on).
+    #[test]
+    fn the_surface_has_a_fill_and_a_one_pixel_border() {
+        let theme = iced::Theme::Light;
+        let palette = theme.extended_palette();
+        let style = sheet_surface_style(&theme, SheetEdge::Bottom, LayoutDirection::Ltr);
+        assert_eq!(
+            style.background,
+            Some(iced::Background::Color(palette.background.base.color))
+        );
+        assert_eq!(style.border.width, 1.0);
+        assert_eq!(style.border.color, palette.background.weak.color);
     }
 }

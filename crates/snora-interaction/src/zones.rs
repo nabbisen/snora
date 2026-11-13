@@ -3,11 +3,14 @@
 //! # The rules
 //!
 //! 1. **F6 and Shift+F6 move focus to the first control of the next and the previous zone**, counted
-//!    from the zone that holds focus **when the key is pressed**. The order is Header, SideBar, Body,
-//!    Footer, wrapping. It is logical, and does not mirror under RTL.
+//!    from the zone that holds focus **when the key is pressed**, or, when nothing holds focus, from
+//!    the zone of **Tab's starting point**: the control last clicked (RFC-121 R-2, the mark
+//!    `sequential_focus` reads). The order is Header, SideBar, Body, Footer, wrapping. It is logical,
+//!    and does not mirror under RTL.
 //! 2. **A zone with no control that can take focus is skipped**, whether it is absent or holds none.
-//! 3. **With focus in no zone** (nothing focused, a toast, a dialog's control, an inline context
-//!    menu): F6 goes to the first zone that has a control, and Shift+F6 to the last.
+//! 3. **With focus in no zone and no starting point in one** (nothing focused and no click since, a
+//!    toast, an inline context menu): F6 goes to the first zone that has a control, and Shift+F6 to
+//!    the last. A press anywhere that is not a control clears the starting point.
 //! 4. **An open menu's dropdown belongs to its trigger's zone**, for finding where focus is. **F6 lands
 //!    only on a zone's own controls, never inside an open menu.**
 //! 5. **While the page is covered, F6 does nothing**: under a dialog or a sheet, a menu with its
@@ -19,13 +22,15 @@
 //! [`zone_focus`] is one window-wide operation in two passes, like `sequential_focus`:
 //!
 //! 1. **Look.** Walk everything an operation reaches (the tree, then any overlay) and note, for each
-//!    focus target, **which zone it is in** (the innermost of the four region containers it sits in)
-//!    and whether it holds focus. An open menu's dropdown is an overlay, outside the header's
+//!    focus target, **which zone it is in** (the innermost of the four region containers it sits in),
+//!    whether it holds focus, and whether it is Tab's starting point (a click's mark, which is keyed
+//!    by the control's id so that a covered control, whose focus target is hidden, takes no part). An open menu's dropdown is an overlay, outside the header's
 //!    container, so the anchor marks it ([`DropdownMark`]) and it is counted in **its trigger's
 //!    zone** (the zone the anchor's [`OpenMenu`] mark was seen in), but only for finding where focus
 //!    is, never as somewhere to land.
 //! 2. **Act.** Focus the first control of the next (or previous) zone that has one, counted from the
-//!    zone that holds focus now; or do nothing.
+//!    zone that holds focus now; or do nothing. When focus moves, the starting point is cleared, as
+//!    Tab clears it (the keyboard has taken over).
 //!
 //! Nothing is remembered between key presses, so nothing can go stale.
 //!
@@ -45,6 +50,7 @@ use crate::menu_anchor::{DropdownMark, OpenMenu};
 
 /// One focus target, as the first pass sees it.
 struct Seen {
+    id: Option<Id>,
     /// Its zone (an index into the four regions), if it is in one.
     zone: Option<usize>,
     focused: bool,
@@ -68,6 +74,8 @@ struct Look {
     /// The zone an open menu's trigger is in.
     menu_zone: Option<usize>,
     in_dropdown: usize,
+    /// The controls that are Tab's starting point (a click's mark).
+    marked_ids: Vec<Id>,
 }
 
 impl Look {
@@ -87,9 +95,10 @@ impl Operation<Plan> for Look {
         self.stack.pop();
     }
 
-    fn focusable(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
+    fn focusable(&mut self, id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
         let in_dropdown = self.in_dropdown > 0;
         self.seen.push(Seen {
+            id: id.cloned(),
             zone: if in_dropdown {
                 self.menu_zone
             } else {
@@ -100,8 +109,11 @@ impl Operation<Plan> for Look {
         });
     }
 
-    fn custom(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Any) {
-        if state.is::<OpenMenu>() {
+    fn custom(&mut self, id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Any) {
+        if let (Some(id), Some(true)) = (id, state.downcast_ref::<bool>().copied()) {
+            // Tab's starting point, as `sequential_focus` reads it.
+            self.marked_ids.push(id.clone());
+        } else if state.is::<OpenMenu>() {
             self.menu_zone = self.zone_now();
         } else if let Some(mark) = state.downcast_ref::<DropdownMark>() {
             if mark.enter {
@@ -120,7 +132,16 @@ impl Operation<Plan> for Look {
                 first[z].get_or_insert(i);
             }
         }
-        let held = self.seen.iter().find(|s| s.focused).and_then(|s| s.zone);
+        // Focus wins; with none held, the control last clicked is where Tab carries on from, so it
+        // is where F6 counts from. A marked control whose focus target is hidden is not seen at all.
+        let held = match self.seen.iter().find(|s| s.focused) {
+            Some(focused) => focused.zone,
+            None => self
+                .seen
+                .iter()
+                .find(|s| s.id.as_ref().is_some_and(|id| self.marked_ids.contains(id)))
+                .and_then(|s| s.zone),
+        };
         let target = match held {
             // From the zone that holds focus: the next one with a control, never this one.
             Some(from) => (1..4)
@@ -132,7 +153,7 @@ impl Operation<Plan> for Look {
                     }
                 })
                 .find_map(|z| first[z]),
-            // In no zone (nothing focused, a toast, a dialog's control).
+            // In no zone (nothing focused and no click since, a toast).
             None if self.forward => first.iter().find_map(|f| *f),
             None => first.iter().rev().find_map(|f| *f),
         };
@@ -161,6 +182,16 @@ impl<T> Operation<T> for Act {
         }
         self.current += 1;
     }
+
+    fn custom(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Any) {
+        // Focus moved, so the keyboard has taken over (as in `sequential_focus`): a stale starting
+        // point must not come back if focus is lost later.
+        if self.target.is_some()
+            && let Some(mark) = state.downcast_mut::<bool>()
+        {
+            *mark = false;
+        }
+    }
 }
 
 /// Moves focus to the first control of the next zone (`forward`) or the previous one, from the zone
@@ -179,6 +210,7 @@ where
             seen: Vec::new(),
             menu_zone: None,
             in_dropdown: 0,
+            marked_ids: Vec::new(),
         },
         |plan: Plan| Act {
             target: plan.target,

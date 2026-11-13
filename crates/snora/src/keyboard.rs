@@ -92,8 +92,13 @@ pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
 ///    the zone's **first control** (a memory of the last control per zone is not kept).
 /// 2. **A zone with no control that can take focus is skipped**, whether it is absent or holds
 ///    none (a footer of plain text).
-/// 3. **With focus in no zone** (nothing focused, a toast, a control of a dialog or sheet, an
-///    inline context menu), F6 goes to the first zone that has a control, and Shift+F6 to the last.
+/// 3. **With focus in no zone** (nothing focused and no click since, a toast, an inline context
+///    menu), F6 goes to the first zone that has a control, and Shift+F6 to the last. After a click
+///    on a control nothing is focused, but Tab's starting point is that control (RFC-121), so F6
+///    counts from **its** zone instead: click in the sidebar, press F6, and focus goes to the body.
+///    A press anywhere that is not a control clears the starting point, and so does a move of
+///    focus by F6 or Tab. (A dialog's or a sheet's control is rule 5's, not this one's: the page is
+///    covered and no zone has a control.)
 /// 4. **F6 lands only on a zone's own controls, never inside an open menu.** An open
 ///    `app_header` dropdown **belongs to its trigger's zone** for finding where focus is: with
 ///    focus on one of its items, F6 moves on to the next zone. A context menu
