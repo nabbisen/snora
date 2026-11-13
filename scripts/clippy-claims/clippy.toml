@@ -1,0 +1,22 @@
+# Two claims the book makes about snora's own source, checked by name resolution (the 0.62 audit):
+#   "every control snora draws is reachable by the keyboard" (accessibility.md): no iced `button`
+#   "snora installs no subscription" (keyboard.md): no `Subscription`, no listener, no timer
+#
+# NOT a workspace clippy.toml. CI selects this directory with CLIPPY_CONF_DIR for one step that lints
+# the library targets of the snora crates (`--lib`: no tests, no examples; examples subscribe and
+# draw buttons on purpose), so no test file needs an allow line. See ci.yaml.
+#
+# The one allowance is `snora::toast::subscription`, the function the application calls.
+disallowed-methods = [
+  { path = "iced::widget::button", reason = "iced 0.14's button takes no keyboard input" },
+  { path = "iced::widget::Button::new", reason = "iced 0.14's button takes no keyboard input" },
+  { path = "iced::keyboard::listen", reason = "snora installs no subscription" },
+  { path = "iced::event::listen", reason = "snora installs no subscription" },
+  { path = "iced::event::listen_with", reason = "snora installs no subscription" },
+  { path = "iced::event::listen_raw", reason = "snora installs no subscription" },
+  { path = "iced::time::every", reason = "snora installs no subscription" },
+]
+disallowed-types = [
+  { path = "iced::widget::Button", reason = "iced 0.14's button takes no keyboard input" },
+  { path = "iced::Subscription", reason = "snora installs no subscription" },
+]

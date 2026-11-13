@@ -19,6 +19,8 @@ use snora::{AppLayout, LayoutDirection, Menu, MenuAction, MenuItem};
 enum Msg {
     Menu(MenuAction<u8, u8>),
     Close,
+    /// `on_close_modals`, where a test needs it told apart from `Close` (`on_close_menus`).
+    CloseModals,
     /// What the application set for Escape on a menu (`AppLayout::escape`).
     EscapeMenu,
     Page,
@@ -547,6 +549,64 @@ fn a_modal_covers_the_open_menu_too() {
     // And when the dialog goes, the open menu is there again.
     let mut rig = open.rebuilt(header_scene(true, Wiring::SinkOnly, LTR, 3));
     assert_eq!(rig.targets().len(), 3);
+}
+
+/// **A dialog that opens over a dropdown that is already laid out** (the 0.62 audit's H-3, M-049).
+/// `a_modal_covers_the_open_menu_too` builds the dialog scene from the start, so the dropdown was
+/// never open first; it is not edited, and states what it states. Here the menu is open and laid
+/// out, and then the dialog opens (a rebuild keeping the widget state, as `view` does after
+/// `update`): the dropdown is not drawn above the dim, and a click where its first item was is the
+/// dim's, publishing `on_close_modals` and nothing else.
+#[test]
+fn a_dialog_opened_over_a_laid_out_dropdown_covers_it_and_takes_its_clicks() {
+    let scene = |menu_open: bool, dialog: bool| {
+        let header = snora::widget::app_header(
+            "App",
+            vec![menu(3)],
+            &ON_MENU,
+            menu_open.then_some(&0u8),
+            None,
+            LTR,
+        );
+        let mut layout = AppLayout::new(page())
+            .header(header)
+            .on_close_menus(Msg::Close);
+        if dialog {
+            layout = layout
+                .dialog(snora::Dialog::new(text("dialog").into()))
+                .on_close_modals(Msg::CloseModals);
+        }
+        snora::render(layout)
+    };
+
+    // The premise: with no dialog, a click on the first item's place presses it.
+    let mut alone = Rig::new(scene(true, false));
+    let item = *alone.targets().last().expect("the dropdown has items");
+    let place = item.bounds.center();
+    alone.click_at(place);
+    assert!(
+        alone
+            .messages
+            .iter()
+            .any(|m| matches!(m, Msg::Menu(MenuAction::MenuItemPressed { .. }))),
+        "premise: the click is on an item: {:?}",
+        alone.messages
+    );
+
+    // The dropdown is open and laid out first; then the dialog opens.
+    let mut rig = Rig::new(scene(true, false)).rebuilt(scene(true, true));
+    let mut closed = Rig::new(scene(false, true));
+    assert_eq!(
+        rig.frame(),
+        closed.frame(),
+        "the dropdown is drawn above the dim"
+    );
+    rig.click_at(place);
+    assert_eq!(
+        rig.messages,
+        vec![Msg::CloseModals],
+        "a click where the dropdown's item was is the dim's, and only the dim's"
+    );
 }
 
 #[test]

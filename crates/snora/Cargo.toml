@@ -15,6 +15,11 @@ categories = ["gui", "development-tools", "accessibility", "asynchronous"]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
+# `clippy_claims` is set only by CI's "snora draws no iced button and installs no subscription"
+# step (scripts/clippy-claims/), see `toast::subscription`.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(clippy_claims)'] }
+
 [features]
 # `widgets` is on by default — most applications want the prefab
 # header / sidebar / footer / menu / icon helpers. Opt out with

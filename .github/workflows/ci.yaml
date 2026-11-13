@@ -50,6 +50,18 @@ jobs:
         # `widgets` uses) is invisible there: `toast/contrast_tests.rs` carried one through
         # 0.60. This is the feature set a plain `cargo add snora` gets.
         run: cargo clippy -p snora --all-targets -- -D warnings
+      - name: snora draws no iced button and installs no subscription (0.62 audit A-012, S-017)
+        # accessibility.md: every control snora draws is reachable by the keyboard, and iced 0.14's
+        # `button` takes no keyboard input. keyboard.md: snora installs no subscription. Both are
+        # claims about the library's own code, so clippy checks them by NAME (an aliased import is
+        # still `iced::widget::button`): scripts/clippy-claims/clippy.toml lists the paths, and this
+        # step selects it (CLIPPY_CONF_DIR) for the library targets only, which leaves tests and
+        # examples out. `--cfg clippy_claims` turns the one allowance, `toast::subscription`, into
+        # an `expect`, so a config this step failed to read fails it too.
+        env:
+          RUSTFLAGS: "--cfg clippy_claims"
+          CLIPPY_CONF_DIR: ${{ github.workspace }}/scripts/clippy-claims
+        run: cargo clippy -p snora -p snora-widgets -p snora-interaction -p snora-style -p snora-core -p snora-design --all-features --lib -- -D warnings
       - name: Rustdoc (F-38, RFC-089)
         # RFC-083 shipped because a docs.rs build failed on a published crate.
         # 46 warnings (44 by our own 2026-09-01 recount) is the state that came
