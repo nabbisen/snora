@@ -190,6 +190,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 129 | [A button's label, hovered or pressed, can fall under its preset's text floor](./proposed/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor.md) | **0.62.0** — found by RFC-128's Unit 0: hover and press shift a fill or label a fixed way on every preset, so `light_aaa` hovered and `dark_aaa` pressed fall under 7:1, and Dark's pressed ghost on `surface` under 4.5:1. Proposed: a state moves away from its label, never under the floor, stays visibly different; every state declared and swept |
 
 ## Archive
 
