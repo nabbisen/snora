@@ -189,6 +189,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 128 | [A notice's action label is drawn in a colour that is not a text colour](./proposed/128-a-notices-action-label-is-drawn-in-a-non-text-colour.md) | **0.62.0** — found by the audit's follow-up: a notice's action label takes its tone's colour, so Neutral's (`palette.border`) reads 3.1–3.5:1 on four presets, and Success, Warning and Danger fall under the AAA presets' 7:1. Proposed: the action is a ghost, drawn in the accent like every ghost, and a guard for any text drawn in a colour of a widget's own |
 
 ## Archive
 
