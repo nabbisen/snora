@@ -1457,6 +1457,63 @@ fn every_unstyled_control_is_at_least_one_and_a_half_times_the_text() {
     assert_no_failures("target-size", failures);
 }
 
+/// **The 24 px floor stands alone** (the 0.62 audit's H-1, R-087). The test above runs at host text
+/// 16 and 24, where `1.5 x text` is 24 or more, so the `24` in `max(24, 1.5 x text)` never decides
+/// anything: `MIN_TARGET` 24 -> 10 failed no test. At host text 10 and 12 the multiple is 15 and 18,
+/// and the floor alone is what keeps every unstyled control at 24 x 24.
+#[test]
+fn every_unstyled_control_keeps_the_24px_floor_where_the_text_multiple_is_under_it() {
+    let mut failures = Vec::new();
+    for host in [10.0_f32, 12.0] {
+        assert!(
+            1.5 * host < 24.0,
+            "premise: the multiple is under the floor"
+        );
+        for s in unstyled() {
+            for (k, b) in control_boxes(s.element(), host).iter().enumerate() {
+                if b.width < 23.99 || b.height < 23.99 {
+                    failures.push(format!(
+                        "host {host}px / {} #{k}: {:.1} x {:.1}, under the 24px floor",
+                        s.name, b.width, b.height
+                    ));
+                }
+            }
+        }
+    }
+    assert_no_failures("24px floor, unstyled", failures);
+}
+
+/// The same on the design path, where the floor is `max(24, 1.5 x label size, the token)`: a label
+/// of 10 or 12 px and a token of 0 leave `24` alone to decide it.
+#[cfg(feature = "design")]
+#[test]
+fn every_design_control_keeps_the_24px_floor_with_a_small_label_and_no_token() {
+    let mut failures = Vec::new();
+    for (preset, tokens) in snora::design::Tokens::presets() {
+        for label in [10.0_f32, 12.0] {
+            let mut tokens = tokens.clone();
+            tokens.targets.min = 0.0;
+            tokens.typography.label.size = label;
+            assert!(
+                1.5 * label < 24.0,
+                "premise: the multiple is under the floor"
+            );
+            let tokens: &'static snora::design::Tokens = Box::leak(Box::new(tokens));
+            for s in designed(tokens) {
+                for (k, b) in control_boxes(s.element(), 12.0).iter().enumerate() {
+                    if b.width < 23.99 || b.height < 23.99 {
+                        failures.push(format!(
+                            "{preset} label {label}px / {} #{k}: {:.1} x {:.1}",
+                            s.name, b.width, b.height
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    assert_no_failures("24px floor, design", failures);
+}
+
 /// **The minimum-target token is honoured**: at 44, every design control is
 /// 44 x 44 or more. A token that was read and then ignored would leave the
 /// small ones at 24-30.

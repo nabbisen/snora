@@ -644,6 +644,19 @@ fn close_button_style(
 /// The `tick_message` closure must be `Clone` because iced clones it for
 /// each wake-up. The simplest form is a zero-capture closure like
 /// `|| Message::ToastTick`.
+// The one subscription in the snora crates, and the application installs it: snora installs none
+// (`keyboard.md`). `scripts/clippy-claims/clippy.toml` disallows `Subscription` and every listener, and
+// CI's "snora draws no iced button and installs no subscription" step reads it with `--cfg clippy_claims`.
+// Under that cfg this is an `expect`, so that a config the step failed to read leaves the expectation
+// unfulfilled and fails the step; in every other build there is no config and no attribute.
+#[cfg_attr(
+    clippy_claims,
+    expect(
+        clippy::disallowed_methods,
+        clippy::disallowed_types,
+        reason = "the function the application calls to install the toast sweep; the only one"
+    )
+)]
 pub fn subscription<Message, F>(toasts: &[Toast<Message>], tick_message: F) -> Subscription<Message>
 where
     Message: Clone + Send + 'static,

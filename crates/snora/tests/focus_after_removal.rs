@@ -61,6 +61,13 @@ fn what_iced_does_when_the_focused_control_goes_away() {
 /// application removes something else while focus sits on a control that
 /// stays. Focus is lost or moved onto another control. snora cannot fix this:
 /// nothing in an application's list says which control went.
+///
+/// **This test records a stated limit; it does not guard anything, and it asserts nothing.** It
+/// prints where focus is after each removal (run it with `--nocapture`), so that the table in the
+/// book can be checked against what iced does today. It cannot fail, by design: "can" in the
+/// book's sentence is true by construction of iced (an application's list has no identity snora
+/// can read), and a limit has no behaviour to hold. The 0.62 audit (A-090) counts it as a
+/// measurement, not as a guard.
 #[test]
 fn a_removal_elsewhere_in_an_applications_list_moves_focus_l7() {
     type Scene = fn(&[u8]) -> iced::Element<'static, common::removal_scenes::Msg>;

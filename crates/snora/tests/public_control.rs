@@ -259,6 +259,53 @@ mod builder {
         assert_eq!(boxes(some, 16.0).len(), 1);
     }
 
+    /// The statuses a control's style function is asked about when the control is drawn.
+    fn statuses(control: snora::Control<'static, Msg>) -> Vec<iced::widget::button::Status> {
+        let seen = Rc::new(std::cell::RefCell::new(Vec::new()));
+        let record = Rc::clone(&seen);
+        let control = control.style(move |theme, status| {
+            record.borrow_mut().push(status);
+            iced::widget::button::primary(theme, status)
+        });
+        let element: Element<'static, Msg> = iced::widget::container(control).padding(24).into();
+        let mut ui = iced_test::Simulator::new(element);
+        let _ = ui.snapshot(&Theme::Light).expect("a frame");
+        seen.borrow().clone()
+    }
+
+    /// **Without `on_press` a control is drawn as `Status::Disabled`** (the 0.62 audit's H-2, R-099), on
+    /// both builders; with one it is not. The recording `.style` is what a reader's own style function
+    /// sees. The second half is the premise: a style that was never asked about any status would
+    /// satisfy "never Active" for the wrong reason.
+    #[test]
+    fn a_control_without_on_press_is_styled_as_disabled_on_both_builders() {
+        use iced::widget::button::Status;
+        let tokens = leak(Tokens::light());
+        type Make = fn(&'static Tokens) -> snora::Control<'static, Msg>;
+        let builders: [(&str, Make); 2] = [
+            ("snora::control", |_| snora::control(text("go"))),
+            ("snora::design::control", |t| {
+                snora::design::control(t, text("go"))
+            }),
+        ];
+        for (name, make) in builders {
+            for none in [make(tokens), make(tokens).on_press_maybe(None)] {
+                let got = statuses(none);
+                assert!(!got.is_empty(), "{name}: the style was never asked");
+                assert!(
+                    got.iter().all(|s| *s == Status::Disabled),
+                    "{name} without on_press: {got:?}"
+                );
+            }
+            let got = statuses(make(tokens).on_press(Msg("a")));
+            assert!(!got.is_empty(), "{name}: the style was never asked");
+            assert!(
+                got.iter().all(|s| *s != Status::Disabled),
+                "{name} with on_press: {got:?}"
+            );
+        }
+    }
+
     fn size_of(control: snora::Control<'static, Msg>) -> (f32, f32) {
         let b = boxes(control.on_press(Msg("a")).into(), 16.0)[0];
         (b.width, b.height)
