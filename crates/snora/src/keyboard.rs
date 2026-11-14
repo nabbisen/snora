@@ -81,6 +81,8 @@ pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
 /// over"), and an upgrade must not take a key away silently. The rule a reader can predict:
 /// **snora answers keys inside its own controls and overlays (Enter, Space, the arrows in a menu,
 /// Escape). Keys that move between controls (Tab, F6) are routed to it by the application.**
+/// Enter and Space, in a control, are the plain keys: a chord with Ctrl, Alt or the logo key is
+/// not answered by the control and reaches the application (RFC-130).
 ///
 /// # The rules
 ///

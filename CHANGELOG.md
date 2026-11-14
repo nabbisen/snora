@@ -46,6 +46,14 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Changed
 
+- **A focused control presses on Enter or Space only when Ctrl, Alt and the logo key are not held
+  (RFC-130).** It used to press on those keys whatever else was held, and to capture the key: with a
+  snora button focused, an application's `Ctrl+Enter` ("send") published the button's message
+  instead, and never reached its `keyboard::listen()` or snora's shortcuts. A chord with Ctrl, Alt
+  or the logo key is now not a press and is not captured, so it arrives as it does when nothing is
+  focused. **Shift does not count:** `Shift+Enter` and `Shift+Space` still press. A held key still
+  presses once. **If you relied on Ctrl+Enter pressing a focused control, bind the action to plain
+  Enter.**
 - **A notice's action is drawn as a ghost action, in the accent colour, for every tone
   (RFC-128).** Its label used to take the notice's tone colour, which is not a text colour: on
   `Neutral` it read 3.12:1 on `light` and `light_aaa` and 3.50:1 on `dark` and `dark_aaa`, under the

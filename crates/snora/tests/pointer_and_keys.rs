@@ -130,6 +130,16 @@ impl Rig {
         named: Named,
         modifiers: keyboard::Modifiers,
     ) -> iced_runtime::core::event::Status {
+        self.press_with(named, modifiers, false)
+    }
+
+    /// [`press`](Self::press), with the `repeat` flag a held key reports.
+    fn press_with(
+        &mut self,
+        named: Named,
+        modifiers: keyboard::Modifiers,
+        repeat: bool,
+    ) -> iced_runtime::core::event::Status {
         let key = Key::Named(named);
         let (_, statuses) = self.ui.update(
             &[Event::Keyboard(keyboard::Event::KeyPressed {
@@ -140,7 +150,7 @@ impl Rig {
                 ),
                 location: keyboard::Location::Standard,
                 modifiers,
-                repeat: false,
+                repeat,
                 text: None,
             })],
             self.cursor,
@@ -616,7 +626,7 @@ fn tab_to_a_control_draws_a_ring() {
 #[test]
 fn a_focused_snora_control_leaves_every_other_key_alone() {
     use keyboard::Modifiers as M;
-    let others: [(Named, M); 14] = [
+    let others: [(Named, M); 16] = [
         (Named::ArrowDown, M::empty()),
         (Named::ArrowUp, M::empty()),
         (Named::ArrowLeft, M::empty()),
@@ -631,6 +641,9 @@ fn a_focused_snora_control_leaves_every_other_key_alone() {
         (Named::PageDown, M::CTRL),
         (Named::ArrowUp, M::ALT),
         (Named::ArrowDown, M::SHIFT),
+        // RFC-130: a chord on Enter or Space is not a press either.
+        (Named::Enter, M::CTRL),
+        (Named::Space, M::CTRL),
     ];
     let failures = for_every_target(|_, subject, k, want| {
         let mut rig = Rig::new(subject.element());
@@ -781,4 +794,85 @@ fn a_pointer_resting_on_a_control_draws_no_ring() {
         (n > 0).then(|| format!("{n} pixels outside the control differ under the pointer: a ring"))
     });
     assert_clean("hover-ring", failures);
+}
+
+// ---- RFC-130: a chord is not a press ---------------------------------------------------------
+
+/// **A chord is not a press, and is not captured.** On every control (the subjects of this file),
+/// focused by Tab:
+/// - Enter and Space, plain and with Shift, publish the control's message once and are captured;
+/// - with Ctrl, with Alt, with the logo key, and with Ctrl+Shift, Alt+Shift and Logo+Shift, they
+///   publish nothing **and are left `Ignored`**, which is how they reach snora's router and an
+///   application's `keyboard::listen()` (it passes only what nothing captured). The arrival is
+///   asserted and not only the silence: a control that dropped the key without capturing it passes a
+///   silence-only test, and so would one that captured it without publishing (row 3 of the
+///   breakages);
+/// - a held `Ctrl+Enter` (`repeat: true`) publishes nothing and is not captured either.
+#[test]
+fn a_chord_is_not_a_press_and_is_left_for_the_application() {
+    use iced_runtime::core::event::Status;
+    use keyboard::Modifiers as M;
+    let presses = [M::empty(), M::SHIFT];
+    let chords = [
+        M::CTRL,
+        M::ALT,
+        M::LOGO,
+        M::CTRL | M::SHIFT,
+        M::ALT | M::SHIFT,
+        M::LOGO | M::SHIFT,
+        M::CTRL | M::ALT,
+    ];
+    let failures = for_every_target(|_, subject, k, want| {
+        let focused = |rig: &mut Rig| {
+            for _ in 0..=k {
+                rig.tab();
+            }
+            rig.redraw_requested();
+            rig.targets()[k].focused
+        };
+        for key in [Named::Enter, Named::Space] {
+            for mods in presses {
+                let mut rig = Rig::new(subject.element());
+                if !focused(&mut rig) {
+                    return Some("the premise failed: Tab did not focus it".to_owned());
+                }
+                let status = rig.press(key, mods);
+                if rig.messages != vec![want.clone()] || status != Status::Captured {
+                    return Some(format!(
+                        "{key:?}+{mods:?} published {:?} and was {status:?}, expected {want:?} and Captured",
+                        rig.messages
+                    ));
+                }
+            }
+            for mods in chords {
+                let mut rig = Rig::new(subject.element());
+                if !focused(&mut rig) {
+                    return Some("the premise failed: Tab did not focus it".to_owned());
+                }
+                let status = rig.press(key, mods);
+                if !rig.messages.is_empty() {
+                    return Some(format!("{key:?}+{mods:?} pressed it: {:?}", rig.messages));
+                }
+                if status != Status::Ignored {
+                    return Some(format!(
+                        "{key:?}+{mods:?} published nothing but was {status:?}: the application never sees it"
+                    ));
+                }
+            }
+        }
+        // Held: a repeat of a chord is neither a press nor captured.
+        let mut rig = Rig::new(subject.element());
+        if !focused(&mut rig) {
+            return Some("the premise failed: Tab did not focus it".to_owned());
+        }
+        let status = rig.press_with(Named::Enter, M::CTRL, true);
+        if !rig.messages.is_empty() || status != Status::Ignored {
+            return Some(format!(
+                "a held Ctrl+Enter published {:?} and was {status:?}",
+                rig.messages
+            ));
+        }
+        None
+    });
+    assert_clean("chord", failures);
 }

@@ -97,7 +97,11 @@ impl RingConfig {
 /// # What is built in, with nothing to set
 ///
 /// - a focus target: Tab and Shift+Tab reach it, in the order the content is laid out;
-/// - Enter and Space press it, once per key press;
+/// - Enter and Space press it, once per key press, **unless Ctrl, Alt or the logo key is held**
+///   (Shift does not count): a chord is not a press, and the control does not capture it, so
+///   it reaches the shortcuts router and your `keyboard::listen()`, as it does when nothing is
+///   focused. If you relied on `Ctrl+Enter` pressing a focused control, bind the action to plain
+///   Enter (RFC-130);
 /// - a click presses it and does **not** focus it, so Tab carries on from where it was;
 /// - a focus ring while it is focused, and none under the pointer;
 /// - a target no smaller than `max(24, 1.5 × the label's text size)` (WCAG 2.5.8);
@@ -255,7 +259,7 @@ impl<'a, Message: Clone + 'a> Control<'a, Message> {
     /// its own, which nothing outside can name.
     ///
     /// A control focused this way behaves as one reached by Tab: its ring is drawn, Enter and
-    /// Space press it, and Tab carries on from it.
+    /// Space (without Ctrl, Alt or the logo key) press it, and Tab carries on from it.
     ///
     /// # Choosing where focus starts when a dialog opens
     ///

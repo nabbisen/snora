@@ -383,3 +383,72 @@ fn a_pointer_crossing_reports_once() {
         vec![Wired::Attention(7, ToastAttention::PointerLeft)]
     );
 }
+
+// ---- RFC-130: only a press can remove a control ---------------------------------------------
+
+/// **A plain Enter that removes a control is observed; a `Ctrl+Enter` is not a press.** Three
+/// `snora::control`s through the engine, the last one focused:
+/// - plain Enter publishes its message, and when the application then removes it focus goes to the
+///   previous one (RFC-120's rule: the removal was observed);
+/// - `Ctrl+Enter` publishes nothing and is not captured, so nothing was observed: when the same
+///   control is removed anyway (the application's own reason) focus goes where iced's positional
+///   state leaves it, nowhere.
+///
+/// The pair is the contrast: the same removal, with and without the observation. (The removal
+/// observer reads the same predicate the control does, `press::is_press`, so the two cannot drift;
+/// `snora-interaction`'s `the_control_and_the_removal_observer_share_the_predicate` pins that.)
+#[test]
+fn a_plain_enter_that_removes_a_control_is_observed_and_a_chord_is_not() {
+    use iced::keyboard::key::Named;
+    use iced::keyboard::{Key, Modifiers};
+    use iced::widget::text;
+    use iced_runtime::core::event::Status;
+
+    #[derive(Debug, Clone, PartialEq)]
+    struct M(&'static str);
+    let view = |labels: &[&'static str]| -> iced::Element<'static, M> {
+        let mut c = iced::widget::column![].spacing(8);
+        for l in labels {
+            c = c.push(snora::control(text(*l)).on_press(M(l)));
+        }
+        snora::render(AppLayout::new(
+            iced::widget::container(c).padding(30).into(),
+        ))
+    };
+    let all = ["one", "two", "three"];
+    let left = ["one", "two"];
+
+    let run = |mods: Modifiers| {
+        let mut rig = Rig::new(view(&all));
+        for _ in 0..3 {
+            rig.tab(false);
+        }
+        assert_eq!(rig.focused(), vec![2], "the premise: 'three' has focus");
+        let status = rig.press(Key::Named(Named::Enter), mods);
+        let published = rig.messages.clone();
+        let mut rig = rig.rebuilt(view(&left));
+        rig.redraw();
+        (status, published, rig.focused())
+    };
+
+    let (status, published, focus) = run(Modifiers::empty());
+    assert_eq!(status, Status::Captured);
+    assert_eq!(published, vec![M("three")], "plain Enter presses");
+    assert_eq!(
+        focus,
+        vec![1],
+        "plain Enter: the removal was observed, focus to 'two'"
+    );
+
+    let (status, published, focus) = run(Modifiers::CTRL);
+    assert_eq!(
+        status,
+        Status::Ignored,
+        "Ctrl+Enter is left for the application"
+    );
+    assert!(published.is_empty(), "Ctrl+Enter pressed: {published:?}");
+    assert!(
+        focus.is_empty(),
+        "Ctrl+Enter triggered an observation: focus went to {focus:?}"
+    );
+}

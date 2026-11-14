@@ -8,7 +8,11 @@
 //!   message a click publishes** — a control with two ways in and two
 //!   messages out would let an application handle one and not the
 //!   other, with nothing to say so — **once per press**: a held key's
-//!   auto-repeat presses nothing;
+//!   auto-repeat presses nothing. **With Ctrl, Alt or the logo key held
+//!   it is a chord and not a press** (Shift does not count), and the
+//!   control does not capture it either, so it reaches the application's
+//!   shortcuts (RFC-130; the predicate is `press::is_press`, read by
+//!   this widget and by `Inert`'s removal observer);
 //! - **a click presses it and does not focus it** (RFC-121). Focus moves
 //!   only by the keyboard (Tab, through `snora::keyboard::traverse`) or by
 //!   the application, so a ring means the keyboard is there, and no key
@@ -31,7 +35,7 @@
 //! `on_press_with` and `on_press_maybe` — is as on `button`.
 
 use iced::border::Border;
-use iced::keyboard::{self, key};
+use iced::keyboard;
 use iced::mouse;
 use iced::touch;
 use iced::window;
@@ -652,12 +656,16 @@ where
             // click emits**. Not a second message: a control with two
             // ways in and two messages out would let an application
             // handle one and not the other, and nothing would say so.
-            Event::Keyboard(keyboard::Event::KeyPressed { key, repeat, .. }) => {
+            Event::Keyboard(keyboard::Event::KeyPressed {
+                key,
+                repeat,
+                modifiers,
+                ..
+            }) => {
                 let state = tree.state.downcast_mut::<State>();
-                let activates = matches!(
-                    key.as_ref(),
-                    keyboard::Key::Named(key::Named::Enter | key::Named::Space)
-                );
+                // **Enter or Space with no Ctrl, Alt or logo key** (RFC-130): a chord is not a
+                // press, and is not captured, so it reaches the router and the application.
+                let activates = crate::press::is_press(key, *modifiers);
                 if let Some(on_press) = &self.on_press
                     && state.is_focused
                     && activates

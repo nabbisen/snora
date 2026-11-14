@@ -512,17 +512,15 @@ impl<Message: Clone> Widget<Message, Theme, iced::Renderer> for Inert<'_, Messag
         );
 
         // Only a press can make a control go away, and only these events
-        // publish one: Enter or Space (not a repeat), a release, a lift.
+        // publish one: Enter or Space without a chord modifier (not a repeat; `press::is_press`, the
+        // control's own predicate), a release, a lift.
         let publishes = match event {
-            Event::Keyboard(keyboard::Event::KeyPressed { key, repeat, .. }) => {
-                !*repeat
-                    && matches!(
-                        key.as_ref(),
-                        keyboard::Key::Named(
-                            keyboard::key::Named::Enter | keyboard::key::Named::Space
-                        )
-                    )
-            }
+            Event::Keyboard(keyboard::Event::KeyPressed {
+                key,
+                repeat,
+                modifiers,
+                ..
+            }) => !*repeat && crate::press::is_press(key, *modifiers),
             Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left))
             | Event::Touch(touch::Event::FingerLifted { .. }) => true,
             _ => false,
