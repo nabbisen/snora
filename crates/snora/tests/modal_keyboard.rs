@@ -97,6 +97,8 @@ enum Menu {
     None,
     WithBackdrop,
     WithoutBackdrop,
+    /// A `context_menu`, with the backdrop `on_close_menus` gives it.
+    ContextWithBackdrop,
 }
 
 /// What is open.
@@ -193,6 +195,11 @@ fn window(scene: Scene) -> Element<'static, Msg> {
                 .on_close_menus(Msg::CloseMenus);
         }
         Menu::WithoutBackdrop => layout = layout.header_menu(btn("Menu item", Msg::MenuItem)),
+        Menu::ContextWithBackdrop => {
+            layout = layout
+                .context_menu(btn("Context item", Msg::MenuItem))
+                .on_close_menus(Msg::CloseMenus);
+        }
     }
     if scene.dialog {
         let content: Element<'static, Msg> = if scene.dialog_input {
@@ -335,6 +342,39 @@ impl Rig {
     /// `focus_next`, run to completion as the window loop does.
     fn tab(&mut self) {
         let _ = self.run(focusable::focus_next::<()>());
+    }
+
+    /// Tab, or Shift+Tab, **through `snora::keyboard::traverse`**: the task it returns is taken
+    /// apart and the operation inside run on this interface (as `common::removal::Rig::tab`
+    /// does). `tab` above is iced's own `focus_next`; this is the operation snora's router
+    /// hands the runtime, so a cover is tested against both.
+    fn traverse_tab(&mut self, shift: bool) {
+        use iced::futures::StreamExt;
+        let modifiers = if shift {
+            iced::keyboard::Modifiers::SHIFT
+        } else {
+            iced::keyboard::Modifiers::empty()
+        };
+        let task = snora::keyboard::traverse::<Msg>(
+            iced::keyboard::Key::Named(iced::keyboard::key::Named::Tab),
+            modifiers,
+        )
+        .expect("Tab is claimed");
+        let mut stream = iced_runtime::task::into_stream(task).expect("a task with work in it");
+        let Some(iced_runtime::Action::Widget(op)) =
+            iced::futures::executor::block_on(stream.next())
+        else {
+            panic!("traverse did not produce a widget operation");
+        };
+        let mut current = op;
+        loop {
+            self.ui
+                .operate(&self.renderer, &mut operation::black_box(current.as_mut()));
+            match current.finish() {
+                Outcome::None | Outcome::Some(()) => return,
+                Outcome::Chain(next) => current = next,
+            }
+        }
     }
 
     /// The focus targets the tree **reports**, in tree order.
@@ -778,5 +818,234 @@ fn a_page_overlay_does_not_float_above_the_dim() {
         0,
         "[{}] the page's tooltip is still drawn above the dim ({differing} bytes differ)",
         backend()
+    );
+}
+
+// ---- RFC-0.62 audit, Unit 3: what the guides say about Tab, the cover and Escape ----------------
+
+/// A character key, as the runtime delivers one to a focused `text_input`.
+fn character(c: &str) -> Event {
+    Event::Keyboard(iced::keyboard::Event::KeyPressed {
+        key: iced::keyboard::Key::Character(c.into()),
+        modified_key: iced::keyboard::Key::Character(c.into()),
+        physical_key: iced::keyboard::key::Physical::Unidentified(
+            iced::keyboard::key::NativeCode::Unidentified,
+        ),
+        location: iced::keyboard::Location::Standard,
+        modifiers: iced::keyboard::Modifiers::empty(),
+        text: Some(c.into()),
+        repeat: false,
+    })
+}
+
+/// **K-005, L-063/L-069, A-096: Tab does not wrap.** Past the last control focus leaves the group:
+/// one press with nothing focused, then Tab starts again from the first. On a page, and inside a
+/// modal (where "the group" is the dialog and the toasts, and the page is not in it).
+/// Shift+Tab from the first control does the same the other way.
+///
+/// Driven both ways Tab reaches a window: iced's own `focus_next` (an application that routes
+/// nothing) and `snora::keyboard::traverse` (the router, which counts from the last click when
+/// nothing has focus). **The first is iced's behaviour and no snora code runs in it**, so no
+/// snora change can fail that half but one that adds a focus target; it is here because the guides
+/// state the gap for both and a change to either would otherwise pass every other test. The second
+/// half fails if `sequential_focus` wraps.
+#[test]
+fn tab_past_the_last_control_leaves_the_group_for_one_press_then_starts_again() {
+    for router in [false, true] {
+        let step = |rig: &mut Rig, shift: bool| {
+            if router {
+                rig.traverse_tab(shift);
+            } else if shift {
+                let _ = rig.run(focusable::focus_previous::<()>());
+            } else {
+                rig.tab();
+            }
+        };
+        for (what, scene, controls) in [
+            ("a page of two controls", Scene::buttons(), 2),
+            (
+                "a dialog and a toast",
+                Scene::buttons().with_dialog().with_toast(),
+                2,
+            ),
+        ] {
+            let what = format!("{what}, router: {router}");
+            let mut rig = Rig::new(window(scene));
+            let mut seen = Vec::new();
+            for _ in 0..controls + 2 {
+                step(&mut rig, false);
+                seen.push(rig.flags());
+            }
+            let first = {
+                let mut f = vec![false; controls];
+                f[0] = true;
+                f
+            };
+            let last = {
+                let mut f = vec![false; controls];
+                f[controls - 1] = true;
+                f
+            };
+            let none = vec![false; controls];
+            assert_eq!(seen[0], first, "{what}: the first press");
+            assert_eq!(seen[controls - 1], last, "{what}: the last control");
+            assert_eq!(
+                seen[controls], none,
+                "{what}: past the last, nothing is focused"
+            );
+            assert_eq!(
+                seen[controls + 1],
+                first,
+                "{what}: and then it starts again"
+            );
+
+            // Enter on the empty press presses nothing: it is not a hidden focus.
+            let mut rig = Rig::new(window(scene));
+            for _ in 0..controls + 1 {
+                step(&mut rig, false);
+            }
+            rig.enter();
+            assert!(
+                rig.messages.is_empty(),
+                "{what}: Enter with nothing focused published {:?}",
+                rig.messages
+            );
+
+            // Shift+Tab from the first control: nothing, then the last.
+            let mut rig = Rig::new(window(scene));
+            step(&mut rig, false);
+            step(&mut rig, true);
+            assert_eq!(rig.flags(), none, "{what}: Shift+Tab before the first");
+            step(&mut rig, true);
+            assert_eq!(rig.flags(), last, "{what}: and then the last");
+        }
+    }
+}
+
+/// **L-039: a character, and an IME commit, do not reach a `text_input` the dialog covers.** The
+/// uncovered twin publishes what was typed, so the silence is the cover's.
+#[test]
+fn a_character_and_an_ime_commit_do_not_reach_a_text_input_under_a_dialog() {
+    let page = Scene::page(Page::Rich);
+    let mut open = Rig::new(window(page));
+    open.tab();
+    assert_eq!(open.flags(), vec![true], "the premise: the input has focus");
+    let _ = open.deliver(&[character("a")]);
+    assert_eq!(
+        open.messages,
+        vec![Msg::Typed("helloa".to_owned())],
+        "the premise: uncovered, the character is typed"
+    );
+
+    for redraw in [false, true] {
+        let mut rig = Rig::new(window(page));
+        rig.tab();
+        let mut rig = rig.rebuilt_with(window(page.with_dialog()), redraw);
+        let _ = rig.deliver(&[character("a")]);
+        let _ = rig.deliver(&[Event::InputMethod(
+            iced_runtime::core::input_method::Event::Commit("b".to_owned()),
+        )]);
+        assert!(
+            rig.messages.is_empty(),
+            "(redraw {redraw}) text reached a covered text_input: {:?}",
+            rig.messages
+        );
+    }
+}
+
+/// **R-129: Escape closes a `context_menu` that has a backdrop**, once, and the event is
+/// `Captured`. (The dropdown and the header menu are guarded above and in `menu_overlay.rs`.)
+#[test]
+fn escape_closes_a_context_menu_with_a_backdrop_once_and_is_captured() {
+    let mut rig = Rig::new(window(
+        Scene::buttons().with_menu(Menu::ContextWithBackdrop),
+    ));
+    let statuses = rig.escape();
+    assert_eq!(rig.messages, vec![Msg::CloseMenus]);
+    assert_eq!(statuses, vec![Status::Captured]);
+}
+
+/// **R-033: the cover holds under `snora::keyboard::traverse`**, the operation the router hands the
+/// runtime, and not only under iced's `focus_next` (which the tests above drive). For each thing
+/// that covers the page: Tab all the way round and Enter on each stop reaches no page control.
+#[test]
+fn the_cover_holds_under_the_routers_own_tab() {
+    for (what, scene) in [
+        ("a dialog", Scene::buttons().with_dialog()),
+        ("a sheet", Scene::buttons().with_sheet()),
+        (
+            "a header menu with its backdrop",
+            Scene::buttons().with_menu(Menu::WithBackdrop),
+        ),
+        (
+            "a context menu with its backdrop",
+            Scene::buttons().with_menu(Menu::ContextWithBackdrop),
+        ),
+    ] {
+        let mut rig = Rig::new(window(scene));
+        assert_eq!(
+            rig.targets().len(),
+            1,
+            "{what}: the tree reports only the overlay's one control"
+        );
+        for _ in 0..4 {
+            rig.traverse_tab(false);
+            rig.enter();
+        }
+        assert!(
+            page_messages(&rig.messages).is_empty(),
+            "{what}: the router's Tab reached the page: {:?}",
+            rig.messages
+        );
+        assert!(
+            !rig.messages.is_empty(),
+            "{what}: the premise, Tab and Enter reached the overlay's own control"
+        );
+    }
+}
+
+/// **A-077: focus returns to the control that had it** when a sheet closes, and when a menu with a
+/// backdrop closes, as it does for a dialog.
+#[test]
+fn focus_returns_when_a_sheet_or_a_menu_with_its_backdrop_closes() {
+    for (what, over) in [
+        ("a sheet", Scene::buttons().with_sheet()),
+        (
+            "a menu with a backdrop",
+            Scene::buttons().with_menu(Menu::WithBackdrop),
+        ),
+    ] {
+        let mut rig = Rig::new(window(Scene::buttons()));
+        rig.tab();
+        rig.tab(); // "Search"
+        assert_eq!(rig.flags(), vec![false, true], "{what}: the premise");
+
+        let rig = rig.rebuilt(window(over));
+        let mut rig = rig.rebuilt(window(Scene::buttons()));
+        assert_eq!(
+            rig.flags(),
+            vec![false, true],
+            "{what}: focus did not return to \"Search\""
+        );
+    }
+}
+
+/// **A-075: the toasts stay reachable under a menu with a backdrop**, as under a dialog and a
+/// sheet. (The page is covered; the toast is above the backdrop.)
+#[test]
+fn the_toasts_are_reachable_under_a_menu_with_a_backdrop() {
+    let mut rig = Rig::new(window(
+        Scene::buttons().with_menu(Menu::WithBackdrop).with_toast(),
+    ));
+    assert_eq!(
+        rig.targets().len(),
+        2,
+        "the menu's control and the toast's, and no page control"
+    );
+    let published = tab_enter(&mut rig, 2);
+    assert_eq!(
+        published,
+        vec![Msg::MenuItem, Msg::ToastDismiss],
+        "Tab reaches the menu, then the toast"
     );
 }

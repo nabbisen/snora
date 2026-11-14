@@ -69,7 +69,30 @@ impl RingConfig {
 /// [`height`](Control::height), [`clip`](Control::clip) and
 /// [`style`](Control::style), which takes iced's own
 /// `Fn(&Theme, button::Status) -> button::Style`, so an existing style closure, and
-/// `snora::design::style::button::*`, work unchanged. **Nothing else is public.**
+/// iced's own style functions (`iced::widget::button::primary`), work unchanged. The
+/// builder has one more method that `button` does not: [`id`](Control::id), which
+/// iced's `focus(id)` and `is_focused(id)` reach (RFC-127).
+///
+/// `snora::design::style::button::*` take the tokens and not the theme
+/// (`fn(&Tokens, button::Status) -> button::Style`), so they go in a closure that
+/// supplies the tokens:
+///
+/// ```
+/// # #[cfg(feature = "design")]
+/// # {
+/// # use iced::widget::text;
+/// # #[derive(Clone)] enum Message { Save }
+/// # fn view<'a>(tokens: snora::design::Tokens) -> iced::Element<'a, Message> {
+/// snora::control(text("Save"))
+///     .on_press(Message::Save)
+///     .style(move |_theme, status| snora::design::style::button::secondary(&tokens, status))
+///     .into()
+/// # }
+/// # }
+/// ```
+///
+/// On the design path, `snora::design::control` already draws as `ghost` and takes the
+/// tokens itself.
 ///
 /// # What is built in, with nothing to set
 ///
@@ -88,9 +111,10 @@ impl RingConfig {
 /// define; on the engine path, against the theme's background tiers except
 /// SolarizedDark's `strongest` (2.91:1). On a coloured fill of your own, check it.
 ///
-/// On the engine path a dialog or sheet has no card of its own: put its content on a
-/// container with the theme's background. A control or text placed directly on the dim may
-/// not be legible, and its focus ring may fall under 3:1.
+/// On the engine path a dialog has no card of its own: put its content on a container with
+/// the theme's background. A control or text placed directly on the dim may not be legible,
+/// and its focus ring may fall under 3:1. (A sheet has a surface of its own: the theme's
+/// background.)
 ///
 /// ## The target
 ///

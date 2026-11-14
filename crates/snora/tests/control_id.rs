@@ -331,3 +331,78 @@ fn two_controls_with_one_id_are_both_focused_and_is_focused_reports_the_last() {
     assert_eq!(focused(&mut rig), vec![2]);
     assert_eq!(rig.task(is_focused("b")), vec![true]);
 }
+
+// ---- the 0.62 audit, Unit 3 ---------------------------------------------------------------------
+
+/// **R-113: a menu with its backdrop covers the page too.** `focus(id)` for a page control under a
+/// `header_menu` or a `context_menu` with `on_close_menus` focuses nothing and leaves nothing
+/// focused, even if the menu's own control held focus; `is_focused` gives no answer; Tab starts
+/// again inside the menu. (The dialog and the sheet are above.)
+#[test]
+fn focus_by_id_beneath_a_menu_with_its_backdrop_focuses_nothing_and_leaves_nothing_focused() {
+    let header = || {
+        snora::render(
+            AppLayout::new(page_control())
+                .header_menu(ctl("Item", Msg::Ok).id("menu").into())
+                .on_close_menus(Msg::Cancel),
+        )
+    };
+    let context = || {
+        snora::render(
+            AppLayout::new(page_control())
+                .context_menu(ctl("Item", Msg::Ok).id("menu").into())
+                .on_close_menus(Msg::Cancel),
+        )
+    };
+    for (name, build) in [
+        ("header menu", Box::new(header) as Build),
+        ("context menu", Box::new(context) as Build),
+    ] {
+        let mut rig = Rig::new(build());
+        assert_eq!(
+            rig.targets().len(),
+            1,
+            "{name}: the premise, the page is covered"
+        );
+        let _ = rig.task::<()>(focus("page-b"));
+        assert_eq!(
+            focused(&mut rig),
+            Vec::<usize>::new(),
+            "{name}: from nothing"
+        );
+        assert_eq!(
+            rig.task(is_focused("page-b")),
+            Vec::<bool>::new(),
+            "{name}: is_focused answered for a covered control"
+        );
+
+        let mut rig = Rig::new(build());
+        let _ = rig.task::<()>(focus("menu"));
+        assert_eq!(
+            focused(&mut rig),
+            vec![0],
+            "{name}: the menu's control is focused"
+        );
+        let _ = rig.task::<()>(focus("page-b"));
+        assert_eq!(
+            focused(&mut rig),
+            Vec::<usize>::new(),
+            "{name}: focus did not stay on the menu's control, and nothing beneath took it"
+        );
+        rig.tab(false);
+        assert_eq!(focused(&mut rig), vec![0], "{name}: Tab starts again");
+    }
+}
+
+/// **R-106: Space presses a control focused by id**, once, as Enter does (both paths).
+#[test]
+fn space_presses_a_control_focused_by_id_once() {
+    for (path, build) in paths() {
+        let mut rig = Rig::new(build());
+        rig.key(iced::keyboard::key::Named::Space);
+        assert!(rig.messages.is_empty(), "{path}: Space before any focus");
+        let _ = rig.task::<()>(focus("b"));
+        rig.key(iced::keyboard::key::Named::Space);
+        assert_eq!(rig.messages, vec![Msg::B], "{path}: Space");
+    }
+}

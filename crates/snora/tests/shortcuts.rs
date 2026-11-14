@@ -58,6 +58,7 @@ enum Msg {
     EscapeMenu,
     Typed,
     Edit,
+    Menu(snora::MenuAction<u8, u8>),
 }
 
 static ON_TAB: fn(TabAction<u8>) -> Msg = |a| {
@@ -128,6 +129,8 @@ struct Scene {
     tabs_in_shortcuts: usize,
     active_tab: u8,
     crumbs: bool,
+    /// The router is told about the crumbs (`crumbs` draws them).
+    crumbs_routed: bool,
     side_bar: bool,
     view: u8,
     content: Content,
@@ -147,6 +150,7 @@ impl Scene {
             tabs_in_shortcuts: 4,
             active_tab: 0,
             crumbs: true,
+            crumbs_routed: true,
             side_bar: false,
             view: 0,
             content: Content::Buttons,
@@ -254,7 +258,7 @@ fn window(sc: &Scene) -> Element<'static, Msg> {
         if sc.tabs_in_shortcuts > 0 {
             shortcuts = shortcuts.tabs(&tab_bar_data(sc.tabs_in_shortcuts, sc.active_tab), &ON_TAB);
         }
-        if sc.crumbs {
+        if sc.crumbs && sc.crumbs_routed {
             shortcuts = shortcuts.crumbs(&crumb_data(), &ON_CRUMB);
         }
         if let Some(digits) = sc.digits {
@@ -938,4 +942,514 @@ fn escape_goes_to_the_modal_and_not_the_menu_it_covers() {
     rig.messages.clear();
     rig.press(Key::Named(Named::Escape), Modifiers::empty());
     assert_eq!(rig.messages, vec![Msg::EscapeModal]);
+}
+
+// ---- the 0.62 audit, Unit 3: what the router guides say, row by row -----------------------------
+
+fn press_key(rig: &mut Rig<Msg>, key: Named, modifiers: Modifiers) -> Status {
+    named(rig, key, modifiers)
+}
+
+/// **K-011, R-059: next and previous tab wrap, both ways, on both key pairs.** From the last tab,
+/// `Ctrl+Tab` and `Ctrl+PageDown` go to the first; from the first, `Ctrl+Shift+Tab` and
+/// `Ctrl+PageUp` go to the last; and in the middle they step. (The first-to-last half of
+/// `Ctrl+Shift+Tab` is also in `a_shortcut_publishes_what_a_click_publishes`.)
+#[test]
+fn next_and_previous_tab_wrap_from_the_ends_and_step_in_the_middle() {
+    let at = |active_tab: u8| Scene {
+        active_tab,
+        ..Scene::tabs()
+    };
+    for (what, active, key, mods, want) in [
+        ("Ctrl+Tab from the last", 3, Named::Tab, CTRL, 0),
+        ("Ctrl+PageDown from the last", 3, Named::PageDown, CTRL, 0),
+        (
+            "Ctrl+Shift+Tab from the first",
+            0,
+            Named::Tab,
+            CTRL | Modifiers::SHIFT,
+            3,
+        ),
+        ("Ctrl+PageUp from the first", 0, Named::PageUp, CTRL, 3),
+        ("Ctrl+Tab in the middle", 1, Named::Tab, CTRL, 2),
+        ("Ctrl+PageDown in the middle", 1, Named::PageDown, CTRL, 2),
+        (
+            "Ctrl+Shift+Tab in the middle",
+            2,
+            Named::Tab,
+            CTRL | Modifiers::SHIFT,
+            1,
+        ),
+        ("Ctrl+PageUp in the middle", 2, Named::PageUp, CTRL, 1),
+    ] {
+        let mut rig = Rig::new(window(&at(active)));
+        let status = press_key(&mut rig, key, mods);
+        assert_eq!(rig.messages, vec![Msg::Tab(want)], "{what}");
+        assert_eq!(status, Status::Captured, "{what}");
+    }
+}
+
+/// **K-003, R-045: a route the builder does not name answers nothing.** Without `.digits(..)` no
+/// Ctrl+digit key does anything (all nine, `Ignored`); without `.tabs(..)` neither tab key pair
+/// moves a tab while the tab bar is drawn; without `.crumbs(..)` `Alt+↑` does nothing while the
+/// trail is drawn and the other routes are named.
+#[test]
+fn a_route_the_builder_does_not_name_answers_nothing() {
+    let none = Scene {
+        digits: None,
+        ..Scene::tabs()
+    };
+    for n in 1..=9u8 {
+        let mut rig = Rig::new(window(&none));
+        let status = digit(&mut rig, n, CTRL);
+        assert!(
+            rig.messages.is_empty() && status == Status::Ignored,
+            "no .digits: Ctrl+{n}: {:?} {status:?}",
+            rig.messages
+        );
+    }
+
+    let no_tabs = Scene {
+        tabs_in_shortcuts: 0,
+        ..Scene::tabs()
+    };
+    for (key, mods) in [
+        (Named::Tab, CTRL),
+        (Named::Tab, CTRL | Modifiers::SHIFT),
+        (Named::PageDown, CTRL),
+        (Named::PageUp, CTRL),
+    ] {
+        let mut rig = Rig::new(window(&no_tabs));
+        let status = press_key(&mut rig, key, mods);
+        assert!(
+            rig.messages.is_empty() && status == Status::Ignored,
+            "no .tabs: {key:?}+{mods:?}: {:?} {status:?}",
+            rig.messages
+        );
+    }
+
+    // The premise for the crumbs: with them named, Alt+Up goes to the ancestor before the leaf.
+    let mut rig = Rig::new(window(&Scene::tabs()));
+    press_key(&mut rig, Named::ArrowUp, Modifiers::ALT);
+    assert_eq!(rig.messages, vec![Msg::Crumb(1)], "the premise");
+    let no_crumbs = Scene {
+        crumbs_routed: false,
+        ..Scene::tabs()
+    };
+    let mut rig = Rig::new(window(&no_crumbs));
+    let status = press_key(&mut rig, Named::ArrowUp, Modifiers::ALT);
+    assert!(
+        rig.messages.is_empty() && status == Status::Ignored,
+        "no .crumbs: Alt+Up: {:?} {status:?}",
+        rig.messages
+    );
+}
+
+/// **R-067: a trail with no ancestor has no parent route.** A single crumb, the leaf, is drawn and
+/// named: `Alt+↑` does nothing.
+#[test]
+fn a_trail_with_no_ancestor_has_no_parent_route() {
+    let view = |crumbs: Vec<Crumb<u8>>| {
+        let body: Element<'static, Msg> =
+            snora::widget::app_breadcrumb(crumbs.clone(), &ON_CRUMB, LayoutDirection::Ltr);
+        render(
+            AppLayout::new(body).shortcuts(
+                Shortcuts::new()
+                    .platform(Platform::Other)
+                    .crumbs(&crumbs, &ON_CRUMB),
+            ),
+        )
+    };
+    let mut rig = Rig::new(view(crumb_data()));
+    press_key(&mut rig, Named::ArrowUp, Modifiers::ALT);
+    assert_eq!(
+        rig.messages,
+        vec![Msg::Crumb(1)],
+        "the premise: with ancestors it routes"
+    );
+
+    let mut rig = Rig::new(view(vec![Crumb::leaf(0, "Only")]));
+    let status = press_key(&mut rig, Named::ArrowUp, Modifiers::ALT);
+    assert!(
+        rig.messages.is_empty() && status == Status::Ignored,
+        "a leaf only: {:?} {status:?}",
+        rig.messages
+    );
+}
+
+/// **R-071: with fewer than two tabs there is nothing to go to.** One tab: none of the four tab keys
+/// publishes, and each is `Ignored`.
+#[test]
+fn with_fewer_than_two_tabs_next_and_previous_do_nothing() {
+    for count in [1usize, 0] {
+        let sc = Scene {
+            tabs_drawn: count,
+            tabs_in_shortcuts: count,
+            ..Scene::tabs()
+        };
+        for (key, mods) in [
+            (Named::Tab, CTRL),
+            (Named::Tab, CTRL | Modifiers::SHIFT),
+            (Named::PageDown, CTRL),
+            (Named::PageUp, CTRL),
+        ] {
+            let mut rig = Rig::new(window(&sc));
+            let status = press_key(&mut rig, key, mods);
+            assert!(
+                rig.messages.is_empty() && status == Status::Ignored,
+                "{count} tab(s): {key:?}+{mods:?}: {:?} {status:?}",
+                rig.messages
+            );
+        }
+    }
+}
+
+/// **R-048: a disabled target does nothing.** A route names a tab; the control that is that tab is
+/// there but has no handler (disabled), so it reports no tag and cannot be found. Ctrl+2 publishes
+/// nothing and is `Ignored`. With the handler, the same scene publishes (the premise).
+#[test]
+fn a_disabled_target_does_nothing() {
+    use snora_interaction::{Control, Ring, Role};
+    let view = |enabled: bool| {
+        let mut controls = column![].spacing(8);
+        for i in 0..4u8 {
+            let c = Control::new(
+                iced::widget::text(format!("T{i}")),
+                Box::new(iced::widget::button::primary),
+                Ring {
+                    color: Box::new(|_| iced::Color::BLACK),
+                    width: 2.0,
+                    offset: 2.0,
+                },
+            )
+            .tag(Role::Tab, usize::from(i));
+            let c = if i != 1 || enabled {
+                c.on_press(Msg::Tab(i))
+            } else {
+                c
+            };
+            controls = controls.push(c);
+        }
+        let body: Element<'static, Msg> = controls.into();
+        render(
+            AppLayout::new(body).shortcuts(
+                Shortcuts::new()
+                    .platform(Platform::Other)
+                    .digits(Digits::Tabs)
+                    .tabs(&tab_bar_data(4, 0), &ON_TAB),
+            ),
+        )
+    };
+    let mut rig = Rig::new(view(true));
+    digit(&mut rig, 2, CTRL);
+    assert_eq!(
+        rig.messages,
+        vec![Msg::Tab(1)],
+        "the premise: enabled, it answers"
+    );
+
+    let mut rig = Rig::new(view(false));
+    let status = digit(&mut rig, 2, CTRL);
+    assert!(
+        rig.messages.is_empty() && status == Status::Ignored,
+        "a disabled target: {:?} {status:?}",
+        rig.messages
+    );
+    // And its neighbours still answer.
+    digit(&mut rig, 3, CTRL);
+    assert_eq!(rig.messages, vec![Msg::Tab(2)]);
+}
+
+/// **R-005: snora installs no other key binding.** On an unfocused page with the router and the
+/// Escape field set, F6, Shift+F6, Tab, Shift+Tab, Enter, Space and an arrow are `Ignored`, publish
+/// nothing and focus nothing.
+#[test]
+fn the_engine_answers_no_key_that_was_not_routed() {
+    let mut rig = Rig::new(window(&Scene {
+        escape: Escape {
+            modal: Some(Msg::EscapeModal),
+            menu: Some(Msg::EscapeMenu),
+        },
+        ..Scene::tabs()
+    }));
+    let mut off = Vec::new();
+    for (key, mods) in [
+        (Named::F6, Modifiers::empty()),
+        (Named::F6, Modifiers::SHIFT),
+        (Named::Tab, Modifiers::empty()),
+        (Named::Tab, Modifiers::SHIFT),
+        (Named::Enter, Modifiers::empty()),
+        (Named::Space, Modifiers::empty()),
+        (Named::ArrowDown, Modifiers::empty()),
+    ] {
+        let status = press_key(&mut rig, key, mods);
+        let focused = rig.focused();
+        if status != Status::Ignored || !rig.messages.is_empty() || !focused.is_empty() {
+            off.push(format!(
+                "{key:?}+{mods:?}: {status:?} {:?} focused {focused:?}",
+                rig.messages
+            ));
+        }
+    }
+    assert!(
+        off.is_empty(),
+        "keys the engine answered by itself: {off:?}"
+    );
+}
+
+/// **K-024, R-073, L-067 row 4: the Escape field and the click-outside message, composed.**
+/// A dialog or a sheet with only an escape message is not closed by a click outside, and closes on
+/// Escape (captured); with both, a click still publishes the click-outside message and Escape the
+/// escape message; with nothing open, Escape is `Ignored` and publishes nothing.
+#[test]
+fn the_escape_message_and_the_click_outside_message_compose() {
+    let corner = iced::Point::new(4.0, 4.0);
+    let far = iced::Point::new(790.0, 590.0);
+    for (overlay, spot) in [(Overlay::Dialog, far), (Overlay::Sheet, corner)] {
+        // Escape only: a click outside does nothing.
+        let mut rig = Rig::new(window(&escape_scene(overlay, true, false)));
+        rig.click_at(spot);
+        assert!(
+            rig.messages.is_empty(),
+            "{overlay:?} with only an escape message: a click outside published {:?}",
+            rig.messages
+        );
+        let status = rig.press(Key::Named(Named::Escape), Modifiers::empty());
+        assert_eq!(rig.messages, vec![Msg::EscapeModal], "{overlay:?}");
+        assert_eq!(status, Status::Captured, "{overlay:?}");
+
+        // Both: the click still closes.
+        let mut rig = Rig::new(window(&escape_scene(overlay, true, true)));
+        rig.click_at(spot);
+        assert_eq!(
+            rig.messages,
+            vec![Msg::CloseModals],
+            "{overlay:?} with both: a click outside still publishes the close message"
+        );
+    }
+    // Nothing open: Escape is left to the application.
+    let mut rig = Rig::new(window(&Scene {
+        escape: Escape {
+            modal: Some(Msg::EscapeModal),
+            menu: Some(Msg::EscapeMenu),
+        },
+        shortcuts: false,
+        ..Scene::tabs()
+    }));
+    let status = rig.press(Key::Named(Named::Escape), Modifiers::empty());
+    assert!(rig.messages.is_empty(), "{:?}", rig.messages);
+    assert_eq!(status, Status::Ignored);
+}
+
+/// **R-076: Escape does not dismiss a toast.** With only a toast on screen, and with the toast's
+/// close control focused, Escape publishes nothing and is `Ignored`; with a dialog also open, only
+/// the dialog's message.
+#[test]
+fn escape_does_not_dismiss_a_toast() {
+    let escape = Escape {
+        modal: Some(Msg::EscapeModal),
+        menu: Some(Msg::EscapeMenu),
+    };
+    let only_toast = Scene {
+        escape: escape.clone(),
+        open: Open {
+            toast: true,
+            ..Open::NOTHING
+        },
+        shortcuts: false,
+        ..Scene::tabs()
+    };
+    let mut rig = Rig::new(window(&only_toast));
+    let status = rig.press(Key::Named(Named::Escape), Modifiers::empty());
+    assert!(
+        rig.messages.is_empty() && status == Status::Ignored,
+        "{:?} {status:?}",
+        rig.messages
+    );
+
+    // With the toast's own × focused (the last target in tree order).
+    let mut rig = Rig::new(window(&only_toast));
+    let last = rig.targets().len() - 1;
+    rig.focus_at(last);
+    assert_eq!(rig.focused(), vec![last], "the premise: the × has focus");
+    let status = rig.press(Key::Named(Named::Escape), Modifiers::empty());
+    assert!(
+        rig.messages.is_empty() && status == Status::Ignored,
+        "{:?} {status:?}",
+        rig.messages
+    );
+
+    // A dialog and a toast: only the dialog answers.
+    let both = Scene {
+        escape,
+        open: Open {
+            toast: true,
+            dialog: true,
+            ..Open::NOTHING
+        },
+        shortcuts: false,
+        ..Scene::tabs()
+    };
+    let mut rig = Rig::new(window(&both));
+    rig.press(Key::Named(Named::Escape), Modifiers::empty());
+    assert_eq!(rig.messages, vec![Msg::EscapeModal]);
+}
+
+/// **R-133: the router is silent under every cover that blocks the pointer**, including the two the
+/// table above does not run: a `context_menu` with its backdrop, and an open `app_header` dropdown
+/// with `on_close_menus`. Ctrl+2 goes to tab 2 with nothing open (the premise) and to no one under
+/// either; neither captures it.
+#[test]
+fn the_router_is_silent_under_a_context_menu_and_an_open_dropdown() {
+    static ON_MENU: fn(snora::MenuAction<u8, u8>) -> Msg = Msg::Menu;
+    fn menu() -> snora::Menu<u8, u8> {
+        snora::Menu {
+            id: 0,
+            label: "File".into(),
+            icon: None,
+            items: (0..2)
+                .map(|i| snora::MenuItem {
+                    menu_id: 0,
+                    id: i,
+                    label: "Open".into(),
+                    icon: None,
+                })
+                .collect(),
+        }
+    }
+    let base = || {
+        let body: Element<'static, Msg> =
+            snora::widget::app_tab_bar(tab_bar_data(4, 0), &ON_TAB, LayoutDirection::Ltr);
+        AppLayout::new(body).shortcuts(
+            Shortcuts::new()
+                .platform(Platform::Other)
+                .digits(Digits::Tabs)
+                .tabs(&tab_bar_data(4, 0), &ON_TAB),
+        )
+    };
+    let mut rig = Rig::new(render(base()));
+    let status = digit(&mut rig, 2, CTRL);
+    assert_eq!(
+        rig.messages,
+        vec![Msg::Tab(1)],
+        "the premise: nothing open, it answers"
+    );
+    assert_eq!(status, Status::Captured);
+
+    let covers: [(&str, AppLayout<Element<'static, Msg>, Msg>); 2] = [
+        (
+            "a context menu with its backdrop",
+            base()
+                .context_menu(snora::widget::render_menu(menu(), &ON_MENU, true))
+                .on_close_menus(Msg::CloseMenus),
+        ),
+        (
+            "an open dropdown with on_close_menus",
+            base()
+                .header(snora::widget::app_header(
+                    "App",
+                    vec![menu()],
+                    &ON_MENU,
+                    Some(&0u8),
+                    None,
+                    LayoutDirection::Ltr,
+                ))
+                .on_close_menus(Msg::CloseMenus),
+        ),
+    ];
+    for (what, layout) in covers {
+        let mut rig = Rig::new(render(layout));
+        let status = digit(&mut rig, 2, CTRL);
+        assert!(
+            rig.messages.is_empty() && status == Status::Ignored,
+            "{what}: the router answered: {:?} {status:?}",
+            rig.messages
+        );
+    }
+}
+
+/// **R-050: a focused text field is taken to use every arrow key, with any modifier.** Every arrow,
+/// with each modifier set a binding could have, on both platform tables: the router publishes no
+/// route (the field's own handling is all that happens). Nothing focused, the same `Alt+↑`
+/// (`Cmd+↑` on macOS) reaches the parent, which is the premise that the route is there.
+#[test]
+fn a_focused_text_field_takes_every_arrow_with_every_modifier() {
+    let arrows = [
+        Named::ArrowUp,
+        Named::ArrowDown,
+        Named::ArrowLeft,
+        Named::ArrowRight,
+    ];
+    let modifier_sets = [
+        Modifiers::empty(),
+        Modifiers::SHIFT,
+        Modifiers::CTRL,
+        Modifiers::ALT,
+        Modifiers::LOGO,
+        Modifiers::CTRL | Modifiers::SHIFT,
+        Modifiers::ALT | Modifiers::SHIFT,
+        Modifiers::LOGO | Modifiers::SHIFT,
+    ];
+    for platform in [Platform::Other, Platform::MacOs] {
+        let sc = Scene {
+            content: Content::TextInput,
+            platform,
+            ..Scene::tabs()
+        };
+        for arrow in arrows {
+            for mods in modifier_sets {
+                let mut rig = Rig::new(window(&sc));
+                let last = rig.targets().len() - 1;
+                rig.focus_at(last);
+                assert_eq!(
+                    rig.focused(),
+                    vec![last],
+                    "the premise: the field has focus"
+                );
+                named(&mut rig, arrow, mods);
+                assert!(
+                    !rig.messages
+                        .iter()
+                        .any(|m| matches!(m, Msg::Crumb(_) | Msg::Tab(_) | Msg::Go(_))),
+                    "{platform:?}: {arrow:?}+{mods:?} in a text field was routed: {:?}",
+                    rig.messages
+                );
+            }
+        }
+    }
+}
+
+/// **R-049: a shortcut works unless the focused control uses that key, and no more is "used".** In
+/// a focused text field `Ctrl+2` still goes to tab 2 (the field does not use it), and with a snora
+/// control focused (which uses Enter and Space only) `Alt+↑` still goes to the parent.
+#[test]
+fn a_shortcut_works_in_a_field_that_does_not_use_its_key() {
+    let mut rig = Rig::new(window(&Scene {
+        content: Content::TextInput,
+        ..Scene::tabs()
+    }));
+    let last = rig.targets().len() - 1;
+    rig.focus_at(last);
+    assert_eq!(
+        rig.focused(),
+        vec![last],
+        "the premise: the field has focus"
+    );
+    digit(&mut rig, 2, CTRL);
+    assert_eq!(rig.messages, vec![Msg::Tab(1)], "Ctrl+2 in a text field");
+
+    let mut rig = Rig::new(window(&Scene::tabs()));
+    let last = rig.targets().len() - 1;
+    rig.focus_at(last);
+    assert_eq!(
+        rig.focused(),
+        vec![last],
+        "the premise: a control has focus"
+    );
+    named(&mut rig, Named::ArrowUp, Modifiers::ALT);
+    assert_eq!(
+        rig.messages,
+        vec![Msg::Crumb(1)],
+        "Alt+↑ with a snora control focused"
+    );
 }

@@ -357,3 +357,108 @@ impl<Message> Default for Escape<Message> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    //! The data the router is built from (the 0.62 audit, R-067, R-071, R-059): `routes()` had no
+    //! unit test, and the claims about it are about what it returns, which an integration test
+    //! cannot always see (a leaf crumb is not a control, so a route to it would find no target
+    //! and stay silent whether or not it was there).
+    use super::*;
+    use crate::{Crumb, Tab, TabBar};
+
+    fn on_crumb(a: BreadcrumbAction<u8>) -> u8 {
+        let BreadcrumbAction::Pressed(i) = a;
+        i
+    }
+
+    fn on_tab(a: TabAction<u8>) -> u8 {
+        let TabAction::Pressed(i) = a;
+        i
+    }
+
+    fn actions(routes: &[ShortcutRoute<u8>]) -> Vec<ShortcutAction> {
+        routes.iter().map(|r| r.action).collect()
+    }
+
+    /// **R-067: the parent is the ancestor just before the leaf; a trail with no ancestor has no
+    /// parent route.** Read from `routes()`, where a route to a leaf would be visible.
+    #[test]
+    fn the_parent_route_is_the_ancestor_before_the_leaf_and_a_lone_leaf_has_none() {
+        let trail = vec![
+            Crumb::ancestor(0u8, "Root"),
+            Crumb::ancestor(1, "Mid"),
+            Crumb::leaf(2, "Here"),
+        ];
+        let routes = Shortcuts::new()
+            .crumbs(&trail, &on_crumb)
+            .routes(LayoutDirection::Ltr);
+        let parent: Vec<_> = routes
+            .iter()
+            .filter(|r| r.action == ShortcutAction::Parent)
+            .collect();
+        assert_eq!(parent.len(), 1, "one parent route");
+        assert_eq!(
+            (parent[0].index, parent[0].message),
+            (1, 1),
+            "the crumb before the leaf"
+        );
+
+        let lone = vec![Crumb::leaf(0u8, "Only")];
+        let routes = Shortcuts::new()
+            .crumbs(&lone, &on_crumb)
+            .routes(LayoutDirection::Ltr);
+        assert!(
+            !actions(&routes).contains(&ShortcutAction::Parent),
+            "a trail with no ancestor has a parent route: {:?}",
+            actions(&routes)
+        );
+    }
+
+    fn bar(count: u8, active: u8) -> TabBar<u8> {
+        TabBar {
+            tabs: (0..count)
+                .map(|i| Tab {
+                    id: i,
+                    label: format!("T{i}"),
+                    icon: None,
+                })
+                .collect(),
+            active,
+        }
+    }
+
+    /// **R-059, R-071: next and previous tab wrap, and with fewer than two tabs there are none.**
+    #[test]
+    fn next_and_previous_tab_wrap_and_need_two_tabs() {
+        let target = |count: u8, active: u8, action: ShortcutAction, dir: LayoutDirection| {
+            Shortcuts::new()
+                .tabs(&bar(count, active), &on_tab)
+                .routes(dir)
+                .into_iter()
+                .find(|r| r.action == action)
+                .map(|r| r.index)
+        };
+        use ShortcutAction::{NextTab, PreviousTab};
+        let ltr = LayoutDirection::Ltr;
+        assert_eq!(
+            target(4, 3, NextTab, ltr),
+            Some(0),
+            "next wraps from the last"
+        );
+        assert_eq!(
+            target(4, 0, PreviousTab, ltr),
+            Some(3),
+            "previous wraps from the first"
+        );
+        assert_eq!(target(4, 1, NextTab, ltr), Some(2));
+        assert_eq!(target(4, 1, PreviousTab, ltr), Some(0));
+        // Under RTL the row is mirrored: "next" is the one Tab calls next.
+        assert_eq!(target(4, 1, NextTab, LayoutDirection::Rtl), Some(0));
+        for count in [0, 1] {
+            assert_eq!(target(count, 0, NextTab, ltr), None, "{count} tab(s)");
+            assert_eq!(target(count, 0, PreviousTab, ltr), None, "{count} tab(s)");
+        }
+        assert!(target(2, 0, NextTab, ltr).is_some(), "two tabs are enough");
+    }
+}

@@ -31,6 +31,11 @@ fn ctl(label: &'static str) -> Element<'static, Msg> {
         .into()
 }
 
+/// A control with no handler: disabled, so it is not a focus target.
+fn disabled(label: &'static str) -> Element<'static, Msg> {
+    snora::control(text(label)).into()
+}
+
 fn ctl_id(label: &'static str, id: &'static str) -> Element<'static, Msg> {
     snora::control(text(label))
         .on_press(Msg::Press(label))
@@ -69,6 +74,10 @@ struct Scene {
     sheet: bool,
     toast: bool,
     ctx_menu: bool,
+    /// The sidebar's controls have no handler: disabled, so no focus target (R-019).
+    side_disabled: bool,
+    /// Content in the `header_menu` slot, with `close` giving it its backdrop (R-025).
+    header_menu: bool,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -91,6 +100,8 @@ impl Scene {
             sheet: false,
             toast: false,
             ctx_menu: false,
+            side_disabled: false,
+            header_menu: false,
         }
     }
 
@@ -102,7 +113,8 @@ impl Scene {
         let covered = self.dialog
             || self.sheet
             || (self.menu && self.open && self.close)
-            || (self.ctx_menu && self.close);
+            || (self.ctx_menu && self.close)
+            || (self.header_menu && self.close);
         if !covered {
             if self.menu {
                 v.push("trigger");
@@ -110,7 +122,11 @@ impl Scene {
                 v.extend(["H1", "H2"]);
             }
             let body = ["B1", "B2"];
-            let side: &[&str] = if self.side { &["S1", "S2"] } else { &[] };
+            let side: &[&str] = if self.side && !self.side_disabled {
+                &["S1", "S2"]
+            } else {
+                &[]
+            };
             if self.dir == LayoutDirection::Ltr {
                 v.extend(side.iter().copied());
                 v.extend(body);
@@ -121,6 +137,9 @@ impl Scene {
             if self.footer == Footer::Control {
                 v.push("F1");
             }
+        }
+        if self.header_menu {
+            v.push("hm");
         }
         if self.ctx_menu {
             v.extend(["cm-trigger", "cm-item0", "cm-item1"]);
@@ -156,7 +175,12 @@ impl Scene {
             row![ctl("H1"), ctl("H2")].into()
         });
         if self.side {
-            l = l.side_bar(column![ctl("S1"), ctl("S2")].width(Length::Shrink).into());
+            let items: Element<'static, Msg> = if self.side_disabled {
+                column![disabled("S1"), disabled("S2")].into()
+            } else {
+                column![ctl("S1"), ctl("S2")].into()
+            };
+            l = l.side_bar(iced::widget::container(items).width(Length::Shrink).into());
         }
         match self.footer {
             Footer::Control => l = l.footer(ctl("F1")),
@@ -182,6 +206,9 @@ impl Scene {
                 "b",
                 Msg::Dismiss(7),
             )]);
+        }
+        if self.header_menu {
+            l = l.header_menu(ctl("hm"));
         }
         if self.ctx_menu {
             l = l.context_menu(snora::widget::render_menu(menu(), &ON_MENU, true));
@@ -763,4 +790,131 @@ fn rule_5_a_click_in_a_dialog_then_f6_moves_nothing() {
         rig.focused().is_empty(),
         "Shift+F6 moved focus under a dialog"
     );
+}
+
+// ---- the 0.62 audit, Unit 3 ---------------------------------------------------------------
+
+/// **R-012: snora does not answer F6 by itself.** The key event, delivered to the rendered layout:
+/// `Ignored`, nothing focused, nothing published, for F6 and Shift+F6. The application routes F6 (to
+/// `cycle_zones` and `focus_zone`); the premise is that this scene does move when it does.
+#[test]
+fn the_engine_does_not_answer_f6() {
+    let scene = Scene::new();
+    let names = scene.names();
+    let mut rig = scene.rig();
+    for mods in [Modifiers::empty(), Modifiers::SHIFT] {
+        let status = rig.press(iced::keyboard::Key::Named(F6), mods);
+        assert_eq!(
+            status,
+            iced_runtime::core::event::Status::Ignored,
+            "F6 with {mods:?}"
+        );
+        assert!(rig.focused().is_empty(), "F6 with {mods:?} moved focus");
+        assert!(rig.messages.is_empty(), "{:?}", rig.messages);
+    }
+    press_f6(&mut rig, false);
+    assert_eq!(
+        held(&mut rig, &names),
+        vec!["H1"],
+        "the premise: routed by the application, F6 moves"
+    );
+}
+
+/// **R-019: a zone whose only controls are disabled is skipped** (rule 2), like one with none: the
+/// sidebar's controls have no handler, so F6 goes header, body, footer, header, and Shift+F6 from
+/// the body goes to the header.
+#[test]
+fn rule_2_a_zone_whose_controls_are_all_disabled_is_skipped() {
+    let scene = Scene {
+        side_disabled: true,
+        ..Scene::new()
+    };
+    let names = scene.names();
+    assert!(
+        !names.contains(&"S1"),
+        "the premise: a disabled control is no target"
+    );
+    let mut rig = scene.rig();
+    assert_eq!(
+        rig.targets().len(),
+        names.len(),
+        "the tree reports exactly the enabled controls"
+    );
+    let mut walk = Vec::new();
+    for _ in 0..4 {
+        press_f6(&mut rig, false);
+        walk.push(held(&mut rig, &names)[0]);
+    }
+    assert_eq!(walk, vec!["H1", "B1", "F1", "H1"]);
+    let mut rig = scene.rig();
+    rig.focus_at(names.iter().position(|n| *n == "B1").unwrap());
+    press_f6(&mut rig, true);
+    assert_eq!(held(&mut rig, &names), vec!["H1"], "Shift+F6 over it");
+}
+
+/// **R-025: rule 5 for a `header_menu` with its backdrop**, the cover `rule_5_under_a_cover_...`
+/// does not run: the page is covered, F6 does nothing from nothing and from the menu's own control.
+#[test]
+fn rule_5_under_a_header_menu_with_its_backdrop_f6_does_nothing() {
+    let scene = Scene {
+        header_menu: true,
+        close: true,
+        ..Scene::new()
+    };
+    let names = scene.names();
+    assert_eq!(names, vec!["hm"], "the premise: the page is covered");
+    for shift in [false, true] {
+        let mut rig = scene.rig();
+        press_f6(&mut rig, shift);
+        assert!(
+            held(&mut rig, &names).is_empty(),
+            "moved from nothing (shift {shift})"
+        );
+        let mut rig = scene.rig();
+        rig.focus_at(0);
+        press_f6(&mut rig, shift);
+        assert_eq!(
+            held(&mut rig, &names),
+            vec!["hm"],
+            "moved from the menu's control (shift {shift})"
+        );
+    }
+}
+
+/// **R-021: a control of a dialog or a sheet is in no zone, and F6 does not take it into one.**
+/// With focus on the dialog's first control (or the sheet's), F6 and Shift+F6 leave it where it is,
+/// and the skeleton's controls stay out of reach. (The rustdoc used to say "goes to the first zone";
+/// rule 5 is what holds, and this names the dialog and the sheet.)
+#[test]
+fn a_dialogs_or_a_sheets_control_keeps_focus_through_f6() {
+    for (what, scene, first) in [
+        (
+            "a dialog",
+            Scene {
+                dialog: true,
+                ..Scene::new()
+            },
+            "D1",
+        ),
+        (
+            "a sheet",
+            Scene {
+                sheet: true,
+                ..Scene::new()
+            },
+            "Sheet1",
+        ),
+    ] {
+        let names = scene.names();
+        for shift in [false, true] {
+            let mut rig = scene.rig();
+            rig.focus_at(names.iter().position(|n| *n == first).unwrap());
+            press_f6(&mut rig, shift);
+            assert_eq!(
+                held(&mut rig, &names),
+                vec![first],
+                "{what}: F6 (shift {shift}) took focus out of it"
+            );
+        }
+    }
 }

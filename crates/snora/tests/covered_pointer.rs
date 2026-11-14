@@ -43,6 +43,8 @@ enum Msg {
     Attention(u64, ToastAttention),
     Dismiss(u64),
     Picked(&'static str),
+    SheetOk,
+    Own,
 }
 static ON_MENU: fn(MenuAction<u8, u8>) -> Msg = Msg::Menu;
 
@@ -625,4 +627,136 @@ fn an_animation_beneath_a_cover_keeps_running() {
             "[{cover:?}] a redraw did not reach the layer beneath the cover"
         );
     }
+}
+
+// ---------------------------------------------------------------------------
+// The 0.62 audit, Unit 3: touch, two menus together, and a sheet with no sink
+// ---------------------------------------------------------------------------
+
+/// A finger on the screen at `at`: it goes down and comes up. The cursor is set as well; **whether
+/// a real window's touch moves the cursor is `iced_winit`'s**, and this cannot say (the audit's
+/// caveat, L-024).
+fn tap(r: &mut Rig<Msg>, at: Point) {
+    use iced_runtime::core::touch;
+    r.set_cursor(at);
+    let id = touch::Finger(0);
+    r.batch(&[Event::Touch(touch::Event::FingerPressed {
+        id,
+        position: at,
+    })]);
+    r.batch(&[Event::Touch(touch::Event::FingerLifted {
+        id,
+        position: at,
+    })]);
+}
+
+/// **L-024, O-009: a tap closes what a click closes**, once: on a dialog's dim, a sheet's, a context
+/// menu's backdrop, a header menu's, and an open dropdown's cover. A dim with no close message
+/// publishes nothing.
+#[test]
+fn a_tap_on_the_dim_or_a_backdrop_publishes_its_close_message_once() {
+    for (cover, expected) in [
+        (Cover::Dialog, Msg::CloseModals),
+        (Cover::Sheet, Msg::CloseModals),
+        (Cover::ContextMenu, Msg::CloseMenus),
+        (Cover::HeaderMenu, Msg::CloseMenus),
+        (Cover::HeaderDropdown, Msg::CloseMenus),
+    ] {
+        let mut r = rig(page_scroller(), cover);
+        r.redraw();
+        tap(&mut r, ON_DIM);
+        assert_eq!(
+            r.messages,
+            vec![expected.clone()],
+            "[{cover:?}] a tap must publish {expected:?} once"
+        );
+    }
+    let mut r = rig(page_scroller(), Cover::DialogNoSink);
+    r.redraw();
+    tap(&mut r, ON_DIM);
+    assert!(r.messages.is_empty(), "{:?}", r.messages);
+}
+
+/// **L-066: a `header_menu` and a `context_menu` together.** Both menus' controls are in the tree
+/// (the page's is not: they cover it), each press publishes its own message, and a press outside
+/// both closes once.
+#[test]
+fn a_header_menu_and_a_context_menu_together_are_both_live_and_close_once() {
+    let view = || {
+        snora::render(
+            AppLayout::new(page_button())
+                .header_menu(snora::control(text("own")).on_press(Msg::Own).into())
+                // The menus draw where the application puts them; unpositioned, both sit at the
+                // top-left corner and one hides the other, so this one is placed.
+                .context_menu(placed(snora::widget::render_menu(menu(2), &ON_MENU, true)))
+                .on_close_menus(Msg::CloseMenus),
+        )
+    };
+    let mut r = Rig::new(view());
+    let n = r.targets().len();
+    // The header's control, and the context menu's trigger and two items; the page's button is
+    // under the backdrop.
+    assert_eq!(n, 4, "both menus' controls are in the tree");
+    let mut published = Vec::new();
+    for k in 0..n {
+        let mut r = Rig::new(view());
+        let at = r.targets()[k].bounds.center();
+        r.click_at(at);
+        published.push(r.messages.clone());
+    }
+    assert!(
+        published.contains(&vec![Msg::Own]),
+        "the header menu's own content answers a press: {published:?}"
+    );
+    assert!(
+        published
+            .iter()
+            .filter(|m| matches!(m.as_slice(), [Msg::Menu(_)]))
+            .count()
+            >= 2,
+        "the context menu's items answer a press: {published:?}"
+    );
+    let mut r = Rig::new(view());
+    r.click_at(AWAY);
+    assert_eq!(r.messages, vec![Msg::CloseMenus], "outside both: once");
+}
+
+/// **L-013: a sheet with no close message is content that is never dropped.** Its one control is the
+/// only target (the page is covered, Tab included), a corner click and a click at the page's own
+/// control publish nothing, and a wheel is captured.
+#[test]
+fn a_sheet_with_no_close_message_blocks_the_pointer_the_wheel_and_tab() {
+    let view = || {
+        snora::render(AppLayout::new(page_button()).sheet(Sheet::new(
+            snora::control(text("sheet")).on_press(Msg::SheetOk).into(),
+        )))
+    };
+    let mut r = Rig::new(view());
+    assert_eq!(
+        r.targets().len(),
+        1,
+        "only the sheet's control is reachable"
+    );
+    r.click_at(AWAY);
+    r.click_at(ON_BUTTON);
+    assert!(
+        r.messages.is_empty(),
+        "a click through the sheet's dim published {:?}",
+        r.messages
+    );
+    let statuses = r.wheel(Point::new(400.0, 300.0), 2);
+    assert!(
+        statuses.iter().all(|s| *s == Status::Captured),
+        "a wheel over the sheet went through: {statuses:?}"
+    );
+    // Tab, through the router's operation, stays on the sheet's one control.
+    for _ in 0..4 {
+        r.tab(false);
+        r.enter();
+    }
+    assert!(!r.messages.contains(&Msg::Page), "{:?}", r.messages);
+    assert!(
+        r.messages.contains(&Msg::SheetOk),
+        "the premise: Tab and Enter reach the sheet"
+    );
 }

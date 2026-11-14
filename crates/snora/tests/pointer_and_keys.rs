@@ -122,6 +122,35 @@ impl Rig {
         })]);
     }
 
+    /// A key press with `modifiers`, and what the interface did with it: the event's `Status`, the
+    /// testable stand-in for "an application's `keyboard::listen()` never receives it" (`listen()`
+    /// passes only `Ignored`).
+    fn press(
+        &mut self,
+        named: Named,
+        modifiers: keyboard::Modifiers,
+    ) -> iced_runtime::core::event::Status {
+        let key = Key::Named(named);
+        let (_, statuses) = self.ui.update(
+            &[Event::Keyboard(keyboard::Event::KeyPressed {
+                key: key.clone(),
+                modified_key: key,
+                physical_key: keyboard::key::Physical::Unidentified(
+                    keyboard::key::NativeCode::Unidentified,
+                ),
+                location: keyboard::Location::Standard,
+                modifiers,
+                repeat: false,
+                text: None,
+            })],
+            self.cursor,
+            &mut self.renderer,
+            &mut clipboard::Null,
+            &mut self.messages,
+        );
+        statuses[0]
+    }
+
     /// Cursor move, press, release: a click, left where it landed.
     fn click(&mut self, at: Point) {
         self.cursor = mouse::Cursor::Available(at);
@@ -576,4 +605,180 @@ fn tab_to_a_control_draws_a_ring() {
         (tabbed.frame() == plain).then(|| "Tab changed no pixel".to_owned())
     });
     assert_clean("tab-ring", failures);
+}
+
+// ---- the 0.62 audit, Unit 3 ---------------------------------------------------------------
+
+/// **K-033: a focused snora control uses Enter and Space, and nothing else.** On every control (the
+/// subjects of this file), focused by Tab: no arrow, Home, End, PageUp, PageDown, F6, Escape or
+/// modified key is taken (each `Status::Ignored`) and nothing is published; Enter then presses it.
+/// None of the shortcuts' keys (`Ctrl+Tab`, `Alt+↑`) is used by a control either.
+#[test]
+fn a_focused_snora_control_leaves_every_other_key_alone() {
+    use keyboard::Modifiers as M;
+    let others: [(Named, M); 14] = [
+        (Named::ArrowDown, M::empty()),
+        (Named::ArrowUp, M::empty()),
+        (Named::ArrowLeft, M::empty()),
+        (Named::ArrowRight, M::empty()),
+        (Named::Home, M::empty()),
+        (Named::End, M::empty()),
+        (Named::PageDown, M::empty()),
+        (Named::PageUp, M::empty()),
+        (Named::F6, M::empty()),
+        (Named::Escape, M::empty()),
+        (Named::Tab, M::CTRL),
+        (Named::PageDown, M::CTRL),
+        (Named::ArrowUp, M::ALT),
+        (Named::ArrowDown, M::SHIFT),
+    ];
+    let failures = for_every_target(|_, subject, k, want| {
+        let mut rig = Rig::new(subject.element());
+        for _ in 0..=k {
+            rig.tab();
+        }
+        rig.redraw_requested();
+        if !rig.targets()[k].focused {
+            return Some("the premise failed: Tab did not focus it".to_owned());
+        }
+        for (key, mods) in others {
+            let status = rig.press(key, mods);
+            if status != iced_runtime::core::event::Status::Ignored || !rig.messages.is_empty() {
+                return Some(format!(
+                    "{key:?}+{mods:?} was {status:?} and published {:?}",
+                    rig.messages
+                ));
+            }
+        }
+        rig.key(Named::Enter, false);
+        (rig.messages != vec![want.clone()])
+            .then(|| format!("Enter published {:?}, not {want:?}", rig.messages))
+    });
+    assert_clean("other-keys", failures);
+}
+
+/// **R-014, A-042: the engine binds neither Tab nor F6.** A rendered page, with no router and no
+/// Escape field: Tab, Shift+Tab and F6 key events are `Ignored` and focus nothing. Tab moves focus
+/// only where the application routes it (`snora::keyboard::traverse`); without the line, Tab does
+/// nothing, as before RFC-121.
+#[test]
+fn the_engine_binds_neither_tab_nor_f6() {
+    use keyboard::Modifiers as M;
+    let mut rig = Rig::new(snora::render(snora::AppLayout::new(three())));
+    for (key, mods) in [
+        (Named::Tab, M::empty()),
+        (Named::Tab, M::SHIFT),
+        (Named::F6, M::empty()),
+        (Named::F6, M::SHIFT),
+    ] {
+        let status = rig.press(key, mods);
+        assert_eq!(
+            status,
+            iced_runtime::core::event::Status::Ignored,
+            "{key:?}+{mods:?}"
+        );
+        assert_eq!(
+            focused_of(&mut rig),
+            vec![false, false, false],
+            "{key:?}+{mods:?} moved focus"
+        );
+        assert!(rig.messages.is_empty(), "{:?}", rig.messages);
+    }
+    // The premise: the same page, with the application's routing, does move focus.
+    let mut rig = Rig::new(three());
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "the premise"
+    );
+}
+
+/// **R-043, A-017: Tab does not wrap, at either end, through `traverse`.** From a control focused
+/// by Tab (not by a click): past the last one, nothing is focused for one press, and the next starts
+/// at the top. Shift+Tab from the first: nothing, then the last.
+#[test]
+fn tab_past_either_end_leaves_the_group_through_traverse() {
+    let mut rig = Rig::new(three());
+    for _ in 0..3 {
+        traverse(&mut rig, false);
+    }
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, false, true],
+        "the premise: Tab walked to the last"
+    );
+    traverse(&mut rig, false);
+    assert_eq!(focused_of(&mut rig), vec![false, false, false], "no wrap");
+    traverse(&mut rig, false);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![true, false, false],
+        "then from the top"
+    );
+
+    let mut rig = Rig::new(three());
+    traverse(&mut rig, false);
+    traverse(&mut rig, true);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, false, false],
+        "Shift+Tab before the first"
+    );
+    traverse(&mut rig, true);
+    assert_eq!(
+        focused_of(&mut rig),
+        vec![false, false, true],
+        "then the last"
+    );
+}
+
+/// **R-086: no ring under the pointer.** The pointer rests on an unfocused control: the frame
+/// differs from an untouched one only inside the control's bounds (the style's own hover look); a
+/// ring lies outside them (offset 2 on both paths). The premise is asserted for the same control:
+/// Tab to it **does** change pixels outside its bounds.
+#[test]
+fn a_pointer_resting_on_a_control_draws_no_ring() {
+    let outside = |frame: &[u8], other: &[u8], b: Rectangle| -> usize {
+        let w = WINDOW.width as usize;
+        let (x0, x1) = (b.x as usize - 1, (b.x + b.width) as usize + 1);
+        let (y0, y1) = (b.y as usize - 1, (b.y + b.height) as usize + 1);
+        let mut n = 0;
+        for y in 0..WINDOW.height as usize {
+            for x in 0..w {
+                if x >= x0 && x < x1 && y >= y0 && y < y1 {
+                    continue;
+                }
+                let i = (y * w + x) * 4;
+                if frame[i..i + 4] != other[i..i + 4] {
+                    n += 1;
+                }
+            }
+        }
+        n
+    };
+    let failures = for_every_target(|_, subject, k, _| {
+        let mut untouched = Rig::new(subject.element());
+        untouched.redraw_requested();
+        let plain = untouched.frame();
+        let b = untouched.targets()[k].bounds;
+
+        let mut tabbed = Rig::new(subject.element());
+        for _ in 0..=k {
+            tabbed.tab();
+        }
+        tabbed.redraw_requested();
+        if outside(&tabbed.frame(), &plain, b) == 0 {
+            return Some("the premise failed: Tab drew no ring outside the bounds".to_owned());
+        }
+
+        let mut hovered = Rig::new(subject.element());
+        let at = hovered.targets()[k].bounds.center();
+        hovered.cursor = mouse::Cursor::Available(at);
+        hovered.deliver(&[Event::Mouse(mouse::Event::CursorMoved { position: at })]);
+        hovered.redraw_requested();
+        let n = outside(&hovered.frame(), &plain, b);
+        (n > 0).then(|| format!("{n} pixels outside the control differ under the pointer: a ring"))
+    });
+    assert_clean("hover-ring", failures);
 }
