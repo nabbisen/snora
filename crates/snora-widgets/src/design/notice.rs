@@ -111,7 +111,9 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         self
     }
 
-    /// Adds a primary action button.
+    /// Adds an action: a ghost control, with its label in the accent colour **whatever the
+    /// notice's tone** (RFC-128). The tone shows in the bar and the border, which are not text;
+    /// the label is, and the accent is a declared text pair in every preset.
     #[must_use]
     pub fn action(mut self, label: impl Into<String>, on_press: Message) -> Self {
         self.action = Some(NoticeAction {
@@ -187,9 +189,10 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             controls.push(
                 design_control(
                     t,
-                    text(act.label)
-                        .size(style::text::label_size(t))
-                        .color(accent_color),
+                    // No colour of its own (RFC-128): the ghost style draws the label in
+                    // `palette.accent`, a declared text pair. The tone shows in the bar and
+                    // the border, which are not text.
+                    text(act.label).size(style::text::label_size(t)),
                     move |_theme: &Theme, status| style::button::ghost(&tok, status),
                     t.palette.surface,
                 )
@@ -258,8 +261,8 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
 }
 
 /// Maps a [`Tone`] to the single colour that carries it: the left accent
-/// bar, the outer border, and the action button's label all reuse this
-/// same value. **Colour only** — RFC-093's register for this surface;
+/// bar and the outer border reuse this same value. It is **not a text
+/// colour** and the action's label does not use it (RFC-128). **Colour only** — RFC-093's register for this surface;
 /// see `channel_register.rs`'s test asserting nothing else varies by
 /// tone in [`notice_accent_bar_style`] or [`notice_outer_style`].
 ///

@@ -26,6 +26,18 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Changed
+
+- **A notice's action is drawn as a ghost action, in the accent colour, for every tone
+  (RFC-128).** Its label used to take the notice's tone colour, which is not a text colour: on
+  `Neutral` it read 3.12:1 on `light` and `light_aaa` and 3.50:1 on `dark` and `dark_aaa`, under the
+  4.5:1 that text needs, and on `light_aaa` the `Success`, `Warning` and `Danger` labels read 6.51:1
+  and `dark_aaa`'s `Danger` 6.54:1, under the 7:1 those presets promise for text. The tone still
+  shows in the notice's bar and border. **If you keep screenshot baselines, retake those of notices
+  with an action:** the label is now the accent in every tone. No API changes. A new test draws
+  every notice action, button and chip label at rest on every neutral surface, in every preset, and
+  fails under the preset's floor (the hovered and pressed states are RFC-129's).
+
 ### Fixed
 
 - **A sheet on the right had the spacer's width, not the width you asked for.** A sheet whose edge
