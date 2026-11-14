@@ -246,6 +246,9 @@ rustdoc, 15 were false. Handoff:
 - **A notice's action label was drawn in its tone colour** (RFC-128, accepted 2026-11-14): Neutral's
   read 3.1:1, and the AAA presets' were under 7:1. It becomes a ghost in the accent, and drawn text
   gets a guard.
+- **A button's label, hovered or pressed, could fall under its preset's floor** (RFC-129, accepted
+  2026-11-14): the AAA presets under 7:1, Dark's pressed ghost on a surface under 4.5:1. A state never
+  crosses the floor and stays visibly different, and every state is swept.
 - The book's other false sentences are corrected already. Tests pin them, and close the holes
   the audit found: the 24 px floor alone, a disabled status, two source gates.
 - **The overlay laws, the keyboard map and the public keyboard rustdoc are guarded in full.** The

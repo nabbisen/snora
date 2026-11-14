@@ -184,13 +184,13 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 129 | [A button's label, hovered or pressed, can fall under its preset's text floor](./accepted/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor.md) | **0.62.0** — found by RFC-128's Unit 0: hover and press shift a fill or label a fixed way on every preset, so `light_aaa` hovered and `dark_aaa` pressed fall under 7:1, and Dark's pressed ghost on `surface` under 4.5:1. Proposed: a state moves away from its label, never under the floor, stays visibly different; every state declared and swept — **accepted 2026-11-14** |
 | 128 | [A notice's action label is drawn in a colour that is not a text colour](./accepted/128-a-notices-action-label-is-drawn-in-a-non-text-colour.md) | **0.62.0** — found by the audit's follow-up: a notice's action label takes its tone's colour, so Neutral's (`palette.border`) reads 3.1–3.5:1 on four presets, and Success, Warning and Danger fall under the AAA presets' 7:1. Proposed: the action is a ghost, drawn in the accent like every ghost, and a guard for any text drawn in a colour of a widget's own — **accepted 2026-11-14** |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 129 | [A button's label, hovered or pressed, can fall under its preset's text floor](./proposed/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor.md) | **0.62.0** — found by RFC-128's Unit 0: hover and press shift a fill or label a fixed way on every preset, so `light_aaa` hovered and `dark_aaa` pressed fall under 7:1, and Dark's pressed ghost on `surface` under 4.5:1. Proposed: a state moves away from its label, never under the floor, stays visibly different; every state declared and swept |
 
 ## Archive
 

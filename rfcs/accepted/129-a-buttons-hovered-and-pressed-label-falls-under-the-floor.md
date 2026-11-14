@@ -1,6 +1,7 @@
 # RFC-129 — A button's label, hovered or pressed, can fall under its preset's text floor
 
-**Status.** Proposed 2026-11-14.
+**Status.** Accepted 2026-11-14. Every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/129-…`](../handoffs/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from RFC-128's Unit 0, which measured it.
 **Release target.** 0.62.0, with RFC-128.
 **Priority.** Contrast in states a reader sees. Most of it is in the presets whose purpose is AAA
@@ -107,3 +108,12 @@ non-text floor between the two fills is too much, while a visible step is enough
 2. **Unit 1:** R-1 and R-2, with the sweep failing on today's code (the breakage row), and a frame
    test that every state still differs from rest.
 3. **The book,** by the architect: `aaa-presets.md` (every state), `buttons.md`.
+
+## Rulings, 2026-11-14 (owner)
+
+The RFC is accepted as written:
+- **Q-1:** the direction of a state's shift is chosen from the measured contrast, preferring
+  today's; Unit 0 proposes the rule, or a simpler one that also holds.
+- **Q-2:** nothing that passes today is moved; the visible change is the failing cells, listed in
+  the migration guide.
+- **Q-3:** a state stays visibly different from rest, by a step Unit 0 proposes, guarded by frames.
