@@ -109,6 +109,29 @@ non-text floor between the two fills is too much, while a visible step is enough
    test that every state still differs from rest.
 3. **The book,** by the architect: `aaa-presets.md` (every state), `buttons.md`.
 
+## What Unit 0 found (2026-11-14)
+
+**Wider than the finding above,** which measured one surface and no chips:
+- **36 cells in 15 groups** fall under the floor. A group is a preset, a variant and a state.
+- **Two groups are on the default presets:** `light` secondary hovered on `surface` (4.47), and
+  `dark` secondary and ghost pressed on `surface` and `surface_raised` (4.16, 3.73). So this
+  RFC's "Light and Dark pass in every state" was wrong.
+- **Both chips fail** on the AAA presets.
+- **A hover cue that does not exist:** on `high_contrast_dark` the unselected chip's hovered and
+  pressed states draw **exactly** like rest. Its `surface` is black, so darkening it does nothing.
+
+**Q-1's rule holds,** applied on the worst of the three surfaces, since a style cannot know which it
+is drawn on. With Q-3's visibility step (ΔE76 ≥ 3.0):
+- every group clears its floor;
+- **no group that passed today moves;**
+- **17 groups change** (the migration list). They are the failing ones, plus the invisible chip.
+
+**Q-2 holds as ruled:** nothing that passes moves. The visible change is wider than the RFC
+expected because more cells fail, not because the rule moved passing ones.
+
+**One question Unit 0 raised that the RFC did not ask (Q-4, below):** the rule needs each
+preset's text floor, and `Tokens` does not carry it.
+
 ## Rulings, 2026-11-14 (owner)
 
 The RFC is accepted as written:
@@ -117,3 +140,30 @@ The RFC is accepted as written:
 - **Q-2:** nothing that passes today is moved; the visible change is the failing cells, listed in
   the migration guide.
 - **Q-3:** a state stays visibly different from rest, by a step Unit 0 proposes, guarded by frames.
+
+## Q-4 — where does a style get its preset's text floor? (raised at Unit 0's review, for the owner)
+
+The rule must know whether a preset holds its text to 4.5:1 or 7:1. Today only the tests know:
+`Palette::usages()` is test-only, and the AAA presets are named in the sweep.
+
+**Suggest a token: `Tokens::text_contrast`, an enum, `TextContrast::Aa` or `TextContrast::Aaa`.**
+- **Each preset says what it promises,** in data a reader can see:
+  - `light` and `dark`: `Aa`;
+  - `light_aaa` and `dark_aaa`: `Aaa`;
+  - the two high-contrast presets: `Aaa`, since their text is 8.38:1 or more, beyond AAA.
+- **The suites read it too,** instead of naming presets. A preset an application builds field by
+  field chooses, and `Aa` is the default.
+- **An enum, not a number,** so no preset can say "5.3", and the book's table and the token say the
+  same thing.
+- It is an addition to the frozen design surface (RFC-036), as `targets` was in 0.55: `Tokens` is
+  `#[non_exhaustive]`, and every preset sets it.
+
+**Rejected:**
+- **Deriving the floor from each pair's resting contrast** holds 14 pairs to 7 where the preset says
+  4.5. It moves a `light` chip that passes today: a rule about one preset changing another,
+  which no reader could predict.
+- **One floor of 4.5 for every preset** leaves the AAA presets, half the finding, unfixed.
+
+**What it changes for the high-contrast presets:** their states are then held to 7:1. Unit 0
+measured them passing at 4.5, and Unit 1 measures them at 7. Any cell under 7 joins the
+migration list by the same rule.
