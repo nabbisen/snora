@@ -127,9 +127,19 @@ same, with iced's default look and the theme's ring.
   `snora::keyboard::traverse(key, modifiers)`. See
   [Accessibility](../guides/accessibility.md). *(Corrected 2026-11-04: before
   0.55 they were iced buttons, which take no keyboard input; this page once said
-  they inherited Enter and Space.)*
+  they inherited Enter and Space.)* **With Ctrl, Alt or the logo key held, Enter
+  and Space are not a press** and reach your own shortcuts (0.62, RFC-130).
+- **Hovered and pressed (0.62, RFC-129).** A hovered or pressed label stays at the
+  palette's [`text_contrast`](tokens.md#the-palettes-text-level-062) level (4.5:1 or
+  7:1) on every neutral surface, and every state differs visibly from rest. A state
+  keeps the shift it has always made where that holds, and takes another where it
+  does not. `secondary`'s border is drawn in its label's colour, so it moves with
+  it. Measured on the drawn pixels, for every variant, chip and preset.
 - **Focus ring.** It is drawn from `Tokens::focus` (width, offset, colour), and
-  clears 3:1 against what it sits on in every preset. Where the token's colour
+  clears 3:1 against what it sits on in every preset. **The offset is to the ring's
+  outer edge, and the stroke is drawn inward from there**, so a ring wider than its
+  offset overlaps the control by the difference: 1 px on the high-contrast presets
+  (3 wide, 2 out). *(Corrected in 0.62: `ring_offset`'s rustdoc called it a gap.)* Where the token's colour
   would not, it is black or white instead. It is drawn above neighbouring
   controls, so a neighbour cannot hide part of it.
 - **Target size (RFC-115).** A button is at least

@@ -12,7 +12,22 @@ are for applications that hold their text to AAA, for instance for older readers
 | `light_aaa`, `dark_aaa` | **AAA, 7:1** | 3:1, as their parents | Light's or Dark's character at AAA text |
 | `high_contrast_light`, `high_contrast_dark` | ≥ 8.38:1 | borders at 21:1 | maximum contrast ([High contrast](high-contrast.md)) |
 
-`Tokens::presets()` lists every preset, in this order.
+`Tokens::presets()` lists every preset, in this order. Each declares its level as
+[`Palette::text_contrast`](tokens.md#the-palettes-text-level-062): `Aa` for `light` and
+`dark`, `Aaa` for the other four (0.62).
+
+## In every state (0.62)
+
+**The 7:1 holds while the reader points at a control or presses it,** not only at rest:
+- for every `design::button` variant, both chips, `button::link` and a notice's action;
+- hovered and pressed;
+- on every neutral surface (`background`, `surface`, `surface_raised`);
+- measured on the pixels drawn.
+
+Before 0.62 it held only at rest. 17 combinations of a preset, a variant and a state
+fell under their level, most of them on these two presets (RFC-129). Every state also
+differs visibly from rest. The high-contrast presets' states were at 7:1 already, except
+one unselected chip on `high_contrast_dark` that drew exactly like rest.
 
 ## How they were made
 

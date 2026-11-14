@@ -140,7 +140,9 @@ style closure is an arbitrary `Fn(&Theme) -> Style`; anything the *caller*
 already knows (including its own focus state) is available inside it.
 
 `FocusTokens` (`tokens.focus.ring_color`, `.ring_width`, `.ring_offset`)
-therefore has a **present-day audience**, not only a future one:
+therefore has a **present-day audience**, not only a future one. (`ring_offset` is
+the distance to the ring's **outer** edge, with the stroke drawn inward from there,
+as snora's own controls draw it; it is not a gap.)
 
 - any application that already owns focus as its own state — a
   focus-zone enum cycled by Tab, say — can read that boolean inside its own

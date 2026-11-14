@@ -65,6 +65,10 @@ counted from **the zone that holds focus now**, read from the tree when the key 
   none.
 - **With focus in no zone** (nothing focused, or a toast): F6 goes to the first zone that has
   a control, and Shift+F6 to the last.
+  *(Extended in 0.62, by the audit follow-up's Unit 1: with nothing focused, F6 counts from
+  the zone of the control last clicked, the starting point Tab carries on from (RFC-121).
+  **F6 spends that starting point when it moves focus,** as Tab's second pass clears every mark,
+  so a click from long ago cannot outlive the focus that replaced it.)*
 - **An open menu's dropdown belongs to its trigger's zone.**
 - **F6 never presses anything. Held, it keeps moving, one zone per repeat, as Tab does.**
   *(Corrected 2026-11-12 at Unit 0's review: this read "moves once per press". A held Tab

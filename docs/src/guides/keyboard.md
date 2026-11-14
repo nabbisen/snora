@@ -43,7 +43,7 @@ A route you leave out answers nothing. Without `.digits(…)`, no digit key does
 | Keys (Windows, Linux) | Keys (macOS) | What it does | Needs |
 |---|---|---|---|
 | `Tab` / `Shift+Tab` | the same | Moves focus to the next / previous control. **Past the last, focus leaves the group**: it does not wrap | `traverse` |
-| `Enter`, `Space` | the same | Presses the focused control, publishing exactly what a click publishes. **Held, it presses once** | nothing |
+| `Enter`, `Space` | the same | Presses the focused control, publishing exactly what a click publishes. **Held, it presses once.** With Ctrl, Alt or the logo key (`Cmd` on macOS) held it is not a press, and reaches your shortcuts; Shift does not count (0.62, RFC-130) | nothing |
 | `Escape` | the same | Closes the open overlay (a dialog, a sheet, then a menu) | a close message (below) |
 | `F6` / `Shift+F6` | the same | Moves focus to the first control of the next / previous **zone** (header, sidebar, body, footer), from the zone that holds focus; wraps; nothing under a cover ([Accessibility](accessibility.md)) | `cycle_zones` and `focus_zone` (0.61) |
 | `↓` / `↑`, `Home` / `End` | the same | **Inside an open snora menu:** the next / previous item (wrapping), the first / last. With nothing focused, ↓ is the first item and ↑ the last ([Menus](menus.md#the-keyboard-inside-an-open-menu-060-rfc-123)) | nothing (0.60) |
@@ -126,5 +126,8 @@ Details: [Accessibility](accessibility.md), and the
 ## Keys snora's own controls use
 
 So that you can predict rule 2: a focused snora control, `snora::control` included, uses
-**Enter and Space**, and nothing else. None of the shortcuts above is used by a snora control. A `text_input` or
+**Enter and Space**, without Ctrl, Alt or the logo key, and nothing else. **So `Ctrl+Enter` is
+yours even while a snora control has focus** (0.62, RFC-130; before, the control took it and
+pressed itself). Shift does not count: `Shift+Enter` presses. None of the shortcuts above is used
+by a snora control. A `text_input` or
 `text_editor` of yours uses what iced gives it, plus every arrow key, with any modifier.
