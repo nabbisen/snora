@@ -12,10 +12,10 @@ extends. Then the audit follow-up's Unit 3.
 
 ## The rule
 
-> **A hovered or pressed control never takes its label under its preset's text floor** (4.5, or 7
-> on `light_aaa` and `dark_aaa`), **on any neutral surface it is drawn on** (`background`,
-> `surface`, `surface_raised`). **It still draws visibly differently from rest.** Disabled is
-> exempt.
+> **A hovered or pressed control never takes its label under its palette's text level**
+> (`Palette::text_contrast`: `Aa` is 4.5, `Aaa` is 7), **on any neutral surface it is drawn on**
+> (`background`, `surface`, `surface_raised`). **It still draws visibly differently from rest**
+> (ΔE76 ≥ 3.0). Disabled is exempt.
 
 ## What exists
 
@@ -46,7 +46,42 @@ extends. Then the audit follow-up's Unit 3.
 4. **If no rule keeps every cell above its floor while staying visibly different** (for example, a
    fill with no room left on one side), **stop and report** the cells. Those go back to the owner.
 
-## Unit 1
+## Unit 1 (Unit 0 accepted; Q-4 ruled 2026-11-14, revision 2)
+
+Read the RFC's "What Unit 0 found", and **Q-4 revision 2 in full**: its points 1 to 5 and its
+"For Unit 1".
+
+**The token (Q-4):**
+- **`TextContrast { Aa, Aaa }` in `snora-design`, and `Palette::text_contrast`:**
+  - `light` and `dark` are `Aa`;
+  - `light_aaa`, `dark_aaa` and both high-contrast presets are `Aaa`.
+- **`Palette`'s rustdoc** gains "and the contrast level its text is held to".
+- **`usages()` binds the field** as `text_contrast: _`, with a comment saying it is not a role.
+  Do not add `..`.
+- **The field's rustdoc** says it is the level snora holds every hovered and pressed label to. At
+  rest the colours are the application's, and changing `accent` on `light_aaa` leaves `Aaa`.
+- **No `Default`** for `Palette`, `Tokens` or `TextContrast`.
+- **The suites keep their own table** of each preset's level:
+  - they assert the token equals it;
+  - they assert the resting pairs meet it;
+  - **they never read the token to choose their floor.**
+- **The style code alone reads the token.**
+
+**The shift (Q-1, Q-3):**
+- **One function in `snora-style`,** shared by every variant and the chips, not copied into each
+  arm.
+- **The candidates are a fixed, finite list:** today's shift, the opposite, then larger steps up
+  to a fixed maximum. The result is measured against the worst of the three neutral surfaces.
+- **It is total:** if no candidate clears the level, it takes the highest-contrast candidate that
+  is still ΔE76 ≥ 3.0 from rest. Never the resting colour, and never a panic.
+- **`secondary`'s border moves with its label:** measure it at 3:1 (non-text).
+- **The high-contrast presets at 7:** measure their states. Any cell under 7 joins the migration
+  list by the same rule. Say how many.
+- **The cost of the search:** measure it per state per frame. If it is noticeable, say so before
+  optimising.
+
+**The breakage rows, in addition to those below:** Q-4's points 1, 2, 4 and 5, as the RFC lists
+them. Point 3 has no row.
 
 - **The rule in `snora-style`'s shift**, shared by every variant and the chips, not copied into
   each arm.
@@ -58,7 +93,8 @@ extends. Then the audit follow-up's Unit 3.
   they must change.
 - **CHANGELOG `[Unreleased]`, Fixed:** a hovered or pressed label could fall under the preset's
   floor (RFC-129), with Unit 0's list of the changed cells.
-- **The book is the architect's:** `aaa-presets.md` (every state), `buttons.md`.
+- **CHANGELOG `[Unreleased]`, Added:** `Palette::text_contrast` and `TextContrast` (RFC-129 Q-4).
+- **The book is the architect's:** `aaa-presets.md` (every state), `buttons.md`, `tokens.md` (the field).
 
 ## Acceptance criteria
 

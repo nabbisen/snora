@@ -1,6 +1,6 @@
 # RFC-129 — A button's label, hovered or pressed, can fall under its preset's text floor
 
-**Status.** Accepted 2026-11-14. Q-1 to Q-3 ruled as suggested (see Rulings). Q-4, revision 2, is open for the owner.
+**Status.** Accepted 2026-11-14. Every open question ruled as suggested (see Rulings); Q-4 in its revision 2.
 **Handoff.** [`handoffs/129-…`](../handoffs/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from RFC-128's Unit 0, which measured it.
 **Release target.** 0.62.0, with RFC-128.
@@ -140,8 +140,13 @@ The RFC is accepted as written:
 - **Q-2:** nothing that passes today is moved; the visible change is the failing cells, listed in
   the migration guide.
 - **Q-3:** a state stays visibly different from rest, by a step Unit 0 proposes, guarded by frames.
+- **Q-4 (ruled later the same day, on revision 2):** each preset declares its text level as
+  `Palette::text_contrast`, `TextContrast::Aa` or `TextContrast::Aaa`. The suites keep their own
+  table and check the token against it. No `Default` is added. The rustdoc says what the level means
+  after an application changes a colour. The search is bounded, deterministic and total. Revision 1
+  (`Tokens::text_contrast`) was accepted only in part.
 
-## Q-4 — where does a style get its preset's text floor? (raised at Unit 0's review, for the owner)
+## Q-4 — where does a style get its preset's text floor? (raised at Unit 0's review; ruled, revision 2)
 
 The rule must know whether a preset holds its text to 4.5:1 or 7:1. Today only the tests know:
 `Palette::usages()` is test-only, and the AAA presets are named in the sweep.
