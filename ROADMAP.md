@@ -236,23 +236,10 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.62.0
+## Next — 0.63.0
 
-**From the audit** (2026-11-13): of 508 keyboard and overlay claims in the book and the public
-rustdoc, 15 were false. Handoff:
-[`follow-up-0-62.md`](rfcs/handoffs/audit-0-62-keyboard-and-overlay-claims/follow-up-0-62.md).
-- **A sheet on the right has had the wrong width since 0.4:** `OneThird` drew two thirds. Fixed.
-- **F6 after a click counted from no zone.** It counts from where the click left Tab. Fixed.
-- **A notice's action label was drawn in its tone colour** (RFC-128, accepted 2026-11-14): Neutral's
-  read 3.1:1, and the AAA presets' were under 7:1. It becomes a ghost in the accent, and drawn text
-  gets a guard.
-- **A button's label, hovered or pressed, could fall under its preset's floor** (RFC-129, accepted
-  2026-11-14): the AAA presets under 7:1, Dark's pressed ghost on a surface under 4.5:1. A state never
-  crosses the floor and stays visibly different, and every state is swept.
-- The book's other false sentences are corrected already. Tests pin them, and close the holes
-  the audit found: the 24 px floor alone, a disabled status, two source gates.
-- **The overlay laws, the keyboard map and the public keyboard rustdoc are guarded in full.** The
-  guides' remaining partial rows are a backlog, in the audit's tables.
+Nothing is scheduled yet. 0.64.0 removes `next_zone`, `FocusZone` and `ZonePresence`
+(deprecated in 0.61, RFC-126).
 
 ## Future wanted
 
@@ -273,6 +260,17 @@ rustdoc, 15 were false. Handoff:
   `design::control` with the same style takes one.
 
 ## Recently shipped
+
+- **0.62.0** — an audit of every keyboard and overlay claim in the book (508 claims, 15 false).
+  - **A sheet on the right has the width you asked for.** Since 0.4 it had the width of the space
+    beside it: `OneThird` drew two thirds.
+  - **F6 after a click counts from the zone clicked in,** as Tab does.
+  - **Every text snora draws holds its preset's level, hovered and pressed included** (RFC-128,
+    RFC-129). A notice's action is a ghost in the accent; 17 state colours moved. Each palette
+    declares its level as `Palette::text_contrast`.
+  - **`Ctrl+Enter` is the application's while a snora control has focus** (RFC-130).
+  - Every normative keyboard, overlay and control claim has a test shown able to fail. The book's
+    false sentences are corrected, and the guide says what to re-check.
 
 - **0.61.0** — the keyboard between zones, and where focus starts.
   - **F6 moves focus between the frame's zones** (RFC-126), counted from where focus is,

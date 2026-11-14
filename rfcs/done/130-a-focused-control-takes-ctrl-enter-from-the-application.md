@@ -1,6 +1,6 @@
 # RFC-130 — A focused control takes Ctrl+Enter from the application
 
-**Status.** Accepted 2026-11-14 (owner), every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.62.0. Accepted 2026-11-14 (owner), every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/130-…`](../handoffs/130-a-focused-control-takes-ctrl-enter-from-the-application/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from the 0.62 audit follow-up's Unit 3. While asserting K-033
 ("a control uses Enter and Space, and nothing else"), the dev team found that `Ctrl+Space` presses

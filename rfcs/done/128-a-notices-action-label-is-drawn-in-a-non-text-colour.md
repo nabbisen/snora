@@ -1,6 +1,6 @@
 # RFC-128 — A notice's action label is drawn in a colour that is not a text colour
 
-**Status.** Accepted 2026-11-14. Every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.62.0. Accepted 2026-11-14. Every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/128-…`](../handoffs/128-a-notices-action-label-is-drawn-in-a-non-text-colour/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from the 0.62 audit's follow-up (Unit 2, H-5), which measured
 it and stopped, as its handoff said to.

@@ -26,6 +26,31 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.62.0] — 2026-11-14
+
+**Upgrading from 0.61:** read the [0.61 → 0.62 migration guide](docs/src/guides/migration-0.61-to-0.62.md).
+
+> **In short:** 0.62 is the release of an audit of every keyboard and overlay claim in the book
+> (508 claims, 15 false). **A sheet on the right now has the width you asked for** (since 0.4 it
+> had the width of the space beside it). F6 after a click counts from where you clicked. Every
+> text snora draws holds its preset's contrast level, hovered and pressed included, and
+> `Ctrl+Enter` reaches your application while a snora control has focus.
+>
+> **Code:** **nothing breaks at compile time.** New: `Palette::text_contrast` (`TextContrast`) and
+> `snora::design::style::chip`. A chord with Ctrl, Alt or the logo key no longer presses a focused
+> control; if you relied on that, bind plain Enter. If you picked the opposite size for a
+> right-hand sheet to get the look you wanted, change it back.
+>
+> **Appearance:** **changed.** A right-hand sheet's width; a notice's action label (the accent, in
+> every tone); 17 hovered or pressed button, chip and link colours, most on `light_aaa` and
+> `dark_aaa`. Retake those screenshot baselines.
+>
+> **Security:** one advisory, not reachable through snora: RUSTSEC-2026-0486 (`rustix` 1.1.4), the
+> lockfile moves to 1.1.6. Run `cargo update -p rustix@1.1.4` in yours. The accepted advisories are
+> unchanged.
+
 ### Added
 
 - **`Palette::text_contrast` and `TextContrast` (RFC-129).** The level of contrast a palette holds
@@ -105,6 +130,16 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   last clicked, as Tab does: click in the sidebar, press F6, and focus goes to the body. A press
   anywhere that is not a control, or a move of focus by F6, ends the starting point as it does
   for Tab. (Found by the 0.62 audit.)
+
+### Security
+
+- **RUSTSEC-2026-0486 (`rustix` 1.1.4, unsound): the lockfile moves to `rustix` 1.1.6.** The
+  advisory is in `rustix::fs`'s extended-attribute functions (`getxattr`, `listxattr` and their
+  `l`/`f` forms). **It is not reachable through snora:** none of the 14 crates in snora's graph
+  that depend on `rustix` 1.x calls them (checked in their sources at the cut). It reaches the
+  graph through iced's platform layer (`async-io`, `polling`, `wayland-*`, `x11rb`, `zbus`…). A
+  library's lockfile is not published, so **your own lockfile keeps 1.1.4 until you run
+  `cargo update -p rustix@1.1.4`**, which clears the advisory from your audit.
 
 ## [0.61.0] — 2026-11-12
 
@@ -225,6 +260,7 @@ deprecated it.
 - **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
   page beneath it.** It no longer does.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.61.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.62.0...HEAD
+[0.62.0]: https://github.com/nabbisen/snora/compare/0.61.0...0.62.0
 [0.61.0]: https://github.com/nabbisen/snora/compare/0.60.0...0.61.0
 [0.60.0]: https://github.com/nabbisen/snora/compare/0.59.0...0.60.0

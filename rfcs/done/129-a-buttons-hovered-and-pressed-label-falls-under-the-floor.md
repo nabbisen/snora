@@ -1,6 +1,6 @@
 # RFC-129 — A button's label, hovered or pressed, can fall under its preset's text floor
 
-**Status.** Accepted 2026-11-14. Every open question ruled as suggested (see Rulings); Q-4 in its revision 2.
+**Status.** Done — shipped v0.62.0. Accepted 2026-11-14. Every open question ruled as suggested (see Rulings); Q-4 in its revision 2.
 **Handoff.** [`handoffs/129-…`](../handoffs/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from RFC-128's Unit 0, which measured it.
 **Release target.** 0.62.0, with RFC-128.

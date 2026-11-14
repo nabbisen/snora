@@ -356,7 +356,7 @@ they are the person who knows: *did this release withdraw, narrow, or
 correct anything we previously told consumers? If so, does the note say
 what a consumer who acted on it should now do?*
 
-## Current status (snora 0.61.0, re-derived 2026-11-12, RFC-062)
+## Current status (snora 0.62.0, re-derived 2026-11-14, RFC-062)
 
 **Every row states a measured value against its threshold and whether
 the threshold is met — a prose verdict alone is what let "Within
@@ -367,8 +367,8 @@ budget" sit beside a 3.2×-over-threshold figure for ten minors
 |---|---|---|---|
 | 1. Compile time | 30 000 ms, developer machine, cold | **Measured 2026-09-12, no longer unassessed.** **~0.2 s marginal** (`snora-widgets` alone, closure warm; 181–222 ms over four runs on a 16-core desktop) — **~150× under**. The cold-closure reading is 29 523 ms on the same machine, but that cost is `iced`'s and is paid by every snora consumer whether or not a widget is enabled, so per-widget gating cannot reduce it; the marginal number is the one this indicator's own purpose needs. **The procedure printed here until today measured a no-op** (393 ms — `cargo clean -p <pkg>` does not reach the release profile); corrected above. The threshold's magnitude fits the cold-closure quantity rather than the marginal one — flagged for the owner, not silently rewritten | **No** |
 | 2. Binary size | 150 KB stripped (`widgets_diff_bytes`) | **104,832 B (~102 KB)**, from `binary-size.csv`'s 0.61.0 row, read back after the tag. **70% of a 150 KB bar**, down from 71%. It moved **−2,304 B** from 0.60.0's 107,136, a clean comparison (rustc 1.99.1, `ubuntu-latest` in both rows): `engine_bytes` rose 2,560 and `widgets_bytes` 256. 0.61.0 added `focus_zone` and `Control::id`, both on the engine path. Small, and not attributed. *0.60.0: 107,136 B, +5,632 B, from RFC-123's arrow keys and RFC-125's covered-layer rule (expected, not measured). 0.59.0: 101,504 B, +46,208 B, attributed on 2026-11-11 with `cargo bloat`: about 70% of the `.text` growth is the first `scrollable` the probe instantiates, which the dropdown has been since a tall menu must scroll (RFC-124, ruling 4), and `MenuAnchor` and the cover are 13%. The probe shows the largest case, since it had no `scrollable` of its own. No change: the scroller is there so no item is out of reach.* *(Corrected 2026-11-12: at the 0.60.0 cut the architect wrote that row's figures into the verdict column, so this cell kept 0.59.0's figures and the verdict was lost.)* | **No** |
-| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked for 0.61.0 against the manifests: no new dependency. Zone focus and control ids are built on `iced_core`, already in every graph | **No** |
-| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.61.0: no package was added to or removed from `Cargo.lock` since 0.60.0; only snora's own versions moved | **No** |
+| 3. Heavy optional dep | >500 KB compiled crate, not already shared | None — re-checked for 0.62.0 against the manifests: no new dependency. The state-contrast rule, `TextContrast` and the chord predicate are snora's own code | **No** |
+| 4. Platform-specific dep | Any system library not already required | None — re-checked for 0.62.0: no package was added to or removed from `Cargo.lock` since 0.61.0. `rustix` moved 1.1.4 → 1.1.6 (RUSTSEC-2026-0486), and snora's own versions | **No** |
 | 5. Field requests | Three independent applications | None received | **No** |
 
 **No indicator is met, and that is now measured rather than open.**

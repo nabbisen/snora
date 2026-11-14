@@ -20,7 +20,7 @@ widgets.
 If you want to skip the widget compilation entirely:
 
 ```toml
-snora = { version = "0.61", default-features = false }
+snora = { version = "0.62", default-features = false }
 ```
 
 In that configuration `snora::widget`, `snora::direction`, and
