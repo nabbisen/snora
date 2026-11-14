@@ -256,6 +256,9 @@ rustdoc, 15 were false. Handoff:
 
 ## Future wanted
 
+- **A contrast sweep for glyphs** (a notice's dismiss mark, a removable chip's close mark) at the
+  3:1 non-text floor, by a measure that does not false-fail on thin SVG strokes (RFC-128 Unit 1).
+  Their text is guarded; their glyphs are not yet.
 - Type-ahead in menus, and arrow keys in the tab bar (RFC-116 L-10, L-11). Built when an
   adopter asks.
 - A public way for an application to declare its structure to the focus rule: a
