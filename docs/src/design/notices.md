@@ -31,6 +31,10 @@ produce the `Element`.
 | `Tone::Accent` | Primary call-out; default emphasis |
 | `Tone::Neutral` | Low-emphasis status |
 
+**The tone colours the notice's bar and border.** Its text is drawn in text colours: the title and
+body in `text_primary`, and the action as a ghost action, in `palette.accent`, whatever the tone
+(0.62, RFC-128). An action does something where the reader is, so it is drawn as every action is.
+
 ## Visibility
 
 The notice has no internal visible/hidden state. Conditionally include it in
@@ -55,7 +59,8 @@ if self.show_notice {
   container, or else before it (RFC-120).
   *(Corrected 2026-11-07: up to 0.54 they were iced buttons, which take no
   keyboard input; this page had said "keyboard-reachable".)*
-- Each palette pair a notice uses meets the contrast its declared class requires, tested by the
-  palette's own contrast suite. The colour a notice's action label is drawn in is measured in
-  0.62. *(Corrected 2026-11-13, from the 0.62 audit: this said all tone colours pass AA, which no
-  notice-level test checked.)*
+- **Every text a notice draws clears its preset's text floor:** 4.5:1, or 7:1 on `light_aaa` and
+  `dark_aaa`. The title and body are declared pairs, and the palette's suite tests them. The action's
+  label is measured as drawn, in every tone of every preset (`text_floor.rs`, 0.62). The bar and border,
+  in the tone colour, are non-text, at 3:1. *(Until 0.62 the action's label took the tone colour:
+  Neutral's read 3.1:1, and on the AAA presets Success, Warning and Danger fell under 7:1. RFC-128.)*
