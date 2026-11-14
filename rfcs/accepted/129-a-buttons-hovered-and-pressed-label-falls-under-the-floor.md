@@ -1,6 +1,6 @@
 # RFC-129 — A button's label, hovered or pressed, can fall under its preset's text floor
 
-**Status.** Accepted 2026-11-14. Every open question ruled as suggested (see Rulings).
+**Status.** Accepted 2026-11-14. Q-1 to Q-3 ruled as suggested (see Rulings). Q-4, revision 2, is open for the owner.
 **Handoff.** [`handoffs/129-…`](../handoffs/129-a-buttons-hovered-and-pressed-label-falls-under-the-floor/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from RFC-128's Unit 0, which measured it.
 **Release target.** 0.62.0, with RFC-128.
@@ -146,24 +146,92 @@ The RFC is accepted as written:
 The rule must know whether a preset holds its text to 4.5:1 or 7:1. Today only the tests know:
 `Palette::usages()` is test-only, and the AAA presets are named in the sweep.
 
-**Suggest a token: `Tokens::text_contrast`, an enum, `TextContrast::Aa` or `TextContrast::Aaa`.**
+**Revision 2, 2026-11-14.** The owner accepted the first version in part and asked for a review
+against snora's principles. The token is kept, and so are its values and its form, an enum. Four
+things changed, and one rule was added:
+
+| | Revision 1 | Revision 2 | Why |
+|---|---|---|---|
+| Where it lives | `Tokens::text_contrast` | **`Palette::text_contrast`** | The level describes the colours, so it must travel with them |
+| What the suites read | the token | **their own table**, checked against the token | A guard must not read the value it guards |
+| A `Tokens` built "field by field" | defaults to `Aa` | **removed: no such `Tokens` exists** | The sentence was false |
+| After an application changes a colour | not said | **stated in the rustdoc** | Nobody should read the token as a claim snora cannot keep |
+| When no shift clears the floor | not said | **the rule is total** | Application colours reach the search |
+
+### The proposal
+
+**Suggest a field of the palette: `Palette::text_contrast`, an enum, `TextContrast::Aa` or
+`TextContrast::Aaa`.**
 - **Each preset says what it promises,** in data a reader can see:
   - `light` and `dark`: `Aa`;
   - `light_aaa` and `dark_aaa`: `Aaa`;
-  - the two high-contrast presets: `Aaa`, since their text is 8.38:1 or more, beyond AAA.
-- **The suites read it too,** instead of naming presets. A preset an application builds field by
-  field chooses, and `Aa` is the default.
-- **An enum, not a number,** so no preset can say "5.3", and the book's table and the token say the
-  same thing.
-- It is an addition to the frozen design surface (RFC-036), as `targets` was in 0.55: `Tokens` is
-  `#[non_exhaustive]`, and every preset sets it.
+  - the two high-contrast presets: `Aaa`. This is not a new promise: `Tokens::presets()`, `theme.md`
+    and the accessibility guide already promise AAA for them.
+- **An enum, not a number,** so no preset can say "5.3". The variant names are the same words as the
+  presets' own names (`light_aaa`) and the book's table.
+- **It is an addition to the frozen design surface (RFC-036),** as `targets` was in 0.55. `Palette`
+  is `#[non_exhaustive]`, and every preset sets it.
 
-**Rejected:**
-- **Deriving the floor from each pair's resting contrast** holds 14 pairs to 7 where the preset says
-  4.5. It moves a `light` chip that passes today: a rule about one preset changing another,
+**1. It lives on `Palette`, not `Tokens`.** The level is a fact about the colours, so it must be
+copied with them. `Palette` is `Copy`, and `tokens.palette = Tokens::light_aaa().palette` is a
+natural line: AAA colours with an application's own spacing.
+- **On `Tokens`,** that line would carry the colours but not their level. The states would be held
+  to 4.5 under AAA colours, a silent break of the AAA promise in exactly the states this RFC fixes.
+- **On `Palette`,** the level and the colours it describes are one value.
+- **The cost:** `Palette`'s rustdoc says "semantic color roles", and this field is not a colour.
+  The rustdoc gains one sentence: "and the contrast level its text is held to". `usages()`'s
+  exhaustive destructuring forces the field to be bound, as `text_contrast: _` with a comment saying
+  it is not a role. That is the destructuring doing its job.
+
+**2. The suites do not read the token to decide their floor.** Revision 1 had them read it
+"instead of naming presets". Then, if `light_aaa`'s token were flipped to `Aa`, the suites would
+lower their own bar and pass: the guard and what it guards would be one value. Instead:
+- **the suite keeps its own table** of each preset's level, taken from the book's table;
+- **it asserts the token equals that table,** so a flipped token fails;
+- **it asserts the resting pairs meet the table's level,** as today;
+- **only the style code reads the token.**
+
+**3. No default.** Revision 1 said "a preset an application builds field by field chooses, and `Aa`
+is the default". That is not possible. `Tokens` and `Palette` are `#[non_exhaustive]` and have no
+`Default`, so every palette starts from a preset and inherits that preset's level. No `Default` is
+added, because it would be a silent choice nobody made.
+
+**4. What the token means once an application changes a colour, stated in the rustdoc.** The token
+is **the level snora holds every hovered and pressed label to.** At rest the colours are the
+application's, and snora cannot hold them.
+- **Changing `accent` on `light_aaa` leaves `Aaa`:** the states still aim at 7:1, and the resting
+  accent is what the application chose.
+- **Lowering the level is an explicit act:** `palette.text_contrast = TextContrast::Aa`.
+- **The rustdoc says this,** so nobody reads the token as a certificate of the resting colours.
+
+**5. The rule is total, with a bounded and deterministic search.** The candidates are a fixed,
+finite list: today's shift, then the opposite one, then larger steps up to a fixed maximum. The
+cost is bounded, and the same palette always gives the same colour. If no candidate clears the
+floor (this can only happen with an application's colours, because every preset is swept):
+- the state takes the candidate with the **highest contrast that is still visibly different**
+  (Q-3's step);
+- it is **never the resting colour, and it never panics.**
+- The cue survives, and the label is as readable as the colours allow.
+
+### Rejected
+
+- **Deriving the floor from each pair's resting contrast.** It holds 14 pairs to 7 where the preset
+  says 4.5. It moves a `light` chip that passes today: a rule about one preset changing another,
   which no reader could predict.
-- **One floor of 4.5 for every preset** leaves the AAA presets, half the finding, unfixed.
+- **Deriving one level per palette** ("`Aaa` if every resting text pair reaches 7"). It cannot lie,
+  but it is a cliff. Changing `accent` from 7.01 to 6.99 would change every secondary button's
+  hover, an effect at a distance that nobody could predict from the line they wrote.
+- **One floor of 4.5 for every preset.** It leaves the AAA presets, half the finding, unfixed.
 
-**What it changes for the high-contrast presets:** their states are then held to 7:1. Unit 0
-measured them passing at 4.5, and Unit 1 measures them at 7. Any cell under 7 joins the
-migration list by the same rule.
+### For Unit 1
+
+- **The high-contrast presets at 7:1:** Unit 0 measured their states passing at 4.5, and Unit 1
+  measures them at 7. Any cell under 7 already breaks their promise, so it joins the migration list
+  by the same rule. Q-2 is unaffected: such a cell does not pass today.
+- **Each of points 1 to 5 gets a breakage row:**
+  1. a palette swapped from `light_aaa` keeps `Aaa`;
+  2. a flipped token fails the suite;
+  3. point 3 has no row, since it adds nothing that could break. A `compile_fail` doctest would pass
+     on any error, so it would prove nothing;
+  4. the rustdoc sentence is present;
+  5. a palette no candidate can satisfy still draws a visibly different state, without panicking.
