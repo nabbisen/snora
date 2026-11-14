@@ -70,11 +70,16 @@ correction, they deliberately use different ones:
 - **Semantic sets** (`weak`/`strong` of `primary`, `secondary`, `success`,
   `warning`, `danger`) pass the tier's *fixed paired text* as `reference`
   — chosen because their contrast against that text is the property that
-  matters. This makes a derived tier's contrast against its fixed text
-  provably no worse than `base`'s: moving `color` further from the text's
-  own tone can only widen the luminance gap, never narrow it (unlike
-  iced's own `iced::theme::palette::deviate`, which picks a direction from
-  `color`'s own darkness, independent of what it's paired with). Two
+  matters. Moving `color` further from the text's own tone widens the
+  luminance gap **wherever there is room to move** (unlike iced's own
+  `iced::theme::palette::deviate`, which picks a direction from `color`'s
+  own darkness, independent of what it's paired with). **At a luminance
+  extreme there is none:** the clamp fallback then moves toward the text,
+  so on `high_contrast_dark` the `secondary` set reads 21.00:1 at `base`,
+  20.91:1 at `weak` and 19.67:1 at `strong`. Every derived tier still
+  clears AA against its text (see the guarantees below). *(Corrected 2026-11-15, from the 0.63 audit: this
+  said a derived tier was "provably no worse than `base`", and one set in
+  six presets is.)* Two
   simpler alternatives were tried first and rejected on measured contrast,
   not by inspection: mixing `weak` toward `background` (iced's own
   `Primary::generate` shape) degenerates to `base` unmodified whenever
@@ -110,7 +115,8 @@ iced's `Theme::palette()` reports a six-slot base `Palette`
 (`background`, `text`, `primary`, `success`, `warning`, `danger`). This is
 a **lossy view** — widgets don't read it directly. What widgets actually
 read is `Theme::extended_palette()`, which `theme()` constructs in full
-from the 18 `snora-design` roles.
+from 11 of the `snora-design` roles (the seven it does not read are
+listed under *What is not represented*). *(Corrected 2026-11-15, from the 0.63 audit: this said all 18.)*
 
 ### Base `Palette` (six slots)
 
@@ -134,18 +140,19 @@ different ways:
   `strongest`) are `shift_away_from(background, background, amount)` at
   fixed, increasing amounts — the same magnitudes iced's own
   `Background::new` uses for its equivalent slots.
-- **`strong`** — the one tier iced's stock widgets actually read as a
-  border/separator color, not a text background
-  (`iced_widget-0.14.2/src/button.rs:700,721`, `checkbox.rs:574,581`,
-  `rule.rs:308`, `slider.rs:687`, and others) — is instead computed by
+- **`strong`** — the tier iced's stock widgets read as a border or
+  separator (`iced_widget-0.14.2/src/checkbox.rs:574,581`, `rule.rs:308`,
+  `slider.rs:687`, and others), **and also as the pressed fill of
+  `button::background` and `button::subtle`, with text on top**
+  (`button.rs:700,721`) — is instead computed by
   growing the shift amount, starting from the same fixed amount the other
   tiers would use, until the result clears a `1.5:1` WCAG contrast floor
-  against `background` itself, or the amount reaches `1.0`. For three of
-  the four built-in presets the starting amount already clears the floor
+  against `background` itself, or the amount reaches `1.0`. For five of
+  the six built-in presets the starting amount already clears the floor
   and this returns immediately — identical output to the fixed-amount
   approach. Only a preset whose background sits at a luminance extreme
   (`high_contrast_dark`'s pure black) needs the amount grown further: the
-  same fixed delta that comfortably clears the floor for a near-black
+  same fixed delta that clears the floor, narrowly, for a near-black
   background (`dark`) produces an almost invisible border against a
   *literal* black one, because WCAG's contrast formula is highly
   nonlinear near the extremes — the same OKLCH-lightness step yields a
@@ -180,7 +187,7 @@ below.
 
 Two independent signals confirmed the seed-relative direction (what
 `theme()` now implements) is the correct one: `dark`'s own `border` token
-(`rgb(0.169, 0.192, 0.227)`) is *lighter* than its `background` — the
+(`rgb(0.412, 0.443, 0.490)`) is *lighter* than its `background` — the
 token set's own design intent is "borders lighten in dark mode," the
 opposite of what the text-relative rule produced — and `high_contrast_dark`
 (pure-black background) only ever looked correct by accident, because its
@@ -229,8 +236,8 @@ than an accent.
 
 ### What is not represented
 
-`text_secondary`, `text_muted`, `border`, `focus`, and `surface_raised`
-have no slot in the emitted theme. Applications needing these read
+`text_secondary`, `text_muted`, `border`, `focus`, `surface_raised`,
+`info` and `info_text` have no slot in the emitted theme. Applications needing these read
 `tokens.palette` directly — trivial, since they already hold the
 `Tokens` value used to build the theme.
 
@@ -247,14 +254,14 @@ from its background luminance rather than a hand-declared intent.
 ## Contrast and distinctness guarantees
 
 Every `Pair` in the emitted `Extended` — base and derived — meets WCAG AA
-(≥ 4.5:1) against its own paired text, for all four presets, and the two
+(≥ 4.5:1) against its own paired text, for all six presets, and the two
 high-contrast presets meet AAA (≥ 7.0:1) wherever the underlying tokens
 already do. Within every semantic set, `base`, `weak`, and `strong` are
-pairwise distinct for all four presets — the property whose absence broke
+pairwise distinct for all six presets — the property whose absence broke
 stock-widget hover/pressed feedback in the collapsed-tier design.
 
 `background.strong` additionally meets a `1.5:1` contrast floor against
-`background.base` itself, for all four presets — the adjacent-surface
+`background.base` itself, for all six presets — the adjacent-surface
 comparison that matters for its role as a border color, which the
 text-contrast checks above can't catch (see "Why `strong`'s direction
 mattered" above).

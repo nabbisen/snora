@@ -20,8 +20,9 @@ Pass `None` (or `Option::<Message>::None`) to render a disabled chip.
 
 ### `chip::removable`
 
-A chip with a separate remove (×) button. Both the label and the × are
-independent `iced::widget::button` controls.
+A chip with a separate remove (×) button. The label and the × are two
+independent snora controls (`design_control`, since 0.55), each a focus target. *(Corrected 2026-11-15, from the 0.63 audit: this
+said `iced::widget::button`.)*
 
 ```rust,ignore
 chip::removable(

@@ -4,8 +4,10 @@
 measured on drawn pixels, in every state". The roadmap has listed a glyph sweep since RFC-128 Unit 1.
 **What it produces.** Measurements and a proposed measure, in one review request. **No product code
 and no test committed.** The architect then raises an RFC from them, for the owner.
-**Starts after** audit-0-63 request A has been reviewed. Its `non-text-inventory.md` is this unit's
-list of subjects.
+**Starts after** audit-0-63 request B has been reviewed (moved from request A at A's review,
+2026-11-15, so that one follow-up covers both requests). Request A's `non-text-inventory.md` is this
+unit's list of subjects. **If the owner accepts RFC-131,** its Unit 0 and this one are one sweep: the
+same frames, every text and every non-text element, each at its own floor.
 **Where.** On `main`. The probe is a scratch test, described in the request, not committed.
 
 ## Why

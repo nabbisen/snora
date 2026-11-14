@@ -60,9 +60,10 @@ readonly FROZEN_EXCEPTIONS=(
   "0.19.1|bd215f8|revised after release; corrected line present"
   "0.20.0|d8d3f9d|revised after release; corrected line present"
   "0.25.2|6642b94|no entry at the tag at all; corrected line present"
+  "0.62.0|the 0.63 audit's book corrections (2026-11-15)|revised after release: the lead overstated the contrast sweep; corrected line present"
 )
 # The subset that must carry a disclosure line.
-readonly CORRECTED_EXCEPTIONS=(0.19.1 0.20.0 0.25.2)
+readonly CORRECTED_EXCEPTIONS=(0.19.1 0.20.0 0.25.2 0.62.0)
 
 failures=()
 warnings=()

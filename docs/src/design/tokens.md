@@ -19,9 +19,10 @@ pub struct Tokens {             // #[non_exhaustive]
 ```
 
 `Tokens` and `Palette` are `#[non_exhaustive]` — new fields can be added in
-future minor releases without breaking downstream code. All other token
-sub-types (`Spacing`, `Radius`, `Typography`, `FocusTokens`) are
-constructible by struct literal and are not marked `#[non_exhaustive]`.
+future minor releases without breaking downstream code. So is
+`TargetTokens`. The other token sub-types (`Spacing`, `Radius`,
+`Typography`, `FocusTokens`) are constructible by struct literal and are not
+marked `#[non_exhaustive]`.
 
 This entire surface is under a contractual additive-only covenant — see
 [Stability](stability.md) for what is and is not frozen.

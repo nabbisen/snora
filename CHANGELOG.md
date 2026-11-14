@@ -35,8 +35,8 @@ Nothing yet.
 > **In short:** 0.62 is the release of an audit of every keyboard and overlay claim in the book
 > (508 claims, 15 false). **A sheet on the right now has the width you asked for** (since 0.4 it
 > had the width of the space beside it). F6 after a click counts from where you clicked. Every
-> text snora draws holds its preset's contrast level, hovered and pressed included, and
-> `Ctrl+Enter` reaches your application while a snora control has focus.
+> button, chip and link label, and a notice's action, holds its preset's contrast level, hovered
+> and pressed included, and `Ctrl+Enter` reaches your application while a snora control has focus.
 >
 > **Code:** **nothing breaks at compile time.** New: `Palette::text_contrast` (`TextContrast`) and
 > `snora::design::style::chip`. A chord with Ctrl, Alt or the logo key no longer presses a focused
@@ -50,6 +50,11 @@ Nothing yet.
 > **Security:** one advisory, not reachable through snora: RUSTSEC-2026-0486 (`rustix` 1.1.4), the
 > lockfile moves to 1.1.6. Run `cargo update -p rustix@1.1.4` in yours. The accepted advisories are
 > unchanged.
+
+*Corrected 2026-11-15, from the 0.63 audit: the lead said "every text snora draws holds its
+preset's contrast level". It held for the labels 0.62's sweep draws: buttons, chips, links and a
+notice's action. An inactive tab label reads 6.58:1 on `light_aaa`, under its 7:1, and tab labels,
+crumbs, sidebar names, menu items, tooltips and toasts were not measured (RFC-131).*
 
 ### Added
 

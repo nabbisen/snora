@@ -10,7 +10,7 @@ are for applications that hold their text to AAA, for instance for older readers
 |---|---|---|---|
 | `light`, `dark` | AA, 4.5:1 | 3:1 | general use |
 | `light_aaa`, `dark_aaa` | **AAA, 7:1** | 3:1, as their parents | Light's or Dark's character at AAA text |
-| `high_contrast_light`, `high_contrast_dark` | ≥ 8.38:1 | borders at 21:1 | maximum contrast ([High contrast](high-contrast.md)) |
+| `high_contrast_light`, `high_contrast_dark` | ≥ 8.38:1 | borders at 21:1 against the page (19.80:1 on `high_contrast_dark`'s raised surface) | maximum contrast ([High contrast](high-contrast.md)) |
 
 `Tokens::presets()` lists every preset, in this order. Each declares its level as
 [`Palette::text_contrast`](tokens.md#the-palettes-text-level-062): `Aa` for `light` and
@@ -24,6 +24,10 @@ are for applications that hold their text to AAA, for instance for older readers
 - on every neutral surface (`background`, `surface`, `surface_raised`);
 - measured on the pixels drawn.
 
+**Other text is not measured as drawn yet.** Tab labels, crumbs, sidebar names, menu items,
+tooltips, a notice's title and body, and toasts are outside that sweep. An inactive tab's label
+is a mix of text and page, and **reads 6.58:1 on `light_aaa`**, under its 7:1 (RFC-131).
+
 Before 0.62 it held only at rest. 17 combinations of a preset, a variant and a state
 fell under their level, most of them on these two presets (RFC-129). Every state also
 differs visibly from rest. The high-contrast presets' states were at 7:1 already, except
@@ -34,8 +38,14 @@ one unselected chip on `high_contrast_dark` that drew exactly like rest.
 Each keeps its parent's background, surfaces and border. A role moves **only if one
 of its declared text pairs is under 7:1**, and then by the smallest step that reaches
 it:
-- a lightness-only shift in OKLCh, with chroma and hue held;
+- a lightness-only shift in OKLCh, holding chroma and hue as far as the sRGB gamut
+  allows (the hue shifts below show where it does not; no role's hue moves more than
+  6°, asserted, and chroma is not asserted);
 - bisected to the floor.
+
+**One role moves with another:** `light_aaa`'s `focus` is its accent, as Light's is, so it
+moved when the accent did (`#1544ce`). `dark_aaa`'s `focus` is unchanged. *(Corrected 2026-11-15, from the 0.63 audit: this
+said only a role with a text pair under 7:1 moves, and left `focus` out.)*
 
 A fill moves only when its *own text* needed it, never because its boundary against a
 surface was low: that pair is non-text, at 3:1. Two properties are asserted, besides

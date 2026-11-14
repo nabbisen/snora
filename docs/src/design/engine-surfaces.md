@@ -28,7 +28,8 @@ path, and no release amended it until this correction.)*
 
 ## Why a sibling function, not a field on `AppLayout`
 
-`AppLayout` lives in `snora-core`, which has **no dependencies at all**.
+`AppLayout` lives in `snora-core`, which has **no dependencies** with its default features
+(its optional `lucide-icons` feature adds one).
 Adding a `Tokens` field would pull `snora-design` into every engine-only
 build, defeating the opt-in size discipline and inverting the documented
 crate-dependency direction. `snora` already depends on both
@@ -61,8 +62,8 @@ Reuses `snora::design::style::container::card_raised` (RFC-029) directly
 — the exact same fill/border/radius mapping the card primitive already
 uses — rather than recomputing it, with its drop shadow zeroed out.
 
-**Border-defined, not shadow-defined**, deliberately. Two of the four
-built-in presets (`light`, `high_contrast_light`) have `surface_raised ==
+**Border-defined, not shadow-defined**, deliberately. Three of the six
+built-in presets (`light`, `light_aaa`, `high_contrast_light`) have `surface_raised ==
 background` — the card's fill is *bitwise identical* to the page behind
 it in those presets, by the token data's own design. Shadows are also
 close to meaningless in the high-contrast presets (a light shadow on a
@@ -87,6 +88,11 @@ below for that measurement — it is not this one, and the two disagree.
 
 Measured border-vs-background contrast, all four presets (re-derived at
 0.38.1, RFC-071 — the figures below stood stale since 0.34.0):
+
+*(Corrected 2026-11-15, from the 0.63 audit: **the tables on this page list the four presets that existed at
+0.38.1.** `light_aaa` and `dark_aaa` (0.53, RFC-118) keep their parents' background, surfaces and
+border, so each of these rows holds for them as for `light` and `dark`. Where this page says
+"all four presets", read it as those four and their two AAA children.)*
 
 | Preset | Contrast |
 |---|---|
@@ -126,9 +132,11 @@ in addition to `card_raised`'s own coverage.
 
 ### The modal dim
 
-Unstyled default: `iced::Color::from_rgba(0.0, 0.0, 0.0, 0.4)` — opaque
-black at 40% alpha, unchanged by this RFC. *(Corrected 2026-11-13, from the 0.62 audit: since
-`eb6a544` the unstyled dim is 44%, the same as `DIM_ALPHA`.)*
+Unstyled default, when this RFC was written: `iced::Color::from_rgba(0.0, 0.0, 0.0, 0.4)`,
+black at 40% alpha. *(Corrected 2026-11-13, from the 0.62 audit: since `eb6a544` the unstyled
+dim is 44%, the same as `DIM_ALPHA`.)* *(Corrected 2026-11-15, from the 0.63 audit: **it is not black on
+every theme either.** Since RFC-110 the unstyled dim takes the pole opposite the theme's
+background, as the design dim does: black on a light theme, **white on a dark one**.)*
 
 Composited over a **dark** page background, black-on-black is close to a
 no-op — the same class of defect RFC-038's `shift_away_from` was built
@@ -243,7 +251,7 @@ sheet (see "What this RFC does not cover" below); its border and fill
 come from `iced::Theme::extended_palette()`'s `background.weak` and
 `background.base`, not from `snora-design`'s `border`/`surface_raised`
 tokens. The figures below hold only when the application's
-`iced::Theme` is `snora::design::theme::theme(&tokens)` (RFC-038); an
+`iced::Theme` is `snora::design::theme(&tokens)` (RFC-038); an
 app using a different `iced::Theme` gets different, unmeasured numbers
 from the ones stated here.
 

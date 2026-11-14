@@ -31,11 +31,16 @@ These ratios are verified by the automated contrast test suite
 ## Characteristic differences from light/dark
 
 - **Borders are solid black / solid white.** The `border` role is `#000000`
-  (light HC) or `#FFFFFF` (dark HC), making every card, panel, and input
-  clearly delineated.
-- **Surfaces collapse to a single background.** `background`, `surface`,
-  and `surface_raised` are the same color; separation comes from borders
-  alone, not shading.
+  (light HC) or `#FFFFFF` (dark HC): 21:1 against the page and `surface`, and
+  19.80:1 against `high_contrast_dark`'s `surface_raised`.
+- **Surfaces nearly collapse to a single background.** `background` and
+  `surface` are the same colour; `surface_raised` is too in
+  `high_contrast_light`, and is `#0a0a0a` in `high_contrast_dark`.
+  Separation comes from borders, not shading. **An element with neither has
+  none:** a progress bar's track is invisible against the page in both
+  presets (1.00:1). *(Corrected 2026-11-15, from the 0.63 audit: this said the
+  three surfaces were the same colour, and that every card, panel and input was clearly
+  delineated.)*
 - **Focus ring is thicker.** `FocusTokens.ring_width` is `3.0` in the
   high-contrast presets versus `2.0` in light/dark.
 
@@ -54,8 +59,10 @@ When testing under a high-contrast preset in the workbench:
 
 - All card borders must be clearly visible.
 - All swatch backgrounds must be visually distinct.
-- Button text must be readable in all four states (active, hover, pressed,
-  disabled).
+- Button text must meet 7:1 at rest, hovered and pressed (snora tests this on
+  the drawn pixels). **Disabled is exempt** (WCAG 1.4.3): disabled labels read
+  2.5–3.0:1 here, and a disabled control is told apart by its dimming
+  (RFC-106), not by readable text.
 - The focus ring at `3.0` width must be visible when tabbing through
   controls. From 0.55 snora's controls draw it (RFC-116), so this item can
   pass: route Tab with `snora::keyboard::traverse` and look. The wider ring
