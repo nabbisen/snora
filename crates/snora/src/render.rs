@@ -526,35 +526,33 @@ where
 /// Same visual as [`dim_backdrop`] but without the click sink — used when
 /// the application chose not to provide `on_close_modals`.
 ///
-/// Wrapped in [`opaque`] (RFC-084 F-02 / Q-1) so it still blocks pointer
-/// input from reaching content beneath it, matching Law 8's unconditional
-/// "Pointer blocking — yes" — blocking must not depend on whether a
-/// dismiss message was provided. This also blocks wheel-scroll (F-03),
-/// measured rather than assumed — `opaque`'s own `update` method only
-/// checks for a mouse button press, but `iced_widget::Stack`'s dispatch
-/// separately consults every layer's `mouse_interaction()` after each
-/// event and stops passing the cursor to layers beneath one that reports
-/// non-`None`, which `opaque` does unconditionally whenever hovered. See
-/// `modal_with_no_close_sink_also_blocks_wheel_scroll` in
-/// `crates/snora/tests/render_semantics.rs` for the measurement, including
-/// the record of the wrong first assumption it corrected.
+/// **This dim has no pointer role of its own.** What keeps the pointer and the wheel from the
+/// page beneath any dim, with a close message or without one, is the cover: the skeleton sits
+/// inside an `Inert` that is on while a modal is open, and a covered layer gets no cursor and
+/// swallows the wheel (RFC-125). Blocking therefore does not depend on whether a dismiss message
+/// was provided (Law 8's unconditional "Pointer blocking — yes").
+///
+/// It used to be wrapped in `iced::widget::opaque` (RFC-084 F-02), on a measurement made before
+/// the cover existed. Removed in the 0.62 audit: with the wrapper gone no test fails, so it was
+/// a second mechanism no test could see working. The tests that hold the outcome are
+/// `render_semantics.rs::modal_with_no_close_sink_also_blocks_wheel_scroll` and
+/// `modal_with_no_close_sink_still_blocks_pointer_at_dim`, and `a_sheet_with_no_close_message_blocks_the_pointer_the_wheel_and_tab` in
+/// `covered_pointer.rs`; with the page left uncovered they fail.
 fn dim_without_capture<'a, Message>(fill: DimFill) -> Element<'a, Message>
 where
     Message: 'a,
 {
-    use iced::widget::opaque;
     use iced::{Background, widget::container::Style};
 
-    opaque(
-        container(space())
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .id(identifiers::MODAL_DIM)
-            .style(move |theme| Style {
-                background: Some(Background::Color(fill.resolve(theme))),
-                ..Default::default()
-            }),
-    )
+    container(space())
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .id(identifiers::MODAL_DIM)
+        .style(move |theme| Style {
+            background: Some(Background::Color(fill.resolve(theme))),
+            ..Default::default()
+        })
+        .into()
 }
 
 #[cfg(test)]

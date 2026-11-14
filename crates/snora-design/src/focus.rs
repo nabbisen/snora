@@ -36,7 +36,11 @@ use crate::Color;
 pub struct FocusTokens {
     /// Focus-ring thickness (logical pixels).
     pub ring_width: f32,
-    /// Gap between the control edge and the ring (logical pixels).
+    /// How far out the ring's **outer** edge is from the control's edge (logical pixels): the room a
+    /// layout reserves outside a control. **The stroke is drawn inward from there**, so a ring wider
+    /// than its offset overlaps the control by the difference (each high-contrast preset's ring is 3
+    /// wide and 2 out, so it overlaps by 1 px). Measured in a frame, on both paths, by
+    /// `the_ring_is_as_wide_and_as_far_out_as_the_path_says` in `crates/snora/tests/public_control.rs`.
     pub ring_offset: f32,
     /// Focus-ring color.
     pub ring_color: Color,
