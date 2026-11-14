@@ -16,12 +16,16 @@ let layout = AppLayout::new(body)
 ```
 
 `direction` controls how snora composes the **skeleton row** (where
-the sidebar lands), and is also passed to the prefab widgets so they
-mirror their own internal `start` / `end` arrangements.
+the sidebar lands), and reaches the sheet and the toast layer. **It does
+not reach the prefab widgets by itself:** each one (`app_header`,
+`app_side_bar`, …) takes its own `direction` argument, and you pass it the
+same value. *(Corrected 2026-11-15, from the 0.63 audit: this said `AppLayout::direction` was passed to them.)*
 
 ## Logical vs physical
 
-`Edge` is the central vocabulary type:
+`Edge` names the two logical sides. snora's own APIs take their own types
+(`SheetEdge`, `ToastPosition`), so `Edge` is for your code. *(Corrected 2026-11-15, from the 0.63 audit: this
+called it the central vocabulary type; nothing in snora takes one.)*
 
 ```rust,ignore
 pub enum Edge { Start, End }
@@ -58,7 +62,7 @@ under `Rtl`, the order is mirrored. You write the row once.
 
 | Widget | What flips |
 |---|---|
-| `app_header` | Title group on `Start`, end-controls on `End` |
+| `app_header` | Meant to put the title group on `Start` and the end-controls on `End`. **Under RTL it does not today:** the end-controls are drawn beside the title group, not at the end edge, and the title group's own order is not mirrored (0.63 audit, RFC-132) |
 | `app_side_bar` | Tooltip side; the sidebar position is determined by `AppLayout::direction` |
 | Toast layer | Anchor side, when `ToastPosition` is `*Start` or `*End` |
 | `Sheet` | Anchor side, when `SheetEdge` is `Start` or `End`. Inside-facing rounded corner also flips. `Top` / `Bottom` edges are unaffected. |
@@ -69,7 +73,10 @@ under `Rtl`, the order is mirrored. You write the row once.
 Live LTR ↔ RTL flipping is a one-line accessibility setting. Keep
 `direction: LayoutDirection` on your state, mutate it on a user
 action, and re-pass it on each `view`. Snora re-renders the whole
-skeleton mirrored — no per-widget reset needed.
+skeleton mirrored. **A flip loses keyboard focus today:** snora mirrors by
+reordering widgets, and iced keeps a widget's state by its position, so a
+focused control is no longer focused after the flip (0.63 audit,
+RFC-132). *(Corrected 2026-11-15, from the 0.63 audit: this said no per-widget reset was needed.)*
 
 The [`examples/rtl`](https://github.com/nabbisen/snora/tree/main/examples/rtl)
 demo flips on a button press.

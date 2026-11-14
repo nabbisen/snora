@@ -47,20 +47,20 @@ coincidence is called out per-row, not hidden behind it.
 |---|---|---|---|---|---|
 | header | vertical padding | 8 | `Spacing::sm` | yes | compact internal gap fits a shallow bar inset |
 | header | horizontal padding | 16 | `Spacing::lg` | yes | section spacing fits outer chrome padding |
-| header | title↔menu / filler↔controls gap | 12 | `Spacing::md` | yes | ordinary component gap between sibling controls |
+| header | title↔menu / filler↔controls gap | 12 | `Spacing::md` | yes | ordinary component gap between sibling controls. The title is also followed by a fixed 20 px spacer, so the title's end to the first menu is 12 + 20 + 12 = 44 |
 | header | corner radius | 0 | `Radius::sm` | **no** | RFC-040's stated target, see "Chrome radius" below |
 | footer | horizontal padding | 16 | `Spacing::lg` | yes | same role as header |
 | footer | vertical padding | 6 | `Spacing::sm` | **no** | 6 has no clean token; `sm` chosen for rhythm with header |
 | footer | corner radius | 0 | `Radius::sm` | **no** | same as header |
 | sidebar | icon-button gap | 16 | `Spacing::md` | **no** | reclassified — sibling controls in one list read as "ordinary component gap", not "section spacing"; deliberately not reproducing 16 |
-| sidebar | rail padding | 16 | `Spacing::lg` | yes | outer chrome padding, same role as header/footer |
+| sidebar | rail padding | 16 vertical (8 horizontal) | `Spacing::lg` | yes, vertical | outer chrome padding, same role as header/footer |
 | sidebar | button radius | 6 | `Radius::md` | yes | `Radius::md` is documented "buttons, chips, notices" |
 | tab bar | tab-to-tab gap | 2 | `Spacing::xs` | **no** | no clean equivalent; smallest available |
 | tab bar | bar horizontal padding | 12 | `Spacing::md` | yes | ordinary component padding |
 | tab bar | icon↔label gap | 6 | `Spacing::sm` | **no** | shared "inline gap" rhythm, see below |
 | tab bar | per-tab horizontal padding | 12 | `Spacing::md` | yes | button padding |
 | tab bar | per-tab vertical padding | 8 | `Spacing::sm` | yes | button padding, smaller than horizontal |
-| tab bar | corner radius | 0 | `Radius::sm` | **no** | RFC-040's stated target |
+| tab bar | corner radius | 0 | none | — | RFC-102 retired the tab bar's radius: a straight bar under a straight underline |
 | breadcrumb | crumb-to-separator gap | 6 | `Spacing::sm` | **no** | shared "inline gap" rhythm, see below |
 | breadcrumb | trail horizontal padding | 12 | `Spacing::md` | yes | ordinary padding |
 | breadcrumb | trail vertical padding | 4 | `Spacing::xs` | yes | shallow strip padding |
@@ -77,20 +77,21 @@ kind of thing, in three unrelated files. All three map to `Spacing::sm`
 uniformly so these three sites share one rhythm instead of an
 accidentally-identical-but-unrelated `6`.
 
-**Chrome radius.** The header, footer, and tab bar all hardcode
-`radius: 0.0` — square corners — which RFC-040 names directly as "a
-large part of why stock snora chrome reads as flat and dated". All
-three map to `Radius::sm` (4): the smallest available radius, a modest
-rounding appropriate for a full-width chrome strip.
+**Chrome radius.** The header and footer hardcode `radius: 0.0` on the
+unstyled path (square corners), which RFC-040 names directly as "a large part
+of why stock snora chrome reads as flat and dated". Both map to `Radius::sm`
+(4): the smallest available radius, a modest rounding appropriate for a
+full-width chrome strip. **The tab bar has no radius** since RFC-102, which
+made its edge a straight rule. *(Corrected 2026-11-15, from the 0.63 audit: this listed the tab bar as a third.)*
 
 **Unmapped literals** — no `Spacing`/`Radius` equivalent, left as
 literal constants, identical in both the unstyled and styled paths:
 
 - Sidebar's and breadcrumb's button border *widths* (`0.0` — "no
   border" is not expressible on either scale).
-- The tab bar container's border *width* (`1.0` — border widths aren't
-  part of either scale, matching `chrome_container_style`'s own border
-  width).
+- The tab bar's 1 px bottom edge, a separate rule element (its container
+  paints no border, which a test asserts). Border widths are not part of
+  either scale.
 - The tab bar's vertical padding (`0.0` — structural: tabs supply their
   own vertical padding via their button padding; this is an absence of
   a value, not a design literal).
@@ -113,7 +114,7 @@ preset currently offers two distinct `Spacing` values to compare.
 
 ## Chrome radius shared with the dialog card
 
-The `Radius::sm` chosen for header/footer/tab-bar chrome is
+The `Radius::sm` chosen for header and footer chrome is
 deliberately the *smallest* radius role — distinct from the dialog
 card's `Radius::lg` (RFC-039, `docs/src/design/engine-surfaces.md`). A
 full-width bar reads oddly with a pronounced rounding; a floating card
@@ -121,8 +122,7 @@ does not carry that constraint.
 
 ## What this RFC does not cover
 
-Typography (`Typography` exists and chrome could use it, but font-size
-changes reflow layout and deserve their own evidence — deferred with
-its own trigger). New widgets — this RFC restyles what exists; the
+Typography, which RFC-104 did later (0.52): chrome labels take the `label`
+role, the header and toast titles `title`, and the toast message `body`. New widgets — this RFC restyles what exists; the
 permanent non-goals (no form, data-display, or decorative widgets)
 stand unchanged. Engine surfaces (dialog card, modal dim) are RFC-039.

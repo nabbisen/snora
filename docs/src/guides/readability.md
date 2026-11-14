@@ -79,8 +79,8 @@ both have to clear a floor for text to be legible, and this is the size half of
 that pair.
 
 **Separately, and not a second floor: express sizes through a role rather than
-a literal.** `body` and `body_small` are the roles for notices, labels and help
-content. That is about keeping sizes in one place, not about a minimum — a
+a literal.** `body` and `body_small` are the roles for notices and help content,
+and `label` for labels. That is about keeping sizes in one place, not about a minimum — a
 role's value is yours to set.
 
 The two combine in the case you may actually want: if your densest surface needs
@@ -97,7 +97,7 @@ at roughly twice what it needed (knotra, 2026-08-19).
 **What's actually asserted, and what isn't (RFC-081).**
 `text_size_meets_12px_floor_for_every_role` in
 `crates/snora-design/src/tests.rs` asserts every role's `size` clears
-12.0 in all four **built-in presets** — it proves the presets snora
+12.0 in all six **built-in presets** — it proves the presets snora
 ships comply, and would catch a future preset edit that dropped a role
 below the floor. **It cannot enforce this on your own `Tokens`.**
 `Typography`'s fields are public and stay that way (RFC-036's

@@ -193,6 +193,7 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 | 131 | [Text snora draws outside 0.62's sweep is unmeasured, and an inactive tab reads 6.58:1 on `light_aaa`](./proposed/131-text-outside-0-62s-sweep-is-unmeasured.md) | **0.63.0** (proposed) — found by the 0.63 audit: an inactive tab label is a 70/30 mix of text and page, 6.58:1, under `light_aaa`'s 7:1; RFC-128 R-2's sweep was built from a source search and covers buttons, chips, links and a notice's action only. Proposed: every text snora draws on the design path, inventoried from frames, held to its palette's level by RFC-129's rule; nothing that passes moves — **proposed 2026-11-15** |
+| 132 | [Under RTL, snora reorders widgets instead of mirroring them: the header is not a mirror, and a flip loses focus](./proposed/132-under-rtl-snora-reorders-widgets-instead-of-mirroring-them.md) | **0.63.0** (proposed) — found by the 0.63 audit: `app_header` under RTL puts its end-controls beside the title, not at the end edge; a live direction flip loses focus, because mirroring reorders children and iced keys state by position; Tab order under RTL unmeasured. Proposed: mirroring becomes a layout, with children in logical order; the header mirrored whole; Tab follows reading order in both directions — **proposed 2026-11-15** |
 
 ## Archive
 

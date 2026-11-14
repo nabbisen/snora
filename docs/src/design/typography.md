@@ -90,18 +90,22 @@ of strong text in every script you ship.** *(Reported by knotra, 2026-11-09.)*
 
 ## What snora's own widgets use today
 
-**snora uses two of these six roles: `label` and `body`.** `body_small`,
-`title`, `heading` and `display` are applied by **nothing in any snora crate**
-— not `snora-widgets`, not the engine, not the style bridge. They exist for the
-application's own text, not for snora's chrome.
+**snora uses three of these six roles: `label`, `body` and `title`.** `title`
+is the design header's title and a design toast's title (since 0.52, RFC-104).
+`body_small`, `heading` and `display` are applied by **nothing in any snora
+crate**: not `snora-widgets`, not the engine, not the style bridge. They exist
+for the application's own text, not for snora's chrome.
 
 That is a **commitment, not just a description of the current source**: if a
 snora widget ever starts applying one of the other four roles, that is a
 rendered change and will be announced as one. It is stated as a commitment
 because consumers act on it — an application can safely redefine
-`body_small`, `title`, `heading` or `display` on its own `Tokens` knowing snora's
-chrome will not shift underneath it. Redefining `label` or `body` *will* reach
-snora's widgets.
+`body_small`, `heading` or `display` on its own `Tokens` knowing snora's
+chrome will not shift underneath it. Redefining `label`, `body` or `title`
+*will* reach snora's widgets. *(Corrected 2026-11-15, from the 0.63 audit: from 0.52 to 0.62 this said snora
+used only `label` and `body`, and that `title` was safe to redefine. It was
+not: since 0.52 a redefined `title` resizes the header title and toast
+titles. RFC-104's own changelog entry said so; this page did not follow.)*
 
 The previous wording scoped this to `snora-widgets` alone, which did not answer
 the question for a consumer reaching those widgets through `snora::design::*`

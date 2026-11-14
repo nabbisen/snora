@@ -154,9 +154,13 @@ it.
 
 **Token surface** — all public items of `snora-design`:
 
-- `Tokens` and its constructors: `light`, `dark`, `high_contrast_light`,
-  `high_contrast_dark`.
-- `Palette` and its 18 role fields.
+- `Tokens` and its constructors: `light`, `dark`, `light_aaa`, `dark_aaa`
+  (0.53, RFC-118), `high_contrast_light`, `high_contrast_dark`, and
+  `presets()`.
+- `Palette` and its 18 role fields, and `text_contrast` with `TextContrast`
+  (0.62, RFC-129).
+- `TargetTokens` (0.55, RFC-115). *(Corrected 2026-11-15, from the 0.63
+  audit: the additions since 0.53 were missing from this list.)*
 - `Color`.
 - `Spacing`.
 - `Typography` and `TextRole`.
@@ -172,8 +176,8 @@ it.
 
 **Style-bridge surface** — all public functions of `snora_style`
 (RFC-055; formerly `snora_widgets::design::style`, removed in RFC-056):
-the `color`, `button`, `container`, `progress`, `text`, and `theme`
-modules. See the crate's own rustdoc for the current function list —
+the `color`, `button`, `chip` (0.62), `container`, `progress`, `text`, and
+`theme` modules. See the crate's own rustdoc for the current function list —
 that sentence defines the surface completely; a hand-listed
 enumeration adds no governance and can only go stale, which it has
 twice (RFC-075: missing the `text::*_line_height` helpers shipped in
