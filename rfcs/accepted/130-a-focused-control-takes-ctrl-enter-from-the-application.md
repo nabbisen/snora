@@ -1,6 +1,7 @@
 # RFC-130 — A focused control takes Ctrl+Enter from the application
 
-**Status.** Proposed 2026-11-14, for the owner.
+**Status.** Accepted 2026-11-14 (owner), every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/130-…`](../handoffs/130-a-focused-control-takes-ctrl-enter-from-the-application/implementation-handoff.md).
 **Raised.** 2026-11-14, architect, from the 0.62 audit follow-up's Unit 3. While asserting K-033
 ("a control uses Enter and Space, and nothing else"), the dev team found that `Ctrl+Space` presses
 a focused control on every subject.
@@ -68,6 +69,13 @@ would go unobserved by RFC-120's removal rule, or the reverse. They become one f
 - It closes the gap the audit found, in the release the audit belongs to.
 - The behaviour change is only that a chord stops pressing. The migration guide says so in one
   line: *"if you relied on Ctrl+Enter pressing a focused control, bind the action to plain Enter."*
+
+## Rulings, 2026-11-14 (owner)
+
+The RFC is accepted as proposed:
+- **Q-1:** Shift does not count. `Shift+Enter` and `Shift+Space` still press. A chord with Ctrl,
+  Alt or the logo key is not a press, and is not captured.
+- **Q-2:** 0.62.0.
 
 ## Review against snora's principles
 
