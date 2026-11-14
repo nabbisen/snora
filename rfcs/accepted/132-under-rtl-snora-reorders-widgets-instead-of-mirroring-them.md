@@ -1,6 +1,7 @@
 # RFC-132 — Under RTL, snora reorders widgets instead of mirroring them: the header is not a mirror, and a flip loses focus
 
-**Status.** Proposed 2026-11-15, for the owner.
+**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings), with the refinements of the principles review below.
+**Handoff.** [`handoffs/132-…`](../handoffs/132-under-rtl-snora-reorders-widgets-instead-of-mirroring-them/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from the 0.63 audit's request B (W2-D15, W2-D24), verified by
 the architect against the code.
 **Release target.** 0.63.0 (Q-3).
@@ -58,6 +59,14 @@ right under RTL.
 - **Then a flip keeps every widget's state,** focus included, because no child moves in the tree.
 - **And Tab follows the logical order in both directions** (Q-1), because the tree is the logical
   order.
+- **Every row snora builds whose order is logical uses it, not only the outer blocks** (principles
+  review). The header's title group is the case that showed a block mirrored outside and not
+  inside. Unit 0 lists every row snora constructs, about 30 by a first count, and marks each
+  logical or not. A row that is not logical, with no reading order (rare), says why in a comment.
+- **`row_dir` is public, so its change is a change for applications.** An application row built
+  with it keeps logical tree order from then on, so its Tab order and widget state under RTL
+  change with ours. The migration guide says so. `direction.md` teaches the rule: the order is
+  logical, and the positions mirror.
 
 **R-2. The header is mirrored whole:**
 - the title at the start edge;
@@ -72,6 +81,18 @@ right under RTL.
 
 The audit's probes show the skeleton and the toasts mirror correctly today. Their tests guard
 that.
+
+**R-4. Directional glyphs follow the direction, and the rule is written down** (principles
+review). The breadcrumb's separator flips today (`›` to `‹`, `crumb.rs`). Unit 0 lists every
+glyph snora draws and marks it directional or not:
+- **a directional glyph** (a chevron, a "next" arrow) flips under RTL, with a test each way;
+- **a non-directional one** does not flip, with a test that it does not.
+
+**R-5. The keyboard rule for horizontal arrows, stated before it is needed** (principles review).
+snora answers no ← or → today: `router.rs` only recognises arrows so that a text field keeps them.
+If snora ever answers them (tab-bar arrows, RFC-116 L-11), **they follow the visual direction:
+→ moves right on screen under both directions,** as platforms do. Tab, F6 and the tab shortcuts
+stay logical. Writing it down now means a later RFC cannot pick the other way by accident.
 
 ## Open questions, with suggested rulings
 
@@ -95,6 +116,21 @@ If it cannot be built in iced 0.14 without public API, Unit 0 says so before Uni
 **Q-3 — 0.63.0.** **Suggest: yes, all of it,** if Unit 0 shows the row is small. If it is not, the
 header (R-2, a fix inside `header.rs`) and the tests go in 0.63, and R-1 in 0.64, with the flip
 named as a known limit until then.
+
+## Rulings, 2026-11-15 (owner)
+
+Accepted, with each question as suggested:
+- **Q-1:** Tab follows reading order, start to end, in both directions.
+- **Q-2:** Unit 0 prototypes the mirrored row as a small layout widget in `snora-interaction`, used
+  by `row_dir`, and reports before Unit 1 if it needs public API.
+- **Q-3:** 0.63.0 for all of it if the row is small. Otherwise the header and the tests go in 0.63,
+  and the mirrored row in 0.64, with the flip named as a known limit.
+
+The owner asked for a careful check against the fundamental philosophy. That check added:
+- every logical row, not only the outer blocks;
+- the public change to `row_dir`, named for applications;
+- directional glyphs (R-4);
+- the horizontal-arrow rule (R-5).
 
 ## Review against snora's principles
 

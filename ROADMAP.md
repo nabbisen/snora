@@ -258,6 +258,12 @@ covenant.
 - an iced upgrade (0.14.0 is the latest);
 - the workflow-hygiene deferral, whose condition has not fired.
 
+**From the audit, accepted 2026-11-15:**
+- **RFC-131:** every text snora draws holds its palette's level, beginning with an inactive tab that
+  reads 6.58:1 on `light_aaa`, from an inventory made by drawing.
+- **RFC-132:** under RTL, mirroring becomes a layout, not a reordering. That fixes the header and a
+  flip that loses focus, and Tab follows reading order.
+
 **The letters to app teams are deferred to the 0.63 release** (owner, 2026-11-14).
 
 ## Future wanted

@@ -1,6 +1,7 @@
 # RFC-131 — Text snora draws outside 0.62's sweep is unmeasured, and an inactive tab reads 6.58:1 on `light_aaa`
 
-**Status.** Proposed 2026-11-15, for the owner.
+**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings), with the refinements of the principles review below.
+**Handoff.** [`handoffs/131-…`](../handoffs/131-text-outside-0-62s-sweep-is-unmeasured/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from the 0.63 audit's request A (its "7:1 boundary" doubtful row),
 verified by the architect against the code.
 **Release target.** 0.63.0.
@@ -59,6 +60,14 @@ searching.**
   the tab.
 - **The unstyled path is out of scope,** as for RFC-129: its colours are the application's iced
   theme.
+- **The inventory is mechanical, and complete by construction** (principles review). It lists
+  every text run the frame contains, as the renderer receives it. **A completeness check fails
+  if a text run appears that the sweep does not measure,** so a widget that adds text cannot be
+  left out by anyone's memory. That is the gap that let the tab through.
+- **One level per palette, whatever the text's size.** WCAG relaxes large text to 3:1 (AA) and
+  4.5:1 (AAA). snora does not. One number per palette is the rule a reader can predict, and it is
+  the stricter one.
+- **Disabled is exempt,** as in RFC-129 (WCAG 1.4.3).
 
 **R-2. Every text under its level is fixed by RFC-129's rule:**
 - keep today's colour where it holds the level;
@@ -91,8 +100,27 @@ underline carries the active state at 3:1.
 mix a little nearer the text. Removing the muting everywhere would move Light, which passes, and
 RFC-129's ruling is that nothing passing moves.
 
+**Which cue carries the state, said plainly** (principles review): the active tab is told apart
+by its underline, held at 3:1 and tested. The muted label is a secondary cue. Where holding the
+level shrinks it, the underline still carries the state. The book says that, so nobody reads the
+muting as the indicator.
+
 **Q-3 — 0.63.0.** **Suggest: yes.** It is the contrast work of the release, and Unit 0's sweep
 shares the drawing machinery with the non-text unit.
+
+## Rulings, 2026-11-15 (owner)
+
+Accepted, with each question as suggested:
+- **Q-1:** Unit 0 finds how a widget learns its palette's level. There is one rule (RFC-129's
+  `state`, `pub(crate)`), no level inferred from colours, and the owner rules if public API is
+  added.
+- **Q-2:** the inactive tab keeps a muted cue, only as far as the level allows. The underline
+  carries the state.
+- **Q-3:** 0.63.0.
+
+The owner asked for a careful check against the fundamental philosophy. That check added the
+mechanical, self-checking inventory; one level per palette whatever the size; the disabled
+exemption; and which cue carries the tab's state. These are in R-1 and Q-2 above.
 
 ## Review against snora's principles
 

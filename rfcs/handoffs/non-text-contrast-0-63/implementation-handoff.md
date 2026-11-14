@@ -6,8 +6,10 @@ measured on drawn pixels, in every state". The roadmap has listed a glyph sweep 
 and no test committed.** The architect then raises an RFC from them, for the owner.
 **Starts after** audit-0-63 request B has been reviewed (moved from request A at A's review,
 2026-11-15, so that one follow-up covers both requests). Request A's `non-text-inventory.md` is this
-unit's list of subjects. **If the owner accepts RFC-131,** its Unit 0 and this one are one sweep: the
-same frames, every text and every non-text element, each at its own floor.
+unit's list of subjects. **RFC-131 is accepted (2026-11-15):** its Unit 0 and this one are one sweep,
+the same frames, every text and every non-text element, each at its own floor. There is one review
+request, `.git-exclude/review-request/drawn-contrast-unit0/`, after RFC-132's Unit 0. Its inventory
+is made from frames, as RFC-131's R-1 requires.
 **Where.** On `main`. The probe is a scratch test, described in the request, not committed.
 
 ## Why
