@@ -238,8 +238,27 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.63.0
 
-Nothing is scheduled yet. 0.64.0 removes `next_zone`, `FocusZone` and `ZonePresence`
-(deprecated in 0.61, RFC-126).
+**Scoped by the owner, 2026-11-14: the visual guarantees.** These are the claims adopters cite:
+orbok's WCAG record (1.4.3, 1.4.11, 2.4.7, 2.5.8), arama's AA contrast, and knotra's typography
+covenant.
+- **Audit 2:** every contrast, surface, ring, target, typography, direction and stability claim in
+  the book and in `snora-design`'s and `snora-style`'s rustdoc, checked against a test, by 0.62's
+  method. It covers 11 pages and the visual half of `buttons.md`, 1,404 lines. Handoff:
+  [`audit-0-63-visual-guarantees`](rfcs/handoffs/audit-0-63-visual-guarantees/implementation-handoff.md).
+- **Non-text contrast at 3:1, on the pixels drawn, in every state:** glyphs, borders, indicators.
+  It is WCAG 1.4.11's counterpart of RFC-128 and RFC-129. Unit 0 measures and proposes a measure
+  that does not false-fail thin strokes, and an RFC follows. Handoff:
+  [`non-text-contrast-0-63`](rfcs/handoffs/non-text-contrast-0-63/implementation-handoff.md).
+
+**Not in 0.63:**
+- 0.62's backlog, the guides' rows guarded in part, which stay in its `claims` tables (owner,
+  2026-11-14);
+- the removal of the deprecated F6 types, which stays at 0.64.0 as announced;
+- the future-wanted features, until an adopter asks;
+- an iced upgrade (0.14.0 is the latest);
+- the workflow-hygiene deferral, whose condition has not fired.
+
+**The letters to app teams are deferred to the 0.63 release** (owner, 2026-11-14).
 
 ## Future wanted
 
