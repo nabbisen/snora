@@ -145,6 +145,16 @@ The RFC is accepted as written:
   table and check the token against it. No `Default` is added. The rustdoc says what the level means
   after an application changes a colour. The search is bounded, deterministic and total. Revision 1
   (`Tokens::text_contrast`) was accepted only in part.
+- **Q-5 (raised at Unit 1's review, ruled the same day):** the buttons and the chips share one
+  rule, but they live in different crates.
+  - **The chips' two style functions move into `snora-style`** as `snora_style::chip::{selected,
+    unselected}`, re-exported at `snora::design::style::chip`, where RFC-055 put every style
+    function.
+  - **The rule stays `pub(crate)`.**
+  - **Rejected:**
+    - a public `snora_style::state::shifted`: its two arguments of one type can be swapped
+      silently, and it would freeze the search's step;
+    - `#[doc(hidden)]`, which is still public and still semver.
 
 ## Q-4 — where does a style get its preset's text floor? (raised at Unit 0's review; ruled, revision 2)
 
