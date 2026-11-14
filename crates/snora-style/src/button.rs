@@ -22,7 +22,7 @@
 //! (`primary` and `danger` lighten when hovered and darken when pressed; `secondary` shifts its
 //! label and border; `ghost` darkens its label when pressed), **keeps it where it holds that**, and
 //! takes another from a fixed list where it does not (a hovered `primary` on `light_aaa`, for
-//! example, darkens instead). The rule is [`crate::state::shifted`], shared with the chips.
+//! example, darkens instead). The rule is one function in this crate, shared with the chips ([`crate::chip`]).
 //! Disabled is exempt.
 //!
 //! # Usage
@@ -67,7 +67,7 @@ fn tint_in_state(tokens: &Tokens, accent: Color, alpha: f32, today: f32) -> Pair
 }
 
 /// Applies a standard disabled alpha reduction.
-fn disabled_alpha(color: Color) -> Color {
+pub(crate) fn disabled_alpha(color: Color) -> Color {
     Color {
         a: color.a * 0.45,
         ..color

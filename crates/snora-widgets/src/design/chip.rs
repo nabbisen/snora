@@ -28,13 +28,9 @@
 //!
 //! # Hovered and pressed (RFC-129)
 //!
-//! A chip's hovered and pressed fills used to be a fixed darkening (selected: 0.06 and 0.12;
-//! unselected: 0.04 and 0.08 of `surface`), which took the label under its preset's level on
-//! `light_aaa` and `dark_aaa` and drew **nothing at all** for an unselected chip on
-//! `high_contrast_dark` (its `surface` is black). They now go through `snora_style::state`, the
-//! rule every button shares: the fixed darkening where it holds, and another shift where it
-//! does not, so the label stays at `Palette::text_contrast` and the state stays visibly
-//! different from rest.
+//! A chip's hovered and pressed fills are held to the palette's text level on every neutral
+//! surface and stay visibly different from rest; see [`snora_style::chip`], where the chips'
+//! style functions live (they moved there from this module, RFC-129 Q-5).
 //!
 //! # iced 0.14 focus limitation
 //!
@@ -79,48 +75,18 @@
 
 use iced::widget::text::Wrapping;
 use iced::{
-    Border, Color, Element, Theme,
-    widget::{button, container, row, text, tooltip},
+    Color, Element, Theme,
+    widget::{container, row, text, tooltip},
 };
 use snora_design::Tokens;
 
 use snora_style as style;
 
 use crate::style::design_control;
-use style::state::{Knob, Pair, shifted};
 
 // ---------------------------------------------------------------------------
 // Private helpers
 // ---------------------------------------------------------------------------
-
-/// How much of its opacity a disabled chip's label and border keep
-/// (RFC-106).
-///
-/// The same factor `snora_style::button::disabled_alpha` applies to a
-/// disabled button, so the two read alike — **reproduced rather than
-/// shared** because that function is private to `snora-style`, and
-/// widening a frozen crate's public surface for one number is the worse
-/// trade. If one moves, move both.
-///
-/// The fill's own half alpha is unchanged: it is the selected chip's
-/// existing cue, and nothing measured asks for it to move.
-const CHIP_DISABLED_ALPHA: f32 = 0.45;
-
-/// Dims a colour to [`CHIP_DISABLED_ALPHA`] of its opacity.
-fn dimmed(color: Color) -> Color {
-    Color {
-        a: color.a * CHIP_DISABLED_ALPHA,
-        ..color
-    }
-}
-
-/// A chip's hovered or pressed fill (RFC-129): `fill` shifted by the first candidate that keeps
-/// `label` at the palette's text level on every neutral surface, `today` (a darkening, always,
-/// before RFC-129) first. Shared with the buttons through `snora_style::state`.
-fn fill_in_state(tokens: &Tokens, label: Color, fill: Color, today: f32) -> Color {
-    let rest = Pair { label, fill };
-    shifted(&tokens.palette, Knob::Fill, today, rest, rest).fill
-}
 
 /// The `remove` button's square pointer-target size (RFC-061): computed
 /// the same way its height already resolves — `line_box + 2 × spacing.xs`
@@ -218,74 +184,6 @@ pub(super) fn with_close_tooltip<'a, Message: 'a>(
     .into()
 }
 
-/// Selected chip style: solid accent background + accent_text foreground.
-///
-/// This replaces the previous semi-transparent tint approach, which failed
-/// WCAG AA (4.5:1) at hovered (α=0.22) and pressed (α=0.30) states after
-/// compositing over the surface. Solid background + paired foreground role
-/// yields ≥6.7:1 across all four built-in presets.
-pub(crate) fn chip_style_selected(tokens: &Tokens, status: button::Status) -> button::Style {
-    let accent = style::color::to_iced_color(tokens.palette.accent);
-    let accent_text = style::color::to_iced_color(tokens.palette.accent_text);
-    let disabled = status == button::Status::Disabled;
-    let bg = match status {
-        button::Status::Active => accent,
-        button::Status::Hovered => fill_in_state(tokens, accent_text, accent, -0.06),
-        button::Status::Pressed => fill_in_state(tokens, accent_text, accent, -0.12),
-        button::Status::Disabled => Color { a: 0.5, ..accent },
-    };
-    // The label and border dim with the fill (RFC-106 Q-2), so the two
-    // chip states' disabled treatment reads alike.
-    let (text_color, border_color) = if disabled {
-        (dimmed(accent_text), dimmed(accent))
-    } else {
-        (accent_text, accent)
-    };
-    button::Style {
-        background: Some(bg.into()),
-        text_color,
-        border: Border::default()
-            .rounded(tokens.radius.pill)
-            .color(border_color)
-            .width(1.0),
-        shadow: iced::Shadow::default(),
-        snap: true,
-    }
-}
-
-pub(crate) fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> button::Style {
-    let border_col = style::color::to_iced_color(tokens.palette.border);
-    let text_col = style::color::to_iced_color(tokens.palette.text_secondary);
-    let surface = style::color::to_iced_color(tokens.palette.surface);
-    let disabled = status == button::Status::Disabled;
-    let bg = match status {
-        button::Status::Active => surface,
-        button::Status::Hovered => fill_in_state(tokens, text_col, surface, -0.04),
-        button::Status::Pressed => fill_in_state(tokens, text_col, surface, -0.08),
-        button::Status::Disabled => Color { a: 0.5, ..surface },
-    };
-    // **This chip's fill cannot carry its disabled cue** (RFC-106): it is
-    // `surface` at half alpha over a page that is nearly `surface`, which
-    // measured 1.00-1.05:1 against the enabled fill — a disabled
-    // unselected chip was indistinguishable from an enabled one. The
-    // label and border carry it instead.
-    let (text_color, border_color) = if disabled {
-        (dimmed(text_col), dimmed(border_col))
-    } else {
-        (text_col, border_col)
-    };
-    button::Style {
-        background: Some(bg.into()),
-        text_color,
-        border: Border::default()
-            .rounded(tokens.radius.pill)
-            .color(border_color)
-            .width(1.0),
-        shadow: iced::Shadow::default(),
-        snap: true,
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -304,9 +202,9 @@ pub fn filter<'a, Message: Clone + 'a>(
 ) -> Element<'a, Message> {
     let t = tokens.clone();
     let style_fn = if selected {
-        chip_style_selected
+        style::chip::selected
     } else {
-        chip_style_unselected
+        style::chip::unselected
     };
     design_control(
         tokens,
@@ -388,9 +286,9 @@ fn build_removable<'a, Message: Clone + 'a>(
     let t_label = tokens.clone();
     let t_remove = tokens.clone();
     let style_fn = if selected {
-        chip_style_selected
+        style::chip::selected
     } else {
-        chip_style_unselected
+        style::chip::unselected
     };
 
     let label_btn: Element<'a, Message> = design_control(

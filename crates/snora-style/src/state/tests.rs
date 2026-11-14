@@ -245,11 +245,16 @@ fn level_of(preset: &str) -> f32 {
 }
 
 type StyleFn = fn(&Tokens, Status) -> button::Style;
-const BUTTONS: [(&str, StyleFn); 4] = [
+/// Every variant whose hovered and pressed look this rule shapes: the four buttons and, since
+/// RFC-129 Q-5 moved them here, both chips. The chips are in every sweep below that reads this
+/// table, so the exact level, the exact ΔE and Q-2 each have one table.
+const BUTTONS: [(&str, StyleFn); 6] = [
     ("primary", crate::button::primary),
     ("secondary", crate::button::secondary),
     ("ghost", crate::button::ghost),
     ("danger", crate::button::danger),
+    ("chip selected", crate::chip::selected),
+    ("chip unselected", crate::chip::unselected),
 ];
 
 fn drawn(style: &button::Style, surface: Color) -> (Color, Color) {
@@ -373,6 +378,16 @@ fn a_state_that_held_the_rule_before_rfc_129_has_its_old_colours() {
             ("secondary", Status::Pressed) => (shade(accent, -0.06), tint(0.14)),
             ("ghost", Status::Hovered) => (accent, tint(0.08)),
             ("ghost", Status::Pressed) => (shade(accent, -0.06), tint(0.14)),
+            ("chip selected", Status::Hovered) => (ic(t.palette.accent_text), shade(accent, -0.06)),
+            ("chip selected", Status::Pressed) => (ic(t.palette.accent_text), shade(accent, -0.12)),
+            ("chip unselected", Status::Hovered) => (
+                ic(t.palette.text_secondary),
+                shade(ic(t.palette.surface), -0.04),
+            ),
+            ("chip unselected", Status::Pressed) => (
+                ic(t.palette.text_secondary),
+                shade(ic(t.palette.surface), -0.08),
+            ),
             _ => unreachable!(),
         }
     };
@@ -382,9 +397,14 @@ fn a_state_that_held_the_rule_before_rfc_129_has_its_old_colours() {
         for (name, style) in BUTTONS {
             for status in [Status::Hovered, Status::Pressed] {
                 let (old_label, old_fill) = old(name, status, &t);
+                // "Held the rule" is both halves of it: the level, and a visible step from rest
+                // (the unselected chip on `high_contrast_dark` held the level and drew exactly
+                // like rest, which is a defect and so in the migration list).
                 let held = surfaces_of(&t).into_iter().all(|s| {
                     let f = over(old_fill, s);
+                    let (rest_label, rest_fill) = drawn(&style(&t, Status::Active), s);
                     contrast_ratio(opaque(old_label), opaque(f)) >= floor
+                        && de76(rest_fill, f).max(de76(rest_label, old_label)) >= 3.0
                 });
                 let now = style(&t, status);
                 let same = now.text_color == old_label
@@ -427,5 +447,5 @@ fn a_palette_swapped_from_light_aaa_is_held_to_seven_by_the_styles() {
             }
         }
     }
-    assert_eq!(checked, 24);
+    assert_eq!(checked, 36);
 }

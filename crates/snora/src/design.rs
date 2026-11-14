@@ -33,6 +33,7 @@ pub mod contrast {
 /// modules below, this one does not depend on `snora-widgets` at all.
 pub mod style {
     pub use snora_style::button;
+    pub use snora_style::chip;
     pub use snora_style::color;
     pub use snora_style::container;
     pub use snora_style::progress;

@@ -37,9 +37,12 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   `tokens.palette = Tokens::light_aaa().palette` brings the level with the colours. There is no
   `Default`: a palette starts from a preset. `Palette` is `#[non_exhaustive]`, so reading and
   assigning the field is all that changes for you.
-- **`snora_style::state` (RFC-129):** `shifted`, with `Knob` and `Pair`, the one rule that
-  `snora_style::button::{primary, secondary, ghost, danger}` and the chips use for a hovered or
-  pressed colour. An application that draws its own button can use it to get the same guarantee.
+- **`snora_style::chip::{selected, unselected}`, also at `snora::design::style::chip` (RFC-129).**
+  The chips' two style functions, `fn(&Tokens, button::Status) -> button::Style`, beside
+  `snora_style::button::*`. They were private to `snora-widgets` and moved to the crate that holds
+  the style functions (RFC-055); `design::chip::filter` and `removable` draw with them, so nothing
+  about a chip changes but what the Fixed entry below lists. Use them to style your own button as a
+  chip.
 
 ### Changed
 
@@ -73,6 +76,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   - `high_contrast_dark`: the unselected chip, hovered and pressed. It drew **exactly** like rest
     (its `surface` is black and the chip darkened it), so nothing showed it was hovered or pressed.
     Its contrast stays above 7:1 (14.71 to 15.33).
+  `button::link` is drawn with `ghost`'s colours, so its label and underline move with `ghost`
+  (hovered on `light_aaa`: 6.21 → 7.08).
   A `secondary` button draws its border in the label's colour, so its border moves with the label
   and stays above 3:1 in every state. **If you keep screenshot baselines, retake those with a
   hovered or pressed button or chip on the presets above.** A new test draws every button, chip and

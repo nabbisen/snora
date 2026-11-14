@@ -31,8 +31,8 @@
 //! | Design button disabled | `Luminance` ≥ 2.9 against enabled | this module |
 //!
 //! **The removable chip's remove control** is styled by the same two
-//! functions as the chip body ([`chip_style_selected`] /
-//! [`chip_style_unselected`]), so the two chip-disabled rows cover it
+//! functions as the chip body ([`snora_style::chip::selected`] /
+//! [`snora_style::chip::unselected`]), so the two chip-disabled rows cover it
 //! too. It is not a separate row because it is not a separate style; if
 //! it ever gets one, it needs its own row here.
 //!
@@ -51,7 +51,7 @@
 //!   `surface` at half alpha over a page that is nearly `surface` is
 //!   nearly `surface`. Its text colour and border do not change either.
 //!   A disabled unselected chip is indistinguishable from an enabled one.
-//!   Closing that is a change to `chip_style_unselected`, which is a
+//!   Closing that is a change to `snora_style::chip::unselected`, which is a
 //!   design decision rather than a test one.
 //!
 //! [`states_without_a_cue`] pins it, so that closing it fails this
@@ -67,7 +67,7 @@ use iced::{Background, Color};
 use snora_design::{Tokens, contrast};
 use snora_style::color::to_iced_color;
 
-use crate::design::chip::{chip_style_selected, chip_style_unselected};
+use snora_style::chip;
 
 /// Every state `snora-widgets` draws for its own surfaces.
 ///
@@ -371,8 +371,8 @@ fn named_shape_tests_exist() {
 fn chip_selected_differs_from_unselected_by_luminance() {
     let min = luminance_min(State::ChipSelected);
     for (name, tokens) in presets() {
-        let selected = fill(&chip_style_selected(&tokens, Status::Active));
-        let unselected = fill(&chip_style_unselected(&tokens, Status::Active));
+        let selected = fill(&chip::selected(&tokens, Status::Active));
+        let unselected = fill(&chip::unselected(&tokens, Status::Active));
         let ratio = contrast::contrast_ratio(sn(selected), sn(unselected));
         assert!(
             ratio >= min,
@@ -401,8 +401,8 @@ fn chip_selected_differs_from_unselected_by_luminance() {
 fn chip_selected_disabled_differs_from_enabled() {
     let min = luminance_min(State::ChipSelectedDisabled);
     for (name, tokens) in presets() {
-        let enabled = fill(&chip_style_selected(&tokens, Status::Active));
-        let disabled = fill(&chip_style_selected(&tokens, Status::Disabled));
+        let enabled = fill(&chip::selected(&tokens, Status::Active));
+        let disabled = fill(&chip::selected(&tokens, Status::Disabled));
         let ratio = ratio_over_page(enabled, disabled, &tokens);
         assert!(
             ratio >= min,
@@ -435,8 +435,8 @@ fn chip_unselected_disabled_differs_from_enabled() {
         "this state's cue is registered on a channel this test does not measure",
     );
     for (name, tokens) in presets() {
-        let enabled = chip_style_unselected(&tokens, Status::Active);
-        let disabled = chip_style_unselected(&tokens, Status::Disabled);
+        let enabled = chip::unselected(&tokens, Status::Active);
+        let disabled = chip::unselected(&tokens, Status::Disabled);
         let ratio = label_ratio_on_own_fill(&enabled, &disabled, &tokens);
         assert!(
             ratio >= min,

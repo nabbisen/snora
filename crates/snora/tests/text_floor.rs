@@ -33,8 +33,33 @@ enum Msg {
 /// 7.05 against 7).
 const TOLERANCE: f32 = 0.05;
 
+/// This sweep's own table of each preset's text level (the book's), never the palette's token: a
+/// guard does not read what it guards (RFC-129 Q-4). **The high-contrast presets are `Aaa`** since
+/// Q-4 (`Tokens::presets()`, `theme.md` and the accessibility guide promise it). A preset that is
+/// not here **panics, naming it**: it is not measured at a guessed level by what its name contains.
+const LEVELS: [(&str, f32); 6] = [
+    ("light", 4.5),
+    ("dark", 4.5),
+    ("light_aaa", 7.0),
+    ("dark_aaa", 7.0),
+    ("high_contrast_light", 7.0),
+    ("high_contrast_dark", 7.0),
+];
+
 fn floor(preset: &str) -> f32 {
-    if preset.contains("aaa") { 7.0 } else { 4.5 }
+    LEVELS
+        .iter()
+        .find(|(name, _)| *name == preset)
+        .unwrap_or_else(|| panic!("`{preset}` is a new preset: say its text level in LEVELS"))
+        .1
+}
+
+/// The table names exactly the presets (a seventh cannot go unlisted, a renamed one cannot linger).
+#[test]
+fn the_sweeps_level_table_names_every_preset_and_only_them() {
+    let presets: Vec<&str> = Tokens::presets().into_iter().map(|(n, _)| n).collect();
+    let table: Vec<&str> = LEVELS.iter().map(|(n, _)| *n).collect();
+    assert_eq!(presets, table);
 }
 
 fn leak(t: Tokens) -> &'static Tokens {
@@ -279,6 +304,10 @@ fn every_button_and_chip_label_clears_the_floor_in_every_state_on_every_neutral_
 /// and pressed (ΔE 0.00): its `surface` is black, and darkening black is a no-op.
 #[test]
 fn hovered_and_pressed_each_differ_from_rest_by_a_visible_step() {
+    // The exact 3.0 is held in floats by `snora-style`'s suite for every button and chip
+    // (`state/tests.rs`). This is the rendered frame: 8-bit rounding moves a small step by up to a
+    // third, so the bar only absorbs that, on a step the floats already guarantee (as the 0.05 on
+    // contrast does).
     const BAR: f32 = 2.5;
     let mut failures = Vec::new();
     let mut cells = 0;

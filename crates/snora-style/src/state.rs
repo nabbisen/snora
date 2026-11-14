@@ -167,20 +167,6 @@ fn candidates(today: f32) -> impl Iterator<Item = f32> {
 ///
 /// Returns `state` with the knob shifted. `secondary` draws its border in the label's colour, so
 /// it reads the returned label.
-///
-/// ```
-/// use iced::Color;
-/// use snora_design::Tokens;
-/// use snora_style::state::{Knob, Pair, shifted};
-///
-/// let t = Tokens::light();
-/// let c = |c: snora_design::Color| Color::from_rgba(c.r, c.g, c.b, c.a);
-/// let rest = Pair { label: c(t.palette.accent_text), fill: c(t.palette.accent) };
-/// // The shift primary has always made when hovered: lighter.
-/// let hovered = shifted(&t.palette, Knob::Fill, 0.06, rest, rest);
-/// assert_ne!(hovered.fill, rest.fill, "a hovered control draws differently from rest");
-/// assert_eq!(hovered.label, rest.label, "the label is not the knob");
-/// ```
 #[must_use]
 pub fn shifted(palette: &Palette, knob: Knob, today: f32, rest: Pair, state: Pair) -> Pair {
     let surfaces = [palette.background, palette.surface, palette.surface_raised]
