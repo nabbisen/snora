@@ -42,12 +42,13 @@ fn fill_in_state(tokens: &Tokens, label: Color, fill: Color, today: f32) -> Colo
     shifted(&tokens.palette, Knob::Fill, today, rest, rest).fill
 }
 
-/// Selected chip style: solid accent background + accent_text foreground.
+/// Selected chip style: a solid `accent` fill with `accent_text` on it.
 ///
-/// This replaces the previous semi-transparent tint approach, which failed
-/// WCAG AA (4.5:1) at hovered (α=0.22) and pressed (α=0.30) states after
-/// compositing over the surface. Solid background + paired foreground role
-/// yields ≥6.7:1 across all four built-in presets.
+/// **The label is held at the palette's [`text_contrast`](snora_design::Palette::text_contrast)** in
+/// every state but disabled, on every neutral surface: at rest by the palette's own pairs, and
+/// hovered and pressed by the rule in the [module](self) section. The suites that hold it are
+/// `state/tests.rs` here (level and visible step, exactly) and `text_floor.rs` in `snora` (as drawn).
+#[must_use]
 pub fn selected(tokens: &Tokens, status: button::Status) -> button::Style {
     let accent = to_iced_color(tokens.palette.accent);
     let accent_text = to_iced_color(tokens.palette.accent_text);
@@ -77,9 +78,14 @@ pub fn selected(tokens: &Tokens, status: button::Status) -> button::Style {
     }
 }
 
-/// Unselected chip style: `surface` fill, a `border` outline and a `text_secondary` label.
+/// Unselected chip style: the `surface` fill, a `border` outline and a `text_secondary` label.
 ///
-/// Hovered and pressed darken the fill; see the [module](self) for how far.
+/// Hovered and pressed shift the fill by the rule in the [module](self) section: the darkening
+/// the chip has always made where that holds the palette's level and is a visible step, another
+/// shift where it does not (on `high_contrast_dark` the `surface` is black and cannot darken).
+/// The label is held at the palette's [`text_contrast`](snora_design::Palette::text_contrast) in
+/// every state but disabled, on every neutral surface.
+#[must_use]
 pub fn unselected(tokens: &Tokens, status: button::Status) -> button::Style {
     let border_col = to_iced_color(tokens.palette.border);
     let text_col = to_iced_color(tokens.palette.text_secondary);

@@ -16,15 +16,14 @@
 //! disabled and is skipped.
 //! The application owns selection/filter state.
 //!
-//! # Contrast design (M-4 fix)
+//! # Contrast design
 //!
-//! Prior to v0.24, the selected chip used a semi-transparent accent tint
-//! (alpha 0.15–0.30) as the background with the full accent color as text.
-//! After compositing over the surface, hovered/pressed states failed
-//! WCAG AA (4.5:1). Replaced with a solid `accent` background +
-//! `accent_text` foreground, which yields ≥6.7:1 across all four presets.
-//! The contrast test `chip_selected_text_over_accent_background` verifies
-//! this.
+//! A selected chip is a solid `accent` fill with `accent_text` on it. **Its label, and an
+//! unselected chip's, are held at the palette's
+//! [`text_contrast`](snora_design::Palette::text_contrast) in every state but disabled, on every
+//! neutral surface.** The tests that hold it: `snora-style`'s `state/tests.rs` (the level and the
+//! visible step from rest, exactly, for both chips and every preset) and `snora`'s
+//! `tests/text_floor.rs` (the same, read from the pixels the widget draws).
 //!
 //! # Hovered and pressed (RFC-129)
 //!
@@ -191,7 +190,8 @@ pub(super) fn with_close_tooltip<'a, Message: 'a>(
 /// A toggle chip for filtering or categorizing content.
 ///
 /// Shows a solid accent background and `accent_text` foreground when
-/// `selected` (WCAG AA ≥6.7:1 across all built-in presets). Emits
+/// `selected`; the label is held at the palette's `text_contrast` in every
+/// state but disabled (see the module's *Contrast design*). Emits
 /// `on_toggle` when pressed. Pass `None` to disable.
 #[must_use]
 pub fn filter<'a, Message: Clone + 'a>(
