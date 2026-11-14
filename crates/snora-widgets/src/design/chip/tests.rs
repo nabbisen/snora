@@ -71,56 +71,34 @@ fn chip_selected_text_over_accent_background_meets_aa_all_presets() {
     }
 }
 
-/// Verifies that the hovered/pressed backgrounds (darken(accent, amount))
-/// still yield passing contrast against accent_text.
+/// Verifies that the **hovered and pressed fills the chip draws** still yield passing contrast
+/// against `accent_text`.
 ///
-/// We composite darken(accent, 0.06) (hover) and darken(accent, 0.12) (pressed)
-/// and check against accent_text. Because both background and foreground colors
-/// are opaque, no alpha compositing is needed.
+/// RFC-129: this test used to replicate the fixed darkening (`accent - 0.06` and `- 0.12`) and
+/// check the replica, which is a model of the code and no longer what it draws (the shift is now
+/// chosen per preset so the label holds its level). It reads the real style function instead.
+/// The fill is opaque, so no compositing is needed. The floor here is AA for every preset; the
+/// preset's own level (AAA on four of them) is held by `snora/tests/text_floor.rs`.
 ///
 /// Verifies: M-4 (chip selected contrast — hover/pressed states).
 #[test]
 fn chip_selected_text_hover_pressed_meets_aa_all_presets() {
     const AA: f32 = 4.5;
     for (name, t) in named_presets() {
-        let accent = t.palette.accent;
         let accent_text = t.palette.accent_text;
-
-        let hover_bg = snora_design::Color {
-            r: (accent.r - 0.06).max(0.0),
-            g: (accent.g - 0.06).max(0.0),
-            b: (accent.b - 0.06).max(0.0),
-            a: accent.a,
-        };
-        let pressed_bg = snora_design::Color {
-            r: (accent.r - 0.12).max(0.0),
-            g: (accent.g - 0.12).max(0.0),
-            b: (accent.b - 0.12).max(0.0),
-            a: accent.a,
-        };
-
-        let hover_ratio = contrast::contrast_ratio(accent_text, hover_bg);
-        let pressed_ratio = contrast::contrast_ratio(accent_text, pressed_bg);
-
-        assert!(
-            hover_ratio >= AA,
-            "{name}: accent_text/hover_bg {hover_ratio:.2} < {AA} (WCAG AA)"
-        );
-        assert!(
-            pressed_ratio >= AA,
-            "{name}: accent_text/pressed_bg {pressed_ratio:.2} < {AA} (WCAG AA)"
-        );
+        for (state, status) in [("hover", Status::Hovered), ("pressed", Status::Pressed)] {
+            let style = chip_style_selected(&t, status);
+            let Some(iced::Background::Color(fill)) = style.background else {
+                panic!("{name}: the selected chip's {state} fill is not a colour");
+            };
+            let fill = snora_design::Color::rgb(fill.r, fill.g, fill.b);
+            let ratio = contrast::contrast_ratio(accent_text, fill);
+            assert!(
+                ratio >= AA,
+                "{name}: accent_text/{state} fill {ratio:.2} < {AA} (WCAG AA)"
+            );
+        }
     }
-}
-
-// ---------------------------------------------------------------------------
-// Private helper
-// ---------------------------------------------------------------------------
-
-#[test]
-fn darken_clamps_to_zero() {
-    let black = darken(iced::Color::BLACK, 1.0);
-    assert!(black.r >= 0.0 && black.g >= 0.0 && black.b >= 0.0);
 }
 
 // ---------------------------------------------------------------------------
@@ -222,4 +200,54 @@ fn both_disabled_arms_dim_their_label_and_border() {
             );
         }
     }
+}
+
+// ---------------------------------------------------------------------------
+// RFC-129: a hovered or pressed chip holds its preset's level
+// ---------------------------------------------------------------------------
+
+/// **Both chips, hovered and pressed, at the preset's own level, exactly.** The chips paint their
+/// own opaque fill, so the surface is not in the sum. The level is this suite's own table (the
+/// book's), never the palette's token: a guard does not read what it guards (RFC-129 Q-4).
+///
+/// Fails on the fixed darkening the chips had before RFC-129: `light_aaa`'s unselected chip
+/// pressed (6.75) and `dark_aaa`'s selected chip pressed (5.96).
+#[test]
+fn a_hovered_or_pressed_chip_label_holds_its_presets_level() {
+    let level = |preset: &str| match preset {
+        "light" | "dark" => 4.5,
+        "light_aaa" | "dark_aaa" | "high_contrast_light" | "high_contrast_dark" => 7.0,
+        other => panic!("`{other}` is a new preset: say its text level here"),
+    };
+    let mut failures = Vec::new();
+    for (name, t) in named_presets() {
+        for (chip, style) in [
+            (
+                "selected",
+                chip_style_selected as fn(&Tokens, Status) -> button::Style,
+            ),
+            ("unselected", chip_style_unselected),
+        ] {
+            for status in [Status::Hovered, Status::Pressed] {
+                let s = style(&t, status);
+                let Some(iced::Background::Color(fill)) = s.background else {
+                    panic!("{name} {chip} {status:?}: the fill is not a colour");
+                };
+                let d = |c: iced::Color| snora_design::Color::rgb(c.r, c.g, c.b);
+                let r = contrast::contrast_ratio(d(s.text_color), d(fill));
+                if r < level(name) {
+                    failures.push(format!(
+                        "{name} {chip} {status:?}: {r:.2}, level {}",
+                        level(name)
+                    ));
+                }
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} cells:\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
 }

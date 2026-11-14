@@ -909,9 +909,12 @@ fn a_focused_links_ring_does_not_cover_its_underline() {
                 failures.push(format!("{preset} {size}px: no underline"));
                 continue;
             };
-            // Focused by the keyboard, so the ring is drawn and the label (and
-            // so the underline) is the resting colour. (Pressing used to focus
-            // the control, and this was drawn from a press; it no longer does.)
+            // Focused, so the ring is drawn; the pointer is over the control (`shoot` puts it
+            // there for everything but `Away`), so the label, and the underline with it, are the
+            // ghost's **hovered** colour. That equalled the resting colour until RFC-129, which
+            // shifts a hovered ghost label where its resting colour would fall under the
+            // preset's level (`light_aaa`, 6.21:1 against 7). (Pressing used to focus the
+            // control, and this was drawn from a press; it no longer does.)
             let down = shoot(
                 window_of(&tokens, link_of(&tokens, "Open")),
                 &theme,
@@ -937,7 +940,7 @@ fn a_focused_links_ring_does_not_cover_its_underline() {
                 ));
             }
             let want =
-                snora::design::style::button::ghost(&tokens, iced::widget::button::Status::Active)
+                snora::design::style::button::ghost(&tokens, iced::widget::button::Status::Hovered)
                     .text_color;
             let x = ((PAD + 20.0) * 2.0) as u32;
             for y in u.top..=u.bottom {

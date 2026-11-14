@@ -81,5 +81,43 @@ pub fn composite_over(fg: Color, bg: Color) -> Color {
     )
 }
 
+/// The contrast level a [`crate::Palette`]'s text is held to (RFC-129 Q-4).
+///
+/// WCAG has two for text: **AA** (1.4.3, 4.5:1) and **AAA** (1.4.6, 7:1). This is an enum and not
+/// a number so that no palette can promise a level WCAG does not name.
+///
+/// It is read through [`crate::Palette::text_contrast`]. Each preset sets it:
+/// [`Aa`](Self::Aa) for `light` and `dark`; [`Aaa`](Self::Aaa) for `light_aaa`, `dark_aaa` and
+/// the two high-contrast presets.
+///
+/// There is no `Default`, on purpose: a level nobody chose would be a silent promise. Start from a
+/// preset, which sets the level of its own colours.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum TextContrast {
+    /// WCAG AA, 4.5:1.
+    Aa,
+    /// WCAG AAA, 7:1.
+    Aaa,
+}
+
+impl TextContrast {
+    /// The contrast ratio this level asks of text: 4.5 for [`Aa`](Self::Aa), 7.0 for
+    /// [`Aaa`](Self::Aaa).
+    ///
+    /// ```
+    /// use snora_design::TextContrast;
+    ///
+    /// assert_eq!(TextContrast::Aa.ratio(), 4.5);
+    /// assert_eq!(TextContrast::Aaa.ratio(), 7.0);
+    /// ```
+    #[must_use]
+    pub fn ratio(self) -> f32 {
+        match self {
+            Self::Aa => 4.5,
+            Self::Aaa => 7.0,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests;

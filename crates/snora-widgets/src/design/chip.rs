@@ -26,6 +26,16 @@
 //! The contrast test `chip_selected_text_over_accent_background` verifies
 //! this.
 //!
+//! # Hovered and pressed (RFC-129)
+//!
+//! A chip's hovered and pressed fills used to be a fixed darkening (selected: 0.06 and 0.12;
+//! unselected: 0.04 and 0.08 of `surface`), which took the label under its preset's level on
+//! `light_aaa` and `dark_aaa` and drew **nothing at all** for an unselected chip on
+//! `high_contrast_dark` (its `surface` is black). They now go through `snora_style::state`, the
+//! rule every button shares: the fixed darkening where it holds, and another shift where it
+//! does not, so the label stays at `Palette::text_contrast` and the state stays visibly
+//! different from rest.
+//!
 //! # iced 0.14 focus limitation
 //!
 //! No custom focus ring — `button::Status` has no `Focused` variant.
@@ -77,6 +87,7 @@ use snora_design::Tokens;
 use snora_style as style;
 
 use crate::style::design_control;
+use style::state::{Knob, Pair, shifted};
 
 // ---------------------------------------------------------------------------
 // Private helpers
@@ -103,14 +114,12 @@ fn dimmed(color: Color) -> Color {
     }
 }
 
-/// Blends a color toward black by `amount`. Used for hover/press states.
-fn darken(color: Color, amount: f32) -> Color {
-    Color {
-        r: (color.r - amount).max(0.0),
-        g: (color.g - amount).max(0.0),
-        b: (color.b - amount).max(0.0),
-        a: color.a,
-    }
+/// A chip's hovered or pressed fill (RFC-129): `fill` shifted by the first candidate that keeps
+/// `label` at the palette's text level on every neutral surface, `today` (a darkening, always,
+/// before RFC-129) first. Shared with the buttons through `snora_style::state`.
+fn fill_in_state(tokens: &Tokens, label: Color, fill: Color, today: f32) -> Color {
+    let rest = Pair { label, fill };
+    shifted(&tokens.palette, Knob::Fill, today, rest, rest).fill
 }
 
 /// The `remove` button's square pointer-target size (RFC-061): computed
@@ -221,8 +230,8 @@ pub(crate) fn chip_style_selected(tokens: &Tokens, status: button::Status) -> bu
     let disabled = status == button::Status::Disabled;
     let bg = match status {
         button::Status::Active => accent,
-        button::Status::Hovered => darken(accent, 0.06),
-        button::Status::Pressed => darken(accent, 0.12),
+        button::Status::Hovered => fill_in_state(tokens, accent_text, accent, -0.06),
+        button::Status::Pressed => fill_in_state(tokens, accent_text, accent, -0.12),
         button::Status::Disabled => Color { a: 0.5, ..accent },
     };
     // The label and border dim with the fill (RFC-106 Q-2), so the two
@@ -251,8 +260,8 @@ pub(crate) fn chip_style_unselected(tokens: &Tokens, status: button::Status) -> 
     let disabled = status == button::Status::Disabled;
     let bg = match status {
         button::Status::Active => surface,
-        button::Status::Hovered => darken(surface, 0.04),
-        button::Status::Pressed => darken(surface, 0.08),
+        button::Status::Hovered => fill_in_state(tokens, text_col, surface, -0.04),
+        button::Status::Pressed => fill_in_state(tokens, text_col, surface, -0.08),
         button::Status::Disabled => Color { a: 0.5, ..surface },
     };
     // **This chip's fill cannot carry its disabled cue** (RFC-106): it is

@@ -907,3 +907,134 @@ fn light_aaa_focus_clears_its_floor() {
         );
     }
 }
+
+// ---------------------------------------------------------------------
+// RFC-129 Q-4: `Palette::text_contrast`, the level every hovered and
+// pressed label is held to
+// ---------------------------------------------------------------------
+
+/// Each preset's text level, **kept here by the suite** and taken from the book's table
+/// (`aaa-presets.md`), not read from the token. The token is checked against it (so a flipped
+/// token fails), and the resting pairs are held to this level (so the suite's own floor never
+/// moves with the value it guards): RFC-129 Q-4, point 2.
+///
+/// The two high-contrast presets are `Aaa`: `Tokens::presets()`, `theme.md` and the accessibility
+/// guide already promise AAA for them.
+const TEXT_LEVELS: [(&str, crate::TextContrast); 6] = [
+    ("light", crate::TextContrast::Aa),
+    ("dark", crate::TextContrast::Aa),
+    ("light_aaa", crate::TextContrast::Aaa),
+    ("dark_aaa", crate::TextContrast::Aaa),
+    ("high_contrast_light", crate::TextContrast::Aaa),
+    ("high_contrast_dark", crate::TextContrast::Aaa),
+];
+
+/// This suite's own number for a level, not `TextContrast::ratio`.
+fn level_floor(level: crate::TextContrast) -> f32 {
+    match level {
+        crate::TextContrast::Aa => AA_TEXT,
+        crate::TextContrast::Aaa => AAA_TEXT,
+    }
+}
+
+/// The table names exactly the presets, so a seventh preset cannot go unlisted.
+#[test]
+fn the_text_level_table_names_every_preset_and_only_them() {
+    let presets: Vec<&str> = all_presets().into_iter().map(|(n, _)| n).collect();
+    let table: Vec<&str> = TEXT_LEVELS.iter().map(|(n, _)| *n).collect();
+    assert_eq!(presets, table);
+}
+
+/// **A flipped token fails here**: every preset's `text_contrast` equals the suite's table.
+#[test]
+fn every_preset_declares_the_level_the_table_gives_it() {
+    for (name, t) in all_presets() {
+        let (_, want) = TEXT_LEVELS
+            .iter()
+            .find(|(n, _)| *n == name)
+            .unwrap_or_else(|| panic!("{name} is not in TEXT_LEVELS"));
+        assert_eq!(
+            t.palette.text_contrast, *want,
+            "{name}: the palette declares {:?}, the table says {want:?}",
+            t.palette.text_contrast
+        );
+    }
+}
+
+/// The resting pairs meet the table's level: the claim the token makes about the states, checked
+/// for the rest. Includes the two high-contrast presets, which promise AAA.
+#[test]
+fn every_declared_text_pair_meets_its_presets_table_level() {
+    let mut failures = Vec::new();
+    for (name, t) in all_presets() {
+        let (_, level) = TEXT_LEVELS.iter().find(|(n, _)| *n == name).unwrap();
+        let floor = level_floor(*level);
+        for usage in t.palette.usages() {
+            if usage.class != Some(ThresholdClass::Text) {
+                continue;
+            }
+            for (surface_label, surface) in usage.surfaces {
+                let r = contrast_ratio(usage.fg, surface);
+                if r < floor {
+                    failures.push(format!(
+                        "{name}: {}/{surface_label} {r:.2} < {floor}",
+                        usage.label
+                    ));
+                }
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// **The level is copied with the colours it describes** (Q-4 point 1): AAA colours with an
+/// application's own spacing keep AAA, and changing one colour leaves the level.
+#[test]
+fn a_palette_swapped_from_light_aaa_keeps_aaa() {
+    let mut t = Tokens::light();
+    assert_eq!(
+        t.palette.text_contrast,
+        crate::TextContrast::Aa,
+        "premise: Light is Aa"
+    );
+    t.palette = Tokens::light_aaa().palette;
+    assert_eq!(t.palette.text_contrast, crate::TextContrast::Aaa);
+
+    let mut aaa = Tokens::light_aaa();
+    aaa.palette.accent = crate::Color::rgb(0.2, 0.3, 0.9);
+    assert_eq!(
+        aaa.palette.text_contrast,
+        crate::TextContrast::Aaa,
+        "changing a colour does not lower the level"
+    );
+}
+
+/// Q-4 point 4: the rustdoc says what the level means, in the field's own words. Read from the
+/// source, with the doc markers and line breaks folded away, so a re-wrapped paragraph still
+/// passes and a deleted sentence does not.
+#[test]
+fn the_text_contrast_rustdoc_says_what_the_level_means() {
+    let source = include_str!("palette.rs");
+    let docs: String = source
+        .lines()
+        .filter_map(|l| l.trim_start().strip_prefix("///"))
+        .collect::<Vec<_>>()
+        .join(" ")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .replace('*', "");
+    for sentence in [
+        "and the contrast level its text is held to",
+        "holds every hovered and pressed label to",
+        "a level snora aims the states at, not a certificate of the resting colours",
+        "Changing `accent` on `light_aaa` leaves `Aaa`",
+        "the resting accent is what the application chose",
+        "Lowering it is an explicit act: `palette.text_contrast = TextContrast::Aa`",
+    ] {
+        assert!(
+            docs.contains(sentence),
+            "Palette's rustdoc no longer says: {sentence:?}"
+        );
+    }
+}

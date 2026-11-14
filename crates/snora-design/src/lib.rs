@@ -74,6 +74,7 @@ pub mod typography;
 pub mod variants;
 
 pub use color::Color;
+pub use contrast::TextContrast;
 pub use focus::FocusTokens;
 pub use palette::Palette;
 pub use radius::Radius;

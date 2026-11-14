@@ -36,7 +36,7 @@
 //! The largest hue shift across both AAA presets is 5.442°, asserted in
 //! `tests.rs` against a bound of 6°.
 
-use crate::{Color, Palette, Tokens};
+use crate::{Color, Palette, TextContrast, Tokens};
 
 pub(crate) fn palette() -> Palette {
     let parent = super::light::palette();
@@ -68,6 +68,7 @@ pub(crate) fn palette() -> Palette {
         warning_text: parent.warning_text,
         danger: Color::rgb(0.678062, 0.119634, 0.093896),
         danger_text: parent.danger_text,
+        text_contrast: TextContrast::Aaa,
     }
 }
 

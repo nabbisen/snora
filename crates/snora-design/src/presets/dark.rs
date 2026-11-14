@@ -1,6 +1,6 @@
 //! Dark preset.
 
-use crate::{Color, Palette, Tokens};
+use crate::{Color, Palette, TextContrast, Tokens};
 
 pub(crate) fn palette() -> Palette {
     Palette {
@@ -22,6 +22,7 @@ pub(crate) fn palette() -> Palette {
         info: Color::rgb(0.356863, 0.607843, 1.0),
         info_text: Color::rgb(0.0313725, 0.0666667, 0.121569),
         focus: Color::rgb(0.498039, 0.694118, 1.0),
+        text_contrast: TextContrast::Aa,
     }
 }
 

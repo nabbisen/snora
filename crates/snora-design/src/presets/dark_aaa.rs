@@ -15,7 +15,7 @@
 //!   hierarchy keeps its order: 14.04 ≥ 7.62 ≥ 7.05.
 //! - **`info` follows `accent`**, as in Light.
 
-use crate::{Color, Palette, Tokens};
+use crate::{Color, Palette, TextContrast, Tokens};
 
 pub(crate) fn palette() -> Palette {
     let parent = super::dark::palette();
@@ -45,6 +45,7 @@ pub(crate) fn palette() -> Palette {
         // 6.71 under its own text; lightened to 7.05.
         danger: Color::rgb(1.000000, 0.450782, 0.448162),
         danger_text: parent.danger_text,
+        text_contrast: TextContrast::Aaa,
     }
 }
 

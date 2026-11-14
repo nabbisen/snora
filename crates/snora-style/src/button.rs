@@ -14,6 +14,17 @@
 //! status iced exposes; they do **not** attempt to render a focus ring.
 //! That is a documented limitation, not a bug.
 //!
+//! # Hovered and pressed (RFC-129)
+//!
+//! A hovered or pressed label is held to the palette's text level
+//! ([`snora_design::Palette::text_contrast`]: 4.5:1 or 7:1) on every neutral surface, and the state
+//! stays visibly different from rest. Each variant makes the shift it has always made
+//! (`primary` and `danger` lighten when hovered and darken when pressed; `secondary` shifts its
+//! label and border; `ghost` darkens its label when pressed), **keeps it where it holds that**, and
+//! takes another from a fixed list where it does not (a hovered `primary` on `light_aaa`, for
+//! example, darkens instead). The rule is [`crate::state::shifted`], shared with the chips.
+//! Disabled is exempt.
+//!
 //! # Usage
 //!
 //! ```rust,no_run
@@ -30,27 +41,29 @@ use iced::{Border, Color, Shadow, widget::button};
 use snora_design::Tokens;
 
 use super::color::to_iced_color;
+use super::state::{Knob, Pair, shifted};
 
 // ---- internal helpers ----------------------------------------------------
 
-/// Blends `color` toward white by `amount` (0.0 = unchanged, 1.0 = white).
-fn lighten(color: Color, amount: f32) -> Color {
-    Color {
-        r: (color.r + amount).min(1.0),
-        g: (color.g + amount).min(1.0),
-        b: (color.b + amount).min(1.0),
-        a: color.a,
-    }
+/// A filled variant's hovered or pressed fill (RFC-129): `fill` shifted by the first candidate
+/// that keeps `label` at the palette's text level on every neutral surface, `today` first.
+fn fill_in_state(tokens: &Tokens, label: Color, fill: Color, today: f32) -> Color {
+    let rest = Pair { label, fill };
+    shifted(&tokens.palette, Knob::Fill, today, rest, rest).fill
 }
 
-/// Blends `color` toward black by `amount` (0.0 = unchanged, 1.0 = black).
-fn darken(color: Color, amount: f32) -> Color {
-    Color {
-        r: (color.r - amount).max(0.0),
-        g: (color.g - amount).max(0.0),
-        b: (color.b - amount).max(0.0),
-        a: color.a,
-    }
+/// A tinted variant's hovered or pressed look (RFC-129): `accent` at `alpha` behind the label,
+/// and the label (which `secondary` also draws its border in) shifted the same way.
+fn tint_in_state(tokens: &Tokens, accent: Color, alpha: f32, today: f32) -> Pair {
+    let rest = Pair {
+        label: accent,
+        fill: Color::TRANSPARENT,
+    };
+    let state = Pair {
+        label: accent,
+        fill: Color { a: alpha, ..accent },
+    };
+    shifted(&tokens.palette, Knob::Label, today, rest, state)
 }
 
 /// Applies a standard disabled alpha reduction.
@@ -78,8 +91,8 @@ pub fn primary(tokens: &Tokens, status: button::Status) -> button::Style {
 
     let (bg, text_color) = match status {
         button::Status::Active => (accent, text),
-        button::Status::Hovered => (lighten(accent, 0.06), text),
-        button::Status::Pressed => (darken(accent, 0.06), text),
+        button::Status::Hovered => (fill_in_state(tokens, text, accent, 0.06), text),
+        button::Status::Pressed => (fill_in_state(tokens, text, accent, -0.06), text),
         button::Status::Disabled => (disabled_alpha(accent), disabled_alpha(text)),
     };
 
@@ -102,16 +115,14 @@ pub fn secondary(tokens: &Tokens, status: button::Status) -> button::Style {
 
     let (bg, text_color, border_color) = match status {
         button::Status::Active => (Color::TRANSPARENT, accent, accent),
-        button::Status::Hovered => (
-            Color { a: 0.08, ..accent },
-            lighten(accent, 0.06),
-            lighten(accent, 0.06),
-        ),
-        button::Status::Pressed => (
-            Color { a: 0.14, ..accent },
-            darken(accent, 0.06),
-            darken(accent, 0.06),
-        ),
+        button::Status::Hovered => {
+            let p = tint_in_state(tokens, accent, 0.08, 0.06);
+            (p.fill, p.label, p.label)
+        }
+        button::Status::Pressed => {
+            let p = tint_in_state(tokens, accent, 0.14, -0.06);
+            (p.fill, p.label, p.label)
+        }
         button::Status::Disabled => (
             Color::TRANSPARENT,
             disabled_alpha(accent),
@@ -141,8 +152,14 @@ pub fn ghost(tokens: &Tokens, status: button::Status) -> button::Style {
 
     let (bg, text_color) = match status {
         button::Status::Active => (Color::TRANSPARENT, accent),
-        button::Status::Hovered => (Color { a: 0.08, ..accent }, accent),
-        button::Status::Pressed => (Color { a: 0.14, ..accent }, darken(accent, 0.06)),
+        button::Status::Hovered => {
+            let p = tint_in_state(tokens, accent, 0.08, 0.0);
+            (p.fill, p.label)
+        }
+        button::Status::Pressed => {
+            let p = tint_in_state(tokens, accent, 0.14, -0.06);
+            (p.fill, p.label)
+        }
         button::Status::Disabled => (Color::TRANSPARENT, disabled_alpha(accent)),
     };
 
@@ -169,8 +186,8 @@ pub fn danger(tokens: &Tokens, status: button::Status) -> button::Style {
 
     let (bg, text_color) = match status {
         button::Status::Active => (bg_color, text),
-        button::Status::Hovered => (lighten(bg_color, 0.06), text),
-        button::Status::Pressed => (darken(bg_color, 0.06), text),
+        button::Status::Hovered => (fill_in_state(tokens, text, bg_color, 0.06), text),
+        button::Status::Pressed => (fill_in_state(tokens, text, bg_color, -0.06), text),
         button::Status::Disabled => (disabled_alpha(bg_color), disabled_alpha(text)),
     };
 

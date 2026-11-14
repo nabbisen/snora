@@ -1,8 +1,8 @@
 //! The semantic color [`Palette`].
 
-use crate::Color;
+use crate::{Color, TextContrast};
 
-/// Semantic color roles for a theme.
+/// Semantic color roles for a theme, and the contrast level its text is held to.
 ///
 /// Roles are named by *meaning*, not by a color scale. Status background roles
 /// (`success`/`warning`/`danger`/`info`) each have a paired on-status
@@ -66,6 +66,23 @@ pub struct Palette {
 
     /// Focus-ring color.
     pub focus: Color,
+
+    /// The contrast level snora holds **every hovered and pressed label** to (RFC-129): `Aa` is
+    /// 4.5:1, `Aaa` is 7:1. It is not a colour role, and `light` and `dark` set `Aa`; `light_aaa`,
+    /// `dark_aaa` and both high-contrast presets set `Aaa`.
+    ///
+    /// **It is a level snora aims the states at, not a certificate of the resting colours.** At
+    /// rest the colours are the application's, and snora cannot hold them. Changing `accent` on
+    /// `light_aaa` leaves `Aaa`: the hovered and pressed states still aim at 7:1 against the new
+    /// accent, and the resting accent is what the application chose.
+    ///
+    /// The level lives here, and not on [`crate::Tokens`], because it describes these colours and
+    /// must be copied with them: `tokens.palette = Tokens::light_aaa().palette` brings AAA colours
+    /// and the AAA level together.
+    ///
+    /// Lowering it is an explicit act: `palette.text_contrast = TextContrast::Aa`. There is no
+    /// `Default`: a palette starts from a preset and inherits that preset's level.
+    pub text_contrast: TextContrast,
 }
 
 /// Threshold class a role's contrast pairs are measured against
@@ -151,6 +168,9 @@ impl Palette {
             info,
             info_text,
             focus,
+            // Not a role: the level every hovered and pressed label is held to (RFC-129 Q-4),
+            // read by `snora-style`. Bound here so a new field still has to be placed.
+            text_contrast: _,
         } = *self;
 
         let neutral_surfaces = || {

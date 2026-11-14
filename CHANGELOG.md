@@ -26,6 +26,21 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+### Added
+
+- **`Palette::text_contrast` and `TextContrast` (RFC-129).** The level of contrast a palette holds
+  its text to: `TextContrast::Aa` (4.5:1) or `TextContrast::Aaa` (7:1), with `TextContrast::ratio()`.
+  `light` and `dark` are `Aa`; `light_aaa`, `dark_aaa` and both high-contrast presets are `Aaa`. It is
+  the level snora aims every hovered and pressed label at, **not a certificate of the resting
+  colours**: changing `accent` on `light_aaa` leaves `Aaa`, and lowering it is an explicit act
+  (`palette.text_contrast = TextContrast::Aa`). It lives on the palette so that
+  `tokens.palette = Tokens::light_aaa().palette` brings the level with the colours. There is no
+  `Default`: a palette starts from a preset. `Palette` is `#[non_exhaustive]`, so reading and
+  assigning the field is all that changes for you.
+- **`snora_style::state` (RFC-129):** `shifted`, with `Knob` and `Pair`, the one rule that
+  `snora_style::button::{primary, secondary, ghost, danger}` and the chips use for a hovered or
+  pressed colour. An application that draws its own button can use it to get the same guarantee.
+
 ### Changed
 
 - **A notice's action is drawn as a ghost action, in the accent colour, for every tone
@@ -40,6 +55,29 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
+- **A hovered or pressed label could fall under its preset's contrast level, and one chip state
+  drew nothing (RFC-129).** Every variant shifted its fill or label the same way on every preset
+  (lighten when hovered, darken when pressed), so on a preset where that moves toward the other
+  colour the label lost contrast, and only the resting pair was ever checked. Measured on each
+  neutral surface (`background`, `surface`, `surface_raised`), **17 groups of a preset, a variant and
+  a state** are fixed. A state now keeps the shift it has always made where that holds the
+  preset's level (nothing that held it moves), and takes the first of a fixed list of other shifts
+  where it does not, and always differs from rest by a visible step (ΔE76 of at least 3). The
+  cells that change:
+  - `light`: `secondary` hovered (4.47:1 against 4.5, on `surface`): the label is now darker, 6.71.
+  - `dark`: `secondary` and `ghost` pressed (3.73): the label is now lighter, 5.24.
+  - `light_aaa`: hovered `primary`, `secondary`, `ghost` and `danger` (6.23, 5.07, 6.21, 5.90 against
+    7); pressed `secondary` and `ghost` (6.84); pressed unselected chip (6.75).
+  - `dark_aaa`: pressed `secondary`, `ghost` and `danger` (4.53, 4.53, 5.93); hovered `ghost`
+    (6.09); pressed selected chip (5.96).
+  - `high_contrast_dark`: the unselected chip, hovered and pressed. It drew **exactly** like rest
+    (its `surface` is black and the chip darkened it), so nothing showed it was hovered or pressed.
+    Its contrast stays above 7:1 (14.71 to 15.33).
+  A `secondary` button draws its border in the label's colour, so its border moves with the label
+  and stays above 3:1 in every state. **If you keep screenshot baselines, retake those with a
+  hovered or pressed button or chip on the presets above.** A new test draws every button, chip and
+  notice action in every state on every neutral surface and fails under the preset's level or under
+  the visible step. The `high_contrast_*` presets' other states were already at 7:1.
 - **A sheet on the right had the spacer's width, not the width you asked for.** A sheet whose edge
   is on the right (`SheetEdge::End` under left-to-right, `SheetEdge::Start` under right-to-left)
   has been laid out with the width of the empty space beside it since 0.4.0. So `OneThird` drew
