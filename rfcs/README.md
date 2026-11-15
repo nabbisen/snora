@@ -194,6 +194,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 133 | [Five snora widgets take no direction, so they cannot mirror under RTL](./proposed/133-five-snora-widgets-take-no-direction.md) | **0.64.0** (proposed) — found by RFC-132's Unit 0: the notice, the removable chip, the progress bar (its fill runs left to right in both directions), the footer and `render_menu` take no `LayoutDirection`. Proposed: a required `direction` parameter on each, as the header, sidebar, tab bar and breadcrumb have; each laid out by RFC-132's row; a test that every public widget with a row takes a direction — **proposed 2026-11-15** |
 
 ## Archive
 

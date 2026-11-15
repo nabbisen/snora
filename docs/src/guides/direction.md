@@ -68,6 +68,11 @@ under `Rtl`, the order is mirrored. You write the row once.
 | `Sheet` | Anchor side, when `SheetEdge` is `Start` or `End`. Inside-facing rounded corner also flips. `Top` / `Bottom` edges are unaffected. |
 | `Dialog` | Unaffected — centered, not edge-anchored |
 
+**Five widgets take no direction yet, and draw left-to-right under RTL:** `design::notice::Notice`,
+`design::chip::removable` (and `removable_with_tooltip`), `design::progress` (its fill also runs
+from the left), `app_footer`, and `render_menu` used on its own (the header's menus do mirror).
+RFC-133 gives each a `direction` parameter.
+
 ## Live flip
 
 Live LTR ↔ RTL flipping is a one-line accessibility setting. Keep
