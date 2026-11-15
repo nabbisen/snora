@@ -246,6 +246,10 @@ crate short of the pixels**, and that is RFC-085's real subject.
 - **Housekeeping:** the drawn-contrast sweeps add 209 s on tiny-skia and 635 s on wgpu to CI. Cut that
   by drawing each frame once and reading boundaries at 2x, kept only if no verdict changes on either
   renderer.
+- **Housekeeping: the build-cost ratio.** It read 0.05578 at 0.63.0, +16% on 0.62.0's 0.04793,
+  with the same compiler. That is above the 10% noise floor, but the last four rows span
+  0.0479–0.0562 (0.60.0 read 0.0562). Measure the workbench build locally, before and after 0.63's
+  changes, to say whether 0.63 caused it, and whether the floor is right for so short a build.
 - **RFC-134's Unit 0:** keyboard-reachable form controls, measured control by control. The controls
   themselves land in 0.65.0, as additions.
 
