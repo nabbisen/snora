@@ -37,9 +37,13 @@
 //! `secondary`, `success`, `warning`, `danger`), the direction comes from
 //! the *fixed paired text*'s darkness, not the base color's own (unlike
 //! iced's own [`iced::theme::palette::deviate`]). This guarantees each
-//! derived tier's contrast against that text is no worse than `base`'s:
-//! moving the color further from the text's own tone can only widen the
-//! luminance gap. Two unsafe alternatives were tried and rejected
+//! derived tier's contrast against that text *widen* from `base`'s wherever
+//! there is room to move: moving the color further from the text's own tone
+//! can only widen the luminance gap. **At a luminance extreme there is no
+//! room, and the clamp fallback below moves the other way**: `high_contrast_dark`'s
+//! `secondary` goes 21.00, 20.91 (`weak`), 19.67 (`strong`), still far above AA.
+//! What is guaranteed, and tested, is that every derived tier clears AA against
+//! its text. Two unsafe alternatives were tried and rejected
 //! empirically during development, not by inspection: mixing `weak`
 //! toward `background` (iced's own `Primary::generate` shape) degenerates
 //! to `base` unmodified whenever `background` happens to equal the seed
@@ -169,9 +173,10 @@ const BACKGROUND_STRONG_START_AMOUNT: f32 = 0.15;
 /// `reference` is a separate parameter, not always `color` itself, because
 /// the two call sites need different notions of "away from": [`derive_tiers`]
 /// passes the tier's *fixed paired text* as `reference` (round-1/R-1 fix —
-/// this is the property that makes a derived tier's contrast against that
-/// text provably no worse than `base`'s, since moving `color` further from
-/// `reference`'s tone can only widen the luminance gap, never narrow it).
+/// this is the property that widens a derived tier's contrast against that
+/// text from `base`'s wherever there is room, since moving `color` further
+/// from `reference`'s tone widens the luminance gap; at a luminance extreme the
+/// fallback below moves the other way, and the gap narrows a little).
 /// [`derive_background`] instead passes `color` as its own `reference`
 /// (round-2/R-3 fix), matching [`iced::theme::palette::deviate`]'s
 /// direction exactly — see that function's call site for why a

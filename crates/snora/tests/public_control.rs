@@ -545,8 +545,28 @@ mod audit {
             (2, 2),
             "the engine path: (outer edge, thickness)"
         );
+        // The widths and offsets the book prints (`high-contrast.md`: 3 wide in the high-contrast presets, 2 in the
+        // others; 2 out everywhere), stated here as a literal table so the drawn ring is held to the page and not
+        // only to the token it was built from (0.63 audit).
+        const BOOK: [(&str, usize, usize); 6] = [
+            ("light", 2, 2),
+            ("dark", 2, 2),
+            ("light_aaa", 2, 2),
+            ("dark_aaa", 2, 2),
+            ("high_contrast_light", 3, 2),
+            ("high_contrast_dark", 3, 2),
+        ];
         for (name, tokens) in Tokens::presets() {
             let (width, offset) = (tokens.focus.ring_width, tokens.focus.ring_offset);
+            let &(_, book_width, book_offset) = BOOK
+                .iter()
+                .find(|(n, _, _)| *n == name)
+                .unwrap_or_else(|| panic!("`{name}` is a new preset: state its ring in BOOK"));
+            assert_eq!(
+                (width as usize, offset as usize),
+                (book_width, book_offset),
+                "{name}: the token disagrees with the book's table"
+            );
             let tokens = leak(tokens);
             assert_eq!(
                 ring_left(|| page_on(

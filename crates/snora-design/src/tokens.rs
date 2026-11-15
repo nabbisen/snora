@@ -99,7 +99,8 @@ impl Tokens {
     /// - `light_aaa`, `dark_aaa` — text at **AAA (7:1)**, non-text at 3:1, in
     ///   the character of their parents; for readers who need more;
     /// - `high_contrast_light`, `high_contrast_dark` — AAA and beyond (at
-    ///   least 8.38:1), borders at 21:1; for maximum contrast.
+    ///   least 8.38:1), borders at 21:1 against the page and `surface` (19.80:1 against
+    ///   `high_contrast_dark`'s raised surface); for maximum contrast.
     ///
     /// **The list is complete.** A test reads this file's own source and
     /// fails if a zero-argument constructor returning `Self` exists that is

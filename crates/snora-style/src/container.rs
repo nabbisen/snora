@@ -129,5 +129,14 @@ mod tests {
             s.shadow.blur_radius > 0.0,
             "card_raised should have a shadow"
         );
+        // The offset the test is named for (0.63 audit): the shadow is cast down, not sideways, and by
+        // 2 px; it was asserting only the blur.
+        assert_eq!(
+            (s.shadow.offset.x, s.shadow.offset.y),
+            (0.0, 2.0),
+            "card_raised casts its shadow 2 px down"
+        );
+        // And `card_surface` casts none, so the raised card is the one that rises.
+        assert_eq!(card_surface(&t).shadow.blur_radius, 0.0);
     }
 }

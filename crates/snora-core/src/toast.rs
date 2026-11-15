@@ -294,7 +294,8 @@ pub struct Toast<Message: Clone> {
     /// the application is the source of truth. Typically a monotonically
     /// increasing `u64`.
     pub id: u64,
-    /// Bold heading line — typically a few words.
+    /// Heading line — typically a few words. (Drawn at the `title` role on the design path and with no weight of its
+    /// own; only the header's title is bold.)
     pub title: String,
     /// Body text — one or two short sentences, explaining the situation.
     pub message: String,

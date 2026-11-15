@@ -253,6 +253,34 @@ mod notice {
         assert_shown_whole("notice body", rendered, natural, column(&tokens));
     }
 
+    /// **A notice's title is drawn at `label_size`, not `title_size`** (`typography.md`: the notice "renders its title at
+    /// the label size"; the 0.63 audit found the test that seemed to hold it could not fail on a larger title: it asked
+    /// only for 90 % of the area). A short title, one line: its drawn height is the string's natural height at the label
+    /// size, and not at the title size, which the premise shows is a different height.
+    #[test]
+    fn a_notices_title_is_drawn_at_label_size_and_not_at_title_size() {
+        let tokens = Tokens::light();
+        let title = "Heads up";
+        let label = snora::design::style::text::label_size(&tokens).0;
+        let title_size = snora::design::style::text::title_size(&tokens).0;
+        let at_label = natural_size(title, Some(label));
+        let at_title = natural_size(title, Some(title_size));
+        assert!(
+            (at_title.height - at_label.height).abs() > 2.0,
+            "premise: the label and title sizes draw different heights ({} and {})",
+            at_label.height,
+            at_title.height
+        );
+        let rendered = rendered_size(notice(&tokens, Some(title), "body text"), title);
+        assert!(
+            (rendered.height - at_label.height).abs() <= 0.5,
+            "the notice title is {:.1} tall; at the label size it is {:.1}, at the title size {:.1}",
+            rendered.height,
+            at_label.height,
+            at_title.height
+        );
+    }
+
     #[test]
     fn notice_prose_is_unchanged() {
         let tokens = Tokens::light();

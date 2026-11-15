@@ -342,4 +342,41 @@ fn geometry_follows_hand_mutated_spacing_and_radius() {
     // built-in-preset tests above — no hidden branch on tokens.density.
     assert_eq!(tight_header.gap, tight.spacing.md);
     assert_eq!(tight_header.radius, tight.radius.sm);
+
+    // **And the branch this test is named for (0.63 audit).** Both bundles above keep `Density::Comfortable`, so a
+    // `match tokens.density` inside a geometry constructor would never have been taken and this test could not
+    // fail on it. Flipping *only* the density, on the same scale, must change nothing, for every constructor.
+    for base in [&roomy, &tight] {
+        let mut compact = base.clone();
+        compact.density = snora_design::Density::Compact;
+        assert_ne!(
+            compact.density, base.density,
+            "premise: the density really differs"
+        );
+        assert_eq!(
+            header_geometry(&compact),
+            header_geometry(base),
+            "header reads tokens.density"
+        );
+        assert_eq!(
+            footer_geometry(&compact),
+            footer_geometry(base),
+            "footer reads tokens.density"
+        );
+        assert_eq!(
+            side_bar_geometry(&compact),
+            side_bar_geometry(base),
+            "side bar reads tokens.density"
+        );
+        assert_eq!(
+            tab_geometry(&compact),
+            tab_geometry(base),
+            "tab bar reads tokens.density"
+        );
+        assert_eq!(
+            breadcrumb_geometry(&compact),
+            breadcrumb_geometry(base),
+            "breadcrumb reads tokens.density"
+        );
+    }
 }

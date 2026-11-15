@@ -5,8 +5,9 @@
 //!
 //! This crate defines design *tokens* as plain data — colors, spacing,
 //! typography, radius, focus, and a small semantic variant vocabulary — plus
-//! four built-in [`Tokens`] presets ([`Tokens::light`], [`Tokens::dark`],
-//! [`Tokens::high_contrast_light`], [`Tokens::high_contrast_dark`]).
+//! six built-in [`Tokens`] presets ([`Tokens::light`], [`Tokens::dark`], [`Tokens::light_aaa`],
+//! [`Tokens::dark_aaa`], [`Tokens::high_contrast_light`], [`Tokens::high_contrast_dark`]), listed by
+//! [`Tokens::presets`].
 //!
 //! It has **no dependency on iced**. Converting these tokens into iced widget
 //! styles is the job of the `snora-style` style bridge (RFC-055); this crate

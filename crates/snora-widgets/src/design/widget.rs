@@ -46,16 +46,16 @@
 //! | tab | `content_gap` | 6 | `Spacing::sm` | **no** | shared "icon-label inline gap" rhythm with menu/crumb, below |
 //! | tab | `tab_pad_x` | 12 | `Spacing::md` | yes | button horizontal padding |
 //! | tab | `tab_pad_y` | 8 | `Spacing::sm` | yes | button vertical padding, smaller than horizontal |
-//! | tab | `label_size` | 13 | `Typography::label` | **no** | 13 has no role; `label` is the role for a control's own text (RFC-104) |
+//! | tab | `label_size` | host's default (RFC-104: no literal) | `Typography::label` (14) | — | `label` is the role for a control's own text; the unstyled path draws at the host's `default_text_size` |
 //! | crumb | `gap` | 6 | `Spacing::sm` | **no** | shared inline-gap rhythm (see below) |
 //! | crumb | `row_pad_x` | 12 | `Spacing::md` | yes | trail's horizontal padding |
 //! | crumb | `row_pad_y` | 4 | `Spacing::xs` | yes | trail's shallow vertical padding |
 //! | crumb | `btn_pad_x` | 4 | `Spacing::xs` | yes | per-crumb button horizontal padding |
 //! | crumb | `btn_pad_y` | 2 | `Spacing::xs` | **no** | no token smaller than `xs`; used as the floor |
 //! | crumb | `btn_radius` | 3 | `Radius::sm` | **no** | `sm` is the smallest radius available |
-//! | crumb | `label_size` | 13 | `Typography::label` | **no** | same role as the tab's, and the separator follows the crumbs (RFC-104) |
-//! | menu | `label_size` | 14 | `Typography::label` | **no** | trigger and items are controls; 14 has no role (RFC-104) |
-//! | header | `title_size` | 16 | `Typography::title` | yes | `title` is documented "card / dialog / notice title"; the header's is the page's (RFC-104) |
+//! | crumb | `label_size` | host's default (RFC-104: no literal) | `Typography::label` (14) | — | same role as the tab's, and the separator follows the crumbs |
+//! | menu | `label_size` | host's default (RFC-104: no literal) | `Typography::label` (14) | — | trigger and items are controls |
+//! | header | `title_size` | host's default (RFC-104: no literal) | `Typography::title` (18) | — | `title` is documented "card / dialog / notice title"; the header's is the page's. *(Corrected at the 0.63 audit: this row said "Today 16, exact yes"; `title` is 18 and the unstyled header has no literal.)* |
 //! | menu | `gap` | 6 | `Spacing::sm` | **no** | shared inline-gap rhythm (see below) |
 //!
 //! **The sidebar's horizontal padding is derived, not mapped (RFC-099).**

@@ -138,7 +138,7 @@ impl Palette {
     ///
     /// **Exhaustive destructuring, deliberately.** `Palette` is
     /// `#[non_exhaustive]` for *other* crates; that attribute does not
-    /// constrain the crate that defines it. Adding a nineteenth field
+    /// constrain the crate that defines it. Adding a twentieth field
     /// to `Palette` makes the `let Palette { .. } = *self;` below fail
     /// to compile (`E0027: pattern does not mention field ...`) until
     /// this function says where the new role renders and what it must

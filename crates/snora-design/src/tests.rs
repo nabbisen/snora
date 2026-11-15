@@ -188,7 +188,8 @@ const DIM_SWEEP_STEPS: usize = 1000;
 /// over the full achievable content range (RFC-066) rather than checked
 /// at discrete surfaces — the dim is painted over whatever the
 /// application actually rendered, which is a continuum, and for two of
-/// the four built-in presets the true worst case is an **interior**
+/// the four distinct built-in palettes (the AAA presets share their parents')
+/// the true worst case is an **interior**
 /// minimum a discrete check cannot see (RFC-065 recorded `high_contrast_light`
 /// at 7.37 and `high_contrast_dark` at 5.25, checking only three
 /// surfaces; the true minima are 4.58 and 4.45).
@@ -299,7 +300,7 @@ fn named_surface_report(t: &Tokens, dim: crate::Color) -> String {
 /// equals `background`, so it cannot signal against **the background** —
 /// but this assertion measures against **the dim**, and there its worst
 /// `fill ǀ dim` is **3.24:1**, clearing the bar on its own. Measured
-/// worst-point figures, all four presets: `light` fill 3.24 / border
+/// worst-point figures, the four presets below (the AAA children share their parents'): `light` fill 3.24 / border
 /// 1.04; `dark` fill 3.16 / border 1.00; `high_contrast_light` 4.58 /
 /// 4.58; `high_contrast_dark` 4.45 / 4.45. Splitting this into two assertions would fail two correct
 /// presets — read `max(...)` as intentional, not as a mistake to
@@ -437,9 +438,9 @@ fn every_text_role(ty: Typography) -> [(&'static str, TextRole); 6] {
     ]
 }
 
-/// Asserts every `TextRole`'s `size` in all four **built-in** presets
+/// Asserts every `TextRole`'s `size` in all six **built-in** presets
 /// clears [`TEXT_SIZE_MIN`]. **What this does and does not prove:** it
-/// proves our four shipped presets comply, and would catch a future
+/// proves our six shipped presets comply, and would catch a future
 /// preset edit that dropped a role below the floor. **It cannot
 /// constrain a consumer's own `Tokens`** — `Typography`'s fields are
 /// public and RFC-036's covenant freezes that surface, so
@@ -1038,3 +1039,5 @@ fn the_text_contrast_rustdoc_says_what_the_level_means() {
         );
     }
 }
+
+mod book_figures;

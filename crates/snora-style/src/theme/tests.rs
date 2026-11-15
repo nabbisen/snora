@@ -206,7 +206,7 @@ fn derived_semantic_tiers_match_expected_transform() {
 fn background_derived_tiers_match_expected_transform() {
     // strong is excluded — computed by `background_strong_color`'s search,
     // not a fixed amount; see `background_strong_tier_clears_border_floor`
-    // and `background_strong_matches_expected_search`.
+    // and `background_strong_is_the_stated_colour_in_every_preset`.
     const FIXED_AMOUNTS: [f32; 6] = [0.03, 0.07, 0.10, 0.125, 0.175, 0.20];
 
     for (name, t) in named_presets() {
@@ -243,22 +243,100 @@ fn background_derived_tiers_match_expected_transform() {
     }
 }
 
+/// **`background.strong`, stated (0.63 audit).** This used to compare `theme()`'s value with
+/// `background_strong_color(seed)`, the function that produced it: it could not fail. The expected colours are
+/// written here, six decimals as printed, one per preset (recorded from the code at the 0.63 audit, so they are
+/// goldens and not an independent derivation: a change to the search, its start amount or its floor fails here
+/// and points at `theme.md`). `.text` stays `text_primary`.
 #[test]
-fn background_strong_matches_expected_search() {
+fn background_strong_is_the_stated_colour_in_every_preset() {
+    let want: [(&str, [f32; 3]); 6] = [
+        ("light", [0.806045, 0.806046, 0.806045]),
+        ("dark", [0.176565, 0.213017, 0.261495]),
+        ("light_aaa", [0.806045, 0.806046, 0.806045]),
+        ("dark_aaa", [0.176565, 0.213017, 0.261495]),
+        ("high_contrast_light", [0.806045, 0.806046, 0.806045]),
+        ("high_contrast_dark", [0.179236, 0.179236, 0.179236]),
+    ];
     for (name, t) in named_presets() {
+        let (_, rgb) = want.iter().find(|(n, _)| *n == name).unwrap_or_else(|| {
+            panic!("`{name}` is a new preset: state its background.strong here")
+        });
         let th = theme(&t);
         let ext = th.extended_palette();
-        let seed = to_iced_color(t.palette.background);
-        let text = to_iced_color(t.palette.text_primary);
-
+        let got = ext.background.strong.color;
+        for (c, w) in [got.r, got.g, got.b].into_iter().zip(rgb) {
+            assert!(
+                (c - w).abs() < 2e-6,
+                "{name}: background.strong {got:?}, stated {rgb:?}"
+            );
+        }
         assert_eq!(
-            ext.background.strong.color,
-            background_strong_color(seed),
-            "{name}: background.strong does not match background_strong_color(background)"
-        );
-        assert_eq!(
-            ext.background.strong.text, text,
+            ext.background.strong.text,
+            iced::Color::from_rgba(
+                t.palette.text_primary.r,
+                t.palette.text_primary.g,
+                t.palette.text_primary.b,
+                t.palette.text_primary.a
+            ),
             "{name}: background.strong.text must stay fixed at text_primary"
+        );
+    }
+}
+
+/// **The derived semantic tiers, stated (0.63 audit).** The derivation tests above compute their expectation with
+/// the production `shift_away_from`; these state it. One preset per family (an AA preset, an AAA preset, and
+/// `high_contrast_dark`, whose pure-black `secondary` is the clamp case the fallback exists for): `weak` and
+/// `strong` of the five sets, as recorded at the audit, to 2e-6. A change to an amount, the direction rule or the
+/// fallback fails here, and `theme.md` is where it must be said.
+#[test]
+fn derived_semantic_tiers_are_the_stated_colours() {
+    // (preset, set, weak, strong)
+    #[rustfmt::skip]
+    let want: [(&str, &str, [f32; 3], [f32; 3]); 15] = [
+        ("light", "primary",   [0.036467, 0.208922, 0.790470], [0.016230, 0.000000, 0.704639]),
+        ("light", "secondary", [0.992540, 1.000000, 1.000000], [0.991306, 1.000000, 1.000000]),
+        ("light", "success",   [0.000000, 0.437000, 0.149448], [0.000000, 0.340529, 0.000000]),
+        ("light", "warning",   [0.545381, 0.278047, 0.000000], [0.456202, 0.153869, 0.000000]),
+        ("light", "danger",    [0.636445, 0.000000, 0.000000], [0.534904, 0.000000, 0.000000]),
+        ("dark_aaa", "primary",   [0.467072, 0.772207, 1.000000], [0.504255, 0.887261, 1.000000]),
+        ("dark_aaa", "secondary", [0.026949, 0.053209, 0.094829], [0.000000, 0.001765, 0.040562]),
+        ("dark_aaa", "success",   [0.244467, 0.966329, 0.532819], [0.052958, 1.000000, 0.578191]),
+        ("dark_aaa", "warning",   [1.000000, 0.816714, 0.254435], [1.000000, 0.919885, 0.147675]),
+        ("dark_aaa", "danger",    [1.000000, 0.478975, 0.482108], [1.000000, 0.518012, 0.532945]),
+        ("high_contrast_dark", "primary",   [0.661879, 0.845189, 1.000000], [0.738087, 0.962330, 1.000000]),
+        ("high_contrast_dark", "secondary", [0.002791, 0.002791, 0.002791], [0.043484, 0.043484, 0.043484]),
+        ("high_contrast_dark", "success",   [0.499090, 0.986672, 0.648553], [0.519454, 1.000000, 0.716036]),
+        ("high_contrast_dark", "warning",   [1.000000, 0.900057, 0.491002], [1.000000, 0.961956, 0.454469]),
+        ("high_contrast_dark", "danger",    [1.000000, 0.654920, 0.656817], [1.000000, 0.732076, 0.737491]),
+    ];
+    let close = |a: iced::Color, b: [f32; 3]| {
+        [a.r, a.g, a.b]
+            .into_iter()
+            .zip(b)
+            .all(|(x, y)| (x - y).abs() < 2e-6)
+    };
+    for (preset, set, weak, strong) in want {
+        let (_, t) = named_presets()
+            .into_iter()
+            .find(|(n, _)| *n == preset)
+            .unwrap();
+        let th = theme(&t);
+        let e = th.extended_palette();
+        let (w, st) = match set {
+            "primary" => (e.primary.weak.color, e.primary.strong.color),
+            "secondary" => (e.secondary.weak.color, e.secondary.strong.color),
+            "success" => (e.success.weak.color, e.success.strong.color),
+            "warning" => (e.warning.weak.color, e.warning.strong.color),
+            _ => (e.danger.weak.color, e.danger.strong.color),
+        };
+        assert!(
+            close(w, weak),
+            "{preset} {set}.weak is {w:?}, stated {weak:?}"
+        );
+        assert!(
+            close(st, strong),
+            "{preset} {set}.strong is {st:?}, stated {strong:?}"
         );
     }
 }
@@ -277,9 +355,11 @@ fn background_strong_clears_border_floor_all_presets() {
             to_sn(ext.background.strong.color),
             to_sn(ext.background.base.color),
         );
+        // The floor is this test's own 1.5, not `BORDER_CONTRAST_FLOOR`: a guard must not read the constant it
+        // guards (0.63 audit), or lowering the constant lowers the bar with it.
         assert!(
-            r >= BORDER_CONTRAST_FLOOR,
-            "{name}: background.strong vs background.base contrast {r:.2} < {BORDER_CONTRAST_FLOOR} \
+            r >= 1.5,
+            "{name}: background.strong vs background.base contrast {r:.2} < 1.5 \
              — a border this close to its surface is effectively invisible"
         );
     }
@@ -529,5 +609,65 @@ fn modal_dim_pole_choice_agrees_with_iced_is_dark_across_a_color_grid() {
                 );
             }
         }
+    }
+}
+
+/// **`engine-surfaces.md`, "The sheet panel": the table, asserted (0.63 audit).** The sheet's border is
+/// `background.weak` and its fill `background.base`, under `theme(&tokens)`. The page prints, per preset, the
+/// minimum of `border | dim` and of `dim | fill` over every grey the content could be, and the border against its
+/// own fill (1.02-1.35:1, well under 3). These are the page's numbers, stated here to two decimals, so a change to
+/// the theme derivation (or to the dim) that moves them fails and points at the page.
+#[test]
+fn engine_surfaces_md_sheet_table() {
+    #[rustfmt::skip]
+    let rows: [(&str, f32, f32, f32); 4] = [
+        // preset, border|dim min, dim|fill min, own border|own fill
+        ("light",               2.41, 3.24, 1.35),
+        ("dark",                2.95, 3.80, 1.29),
+        ("high_contrast_light", 2.41, 3.24, 1.35),
+        ("high_contrast_dark",  4.17, 4.25, 1.02),
+    ];
+    for (name, bd_min, df_min, own) in rows {
+        let (_, t) = named_presets()
+            .into_iter()
+            .find(|(n, _)| *n == name)
+            .unwrap();
+        let th = theme(&t);
+        let ext = th.extended_palette();
+        let border = to_sn(ext.background.weak.color);
+        let fill = to_sn(ext.background.base.color);
+        let dim = snora_design::surfaces::modal_dim(&t);
+        let (mut bd, mut df) = (f32::INFINITY, f32::INFINITY);
+        for step in 0..=1000 {
+            let c = step as f32 / 1000.0;
+            let over = snora_design::contrast::composite_over(dim, SnColor::rgb(c, c, c));
+            bd = bd.min(contrast_ratio(border, over));
+            df = df.min(contrast_ratio(fill, over));
+        }
+        let near = |what: &str, got: f32, want: f32| {
+            assert!(
+                (got - want).abs() <= 0.01,
+                "{name}: {what} is {got:.3}, the page prints {want}"
+            );
+        };
+        near("border | dim, minimum", bd, bd_min);
+        near("dim | fill, minimum", df, df_min);
+        near("own border | own fill", contrast_ratio(border, fill), own);
+    }
+    // The AAA children keep their parents' background and so these rows hold for them.
+    for (aaa, parent) in [("light_aaa", "light"), ("dark_aaa", "dark")] {
+        let get = |n: &str| {
+            named_presets()
+                .into_iter()
+                .find(|(x, _)| *x == n)
+                .unwrap()
+                .1
+        };
+        let (a, b) = (theme(&get(aaa)), theme(&get(parent)));
+        assert_eq!(
+            a.extended_palette().background.weak.color,
+            b.extended_palette().background.weak.color,
+            "{aaa} against {parent}"
+        );
     }
 }
