@@ -731,7 +731,8 @@ fn tab_order(sc: &Scene) -> Vec<u8> {
     order
 }
 
-/// **RTL: the tab row is mirrored, and next tab is the one Tab calls next.**
+/// **RTL: the tab row is placed from the right, Tab order is the declared order under both directions, and next tab is the one
+/// Tab calls next** (RFC-132). Under RTL that is the tab to the **left** on screen.
 #[test]
 fn right_to_left_next_tab_follows_tab_order() {
     for direction in [LayoutDirection::Ltr, LayoutDirection::Rtl] {
@@ -766,7 +767,9 @@ fn right_to_left_next_tab_follows_tab_order() {
         named(&mut rig, Named::ArrowUp, Modifiers::ALT);
         assert_eq!(rig.messages, vec![Msg::Crumb(1)], "{direction:?}: Alt+↑");
     }
-    // And the two directions really differ, so this can fail.
+    // **The two directions have the same Tab order, and it is the declared one** (RFC-132, Q-1): the tabs are in reading order
+    // in the tree and only their positions mirror. Before, this asserted that they differed (Tab ran left to right on screen,
+    // against reading order under RTL). It can fail either way: a reversed tree gives `[3, 2, 1, 0]` under RTL.
     let ltr = tab_order(&Scene {
         active_tab: 1,
         ..Scene::tabs()
@@ -776,7 +779,8 @@ fn right_to_left_next_tab_follows_tab_order() {
         active_tab: 1,
         ..Scene::tabs()
     });
-    assert_ne!(ltr, rtl, "the mirrored row has a different Tab order");
+    assert_eq!(ltr, vec![0, 1, 2, 3], "LTR Tab order is the declared one");
+    assert_eq!(rtl, ltr, "RTL Tab order is the same: logical, not visual");
 }
 
 // ---- both platform tables --------------------------------------------------------------------

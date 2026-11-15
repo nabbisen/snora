@@ -436,7 +436,10 @@ where
         );
     }
 
-    // Body row: sidebar on the logical start side.
+    // Body row: sidebar on the logical start side. **The children are in logical
+    // order under both directions and the row places them from the start edge**
+    // (RFC-132): reversing them for RTL would change the tree, so a direction
+    // flip would lose every widget's state, and Tab would run the other way.
     let body_container = container(body)
         .width(Length::Fill)
         .height(Length::Fill)
@@ -448,13 +451,13 @@ where
             .id(identifiers::SIDEBAR_REGION)
     };
 
-    let body_row = match (direction, side_bar) {
-        (LayoutDirection::Ltr, Some(sb)) => row![sidebar_region(sb), body_container],
-        (LayoutDirection::Rtl, Some(sb)) => row![body_container, sidebar_region(sb)],
-        (_, None) => row![body_container],
+    let body_row = match side_bar {
+        Some(sb) => row![sidebar_region(sb), body_container],
+        None => row![body_container],
     }
     .width(Length::Fill)
     .height(Length::Fill);
+    let body_row = snora_interaction::MirroredRow::new(body_row, direction == LayoutDirection::Rtl);
 
     main_col = main_col.push(body_row);
 

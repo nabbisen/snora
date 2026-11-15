@@ -10,12 +10,13 @@ use std::fmt::Debug;
 use iced::{
     Alignment::Center,
     Element,
-    widget::{column, container, row, scrollable, text},
+    widget::{column, container, scrollable, text},
 };
 
-use snora_core::{Menu, MenuAction};
+use snora_core::{LayoutDirection, Menu, MenuAction};
 use snora_interaction::{MenuAnchor, MenuPart};
 
+use crate::direction::LogicalRow;
 use crate::icon::icon_beside_label;
 use crate::style::{
     BUTTON_DEFAULT_PADDING, ControlGeometry, chrome_container_style, control, menu_button_style,
@@ -38,6 +39,10 @@ pub(crate) struct MenuGeometry {
     /// (the header's menus, RFC-124); `None` draws it inline below the trigger (a menu
     /// in a layer of its own: the context menu, RFC-124 R-4).
     pub(crate) anchored: Option<bool>,
+    /// The direction the icon-and-label rows are laid out for (RFC-132): the icon
+    /// is at the start edge. The header passes its own; a bare [`render_menu`] has
+    /// none to be given and draws left to right (RFC-133).
+    pub(crate) direction: LayoutDirection,
 }
 
 impl MenuGeometry {
@@ -48,6 +53,7 @@ impl MenuGeometry {
             label_size: None,
             control: ControlGeometry::unstyled(),
             anchored: None,
+            direction: LayoutDirection::Ltr,
         }
     }
 }
@@ -92,8 +98,12 @@ where
     MenuItemId: Clone + Debug + 'a,
     F: Fn(MenuAction<MenuId, MenuItemId>) -> Message + 'a,
 {
+    // The icon-and-label rows are logical rows (RFC-132).
+    let direction = geometry.direction;
     // Trigger button (always visible).
-    let mut header_content = row![].spacing(geometry.gap).align_y(Center);
+    let mut header_content = LogicalRow::new(direction)
+        .spacing(geometry.gap)
+        .align_y(Center);
     if let Some(ref ic) = menu.icon {
         header_content = header_content.push(icon_beside_label(ic, geometry.label_size));
     }
@@ -123,7 +133,9 @@ where
     let mut items: Vec<Element<'a, Message>> = Vec::new();
     if is_active {
         for item in menu.items {
-            let mut btn_content = row![].spacing(geometry.gap).align_y(Center);
+            let mut btn_content = LogicalRow::new(direction)
+                .spacing(geometry.gap)
+                .align_y(Center);
             if let Some(ref ic) = item.icon {
                 btn_content = btn_content.push(icon_beside_label(ic, geometry.label_size));
             }

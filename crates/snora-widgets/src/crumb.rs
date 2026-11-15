@@ -10,19 +10,23 @@
 //!  (clickable)                   (plain text)
 //! ```
 //!
-//! Under [`LayoutDirection::Rtl`] the order is mirrored as a whole and
-//! the separator glyph flips (`›` → `‹`).
+//! Under [`LayoutDirection::Rtl`] the trail is mirrored as a whole (it starts at
+//! the right edge) and the separator glyph flips (`›` → `‹`). **The order is
+//! logical** (RFC-132): the crumbs stay in trail order in the tree, so Tab
+//! visits the first crumb first under both directions, and a change of
+//! direction keeps every crumb's state.
 
 use std::fmt::Debug;
 
 use iced::{
     Alignment::Center,
     Color, Element, Length, Padding, Theme,
-    widget::{button, column, container, row, space, text},
+    widget::{button, column, container, space, text},
 };
 
 use snora_core::{BreadcrumbAction, Crumb, LayoutDirection};
 
+use crate::direction::LogicalRow;
 use crate::style::{ControlGeometry, control, page_background};
 
 /// Geometry parameters [`build_breadcrumb`] takes, letting
@@ -121,39 +125,33 @@ where
 
     // Pressing an ancestor makes it the current page, and the crumbs deeper than
     // it go: how many targets go with it (RFC-120), counted in the trail's own
-    // order, before the direction reverses it.
+    // order, which is also the tree's order under both directions (RFC-132).
     let deeper: Vec<usize> = (0..crumbs.len())
         .map(|i| crumbs[i + 1..].iter().filter(|c| !c.is_leaf).count())
         .collect();
     // Each crumb also carries its place in the trail **as declared**, so a
     // shortcut to the parent finds it whichever way the row is mirrored
     // (RFC-116 R-2).
-    let mut crumbs: Vec<_> = crumbs
+    let crumbs: Vec<_> = crumbs
         .into_iter()
         .zip(deeper)
         .enumerate()
         .map(|(index, (crumb, deeper))| (index, crumb, deeper))
         .collect();
-    if direction == LayoutDirection::Rtl {
-        crumbs.reverse();
-    }
-
-    let mut trail = row![].spacing(geometry.gap).align_y(Center);
+    // `Fill` wide, so the trail starts at the start edge of its bar: a trail
+    // as wide as its content would be reflected about its own width and stay
+    // at the left under RTL.
+    let mut trail = LogicalRow::new(direction)
+        .width(Length::Fill)
+        .spacing(geometry.gap)
+        .align_y(Center);
 
     let last = crumbs.len().saturating_sub(1);
     for (i, (index, crumb, deeper)) in crumbs.into_iter().enumerate() {
         trail = trail.push(render_crumb(
-            // In Tab order the deeper crumbs come after this one in a
-            // left-to-right trail and before it in a right-to-left one.
-            (
-                crumb,
-                index,
-                if direction == LayoutDirection::Rtl {
-                    (deeper, 0)
-                } else {
-                    (0, deeper)
-                },
-            ),
+            // In Tab order the deeper crumbs come after this one, under both
+            // directions (RFC-132).
+            (crumb, index, (0, deeper)),
             on_action,
             geometry.btn_pad_x,
             geometry.btn_pad_y,

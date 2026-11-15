@@ -384,8 +384,8 @@ pub fn dialog_with_chips(ids: &[u8]) -> Element<'static, Msg> {
     render(AppLayout::new(page).dialog(Dialog::new(chips(ids))))
 }
 
-/// The same cases, in a right-to-left page: Tab goes the other way along a
-/// breadcrumb trail, and "next" follows it.
+/// The same cases, in a right-to-left page. The tree is in logical order under both directions
+/// (RFC-132), so the landings are the same as under LTR.
 pub fn rtl_cases() -> Vec<Case> {
     cases()
         .into_iter()

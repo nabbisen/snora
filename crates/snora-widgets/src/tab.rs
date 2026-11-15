@@ -9,21 +9,25 @@
 //!    └─────── start (LTR) / end (RTL) — first tab ─────────────┘
 //! ```
 //!
-//! Under [`LayoutDirection::Rtl`] the tab order is mirrored as a whole;
-//! individual tab labels keep their text direction (set by iced's
-//! BiDi handling, which this widget does not override).
+//! Under [`LayoutDirection::Rtl`] the bar is mirrored as a whole: the first tab
+//! is at the right edge, and so is the icon within a tab. **The order is
+//! logical** (RFC-132): the tabs stay in declaration order in the tree, so Tab
+//! visits the first declared tab first under both directions, and a change of
+//! direction keeps every tab's state. Individual tab labels keep their text
+//! direction (set by iced's BiDi handling, which this widget does not
+//! override).
 
 use std::fmt::Debug;
 
 use iced::{
     Alignment::Center,
     Background, Border, Color, Element, Length, Padding, Shadow, Theme,
-    widget::{button, column, container, row, space, stack, text},
+    widget::{button, column, container, space, stack, text},
 };
 
 use snora_core::{LayoutDirection, TabAction, TabBar};
 
-use crate::direction::row_dir;
+use crate::direction::{LogicalRow, row_dir};
 use crate::icon::icon_beside_label;
 use crate::style::{ControlGeometry, control, page_background};
 
@@ -119,26 +123,23 @@ where
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
     let active = bar.active.clone();
-    // Direction affects tab order below (declaration order vs. reversed),
-    // not this row's construction — both arms built the same `row![]`
-    // here (F-33, RFC-089).
-    let mut tab_row = row![].spacing(geometry.bar_gap).align_y(Center);
+    // The tabs are pushed in declaration order under both directions, and the
+    // row places them from the start edge (RFC-132): the *first declared* tab
+    // leads in both reading directions, which is what `vec[0]` being the
+    // primary tab means. The tree order is the declaration order, so Tab and
+    // the tab shortcuts go start to end, and a change of direction keeps every
+    // tab's state.
+    let mut tab_row = LogicalRow::new(direction)
+        .spacing(geometry.bar_gap)
+        .align_y(Center);
 
-    // We push tabs in declaration order under LTR and reverse order
-    // under RTL, so that the *first declared* tab visually leads in
-    // both reading directions. This matches how `row_dir` treats its
-    // start/end pair, and what users expect from `vec[0]` being the
-    // primary tab.
     // Each tab carries its place in the bar **as declared**, so a shortcut to
     // "tab 3" finds it whichever way the row is mirrored (RFC-116 R-2).
-    let mut tabs: Vec<_> = bar.tabs.into_iter().enumerate().collect();
-    if direction == LayoutDirection::Rtl {
-        tabs.reverse();
-    }
-
-    for (index, tab) in tabs {
+    for (index, tab) in bar.tabs.into_iter().enumerate() {
         let is_active = tab.id == active;
-        tab_row = tab_row.push(render_tab(tab, index, is_active, on_action, &geometry));
+        tab_row = tab_row.push(render_tab(
+            tab, index, is_active, on_action, &geometry, direction,
+        ));
     }
 
     // Leave the trailing edge fillable so the row hugs the start edge
@@ -171,6 +172,7 @@ fn render_tab<'a, Message, TabId, F>(
     is_active: bool,
     on_action: &'a F,
     geometry: &TabGeometry,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -178,7 +180,9 @@ where
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
     let label_size = geometry.label_size;
-    let mut content = row![].spacing(geometry.content_gap).align_y(Center);
+    let mut content = LogicalRow::new(direction)
+        .spacing(geometry.content_gap)
+        .align_y(Center);
     if let Some(icon) = &tab.icon {
         content = content.push(icon_beside_label::<Message>(icon, label_size));
     }

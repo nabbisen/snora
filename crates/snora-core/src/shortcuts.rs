@@ -30,8 +30,10 @@
 //! `Ctrl/Cmd + 1…9` go to **exactly one destination, chosen by the application
 //! with [`Digits`]**, and never change while it runs. `9` is the last one, as in
 //! the browsers; a digit beyond the count does nothing. **Next and previous tab
-//! wrap**, as the browsers' do, and follow **Tab order**: under right-to-left the
-//! tab row is mirrored, and "next" is the one Tab calls next.
+//! wrap**, as the browsers' do, and follow **Tab order**, which is the declared
+//! order under both directions (RFC-132): "next" is the declared next tab, so
+//! under right-to-left, where the first tab is at the right edge, it moves left on
+//! screen.
 //!
 //! > **The macOS bindings follow Apple's conventions but have not been checked on
 //! > a Mac** (how `iced_winit` reports `Cmd+↑`, and whether a field keeps it). The
@@ -258,12 +260,17 @@ impl<Message: Clone> Shortcuts<Message> {
     /// - **Digits:** `n` is the *n*th destination, `9` is the last, and a digit
     ///   beyond the count has no route. No destination (digits set to tabs, and
     ///   no tab bar) means no route.
-    /// - **Next and previous tab follow Tab order,** which the tab row mirrors
-    ///   under [`LayoutDirection::Rtl`], and **wrap**. With fewer than two tabs
-    ///   there is nothing to go to.
+    /// - **Next and previous tab follow Tab order,** which is the declared order
+    ///   under **both** directions (RFC-132), and **wrap**: next is the declared
+    ///   next tab, which under [`LayoutDirection::Rtl`] is the one to the left on
+    ///   screen. With fewer than two tabs there is nothing to go to.
+    ///
+    /// `direction` is accepted and **no route depends on it today** (the tab rule
+    /// did until RFC-132 made Tab order logical); removing the parameter would be
+    /// a breaking change nobody has ruled on.
     /// - **Parent:** the ancestor before the leaf.
     #[must_use]
-    pub fn routes(&self, direction: LayoutDirection) -> Vec<ShortcutRoute<Message>> {
+    pub fn routes(&self, _direction: LayoutDirection) -> Vec<ShortcutRoute<Message>> {
         let mut routes = Vec::new();
 
         // The digits: one destination, never both.
@@ -295,11 +302,9 @@ impl<Message: Clone> Shortcuts<Message> {
         if count >= 2 {
             let after = (self.active_tab + 1) % count;
             let before = (self.active_tab + count - 1) % count;
-            // The row is built in reverse under RTL, so Tab order is too.
-            let (next, previous) = match direction {
-                LayoutDirection::Ltr => (after, before),
-                LayoutDirection::Rtl => (before, after),
-            };
+            // The tabs are in declared order in the tree under both directions
+            // (RFC-132), so Tab order is declared order, and so is "next".
+            let (next, previous) = (after, before);
             routes.push(ShortcutRoute {
                 action: ShortcutAction::NextTab,
                 message: self.tabs[next].clone(),
@@ -453,8 +458,12 @@ mod tests {
         );
         assert_eq!(target(4, 1, NextTab, ltr), Some(2));
         assert_eq!(target(4, 1, PreviousTab, ltr), Some(0));
-        // Under RTL the row is mirrored: "next" is the one Tab calls next.
-        assert_eq!(target(4, 1, NextTab, LayoutDirection::Rtl), Some(0));
+        // Under RTL the tabs are placed from the right but stay in declared order in
+        // the tree (RFC-132): "next" is the declared next, as under LTR.
+        let rtl = LayoutDirection::Rtl;
+        assert_eq!(target(4, 1, NextTab, rtl), Some(2));
+        assert_eq!(target(4, 1, PreviousTab, rtl), Some(0));
+        assert_eq!(target(4, 3, NextTab, rtl), Some(0), "next wraps under RTL");
         for count in [0, 1] {
             assert_eq!(target(count, 0, NextTab, ltr), None, "{count} tab(s)");
             assert_eq!(target(count, 0, PreviousTab, ltr), None, "{count} tab(s)");

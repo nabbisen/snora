@@ -127,13 +127,10 @@ impl Scene {
             } else {
                 &[]
             };
-            if self.dir == LayoutDirection::Ltr {
-                v.extend(side.iter().copied());
-                v.extend(body);
-            } else {
-                v.extend(body);
-                v.extend(side.iter().copied());
-            }
+            // The tree is in logical order under both directions (RFC-132): the sidebar
+            // is the start side, so it comes before the body in Tab order under RTL too.
+            v.extend(side.iter().copied());
+            v.extend(body);
             if self.footer == Footer::Control {
                 v.push("F1");
             }
@@ -508,7 +505,8 @@ fn rule_4_a_dropdown_belongs_to_its_triggers_zone() {
     assert_eq!(held(&mut rig, &names), vec!["item0"]);
 }
 
-/// RTL: the same logical order.
+/// RTL: the same logical order. F6 walks the zones header, sidebar, body, footer under both
+/// directions, and (RFC-132) so does Tab: the targets are in the same order in the tree.
 #[test]
 fn rtl_keeps_the_logical_order() {
     let scene = Scene {

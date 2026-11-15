@@ -23,6 +23,14 @@
 //!   logical `1` would never fire there; browsers match the physical row.
 //! - **It captures what it answers**, so an application's `keyboard::listen()`
 //!   (which receives only what nothing captured) does not see the key again.
+//! - **Horizontal arrows follow the screen (RFC-132 R-5).** snora answers no ← or → today:
+//!   `is_arrow` only recognises them so that a text field keeps them. If snora ever answers
+//!   one (tab-bar arrows, RFC-116 L-11), **→ moves right on screen under both directions**, as
+//!   platforms do, and ← moves left. **Tab, F6 and the tab shortcuts stay logical** (start to
+//!   end, so right to left under RTL). The two are different keys with different meanings, and
+//!   writing the rule down before it is needed keeps a later change from picking the other way
+//!   by accident. `snora/tests/mirrored_layout.rs::snora_answers_no_horizontal_arrow` fails the
+//!   day something answers one, and points here.
 //!
 //! Public because the engine builds it; not for applications.
 

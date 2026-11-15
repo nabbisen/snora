@@ -26,7 +26,60 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`snora::direction::LogicalRow` (RFC-132).** What `row_dir` and `row_dir_three` return now: a row
+  whose children are in **reading order** under both directions and are placed from the start edge
+  (left under LTR, right under RTL). It offers `push`, `spacing`, `align_y`, `width`, `height` and
+  `padding`, and `Into<Element>`. `snora_interaction::MirroredRow` is the layout widget under it (that
+  crate's own item; not for applications).
+
+### Changed
+
+- **`row_dir` and `row_dir_three` return a `LogicalRow`, not an `iced::widget::Row`, and under RTL
+  they no longer reverse their children (RFC-132).** The children stay in the order you gave them
+  in the widget tree and only their positions mirror, so **a change of direction keeps every
+  widget's state in your row (focus, a scroll offset, a text cursor)** and **Tab visits your row
+  start to end under both directions**, which is right to left on screen under RTL. Before, an RTL
+  row's tree was the reverse of the LTR one: Tab ran left to right on screen, and a flip lost the
+  state. **Compile-time break:** code that names `Row` for the result, or calls a `Row` method other
+  than `push`, `spacing`, `align_y`, `width`, `height` and `padding` on it (`wrap`, `clip`,
+  `extend`, ...), no longer compiles; those have no mirrored meaning, and one that half-worked under
+  RTL would fail silently. Pass the result on as an element, or build the row you need with
+  `LogicalRow::new(direction).push(..)`.
+- **Tab goes in reading order under RTL, in snora's own widgets (RFC-132).** It went left to right
+  on screen: the header's end control came before its menus, the tab bar ran from the last declared
+  tab to the first, the breadcrumb from the current page up to the root, and the body came before
+  the sidebar. Now each goes first-declared to last, the sidebar before the body, the header's
+  menus before its end controls, as under LTR (F6 already did). **`Ctrl+Tab` follows it:** under RTL
+  it moves to the next declared tab, which is to the **left** on screen (it moved right), and
+  `Ctrl+Shift+Tab` the other way. `Ctrl+1` to `Ctrl+9` and `Alt+↑` are unchanged. No API changes;
+  `Shortcuts::routes` still takes a direction, which no route uses now.
+
+### Fixed
+
+- **Under RTL the header was not a mirror image (RFC-132).** `app_header` swapped its two blocks
+  and nothing inside them: the end controls sat **beside the title**, and the menus stayed to the
+  title's right. It is the left-to-right header reflected now, in every variant: the title at the right
+  edge, the menus after it to the left, the end controls at the left edge. This is a change of
+  appearance: **retake RTL screenshot baselines of a header.**
+- **Under RTL the breadcrumb started at the left edge, and the toast's close mark, the icon in a tab
+  and the icon in a menu trigger or item did not mirror (RFC-132).** The trail was reversed and
+  still started at the left; a toast kept its text at the left and its `×` at the right; an icon sat
+  left of its label. Each is mirrored now: the trail starts at the right edge, the `×` is at the end
+  edge of its toast, the icon is at the start edge of its label. **Retake RTL baselines of a
+  breadcrumb, a toast, a tab with an icon and an open menu.**
+- **A change of direction lost keyboard focus and every scroll offset in the skeleton (RFC-132).**
+  The skeleton reordered its children per direction, and iced keeps a widget's state by its place in
+  the tree, so after a flip nothing was focused and a scrolled body went back to the top. Nothing
+  moves in the tree now. **Measured:** focus on each of four controls, either way, was `[n]` and
+  became `[]`; a body scrolled to 200 became 0. Both are kept.
+- **A test now pins the breadcrumb separator's flip (RFC-132 R-4):** `›` under LTR and `‹` under
+  RTL. It flipped already, and nothing guarded it.
+- **Still not mirrored: five widgets that take no direction (RFC-133, for 0.64.0).** The notice,
+  the removable chip, the progress bar (its fill and its label), the footer's content and a bare
+  `render_menu` draw left to right under RTL. The progress bar's fill runs left to right in both
+  directions.
 
 ## [0.62.0] — 2026-11-14
 

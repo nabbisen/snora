@@ -9,8 +9,13 @@
 //!    └────────── start ──────────┘            └────── end ─────────┘
 //! ```
 //!
-//! Under [`LayoutDirection::Rtl`] the two groups swap sides automatically —
-//! individual elements inside each group keep their internal order.
+//! Under [`LayoutDirection::Rtl`] the header is **mirrored whole** (RFC-132): the
+//! title is at the right edge, the menus follow it to the left, and the end
+//! controls are at the left edge. Every row inside it is a logical row, not only
+//! the two groups, so the picture is the left-to-right one reflected. The
+//! widgets stay in the same order in the tree under both directions: Tab visits
+//! the menus before the end controls under both, and a change of direction
+//! keeps focus.
 
 use std::fmt::Debug;
 
@@ -22,7 +27,7 @@ use iced::{
 
 use snora_core::{LayoutDirection, Menu, MenuAction};
 
-use crate::direction::row_dir;
+use crate::direction::{LogicalRow, row_dir};
 use crate::menu::{MenuGeometry, build_menu};
 use crate::style::{ControlGeometry, chrome_container_style_with_radius};
 
@@ -134,10 +139,11 @@ where
         title_text = title_text.size(size);
     }
 
-    let mut start_group =
-        iced::widget::row![title_text, container(space()).width(Length::Fixed(20.0)),]
-            .align_y(Center)
-            .spacing(geometry.gap);
+    let mut start_group = LogicalRow::new(direction)
+        .push(title_text)
+        .push(container(space()).width(Length::Fixed(20.0)))
+        .align_y(Center)
+        .spacing(geometry.gap);
 
     for menu in menus {
         let is_active = active_menu_id == Some(&menu.id);
@@ -150,6 +156,7 @@ where
                 label_size: geometry.menu_label_size,
                 control: geometry.control,
                 anchored: Some(direction == LayoutDirection::Rtl),
+                direction,
             },
         ));
     }
@@ -157,9 +164,13 @@ where
     // Middle filler — pushes end_controls to the far edge.
     let filler = container(space()).width(Length::Fill);
 
-    // Compose start + filler + end in logical order.
+    // Compose start + filler + end in logical order. The filler is a child of
+    // its own row so that the end controls sit at the end edge under both
+    // directions; both rows are logical rows (RFC-132).
     let end_side: Element<'_, Message> = match end_controls {
-        Some(ctrls) => iced::widget::row![filler, ctrls]
+        Some(ctrls) => LogicalRow::new(direction)
+            .push(filler)
+            .push(ctrls)
             .align_y(Center)
             .spacing(geometry.gap)
             .into(),

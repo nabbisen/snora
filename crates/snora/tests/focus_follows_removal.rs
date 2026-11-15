@@ -77,9 +77,10 @@ fn assert_landings(cases: Vec<Case>) {
     assert!(failures.is_empty(), "off:\n  {}", failures.join("\n  "));
 }
 
-/// **Under RTL as well: the mirrored order.** Tab goes the other way along a
-/// breadcrumb trail, so "the next one" is the other crumb, and the ruled
-/// target is the same crumb: the bar's one that is still there.
+/// **Under RTL as well: the same landings.** The ruled target is the same control as under LTR:
+/// the bar's crumb that is still there, the toast that is next. A removal test, not a Tab-order
+/// test: it passes under a reversed tree and under the logical one (RFC-132 ran it against both),
+/// so it cannot tell them apart. The order is guarded by `mirrored_layout.rs::tab_visits_the_same_controls_in_the_same_order_under_both_directions`.
 #[test]
 fn right_to_left_follows_the_mirrored_order() {
     assert_landings(rtl_cases());

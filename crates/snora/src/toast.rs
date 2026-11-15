@@ -188,7 +188,7 @@ where
     // that asserts the toast layer's composition has to change.
     let wrap = |toast: Toast<Message>| -> Element<'a, Message> {
         let id = toast.id;
-        let single = render_single_toast(toast, style, on_attention);
+        let single = render_single_toast(toast, style, on_attention, direction);
         match on_attention {
             Some(f) => mouse_area(single)
                 .on_enter(f(id, ToastAttention::PointerEntered))
@@ -269,6 +269,7 @@ fn render_single_toast<'a, Message>(
     toast: Toast<Message>,
     style: ToastStyle,
     on_attention: Option<fn(u64, ToastAttention) -> Message>,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -387,9 +388,14 @@ where
     }
     let close_btn = close_btn.on_press(toast.on_dismiss).padding(0);
 
-    let body = row![container(text_col).width(Length::Fill), close_btn]
-        .align_y(Center)
-        .spacing(4);
+    // A logical row (RFC-132): the text at the start edge and the close mark at
+    // the end, whichever way the window reads.
+    let body = snora_interaction::MirroredRow::new(
+        row![container(text_col).width(Length::Fill), close_btn]
+            .align_y(Center)
+            .spacing(4),
+        direction == LayoutDirection::Rtl,
+    );
 
     // Wrapped in `opaque` (RFC-084 F-04): only the `×` button captured
     // clicks before this, because it is a button — a click anywhere else on
