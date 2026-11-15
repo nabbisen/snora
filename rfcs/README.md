@@ -196,6 +196,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 135 | [Four things snora draws fall under 3:1 against what they sit on, and no test measures a glyph](./proposed/135-four-non-text-boundaries-fall-under-three-to-one.md) | **0.63.0** (proposed) — from the drawn-contrast Unit 0: the progress track (1.00:1, invisible on the high-contrast presets), a `Debug` toast's fill, the menu's scrollbar and `card::raised`'s border against its shadow fall under 3:1; every glyph passes, and none is tested. Proposed: one non-text rule at 3:1 on drawn pixels (glyphs at 2x), the four fixed, a sweep with four tripwires — **proposed 2026-11-15** |
 
 ## Archive
 

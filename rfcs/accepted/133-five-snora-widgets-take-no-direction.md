@@ -42,6 +42,16 @@ bar fills from the start edge,** which is right under RTL (Q-2).
 every public widget function with a row, and checks each takes a direction, so a sixth cannot be
 added without one.
 
+**R-4 (added 2026-11-15 at RFC-132 Unit 1's review, the owner told). snora's own text aligns to
+the start edge under RTL.** RFC-132 mirrors the cells, but the text inside a cell stays
+left-aligned: a toast's title, for one, now sits in a mirrored cell aligned to its left. Unit 0
+measures every snora text's alignment under RTL, and Unit 1 aligns each to the start edge. This
+is not text shaping, which is iced's; it is where a text box puts its line.
+
+**R-5 (added the same day). `Shortcuts::routes(&self, direction)` loses its parameter.** No route
+depends on the direction since RFC-132, and its rustdoc says so in 0.63. A parameter that does
+nothing tells a reader it matters. It is removed in this release, which is already breaking.
+
 ## Open questions, with suggested rulings
 
 **Q-1 — a required parameter, or a builder with a default?** **Suggest: required, everywhere,

@@ -42,7 +42,9 @@ a physical side.
 ## Direction-aware rows
 
 For your own widgets, `snora::direction::row_dir` (and `row_dir_three`)
-build a `row!` whose order is decided by direction:
+build a **`LogicalRow`**: **the order is logical, and the positions mirror**
+(0.63, RFC-132). The children stay in reading order in the widget tree under
+both directions; under `Rtl` they are placed from the right edge.
 
 ```rust,ignore
 use snora::direction::row_dir;
@@ -56,15 +58,33 @@ let bar = row_dir(
 ```
 
 Under `Ltr`, "File:" is on the left and the Save button on the right;
-under `Rtl`, the order is mirrored. You write the row once.
+under `Rtl`, they are mirrored. You write the row once. Because the tree order
+does not change:
+- **Tab visits them in reading order** under both directions: "File:" first, then
+  Save. On screen that is right to left under `Rtl`.
+- **A live flip keeps their state:** focus, a scroll offset, an open menu.
+
+**Give a mirrored row a width, or align its container to the start edge.** A
+`LogicalRow` that is only as wide as its content is mirrored about its own
+width, so where it sits is decided by its container's alignment, as for any
+widget. A row with `width(Length::Fill)` places its children from the start
+edge of the space it fills.
+
+**`LogicalRow` has the builders a mirrored row means:** `push`, `spacing`,
+`align_y`, `width`, `height`, `padding`, and `Into<Element>`. Before 0.63 these
+helpers returned iced's `Row`. Code that names `Row`, or calls another `Row`
+method on the result, no longer compiles. See the 0.62 → 0.63 migration guide.
 
 ## Built-in widgets that take direction
 
 | Widget | What flips |
 |---|---|
-| `app_header` | Meant to put the title group on `Start` and the end-controls on `End`. **Under RTL it does not today:** the end-controls are drawn beside the title group, not at the end edge, and the title group's own order is not mirrored (0.63 audit, RFC-132) |
+| `app_header` | Title group (title, then menus) at the `Start` edge, end-controls at the `End` edge: a mirror image (0.63, RFC-132; before, under RTL the end-controls sat beside the title) |
+| `app_tab_bar` | The tabs, from the start edge; a tab's icon and label |
+| `app_breadcrumb` | The trail, from the start edge; the separator (`›` / `‹`) |
+| Menus in the header | A trigger's and an item's icon and label |
 | `app_side_bar` | Tooltip side; the sidebar position is determined by `AppLayout::direction` |
-| Toast layer | Anchor side, when `ToastPosition` is `*Start` or `*End` |
+| Toast layer | Anchor side, when `ToastPosition` is `*Start` or `*End`; a toast's close mark (0.63) |
 | `Sheet` | Anchor side, when `SheetEdge` is `Start` or `End`. Inside-facing rounded corner also flips. `Top` / `Bottom` edges are unaffected. |
 | `Dialog` | Unaffected — centered, not edge-anchored |
 
@@ -78,10 +98,9 @@ RFC-133 gives each a `direction` parameter.
 Live LTR ↔ RTL flipping is a one-line accessibility setting. Keep
 `direction: LayoutDirection` on your state, mutate it on a user
 action, and re-pass it on each `view`. Snora re-renders the whole
-skeleton mirrored. **A flip loses keyboard focus today:** snora mirrors by
-reordering widgets, and iced keeps a widget's state by its position, so a
-focused control is no longer focused after the flip (0.63 audit,
-RFC-132). *(Corrected 2026-11-15, from the 0.63 audit: this said no per-widget reset was needed.)*
+skeleton mirrored, **and keeps every widget's state**: focus, a scroll offset,
+an open menu. Since 0.63 snora mirrors positions, not the tree (RFC-132).
+Before 0.63 a flip lost focus and scroll offsets.
 
 The [`examples/rtl`](https://github.com/nabbisen/snora/tree/main/examples/rtl)
 demo flips on a button press.

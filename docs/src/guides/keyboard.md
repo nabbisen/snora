@@ -64,6 +64,16 @@ On a French AZERTY keyboard, `Ctrl+&`, the key marked 1, goes to destination 1. 
 on a Mac.** If one does not behave as this table says, please tell us (RFC-116's long-term
 plan, L-8).
 
+## Under right-to-left (0.63)
+
+- **Tab, Shift+Tab, F6 and the tab shortcuts follow reading order** under both directions:
+  start to end. Under `Rtl` that is right to left on screen. `Ctrl+Tab` goes to the declared next
+  tab, which is the one on the left under `Rtl` (RFC-132). Before 0.63, Tab and `Ctrl+Tab` went
+  left to right on screen under `Rtl`, which was reading order reversed.
+- **Horizontal arrows, if snora ever answers them, follow the screen:** → moves right under both
+  directions, as platforms do. snora answers no ← or → today, so a text field keeps them
+  (RFC-132 R-5).
+
 ## The rules
 
 1. **A shortcut does exactly what a click on that control does.** It publishes the same

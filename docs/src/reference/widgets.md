@@ -151,8 +151,8 @@ plain text. The separator glyph flips with direction (`›` / `‹`).
 In `snora::direction`:
 
 ```rust,ignore
-pub fn row_dir<'a, M>(direction, start, end) -> iced::widget::Row<'a, M>;
-pub fn row_dir_three<'a, M>(direction, start, center, end) -> iced::widget::Row<'a, M>;
+pub fn row_dir<'a, M>(direction, start, end) -> LogicalRow<'a, M>;
+pub fn row_dir_three<'a, M>(direction, start, center, end) -> LogicalRow<'a, M>;
 ```
 
 The smallest tool for writing your own direction-aware widgets — see
