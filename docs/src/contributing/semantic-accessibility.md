@@ -41,15 +41,17 @@ reconsideration trigger, in
 
 ## Core rule
 
-> **Prefer native iced interactive widgets** for interactive primitives.
-> Avoid visual-only clickable containers — a `mouse_area` wrapping a
-> `container` — when an iced-native control (button, checkbox, pick_list,
-> slider, …) covers the use case.
+> **Prefer a control the keyboard can reach** for every interactive primitive: a snora
+> control, or an iced control that is a Tab stop. Avoid visual-only clickable containers (a
+> `mouse_area` wrapping a `container`).
 
-Native iced controls inherit iced's event routing, and any accessibility-tree information iced
-exposes to the OS. Keyboard handling depends on the control: iced 0.14's `button` takes none,
-which is why snora's controls are its own `control`. A visual-only container
-with a `mouse_area` loses all of that.
+**Most of iced 0.14's form controls are not Tab stops.** Measured: `checkbox`, `toggler`,
+`radio`, `pick_list`, `slider` and `combo_box` register no focus target, so Tab never reaches
+them. Only `text_input` does. `button` takes no keyboard input either, which is why snora's
+controls are its own `control`. See
+[Keyboard § Form controls](../guides/keyboard.md#form-controls) for what to use instead.
+*(Corrected 2026-11-15, from logolig's report: this page recommended iced's checkbox, pick_list and slider as
+"native" controls without saying the keyboard cannot reach them.)*
 
 ---
 

@@ -123,6 +123,38 @@ Details: [Accessibility](accessibility.md), and the
 `button`'s builder, so a `button` moves over by changing one name (0.58, RFC-122). An iced
 `button` left as it is takes no keyboard input.
 
+## Form controls
+
+**snora has no checkbox, toggle, radio, pick list or slider, and iced 0.14's own cannot be reached
+by the keyboard** (measured, 2026-11-15):
+
+| iced 0.14 control | A Tab stop? | Keys it answers |
+|---|---|---|
+| `text_input` | **yes** | typing, and every arrow key |
+| `checkbox`, `toggler`, `radio` | no | none |
+| `pick_list` | no | none |
+| `combo_box` | no (its text input is not exposed to focus) | none by Tab |
+| `slider` | no | ↑ ↓, **only while the pointer is over it** |
+
+**A checkbox, toggle or radio: build it on `snora::control`.** The state you draw goes inside the
+control's content. The control is one Tab stop, and Enter, Space and a click each publish the
+same message once:
+
+```rust,ignore
+snora::control(row![text(if self.remember { "☑" } else { "☐" }), text("Remember me")].spacing(8))
+    .on_press(Message::ToggleRemember)
+```
+
+For a radio group, make one control per option, each publishing its own choice.
+
+**Do not wrap an iced `checkbox` in a control.** A click then publishes the checkbox's message,
+and Enter or Space the control's: two messages for one action, and an application that handles
+one and not the other is broken for half its readers.
+
+**A pick list or a slider has no keyboard route today.** For a short pick list, use a radio
+group as above. For a slider, add a "−" and a "+" control beside it, or answer the keys yourself.
+snora plans keyboard-reachable versions of these controls (RFC-134).
+
 ## Keys snora's own controls use
 
 So that you can predict rule 2: a focused snora control, `snora::control` included, uses

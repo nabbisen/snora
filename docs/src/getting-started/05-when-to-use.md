@@ -35,9 +35,12 @@ support; see [snora's position](../contributing/semantic-accessibility.md#positi
 You can ship with snora, but the framework gives you less leverage:
 
 - **Form-heavy applications.** snora has nothing form-specific (no
-  field widgets, no validation primitives). You wire up iced's
-  `text_input` / `pick_list` / `checkbox` directly. snora won't
-  *fight* you, it just won't help.
+  field widgets, no validation primitives). You wire up iced's own
+  controls directly. **Of those, only `text_input` is reachable by the
+  keyboard in iced 0.14**: a checkbox, toggle, radio, pick list, combo box
+  or slider is not. For a checkbox, toggle or radio, build it on
+  `snora::control` ([Keyboard § Form controls](../guides/keyboard.md#form-controls)).
+  snora has no keyboard-reachable pick list or slider yet.
 
 - **Multilingual apps with complex typography.** snora handles direction
   but not text shaping or i18n. Pair with

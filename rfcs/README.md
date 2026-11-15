@@ -195,6 +195,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 134 | [No checkbox, toggle, radio, pick list or slider can be reached by the keyboard](./proposed/134-no-form-control-can-be-reached-by-the-keyboard.md) | **after 0.64.0** (proposed) — logolig's report, measured true: iced 0.14's checkbox, toggler, radio, pick_list, combo_box and slider are no Tab stop, and snora has none. Direction ruled by the owner (2026-11-15: "Yes. Preferred if available and reasonable"). Proposed: keyboard-reachable versions on snora's `Control`, both paths, keys by platform convention; the non-goal narrows — **proposed 2026-11-15** |
 
 ## Archive
 
