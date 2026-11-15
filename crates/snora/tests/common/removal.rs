@@ -326,12 +326,19 @@ impl<M: Clone + 'static> Rig<M> {
     /// it again. The window loop always sends that redraw request before a draw; the rig does
     /// not, so a test that reads pixels must (`shot()` in `menu_arrows_unit0b.rs`).
     pub fn frame(&mut self) -> Vec<u8> {
+        self.frame_scaled(&Theme::Light, 1.0)
+    }
+
+    /// The frame drawn in `theme` at `scale` physical pixels per logical one (`800 * scale` wide, RGBA,
+    /// rows top to bottom). The design path's widgets are styled by the theme `design::theme` builds, so
+    /// a test of their colours draws in that; and a thin stroke reaches its own colour only when it is
+    /// drawn at 2x or more (`sweep.rs` explains).
+    pub fn frame_scaled(&mut self, theme: &Theme, scale: f32) -> Vec<u8> {
         use iced::theme::Base;
-        let theme = Theme::Light;
         let base = theme.base();
         self.ui.draw(
             &mut self.renderer,
-            &theme,
+            theme,
             &iced_runtime::core::renderer::Style {
                 text_color: base.text_color,
             },
@@ -339,8 +346,11 @@ impl<M: Clone + 'static> Rig<M> {
         );
         Headless::screenshot(
             &mut self.renderer,
-            Size::new(self.size.width as u32, self.size.height as u32),
-            1.0,
+            Size::new(
+                (self.size.width * scale) as u32,
+                (self.size.height * scale) as u32,
+            ),
+            scale,
             base.background_color,
         )
     }

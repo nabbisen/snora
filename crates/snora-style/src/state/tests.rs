@@ -449,3 +449,71 @@ fn a_palette_swapped_from_light_aaa_is_held_to_seven_by_the_styles() {
     }
     assert_eq!(checked, 36);
 }
+
+// ---- the muted label (RFC-131) ------------------------------------------------------------------------------------------------
+
+fn mix_of(text: Color, page: Color, share: f32) -> Color {
+    Color::from_rgb(
+        text.r * (1.0 - share) + page.r * share,
+        text.g * (1.0 - share) + page.g * share,
+        text.b * (1.0 - share) + page.b * share,
+    )
+}
+
+fn lowest(label: Color, t: &Tokens) -> f32 {
+    surfaces_of(t)
+        .iter()
+        .map(|s| contrast_ratio(opaque(label), opaque(*s)))
+        .fold(f32::MAX, f32::min)
+}
+
+/// A mix that already holds the level does not move: `light` holds its 4.5 at 30%.
+#[test]
+fn a_muted_label_that_held_the_level_does_not_move() {
+    let t = Tokens::light();
+    let (text, page) = (ic(t.palette.text_primary), ic(t.palette.background));
+    assert_eq!(
+        muted(&t.palette, text, page, MUTED_TODAY),
+        mix_of(text, page, 0.3)
+    );
+}
+
+/// Where 30% is under the level the next share that holds is taken, in whole steps of 2% toward the
+/// text. On `light_aaa` (text `#15181c` on a white page, `surface` `#f4f6f8`) 30% reads 6.08:1 on
+/// `surface` and 28% 6.52 there; 26% reads 7.01. Those figures are computed here from WCAG, not
+/// read from the function.
+#[test]
+fn a_muted_label_under_the_level_takes_the_first_share_that_holds_it() {
+    let t = Tokens::light_aaa();
+    let (text, page) = (ic(t.palette.text_primary), ic(t.palette.background));
+    for share in [0.30, 0.28] {
+        assert!(
+            lowest(mix_of(text, page, share), &t) < 7.0,
+            "premise: {share} is under"
+        );
+    }
+    assert!(
+        lowest(mix_of(text, page, 0.26), &t) >= 7.0,
+        "premise: 26% holds"
+    );
+    let got = muted(&t.palette, text, page, MUTED_TODAY);
+    let want = mix_of(text, page, 0.26);
+    assert!(
+        (got.r - want.r).abs() < 1e-5
+            && (got.g - want.g).abs() < 1e-5
+            && (got.b - want.b).abs() < 1e-5,
+        "{got:?} against the 26% mix {want:?}"
+    );
+    assert!(lowest(got, &t) >= 7.0);
+}
+
+/// Total and deterministic: text the colour of the page cannot hold anything, and the answer is the
+/// text itself, every time.
+#[test]
+fn a_muted_label_search_is_total_and_deterministic() {
+    let t = Tokens::light_aaa();
+    let page = ic(t.palette.background);
+    let first = muted(&t.palette, page, page, MUTED_TODAY);
+    assert_eq!(first, page);
+    assert_eq!(first, muted(&t.palette, page, page, MUTED_TODAY));
+}

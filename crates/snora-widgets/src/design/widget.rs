@@ -134,13 +134,14 @@ use snora_core::{
 };
 use snora_design::Tokens;
 use std::fmt::Debug;
+use std::rc::Rc;
 
 use crate::crumb::{CrumbGeometry, build_breadcrumb};
 use crate::footer::{FooterGeometry, build_footer};
 use crate::header::{HeaderGeometry, build_header};
 use crate::sidebar::{SideBarGeometry, SideBarLabels, TooltipBody, build_side_bar};
 use crate::style::ControlGeometry;
-use crate::tab::{TabGeometry, build_tab_bar};
+use crate::tab::{TabGeometry, TabStyle, build_tab_bar};
 
 /// Token-derived styled variant of [`crate::app_header`] (RFC-040).
 /// Colors already follow the theme (RFC-038); this maps geometry —
@@ -282,7 +283,18 @@ where
     TabId: Clone + Debug + PartialEq + 'a,
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
-    build_tab_bar(bar, on_action, direction, tab_geometry(tokens))
+    // The design path styles its tabs from the tokens, so an inactive tab's label holds the
+    // palette's text level (RFC-131): `snora_style::tab`.
+    let geometry = tab_geometry(tokens);
+    let tokens = tokens.clone();
+    let style: TabStyle = Rc::new(move |_theme, status, is_active| {
+        if is_active {
+            snora_style::tab::active(&tokens, status)
+        } else {
+            snora_style::tab::inactive(&tokens, status)
+        }
+    });
+    build_tab_bar(bar, on_action, direction, geometry, style)
 }
 
 fn tab_geometry(tokens: &Tokens) -> TabGeometry {

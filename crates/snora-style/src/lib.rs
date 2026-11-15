@@ -59,6 +59,8 @@ pub(crate) mod state;
 
 pub mod chip;
 
+pub mod tab;
+
 /// Card and container style functions.
 pub mod container;
 

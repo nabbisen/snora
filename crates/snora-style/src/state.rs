@@ -206,5 +206,49 @@ pub fn shifted(palette: &Palette, knob: Knob, today: f32, rest: Pair, state: Pai
     best.or(most_different).map_or(state, |(_, pair)| pair)
 }
 
+/// The share of the page in an inactive tab's label, as it has been drawn since RFC-102: 30%.
+pub(crate) const MUTED_TODAY: f32 = 0.3;
+
+/// A **muted** label (RFC-131): `text` mixed toward `page` by the first share that holds the rule.
+///
+/// An inactive tab's label is not a pair of declared colours but a mix of two, drawn lighter so the
+/// active tab reads as foreground. The rule is the one that holds a hovered label (see the
+/// [module](self)): **the label never sits under the palette's text level on any neutral surface.**
+///
+/// * `today` is the share of `page` the mix has always had (`MUTED_TODAY`). It is kept when it holds
+///   the level on all three surfaces, so nothing that passes moves.
+/// * Otherwise the candidates are `today` less 0.02, less 0.04, and so on down to 0, which is `text`
+///   itself, nearer the text by a step each time. The first that holds is taken.
+/// * **The search is total.** When none holds, which only an application's own colours can cause
+///   (every preset is swept), it returns `text`, the highest contrast any mix can have. It never
+///   panics, and the same colours always give the same result.
+///
+/// The muting is a secondary cue (the active tab is told apart by its underline, held at 3:1), so
+/// it is kept only as far as the level allows: this rule does not require it to stay visible.
+#[must_use]
+pub(crate) fn muted(palette: &Palette, text: Color, page: Color, today: f32) -> Color {
+    let surfaces = [palette.background, palette.surface, palette.surface_raised]
+        .map(|c| Color::from_rgb(c.r, c.g, c.b));
+    let level = palette.text_contrast.ratio();
+    let mix = |share: f32| Color {
+        r: text.r * (1.0 - share) + page.r * share,
+        g: text.g * (1.0 - share) + page.g * share,
+        b: text.b * (1.0 - share) + page.b * share,
+        a: 1.0,
+    };
+    let holds = |label: Color| {
+        surfaces
+            .iter()
+            .all(|&surface| contrast_ratio(design(label), design(surface)) >= level)
+    };
+    let steps = (today * STEPS_PER_UNIT + 1e-3).floor() as u32;
+    // `today` itself first, then the whole steps below it, down to the text.
+    std::iter::once(today)
+        .chain((0..steps).rev().map(|k| k as f32 / STEPS_PER_UNIT))
+        .map(mix)
+        .find(|&label| holds(label))
+        .unwrap_or_else(|| mix(0.0))
+}
+
 #[cfg(test)]
 mod tests;

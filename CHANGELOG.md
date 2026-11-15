@@ -33,6 +33,12 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   (left under LTR, right under RTL). It offers `push`, `spacing`, `align_y`, `width`, `height` and
   `padding`, and `Into<Element>`. `snora_interaction::MirroredRow` is the layout widget under it (that
   crate's own item; not for applications).
+- **`snora_style::tab::{active, inactive}`, also at `snora::design::style::tab` (RFC-131).** The
+  design path's tab style functions, `fn(&Tokens, button::Status) -> button::Style`, beside
+  `style::chip`. They were the design path's use of `snora-widgets`' private `tab_button_style`, which
+  takes an `iced::Theme` and so could not know a palette's text level; they moved to the crate that
+  holds the style functions, as the chips' did (RFC-129). Use them to style your own tab button as a
+  snora tab. The unstyled path keeps its theme-based function.
 
 ### Changed
 
@@ -58,6 +64,20 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
+- **An inactive tab's label read under `light_aaa`'s text level (RFC-131).** It was drawn as a 30%
+  mix of the text colour and the page, a colour no palette declares, and the 0.62 sweep did not draw
+  tabs. Measured on the pixels it reads **6.60:1 on the page and on `surface_raised`, and 6.10:1 on
+  `surface`, against `light_aaa`'s 7** (24 cells: rest and pressed, the tabs and their icons). It is
+  now the first mix, from 30% toward the page down to the text itself, that holds the palette's level
+  on all three neutral surfaces: **26% on `light_aaa`** (7.01:1 on `surface`). **Nothing that held
+  its level moves:** `light` (which holds 4.5 with the same colours), `dark`, `dark_aaa` and both
+  high-contrast presets draw exactly what they drew, to the float. The active tab is told apart by
+  its underline, held at 3:1; the muted label is a secondary cue, kept only as far as the level
+  allows. **If you keep screenshot baselines, retake those with an inactive tab on `light_aaa`.**
+  A new sweep (`text_sweep.rs`) draws every text snora draws on the design path, 4,758 cells (33
+  scenes, six presets, three neutral surfaces, rest, hovered and pressed, both directions), and fails
+  under a word's level or a glyph's 3:1. It found that the tab was the only word under; the
+  breadcrumb's separator, which also reads under the level, is a glyph and holds 3:1 (3.12 and up).
 - **Under RTL the header was not a mirror image (RFC-132).** `app_header` swapped its two blocks
   and nothing inside them: the end controls sat **beside the title**, and the menus stayed to the
   title's right. It is the left-to-right header reflected now, in every variant: the title at the right

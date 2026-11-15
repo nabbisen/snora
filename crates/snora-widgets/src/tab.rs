@@ -18,6 +18,7 @@
 //! override).
 
 use std::fmt::Debug;
+use std::rc::Rc;
 
 use iced::{
     Alignment::Center,
@@ -108,14 +109,24 @@ where
     TabId: Clone + Debug + PartialEq + 'a,
     F: Fn(TabAction<TabId>) -> Message + 'a,
 {
-    build_tab_bar(bar, on_action, direction, TabGeometry::unstyled())
+    // The unstyled path's labels come from the host's iced theme (a 30% mix of its text and
+    // page), which has no palette level to hold.
+    let style: TabStyle = Rc::new(tab_button_style);
+    build_tab_bar(bar, on_action, direction, TabGeometry::unstyled(), style)
 }
+
+/// How a tab button is styled: the theme, the button's status, and whether the tab is active.
+///
+/// The unstyled path styles from the `iced::Theme`; the design path from its tokens
+/// (`snora_style::tab`, RFC-131), because a `Theme` carries no palette text level to hold.
+pub(crate) type TabStyle = Rc<dyn Fn(&Theme, button::Status, bool) -> button::Style>;
 
 pub(crate) fn build_tab_bar<'a, Message, TabId, F>(
     bar: TabBar<TabId>,
     on_action: &'a F,
     direction: LayoutDirection,
     geometry: TabGeometry,
+    style: TabStyle,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -138,7 +149,7 @@ where
     for (index, tab) in bar.tabs.into_iter().enumerate() {
         let is_active = tab.id == active;
         tab_row = tab_row.push(render_tab(
-            tab, index, is_active, on_action, &geometry, direction,
+            tab, index, is_active, on_action, &geometry, direction, &style,
         ));
     }
 
@@ -173,6 +184,7 @@ fn render_tab<'a, Message, TabId, F>(
     on_action: &'a F,
     geometry: &TabGeometry,
     direction: LayoutDirection,
+    style: &TabStyle,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -199,7 +211,10 @@ where
     // and Enter and Space press it.
     let pressable = control(
         content,
-        move |theme: &Theme, status| tab_button_style(theme, status, is_active),
+        {
+            let style = Rc::clone(style);
+            move |theme: &Theme, status| style(theme, status, is_active)
+        },
         geometry.control,
         label_size,
         page_background,
@@ -358,6 +373,12 @@ pub(crate) fn tab_indicator_style(theme: &Theme) -> container::Style {
 /// harmless direction: a small colour distinction was described as
 /// removed, and was not. The reliable distinction is the underline,
 /// which RFC-102 put above the non-text floor in every theme.
+///
+/// **This is the unstyled path's style.** An `iced::Theme` carries no palette
+/// text level to hold, so the 30% mix stays here. The design path styles its
+/// tabs from its tokens with `snora_style::tab` (RFC-131), where an inactive
+/// label is held at the palette's level: the same 30% where that holds, the
+/// nearest mix toward the text where it does not (`light_aaa`: 26%).
 pub(crate) fn tab_button_style(
     theme: &Theme,
     status: button::Status,

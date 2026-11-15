@@ -32,6 +32,8 @@ pub mod removal;
 pub mod removal_scenes;
 #[cfg(feature = "widgets")]
 pub mod subjects;
+#[cfg(all(feature = "widgets", feature = "design"))]
+pub mod sweep;
 #[cfg(feature = "widgets")]
 pub mod tab_router;
 

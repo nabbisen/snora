@@ -37,6 +37,7 @@ pub mod style {
     pub use snora_style::color;
     pub use snora_style::container;
     pub use snora_style::progress;
+    pub use snora_style::tab;
     pub use snora_style::text;
 }
 

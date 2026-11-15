@@ -299,6 +299,16 @@ fn derive_background(seed: iced::Color, text: iced::Color) -> Background {
     }
 }
 
+/// The `weak` tier of the background that [`theme`] builds for `tokens`: the fill an inactive tab
+/// takes when hovered. A function of the tokens alone, so a style function that is handed a
+/// [`Tokens`] and not a [`Theme`] draws exactly what the theme would give.
+pub(crate) fn background_weak(tokens: &Tokens) -> iced::Color {
+    let p = &tokens.palette;
+    derive_background(to_iced_color(p.background), to_iced_color(p.text_primary))
+        .weak
+        .color
+}
+
 /// Computes `Background.strong`'s fill color: [`shift_away_from`] the
 /// seed away from its own tone (see [`derive_background`]'s doc comment
 /// for why `strong` keys off the seed rather than text), growing the
