@@ -1,8 +1,9 @@
 # RFC-134 — No checkbox, toggle, radio, pick list or slider can be reached by the keyboard
 
-**Status.** Proposed 2026-11-15, for the owner. **Direction already ruled** (owner, 2026-11-15):
-"Should snora provide focusable form controls? — Yes. Preferred if available and reasonable." This
-RFC is the how, for the owner to accept.
+**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings). The
+direction was ruled first: "Should snora provide focusable form controls? — Yes. Preferred if
+available and reasonable."
+**Handoff.** [`handoffs/134-…`](../handoffs/134-no-form-control-can-be-reached-by-the-keyboard/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from logolig's report ("snora has no focusable checkbox, slider
 or pick list in any version"), verified true by measurement.
 **Release target.** After 0.64.0 (Q-4). Unit 0 can run once 0.63 ships.
@@ -78,6 +79,15 @@ target floor.
 - Unit 0 after 0.63 ships;
 - the controls Unit 0 finds reasonable from **0.65.0**, so that 0.64 stays the one breaking
   release (RFC-133, the F6 removal) and these arrive as additions.
+
+## Rulings, 2026-11-15 (owner)
+
+Accepted as proposed:
+- **Q-1:** snora's own controls, on `snora-interaction`'s `Control`. No wrapper over iced's.
+- **Q-2:** both paths, `snora::…` and `snora::design::…`.
+- **Q-3:** Unit 0 decides control by control. One that is not reasonable is left to a trigger, with
+  the keyboard guide's workaround.
+- **Q-4:** Unit 0 after 0.63 ships; the controls from 0.65.0, as additions.
 
 ## Review against snora's principles
 

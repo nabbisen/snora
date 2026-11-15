@@ -270,6 +270,10 @@ covenant.
 notice, the removable chip, the progress bar, the footer and `render_menu` a required `direction`.
 One breaking release, so adopters migrate once.
 
+**0.65.0 (scheduled):** keyboard-reachable form controls (RFC-134): a checkbox, toggle, radio group,
+select and slider on snora's `Control`, both paths, where Unit 0 finds them reasonable. They are
+additions.
+
 ## Future wanted
 
 - **A contrast sweep for glyphs** (a notice's dismiss mark, a removable chip's close mark) at the

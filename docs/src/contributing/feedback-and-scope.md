@@ -26,7 +26,7 @@ Snora's value is in these areas:
 | Second toast variant (info, persistent ack) | Accepted when two apps need it |
 | Tooltip vocabulary | Accepted when a second consumer type appears |
 | Anchored popover | Accepted with a concrete consuming app |
-| Form widgets / validation | Validation and form layout: out of scope. **Keyboard-reachable versions of iced's checkbox, toggle, radio, pick list and slider: being decided** (RFC-134; the owner ruled snora should provide them where reasonable, 2026-11-15), because iced 0.14's cannot be reached by the keyboard |
+| Form widgets / validation | Validation and form layout: out of scope. **Keyboard-reachable versions of a checkbox, toggle, radio group, select and slider: in scope** (RFC-134, accepted 2026-11-15, from 0.65.0 where reasonable), because iced 0.14's cannot be reached by the keyboard |
 | Table / chart / data-display | Out of scope — UI library territory |
 | Decorative widgets (avatar, badge, chip) | Out of scope — trivial inline |
 | Snora-owned theming layer (state, cascade, registry) | Firm non-goal — use iced theming |
