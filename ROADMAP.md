@@ -264,6 +264,10 @@ covenant.
 - **RFC-132:** under RTL, mirroring becomes a layout, not a reordering. That fixes the header and a
   flip that loses focus, and Tab follows reading order.
 
+- **RFC-135 (accepted 2026-11-15):** one non-text rule at 3:1 on drawn pixels. It fixes the
+  progress track (invisible on the high-contrast presets), a `Debug` toast's fill, the menu's
+  scrollbar and `card::raised`'s border.
+
 **The letters to app teams are deferred to the 0.63 release** (owner, 2026-11-14).
 
 **0.64.0 (scheduled):** the deprecated F6 types are removed (RFC-126), and **RFC-133** gives the

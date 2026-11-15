@@ -122,6 +122,24 @@ The owner asked for a careful check against the fundamental philosophy. That che
 mechanical, self-checking inventory; one level per palette whatever the size; the disabled
 exemption; and which cue carries the tab's state. These are in R-1 and Q-2 above.
 
+## Rulings at Unit 0's review, 2026-11-15 (owner and architect)
+
+- **Q-1's route (owner):** the tab's style moves to `snora-style` as `snora_style::tab`, re-exported
+  at `snora::design::style::tab`, as the chips' did (RFC-129 Q-5). The rule (`state`) stays
+  `pub(crate)`, with one copy. **Rejected:**
+  - a one-use exported colour function;
+  - a second copy of the rule in `snora-widgets`.
+- **Words and glyphs (architect, M-1; the owner told):** a word is text, held to its palette's
+  level. A glyph that is not a word (an icon, the `×`, the breadcrumb's separator, a tab's icon) is
+  non-text, held to 3:1 by RFC-135. This is WCAG's own split (1.4.3 and 1.4.6 against 1.4.11). The
+  sweep's table classifies each run in the test; it is not inferred.
+- **Measured (Unit 0):** with that split, the inactive tab on `light_aaa` is the only text under
+  its level: 24 cells, binding on `surface` at 6.10:1, not the 6.58 computed against the page.
+- **The completeness check** is the four tripwires: a frame run not in the table; a text primitive
+  not announced to `Operation::text`; a design widget with no scene; a `fill_quad` with no finder.
+  Each has a plant.
+- **The sweep runs in both directions** (Unit 0 judged colour direction-free; the test proves it).
+
 ## Review against snora's principles
 
 - **Nobody is confused.** "Every text snora draws holds its level" becomes a sentence that is

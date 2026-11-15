@@ -1,6 +1,7 @@
 # RFC-135 — Four things snora draws fall under 3:1 against what they sit on, and no test measures a glyph
 
-**Status.** Proposed 2026-11-15, for the owner.
+**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/135-…`](../handoffs/135-four-non-text-boundaries-fall-under-three-to-one/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from the drawn-contrast Unit 0, the non-text half (ruled in
 0.63's scope, owner, 2026-11-14).
 **Release target.** 0.63.0 (Q-3).
@@ -81,6 +82,14 @@ its iced theme's style, as the unstyled path does, and the book says so.
 
 **Q-3 — 0.63.0.** **Suggest: yes.** It is the scope the owner set for 0.63 ("non-text contrast at
 3:1, on the pixels drawn"), the machinery exists, and the changes are styles.
+
+## Rulings, 2026-11-15 (owner)
+
+Accepted as proposed:
+- **Q-1:** Unit 1 measures a border and a darker track for the progress track, and takes the one that
+  changes the bar less.
+- **Q-2:** snora's own scrollables only.
+- **Q-3:** 0.63.0.
 
 ## Review against snora's principles
 
