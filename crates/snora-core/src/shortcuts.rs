@@ -255,7 +255,7 @@ impl<Message: Clone> Shortcuts<Message> {
         self.platform
     }
 
-    /// Every route, for a layout read in `direction`.
+    /// Every route.
     ///
     /// - **Digits:** `n` is the *n*th destination, `9` is the last, and a digit
     ///   beyond the count has no route. No destination (digits set to tabs, and
@@ -264,11 +264,10 @@ impl<Message: Clone> Shortcuts<Message> {
     ///   under **both** directions (RFC-132), and **wrap**: next is the declared
     ///   next tab, which under [`LayoutDirection::Rtl`] is the one to the left on
     ///   screen. With fewer than two tabs there is nothing to go to.
-    ///
-    /// `direction` is accepted and **no route depends on it today** (the tab rule
-    /// did until RFC-132 made Tab order logical); removing the parameter would be
-    /// a breaking change nobody has ruled on.
     /// - **Parent:** the ancestor before the leaf.
+    ///
+    /// `direction` is **ignored since 0.63 (RFC-132): no route depends on the
+    /// direction.** Removed in 0.64.0.
     #[must_use]
     pub fn routes(&self, _direction: LayoutDirection) -> Vec<ShortcutRoute<Message>> {
         let mut routes = Vec::new();
