@@ -105,7 +105,7 @@ The floor tested is `NON_TEXT_MIN` (`3.0:1`, WCAG SC 1.4.11's own
 non-text-contrast threshold) — what the `border` role, used directly
 and unmodified (per the mapping above — no derived shift, unlike the
 modal dim below), actually achieves against the plain page across all
-four built-in presets, with the worst case (`light`) clearing it by 13%.
+four built-in presets (the table above, pinned by `book_figures.rs`).
 The border was repaired to clear this bar specifically in 0.34.0
 (RFC-058); the assertion did not test the real bar until 0.38.1
 (RFC-071) — for four minors it tested a discount value (`1.3:1`) chosen
@@ -174,10 +174,10 @@ the release that changed `DIM_ALPHA` without updating this table):
 | `high_contrast_light` | black | 3.2424:1 |
 | `high_contrast_dark` | white | 4.2529:1 |
 
-All four clear `NON_TEXT_MIN` (`3.0:1`) — `light` and
-`high_contrast_light` by the thinnest margin, 8%, which is exactly why
-`DIM_ALPHA` was set to `0.44` rather than the `0.42` that would have
-cleared it by 1.3% (RFC-065). Shared with the card border floor above,
+All four clear `NON_TEXT_MIN` (`3.0:1`), `light` and
+`high_contrast_light` by the thinnest margin (the table above, pinned by
+`book_figures.rs`). That margin is why `DIM_ALPHA` was set to `0.44` rather
+than `0.42`, which would have cleared it by much less (RFC-065). Shared with the card border floor above,
 deliberately (RFC-071): both measure "is this element visually distinct
 from the page behind it," not because the two elements are otherwise
 related.

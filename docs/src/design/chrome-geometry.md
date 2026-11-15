@@ -84,18 +84,28 @@ of why stock snora chrome reads as flat and dated". Both map to `Radius::sm`
 full-width chrome strip. **The tab bar has no radius** since RFC-102, which
 made its edge a straight rule. *(Corrected 2026-11-15, from the 0.63 audit: this listed the tab bar as a third.)*
 
-**Unmapped literals** — no `Spacing`/`Radius` equivalent, left as
-literal constants, identical in both the unstyled and styled paths:
+**Unmapped literals** — every literal in the chrome builders that is not a `Spacing` or
+`Radius` token, the same on the unstyled and the styled path (complete as of 0.63, from a reading
+of `header.rs`, `footer.rs`, `sidebar.rs`, `tab.rs`, `crumb.rs`, `menu.rs` and `design/widget.rs`):
 
-- Sidebar's and breadcrumb's button border *widths* (`0.0` — "no
-  border" is not expressible on either scale).
-- The tab bar's 1 px bottom edge, a separate rule element (its container
-  paints no border, which a test asserts). Border widths are not part of
-  either scale.
-- The tab bar's vertical padding (`0.0` — structural: tabs supply their
-  own vertical padding via their button padding; this is an absence of
-  a value, not a design literal).
+| Where | Literal | What it is |
+|---|---|---|
+| header | a fixed 20 px spacer | between the title and the first menu (title to menu is `gap + 20 + gap`) |
+| header, footer | `radius: 0.0` (unstyled) | square corners (see *Chrome radius*) |
+| sidebar | rail width 64, button 48 | the rail and each rail button |
+| sidebar | horizontal padding 8 | derived: `(64 − 48) / 2` (RFC-099) |
+| sidebar | labelled rail at most 240 wide | its widest form |
+| sidebar | label gap `gap / 2` | between a button and its name; follows the mapped `gap` |
+| sidebar | unstyled tooltip: radius 6, padding `[4, 8]`, gap 4, border 1 | the styled path maps these through `card_raised` |
+| sidebar, breadcrumb | button padding 0, border width 0 | "no padding", "no border" |
+| tab bar | underline 2 px; bottom edge 1 px | the active tab's indicator; the bar's edge (its container paints no border, which a test asserts) |
+| tab bar | vertical padding 0 | tabs supply their own, through their button padding |
+| tab bar | inactive label `mix(text, page, 0.3)` (unstyled) | on the design path the share is the first that holds the palette's level (RFC-131) |
+| breadcrumb | ancestor rule 1 px | under an ancestor crumb |
+| breadcrumb | separator `mix(text, page, 0.5)` | held to 3:1 as a glyph (RFC-135) |
+| menu | iced's default button padding | a trigger's and an item's padding |
 
+*(Corrected 2026-11-16, from the 0.63 audit follow-up: this list named four of these.)*
 ## Density (RFC-040 Q-1)
 
 Every styled function above reads geometry from `tokens.spacing`/

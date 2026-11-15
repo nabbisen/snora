@@ -27,7 +27,7 @@ freezes two surfaces by name:
   individually — the `contrast` module's `relative_luminance`,
   `contrast_ratio`, `composite_over`.
 - **The style-bridge surface** — every public function of `snora_style`
-  (the `color`, `button`, `chip`, `container`, `progress`, `text`, and
+  (the `color`, `button`, `chip`, `container`, `progress`, `tab`, `text`, and
   `theme` modules) — see [API governance § Additive-only
   covenant](../contributing/api-governance.md#additive-only-covenant-design-surface)
   for the current function list rather than a second, hand-maintained

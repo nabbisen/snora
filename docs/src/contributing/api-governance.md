@@ -176,7 +176,7 @@ it.
 
 **Style-bridge surface** — all public functions of `snora_style`
 (RFC-055; formerly `snora_widgets::design::style`, removed in RFC-056):
-the `color`, `button`, `chip` (0.62), `container`, `progress`, `text`, and
+the `color`, `button`, `chip` (0.62), `container`, `progress`, `tab` (0.63), `text`, and
 `theme` modules. See the crate's own rustdoc for the current function list —
 that sentence defines the surface completely; a hand-listed
 enumeration adds no governance and can only go stale, which it has

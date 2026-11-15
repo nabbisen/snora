@@ -20,7 +20,23 @@ contributor-facing documents linked below, not duplicated here.
   - `light_aaa` and `dark_aaa` hold **every declared text pair at AAA,
     7:1**, with their parent's character (RFC-118);
   - `high_contrast_light` and `high_contrast_dark` are for maximum
-    contrast, with text at 8.38:1 or more and borders at 21:1. **Every threshold is a floor, never a ceiling** — if a
+    contrast, with text at 8.38:1 or more and borders at 21:1 against the
+    page (19.80:1 on `high_contrast_dark`'s raised surface).
+  - **What is measured, and how (0.63):** every **word** snora draws on the
+    design path holds its palette's level, 4.5:1 or 7:1, at rest, hovered
+    and pressed, on every neutral surface, in both directions. Every
+    **non-text element** a reader needs to see a control or its state holds
+    **3:1**: a glyph that is not a word (an icon, the ×, the breadcrumb's
+    separator), a border, a track, the focus ring, a scrollbar. Both are read
+    from the drawn pixels, by tests that find every text run and boundary in a
+    frame (RFC-131, RFC-135). A glyph is read at twice the pixel density, so a
+    thin stroke is measured at its colour. **Not held to 3:1, by design:** a
+    hover or press tint (its label carries the state), a drop shadow, a
+    tooltip's border over coloured content, and a dialog's or sheet's border
+    alone (their fill is the boundary). Disabled controls are exempt, as WCAG
+    1.4.3 allows. *(Before 0.62 only the declared colour pairs at rest were
+    tested; 0.62 added the buttons, chips and notice actions as drawn.)*
+  - **Every threshold is a floor, never a ceiling** — if a
   decision in your own code depends on a snora colour staying *below*
   some contrast value, that is not a guarantee snora makes; see
   [API governance § Permitted without reopening the gate](../contributing/api-governance.md#permitted-without-reopening-the-gate)
@@ -32,7 +48,10 @@ contributor-facing documents linked below, not duplicated here.
   the sidebar's items are focus targets. Enter and Space press the focused
   one and publish the same message a click does, and a focus ring of at
   least 3:1 shows where focus is. A control with no handler is disabled and
-  skipped. **iced binds no Tab key, so your application routes it, in one
+  skipped. **snora draws no form controls, and iced 0.14's checkbox, toggler,
+  radio, pick list, combo box and slider cannot be reached by the keyboard;**
+  see [Keyboard § Form controls](keyboard.md#form-controls) (RFC-134 plans
+  snora's own). **iced binds no Tab key, so your application routes it, in one
   line of `update`:**
 
   ```rust,ignore
@@ -108,7 +127,7 @@ them.
 |---|---|
 | **Set a larger text size:** `default_text_size` on the unstyled path, or scale `Typography` on the design path | Every control's target is at least **1.5 × its text** (and never under 24 px). Icons are **1 em** of the text beside them, and the toast's × is 1.125 em. Sidebar names, tab labels and toast text follow it. Caller text wraps and is never clipped (RFC-105) |
 | **Raise `tokens.targets.min`** (44, say) | Every design-path control is at least that, in both directions: `design::button`, `design::chip` and its ×, and the `design::widget` tab bar and sidebar. Below 24 it does nothing |
-| **Choose `Tokens::light_aaa()` / `dark_aaa()`**, or the high-contrast presets | **Every declared text pair at 7:1 or more**, the accent included (the AAA presets keep Light's and Dark's character; high contrast goes further, with text at 8.38:1 or more and borders at 21:1). Asserted by `cargo test -p snora-design` |
+| **Choose `Tokens::light_aaa()` / `dark_aaa()`**, or the high-contrast presets | **Every declared text pair at 7:1 or more**, the accent included (the AAA presets keep Light's and Dark's character; high contrast goes further, with text at 8.38:1 or more and borders at 21:1 against the page). Asserted by `cargo test -p snora-design`, and **as drawn, hovered and pressed included**, by `text_sweep.rs` (0.63) |
 | **Keep the labelled sidebar**, the default since 0.54 | Each item's name is on the rail, beneath its icon. Nothing depends on hovering, which an unsteady hand cannot do (RFC-114) |
 | **Use `.persistent()`** for a toast that must be read | It stays until dismissed. Every other toast already stays 2 s plus 1 s per 6 characters, at least 6 s, and errors are persistent by default (RFC-113) |
 | **Use `design::button::link`** for anything that takes the reader somewhere | It is underlined under every line, so it does not depend on colour (RFC-117) |

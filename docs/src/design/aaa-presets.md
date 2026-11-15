@@ -24,9 +24,12 @@ are for applications that hold their text to AAA, for instance for older readers
 - on every neutral surface (`background`, `surface`, `surface_raised`);
 - measured on the pixels drawn.
 
-**Other text is not measured as drawn yet.** Tab labels, crumbs, sidebar names, menu items,
-tooltips, a notice's title and body, and toasts are outside that sweep. An inactive tab's label
-is a mix of text and page, and **reads 6.58:1 on `light_aaa`**, under its 7:1 (RFC-131).
+**Since 0.63, every word snora draws is measured as drawn:** tab labels, crumbs, sidebar names,
+menu items, tooltips, a notice's title and body, toasts and the rest, found from the frame so
+that no text can be left out (RFC-131). An inactive tab's label, a mix of text and page, read
+6.10:1 on `light_aaa`'s `surface` in 0.62. It now takes the share that holds 7:1, and the tab's
+state is carried by its underline, held at 3:1: **the muted label is a secondary cue, not the
+indicator.**
 
 Before 0.62 it held only at rest. 17 combinations of a preset, a variant and a state
 fell under their level, most of them on these two presets (RFC-129). Every state also
