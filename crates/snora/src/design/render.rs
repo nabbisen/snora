@@ -225,11 +225,16 @@ fn toast_style(tokens: &Tokens) -> ToastStyle {
 /// `container::card_raised` uses and is contrast-tested with the rest.
 /// That keeps it reading as "not a status" while staying legible, which
 /// is what the theme path's `background.strong` did.
+///
+/// **It is outlined** (RFC-135), in the palette's `border` role: its fill is next to the page's colour
+/// (1.00 to 1.20:1 measured), so the outline is the boundary a reader sees. The four status fills are
+/// colours of their own (5.02:1 and up) and have none.
 pub(crate) fn toast_intent_colors(tokens: &Tokens) -> ToastIntentColors {
     let p = &tokens.palette;
     let pair = |fill, text| (to_iced_color(fill), to_iced_color(text));
     ToastIntentColors {
         debug: pair(p.surface_raised, p.text_primary),
+        debug_border: to_iced_color(p.border),
         info: pair(p.info, p.info_text),
         success: pair(p.success, p.success_text),
         warning: pair(p.warning, p.warning_text),
@@ -253,6 +258,9 @@ fn dialog_card_style(tokens: &Tokens) -> DialogCardStyle {
     // Border-defined, not shadow-defined (RFC-039) — card_raised's shadow
     // is meant for popovers/floating panels, not this surface.
     style.shadow = iced::Shadow::default();
+    // The raised card's border is firmed against its own shadow (RFC-135); the dialog has no shadow, so it
+    // keeps the plain `border` role, as it always drew.
+    style.border.color = to_iced_color(tokens.palette.border);
 
     DialogCardStyle {
         padding: tokens.spacing.lg,

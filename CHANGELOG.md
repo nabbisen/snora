@@ -64,6 +64,37 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Fixed
 
+- **Four things snora draws fell under 3:1 against what they sit on (RFC-135).** WCAG 1.4.11 asks 3:1 of
+  the parts of a control a reader needs to see it, and a new sweep (`nontext_sweep.rs`) measures every
+  non-text element on the drawn pixels, in every preset, on every neutral surface, in each state, in both
+  directions: 3,324 cells. Glyphs (every icon, the `×` of a chip, a notice and a toast, the breadcrumb's
+  separator) were all at 3.12:1 or more. Four boundaries were not:
+  - **The progress bar's track** read 1.00 to 1.11:1 against what it sits on, and exactly 1.00 on both
+    high-contrast presets, where `surface` *is* the page: the unfilled part of a bar was invisible.
+    **It has a 1 px outline now, in the `border` role.** (A darker track was the other way; it takes every
+    tone's bar under 3:1 against it on `light` and `dark`, where today's is 3.12 and up. The outline leaves
+    the bar's contrast as it was.) **Retake the screenshot baselines of a progress bar or card.**
+  - **A `Debug` toast** read 1.00 to 1.20:1 against the page (its fill is a neutral surface). **It has a 1 px
+    outline now**: the `border` role on the design path, the page's text colour on the theme path. Its fill
+    is unchanged. The other four intents (5.02:1 and up) need none: every intent has a 1 px border and
+    theirs is their own fill's colour, so a toast still varies by intent through colour alone (RFC-093's
+    channel register). **Retake the baselines of a `Debug` toast.**
+  - **The menu's scrollbar** (a menu taller than the window) read 1.8:1 on `light`, down to 1.02 on
+    `high_contrast_dark`: iced's default thumb. **The thumb holds 3:1 against its track and the page now,**
+    on both paths, by moving iced's own colour toward the text by the smallest step that does (at rest,
+    hovered and dragged). Only snora's own scrollable; an application's takes its iced theme's style.
+    **Retake the baselines of a long menu.**
+  - **`card::raised`'s border** read 2.75:1 against the page under its own drop shadow on `light` and
+    `light_aaa` (the shadow darkens the page by 6% at the edge). **It is firmed 7% toward the text there,**
+    and is exactly the `border` role on the other four presets. (A weaker shadow, alpha 0.12 to 0.037, was
+    the other way; it takes the shadow nearly away.) The sidebar's and a chip's tooltip bodies are raised
+    cards too and take the same border. The dialog, which casts no shadow, keeps the plain role.
+    **Retake the baselines of a raised card on `light` and `light_aaa`.**
+  Nothing that passed moves: a table of 2,268 colours every passing subject drew before, asserted again.
+  What is **not** a gap is listed in the test with its reason, so nobody "fixes" it: the dialog's and
+  the sheet's border (their fill against the dimmed page is 3.23:1 or more, and is the boundary a reader
+  sees), a hover or press tint (WCAG does not ask it; the label and a ΔE76 of 3 carry the state), the drop
+  shadow (decorative), and a tooltip's border over coloured content.
 - **An inactive tab's label read under `light_aaa`'s text level (RFC-131).** It was drawn as a 30%
   mix of the text colour and the page, a colour no palette declares, and the 0.62 sweep did not draw
   tabs. Measured on the pixels it reads **6.60:1 on the page and on `surface_raised`, and 6.10:1 on

@@ -1,11 +1,11 @@
 //! RFC-131: **every text a snora widget draws on the design path holds its palette's level** (4.5, or
 //! 7), whatever its size, at rest and in every state it has, on every neutral surface it can sit on,
-//! in every preset, **in both directions**; and every glyph that is not a word holds 3:1.
+//! in every preset, **in both directions**. (A glyph that is not a word is held to 3:1 by
+//! `nontext_sweep.rs`; here it only has to be listed as one.)
 //!
 //! `text_floor.rs` (RFC-128 R-2) draws the buttons, chips, links and a notice's action. This is the
 //! sweep it promised and did not complete: tab labels, crumbs, sidebar names, menu items, tooltips, a
-//! notice's title and body, toasts, the header's title, the footer, progress labels, and the glyphs
-//! beside them. Its inventory is made by drawing (`common/sweep.rs` says how), and it is checked for
+//! notice's title and body, toasts, the header's title, the footer and progress labels. Its inventory is made by drawing (`common/sweep.rs` says how), and it is checked for
 //! completeness by three tripwires, each with a plant that must fail it:
 //!
 //! 1. **a text run in a frame that the scene's table does not name;**
@@ -46,7 +46,9 @@ fn under(cells: &[Cell]) -> Vec<String> {
         .filter_map(|c| {
             let (floor, what) = match c.kind? {
                 Kind::Word => (level(c.preset), "word".to_owned()),
-                Kind::Glyph(why) => (NON_TEXT, format!("glyph ({why})")),
+                // A glyph that is not a word is held to 3:1 in `nontext_sweep.rs` (RFC-135); here it only has
+                // to be *listed* as one, which is what keeps a label from being waved through as a glyph.
+                Kind::Glyph(_) => return None,
                 Kind::App => return None,
             };
             (c.ratio + TOLERANCE < floor).then(|| {

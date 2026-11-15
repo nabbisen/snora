@@ -14,7 +14,7 @@
 //!
 //! WCAG's own split: a **word** (a label, a title, a crumb, a number) is text, held to its palette's
 //! level (1.4.3, 1.4.6: 4.5, or 7). A **glyph that is not a word** (an icon, the `×`, the breadcrumb's
-//! `›`/`‹`, a tab's `★`) is a graphical object, held to 3:1 (1.4.11, RFC-135). **Each scene lists its
+//! `›`/`‹`, a tab's `★`) is a graphical object, held to 3:1 (1.4.11, held by `nontext_sweep.rs`, RFC-135). **Each scene lists its
 //! runs and says which is which, here, in writing; the classification is never inferred from a
 //! string**, so a label cannot be waved through as a glyph, and a run the table does not name fails
 //! (tripwire 1 in `text_sweep.rs`).
@@ -95,7 +95,7 @@ pub const TOLERANCE: f32 = 0.05;
 pub enum Kind {
     /// A word: text, held to the palette's level.
     Word,
-    /// A glyph that is not a word, with what it is: held to 3:1.
+    /// A glyph that is not a word, with what it is: held to 3:1 by `nontext_sweep.rs`.
     Glyph(&'static str),
     /// The application's own content in the scene (a snora widget does not draw it): not measured.
     App,

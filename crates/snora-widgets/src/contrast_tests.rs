@@ -717,3 +717,74 @@ fn readable_text_table() {
         failures.join("\n  "),
     );
 }
+
+// ---------------------------------------------------------------------
+// The menu's scrollbar — RFC-135. iced's own style drew the thumb in
+// `background.strongest` on `background.weak`, which on the dropdown's
+// white card reads 1.8:1 (1.02 on `high_contrast_dark`). Now each thumb
+// colour iced would draw — at rest, hovered, dragged — holds 3:1 against
+// its track and against the page it sits on (the dropdown card), in all
+// 24 contexts below (stock and design). The page is `page_background`.
+// ---------------------------------------------------------------------
+#[test]
+fn the_menus_scrollbar_thumb_meets_the_non_text_floor_against_its_track_and_the_page() {
+    use crate::menu::scrollbar_style;
+    use iced::widget::scrollable::Status;
+    let mut failures = Vec::new();
+    for (context, theme) in theme_contexts() {
+        let page = crate::style::page_background(&theme);
+        for (label, status) in [
+            (
+                "at rest",
+                Status::Active {
+                    is_horizontal_scrollbar_disabled: false,
+                    is_vertical_scrollbar_disabled: false,
+                },
+            ),
+            (
+                "hovered",
+                Status::Hovered {
+                    is_horizontal_scrollbar_hovered: true,
+                    is_vertical_scrollbar_hovered: true,
+                    is_horizontal_scrollbar_disabled: false,
+                    is_vertical_scrollbar_disabled: false,
+                },
+            ),
+            (
+                "dragged",
+                Status::Dragged {
+                    is_horizontal_scrollbar_dragged: true,
+                    is_vertical_scrollbar_dragged: true,
+                    is_horizontal_scrollbar_disabled: false,
+                    is_vertical_scrollbar_disabled: false,
+                },
+            ),
+        ] {
+            let style = scrollbar_style(&theme, status);
+            for (which, rail) in [
+                ("vertical", style.vertical_rail),
+                ("horizontal", style.horizontal_rail),
+            ] {
+                let iced::Background::Color(thumb) = rail.scroller.background else {
+                    failures.push(format!(
+                        "{context} {label} {which}: the thumb is not a colour"
+                    ));
+                    continue;
+                };
+                let mut against = vec![("the page", page)];
+                if let Some(iced::Background::Color(track)) = rail.background {
+                    against.push(("its track", track));
+                }
+                for (what, behind) in against {
+                    let r = contrast_ratio(to_sn(thumb), to_sn(behind));
+                    if r < NON_TEXT_MIN {
+                        failures.push(format!(
+                            "{context} {label} {which} thumb against {what}: {r:.2}:1"
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    assert_no_failures(failures);
+}

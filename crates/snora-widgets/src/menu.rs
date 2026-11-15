@@ -185,9 +185,11 @@ where
             // top on the first item and bottom on the last.
             let reach = geometry.control.ring_offset;
             let dropdown = (!items.is_empty()).then(|| {
-                container(scrollable(container(column(items)).padding(reach)))
-                    .style(dropdown_card)
-                    .into()
+                container(
+                    scrollable(container(column(items)).padding(reach)).style(scrollbar_style),
+                )
+                .style(dropdown_card)
+                .into()
             });
             MenuAnchor::new(trigger, dropdown, end_aligned, geometry.control.ring_offset).into()
         }
@@ -201,4 +203,53 @@ fn dropdown_card(theme: &iced::Theme) -> container::Style {
         background: Some(iced::Background::Color(page_background(theme))),
         ..chrome_container_style(theme)
     }
+}
+
+/// A thumb's contrast floor, a hair above WCAG 1.4.11's 3:1 so that rounding a colour to 8 bits cannot take it under.
+const THUMB_FLOOR: f32 = 3.05;
+
+/// The menu's scrollbar (RFC-135): iced's own scrollable style, with **the thumb held at 3:1 against its track and
+/// against the page it sits on** (the dropdown card).
+///
+/// iced's default draws the thumb in `background.strongest` on a `background.weak` track, which on the dropdown's
+/// white card reads 1.8:1 on `light`, and as little as 1.02 on `high_contrast_dark`. Here each thumb colour iced
+/// would draw (at rest, hovered, dragged) is **kept where it already holds the floor** and otherwise moved toward the
+/// page's text colour by the smallest step that does (2% at a time). The rest of iced's style (the track, the
+/// corners, the auto-scroll overlay) is its own.
+///
+/// One function for both paths: the floor is WCAG's 3:1 and does not depend on a palette's text level, so it reads
+/// the theme the way `dropdown_card` does.
+pub(crate) fn scrollbar_style(
+    theme: &iced::Theme,
+    status: scrollable::Status,
+) -> scrollable::Style {
+    use snora_interaction::contrast::contrast_ratio;
+    let mut style = scrollable::default(theme, status);
+    let page = page_background(theme);
+    let text = theme.extended_palette().background.base.text;
+    for rail in [&mut style.vertical_rail, &mut style.horizontal_rail] {
+        let track = match rail.background {
+            Some(iced::Background::Color(c)) => Some(c),
+            _ => None,
+        };
+        let iced::Background::Color(thumb) = rail.scroller.background else {
+            continue;
+        };
+        let holds = |c: iced::Color| {
+            contrast_ratio(c, page) >= THUMB_FLOOR
+                && track.is_none_or(|t| contrast_ratio(c, t) >= THUMB_FLOOR)
+        };
+        let mix = |share: f32| iced::Color {
+            r: thumb.r + (text.r - thumb.r) * share,
+            g: thumb.g + (text.g - thumb.g) * share,
+            b: thumb.b + (text.b - thumb.b) * share,
+            a: thumb.a,
+        };
+        let held = (0..=50)
+            .map(|k| mix(k as f32 / 50.0))
+            .find(|&c| holds(c))
+            .unwrap_or(text);
+        rail.scroller.background = iced::Background::Color(held);
+    }
+    style
 }

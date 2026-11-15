@@ -38,10 +38,55 @@ pub fn card_surface(tokens: &Tokens) -> container::Style {
     }
 }
 
+/// The shadow's alpha, and the share of it that reaches the pixel just outside a raised card's edge.
+///
+/// A blurred shadow is about half its alpha at the edge of the shape it is cast from, and the 2 px drop adds a
+/// little under the bottom edge. **Measured on the drawn card: 0.49 of the alpha, on both renderers** (white
+/// reads `#f0f0f0` there); 0.55 keeps margin.
+const RAISED_SHADOW_ALPHA: f32 = 0.12;
+const SHADOW_AT_THE_EDGE: f32 = 0.55;
+
+/// The border a raised card draws (RFC-135): the `border` role, firmed toward the text just far enough to hold 3:1
+/// against **each neutral surface darkened by the card's own shadow**, which is what lies beside the border's
+/// bottom edge. Where the role already holds that (four of the six presets), it is the role, to the float.
+///
+/// The `border` role holds 3:1 against the surfaces as they are (`Palette::usages`); the shadow darkens the page by
+/// about 6% right at the edge, and on `light` and `light_aaa` that took it to 2.75:1. The other way to fix it, a
+/// weaker shadow (alpha 0.12 to 0.037 on those two presets), would have taken the shadow nearly away; the border
+/// moves less.
+fn raised_border(tokens: &Tokens) -> Color {
+    let p = &tokens.palette;
+    let role = to_iced_color(p.border);
+    let text = to_iced_color(p.text_primary);
+    let under_shadow = 1.0 - RAISED_SHADOW_ALPHA * SHADOW_AT_THE_EDGE;
+    let surfaces = [p.background, p.surface, p.surface_raised].map(|c| {
+        snora_design::Color::rgb(c.r * under_shadow, c.g * under_shadow, c.b * under_shadow)
+    });
+    let mix = |share: f32| Color {
+        r: role.r + (text.r - role.r) * share,
+        g: role.g + (text.g - role.g) * share,
+        b: role.b + (text.b - role.b) * share,
+        a: 1.0,
+    };
+    (0..=100)
+        .map(|k| mix(k as f32 / 100.0))
+        .find(|&c| {
+            surfaces.iter().all(|&s| {
+                snora_design::contrast::contrast_ratio(snora_design::Color::rgb(c.r, c.g, c.b), s)
+                    >= 3.0
+            })
+        })
+        .unwrap_or(text)
+}
+
 /// Elevated card on a `surface_raised` background with a soft drop shadow.
 ///
 /// Use for popovers, floating panels, or cards that visually float above the
 /// surrounding content.
+///
+/// **The border holds 3:1 against the page under the card's own shadow** (RFC-135). It is the `border` role where
+/// that holds, and that role firmed toward the text where it does not (`light` and `light_aaa`: 7% toward the
+/// text). A surface that draws this card without its shadow (the dialog) takes the plain role.
 #[must_use]
 pub fn card_raised(tokens: &Tokens) -> container::Style {
     container::Style {
@@ -49,11 +94,11 @@ pub fn card_raised(tokens: &Tokens) -> container::Style {
         background: Some(to_iced_color(tokens.palette.surface_raised).into()),
         border: Border::default()
             .rounded(tokens.radius.lg)
-            .color(to_iced_color(tokens.palette.border))
+            .color(raised_border(tokens))
             .width(1.0),
         shadow: Shadow {
             color: Color {
-                a: 0.12,
+                a: RAISED_SHADOW_ALPHA,
                 ..Color::BLACK
             },
             offset: iced::Vector { x: 0.0, y: 2.0 },
@@ -138,5 +183,70 @@ mod tests {
         );
         // And `card_surface` casts none, so the raised card is the one that rises.
         assert_eq!(card_surface(&t).shadow.blur_radius, 0.0);
+    }
+
+    fn lum(c: Color) -> f64 {
+        let f = |v: f32| {
+            let v = f64::from(v);
+            if v <= 0.04045 {
+                v / 12.92
+            } else {
+                ((v + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b)
+    }
+
+    /// WCAG's ratio, written out here.
+    fn ratio(a: Color, b: Color) -> f32 {
+        let (la, lb) = (lum(a), lum(b));
+        let (hi, lo) = if la > lb { (la, lb) } else { (lb, la) };
+        ((hi + 0.05) / (lo + 0.05)) as f32
+    }
+
+    /// **A raised card's border holds 3:1 against the page under the card's own shadow** (RFC-135), on every neutral
+    /// surface, in every preset. The shadow is taken at 0.55 of its alpha at the edge (measured 0.49 on the drawn card);
+    /// the figures are computed here, not read from the function.
+    #[test]
+    fn a_raised_cards_border_holds_3_to_1_against_the_page_under_its_shadow() {
+        for (name, t) in Tokens::presets() {
+            let border = card_raised(&t).border.color;
+            let dark = 1.0 - 0.12 * 0.55;
+            for (surface_name, s) in [
+                ("background", t.palette.background),
+                ("surface", t.palette.surface),
+                ("surface_raised", t.palette.surface_raised),
+            ] {
+                let under = Color::from_rgb(s.r * dark, s.g * dark, s.b * dark);
+                let r = ratio(border, under);
+                assert!(
+                    r >= 3.0,
+                    "{name}: border {r:.2}:1 against {surface_name} under the shadow"
+                );
+            }
+        }
+    }
+
+    /// **Nothing that passes moves** (RFC-135): four of the six presets draw the `border` role exactly; only `light` and
+    /// `light_aaa`, where the shadow took it to 2.75:1, firm it toward the text.
+    #[test]
+    fn only_light_and_light_aaa_firm_the_raised_cards_border() {
+        for (name, t) in Tokens::presets() {
+            let role = to_iced_color(t.palette.border);
+            let drawn = card_raised(&t).border.color;
+            if name == "light" || name == "light_aaa" {
+                assert!(
+                    lum(drawn) < lum(role),
+                    "{name}: firmed toward the (dark) text"
+                );
+                assert!(
+                    ratio(drawn, role) < 1.2,
+                    "{name}: by a small step ({:.2})",
+                    ratio(drawn, role)
+                );
+            } else {
+                assert_eq!(drawn, role, "{name}: the plain role, to the float");
+            }
+        }
     }
 }

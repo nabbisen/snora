@@ -72,6 +72,10 @@ pub(crate) struct ToastStyle {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) struct ToastIntentColors {
     pub(crate) debug: (Color, Color),
+    /// The `Debug` toast's outline (RFC-135). `Debug` is the one intent with no status colour: its
+    /// fill is a neutral surface, which is next to the page's colour, so the outline is what a
+    /// reader sees. The four status fills are colours of their own and need none.
+    pub(crate) debug_border: Color,
     pub(crate) info: (Color, Color),
     pub(crate) success: (Color, Color),
     pub(crate) warning: (Color, Color),
@@ -538,13 +542,33 @@ fn toast_style(
 
     let (background, text_color) = intent_colors(theme, intent, overrides);
 
+    // **A `Debug` toast has an outline** (RFC-135): its fill is `surface_raised` on the design path
+    // and `background.strong` on the theme path, neither of which is 3:1 against the page it floats
+    // over (1.00 to 1.20 measured). The outline is the page's text colour on the theme path and the
+    // palette's `border` role on the design path, which holds 3:1 against every neutral surface.
+    // **Every intent has a 1 px border; only its colour differs.** The four status fills are
+    // colours of their own (5.02:1 and up), so their border is their own fill and draws nothing
+    // extra. That keeps the surface varying by intent through colour alone, which RFC-093's channel
+    // register asserts (`channel_register.rs`): a border *width* that depended on the intent would
+    // be a new channel, and the register would be saying something false.
+    let outline = if intent == ToastIntent::Debug {
+        match overrides {
+            Some(o) => o.debug_border,
+            None => theme.extended_palette().background.base.text,
+        }
+    } else {
+        background
+    };
+    let border = Border {
+        radius: 8.0.into(),
+        width: 1.0,
+        color: outline,
+    };
+
     Style {
         background: Some(Background::Color(background)),
         text_color: Some(text_color),
-        border: Border {
-            radius: 8.0.into(),
-            ..Default::default()
-        },
+        border,
         shadow: Shadow::default(),
         ..Default::default()
     }

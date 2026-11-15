@@ -1,0 +1,2268 @@
+light	primary button vs its surface	background	rest	#1d4ed8	#ffffff
+light	primary button vs its surface	background	hovered	#2c5de7	#ffffff
+light	primary button vs its surface	background	pressed	#0e3fc9	#ffffff
+light	primary button vs its surface	surface	rest	#1d4ed8	#f4f6f8
+light	primary button vs its surface	surface	hovered	#2c5de7	#f4f6f8
+light	primary button vs its surface	surface	pressed	#0e3fc9	#f4f6f8
+light	primary button vs its surface	surface_raised	rest	#1d4ed8	#ffffff
+light	primary button vs its surface	surface_raised	hovered	#2c5de7	#ffffff
+light	primary button vs its surface	surface_raised	pressed	#0e3fc9	#ffffff
+light	danger button vs its surface	background	rest	#b3261e	#ffffff
+light	danger button vs its surface	background	hovered	#c2352d	#ffffff
+light	danger button vs its surface	background	pressed	#a4170f	#ffffff
+light	danger button vs its surface	surface	rest	#b3261e	#f4f6f8
+light	danger button vs its surface	surface	hovered	#c2352d	#f4f6f8
+light	danger button vs its surface	surface	pressed	#a4170f	#f4f6f8
+light	danger button vs its surface	surface_raised	rest	#b3261e	#ffffff
+light	danger button vs its surface	surface_raised	hovered	#c2352d	#ffffff
+light	danger button vs its surface	surface_raised	pressed	#a4170f	#ffffff
+light	secondary button border vs its surface	background	rest	#1d4ed8	#ffffff
+light	secondary button border vs its surface	background	hovered	#0e3fc9	#ffffff
+light	secondary button border vs its surface	background	pressed	#0e3fc9	#ffffff
+light	secondary button border vs its surface	surface	rest	#1d4ed8	#f4f6f8
+light	secondary button border vs its surface	surface	hovered	#0e3fc9	#f4f6f8
+light	secondary button border vs its surface	surface	pressed	#0e3fc9	#f4f6f8
+light	secondary button border vs its surface	surface_raised	rest	#1d4ed8	#ffffff
+light	secondary button border vs its surface	surface_raised	hovered	#0e3fc9	#ffffff
+light	secondary button border vs its surface	surface_raised	pressed	#0e3fc9	#ffffff
+light	selected chip vs its surface	background	rest	#1d4ed8	#ffffff
+light	selected chip vs its surface	background	hovered	#0e3fc9	#ffffff
+light	selected chip vs its surface	background	pressed	#002fb9	#ffffff
+light	selected chip vs its surface	surface	rest	#1d4ed8	#f4f6f8
+light	selected chip vs its surface	surface	hovered	#0e3fc9	#f4f6f8
+light	selected chip vs its surface	surface	pressed	#002fb9	#f4f6f8
+light	selected chip vs its surface	surface_raised	rest	#1d4ed8	#ffffff
+light	selected chip vs its surface	surface_raised	hovered	#0e3fc9	#ffffff
+light	selected chip vs its surface	surface_raised	pressed	#002fb9	#ffffff
+light	unselected chip outline vs its surface	background	rest	#898c8f	#ffffff
+light	unselected chip outline vs its surface	background	hovered	#898c8f	#ffffff
+light	unselected chip outline vs its surface	background	pressed	#898c8f	#ffffff
+light	unselected chip outline vs its surface	surface	rest	#898c8f	#f4f6f8
+light	unselected chip outline vs its surface	surface	hovered	#898c8f	#f4f6f8
+light	unselected chip outline vs its surface	surface	pressed	#898c8f	#f4f6f8
+light	unselected chip outline vs its surface	surface_raised	rest	#898c8f	#ffffff
+light	unselected chip outline vs its surface	surface_raised	hovered	#898c8f	#ffffff
+light	unselected chip outline vs its surface	surface_raised	pressed	#898c8f	#ffffff
+light	notice tone bar vs the notice (info)	background	rest	#1d4ed8	#f4f6f8
+light	notice tone bar vs the notice (info)	surface	rest	#1d4ed8	#f4f6f8
+light	notice tone bar vs the notice (info)	surface_raised	rest	#1d4ed8	#f4f6f8
+light	notice tone bar vs the notice (neutral)	background	rest	#898c8f	#f4f6f8
+light	notice tone bar vs the notice (neutral)	surface	rest	#898c8f	#f4f6f8
+light	notice tone bar vs the notice (neutral)	surface_raised	rest	#898c8f	#f4f6f8
+light	notice outer border vs the page (info)	background	rest	#1d4ed8	#ffffff
+light	notice outer border vs the page (info)	surface	rest	#1d4ed8	#f4f6f8
+light	notice outer border vs the page (info)	surface_raised	rest	#1d4ed8	#ffffff
+light	notice outer border vs the page (neutral)	background	rest	#898c8f	#ffffff
+light	notice outer border vs the page (neutral)	surface	rest	#898c8f	#f4f6f8
+light	notice outer border vs the page (neutral)	surface_raised	rest	#898c8f	#ffffff
+light	toast fill vs the page (info)	(own page)	rest	#1d4ed8	#ffffff
+light	toast fill vs the page (error)	(own page)	rest	#b3261e	#ffffff
+light	toast fill vs the page (success)	(own page)	rest	#15803d	#ffffff
+light	toast fill vs the page (warning)	(own page)	rest	#9a5b00	#ffffff
+light	tab bar rule vs the page	background	rest	#15181c	#ffffff
+light	tab bar rule vs the page	surface	rest	#15181c	#f4f6f8
+light	tab bar rule vs the page	surface_raised	rest	#15181c	#ffffff
+light	active tab underline vs the bar	background	rest	#0400b4	#ffffff
+light	active tab underline vs the bar	surface	rest	#0400b4	#f4f6f8
+light	active tab underline vs the bar	surface_raised	rest	#0400b4	#ffffff
+light	breadcrumb ancestor rule vs the page	background	rest	#15181c	#ffffff
+light	breadcrumb ancestor rule vs the page	surface	rest	#15181c	#f4f6f8
+light	breadcrumb ancestor rule vs the page	surface_raised	rest	#15181c	#ffffff
+light	active rail item vs the rail (names beneath)	background	rest	#0400b4	#ffffff
+light	active rail item vs the rail (names beneath)	background	hovered	#0400b4	#ffffff
+light	active rail item vs the rail (names beneath)	background	pressed	#0400b4	#ffffff
+light	active rail item vs the rail (names beneath)	surface	rest	#0400b4	#f4f6f8
+light	active rail item vs the rail (names beneath)	surface	hovered	#0400b4	#f4f6f8
+light	active rail item vs the rail (names beneath)	surface	pressed	#0400b4	#f4f6f8
+light	active rail item vs the rail (names beneath)	surface_raised	rest	#0400b4	#ffffff
+light	active rail item vs the rail (names beneath)	surface_raised	hovered	#0400b4	#ffffff
+light	active rail item vs the rail (names beneath)	surface_raised	pressed	#0400b4	#ffffff
+light	active rail item vs the rail (names beside)	background	rest	#0400b4	#ffffff
+light	active rail item vs the rail (names beside)	background	hovered	#0400b4	#ffffff
+light	active rail item vs the rail (names beside)	background	pressed	#0400b4	#ffffff
+light	active rail item vs the rail (names beside)	surface	rest	#0400b4	#f4f6f8
+light	active rail item vs the rail (names beside)	surface	hovered	#0400b4	#f4f6f8
+light	active rail item vs the rail (names beside)	surface	pressed	#0400b4	#f4f6f8
+light	active rail item vs the rail (names beside)	surface_raised	rest	#0400b4	#ffffff
+light	active rail item vs the rail (names beside)	surface_raised	hovered	#0400b4	#ffffff
+light	active rail item vs the rail (names beside)	surface_raised	pressed	#0400b4	#ffffff
+light	header chrome border vs the page	background	rest	#15181c	#ffffff
+light	header chrome border vs the page	surface	rest	#15181c	#f4f6f8
+light	header chrome border vs the page	surface_raised	rest	#15181c	#ffffff
+light	footer chrome border vs the page	background	rest	#15181c	#ffffff
+light	footer chrome border vs the page	surface	rest	#15181c	#f4f6f8
+light	footer chrome border vs the page	surface_raised	rest	#15181c	#ffffff
+light	menu dropdown card vs the page	(own page)	rest	#15181c	#ffffff
+light	card::surface border vs the page	background	rest	#898c8f	#ffffff
+light	card::surface border vs the page	surface	rest	#898c8f	#f4f6f8
+light	card::surface border vs the page	surface_raised	rest	#898c8f	#ffffff
+light	card::selected 2 px border vs the page	background	rest	#1d4ed8	#ffffff
+light	card::selected 2 px border vs the page	surface	rest	#1d4ed8	#f4f6f8
+light	card::selected 2 px border vs the page	surface_raised	rest	#1d4ed8	#ffffff
+light	progress::card border vs the page	background	rest	#898c8f	#ffffff
+light	progress::card border vs the page	surface	rest	#898c8f	#f4f6f8
+light	progress::card border vs the page	surface_raised	rest	#898c8f	#ffffff
+dark	primary button vs its surface	background	rest	#5b9bff	#0f1216
+dark	primary button vs its surface	background	hovered	#6aaaff	#0f1216
+dark	primary button vs its surface	background	pressed	#4c8cf0	#0f1216
+dark	primary button vs its surface	surface	rest	#5b9bff	#171b21
+dark	primary button vs its surface	surface	hovered	#6aaaff	#171b21
+dark	primary button vs its surface	surface	pressed	#4c8cf0	#171b21
+dark	primary button vs its surface	surface_raised	rest	#5b9bff	#1f242b
+dark	primary button vs its surface	surface_raised	hovered	#6aaaff	#1f242b
+dark	primary button vs its surface	surface_raised	pressed	#4c8cf0	#1f242b
+dark	danger button vs its surface	background	rest	#ff6b6b	#0f1216
+dark	danger button vs its surface	background	hovered	#ff7a7a	#0f1216
+dark	danger button vs its surface	background	pressed	#f05c5c	#0f1216
+dark	danger button vs its surface	surface	rest	#ff6b6b	#171b21
+dark	danger button vs its surface	surface	hovered	#ff7a7a	#171b21
+dark	danger button vs its surface	surface	pressed	#f05c5c	#171b21
+dark	danger button vs its surface	surface_raised	rest	#ff6b6b	#1f242b
+dark	danger button vs its surface	surface_raised	hovered	#ff7a7a	#1f242b
+dark	danger button vs its surface	surface_raised	pressed	#f05c5c	#1f242b
+dark	secondary button border vs its surface	background	rest	#5b9bff	#0f1216
+dark	secondary button border vs its surface	background	hovered	#6aaaff	#0f1216
+dark	secondary button border vs its surface	background	pressed	#6aaaff	#0f1216
+dark	secondary button border vs its surface	surface	rest	#5b9bff	#171b21
+dark	secondary button border vs its surface	surface	hovered	#6aaaff	#171b21
+dark	secondary button border vs its surface	surface	pressed	#6aaaff	#171b21
+dark	secondary button border vs its surface	surface_raised	rest	#5b9bff	#1f242b
+dark	secondary button border vs its surface	surface_raised	hovered	#6aaaff	#1f242b
+dark	secondary button border vs its surface	surface_raised	pressed	#6aaaff	#1f242b
+dark	selected chip vs its surface	background	rest	#5b9bff	#0f1216
+dark	selected chip vs its surface	background	hovered	#5b9bff	#0f1216
+dark	selected chip vs its surface	background	pressed	#5b9bff	#0f1216
+dark	selected chip vs its surface	surface	rest	#5b9bff	#171b21
+dark	selected chip vs its surface	surface	hovered	#5b9bff	#171b21
+dark	selected chip vs its surface	surface	pressed	#5b9bff	#171b21
+dark	selected chip vs its surface	surface_raised	rest	#5b9bff	#1f242b
+dark	selected chip vs its surface	surface_raised	hovered	#5b9bff	#1f242b
+dark	selected chip vs its surface	surface_raised	pressed	#5b9bff	#1f242b
+dark	unselected chip outline vs its surface	background	rest	#69717d	#0f1216
+dark	unselected chip outline vs its surface	background	hovered	#69717d	#0f1216
+dark	unselected chip outline vs its surface	background	pressed	#69717d	#0f1216
+dark	unselected chip outline vs its surface	surface	rest	#69717d	#171b21
+dark	unselected chip outline vs its surface	surface	hovered	#69717d	#171b21
+dark	unselected chip outline vs its surface	surface	pressed	#69717d	#171b21
+dark	unselected chip outline vs its surface	surface_raised	rest	#69717d	#1f242b
+dark	unselected chip outline vs its surface	surface_raised	hovered	#69717d	#1f242b
+dark	unselected chip outline vs its surface	surface_raised	pressed	#69717d	#1f242b
+dark	notice tone bar vs the notice (info)	background	rest	#5b9bff	#171b21
+dark	notice tone bar vs the notice (info)	surface	rest	#5b9bff	#171b21
+dark	notice tone bar vs the notice (info)	surface_raised	rest	#5b9bff	#171b21
+dark	notice tone bar vs the notice (neutral)	background	rest	#69717d	#171b21
+dark	notice tone bar vs the notice (neutral)	surface	rest	#69717d	#171b21
+dark	notice tone bar vs the notice (neutral)	surface_raised	rest	#69717d	#171b21
+dark	notice outer border vs the page (info)	background	rest	#5b9bff	#0f1216
+dark	notice outer border vs the page (info)	surface	rest	#5b9bff	#171b21
+dark	notice outer border vs the page (info)	surface_raised	rest	#5b9bff	#1f242b
+dark	notice outer border vs the page (neutral)	background	rest	#69717d	#0f1216
+dark	notice outer border vs the page (neutral)	surface	rest	#69717d	#171b21
+dark	notice outer border vs the page (neutral)	surface_raised	rest	#69717d	#1f242b
+dark	toast fill vs the page (info)	(own page)	rest	#5b9bff	#0f1216
+dark	toast fill vs the page (error)	(own page)	rest	#ff6b6b	#0f1216
+dark	toast fill vs the page (success)	(own page)	rest	#4ade80	#0f1216
+dark	toast fill vs the page (warning)	(own page)	rest	#fbbf4a	#0f1216
+dark	tab bar rule vs the page	background	rest	#f1f3f6	#0f1216
+dark	tab bar rule vs the page	surface	rest	#f1f3f6	#171b21
+dark	tab bar rule vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark	active tab underline vs the bar	background	rest	#65c7ff	#0f1216
+dark	active tab underline vs the bar	surface	rest	#65c7ff	#171b21
+dark	active tab underline vs the bar	surface_raised	rest	#65c7ff	#1f242b
+dark	breadcrumb ancestor rule vs the page	background	rest	#f1f3f6	#0f1216
+dark	breadcrumb ancestor rule vs the page	surface	rest	#f1f3f6	#171b21
+dark	breadcrumb ancestor rule vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark	active rail item vs the rail (names beneath)	background	rest	#65c7ff	#0f1216
+dark	active rail item vs the rail (names beneath)	background	hovered	#65c7ff	#0f1216
+dark	active rail item vs the rail (names beneath)	background	pressed	#65c7ff	#0f1216
+dark	active rail item vs the rail (names beneath)	surface	rest	#65c7ff	#171b21
+dark	active rail item vs the rail (names beneath)	surface	hovered	#65c7ff	#171b21
+dark	active rail item vs the rail (names beneath)	surface	pressed	#65c7ff	#171b21
+dark	active rail item vs the rail (names beneath)	surface_raised	rest	#65c7ff	#1f242b
+dark	active rail item vs the rail (names beneath)	surface_raised	hovered	#65c7ff	#1f242b
+dark	active rail item vs the rail (names beneath)	surface_raised	pressed	#65c7ff	#1f242b
+dark	active rail item vs the rail (names beside)	background	rest	#65c7ff	#0f1216
+dark	active rail item vs the rail (names beside)	background	hovered	#65c7ff	#0f1216
+dark	active rail item vs the rail (names beside)	background	pressed	#65c7ff	#0f1216
+dark	active rail item vs the rail (names beside)	surface	rest	#65c7ff	#171b21
+dark	active rail item vs the rail (names beside)	surface	hovered	#65c7ff	#171b21
+dark	active rail item vs the rail (names beside)	surface	pressed	#65c7ff	#171b21
+dark	active rail item vs the rail (names beside)	surface_raised	rest	#65c7ff	#1f242b
+dark	active rail item vs the rail (names beside)	surface_raised	hovered	#65c7ff	#1f242b
+dark	active rail item vs the rail (names beside)	surface_raised	pressed	#65c7ff	#1f242b
+dark	header chrome border vs the page	background	rest	#f1f3f6	#0f1216
+dark	header chrome border vs the page	surface	rest	#f1f3f6	#171b21
+dark	header chrome border vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark	footer chrome border vs the page	background	rest	#f1f3f6	#0f1216
+dark	footer chrome border vs the page	surface	rest	#f1f3f6	#171b21
+dark	footer chrome border vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark	menu dropdown card vs the page	(own page)	rest	#f1f3f6	#0f1216
+dark	card::surface border vs the page	background	rest	#69717d	#0f1216
+dark	card::surface border vs the page	surface	rest	#69717d	#171b21
+dark	card::surface border vs the page	surface_raised	rest	#69717d	#1f242b
+dark	card::selected 2 px border vs the page	background	rest	#5b9bff	#0f1216
+dark	card::selected 2 px border vs the page	surface	rest	#5b9bff	#171b21
+dark	card::selected 2 px border vs the page	surface_raised	rest	#5b9bff	#1f242b
+dark	progress::card border vs the page	background	rest	#69717d	#0f1216
+dark	progress::card border vs the page	surface	rest	#69717d	#171b21
+dark	progress::card border vs the page	surface_raised	rest	#69717d	#1f242b
+light_aaa	primary button vs its surface	background	rest	#1544ce	#ffffff
+light_aaa	primary button vs its surface	background	hovered	#0635bf	#ffffff
+light_aaa	primary button vs its surface	background	pressed	#0635bf	#ffffff
+light_aaa	primary button vs its surface	surface	rest	#1544ce	#f4f6f8
+light_aaa	primary button vs its surface	surface	hovered	#0635bf	#f4f6f8
+light_aaa	primary button vs its surface	surface	pressed	#0635bf	#f4f6f8
+light_aaa	primary button vs its surface	surface_raised	rest	#1544ce	#ffffff
+light_aaa	primary button vs its surface	surface_raised	hovered	#0635bf	#ffffff
+light_aaa	primary button vs its surface	surface_raised	pressed	#0635bf	#ffffff
+light_aaa	danger button vs its surface	background	rest	#ad1f18	#ffffff
+light_aaa	danger button vs its surface	background	hovered	#9e0f09	#ffffff
+light_aaa	danger button vs its surface	background	pressed	#9e0f09	#ffffff
+light_aaa	danger button vs its surface	surface	rest	#ad1f18	#f4f6f8
+light_aaa	danger button vs its surface	surface	hovered	#9e0f09	#f4f6f8
+light_aaa	danger button vs its surface	surface	pressed	#9e0f09	#f4f6f8
+light_aaa	danger button vs its surface	surface_raised	rest	#ad1f18	#ffffff
+light_aaa	danger button vs its surface	surface_raised	hovered	#9e0f09	#ffffff
+light_aaa	danger button vs its surface	surface_raised	pressed	#9e0f09	#ffffff
+light_aaa	secondary button border vs its surface	background	rest	#1544ce	#ffffff
+light_aaa	secondary button border vs its surface	background	hovered	#0635bf	#ffffff
+light_aaa	secondary button border vs its surface	background	pressed	#0130b9	#ffffff
+light_aaa	secondary button border vs its surface	surface	rest	#1544ce	#f4f6f8
+light_aaa	secondary button border vs its surface	surface	hovered	#0635bf	#f4f6f8
+light_aaa	secondary button border vs its surface	surface	pressed	#0130b9	#f4f6f8
+light_aaa	secondary button border vs its surface	surface_raised	rest	#1544ce	#ffffff
+light_aaa	secondary button border vs its surface	surface_raised	hovered	#0635bf	#ffffff
+light_aaa	secondary button border vs its surface	surface_raised	pressed	#0130b9	#ffffff
+light_aaa	selected chip vs its surface	background	rest	#1544ce	#ffffff
+light_aaa	selected chip vs its surface	background	hovered	#0635bf	#ffffff
+light_aaa	selected chip vs its surface	background	pressed	#0025af	#ffffff
+light_aaa	selected chip vs its surface	surface	rest	#1544ce	#f4f6f8
+light_aaa	selected chip vs its surface	surface	hovered	#0635bf	#f4f6f8
+light_aaa	selected chip vs its surface	surface	pressed	#0025af	#f4f6f8
+light_aaa	selected chip vs its surface	surface_raised	rest	#1544ce	#ffffff
+light_aaa	selected chip vs its surface	surface_raised	hovered	#0635bf	#ffffff
+light_aaa	selected chip vs its surface	surface_raised	pressed	#0025af	#ffffff
+light_aaa	unselected chip outline vs its surface	background	rest	#898c8f	#ffffff
+light_aaa	unselected chip outline vs its surface	background	hovered	#898c8f	#ffffff
+light_aaa	unselected chip outline vs its surface	background	pressed	#898c8f	#ffffff
+light_aaa	unselected chip outline vs its surface	surface	rest	#898c8f	#f4f6f8
+light_aaa	unselected chip outline vs its surface	surface	hovered	#898c8f	#f4f6f8
+light_aaa	unselected chip outline vs its surface	surface	pressed	#898c8f	#f4f6f8
+light_aaa	unselected chip outline vs its surface	surface_raised	rest	#898c8f	#ffffff
+light_aaa	unselected chip outline vs its surface	surface_raised	hovered	#898c8f	#ffffff
+light_aaa	unselected chip outline vs its surface	surface_raised	pressed	#898c8f	#ffffff
+light_aaa	notice tone bar vs the notice (info)	background	rest	#1544ce	#f4f6f8
+light_aaa	notice tone bar vs the notice (info)	surface	rest	#1544ce	#f4f6f8
+light_aaa	notice tone bar vs the notice (info)	surface_raised	rest	#1544ce	#f4f6f8
+light_aaa	notice tone bar vs the notice (neutral)	background	rest	#898c8f	#f4f6f8
+light_aaa	notice tone bar vs the notice (neutral)	surface	rest	#898c8f	#f4f6f8
+light_aaa	notice tone bar vs the notice (neutral)	surface_raised	rest	#898c8f	#f4f6f8
+light_aaa	notice outer border vs the page (info)	background	rest	#1544ce	#ffffff
+light_aaa	notice outer border vs the page (info)	surface	rest	#1544ce	#f4f6f8
+light_aaa	notice outer border vs the page (info)	surface_raised	rest	#1544ce	#ffffff
+light_aaa	notice outer border vs the page (neutral)	background	rest	#898c8f	#ffffff
+light_aaa	notice outer border vs the page (neutral)	surface	rest	#898c8f	#f4f6f8
+light_aaa	notice outer border vs the page (neutral)	surface_raised	rest	#898c8f	#ffffff
+light_aaa	toast fill vs the page (info)	(own page)	rest	#1544ce	#ffffff
+light_aaa	toast fill vs the page (error)	(own page)	rest	#ad1f18	#ffffff
+light_aaa	toast fill vs the page (success)	(own page)	rest	#006725	#ffffff
+light_aaa	toast fill vs the page (warning)	(own page)	rest	#874900	#ffffff
+light_aaa	tab bar rule vs the page	background	rest	#15181c	#ffffff
+light_aaa	tab bar rule vs the page	surface	rest	#15181c	#f4f6f8
+light_aaa	tab bar rule vs the page	surface_raised	rest	#15181c	#ffffff
+light_aaa	active tab underline vs the bar	background	rest	#0800aa	#ffffff
+light_aaa	active tab underline vs the bar	surface	rest	#0800aa	#f4f6f8
+light_aaa	active tab underline vs the bar	surface_raised	rest	#0800aa	#ffffff
+light_aaa	breadcrumb ancestor rule vs the page	background	rest	#15181c	#ffffff
+light_aaa	breadcrumb ancestor rule vs the page	surface	rest	#15181c	#f4f6f8
+light_aaa	breadcrumb ancestor rule vs the page	surface_raised	rest	#15181c	#ffffff
+light_aaa	active rail item vs the rail (names beneath)	background	rest	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beneath)	background	hovered	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beneath)	background	pressed	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beneath)	surface	rest	#0800aa	#f4f6f8
+light_aaa	active rail item vs the rail (names beneath)	surface	hovered	#0800aa	#f4f6f8
+light_aaa	active rail item vs the rail (names beneath)	surface	pressed	#0800aa	#f4f6f8
+light_aaa	active rail item vs the rail (names beneath)	surface_raised	rest	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beneath)	surface_raised	hovered	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beneath)	surface_raised	pressed	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beside)	background	rest	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beside)	background	hovered	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beside)	background	pressed	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beside)	surface	rest	#0800aa	#f4f6f8
+light_aaa	active rail item vs the rail (names beside)	surface	hovered	#0800aa	#f4f6f8
+light_aaa	active rail item vs the rail (names beside)	surface	pressed	#0800aa	#f4f6f8
+light_aaa	active rail item vs the rail (names beside)	surface_raised	rest	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beside)	surface_raised	hovered	#0800aa	#ffffff
+light_aaa	active rail item vs the rail (names beside)	surface_raised	pressed	#0800aa	#ffffff
+light_aaa	header chrome border vs the page	background	rest	#15181c	#ffffff
+light_aaa	header chrome border vs the page	surface	rest	#15181c	#f4f6f8
+light_aaa	header chrome border vs the page	surface_raised	rest	#15181c	#ffffff
+light_aaa	footer chrome border vs the page	background	rest	#15181c	#ffffff
+light_aaa	footer chrome border vs the page	surface	rest	#15181c	#f4f6f8
+light_aaa	footer chrome border vs the page	surface_raised	rest	#15181c	#ffffff
+light_aaa	menu dropdown card vs the page	(own page)	rest	#15181c	#ffffff
+light_aaa	card::surface border vs the page	background	rest	#898c8f	#ffffff
+light_aaa	card::surface border vs the page	surface	rest	#898c8f	#f4f6f8
+light_aaa	card::surface border vs the page	surface_raised	rest	#898c8f	#ffffff
+light_aaa	card::selected 2 px border vs the page	background	rest	#1544ce	#ffffff
+light_aaa	card::selected 2 px border vs the page	surface	rest	#1544ce	#f4f6f8
+light_aaa	card::selected 2 px border vs the page	surface_raised	rest	#1544ce	#ffffff
+light_aaa	progress::card border vs the page	background	rest	#898c8f	#ffffff
+light_aaa	progress::card border vs the page	surface	rest	#898c8f	#f4f6f8
+light_aaa	progress::card border vs the page	surface_raised	rest	#898c8f	#ffffff
+dark_aaa	primary button vs its surface	background	rest	#70b2ff	#0f1216
+dark_aaa	primary button vs its surface	background	hovered	#80c1ff	#0f1216
+dark_aaa	primary button vs its surface	background	pressed	#61a2f0	#0f1216
+dark_aaa	primary button vs its surface	surface	rest	#70b2ff	#171b21
+dark_aaa	primary button vs its surface	surface	hovered	#80c1ff	#171b21
+dark_aaa	primary button vs its surface	surface	pressed	#61a2f0	#171b21
+dark_aaa	primary button vs its surface	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	primary button vs its surface	surface_raised	hovered	#80c1ff	#1f242b
+dark_aaa	primary button vs its surface	surface_raised	pressed	#61a2f0	#1f242b
+dark_aaa	danger button vs its surface	background	rest	#ff7372	#0f1216
+dark_aaa	danger button vs its surface	background	hovered	#ff8282	#0f1216
+dark_aaa	danger button vs its surface	background	pressed	#ff8282	#0f1216
+dark_aaa	danger button vs its surface	surface	rest	#ff7372	#171b21
+dark_aaa	danger button vs its surface	surface	hovered	#ff8282	#171b21
+dark_aaa	danger button vs its surface	surface	pressed	#ff8282	#171b21
+dark_aaa	danger button vs its surface	surface_raised	rest	#ff7372	#1f242b
+dark_aaa	danger button vs its surface	surface_raised	hovered	#ff8282	#1f242b
+dark_aaa	danger button vs its surface	surface_raised	pressed	#ff8282	#1f242b
+dark_aaa	secondary button border vs its surface	background	rest	#70b2ff	#0f1216
+dark_aaa	secondary button border vs its surface	background	hovered	#80c1ff	#0f1216
+dark_aaa	secondary button border vs its surface	background	pressed	#8fd0ff	#0f1216
+dark_aaa	secondary button border vs its surface	surface	rest	#70b2ff	#171b21
+dark_aaa	secondary button border vs its surface	surface	hovered	#80c1ff	#171b21
+dark_aaa	secondary button border vs its surface	surface	pressed	#8fd0ff	#171b21
+dark_aaa	secondary button border vs its surface	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	secondary button border vs its surface	surface_raised	hovered	#80c1ff	#1f242b
+dark_aaa	secondary button border vs its surface	surface_raised	pressed	#8fd0ff	#1f242b
+dark_aaa	selected chip vs its surface	background	rest	#70b2ff	#0f1216
+dark_aaa	selected chip vs its surface	background	hovered	#70b2ff	#0f1216
+dark_aaa	selected chip vs its surface	background	pressed	#8fd0ff	#0f1216
+dark_aaa	selected chip vs its surface	surface	rest	#70b2ff	#171b21
+dark_aaa	selected chip vs its surface	surface	hovered	#70b2ff	#171b21
+dark_aaa	selected chip vs its surface	surface	pressed	#8fd0ff	#171b21
+dark_aaa	selected chip vs its surface	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	selected chip vs its surface	surface_raised	hovered	#70b2ff	#1f242b
+dark_aaa	selected chip vs its surface	surface_raised	pressed	#8fd0ff	#1f242b
+dark_aaa	unselected chip outline vs its surface	background	rest	#69717d	#0f1216
+dark_aaa	unselected chip outline vs its surface	background	hovered	#69717d	#0f1216
+dark_aaa	unselected chip outline vs its surface	background	pressed	#69717d	#0f1216
+dark_aaa	unselected chip outline vs its surface	surface	rest	#69717d	#171b21
+dark_aaa	unselected chip outline vs its surface	surface	hovered	#69717d	#171b21
+dark_aaa	unselected chip outline vs its surface	surface	pressed	#69717d	#171b21
+dark_aaa	unselected chip outline vs its surface	surface_raised	rest	#69717d	#1f242b
+dark_aaa	unselected chip outline vs its surface	surface_raised	hovered	#69717d	#1f242b
+dark_aaa	unselected chip outline vs its surface	surface_raised	pressed	#69717d	#1f242b
+dark_aaa	notice tone bar vs the notice (info)	background	rest	#70b2ff	#171b21
+dark_aaa	notice tone bar vs the notice (info)	surface	rest	#70b2ff	#171b21
+dark_aaa	notice tone bar vs the notice (info)	surface_raised	rest	#70b2ff	#171b21
+dark_aaa	notice tone bar vs the notice (neutral)	background	rest	#69717d	#171b21
+dark_aaa	notice tone bar vs the notice (neutral)	surface	rest	#69717d	#171b21
+dark_aaa	notice tone bar vs the notice (neutral)	surface_raised	rest	#69717d	#171b21
+dark_aaa	notice outer border vs the page (info)	background	rest	#70b2ff	#0f1216
+dark_aaa	notice outer border vs the page (info)	surface	rest	#70b2ff	#171b21
+dark_aaa	notice outer border vs the page (info)	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	notice outer border vs the page (neutral)	background	rest	#69717d	#0f1216
+dark_aaa	notice outer border vs the page (neutral)	surface	rest	#69717d	#171b21
+dark_aaa	notice outer border vs the page (neutral)	surface_raised	rest	#69717d	#1f242b
+dark_aaa	toast fill vs the page (info)	(own page)	rest	#70b2ff	#0f1216
+dark_aaa	toast fill vs the page (error)	(own page)	rest	#ff7372	#0f1216
+dark_aaa	toast fill vs the page (success)	(own page)	rest	#4ade80	#0f1216
+dark_aaa	toast fill vs the page (warning)	(own page)	rest	#fbbf4a	#0f1216
+dark_aaa	tab bar rule vs the page	background	rest	#f1f3f6	#0f1216
+dark_aaa	tab bar rule vs the page	surface	rest	#f1f3f6	#171b21
+dark_aaa	tab bar rule vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	active tab underline vs the bar	background	rest	#81e2ff	#0f1216
+dark_aaa	active tab underline vs the bar	surface	rest	#81e2ff	#171b21
+dark_aaa	active tab underline vs the bar	surface_raised	rest	#81e2ff	#1f242b
+dark_aaa	breadcrumb ancestor rule vs the page	background	rest	#f1f3f6	#0f1216
+dark_aaa	breadcrumb ancestor rule vs the page	surface	rest	#f1f3f6	#171b21
+dark_aaa	breadcrumb ancestor rule vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	active rail item vs the rail (names beneath)	background	rest	#81e2ff	#0f1216
+dark_aaa	active rail item vs the rail (names beneath)	background	hovered	#81e2ff	#0f1216
+dark_aaa	active rail item vs the rail (names beneath)	background	pressed	#81e2ff	#0f1216
+dark_aaa	active rail item vs the rail (names beneath)	surface	rest	#81e2ff	#171b21
+dark_aaa	active rail item vs the rail (names beneath)	surface	hovered	#81e2ff	#171b21
+dark_aaa	active rail item vs the rail (names beneath)	surface	pressed	#81e2ff	#171b21
+dark_aaa	active rail item vs the rail (names beneath)	surface_raised	rest	#81e2ff	#1f242b
+dark_aaa	active rail item vs the rail (names beneath)	surface_raised	hovered	#81e2ff	#1f242b
+dark_aaa	active rail item vs the rail (names beneath)	surface_raised	pressed	#81e2ff	#1f242b
+dark_aaa	active rail item vs the rail (names beside)	background	rest	#81e2ff	#0f1216
+dark_aaa	active rail item vs the rail (names beside)	background	hovered	#81e2ff	#0f1216
+dark_aaa	active rail item vs the rail (names beside)	background	pressed	#81e2ff	#0f1216
+dark_aaa	active rail item vs the rail (names beside)	surface	rest	#81e2ff	#171b21
+dark_aaa	active rail item vs the rail (names beside)	surface	hovered	#81e2ff	#171b21
+dark_aaa	active rail item vs the rail (names beside)	surface	pressed	#81e2ff	#171b21
+dark_aaa	active rail item vs the rail (names beside)	surface_raised	rest	#81e2ff	#1f242b
+dark_aaa	active rail item vs the rail (names beside)	surface_raised	hovered	#81e2ff	#1f242b
+dark_aaa	active rail item vs the rail (names beside)	surface_raised	pressed	#81e2ff	#1f242b
+dark_aaa	header chrome border vs the page	background	rest	#f1f3f6	#0f1216
+dark_aaa	header chrome border vs the page	surface	rest	#f1f3f6	#171b21
+dark_aaa	header chrome border vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	footer chrome border vs the page	background	rest	#f1f3f6	#0f1216
+dark_aaa	footer chrome border vs the page	surface	rest	#f1f3f6	#171b21
+dark_aaa	footer chrome border vs the page	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	menu dropdown card vs the page	(own page)	rest	#f1f3f6	#0f1216
+dark_aaa	card::surface border vs the page	background	rest	#69717d	#0f1216
+dark_aaa	card::surface border vs the page	surface	rest	#69717d	#171b21
+dark_aaa	card::surface border vs the page	surface_raised	rest	#69717d	#1f242b
+dark_aaa	card::selected 2 px border vs the page	background	rest	#70b2ff	#0f1216
+dark_aaa	card::selected 2 px border vs the page	surface	rest	#70b2ff	#171b21
+dark_aaa	card::selected 2 px border vs the page	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	progress::card border vs the page	background	rest	#69717d	#0f1216
+dark_aaa	progress::card border vs the page	surface	rest	#69717d	#171b21
+dark_aaa	progress::card border vs the page	surface_raised	rest	#69717d	#1f242b
+high_contrast_light	primary button vs its surface	background	rest	#0030b0	#ffffff
+high_contrast_light	primary button vs its surface	background	hovered	#0f3fbf	#ffffff
+high_contrast_light	primary button vs its surface	background	pressed	#0021a1	#ffffff
+high_contrast_light	primary button vs its surface	surface	rest	#0030b0	#ffffff
+high_contrast_light	primary button vs its surface	surface	hovered	#0f3fbf	#ffffff
+high_contrast_light	primary button vs its surface	surface	pressed	#0021a1	#ffffff
+high_contrast_light	primary button vs its surface	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	primary button vs its surface	surface_raised	hovered	#0f3fbf	#ffffff
+high_contrast_light	primary button vs its surface	surface_raised	pressed	#0021a1	#ffffff
+high_contrast_light	danger button vs its surface	background	rest	#9a0000	#ffffff
+high_contrast_light	danger button vs its surface	background	hovered	#a90f0f	#ffffff
+high_contrast_light	danger button vs its surface	background	pressed	#8b0000	#ffffff
+high_contrast_light	danger button vs its surface	surface	rest	#9a0000	#ffffff
+high_contrast_light	danger button vs its surface	surface	hovered	#a90f0f	#ffffff
+high_contrast_light	danger button vs its surface	surface	pressed	#8b0000	#ffffff
+high_contrast_light	danger button vs its surface	surface_raised	rest	#9a0000	#ffffff
+high_contrast_light	danger button vs its surface	surface_raised	hovered	#a90f0f	#ffffff
+high_contrast_light	danger button vs its surface	surface_raised	pressed	#8b0000	#ffffff
+high_contrast_light	secondary button border vs its surface	background	rest	#0030b0	#ffffff
+high_contrast_light	secondary button border vs its surface	background	hovered	#0f3fbf	#ffffff
+high_contrast_light	secondary button border vs its surface	background	pressed	#0021a1	#ffffff
+high_contrast_light	secondary button border vs its surface	surface	rest	#0030b0	#ffffff
+high_contrast_light	secondary button border vs its surface	surface	hovered	#0f3fbf	#ffffff
+high_contrast_light	secondary button border vs its surface	surface	pressed	#0021a1	#ffffff
+high_contrast_light	secondary button border vs its surface	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	secondary button border vs its surface	surface_raised	hovered	#0f3fbf	#ffffff
+high_contrast_light	secondary button border vs its surface	surface_raised	pressed	#0021a1	#ffffff
+high_contrast_light	selected chip vs its surface	background	rest	#0030b0	#ffffff
+high_contrast_light	selected chip vs its surface	background	hovered	#0021a1	#ffffff
+high_contrast_light	selected chip vs its surface	background	pressed	#001191	#ffffff
+high_contrast_light	selected chip vs its surface	surface	rest	#0030b0	#ffffff
+high_contrast_light	selected chip vs its surface	surface	hovered	#0021a1	#ffffff
+high_contrast_light	selected chip vs its surface	surface	pressed	#001191	#ffffff
+high_contrast_light	selected chip vs its surface	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	selected chip vs its surface	surface_raised	hovered	#0021a1	#ffffff
+high_contrast_light	selected chip vs its surface	surface_raised	pressed	#001191	#ffffff
+high_contrast_light	unselected chip outline vs its surface	background	rest	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	background	hovered	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	background	pressed	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	surface	rest	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	surface	hovered	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	surface	pressed	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	surface_raised	rest	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	surface_raised	hovered	#000000	#ffffff
+high_contrast_light	unselected chip outline vs its surface	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	notice tone bar vs the notice (info)	background	rest	#0030b0	#ffffff
+high_contrast_light	notice tone bar vs the notice (info)	surface	rest	#0030b0	#ffffff
+high_contrast_light	notice tone bar vs the notice (info)	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	notice tone bar vs the notice (neutral)	background	rest	#000000	#ffffff
+high_contrast_light	notice tone bar vs the notice (neutral)	surface	rest	#000000	#ffffff
+high_contrast_light	notice tone bar vs the notice (neutral)	surface_raised	rest	#000000	#ffffff
+high_contrast_light	notice outer border vs the page (info)	background	rest	#0030b0	#ffffff
+high_contrast_light	notice outer border vs the page (info)	surface	rest	#0030b0	#ffffff
+high_contrast_light	notice outer border vs the page (info)	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	notice outer border vs the page (neutral)	background	rest	#000000	#ffffff
+high_contrast_light	notice outer border vs the page (neutral)	surface	rest	#000000	#ffffff
+high_contrast_light	notice outer border vs the page (neutral)	surface_raised	rest	#000000	#ffffff
+high_contrast_light	toast fill vs the page (info)	(own page)	rest	#0030b0	#ffffff
+high_contrast_light	toast fill vs the page (error)	(own page)	rest	#9a0000	#ffffff
+high_contrast_light	toast fill vs the page (success)	(own page)	rest	#0a5a28	#ffffff
+high_contrast_light	toast fill vs the page (warning)	(own page)	rest	#7a3d00	#ffffff
+high_contrast_light	tab bar rule vs the page	background	rest	#000000	#ffffff
+high_contrast_light	tab bar rule vs the page	surface	rest	#000000	#ffffff
+high_contrast_light	tab bar rule vs the page	surface_raised	rest	#000000	#ffffff
+high_contrast_light	active tab underline vs the bar	background	rest	#0d008c	#ffffff
+high_contrast_light	active tab underline vs the bar	surface	rest	#0d008c	#ffffff
+high_contrast_light	active tab underline vs the bar	surface_raised	rest	#0d008c	#ffffff
+high_contrast_light	breadcrumb ancestor rule vs the page	background	rest	#000000	#ffffff
+high_contrast_light	breadcrumb ancestor rule vs the page	surface	rest	#000000	#ffffff
+high_contrast_light	breadcrumb ancestor rule vs the page	surface_raised	rest	#000000	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	background	rest	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	background	hovered	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	background	pressed	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	surface	rest	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	surface	hovered	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	surface	pressed	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	surface_raised	rest	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	surface_raised	hovered	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beneath)	surface_raised	pressed	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	background	rest	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	background	hovered	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	background	pressed	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	surface	rest	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	surface	hovered	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	surface	pressed	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	surface_raised	rest	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	surface_raised	hovered	#0d008c	#ffffff
+high_contrast_light	active rail item vs the rail (names beside)	surface_raised	pressed	#0d008c	#ffffff
+high_contrast_light	header chrome border vs the page	background	rest	#000000	#ffffff
+high_contrast_light	header chrome border vs the page	surface	rest	#000000	#ffffff
+high_contrast_light	header chrome border vs the page	surface_raised	rest	#000000	#ffffff
+high_contrast_light	footer chrome border vs the page	background	rest	#000000	#ffffff
+high_contrast_light	footer chrome border vs the page	surface	rest	#000000	#ffffff
+high_contrast_light	footer chrome border vs the page	surface_raised	rest	#000000	#ffffff
+high_contrast_light	menu dropdown card vs the page	(own page)	rest	#000000	#ffffff
+high_contrast_light	card::surface border vs the page	background	rest	#000000	#ffffff
+high_contrast_light	card::surface border vs the page	surface	rest	#000000	#ffffff
+high_contrast_light	card::surface border vs the page	surface_raised	rest	#000000	#ffffff
+high_contrast_light	card::selected 2 px border vs the page	background	rest	#0030b0	#ffffff
+high_contrast_light	card::selected 2 px border vs the page	surface	rest	#0030b0	#ffffff
+high_contrast_light	card::selected 2 px border vs the page	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	progress::card border vs the page	background	rest	#000000	#ffffff
+high_contrast_light	progress::card border vs the page	surface	rest	#000000	#ffffff
+high_contrast_light	progress::card border vs the page	surface_raised	rest	#000000	#ffffff
+high_contrast_dark	primary button vs its surface	background	rest	#9cc4ff	#000000
+high_contrast_dark	primary button vs its surface	background	hovered	#abd3ff	#000000
+high_contrast_dark	primary button vs its surface	background	pressed	#8db5f0	#000000
+high_contrast_dark	primary button vs its surface	surface	rest	#9cc4ff	#000000
+high_contrast_dark	primary button vs its surface	surface	hovered	#abd3ff	#000000
+high_contrast_dark	primary button vs its surface	surface	pressed	#8db5f0	#000000
+high_contrast_dark	primary button vs its surface	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	primary button vs its surface	surface_raised	hovered	#abd3ff	#0a0a0a
+high_contrast_dark	primary button vs its surface	surface_raised	pressed	#8db5f0	#0a0a0a
+high_contrast_dark	danger button vs its surface	background	rest	#ff9a9a	#000000
+high_contrast_dark	danger button vs its surface	background	hovered	#ffa9a9	#000000
+high_contrast_dark	danger button vs its surface	background	pressed	#f08b8b	#000000
+high_contrast_dark	danger button vs its surface	surface	rest	#ff9a9a	#000000
+high_contrast_dark	danger button vs its surface	surface	hovered	#ffa9a9	#000000
+high_contrast_dark	danger button vs its surface	surface	pressed	#f08b8b	#000000
+high_contrast_dark	danger button vs its surface	surface_raised	rest	#ff9a9a	#0a0a0a
+high_contrast_dark	danger button vs its surface	surface_raised	hovered	#ffa9a9	#0a0a0a
+high_contrast_dark	danger button vs its surface	surface_raised	pressed	#f08b8b	#0a0a0a
+high_contrast_dark	secondary button border vs its surface	background	rest	#9cc4ff	#000000
+high_contrast_dark	secondary button border vs its surface	background	hovered	#abd3ff	#000000
+high_contrast_dark	secondary button border vs its surface	background	pressed	#8db5f0	#000000
+high_contrast_dark	secondary button border vs its surface	surface	rest	#9cc4ff	#000000
+high_contrast_dark	secondary button border vs its surface	surface	hovered	#abd3ff	#000000
+high_contrast_dark	secondary button border vs its surface	surface	pressed	#8db5f0	#000000
+high_contrast_dark	secondary button border vs its surface	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	secondary button border vs its surface	surface_raised	hovered	#abd3ff	#0a0a0a
+high_contrast_dark	secondary button border vs its surface	surface_raised	pressed	#8db5f0	#0a0a0a
+high_contrast_dark	selected chip vs its surface	background	rest	#9cc4ff	#000000
+high_contrast_dark	selected chip vs its surface	background	hovered	#9cc4ff	#000000
+high_contrast_dark	selected chip vs its surface	background	pressed	#9cc4ff	#000000
+high_contrast_dark	selected chip vs its surface	surface	rest	#9cc4ff	#000000
+high_contrast_dark	selected chip vs its surface	surface	hovered	#9cc4ff	#000000
+high_contrast_dark	selected chip vs its surface	surface	pressed	#9cc4ff	#000000
+high_contrast_dark	selected chip vs its surface	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	selected chip vs its surface	surface_raised	hovered	#9cc4ff	#0a0a0a
+high_contrast_dark	selected chip vs its surface	surface_raised	pressed	#9cc4ff	#0a0a0a
+high_contrast_dark	unselected chip outline vs its surface	background	rest	#ffffff	#000000
+high_contrast_dark	unselected chip outline vs its surface	background	hovered	#ffffff	#000000
+high_contrast_dark	unselected chip outline vs its surface	background	pressed	#ffffff	#000000
+high_contrast_dark	unselected chip outline vs its surface	surface	rest	#ffffff	#000000
+high_contrast_dark	unselected chip outline vs its surface	surface	hovered	#ffffff	#000000
+high_contrast_dark	unselected chip outline vs its surface	surface	pressed	#ffffff	#000000
+high_contrast_dark	unselected chip outline vs its surface	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	unselected chip outline vs its surface	surface_raised	hovered	#ffffff	#0a0a0a
+high_contrast_dark	unselected chip outline vs its surface	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	notice tone bar vs the notice (info)	background	rest	#9cc4ff	#000000
+high_contrast_dark	notice tone bar vs the notice (info)	surface	rest	#9cc4ff	#000000
+high_contrast_dark	notice tone bar vs the notice (info)	surface_raised	rest	#9cc4ff	#000000
+high_contrast_dark	notice tone bar vs the notice (neutral)	background	rest	#ffffff	#000000
+high_contrast_dark	notice tone bar vs the notice (neutral)	surface	rest	#ffffff	#000000
+high_contrast_dark	notice tone bar vs the notice (neutral)	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	notice outer border vs the page (info)	background	rest	#9cc4ff	#000000
+high_contrast_dark	notice outer border vs the page (info)	surface	rest	#9cc4ff	#000000
+high_contrast_dark	notice outer border vs the page (info)	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	notice outer border vs the page (neutral)	background	rest	#ffffff	#000000
+high_contrast_dark	notice outer border vs the page (neutral)	surface	rest	#ffffff	#000000
+high_contrast_dark	notice outer border vs the page (neutral)	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	toast fill vs the page (info)	(own page)	rest	#9cc4ff	#000000
+high_contrast_dark	toast fill vs the page (error)	(own page)	rest	#ff9a9a	#000000
+high_contrast_dark	toast fill vs the page (success)	(own page)	rest	#7be49a	#000000
+high_contrast_dark	toast fill vs the page (warning)	(own page)	rest	#ffd37a	#000000
+high_contrast_dark	tab bar rule vs the page	background	rest	#ffffff	#000000
+high_contrast_dark	tab bar rule vs the page	surface	rest	#ffffff	#000000
+high_contrast_dark	tab bar rule vs the page	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	active tab underline vs the bar	background	rest	#bcf5ff	#000000
+high_contrast_dark	active tab underline vs the bar	surface	rest	#bcf5ff	#000000
+high_contrast_dark	active tab underline vs the bar	surface_raised	rest	#bcf5ff	#0a0a0a
+high_contrast_dark	breadcrumb ancestor rule vs the page	background	rest	#ffffff	#000000
+high_contrast_dark	breadcrumb ancestor rule vs the page	surface	rest	#ffffff	#000000
+high_contrast_dark	breadcrumb ancestor rule vs the page	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	active rail item vs the rail (names beneath)	background	rest	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beneath)	background	hovered	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beneath)	background	pressed	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beneath)	surface	rest	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beneath)	surface	hovered	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beneath)	surface	pressed	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beneath)	surface_raised	rest	#bcf5ff	#0a0a0a
+high_contrast_dark	active rail item vs the rail (names beneath)	surface_raised	hovered	#bcf5ff	#0a0a0a
+high_contrast_dark	active rail item vs the rail (names beneath)	surface_raised	pressed	#bcf5ff	#0a0a0a
+high_contrast_dark	active rail item vs the rail (names beside)	background	rest	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beside)	background	hovered	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beside)	background	pressed	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beside)	surface	rest	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beside)	surface	hovered	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beside)	surface	pressed	#bcf5ff	#000000
+high_contrast_dark	active rail item vs the rail (names beside)	surface_raised	rest	#bcf5ff	#0a0a0a
+high_contrast_dark	active rail item vs the rail (names beside)	surface_raised	hovered	#bcf5ff	#0a0a0a
+high_contrast_dark	active rail item vs the rail (names beside)	surface_raised	pressed	#bcf5ff	#0a0a0a
+high_contrast_dark	header chrome border vs the page	background	rest	#ffffff	#000000
+high_contrast_dark	header chrome border vs the page	surface	rest	#ffffff	#000000
+high_contrast_dark	header chrome border vs the page	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	footer chrome border vs the page	background	rest	#ffffff	#000000
+high_contrast_dark	footer chrome border vs the page	surface	rest	#ffffff	#000000
+high_contrast_dark	footer chrome border vs the page	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	menu dropdown card vs the page	(own page)	rest	#ffffff	#000000
+high_contrast_dark	card::surface border vs the page	background	rest	#ffffff	#000000
+high_contrast_dark	card::surface border vs the page	surface	rest	#ffffff	#000000
+high_contrast_dark	card::surface border vs the page	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	card::selected 2 px border vs the page	background	rest	#9cc4ff	#000000
+high_contrast_dark	card::selected 2 px border vs the page	surface	rest	#9cc4ff	#000000
+high_contrast_dark	card::selected 2 px border vs the page	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	progress::card border vs the page	background	rest	#ffffff	#000000
+high_contrast_dark	progress::card border vs the page	surface	rest	#ffffff	#000000
+high_contrast_dark	progress::card border vs the page	surface_raised	rest	#ffffff	#0a0a0a
+light	progress bar vs the track (accent)	background	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (accent)	background	rest	#1d4ed8	#ffffff
+light	progress bar vs the track (success)	background	rest	#15803d	#f4f6f8
+light	progress bar vs what it sits on (success)	background	rest	#15803d	#ffffff
+light	progress bar vs the track (warning)	background	rest	#9a5b00	#f4f6f8
+light	progress bar vs what it sits on (warning)	background	rest	#9a5b00	#ffffff
+light	progress bar vs the track (danger)	background	rest	#b3261e	#f4f6f8
+light	progress bar vs what it sits on (danger)	background	rest	#b3261e	#ffffff
+light	progress bar vs the track (info)	background	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (info)	background	rest	#1d4ed8	#ffffff
+light	progress bar vs the track (neutral)	background	rest	#898c8f	#f4f6f8
+light	progress bar vs what it sits on (neutral)	background	rest	#898c8f	#ffffff
+light	progress bar vs the track (accent)	surface	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (accent)	surface	rest	#1d4ed8	#f4f6f8
+light	progress bar vs the track (success)	surface	rest	#15803d	#f4f6f8
+light	progress bar vs what it sits on (success)	surface	rest	#15803d	#f4f6f8
+light	progress bar vs the track (warning)	surface	rest	#9a5b00	#f4f6f8
+light	progress bar vs what it sits on (warning)	surface	rest	#9a5b00	#f4f6f8
+light	progress bar vs the track (danger)	surface	rest	#b3261e	#f4f6f8
+light	progress bar vs what it sits on (danger)	surface	rest	#b3261e	#f4f6f8
+light	progress bar vs the track (info)	surface	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (info)	surface	rest	#1d4ed8	#f4f6f8
+light	progress bar vs the track (neutral)	surface	rest	#898c8f	#f4f6f8
+light	progress bar vs what it sits on (neutral)	surface	rest	#898c8f	#f4f6f8
+light	progress bar vs the track (accent)	surface_raised	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (accent)	surface_raised	rest	#1d4ed8	#ffffff
+light	progress bar vs the track (success)	surface_raised	rest	#15803d	#f4f6f8
+light	progress bar vs what it sits on (success)	surface_raised	rest	#15803d	#ffffff
+light	progress bar vs the track (warning)	surface_raised	rest	#9a5b00	#f4f6f8
+light	progress bar vs what it sits on (warning)	surface_raised	rest	#9a5b00	#ffffff
+light	progress bar vs the track (danger)	surface_raised	rest	#b3261e	#f4f6f8
+light	progress bar vs what it sits on (danger)	surface_raised	rest	#b3261e	#ffffff
+light	progress bar vs the track (info)	surface_raised	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (info)	surface_raised	rest	#1d4ed8	#ffffff
+light	progress bar vs the track (neutral)	surface_raised	rest	#898c8f	#f4f6f8
+light	progress bar vs what it sits on (neutral)	surface_raised	rest	#898c8f	#ffffff
+light	progress bar vs the track (accent)	card on background	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (accent)	card on background	rest	#1d4ed8	#f4f6f8
+light	progress bar vs the track (success)	card on background	rest	#15803d	#f4f6f8
+light	progress bar vs what it sits on (success)	card on background	rest	#15803d	#f4f6f8
+light	progress bar vs the track (warning)	card on background	rest	#9a5b00	#f4f6f8
+light	progress bar vs what it sits on (warning)	card on background	rest	#9a5b00	#f4f6f8
+light	progress bar vs the track (danger)	card on background	rest	#b3261e	#f4f6f8
+light	progress bar vs what it sits on (danger)	card on background	rest	#b3261e	#f4f6f8
+light	progress bar vs the track (info)	card on background	rest	#1d4ed8	#f4f6f8
+light	progress bar vs what it sits on (info)	card on background	rest	#1d4ed8	#f4f6f8
+light	progress bar vs the track (neutral)	card on background	rest	#898c8f	#f4f6f8
+light	progress bar vs what it sits on (neutral)	card on background	rest	#898c8f	#f4f6f8
+dark	progress bar vs the track (accent)	background	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (accent)	background	rest	#5b9bff	#0f1216
+dark	progress bar vs the track (success)	background	rest	#4ade80	#171b21
+dark	progress bar vs what it sits on (success)	background	rest	#4ade80	#0f1216
+dark	progress bar vs the track (warning)	background	rest	#fbbf4a	#171b21
+dark	progress bar vs what it sits on (warning)	background	rest	#fbbf4a	#0f1216
+dark	progress bar vs the track (danger)	background	rest	#ff6b6b	#171b21
+dark	progress bar vs what it sits on (danger)	background	rest	#ff6b6b	#0f1216
+dark	progress bar vs the track (info)	background	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (info)	background	rest	#5b9bff	#0f1216
+dark	progress bar vs the track (neutral)	background	rest	#69717d	#171b21
+dark	progress bar vs what it sits on (neutral)	background	rest	#69717d	#0f1216
+dark	progress bar vs the track (accent)	surface	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (accent)	surface	rest	#5b9bff	#171b21
+dark	progress bar vs the track (success)	surface	rest	#4ade80	#171b21
+dark	progress bar vs what it sits on (success)	surface	rest	#4ade80	#171b21
+dark	progress bar vs the track (warning)	surface	rest	#fbbf4a	#171b21
+dark	progress bar vs what it sits on (warning)	surface	rest	#fbbf4a	#171b21
+dark	progress bar vs the track (danger)	surface	rest	#ff6b6b	#171b21
+dark	progress bar vs what it sits on (danger)	surface	rest	#ff6b6b	#171b21
+dark	progress bar vs the track (info)	surface	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (info)	surface	rest	#5b9bff	#171b21
+dark	progress bar vs the track (neutral)	surface	rest	#69717d	#171b21
+dark	progress bar vs what it sits on (neutral)	surface	rest	#69717d	#171b21
+dark	progress bar vs the track (accent)	surface_raised	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (accent)	surface_raised	rest	#5b9bff	#1f242b
+dark	progress bar vs the track (success)	surface_raised	rest	#4ade80	#171b21
+dark	progress bar vs what it sits on (success)	surface_raised	rest	#4ade80	#1f242b
+dark	progress bar vs the track (warning)	surface_raised	rest	#fbbf4a	#171b21
+dark	progress bar vs what it sits on (warning)	surface_raised	rest	#fbbf4a	#1f242b
+dark	progress bar vs the track (danger)	surface_raised	rest	#ff6b6b	#171b21
+dark	progress bar vs what it sits on (danger)	surface_raised	rest	#ff6b6b	#1f242b
+dark	progress bar vs the track (info)	surface_raised	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (info)	surface_raised	rest	#5b9bff	#1f242b
+dark	progress bar vs the track (neutral)	surface_raised	rest	#69717d	#171b21
+dark	progress bar vs what it sits on (neutral)	surface_raised	rest	#69717d	#1f242b
+dark	progress bar vs the track (accent)	card on background	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (accent)	card on background	rest	#5b9bff	#171b21
+dark	progress bar vs the track (success)	card on background	rest	#4ade80	#171b21
+dark	progress bar vs what it sits on (success)	card on background	rest	#4ade80	#171b21
+dark	progress bar vs the track (warning)	card on background	rest	#fbbf4a	#171b21
+dark	progress bar vs what it sits on (warning)	card on background	rest	#fbbf4a	#171b21
+dark	progress bar vs the track (danger)	card on background	rest	#ff6b6b	#171b21
+dark	progress bar vs what it sits on (danger)	card on background	rest	#ff6b6b	#171b21
+dark	progress bar vs the track (info)	card on background	rest	#5b9bff	#171b21
+dark	progress bar vs what it sits on (info)	card on background	rest	#5b9bff	#171b21
+dark	progress bar vs the track (neutral)	card on background	rest	#69717d	#171b21
+dark	progress bar vs what it sits on (neutral)	card on background	rest	#69717d	#171b21
+light_aaa	progress bar vs the track (accent)	background	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (accent)	background	rest	#1544ce	#ffffff
+light_aaa	progress bar vs the track (success)	background	rest	#006725	#f4f6f8
+light_aaa	progress bar vs what it sits on (success)	background	rest	#006725	#ffffff
+light_aaa	progress bar vs the track (warning)	background	rest	#874900	#f4f6f8
+light_aaa	progress bar vs what it sits on (warning)	background	rest	#874900	#ffffff
+light_aaa	progress bar vs the track (danger)	background	rest	#ad1f18	#f4f6f8
+light_aaa	progress bar vs what it sits on (danger)	background	rest	#ad1f18	#ffffff
+light_aaa	progress bar vs the track (info)	background	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (info)	background	rest	#1544ce	#ffffff
+light_aaa	progress bar vs the track (neutral)	background	rest	#898c8f	#f4f6f8
+light_aaa	progress bar vs what it sits on (neutral)	background	rest	#898c8f	#ffffff
+light_aaa	progress bar vs the track (accent)	surface	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (accent)	surface	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs the track (success)	surface	rest	#006725	#f4f6f8
+light_aaa	progress bar vs what it sits on (success)	surface	rest	#006725	#f4f6f8
+light_aaa	progress bar vs the track (warning)	surface	rest	#874900	#f4f6f8
+light_aaa	progress bar vs what it sits on (warning)	surface	rest	#874900	#f4f6f8
+light_aaa	progress bar vs the track (danger)	surface	rest	#ad1f18	#f4f6f8
+light_aaa	progress bar vs what it sits on (danger)	surface	rest	#ad1f18	#f4f6f8
+light_aaa	progress bar vs the track (info)	surface	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (info)	surface	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs the track (neutral)	surface	rest	#898c8f	#f4f6f8
+light_aaa	progress bar vs what it sits on (neutral)	surface	rest	#898c8f	#f4f6f8
+light_aaa	progress bar vs the track (accent)	surface_raised	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (accent)	surface_raised	rest	#1544ce	#ffffff
+light_aaa	progress bar vs the track (success)	surface_raised	rest	#006725	#f4f6f8
+light_aaa	progress bar vs what it sits on (success)	surface_raised	rest	#006725	#ffffff
+light_aaa	progress bar vs the track (warning)	surface_raised	rest	#874900	#f4f6f8
+light_aaa	progress bar vs what it sits on (warning)	surface_raised	rest	#874900	#ffffff
+light_aaa	progress bar vs the track (danger)	surface_raised	rest	#ad1f18	#f4f6f8
+light_aaa	progress bar vs what it sits on (danger)	surface_raised	rest	#ad1f18	#ffffff
+light_aaa	progress bar vs the track (info)	surface_raised	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (info)	surface_raised	rest	#1544ce	#ffffff
+light_aaa	progress bar vs the track (neutral)	surface_raised	rest	#898c8f	#f4f6f8
+light_aaa	progress bar vs what it sits on (neutral)	surface_raised	rest	#898c8f	#ffffff
+light_aaa	progress bar vs the track (accent)	card on background	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (accent)	card on background	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs the track (success)	card on background	rest	#006725	#f4f6f8
+light_aaa	progress bar vs what it sits on (success)	card on background	rest	#006725	#f4f6f8
+light_aaa	progress bar vs the track (warning)	card on background	rest	#874900	#f4f6f8
+light_aaa	progress bar vs what it sits on (warning)	card on background	rest	#874900	#f4f6f8
+light_aaa	progress bar vs the track (danger)	card on background	rest	#ad1f18	#f4f6f8
+light_aaa	progress bar vs what it sits on (danger)	card on background	rest	#ad1f18	#f4f6f8
+light_aaa	progress bar vs the track (info)	card on background	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs what it sits on (info)	card on background	rest	#1544ce	#f4f6f8
+light_aaa	progress bar vs the track (neutral)	card on background	rest	#898c8f	#f4f6f8
+light_aaa	progress bar vs what it sits on (neutral)	card on background	rest	#898c8f	#f4f6f8
+dark_aaa	progress bar vs the track (accent)	background	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (accent)	background	rest	#70b2ff	#0f1216
+dark_aaa	progress bar vs the track (success)	background	rest	#4ade80	#171b21
+dark_aaa	progress bar vs what it sits on (success)	background	rest	#4ade80	#0f1216
+dark_aaa	progress bar vs the track (warning)	background	rest	#fbbf4a	#171b21
+dark_aaa	progress bar vs what it sits on (warning)	background	rest	#fbbf4a	#0f1216
+dark_aaa	progress bar vs the track (danger)	background	rest	#ff7372	#171b21
+dark_aaa	progress bar vs what it sits on (danger)	background	rest	#ff7372	#0f1216
+dark_aaa	progress bar vs the track (info)	background	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (info)	background	rest	#70b2ff	#0f1216
+dark_aaa	progress bar vs the track (neutral)	background	rest	#69717d	#171b21
+dark_aaa	progress bar vs what it sits on (neutral)	background	rest	#69717d	#0f1216
+dark_aaa	progress bar vs the track (accent)	surface	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (accent)	surface	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs the track (success)	surface	rest	#4ade80	#171b21
+dark_aaa	progress bar vs what it sits on (success)	surface	rest	#4ade80	#171b21
+dark_aaa	progress bar vs the track (warning)	surface	rest	#fbbf4a	#171b21
+dark_aaa	progress bar vs what it sits on (warning)	surface	rest	#fbbf4a	#171b21
+dark_aaa	progress bar vs the track (danger)	surface	rest	#ff7372	#171b21
+dark_aaa	progress bar vs what it sits on (danger)	surface	rest	#ff7372	#171b21
+dark_aaa	progress bar vs the track (info)	surface	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (info)	surface	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs the track (neutral)	surface	rest	#69717d	#171b21
+dark_aaa	progress bar vs what it sits on (neutral)	surface	rest	#69717d	#171b21
+dark_aaa	progress bar vs the track (accent)	surface_raised	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (accent)	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	progress bar vs the track (success)	surface_raised	rest	#4ade80	#171b21
+dark_aaa	progress bar vs what it sits on (success)	surface_raised	rest	#4ade80	#1f242b
+dark_aaa	progress bar vs the track (warning)	surface_raised	rest	#fbbf4a	#171b21
+dark_aaa	progress bar vs what it sits on (warning)	surface_raised	rest	#fbbf4a	#1f242b
+dark_aaa	progress bar vs the track (danger)	surface_raised	rest	#ff7372	#171b21
+dark_aaa	progress bar vs what it sits on (danger)	surface_raised	rest	#ff7372	#1f242b
+dark_aaa	progress bar vs the track (info)	surface_raised	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (info)	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	progress bar vs the track (neutral)	surface_raised	rest	#69717d	#171b21
+dark_aaa	progress bar vs what it sits on (neutral)	surface_raised	rest	#69717d	#1f242b
+dark_aaa	progress bar vs the track (accent)	card on background	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (accent)	card on background	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs the track (success)	card on background	rest	#4ade80	#171b21
+dark_aaa	progress bar vs what it sits on (success)	card on background	rest	#4ade80	#171b21
+dark_aaa	progress bar vs the track (warning)	card on background	rest	#fbbf4a	#171b21
+dark_aaa	progress bar vs what it sits on (warning)	card on background	rest	#fbbf4a	#171b21
+dark_aaa	progress bar vs the track (danger)	card on background	rest	#ff7372	#171b21
+dark_aaa	progress bar vs what it sits on (danger)	card on background	rest	#ff7372	#171b21
+dark_aaa	progress bar vs the track (info)	card on background	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs what it sits on (info)	card on background	rest	#70b2ff	#171b21
+dark_aaa	progress bar vs the track (neutral)	card on background	rest	#69717d	#171b21
+dark_aaa	progress bar vs what it sits on (neutral)	card on background	rest	#69717d	#171b21
+high_contrast_light	progress bar vs the track (accent)	background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (accent)	background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (success)	background	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs what it sits on (success)	background	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs the track (warning)	background	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs what it sits on (warning)	background	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs the track (danger)	background	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs what it sits on (danger)	background	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs the track (info)	background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (info)	background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (neutral)	background	rest	#000000	#ffffff
+high_contrast_light	progress bar vs what it sits on (neutral)	background	rest	#000000	#ffffff
+high_contrast_light	progress bar vs the track (accent)	surface	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (accent)	surface	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (success)	surface	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs what it sits on (success)	surface	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs the track (warning)	surface	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs what it sits on (warning)	surface	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs the track (danger)	surface	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs what it sits on (danger)	surface	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs the track (info)	surface	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (info)	surface	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (neutral)	surface	rest	#000000	#ffffff
+high_contrast_light	progress bar vs what it sits on (neutral)	surface	rest	#000000	#ffffff
+high_contrast_light	progress bar vs the track (accent)	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (accent)	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (success)	surface_raised	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs what it sits on (success)	surface_raised	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs the track (warning)	surface_raised	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs what it sits on (warning)	surface_raised	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs the track (danger)	surface_raised	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs what it sits on (danger)	surface_raised	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs the track (info)	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (info)	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (neutral)	surface_raised	rest	#000000	#ffffff
+high_contrast_light	progress bar vs what it sits on (neutral)	surface_raised	rest	#000000	#ffffff
+high_contrast_light	progress bar vs the track (accent)	card on background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (accent)	card on background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (success)	card on background	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs what it sits on (success)	card on background	rest	#0a5a28	#ffffff
+high_contrast_light	progress bar vs the track (warning)	card on background	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs what it sits on (warning)	card on background	rest	#7a3d00	#ffffff
+high_contrast_light	progress bar vs the track (danger)	card on background	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs what it sits on (danger)	card on background	rest	#9a0000	#ffffff
+high_contrast_light	progress bar vs the track (info)	card on background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs what it sits on (info)	card on background	rest	#0030b0	#ffffff
+high_contrast_light	progress bar vs the track (neutral)	card on background	rest	#000000	#ffffff
+high_contrast_light	progress bar vs what it sits on (neutral)	card on background	rest	#000000	#ffffff
+high_contrast_dark	progress bar vs the track (accent)	background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (accent)	background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs the track (success)	background	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs what it sits on (success)	background	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs the track (warning)	background	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs what it sits on (warning)	background	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs the track (danger)	background	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs what it sits on (danger)	background	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs the track (info)	background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (info)	background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs the track (neutral)	background	rest	#ffffff	#000000
+high_contrast_dark	progress bar vs what it sits on (neutral)	background	rest	#ffffff	#000000
+high_contrast_dark	progress bar vs the track (accent)	surface	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (accent)	surface	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs the track (success)	surface	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs what it sits on (success)	surface	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs the track (warning)	surface	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs what it sits on (warning)	surface	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs the track (danger)	surface	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs what it sits on (danger)	surface	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs the track (info)	surface	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (info)	surface	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs the track (neutral)	surface	rest	#ffffff	#000000
+high_contrast_dark	progress bar vs what it sits on (neutral)	surface	rest	#ffffff	#000000
+high_contrast_dark	progress bar vs the track (accent)	surface_raised	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (accent)	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	progress bar vs the track (success)	surface_raised	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs what it sits on (success)	surface_raised	rest	#7be49a	#0a0a0a
+high_contrast_dark	progress bar vs the track (warning)	surface_raised	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs what it sits on (warning)	surface_raised	rest	#ffd37a	#0a0a0a
+high_contrast_dark	progress bar vs the track (danger)	surface_raised	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs what it sits on (danger)	surface_raised	rest	#ff9a9a	#0a0a0a
+high_contrast_dark	progress bar vs the track (info)	surface_raised	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (info)	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	progress bar vs the track (neutral)	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	progress bar vs what it sits on (neutral)	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	progress bar vs the track (accent)	card on background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (accent)	card on background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs the track (success)	card on background	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs what it sits on (success)	card on background	rest	#7be49a	#000000
+high_contrast_dark	progress bar vs the track (warning)	card on background	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs what it sits on (warning)	card on background	rest	#ffd37a	#000000
+high_contrast_dark	progress bar vs the track (danger)	card on background	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs what it sits on (danger)	card on background	rest	#ff9a9a	#000000
+high_contrast_dark	progress bar vs the track (info)	card on background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs what it sits on (info)	card on background	rest	#9cc4ff	#000000
+high_contrast_dark	progress bar vs the track (neutral)	card on background	rest	#ffffff	#000000
+high_contrast_dark	progress bar vs what it sits on (neutral)	card on background	rest	#ffffff	#000000
+light	link underline vs the page	background	rest	#1d4ed8	#ffffff
+light	link underline vs the page	background	hovered	#1d4ed8	#edf1fc
+light	link underline vs the page	background	pressed	#0e3fc9	#dfe6f9
+light	link underline vs the page	surface	rest	#1d4ed8	#f4f6f8
+light	link underline vs the page	surface	hovered	#1d4ed8	#e2e8f5
+light	link underline vs the page	surface	pressed	#0e3fc9	#d5def3
+light	link underline vs the page	surface_raised	rest	#1d4ed8	#ffffff
+light	link underline vs the page	surface_raised	hovered	#1d4ed8	#edf1fc
+light	link underline vs the page	surface_raised	pressed	#0e3fc9	#dfe6f9
+dark	link underline vs the page	background	rest	#5b9bff	#0f1216
+dark	link underline vs the page	background	hovered	#5b9bff	#151d29
+dark	link underline vs the page	background	pressed	#6aaaff	#1a2637
+dark	link underline vs the page	surface	rest	#5b9bff	#171b21
+dark	link underline vs the page	surface	hovered	#5b9bff	#1d2533
+dark	link underline vs the page	surface	pressed	#6aaaff	#212e41
+dark	link underline vs the page	surface_raised	rest	#5b9bff	#1f242b
+dark	link underline vs the page	surface_raised	hovered	#5b9bff	#242e3c
+dark	link underline vs the page	surface_raised	pressed	#6aaaff	#283549
+light_aaa	link underline vs the page	background	rest	#1544ce	#ffffff
+light_aaa	link underline vs the page	background	hovered	#0b3ac4	#edf0fb
+light_aaa	link underline vs the page	background	pressed	#0130b9	#dee5f8
+light_aaa	link underline vs the page	surface	rest	#1544ce	#f4f6f8
+light_aaa	link underline vs the page	surface	hovered	#0b3ac4	#e2e7f4
+light_aaa	link underline vs the page	surface	pressed	#0130b9	#d4ddf2
+light_aaa	link underline vs the page	surface_raised	rest	#1544ce	#ffffff
+light_aaa	link underline vs the page	surface_raised	hovered	#0b3ac4	#edf0fb
+light_aaa	link underline vs the page	surface_raised	pressed	#0130b9	#dee5f8
+dark_aaa	link underline vs the page	background	rest	#70b2ff	#0f1216
+dark_aaa	link underline vs the page	background	hovered	#80c1ff	#171f29
+dark_aaa	link underline vs the page	background	pressed	#8fd0ff	#1d2937
+dark_aaa	link underline vs the page	surface	rest	#70b2ff	#171b21
+dark_aaa	link underline vs the page	surface	hovered	#80c1ff	#1f2733
+dark_aaa	link underline vs the page	surface	pressed	#8fd0ff	#243141
+dark_aaa	link underline vs the page	surface_raised	rest	#70b2ff	#1f242b
+dark_aaa	link underline vs the page	surface_raised	hovered	#80c1ff	#26303c
+dark_aaa	link underline vs the page	surface_raised	pressed	#8fd0ff	#2b3849
+high_contrast_light	link underline vs the page	background	rest	#0030b0	#ffffff
+high_contrast_light	link underline vs the page	background	hovered	#0030b0	#ebeff9
+high_contrast_light	link underline vs the page	background	pressed	#0021a1	#dbe2f4
+high_contrast_light	link underline vs the page	surface	rest	#0030b0	#ffffff
+high_contrast_light	link underline vs the page	surface	hovered	#0030b0	#ebeff9
+high_contrast_light	link underline vs the page	surface	pressed	#0021a1	#dbe2f4
+high_contrast_light	link underline vs the page	surface_raised	rest	#0030b0	#ffffff
+high_contrast_light	link underline vs the page	surface_raised	hovered	#0030b0	#ebeff9
+high_contrast_light	link underline vs the page	surface_raised	pressed	#0021a1	#dbe2f4
+high_contrast_dark	link underline vs the page	background	rest	#9cc4ff	#000000
+high_contrast_dark	link underline vs the page	background	hovered	#9cc4ff	#0c1014
+high_contrast_dark	link underline vs the page	background	pressed	#8db5f0	#161b24
+high_contrast_dark	link underline vs the page	surface	rest	#9cc4ff	#000000
+high_contrast_dark	link underline vs the page	surface	hovered	#9cc4ff	#0c1014
+high_contrast_dark	link underline vs the page	surface	pressed	#8db5f0	#161b24
+high_contrast_dark	link underline vs the page	surface_raised	rest	#9cc4ff	#0a0a0a
+high_contrast_dark	link underline vs the page	surface_raised	hovered	#9cc4ff	#161a1e
+high_contrast_dark	link underline vs the page	surface_raised	pressed	#8db5f0	#1f242d
+light	focus ring vs what it covers (button, primary)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, primary)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (button, primary)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, secondary)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, secondary)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (button, secondary)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, ghost)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, ghost)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (button, ghost)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, link)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (button, link)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (button, link)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (filter chip, unselected)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (filter chip, unselected)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (filter chip, unselected)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (tab bar)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (tab bar)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (tab bar)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (breadcrumb)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (breadcrumb)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (breadcrumb)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (sidebar, names beneath)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (sidebar, names beneath)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (sidebar, names beneath)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (header)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (header)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (header)	surface_raised	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (notice, info)	background	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (notice, info)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (notice, info)	surface_raised	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (toast, info)	(own page)	focused	#ffffff	#1d4ed8
+light	focus ring vs what it covers (removable chip, selected)	background	focused	#1d4ed8	#ffffff
+light	focus ring vs what it covers (removable chip, selected)	surface	focused	#1d4ed8	#f4f6f8
+light	focus ring vs what it covers (removable chip, selected)	surface_raised	focused	#1d4ed8	#ffffff
+dark	focus ring vs what it covers (button, primary)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (button, primary)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (button, primary)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (button, secondary)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (button, secondary)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (button, secondary)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (button, ghost)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (button, ghost)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (button, ghost)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (button, link)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (button, link)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (button, link)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (filter chip, unselected)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (filter chip, unselected)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (filter chip, unselected)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (tab bar)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (tab bar)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (tab bar)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (breadcrumb)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (breadcrumb)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (breadcrumb)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (sidebar, names beneath)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (sidebar, names beneath)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (sidebar, names beneath)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (header)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (header)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (header)	surface_raised	focused	#7fb1ff	#1f242b
+dark	focus ring vs what it covers (notice, info)	background	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (notice, info)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (notice, info)	surface_raised	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (toast, info)	(own page)	focused	#08111f	#5b9bff
+dark	focus ring vs what it covers (removable chip, selected)	background	focused	#7fb1ff	#0f1216
+dark	focus ring vs what it covers (removable chip, selected)	surface	focused	#7fb1ff	#171b21
+dark	focus ring vs what it covers (removable chip, selected)	surface_raised	focused	#7fb1ff	#1f242b
+light_aaa	focus ring vs what it covers (button, primary)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, primary)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (button, primary)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, secondary)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, secondary)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (button, secondary)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, ghost)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, ghost)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (button, ghost)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, link)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (button, link)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (button, link)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (filter chip, unselected)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (filter chip, unselected)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (filter chip, unselected)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (tab bar)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (tab bar)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (tab bar)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (breadcrumb)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (breadcrumb)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (breadcrumb)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (sidebar, names beneath)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (sidebar, names beneath)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (sidebar, names beneath)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (header)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (header)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (header)	surface_raised	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (notice, info)	background	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (notice, info)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (notice, info)	surface_raised	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (toast, info)	(own page)	focused	#ffffff	#1544ce
+light_aaa	focus ring vs what it covers (removable chip, selected)	background	focused	#1544ce	#ffffff
+light_aaa	focus ring vs what it covers (removable chip, selected)	surface	focused	#1544ce	#f4f6f8
+light_aaa	focus ring vs what it covers (removable chip, selected)	surface_raised	focused	#1544ce	#ffffff
+dark_aaa	focus ring vs what it covers (button, primary)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (button, primary)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (button, primary)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (button, secondary)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (button, secondary)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (button, secondary)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (button, ghost)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (button, ghost)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (button, ghost)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (button, link)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (button, link)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (button, link)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (filter chip, unselected)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (filter chip, unselected)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (filter chip, unselected)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (tab bar)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (tab bar)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (tab bar)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (breadcrumb)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (breadcrumb)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (breadcrumb)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (sidebar, names beneath)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (sidebar, names beneath)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (sidebar, names beneath)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (header)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (header)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (header)	surface_raised	focused	#7fb1ff	#1f242b
+dark_aaa	focus ring vs what it covers (notice, info)	background	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (notice, info)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (notice, info)	surface_raised	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (toast, info)	(own page)	focused	#08111f	#70b2ff
+dark_aaa	focus ring vs what it covers (removable chip, selected)	background	focused	#7fb1ff	#0f1216
+dark_aaa	focus ring vs what it covers (removable chip, selected)	surface	focused	#7fb1ff	#171b21
+dark_aaa	focus ring vs what it covers (removable chip, selected)	surface_raised	focused	#7fb1ff	#1f242b
+high_contrast_light	focus ring vs what it covers (button, primary)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, primary)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, primary)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, secondary)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, secondary)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, secondary)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, ghost)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, ghost)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, ghost)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, link)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, link)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (button, link)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (filter chip, unselected)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (filter chip, unselected)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (filter chip, unselected)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (tab bar)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (tab bar)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (tab bar)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (breadcrumb)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (breadcrumb)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (breadcrumb)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (sidebar, names beneath)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (sidebar, names beneath)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (sidebar, names beneath)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (header)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (header)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (header)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (notice, info)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (notice, info)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (notice, info)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (toast, info)	(own page)	focused	#ffffff	#0030b0
+high_contrast_light	focus ring vs what it covers (removable chip, selected)	background	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (removable chip, selected)	surface	focused	#0030b0	#ffffff
+high_contrast_light	focus ring vs what it covers (removable chip, selected)	surface_raised	focused	#0030b0	#ffffff
+high_contrast_dark	focus ring vs what it covers (button, primary)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, primary)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, primary)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (button, secondary)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, secondary)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, secondary)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (button, ghost)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, ghost)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, ghost)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (button, link)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, link)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (button, link)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (filter chip, unselected)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (filter chip, unselected)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (filter chip, unselected)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (tab bar)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (tab bar)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (tab bar)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (breadcrumb)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (breadcrumb)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (breadcrumb)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (sidebar, names beneath)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (sidebar, names beneath)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (sidebar, names beneath)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (header)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (header)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (header)	surface_raised	focused	#ffffff	#0a0a0a
+high_contrast_dark	focus ring vs what it covers (notice, info)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (notice, info)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (notice, info)	surface_raised	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (toast, info)	(own page)	focused	#000000	#9cc4ff
+high_contrast_dark	focus ring vs what it covers (removable chip, selected)	background	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (removable chip, selected)	surface	focused	#ffffff	#000000
+high_contrast_dark	focus ring vs what it covers (removable chip, selected)	surface_raised	focused	#ffffff	#0a0a0a
+light	modal dim vs the page (dialog)	(own page)	rest	#8f8f8f	#ffffff
+light	dialog card vs the dimmed page	(own page)	rest	#ffffff	#8f8f8f
+light	modal dim vs the page (sheet)	(own page)	rest	#8f8f8f	#ffffff
+light	sheet vs the dimmed page	(own page)	rest	#ffffff	#8f8f8f
+dark	modal dim vs the page (dialog)	(own page)	rest	#797b7d	#0f1216
+dark	dialog card vs the dimmed page	(own page)	rest	#1f242b	#797b7d
+dark	modal dim vs the page (sheet)	(own page)	rest	#797b7d	#0f1216
+dark	sheet vs the dimmed page	(own page)	rest	#0f1216	#797b7d
+light_aaa	modal dim vs the page (dialog)	(own page)	rest	#8f8f8f	#ffffff
+light_aaa	dialog card vs the dimmed page	(own page)	rest	#ffffff	#8f8f8f
+light_aaa	modal dim vs the page (sheet)	(own page)	rest	#8f8f8f	#ffffff
+light_aaa	sheet vs the dimmed page	(own page)	rest	#ffffff	#8f8f8f
+dark_aaa	modal dim vs the page (dialog)	(own page)	rest	#797b7d	#0f1216
+dark_aaa	dialog card vs the dimmed page	(own page)	rest	#1f242b	#797b7d
+dark_aaa	modal dim vs the page (sheet)	(own page)	rest	#797b7d	#0f1216
+dark_aaa	sheet vs the dimmed page	(own page)	rest	#0f1216	#797b7d
+high_contrast_light	modal dim vs the page (dialog)	(own page)	rest	#8f8f8f	#ffffff
+high_contrast_light	dialog card vs the dimmed page	(own page)	rest	#000000	#8f8f8f
+high_contrast_light	modal dim vs the page (sheet)	(own page)	rest	#8f8f8f	#ffffff
+high_contrast_light	sheet vs the dimmed page	(own page)	rest	#ffffff	#8f8f8f
+high_contrast_dark	modal dim vs the page (dialog)	(own page)	rest	#707070	#000000
+high_contrast_dark	dialog card vs the dimmed page	(own page)	rest	#ffffff	#707070
+high_contrast_dark	modal dim vs the page (sheet)	(own page)	rest	#707070	#000000
+high_contrast_dark	sheet vs the dimmed page	(own page)	rest	#000000	#707070
+light	glyph (icon) "#" in header	background	rest	#15181c	#ffffff
+light	glyph (icon) "#" in header	background	hovered	#15181c	#ffffff
+light	glyph (icon) "#" in header	background	pressed	#15181c	#ffffff
+light	glyph (icon) "#" in header	surface	rest	#15181c	#f4f6f8
+light	glyph (icon) "#" in header	surface	hovered	#15181c	#f4f6f8
+light	glyph (icon) "#" in header	surface	pressed	#15181c	#f4f6f8
+light	glyph (icon) "#" in header	surface_raised	rest	#15181c	#ffffff
+light	glyph (icon) "#" in header	surface_raised	hovered	#15181c	#ffffff
+light	glyph (icon) "#" in header	surface_raised	pressed	#15181c	#ffffff
+light	glyph (icon) "#" in header with an open menu	(own page)	rest	#15181c	#ffffff
+light	glyph (icon) "@" in header with an open menu	(own page)	rest	#15181c	#ffffff
+light	glyph (icon) "#" in header with an open menu	(own page)	hovered	#15181c	#ffffff
+light	glyph (icon) "#" in header with an open menu	(own page)	pressed	#15181c	#ffffff
+light	glyph (icon) "@" in header with an open menu	(own page)	hovered	#15181c	#ffffff
+light	glyph (icon) "@" in header with an open menu	(own page)	pressed	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	background	rest	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	background	rest	#5b5d60	#ffffff
+light	glyph (icon) "★" in tab bar	background	hovered	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	background	pressed	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	background	hovered	#15181c	#dedede
+light	glyph (icon) "★" in tab bar	background	pressed	#5b5d60	#ffffff
+light	glyph (icon) "★" in tab bar	surface	rest	#15181c	#f4f6f8
+light	glyph (icon) "★" in tab bar	surface	rest	#5b5d60	#f4f6f8
+light	glyph (icon) "★" in tab bar	surface	hovered	#15181c	#f4f6f8
+light	glyph (icon) "★" in tab bar	surface	pressed	#15181c	#f4f6f8
+light	glyph (icon) "★" in tab bar	surface	hovered	#15181c	#dedede
+light	glyph (icon) "★" in tab bar	surface	pressed	#5b5d60	#f4f6f8
+light	glyph (icon) "★" in tab bar	surface_raised	rest	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	surface_raised	rest	#5b5d60	#ffffff
+light	glyph (icon) "★" in tab bar	surface_raised	hovered	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	surface_raised	pressed	#15181c	#ffffff
+light	glyph (icon) "★" in tab bar	surface_raised	hovered	#15181c	#dedede
+light	glyph (icon) "★" in tab bar	surface_raised	pressed	#5b5d60	#ffffff
+light	glyph (separator) "›" in breadcrumb	background	rest	#8a8c8e	#ffffff
+light	glyph (separator) "›" in breadcrumb	background	rest	#8a8c8e	#ffffff
+light	glyph (separator) "›" in breadcrumb	surface	rest	#8a8c8e	#f4f6f8
+light	glyph (separator) "›" in breadcrumb	surface	rest	#8a8c8e	#f4f6f8
+light	glyph (separator) "›" in breadcrumb	surface_raised	rest	#8a8c8e	#ffffff
+light	glyph (separator) "›" in breadcrumb	surface_raised	rest	#8a8c8e	#ffffff
+light	glyph (icon) "1" in sidebar, names beneath	background	rest	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beneath	background	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beneath	background	rest	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beneath	background	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names beneath	background	pressed	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beneath	background	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names beneath	background	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beneath	background	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names beneath	background	pressed	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beneath	surface	rest	#15181c	#f4f6f8
+light	glyph (icon) "2" in sidebar, names beneath	surface	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beneath	surface	rest	#15181c	#f4f6f8
+light	glyph (icon) "1" in sidebar, names beneath	surface	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names beneath	surface	pressed	#15181c	#f4f6f8
+light	glyph (icon) "2" in sidebar, names beneath	surface	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names beneath	surface	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beneath	surface	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names beneath	surface	pressed	#15181c	#f4f6f8
+light	glyph (icon) "1" in sidebar, names beneath	surface_raised	rest	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beneath	surface_raised	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beneath	surface_raised	rest	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beneath	surface_raised	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names beneath	surface_raised	pressed	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beneath	surface_raised	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names beneath	surface_raised	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beneath	surface_raised	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names beneath	surface_raised	pressed	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beside	background	rest	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beside	background	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beside	background	rest	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beside	background	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names beside	background	pressed	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beside	background	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names beside	background	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beside	background	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names beside	background	pressed	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beside	surface	rest	#15181c	#f4f6f8
+light	glyph (icon) "2" in sidebar, names beside	surface	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beside	surface	rest	#15181c	#f4f6f8
+light	glyph (icon) "1" in sidebar, names beside	surface	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names beside	surface	pressed	#15181c	#f4f6f8
+light	glyph (icon) "2" in sidebar, names beside	surface	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names beside	surface	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beside	surface	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names beside	surface	pressed	#15181c	#f4f6f8
+light	glyph (icon) "1" in sidebar, names beside	surface_raised	rest	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beside	surface_raised	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beside	surface_raised	rest	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names beside	surface_raised	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names beside	surface_raised	pressed	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names beside	surface_raised	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names beside	surface_raised	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names beside	surface_raised	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names beside	surface_raised	pressed	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names in tooltips	(own page)	rest	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names in tooltips	(own page)	rest	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names in tooltips	(own page)	rest	#15181c	#ffffff
+light	glyph (icon) "1" in sidebar, names in tooltips	(own page)	hovered	#15181c	#dedede
+light	glyph (icon) "1" in sidebar, names in tooltips	(own page)	pressed	#15181c	#ffffff
+light	glyph (icon) "2" in sidebar, names in tooltips	(own page)	hovered	#ffffff	#0400b4
+light	glyph (icon) "2" in sidebar, names in tooltips	(own page)	pressed	#ffffff	#0400b4
+light	glyph (icon) "3" in sidebar, names in tooltips	(own page)	hovered	#15181c	#dedede
+light	glyph (icon) "3" in sidebar, names in tooltips	(own page)	pressed	#15181c	#ffffff
+light	glyph (close mark) close mark in notice, info	background	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, info	background	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, info	background	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, info	surface	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, info	surface	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, info	surface	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, info	surface_raised	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, info	surface_raised	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, info	surface_raised	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, success	background	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, success	background	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, success	background	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, success	surface	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, success	surface	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, success	surface	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, success	surface_raised	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, success	surface_raised	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, success	surface_raised	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, warning	background	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, warning	background	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, warning	background	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, warning	surface	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, warning	surface	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, warning	surface	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, warning	surface_raised	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, warning	surface_raised	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, warning	surface_raised	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, danger	background	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, danger	background	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, danger	background	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, danger	surface	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, danger	surface	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, danger	surface	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, danger	surface_raised	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, danger	surface_raised	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, danger	surface_raised	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, accent	background	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, accent	background	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, accent	background	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, accent	surface	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, accent	surface	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, accent	surface	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, accent	surface_raised	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, accent	surface_raised	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, accent	surface_raised	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, neutral	background	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, neutral	background	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, neutral	background	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, neutral	surface	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, neutral	surface	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, neutral	surface	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in notice, neutral	surface_raised	rest	#15181c	#f4f6f8
+light	glyph (close mark) close mark in notice, neutral	surface_raised	hovered	#15181c	#e2e8f5
+light	glyph (close mark) close mark in notice, neutral	surface_raised	pressed	#15181c	#d5def3
+light	glyph (close mark) close mark in removable chip, selected	background	rest	#ffffff	#1d4ed8
+light	glyph (close mark) close mark in removable chip, selected	background	hovered	#ffffff	#0e3fc9
+light	glyph (close mark) close mark in removable chip, selected	background	pressed	#ffffff	#002fb9
+light	glyph (close mark) close mark in removable chip, selected	surface	rest	#ffffff	#1d4ed8
+light	glyph (close mark) close mark in removable chip, selected	surface	hovered	#ffffff	#0e3fc9
+light	glyph (close mark) close mark in removable chip, selected	surface	pressed	#ffffff	#002fb9
+light	glyph (close mark) close mark in removable chip, selected	surface_raised	rest	#ffffff	#1d4ed8
+light	glyph (close mark) close mark in removable chip, selected	surface_raised	hovered	#ffffff	#0e3fc9
+light	glyph (close mark) close mark in removable chip, selected	surface_raised	pressed	#ffffff	#002fb9
+light	glyph (close mark) close mark in removable chip, unselected	background	rest	#454b54	#f4f6f8
+light	glyph (close mark) close mark in removable chip, unselected	background	hovered	#454b54	#eaecee
+light	glyph (close mark) close mark in removable chip, unselected	background	pressed	#454b54	#e0e2e4
+light	glyph (close mark) close mark in removable chip, unselected	surface	rest	#454b54	#f4f6f8
+light	glyph (close mark) close mark in removable chip, unselected	surface	hovered	#454b54	#eaecee
+light	glyph (close mark) close mark in removable chip, unselected	surface	pressed	#454b54	#e0e2e4
+light	glyph (close mark) close mark in removable chip, unselected	surface_raised	rest	#454b54	#f4f6f8
+light	glyph (close mark) close mark in removable chip, unselected	surface_raised	hovered	#454b54	#eaecee
+light	glyph (close mark) close mark in removable chip, unselected	surface_raised	pressed	#454b54	#e0e2e4
+light	glyph (close mark) close mark in toast, debug	(own page)	rest	#15181c	#ffffff
+light	glyph (close mark) close mark in toast, info	(own page)	rest	#ffffff	#1d4ed8
+light	glyph (close mark) close mark in toast, success	(own page)	rest	#ffffff	#15803d
+light	glyph (close mark) close mark in toast, warning	(own page)	rest	#ffffff	#9a5b00
+light	glyph (close mark) close mark in toast, error	(own page)	rest	#ffffff	#b3261e
+dark	glyph (icon) "#" in header	background	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "#" in header	background	hovered	#f1f3f6	#0f1216
+dark	glyph (icon) "#" in header	background	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "#" in header	surface	rest	#f1f3f6	#171b21
+dark	glyph (icon) "#" in header	surface	hovered	#f1f3f6	#171b21
+dark	glyph (icon) "#" in header	surface	pressed	#f1f3f6	#171b21
+dark	glyph (icon) "#" in header	surface_raised	rest	#f1f3f6	#1f242b
+dark	glyph (icon) "#" in header	surface_raised	hovered	#f1f3f6	#1f242b
+dark	glyph (icon) "#" in header	surface_raised	pressed	#f1f3f6	#1f242b
+dark	glyph (icon) "#" in header with an open menu	(own page)	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "@" in header with an open menu	(own page)	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "#" in header with an open menu	(own page)	hovered	#f1f3f6	#0f1216
+dark	glyph (icon) "#" in header with an open menu	(own page)	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "@" in header with an open menu	(own page)	hovered	#f1f3f6	#0f1216
+dark	glyph (icon) "@" in header with an open menu	(own page)	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "★" in tab bar	background	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "★" in tab bar	background	rest	#adafb3	#0f1216
+dark	glyph (icon) "★" in tab bar	background	hovered	#f1f3f6	#0f1216
+dark	glyph (icon) "★" in tab bar	background	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "★" in tab bar	background	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "★" in tab bar	background	pressed	#adafb3	#0f1216
+dark	glyph (icon) "★" in tab bar	surface	rest	#f1f3f6	#171b21
+dark	glyph (icon) "★" in tab bar	surface	rest	#adafb3	#171b21
+dark	glyph (icon) "★" in tab bar	surface	hovered	#f1f3f6	#171b21
+dark	glyph (icon) "★" in tab bar	surface	pressed	#f1f3f6	#171b21
+dark	glyph (icon) "★" in tab bar	surface	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "★" in tab bar	surface	pressed	#adafb3	#171b21
+dark	glyph (icon) "★" in tab bar	surface_raised	rest	#f1f3f6	#1f242b
+dark	glyph (icon) "★" in tab bar	surface_raised	rest	#adafb3	#1f242b
+dark	glyph (icon) "★" in tab bar	surface_raised	hovered	#f1f3f6	#1f242b
+dark	glyph (icon) "★" in tab bar	surface_raised	pressed	#f1f3f6	#1f242b
+dark	glyph (icon) "★" in tab bar	surface_raised	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "★" in tab bar	surface_raised	pressed	#adafb3	#1f242b
+dark	glyph (separator) "›" in breadcrumb	background	rest	#808286	#0f1216
+dark	glyph (separator) "›" in breadcrumb	background	rest	#808286	#0f1216
+dark	glyph (separator) "›" in breadcrumb	surface	rest	#808286	#171b21
+dark	glyph (separator) "›" in breadcrumb	surface	rest	#808286	#171b21
+dark	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808286	#1f242b
+dark	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808286	#1f242b
+dark	glyph (icon) "1" in sidebar, names beneath	background	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "2" in sidebar, names beneath	background	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beneath	background	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "1" in sidebar, names beneath	background	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names beneath	background	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "2" in sidebar, names beneath	background	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names beneath	background	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beneath	background	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names beneath	background	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "1" in sidebar, names beneath	surface	rest	#f1f3f6	#171b21
+dark	glyph (icon) "2" in sidebar, names beneath	surface	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beneath	surface	rest	#f1f3f6	#171b21
+dark	glyph (icon) "1" in sidebar, names beneath	surface	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names beneath	surface	pressed	#f1f3f6	#171b21
+dark	glyph (icon) "2" in sidebar, names beneath	surface	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names beneath	surface	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beneath	surface	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names beneath	surface	pressed	#f1f3f6	#171b21
+dark	glyph (icon) "1" in sidebar, names beneath	surface_raised	rest	#f1f3f6	#1f242b
+dark	glyph (icon) "2" in sidebar, names beneath	surface_raised	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beneath	surface_raised	rest	#f1f3f6	#1f242b
+dark	glyph (icon) "1" in sidebar, names beneath	surface_raised	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names beneath	surface_raised	pressed	#f1f3f6	#1f242b
+dark	glyph (icon) "2" in sidebar, names beneath	surface_raised	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names beneath	surface_raised	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beneath	surface_raised	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names beneath	surface_raised	pressed	#f1f3f6	#1f242b
+dark	glyph (icon) "1" in sidebar, names beside	background	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "2" in sidebar, names beside	background	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beside	background	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "1" in sidebar, names beside	background	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names beside	background	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "2" in sidebar, names beside	background	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names beside	background	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beside	background	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names beside	background	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "1" in sidebar, names beside	surface	rest	#f1f3f6	#171b21
+dark	glyph (icon) "2" in sidebar, names beside	surface	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beside	surface	rest	#f1f3f6	#171b21
+dark	glyph (icon) "1" in sidebar, names beside	surface	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names beside	surface	pressed	#f1f3f6	#171b21
+dark	glyph (icon) "2" in sidebar, names beside	surface	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names beside	surface	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beside	surface	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names beside	surface	pressed	#f1f3f6	#171b21
+dark	glyph (icon) "1" in sidebar, names beside	surface_raised	rest	#f1f3f6	#1f242b
+dark	glyph (icon) "2" in sidebar, names beside	surface_raised	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beside	surface_raised	rest	#f1f3f6	#1f242b
+dark	glyph (icon) "1" in sidebar, names beside	surface_raised	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names beside	surface_raised	pressed	#f1f3f6	#1f242b
+dark	glyph (icon) "2" in sidebar, names beside	surface_raised	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names beside	surface_raised	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names beside	surface_raised	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names beside	surface_raised	pressed	#f1f3f6	#1f242b
+dark	glyph (icon) "1" in sidebar, names in tooltips	(own page)	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "2" in sidebar, names in tooltips	(own page)	rest	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names in tooltips	(own page)	rest	#f1f3f6	#0f1216
+dark	glyph (icon) "1" in sidebar, names in tooltips	(own page)	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "1" in sidebar, names in tooltips	(own page)	pressed	#f1f3f6	#0f1216
+dark	glyph (icon) "2" in sidebar, names in tooltips	(own page)	hovered	#08111f	#65c7ff
+dark	glyph (icon) "2" in sidebar, names in tooltips	(own page)	pressed	#08111f	#65c7ff
+dark	glyph (icon) "3" in sidebar, names in tooltips	(own page)	hovered	#f1f3f6	#232a33
+dark	glyph (icon) "3" in sidebar, names in tooltips	(own page)	pressed	#f1f3f6	#0f1216
+dark	glyph (close mark) close mark in notice, info	background	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, info	background	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, info	background	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, info	surface	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, info	surface	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, info	surface	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, info	surface_raised	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, info	surface_raised	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, info	surface_raised	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, success	background	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, success	background	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, success	background	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, success	surface	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, success	surface	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, success	surface	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, success	surface_raised	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, success	surface_raised	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, success	surface_raised	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, warning	background	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, warning	background	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, warning	background	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, warning	surface	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, warning	surface	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, warning	surface	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, warning	surface_raised	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, warning	surface_raised	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, warning	surface_raised	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, danger	background	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, danger	background	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, danger	background	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, danger	surface	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, danger	surface	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, danger	surface	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, danger	surface_raised	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, danger	surface_raised	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, danger	surface_raised	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, accent	background	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, accent	background	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, accent	background	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, accent	surface	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, accent	surface	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, accent	surface	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, accent	surface_raised	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, accent	surface_raised	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, accent	surface_raised	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, neutral	background	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, neutral	background	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, neutral	background	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, neutral	surface	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, neutral	surface	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, neutral	surface	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in notice, neutral	surface_raised	rest	#f1f3f6	#171b21
+dark	glyph (close mark) close mark in notice, neutral	surface_raised	hovered	#f1f3f6	#1d2533
+dark	glyph (close mark) close mark in notice, neutral	surface_raised	pressed	#f1f3f6	#212e41
+dark	glyph (close mark) close mark in removable chip, selected	background	rest	#08111f	#5b9bff
+dark	glyph (close mark) close mark in removable chip, selected	background	hovered	#08111f	#4c8cf0
+dark	glyph (close mark) close mark in removable chip, selected	background	pressed	#08111f	#3c7ce0
+dark	glyph (close mark) close mark in removable chip, selected	surface	rest	#08111f	#5b9bff
+dark	glyph (close mark) close mark in removable chip, selected	surface	hovered	#08111f	#4c8cf0
+dark	glyph (close mark) close mark in removable chip, selected	surface	pressed	#08111f	#3c7ce0
+dark	glyph (close mark) close mark in removable chip, selected	surface_raised	rest	#08111f	#5b9bff
+dark	glyph (close mark) close mark in removable chip, selected	surface_raised	hovered	#08111f	#4c8cf0
+dark	glyph (close mark) close mark in removable chip, selected	surface_raised	pressed	#08111f	#3c7ce0
+dark	glyph (close mark) close mark in removable chip, unselected	background	rest	#aeb6c0	#171b21
+dark	glyph (close mark) close mark in removable chip, unselected	background	hovered	#aeb6c0	#0d1117
+dark	glyph (close mark) close mark in removable chip, unselected	background	pressed	#aeb6c0	#03070d
+dark	glyph (close mark) close mark in removable chip, unselected	surface	rest	#aeb6c0	#171b21
+dark	glyph (close mark) close mark in removable chip, unselected	surface	hovered	#aeb6c0	#0d1117
+dark	glyph (close mark) close mark in removable chip, unselected	surface	pressed	#aeb6c0	#03070d
+dark	glyph (close mark) close mark in removable chip, unselected	surface_raised	rest	#aeb6c0	#171b21
+dark	glyph (close mark) close mark in removable chip, unselected	surface_raised	hovered	#aeb6c0	#0d1117
+dark	glyph (close mark) close mark in removable chip, unselected	surface_raised	pressed	#aeb6c0	#03070d
+dark	glyph (close mark) close mark in toast, debug	(own page)	rest	#f1f3f6	#1f242b
+dark	glyph (close mark) close mark in toast, info	(own page)	rest	#08111f	#5b9bff
+dark	glyph (close mark) close mark in toast, success	(own page)	rest	#06210f	#4ade80
+dark	glyph (close mark) close mark in toast, warning	(own page)	rest	#241600	#fbbf4a
+dark	glyph (close mark) close mark in toast, error	(own page)	rest	#2a0606	#ff6b6b
+light_aaa	glyph (icon) "#" in header	background	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header	background	hovered	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header	background	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (icon) "#" in header	surface	hovered	#15181c	#f4f6f8
+light_aaa	glyph (icon) "#" in header	surface	pressed	#15181c	#f4f6f8
+light_aaa	glyph (icon) "#" in header	surface_raised	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header	surface_raised	hovered	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header	surface_raised	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header with an open menu	(own page)	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "@" in header with an open menu	(own page)	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header with an open menu	(own page)	hovered	#15181c	#ffffff
+light_aaa	glyph (icon) "#" in header with an open menu	(own page)	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "@" in header with an open menu	(own page)	hovered	#15181c	#ffffff
+light_aaa	glyph (icon) "@" in header with an open menu	(own page)	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	background	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	background	rest	#525457	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	background	hovered	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	background	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	background	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "★" in tab bar	background	pressed	#525457	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (icon) "★" in tab bar	surface	rest	#525457	#f4f6f8
+light_aaa	glyph (icon) "★" in tab bar	surface	hovered	#15181c	#f4f6f8
+light_aaa	glyph (icon) "★" in tab bar	surface	pressed	#15181c	#f4f6f8
+light_aaa	glyph (icon) "★" in tab bar	surface	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "★" in tab bar	surface	pressed	#525457	#f4f6f8
+light_aaa	glyph (icon) "★" in tab bar	surface_raised	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	surface_raised	rest	#525457	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	surface_raised	hovered	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	surface_raised	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "★" in tab bar	surface_raised	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "★" in tab bar	surface_raised	pressed	#525457	#ffffff
+light_aaa	glyph (separator) "›" in breadcrumb	background	rest	#8a8c8e	#ffffff
+light_aaa	glyph (separator) "›" in breadcrumb	background	rest	#8a8c8e	#ffffff
+light_aaa	glyph (separator) "›" in breadcrumb	surface	rest	#8a8c8e	#f4f6f8
+light_aaa	glyph (separator) "›" in breadcrumb	surface	rest	#8a8c8e	#f4f6f8
+light_aaa	glyph (separator) "›" in breadcrumb	surface_raised	rest	#8a8c8e	#ffffff
+light_aaa	glyph (separator) "›" in breadcrumb	surface_raised	rest	#8a8c8e	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beneath	background	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beneath	background	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beneath	background	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beneath	background	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names beneath	background	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beneath	background	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names beneath	background	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beneath	background	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names beneath	background	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beneath	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (icon) "2" in sidebar, names beneath	surface	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beneath	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (icon) "1" in sidebar, names beneath	surface	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names beneath	surface	pressed	#15181c	#f4f6f8
+light_aaa	glyph (icon) "2" in sidebar, names beneath	surface	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names beneath	surface	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beneath	surface	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names beneath	surface	pressed	#15181c	#f4f6f8
+light_aaa	glyph (icon) "1" in sidebar, names beneath	surface_raised	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beneath	surface_raised	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beneath	surface_raised	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beneath	surface_raised	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names beneath	surface_raised	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beneath	surface_raised	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names beneath	surface_raised	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beneath	surface_raised	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names beneath	surface_raised	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beside	background	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beside	background	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beside	background	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beside	background	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names beside	background	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beside	background	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names beside	background	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beside	background	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names beside	background	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beside	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (icon) "2" in sidebar, names beside	surface	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beside	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (icon) "1" in sidebar, names beside	surface	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names beside	surface	pressed	#15181c	#f4f6f8
+light_aaa	glyph (icon) "2" in sidebar, names beside	surface	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names beside	surface	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beside	surface	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names beside	surface	pressed	#15181c	#f4f6f8
+light_aaa	glyph (icon) "1" in sidebar, names beside	surface_raised	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beside	surface_raised	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beside	surface_raised	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names beside	surface_raised	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names beside	surface_raised	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names beside	surface_raised	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names beside	surface_raised	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names beside	surface_raised	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names beside	surface_raised	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names in tooltips	(own page)	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names in tooltips	(own page)	rest	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names in tooltips	(own page)	rest	#15181c	#ffffff
+light_aaa	glyph (icon) "1" in sidebar, names in tooltips	(own page)	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "1" in sidebar, names in tooltips	(own page)	pressed	#15181c	#ffffff
+light_aaa	glyph (icon) "2" in sidebar, names in tooltips	(own page)	hovered	#ffffff	#0800aa
+light_aaa	glyph (icon) "2" in sidebar, names in tooltips	(own page)	pressed	#ffffff	#0800aa
+light_aaa	glyph (icon) "3" in sidebar, names in tooltips	(own page)	hovered	#15181c	#dedede
+light_aaa	glyph (icon) "3" in sidebar, names in tooltips	(own page)	pressed	#15181c	#ffffff
+light_aaa	glyph (close mark) close mark in notice, info	background	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, info	background	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, info	background	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, info	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, info	surface	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, info	surface	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, info	surface_raised	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, info	surface_raised	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, info	surface_raised	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, success	background	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, success	background	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, success	background	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, success	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, success	surface	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, success	surface	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, success	surface_raised	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, success	surface_raised	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, success	surface_raised	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, warning	background	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, warning	background	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, warning	background	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, warning	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, warning	surface	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, warning	surface	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, warning	surface_raised	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, warning	surface_raised	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, warning	surface_raised	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, danger	background	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, danger	background	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, danger	background	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, danger	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, danger	surface	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, danger	surface	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, danger	surface_raised	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, danger	surface_raised	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, danger	surface_raised	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, accent	background	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, accent	background	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, accent	background	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, accent	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, accent	surface	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, accent	surface	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, accent	surface_raised	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, accent	surface_raised	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, accent	surface_raised	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, neutral	background	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, neutral	background	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, neutral	background	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, neutral	surface	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, neutral	surface	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, neutral	surface	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in notice, neutral	surface_raised	rest	#15181c	#f4f6f8
+light_aaa	glyph (close mark) close mark in notice, neutral	surface_raised	hovered	#15181c	#e2e7f4
+light_aaa	glyph (close mark) close mark in notice, neutral	surface_raised	pressed	#15181c	#d4ddf2
+light_aaa	glyph (close mark) close mark in removable chip, selected	background	rest	#ffffff	#1544ce
+light_aaa	glyph (close mark) close mark in removable chip, selected	background	hovered	#ffffff	#0635bf
+light_aaa	glyph (close mark) close mark in removable chip, selected	background	pressed	#ffffff	#0025af
+light_aaa	glyph (close mark) close mark in removable chip, selected	surface	rest	#ffffff	#1544ce
+light_aaa	glyph (close mark) close mark in removable chip, selected	surface	hovered	#ffffff	#0635bf
+light_aaa	glyph (close mark) close mark in removable chip, selected	surface	pressed	#ffffff	#0025af
+light_aaa	glyph (close mark) close mark in removable chip, selected	surface_raised	rest	#ffffff	#1544ce
+light_aaa	glyph (close mark) close mark in removable chip, selected	surface_raised	hovered	#ffffff	#0635bf
+light_aaa	glyph (close mark) close mark in removable chip, selected	surface_raised	pressed	#ffffff	#0025af
+light_aaa	glyph (close mark) close mark in removable chip, unselected	background	rest	#454b54	#f4f6f8
+light_aaa	glyph (close mark) close mark in removable chip, unselected	background	hovered	#454b54	#eaecee
+light_aaa	glyph (close mark) close mark in removable chip, unselected	background	pressed	#454b54	#ffffff
+light_aaa	glyph (close mark) close mark in removable chip, unselected	surface	rest	#454b54	#f4f6f8
+light_aaa	glyph (close mark) close mark in removable chip, unselected	surface	hovered	#454b54	#eaecee
+light_aaa	glyph (close mark) close mark in removable chip, unselected	surface	pressed	#454b54	#ffffff
+light_aaa	glyph (close mark) close mark in removable chip, unselected	surface_raised	rest	#454b54	#f4f6f8
+light_aaa	glyph (close mark) close mark in removable chip, unselected	surface_raised	hovered	#454b54	#eaecee
+light_aaa	glyph (close mark) close mark in removable chip, unselected	surface_raised	pressed	#454b54	#ffffff
+light_aaa	glyph (close mark) close mark in toast, debug	(own page)	rest	#15181c	#ffffff
+light_aaa	glyph (close mark) close mark in toast, info	(own page)	rest	#ffffff	#1544ce
+light_aaa	glyph (close mark) close mark in toast, success	(own page)	rest	#ffffff	#006725
+light_aaa	glyph (close mark) close mark in toast, warning	(own page)	rest	#ffffff	#874900
+light_aaa	glyph (close mark) close mark in toast, error	(own page)	rest	#ffffff	#ad1f18
+dark_aaa	glyph (icon) "#" in header	background	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "#" in header	background	hovered	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "#" in header	background	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "#" in header	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "#" in header	surface	hovered	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "#" in header	surface	pressed	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "#" in header	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "#" in header	surface_raised	hovered	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "#" in header	surface_raised	pressed	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "#" in header with an open menu	(own page)	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "@" in header with an open menu	(own page)	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "#" in header with an open menu	(own page)	hovered	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "#" in header with an open menu	(own page)	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "@" in header with an open menu	(own page)	hovered	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "@" in header with an open menu	(own page)	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "★" in tab bar	background	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "★" in tab bar	background	rest	#adafb3	#0f1216
+dark_aaa	glyph (icon) "★" in tab bar	background	hovered	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "★" in tab bar	background	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "★" in tab bar	background	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "★" in tab bar	background	pressed	#adafb3	#0f1216
+dark_aaa	glyph (icon) "★" in tab bar	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "★" in tab bar	surface	rest	#adafb3	#171b21
+dark_aaa	glyph (icon) "★" in tab bar	surface	hovered	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "★" in tab bar	surface	pressed	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "★" in tab bar	surface	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "★" in tab bar	surface	pressed	#adafb3	#171b21
+dark_aaa	glyph (icon) "★" in tab bar	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "★" in tab bar	surface_raised	rest	#adafb3	#1f242b
+dark_aaa	glyph (icon) "★" in tab bar	surface_raised	hovered	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "★" in tab bar	surface_raised	pressed	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "★" in tab bar	surface_raised	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "★" in tab bar	surface_raised	pressed	#adafb3	#1f242b
+dark_aaa	glyph (separator) "›" in breadcrumb	background	rest	#808286	#0f1216
+dark_aaa	glyph (separator) "›" in breadcrumb	background	rest	#808286	#0f1216
+dark_aaa	glyph (separator) "›" in breadcrumb	surface	rest	#808286	#171b21
+dark_aaa	glyph (separator) "›" in breadcrumb	surface	rest	#808286	#171b21
+dark_aaa	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808286	#1f242b
+dark_aaa	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808286	#1f242b
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	background	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	background	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	background	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	background	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	background	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	background	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	background	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	background	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	background	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	surface	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	surface	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	surface	pressed	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	surface	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	surface	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	surface	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	surface	pressed	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	surface_raised	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	surface_raised	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names beneath	surface_raised	pressed	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	surface_raised	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names beneath	surface_raised	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	surface_raised	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names beneath	surface_raised	pressed	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "1" in sidebar, names beside	background	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "2" in sidebar, names beside	background	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beside	background	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "1" in sidebar, names beside	background	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names beside	background	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "2" in sidebar, names beside	background	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names beside	background	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beside	background	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names beside	background	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "1" in sidebar, names beside	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "2" in sidebar, names beside	surface	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beside	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "1" in sidebar, names beside	surface	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names beside	surface	pressed	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "2" in sidebar, names beside	surface	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names beside	surface	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beside	surface	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names beside	surface	pressed	#f1f3f6	#171b21
+dark_aaa	glyph (icon) "1" in sidebar, names beside	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "2" in sidebar, names beside	surface_raised	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beside	surface_raised	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "1" in sidebar, names beside	surface_raised	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names beside	surface_raised	pressed	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "2" in sidebar, names beside	surface_raised	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names beside	surface_raised	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names beside	surface_raised	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names beside	surface_raised	pressed	#f1f3f6	#1f242b
+dark_aaa	glyph (icon) "1" in sidebar, names in tooltips	(own page)	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "2" in sidebar, names in tooltips	(own page)	rest	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names in tooltips	(own page)	rest	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "1" in sidebar, names in tooltips	(own page)	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "1" in sidebar, names in tooltips	(own page)	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (icon) "2" in sidebar, names in tooltips	(own page)	hovered	#08111f	#81e2ff
+dark_aaa	glyph (icon) "2" in sidebar, names in tooltips	(own page)	pressed	#08111f	#81e2ff
+dark_aaa	glyph (icon) "3" in sidebar, names in tooltips	(own page)	hovered	#f1f3f6	#232a33
+dark_aaa	glyph (icon) "3" in sidebar, names in tooltips	(own page)	pressed	#f1f3f6	#0f1216
+dark_aaa	glyph (close mark) close mark in notice, info	background	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, info	background	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, info	background	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, info	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, info	surface	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, info	surface	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, info	surface_raised	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, info	surface_raised	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, info	surface_raised	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, success	background	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, success	background	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, success	background	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, success	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, success	surface	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, success	surface	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, success	surface_raised	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, success	surface_raised	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, success	surface_raised	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, warning	background	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, warning	background	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, warning	background	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, warning	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, warning	surface	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, warning	surface	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, warning	surface_raised	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, warning	surface_raised	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, warning	surface_raised	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, danger	background	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, danger	background	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, danger	background	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, danger	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, danger	surface	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, danger	surface	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, danger	surface_raised	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, danger	surface_raised	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, danger	surface_raised	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, accent	background	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, accent	background	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, accent	background	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, accent	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, accent	surface	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, accent	surface	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, accent	surface_raised	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, accent	surface_raised	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, accent	surface_raised	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, neutral	background	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, neutral	background	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, neutral	background	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, neutral	surface	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, neutral	surface	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, neutral	surface	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in notice, neutral	surface_raised	rest	#f1f3f6	#171b21
+dark_aaa	glyph (close mark) close mark in notice, neutral	surface_raised	hovered	#f1f3f6	#1f2733
+dark_aaa	glyph (close mark) close mark in notice, neutral	surface_raised	pressed	#f1f3f6	#243141
+dark_aaa	glyph (close mark) close mark in removable chip, selected	background	rest	#08111f	#70b2ff
+dark_aaa	glyph (close mark) close mark in removable chip, selected	background	hovered	#08111f	#61a2f0
+dark_aaa	glyph (close mark) close mark in removable chip, selected	background	pressed	#08111f	#8fd0ff
+dark_aaa	glyph (close mark) close mark in removable chip, selected	surface	rest	#08111f	#70b2ff
+dark_aaa	glyph (close mark) close mark in removable chip, selected	surface	hovered	#08111f	#61a2f0
+dark_aaa	glyph (close mark) close mark in removable chip, selected	surface	pressed	#08111f	#8fd0ff
+dark_aaa	glyph (close mark) close mark in removable chip, selected	surface_raised	rest	#08111f	#70b2ff
+dark_aaa	glyph (close mark) close mark in removable chip, selected	surface_raised	hovered	#08111f	#61a2f0
+dark_aaa	glyph (close mark) close mark in removable chip, selected	surface_raised	pressed	#08111f	#8fd0ff
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	background	rest	#aeb6c0	#171b21
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	background	hovered	#aeb6c0	#0d1117
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	background	pressed	#aeb6c0	#03070d
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	surface	rest	#aeb6c0	#171b21
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	surface	hovered	#aeb6c0	#0d1117
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	surface	pressed	#aeb6c0	#03070d
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	surface_raised	rest	#aeb6c0	#171b21
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	surface_raised	hovered	#aeb6c0	#0d1117
+dark_aaa	glyph (close mark) close mark in removable chip, unselected	surface_raised	pressed	#aeb6c0	#03070d
+dark_aaa	glyph (close mark) close mark in toast, debug	(own page)	rest	#f1f3f6	#1f242b
+dark_aaa	glyph (close mark) close mark in toast, info	(own page)	rest	#08111f	#70b2ff
+dark_aaa	glyph (close mark) close mark in toast, success	(own page)	rest	#06210f	#4ade80
+dark_aaa	glyph (close mark) close mark in toast, warning	(own page)	rest	#241600	#fbbf4a
+dark_aaa	glyph (close mark) close mark in toast, error	(own page)	rest	#2a0606	#ff7372
+high_contrast_light	glyph (icon) "#" in header	background	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	background	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	background	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	surface	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	surface	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	surface_raised	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header with an open menu	(own page)	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "@" in header with an open menu	(own page)	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header with an open menu	(own page)	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "#" in header with an open menu	(own page)	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "@" in header with an open menu	(own page)	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "@" in header with an open menu	(own page)	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	background	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	background	rest	#4d4d4d	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	background	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	background	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	background	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "★" in tab bar	background	pressed	#4d4d4d	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface	rest	#4d4d4d	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "★" in tab bar	surface	pressed	#4d4d4d	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface_raised	rest	#4d4d4d	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface_raised	hovered	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "★" in tab bar	surface_raised	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "★" in tab bar	surface_raised	pressed	#4d4d4d	#ffffff
+high_contrast_light	glyph (separator) "›" in breadcrumb	background	rest	#808080	#ffffff
+high_contrast_light	glyph (separator) "›" in breadcrumb	background	rest	#808080	#ffffff
+high_contrast_light	glyph (separator) "›" in breadcrumb	surface	rest	#808080	#ffffff
+high_contrast_light	glyph (separator) "›" in breadcrumb	surface	rest	#808080	#ffffff
+high_contrast_light	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808080	#ffffff
+high_contrast_light	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808080	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	background	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	background	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	background	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	background	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	background	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	background	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	background	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	background	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	background	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	surface	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	surface	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	surface	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	surface	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	surface	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	surface	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	surface	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	surface_raised	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	surface_raised	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names beneath	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	surface_raised	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names beneath	surface_raised	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	surface_raised	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names beneath	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	background	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	background	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	background	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	background	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	background	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	background	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	background	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	background	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	background	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	surface	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	surface	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	surface	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	surface	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	surface	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	surface	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	surface	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	surface_raised	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	surface_raised	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names beside	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	surface_raised	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names beside	surface_raised	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	surface_raised	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names beside	surface_raised	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names in tooltips	(own page)	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names in tooltips	(own page)	rest	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names in tooltips	(own page)	rest	#000000	#ffffff
+high_contrast_light	glyph (icon) "1" in sidebar, names in tooltips	(own page)	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "1" in sidebar, names in tooltips	(own page)	pressed	#000000	#ffffff
+high_contrast_light	glyph (icon) "2" in sidebar, names in tooltips	(own page)	hovered	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "2" in sidebar, names in tooltips	(own page)	pressed	#ffffff	#0d008c
+high_contrast_light	glyph (icon) "3" in sidebar, names in tooltips	(own page)	hovered	#000000	#dedede
+high_contrast_light	glyph (icon) "3" in sidebar, names in tooltips	(own page)	pressed	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, info	background	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, info	background	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, info	background	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, info	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, info	surface	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, info	surface	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, info	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, info	surface_raised	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, info	surface_raised	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, success	background	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, success	background	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, success	background	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, success	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, success	surface	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, success	surface	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, success	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, success	surface_raised	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, success	surface_raised	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, warning	background	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, warning	background	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, warning	background	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, warning	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, warning	surface	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, warning	surface	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, warning	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, warning	surface_raised	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, warning	surface_raised	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, danger	background	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, danger	background	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, danger	background	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, danger	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, danger	surface	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, danger	surface	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, danger	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, danger	surface_raised	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, danger	surface_raised	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, accent	background	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, accent	background	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, accent	background	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, accent	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, accent	surface	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, accent	surface	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, accent	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, accent	surface_raised	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, accent	surface_raised	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, neutral	background	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, neutral	background	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, neutral	background	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, neutral	surface	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, neutral	surface	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, neutral	surface	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in notice, neutral	surface_raised	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in notice, neutral	surface_raised	hovered	#000000	#ebeff9
+high_contrast_light	glyph (close mark) close mark in notice, neutral	surface_raised	pressed	#000000	#dbe2f4
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	background	rest	#ffffff	#0030b0
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	background	hovered	#ffffff	#0021a1
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	background	pressed	#ffffff	#001191
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	surface	rest	#ffffff	#0030b0
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	surface	hovered	#ffffff	#0021a1
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	surface	pressed	#ffffff	#001191
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	surface_raised	rest	#ffffff	#0030b0
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	surface_raised	hovered	#ffffff	#0021a1
+high_contrast_light	glyph (close mark) close mark in removable chip, selected	surface_raised	pressed	#ffffff	#001191
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	background	rest	#1a1a1a	#ffffff
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	background	hovered	#1a1a1a	#f5f5f5
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	background	pressed	#1a1a1a	#ebebeb
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	surface	rest	#1a1a1a	#ffffff
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	surface	hovered	#1a1a1a	#f5f5f5
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	surface	pressed	#1a1a1a	#ebebeb
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	surface_raised	rest	#1a1a1a	#ffffff
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	surface_raised	hovered	#1a1a1a	#f5f5f5
+high_contrast_light	glyph (close mark) close mark in removable chip, unselected	surface_raised	pressed	#1a1a1a	#ebebeb
+high_contrast_light	glyph (close mark) close mark in toast, debug	(own page)	rest	#000000	#ffffff
+high_contrast_light	glyph (close mark) close mark in toast, info	(own page)	rest	#ffffff	#0030b0
+high_contrast_light	glyph (close mark) close mark in toast, success	(own page)	rest	#ffffff	#0a5a28
+high_contrast_light	glyph (close mark) close mark in toast, warning	(own page)	rest	#ffffff	#7a3d00
+high_contrast_light	glyph (close mark) close mark in toast, error	(own page)	rest	#ffffff	#9a0000
+high_contrast_dark	glyph (icon) "#" in header	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header	background	hovered	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header	background	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header	surface	hovered	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header	surface	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "#" in header	surface_raised	hovered	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "#" in header	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "#" in header with an open menu	(own page)	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "@" in header with an open menu	(own page)	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header with an open menu	(own page)	hovered	#ffffff	#000000
+high_contrast_dark	glyph (icon) "#" in header with an open menu	(own page)	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "@" in header with an open menu	(own page)	hovered	#ffffff	#000000
+high_contrast_dark	glyph (icon) "@" in header with an open menu	(own page)	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	background	rest	#b3b3b3	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	background	hovered	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	background	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	background	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "★" in tab bar	background	pressed	#b3b3b3	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	surface	rest	#b3b3b3	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	surface	hovered	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	surface	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	surface	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "★" in tab bar	surface	pressed	#b3b3b3	#000000
+high_contrast_dark	glyph (icon) "★" in tab bar	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "★" in tab bar	surface_raised	rest	#b3b3b3	#0a0a0a
+high_contrast_dark	glyph (icon) "★" in tab bar	surface_raised	hovered	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "★" in tab bar	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "★" in tab bar	surface_raised	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "★" in tab bar	surface_raised	pressed	#b3b3b3	#0a0a0a
+high_contrast_dark	glyph (separator) "›" in breadcrumb	background	rest	#808080	#000000
+high_contrast_dark	glyph (separator) "›" in breadcrumb	background	rest	#808080	#000000
+high_contrast_dark	glyph (separator) "›" in breadcrumb	surface	rest	#808080	#000000
+high_contrast_dark	glyph (separator) "›" in breadcrumb	surface	rest	#808080	#000000
+high_contrast_dark	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808080	#0a0a0a
+high_contrast_dark	glyph (separator) "›" in breadcrumb	surface_raised	rest	#808080	#0a0a0a
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	background	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	background	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	background	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	background	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	background	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	background	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	background	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	surface	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	surface	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	surface	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	surface	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	surface	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	surface	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	surface	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	surface_raised	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	surface_raised	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names beneath	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	surface_raised	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names beneath	surface_raised	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	surface_raised	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names beneath	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	background	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	background	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	background	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	background	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	background	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	background	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	background	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	surface	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	surface	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	surface	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	surface	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	surface	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	surface	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	surface	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	surface_raised	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	surface_raised	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	surface_raised	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names beside	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	surface_raised	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names beside	surface_raised	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	surface_raised	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names beside	surface_raised	pressed	#ffffff	#0a0a0a
+high_contrast_dark	glyph (icon) "1" in sidebar, names in tooltips	(own page)	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names in tooltips	(own page)	rest	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names in tooltips	(own page)	rest	#ffffff	#000000
+high_contrast_dark	glyph (icon) "1" in sidebar, names in tooltips	(own page)	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "1" in sidebar, names in tooltips	(own page)	pressed	#ffffff	#000000
+high_contrast_dark	glyph (icon) "2" in sidebar, names in tooltips	(own page)	hovered	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "2" in sidebar, names in tooltips	(own page)	pressed	#000000	#bcf5ff
+high_contrast_dark	glyph (icon) "3" in sidebar, names in tooltips	(own page)	hovered	#ffffff	#030303
+high_contrast_dark	glyph (icon) "3" in sidebar, names in tooltips	(own page)	pressed	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, info	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, info	background	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, info	background	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, info	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, info	surface	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, info	surface	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, info	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, info	surface_raised	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, info	surface_raised	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, success	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, success	background	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, success	background	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, success	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, success	surface	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, success	surface	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, success	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, success	surface_raised	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, success	surface_raised	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, warning	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, warning	background	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, warning	background	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, warning	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, warning	surface	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, warning	surface	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, warning	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, warning	surface_raised	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, warning	surface_raised	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, danger	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, danger	background	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, danger	background	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, danger	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, danger	surface	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, danger	surface	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, danger	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, danger	surface_raised	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, danger	surface_raised	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, accent	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, accent	background	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, accent	background	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, accent	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, accent	surface	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, accent	surface	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, accent	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, accent	surface_raised	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, accent	surface_raised	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	background	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	background	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	background	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	surface	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	surface	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	surface	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	surface_raised	rest	#ffffff	#000000
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	surface_raised	hovered	#ffffff	#0c1014
+high_contrast_dark	glyph (close mark) close mark in notice, neutral	surface_raised	pressed	#ffffff	#161b24
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	background	rest	#000000	#9cc4ff
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	background	hovered	#000000	#8db5f0
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	background	pressed	#000000	#7da5e0
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	surface	rest	#000000	#9cc4ff
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	surface	hovered	#000000	#8db5f0
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	surface	pressed	#000000	#7da5e0
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	surface_raised	rest	#000000	#9cc4ff
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	surface_raised	hovered	#000000	#8db5f0
+high_contrast_dark	glyph (close mark) close mark in removable chip, selected	surface_raised	pressed	#000000	#7da5e0
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	background	rest	#e6e6e6	#000000
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	background	hovered	#e6e6e6	#0f0f0f
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	background	pressed	#e6e6e6	#141414
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	surface	rest	#e6e6e6	#000000
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	surface	hovered	#e6e6e6	#0f0f0f
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	surface	pressed	#e6e6e6	#141414
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	surface_raised	rest	#e6e6e6	#000000
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	surface_raised	hovered	#e6e6e6	#0f0f0f
+high_contrast_dark	glyph (close mark) close mark in removable chip, unselected	surface_raised	pressed	#e6e6e6	#141414
+high_contrast_dark	glyph (close mark) close mark in toast, debug	(own page)	rest	#ffffff	#0a0a0a
+high_contrast_dark	glyph (close mark) close mark in toast, info	(own page)	rest	#000000	#9cc4ff
+high_contrast_dark	glyph (close mark) close mark in toast, success	(own page)	rest	#000000	#7be49a
+high_contrast_dark	glyph (close mark) close mark in toast, warning	(own page)	rest	#000000	#ffd37a
+high_contrast_dark	glyph (close mark) close mark in toast, error	(own page)	rest	#000000	#ff9a9a
