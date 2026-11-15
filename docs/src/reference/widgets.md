@@ -20,7 +20,7 @@ widgets.
 If you want to skip the widget compilation entirely:
 
 ```toml
-snora = { version = "0.62", default-features = false }
+snora = { version = "0.63", default-features = false }
 ```
 
 In that configuration `snora::widget`, `snora::direction`, and
@@ -77,6 +77,11 @@ target once the application routes Tab with `snora::keyboard::traverse`, and
 Enter and Space press it. A focused item in the `Tooltip` form still shows no
 name, because iced opens tooltips only under the pointer.
 `design::widget::app_side_bar_with` is the token-styled equivalent.
+
+**A rail drawn on its own needs room on its end side.** iced moves a tooltip that has no room
+on its side into the window, over the item it names, where the tooltip then takes the pointer.
+In snora's frame the rail is at the start edge and its tooltips open toward the body, so there is
+always room. A rail you place yourself at the window's end edge does not have it.
 
 ### `app_footer`
 

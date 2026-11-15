@@ -187,20 +187,19 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of **0.62.0**, re-counted at the cut (`cargo test --workspace --all-features
---doc`). Against the table's previous figures: `snora-design` +1 (`TextContrast::ratio`),
-`snora-style` +1 (`chip`'s example, new), and `snora` +1 (`snora::control`'s closure over
-`design::style::button::*`, the audit's A-4). No new `ignore`.
+As of **0.63.0**, re-counted at the cut (`cargo test --workspace --all-features
+--doc`). Against the table's previous figures: `snora-style` +1 (`tab`'s example, new). No new
+`ignore`.
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|
 | `snora-core` | 26 | 0 |
 | `snora-design` | 11 | 0 |
-| `snora-style` | 4 | 1 |
+| `snora-style` | 5 | 1 |
 | `snora-interaction` | 0 | 0 |
 | `snora-widgets` | 6 | 0 |
 | `snora` | 16 | 1 |
-| **Total** | **63** | **2** |
+| **Total** | **64** | **2** |
 
 Tracked in the [release checklist](release-process.md). Do not
 accidentally break these by changing vocabulary without updating the

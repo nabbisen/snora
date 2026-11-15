@@ -1,6 +1,6 @@
 # RFC-132 — Under RTL, snora reorders widgets instead of mirroring them: the header is not a mirror, and a flip loses focus
 
-**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings), with the refinements of the principles review below.
+**Status.** Done — shipped v0.63.0. Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings), with the refinements of the principles review below.
 **Handoff.** [`handoffs/132-…`](../handoffs/132-under-rtl-snora-reorders-widgets-instead-of-mirroring-them/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from the 0.63 audit's request B (W2-D15, W2-D24), verified by
 the architect against the code.

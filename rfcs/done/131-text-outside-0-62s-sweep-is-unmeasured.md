@@ -1,6 +1,6 @@
 # RFC-131 — Text snora draws outside 0.62's sweep is unmeasured, and an inactive tab reads 6.58:1 on `light_aaa`
 
-**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings), with the refinements of the principles review below.
+**Status.** Done — shipped v0.63.0. Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings), with the refinements of the principles review below.
 **Handoff.** [`handoffs/131-…`](../handoffs/131-text-outside-0-62s-sweep-is-unmeasured/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from the 0.63 audit's request A (its "7:1 boundary" doubtful row),
 verified by the architect against the code.

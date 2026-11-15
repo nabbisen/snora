@@ -236,47 +236,20 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.63.0
+## Next — 0.64.0, a breaking release
 
-**Scoped by the owner, 2026-11-14: the visual guarantees.** These are the claims adopters cite:
-orbok's WCAG record (1.4.3, 1.4.11, 2.4.7, 2.5.8), arama's AA contrast, and knotra's typography
-covenant.
-- **Audit 2:** every contrast, surface, ring, target, typography, direction and stability claim in
-  the book and in `snora-design`'s and `snora-style`'s rustdoc, checked against a test, by 0.62's
-  method. It covers 11 pages and the visual half of `buttons.md`, 1,404 lines. Handoff:
-  [`audit-0-63-visual-guarantees`](rfcs/handoffs/audit-0-63-visual-guarantees/implementation-handoff.md).
-- **Non-text contrast at 3:1, on the pixels drawn, in every state:** glyphs, borders, indicators.
-  It is WCAG 1.4.11's counterpart of RFC-128 and RFC-129. Unit 0 measures and proposes a measure
-  that does not false-fail thin strokes, and an RFC follows. Handoff:
-  [`non-text-contrast-0-63`](rfcs/handoffs/non-text-contrast-0-63/implementation-handoff.md).
+- **The deprecated F6 types are removed:** `next_zone`, `FocusZone`, `ZonePresence` (deprecated in 0.61,
+  RFC-126).
+- **RFC-133:** the notice, the removable chip, the progress bar, the footer and `render_menu` take a
+  required `direction`. snora's own text aligns to the start edge under RTL. `Shortcuts::routes`
+  loses its ignored direction.
+- **Housekeeping:** the drawn-contrast sweeps add 209 s on tiny-skia and 635 s on wgpu to CI. Cut that
+  by drawing each frame once and reading boundaries at 2x, kept only if no verdict changes on either
+  renderer.
+- **RFC-134's Unit 0:** keyboard-reachable form controls, measured control by control. The controls
+  themselves land in 0.65.0, as additions.
 
-**Not in 0.63:**
-- 0.62's backlog, the guides' rows guarded in part, which stay in its `claims` tables (owner,
-  2026-11-14);
-- the removal of the deprecated F6 types, which stays at 0.64.0 as announced;
-- the future-wanted features, until an adopter asks;
-- an iced upgrade (0.14.0 is the latest);
-- the workflow-hygiene deferral, whose condition has not fired.
-
-**From the audit, accepted 2026-11-15:**
-- **RFC-131:** every text snora draws holds its palette's level, beginning with an inactive tab that
-  reads 6.58:1 on `light_aaa`, from an inventory made by drawing.
-- **RFC-132:** under RTL, mirroring becomes a layout, not a reordering. That fixes the header and a
-  flip that loses focus, and Tab follows reading order.
-
-- **RFC-135 (accepted 2026-11-15):** one non-text rule at 3:1 on drawn pixels. It fixes the
-  progress track (invisible on the high-contrast presets), a `Debug` toast's fill, the menu's
-  scrollbar and `card::raised`'s border.
-
-**The letters to app teams are deferred to the 0.63 release** (owner, 2026-11-14).
-
-**0.64.0 (scheduled):** the deprecated F6 types are removed (RFC-126), and **RFC-133** gives the
-notice, the removable chip, the progress bar, the footer and `render_menu` a required `direction`.
 One breaking release, so adopters migrate once.
-
-**0.65.0 (scheduled):** keyboard-reachable form controls (RFC-134): a checkbox, toggle, radio group,
-select and slider on snora's `Control`, both paths, where Unit 0 finds them reasonable. They are
-additions.
 
 ## Future wanted
 
@@ -297,6 +270,17 @@ additions.
   `design::control` with the same style takes one.
 
 ## Recently shipped
+
+- **0.63.0** — an audit of every visual guarantee in the book: contrast, surfaces, typography,
+  direction and stability.
+  - **Right-to-left is mirrored for real** (RFC-132): the header is a mirror image, the breadcrumb, toasts
+    and icon rows mirror, Tab and `Ctrl+Tab` follow reading order, and a direction change keeps focus.
+    `row_dir` returns a `LogicalRow`.
+  - **Every word snora draws holds its palette's level, and every non-text element 3:1, on the drawn
+    pixels** (RFC-131, RFC-135). The fixes: an inactive tab on `light_aaa`, a progress track invisible on
+    the high-contrast presets, a `Debug` toast, a long menu's scrollbar, a raised card's border.
+  - The book's false sentences are corrected, and every number it prints is asserted. It now says that
+    iced's form controls cannot be reached by the keyboard (RFC-134 plans snora's own).
 
 - **0.62.0** — an audit of every keyboard and overlay claim in the book (508 claims, 15 false).
   - **A sheet on the right has the width you asked for.** Since 0.4 it had the width of the space

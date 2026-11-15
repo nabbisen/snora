@@ -1,6 +1,6 @@
 # RFC-135 — Four things snora draws fall under 3:1 against what they sit on, and no test measures a glyph
 
-**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.63.0. Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/135-…`](../handoffs/135-four-non-text-boundaries-fall-under-three-to-one/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from the drawn-contrast Unit 0, the non-text half (ruled in
 0.63's scope, owner, 2026-11-14).

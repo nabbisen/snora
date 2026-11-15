@@ -26,6 +26,30 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.63.0] — 2026-11-16
+
+**Upgrading from 0.62:** read the [0.62 → 0.63 migration guide](docs/src/guides/migration-0.62-to-0.63.md).
+
+> **In short:** 0.63 is the release of a second audit, of every visual guarantee in the book.
+> **Right-to-left layouts are mirrored for real**: the header is a mirror image, Tab follows reading
+> order, and a direction change keeps focus. **Every word snora draws on the design path holds its
+> palette's contrast level, and every non-text element 3:1, measured on the drawn pixels.** That fixes
+> an inactive tab on `light_aaa`, a progress track that was invisible on the high-contrast presets,
+> a `Debug` toast, a long menu's scrollbar and a raised card's border.
+>
+> **Code:** one compile-time break: `row_dir` and `row_dir_three` return a `LogicalRow`. Code that
+> names `Row` or calls `wrap`, `clip` or `extend` on the result must change. New:
+> `snora::design::style::tab`. Under RTL, Tab and `Ctrl+Tab` now go start to end.
+>
+> **Appearance:** **changed.** RTL headers, breadcrumbs, toasts and icon rows; an inactive tab on
+> `light_aaa`; a progress bar's outline, a `Debug` toast's outline (both paths), a long menu's
+> scrollbar, and a raised card's border on `light` and `light_aaa`. Retake those screenshot baselines.
+>
+> **Security:** none. No dependency changed since 0.62.0, and the advisory gate is clean, with the
+> same accepted advisories.
+
 ### Added
 
 - **`snora::direction::LogicalRow` (RFC-132).** What `row_dir` and `row_dir_three` return now: a row
@@ -369,7 +393,8 @@ deprecated it.
 - **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
   page beneath it.** It no longer does.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.62.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.63.0...HEAD
+[0.63.0]: https://github.com/nabbisen/snora/compare/0.62.0...0.63.0
 [0.62.0]: https://github.com/nabbisen/snora/compare/0.61.0...0.62.0
 [0.61.0]: https://github.com/nabbisen/snora/compare/0.60.0...0.61.0
 [0.60.0]: https://github.com/nabbisen/snora/compare/0.59.0...0.60.0
