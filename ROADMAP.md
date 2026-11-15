@@ -266,6 +266,10 @@ covenant.
 
 **The letters to app teams are deferred to the 0.63 release** (owner, 2026-11-14).
 
+**0.64.0 (scheduled):** the deprecated F6 types are removed (RFC-126), and **RFC-133** gives the
+notice, the removable chip, the progress bar, the footer and `render_menu` a required `direction`.
+One breaking release, so adopters migrate once.
+
 ## Future wanted
 
 - **A contrast sweep for glyphs** (a notice's dismiss mark, a removable chip's close mark) at the

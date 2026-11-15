@@ -132,6 +132,25 @@ The owner asked for a careful check against the fundamental philosophy. That che
 - directional glyphs (R-4);
 - the horizontal-arrow rule (R-5).
 
+## Rulings at Unit 0's review, 2026-11-15 (owner and architect)
+
+- **Q-3: all of it in 0.63.** Unit 0 showed the row is small: one layout widget, every LTR frame
+  pixel-identical on both renderers.
+- **The row's public shape (owner):** `row_dir` and `row_dir_three` return **`LogicalRow`**, with
+  `push`, `spacing`, `align_y`, `width`, `height`, `padding` and `Into<Element>`.
+  - Code that names `Row` or calls another `Row` method breaks at compile time, and the migration
+    guide says so.
+  - **Rejected:**
+    - the whole `Row` builder set, since `wrap`, `clip` and `extend` have no mirrored meaning
+      designed;
+    - keeping `Row` with one mirrored child, where `.spacing()` would silently do nothing.
+  - `snora_interaction::MirroredRow` is that crate's own item and is not re-exported.
+- **`Ctrl+Tab` under RTL (architect, from R-5 as accepted):** logical. The next tab is the declared
+  next in both directions, so under RTL it moves left on screen.
+- **Not in this RFC (owner):** five widgets that take no direction (the notice, the removable chip,
+  the progress bar, the footer, `render_menu`). They are RFC-133, for 0.64.0. 0.63's
+  `direction.md` names them.
+
 ## Review against snora's principles
 
 - **ABDD.** This is the principle, applied to its own mechanism: the logic (tree, Tab, state) is

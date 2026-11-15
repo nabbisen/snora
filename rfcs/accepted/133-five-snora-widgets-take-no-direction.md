@@ -1,6 +1,7 @@
 # RFC-133 — Five snora widgets take no direction, so they cannot mirror under RTL
 
-**Status.** Proposed 2026-11-15, for the owner.
+**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/133-…`](../handoffs/133-five-snora-widgets-take-no-direction/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from RFC-132's Unit 0, which measured them.
 **Release target.** 0.64.0 (Q-3).
 **Priority.** ABDD is a requirement. These are defects since the widgets were written, and named as
@@ -65,6 +66,15 @@ iced 0.14 without public API, Unit 0 says so.
 - 0.64.0 is already the release that removes the deprecated F6 types. One breaking release,
   announced in 0.63's guide, costs adopters one migration instead of two.
 - 0.63's book names the five as a known limit.
+
+## Rulings, 2026-11-15 (owner)
+
+Accepted as proposed:
+- **Q-1:** a required `direction` parameter everywhere, `Notice::new` included. No default, and
+  not in `Tokens`.
+- **Q-2:** the progress bar fills from the start edge, by RFC-132's row or a fill snora draws,
+  whichever Unit 0 finds smaller.
+- **Q-3:** 0.64.0, with the deprecated F6 removal.
 
 ## Review against snora's principles
 
