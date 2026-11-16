@@ -82,6 +82,7 @@ pub fn chips(ids: &[u8]) -> Element<'static, Msg> {
                 false,
                 msg(format!("toggle {i}")),
                 msg(format!("remove {i}")),
+                snora::LayoutDirection::Ltr,
             )
         }))
         .spacing(8),
@@ -95,7 +96,7 @@ pub fn notice_between(ids: &[u8]) -> Element<'static, Msg> {
     let mut col = column![button::ghost(t, "Before", msg("before"))].spacing(12);
     if ids.contains(&0) {
         col = col.push(
-            Notice::new(t, Tone::Info, "Index rebuilt.")
+            Notice::new(t, Tone::Info, "Index rebuilt.", snora::LayoutDirection::Ltr)
                 .action("Undo", msg("notice undo"))
                 .dismiss(msg("notice dismiss"))
                 .render(),

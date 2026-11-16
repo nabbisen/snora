@@ -187,15 +187,17 @@ fn header_geometry(tokens: &Tokens) -> HeaderGeometry {
     }
 }
 
-/// Token-derived styled variant of [`crate::app_footer`] (RFC-040).
+/// Token-derived styled variant of [`crate::app_footer`] (RFC-040), with the content at the start
+/// edge of `direction` (RFC-133).
 pub fn app_footer<'a, Message>(
     tokens: &Tokens,
     content: Element<'a, Message>,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
-    build_footer(content, footer_geometry(tokens))
+    build_footer(content, footer_geometry(tokens), direction)
 }
 
 fn footer_geometry(tokens: &Tokens) -> FooterGeometry {

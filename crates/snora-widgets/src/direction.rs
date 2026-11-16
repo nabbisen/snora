@@ -43,6 +43,16 @@ use iced::{Element, Length, Padding, Pixels, alignment, widget::Row};
 use snora_core::LayoutDirection;
 use snora_interaction::MirroredRow;
 
+/// The physical side the **start edge** is on: left under [`LayoutDirection::Ltr`], right under
+/// [`LayoutDirection::Rtl`] (RFC-133 R-4). For a `container`'s `align_x` or a `text`'s `align_x`,
+/// which are physical in iced.
+pub(crate) fn start_aligned(direction: LayoutDirection) -> alignment::Horizontal {
+    match direction {
+        LayoutDirection::Ltr => alignment::Horizontal::Left,
+        LayoutDirection::Rtl => alignment::Horizontal::Right,
+    }
+}
+
 /// A horizontal row whose children are in **logical order** and are placed
 /// from the start edge: left under [`LayoutDirection::Ltr`], right under
 /// [`LayoutDirection::Rtl`].

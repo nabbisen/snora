@@ -46,7 +46,12 @@ fn menu() -> Menu<u8, u8> {
 /// Closed: the trigger is there, the dropdown is not.
 #[test]
 fn a_closed_menu_draws_no_dropdown() {
-    let mut ui = simulator(snora::widget::render_menu(menu(), &ON_MENU, false));
+    let mut ui = simulator(snora::widget::render_menu(
+        menu(),
+        &ON_MENU,
+        false,
+        snora::LayoutDirection::Ltr,
+    ));
     ui.find(TRIGGER)
         .expect("a closed menu still draws its trigger");
     assert!(
@@ -59,7 +64,12 @@ fn a_closed_menu_draws_no_dropdown() {
 /// Open: the dropdown is there, and its items are pressable.
 #[test]
 fn an_open_menu_draws_its_dropdown() {
-    let mut ui = simulator(snora::widget::render_menu(menu(), &ON_MENU, true));
+    let mut ui = simulator(snora::widget::render_menu(
+        menu(),
+        &ON_MENU,
+        true,
+        snora::LayoutDirection::Ltr,
+    ));
     ui.find(ITEM)
         .expect("an open menu draws its dropdown items — the cue for the open state");
 

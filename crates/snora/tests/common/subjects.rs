@@ -139,7 +139,7 @@ pub fn unstyled() -> Vec<Subject> {
             )
         }),
         subject("render_menu (trigger and items)", &MENU_MESSAGES, || {
-            snora::widget::render_menu(menu(), &ON_MENU, true)
+            snora::widget::render_menu(menu(), &ON_MENU, true, snora::LayoutDirection::Ltr)
         }),
         subject("toast close", &["dismiss"], || render(toast_layout())),
         // RFC-122: aaai's cases on the public `snora::control`.
@@ -230,17 +230,29 @@ pub fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
             "notice action and dismiss",
             &["act", "dismiss"],
             move || {
-                Notice::new(tokens, Tone::Info, "Index rebuilt.")
-                    .action("Undo", msg("act"))
-                    .dismiss(msg("dismiss"))
-                    .render()
+                Notice::new(
+                    tokens,
+                    Tone::Info,
+                    "Index rebuilt.",
+                    snora::LayoutDirection::Ltr,
+                )
+                .action("Undo", msg("act"))
+                .dismiss(msg("dismiss"))
+                .render()
             },
         ),
         subject("chip::filter", &["toggle"], move || {
             chip::filter(tokens, "Rust", false, msg("toggle"))
         }),
         subject("chip::removable", &["toggle", "remove"], move || {
-            chip::removable(tokens, "Rust", false, msg("toggle"), msg("remove"))
+            chip::removable(
+                tokens,
+                "Rust",
+                false,
+                msg("toggle"),
+                msg("remove"),
+                snora::LayoutDirection::Ltr,
+            )
         }),
         // **A control that is NOT reached** (RFC-119): the page's "page" control
         // is under an open dialog, so the tree reports one focus target, the

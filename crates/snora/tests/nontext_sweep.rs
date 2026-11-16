@@ -670,9 +670,21 @@ fn progress_cells(out: &mut Vec<Cell>) {
             for surface in surfaces {
                 for (tn, tone) in TONES {
                     let el = if scene == "progress row" {
-                        snora::design::progress::row(t, "Progress", Some(0.5), tone)
+                        snora::design::progress::row(
+                            t,
+                            "Progress",
+                            Some(0.5),
+                            tone,
+                            snora::LayoutDirection::Ltr,
+                        )
                     } else {
-                        snora::design::progress::card(t, "Progress", Some(0.5), tone)
+                        snora::design::progress::card(
+                            t,
+                            "Progress",
+                            Some(0.5),
+                            tone,
+                            snora::LayoutDirection::Ltr,
+                        )
                     };
                     let mut rig = Rig::new(on(t, surface, el));
                     let els = elements(&mut rig);
@@ -913,7 +925,15 @@ fn tooltip_cells(out: &mut Vec<Cell>) {
             "28",
             1,
             Box::new(|t| {
-                chip::removable_with_tooltip(t, "Tag", false, Msg::Go, Msg::Go, "Remove tag")
+                chip::removable_with_tooltip(
+                    t,
+                    "Tag",
+                    false,
+                    Msg::Go,
+                    Msg::Go,
+                    "Remove tag",
+                    snora::LayoutDirection::Ltr,
+                )
             }),
         ),
         (
@@ -921,7 +941,7 @@ fn tooltip_cells(out: &mut Vec<Cell>) {
             "28",
             0,
             Box::new(|t| {
-                Notice::new(t, Tone::Info, "Body")
+                Notice::new(t, Tone::Info, "Body", snora::LayoutDirection::Ltr)
                     .dismiss(Msg::Go)
                     .dismiss_tooltip("Dismiss")
                     .render()

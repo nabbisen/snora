@@ -242,6 +242,7 @@ fn skeleton(dir: LayoutDirection, labels: SideBarLabels) -> Element<'static, Msg
         .side_bar(snora::widget::app_side_bar_with(rail(2), dir, labels))
         .footer(snora::widget::app_footer(
             snora::control(text("Foot")).on_press(Msg::Go).into(),
+            snora::LayoutDirection::Ltr,
         ))
         .direction(dir);
     snora::render(l)

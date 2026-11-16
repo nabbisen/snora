@@ -306,9 +306,14 @@ mod lucide {
         // "1em in the lucide font", not a shared pixel size.
         let widgets_size = label_size(&tokens).0;
         let widgets = {
-            let element: Element<'_, Msg> = Notice::new(&tokens, snora::design::Tone::Info, "body")
-                .dismiss(Msg::Dismiss(TOAST_ID))
-                .render();
+            let element: Element<'_, Msg> = Notice::new(
+                &tokens,
+                snora::design::Tone::Info,
+                "body",
+                snora::LayoutDirection::Ltr,
+            )
+            .dismiss(Msg::Dismiss(TOAST_ID))
+            .render();
             let mut ui = simulator(element);
             ui.find(GLYPH)
                 .expect("the notice dismiss control draws the lucide glyph")

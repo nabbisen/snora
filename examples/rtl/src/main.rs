@@ -168,6 +168,7 @@ impl App {
             .align_y(Center)
             .spacing(12)
             .into(),
+            self.direction,
         );
 
         let layout = AppLayout::new(body.into())

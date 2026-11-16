@@ -238,6 +238,7 @@ impl Scene {
                     menu(self.items),
                     &ON_MENU,
                     self.open,
+                    snora::LayoutDirection::Ltr,
                 ));
             }
         }

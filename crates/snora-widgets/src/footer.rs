@@ -1,13 +1,16 @@
 //! A minimal desktop-style footer / status bar.
 //!
 //! The footer is a thin container with the given content placed inside.
-//! Because the footer itself is content-agnostic, direction is not a
-//! parameter here — pass a direction-aware `row` (built with
-//! [`crate::direction::row_dir`]) as the `content` when you need
-//! start / end layout inside the footer.
+//! The footer is content-agnostic, but it has a reading order: its content
+//! sits at the **start edge** (the left under LTR, the right under RTL), so
+//! it takes the direction (RFC-133). Pass a direction-aware `row` (built with
+//! [`crate::direction::row_dir`]) as the `content` when you need start / end
+//! layout inside the footer.
 
 use iced::{Element, Length, Padding, widget::container};
+use snora_core::LayoutDirection;
 
+use crate::direction::start_aligned;
 use crate::style::chrome_container_style_with_radius;
 
 /// Geometry parameters [`build_footer`] takes, letting [`app_footer`]
@@ -34,23 +37,29 @@ impl FooterGeometry {
     }
 }
 
-/// Wrap `content` in a chrome-styled footer bar.
-pub fn app_footer<'a, Message>(content: Element<'a, Message>) -> Element<'a, Message>
+/// Wrap `content` in a chrome-styled footer bar, with the content at the start
+/// edge of `direction`.
+pub fn app_footer<'a, Message>(
+    content: Element<'a, Message>,
+    direction: LayoutDirection,
+) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
-    build_footer(content, FooterGeometry::unstyled())
+    build_footer(content, FooterGeometry::unstyled(), direction)
 }
 
 pub(crate) fn build_footer<'a, Message>(
     content: Element<'a, Message>,
     geometry: FooterGeometry,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
 {
     container(content)
         .width(Length::Fill)
+        .align_x(start_aligned(direction))
         .padding(Padding::from([geometry.pad_y, geometry.pad_x]))
         .style(move |theme| chrome_container_style_with_radius(theme, geometry.radius))
         .into()

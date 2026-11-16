@@ -225,14 +225,22 @@ fn a_tooltips_text_holds_the_level() {
             "removable chip tooltip",
             1,
             Box::new(|t| {
-                chip::removable_with_tooltip(t, "Tag", false, Msg::Go, Msg::Go, "Remove tag")
+                chip::removable_with_tooltip(
+                    t,
+                    "Tag",
+                    false,
+                    Msg::Go,
+                    Msg::Go,
+                    "Remove tag",
+                    snora::LayoutDirection::Ltr,
+                )
             }),
         ),
         (
             "notice dismiss tooltip",
             0,
             Box::new(|t| {
-                Notice::new(t, Tone::Info, "Body")
+                Notice::new(t, Tone::Info, "Body", snora::LayoutDirection::Ltr)
                     .dismiss(Msg::Go)
                     .dismiss_tooltip("Dismiss")
                     .render()

@@ -311,6 +311,7 @@ impl App {
             ]
             .align_y(Center)
             .into(),
+            self.direction,
         );
 
         // Dialog content (app-owned: close button is required).

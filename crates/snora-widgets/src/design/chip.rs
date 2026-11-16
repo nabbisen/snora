@@ -52,6 +52,7 @@
 //! # Usage
 //!
 //! ```rust,no_run
+//! use snora_core::LayoutDirection;
 //! use snora_design::Tokens;
 //! use snora_widgets::design::chip;
 //!
@@ -69,18 +70,21 @@
 //!     true,
 //!     Message::ToggleTag,
 //!     Message::RemoveTag,
+//!     LayoutDirection::Ltr,
 //! );
 //! ```
 
 use iced::widget::text::Wrapping;
 use iced::{
     Color, Element, Theme,
-    widget::{container, row, text, tooltip},
+    widget::{container, text, tooltip},
 };
+use snora_core::LayoutDirection;
 use snora_design::Tokens;
 
 use snora_style as style;
 
+use crate::direction::LogicalRow;
 use crate::style::design_control;
 
 // ---------------------------------------------------------------------------
@@ -235,6 +239,9 @@ pub fn filter<'a, Message: Clone + 'a>(
 /// around it.
 ///
 /// To show a tooltip on the remove button, use [`removable_with_tooltip`].
+///
+/// **`direction`** (RFC-133): the label is at the start edge and the × after it, so under
+/// [`LayoutDirection::Rtl`] the × is on the left. Tab visits the label, then the ×, under both.
 #[must_use]
 pub fn removable<'a, Message: Clone + 'a>(
     tokens: &Tokens,
@@ -242,8 +249,11 @@ pub fn removable<'a, Message: Clone + 'a>(
     selected: bool,
     on_toggle: impl Into<Option<Message>>,
     on_remove: impl Into<Option<Message>>,
+    direction: LayoutDirection,
 ) -> Element<'a, Message> {
-    build_removable(tokens, label, selected, on_toggle, on_remove, None)
+    build_removable(
+        tokens, label, selected, on_toggle, on_remove, None, direction,
+    )
 }
 
 /// [`removable`], with a tooltip on the remove button.
@@ -262,6 +272,7 @@ pub fn removable_with_tooltip<'a, Message: Clone + 'a>(
     on_toggle: impl Into<Option<Message>>,
     on_remove: impl Into<Option<Message>>,
     tooltip: impl Into<String>,
+    direction: LayoutDirection,
 ) -> Element<'a, Message> {
     build_removable(
         tokens,
@@ -270,6 +281,7 @@ pub fn removable_with_tooltip<'a, Message: Clone + 'a>(
         on_toggle,
         on_remove,
         Some(tooltip.into()),
+        direction,
     )
 }
 
@@ -282,6 +294,7 @@ fn build_removable<'a, Message: Clone + 'a>(
     on_toggle: impl Into<Option<Message>>,
     on_remove: impl Into<Option<Message>>,
     tip: Option<String>,
+    direction: LayoutDirection,
 ) -> Element<'a, Message> {
     let t_label = tokens.clone();
     let t_remove = tokens.clone();
@@ -327,7 +340,12 @@ fn build_removable<'a, Message: Clone + 'a>(
     .into();
     let remove_btn = with_close_tooltip(tokens, remove_btn, tip);
 
-    row![label_btn, remove_btn].spacing(0).into()
+    // A logical row (RFC-133): the label first, the × after it, from the start edge.
+    LogicalRow::new(direction)
+        .push(label_btn)
+        .push(remove_btn)
+        .spacing(0)
+        .into()
 }
 
 #[cfg(test)]

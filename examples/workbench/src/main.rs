@@ -366,6 +366,7 @@ impl Workbench {
             .align_y(Center)
             .spacing(12)
             .into(),
+            self.direction,
         );
 
         let mut layout = AppLayout::new(body)

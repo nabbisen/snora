@@ -21,14 +21,18 @@ fn _notice_compiles_for_all_tones_and_presets() {
             Tone::Accent,
             Tone::Neutral,
         ] {
-            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body").render();
             let _: iced::Element<'_, ()> =
-                Notice::new(&tokens, tone, "body").title("Title").render();
-            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body")
+                Notice::new(&tokens, tone, "body", LayoutDirection::Ltr).render();
+            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body", LayoutDirection::Ltr)
+                .title("Title")
+                .render();
+            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body", LayoutDirection::Ltr)
                 .action("Act", ())
                 .render();
-            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body").dismiss(()).render();
-            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body")
+            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body", LayoutDirection::Ltr)
+                .dismiss(())
+                .render();
+            let _: iced::Element<'_, ()> = Notice::new(&tokens, tone, "body", LayoutDirection::Ltr)
                 .title("T")
                 .action("A", ())
                 .dismiss(())

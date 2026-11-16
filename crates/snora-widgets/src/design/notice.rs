@@ -37,6 +37,7 @@
 //! # Usage
 //!
 //! ```rust,no_run
+//! use snora_core::LayoutDirection;
 //! use snora_design::{Tokens, Tone};
 //! use snora_widgets::design::notice::Notice;
 //!
@@ -46,7 +47,7 @@
 //! let tokens = Tokens::light();
 //!
 //! let _notice: iced::Element<'_, Message> =
-//!     Notice::new(&tokens, Tone::Warning, "Index is out of date.")
+//!     Notice::new(&tokens, Tone::Warning, "Index is out of date.", LayoutDirection::Ltr)
 //!         .title("Stale index")
 //!         .action("Rebuild", Message::RebuildIndex)
 //!         .dismiss(Message::DismissNotice)
@@ -56,13 +57,15 @@
 use iced::widget::text::Wrapping;
 use iced::{
     Border, Color, Element, Length, Theme,
-    widget::{column, container, row, text},
+    widget::{column, container, text},
 };
+use snora_core::LayoutDirection;
 use snora_design::{Tokens, Tone};
 
 use snora_style as style;
 
 use super::chip::{close_glyph, with_close_tooltip};
+use crate::direction::{LogicalRow, start_aligned};
 use crate::style::{BUTTON_DEFAULT_PADDING, design_control};
 
 // ---------------------------------------------------------------------------
@@ -82,6 +85,7 @@ struct NoticeAction<Message> {
 pub struct Notice<'a, Message> {
     tokens: &'a Tokens,
     tone: Tone,
+    direction: LayoutDirection,
     title: Option<String>,
     body: String,
     action: Option<NoticeAction<Message>>,
@@ -91,11 +95,21 @@ pub struct Notice<'a, Message> {
 
 impl<'a, Message: Clone + 'a> Notice<'a, Message> {
     /// Creates a notice with the given tone and body message.
+    ///
+    /// **`direction`** (RFC-133): the accent bar, the title and body, and the action and dismiss
+    /// controls are laid out from the start edge, in that order, and the text is aligned to it.
+    /// Under [`LayoutDirection::Rtl`] the bar is on the right and the controls on the left.
     #[must_use]
-    pub fn new(tokens: &'a Tokens, tone: Tone, body: impl Into<String>) -> Self {
+    pub fn new(
+        tokens: &'a Tokens,
+        tone: Tone,
+        body: impl Into<String>,
+        direction: LayoutDirection,
+    ) -> Self {
         Self {
             tokens,
             tone,
+            direction,
             title: None,
             body: body.into(),
             action: None,
@@ -147,6 +161,10 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
     #[must_use]
     pub fn render(self) -> Element<'a, Message> {
         let t = self.tokens;
+        let direction = self.direction;
+        // The text sits at the start edge (RFC-133 R-4): as wide as its cell, aligned to the side
+        // the start edge is on.
+        let align = start_aligned(direction);
 
         let accent_color = notice_accent_color(t, self.tone);
         let text_color = style::color::to_iced_color(t.palette.text_primary);
@@ -167,6 +185,8 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
                 text(title)
                     .size(style::text::label_size(t))
                     .color(text_color)
+                    .width(Length::Fill)
+                    .align_x(align)
                     .wrapping(Wrapping::WordOrGlyph)
                     .into(),
             );
@@ -175,6 +195,8 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             text(self.body)
                 .size(style::text::body_size(t))
                 .color(text_color)
+                .width(Length::Fill)
+                .align_x(align)
                 .wrapping(Wrapping::WordOrGlyph)
                 .into(),
         );
@@ -218,43 +240,47 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             controls.push(with_close_tooltip(t, dismiss_btn, self.dismiss_tooltip));
         }
 
-        // Main row: colored left accent bar + content + controls
+        // Main row: the accent bar at the start edge, then the content, then the controls: a logical
+        // row, so under RTL the bar is on the right and the controls on the left.
         let content_area: Element<'a, Message> = column(content_col).spacing(t.spacing.xs).into();
 
-        let mut main_row_children: Vec<Element<'a, Message>> = Vec::new();
+        let mut main_row = LogicalRow::new(direction);
 
-        // Left accent bar
-        main_row_children.push(
+        main_row = main_row.push(
             container(iced::widget::space())
                 .width(4.0)
                 .height(Length::Fill)
-                .style(move |_| notice_accent_bar_style(accent_color))
-                .into(),
+                .style(move |_| notice_accent_bar_style(accent_color)),
         );
 
-        main_row_children.push(
+        main_row = main_row.push(
             container(content_area)
                 .padding([t.spacing.sm, t.spacing.md])
-                .width(Length::Fill)
-                .into(),
+                .width(Length::Fill),
         );
 
         if !controls.is_empty() {
-            main_row_children.push(
-                container(
-                    row(controls)
-                        .spacing(t.spacing.xs)
-                        .align_y(iced::Alignment::Center),
-                )
-                .padding([t.spacing.sm, t.spacing.sm])
-                .align_y(iced::alignment::Vertical::Center)
-                .into(),
+            let mut control_row = LogicalRow::new(direction)
+                .spacing(t.spacing.xs)
+                .align_y(iced::Alignment::Center);
+            for control in controls {
+                control_row = control_row.push(control);
+            }
+            main_row = main_row.push(
+                container(control_row)
+                    .padding([t.spacing.sm, t.spacing.sm])
+                    .align_y(iced::alignment::Vertical::Center),
             );
         }
 
+        // `Shrink` is set **after** the children are pushed: a row takes the `Fill` of a child it
+        // is given (the accent bar is `Fill` tall), so setting it first leaves the row filling the
+        // height it is offered, and the notice grows with its parent.
+        let main_row = main_row.height(Length::Shrink);
+
         let radius = t.radius.md;
 
-        container(row(main_row_children).height(Length::Shrink))
+        container(main_row)
             .style(move |_| notice_outer_style(surface, accent_color, radius))
             .into()
     }

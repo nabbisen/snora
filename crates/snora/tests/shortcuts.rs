@@ -1344,7 +1344,12 @@ fn the_router_is_silent_under_a_context_menu_and_an_open_dropdown() {
         (
             "a context menu with its backdrop",
             base()
-                .context_menu(snora::widget::render_menu(menu(), &ON_MENU, true))
+                .context_menu(snora::widget::render_menu(
+                    menu(),
+                    &ON_MENU,
+                    true,
+                    snora::LayoutDirection::Ltr,
+                ))
                 .on_close_menus(Msg::CloseMenus),
         ),
         (

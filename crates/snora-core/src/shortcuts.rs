@@ -39,7 +39,7 @@
 //! > a Mac** (how `iced_winit` reports `Cmd+↑`, and whether a field keeps it). The
 //! > text-field rule keeps `Cmd+↑` from ever firing in a field. (RFC-116, L-8.)
 
-use crate::{BreadcrumbAction, Crumb, LayoutDirection, SideBar, TabAction, TabBar};
+use crate::{BreadcrumbAction, Crumb, SideBar, TabAction, TabBar};
 
 /// The platform whose bindings apply. [`Platform::current`] is the one this was
 /// compiled for; setting another is for previews and for tests of the other table.
@@ -142,7 +142,7 @@ pub struct ShortcutRoute<Message> {
 ///     .tabs(&bar, &Message::Tab)
 ///     .digits(Digits::Tabs);
 /// // Ctrl+2 is exactly a click on the second tab.
-/// let routes = shortcuts.routes(snora_core::LayoutDirection::Ltr);
+/// let routes = shortcuts.routes();
 /// assert!(routes
 ///     .iter()
 ///     .any(|r| r.message == Message::Tab(TabAction::Pressed(View::Editor))));
@@ -262,14 +262,14 @@ impl<Message: Clone> Shortcuts<Message> {
     ///   no tab bar) means no route.
     /// - **Next and previous tab follow Tab order,** which is the declared order
     ///   under **both** directions (RFC-132), and **wrap**: next is the declared
-    ///   next tab, which under [`LayoutDirection::Rtl`] is the one to the left on
-    ///   screen. With fewer than two tabs there is nothing to go to.
+    ///   next tab, which under [`LayoutDirection::Rtl`](crate::LayoutDirection::Rtl) is
+    ///   the one to the left on screen. With fewer than two tabs there is nothing to go to.
     /// - **Parent:** the ancestor before the leaf.
     ///
-    /// `direction` is **ignored since 0.63 (RFC-132): no route depends on the
-    /// direction.** Removed in 0.64.0.
+    /// **No route depends on the direction** (RFC-132), so this takes none. (Until 0.63 it took a
+    /// `direction` and ignored it; it was removed in 0.64.0, RFC-133 R-5.)
     #[must_use]
-    pub fn routes(&self, _direction: LayoutDirection) -> Vec<ShortcutRoute<Message>> {
+    pub fn routes(&self) -> Vec<ShortcutRoute<Message>> {
         let mut routes = Vec::new();
 
         // The digits: one destination, never both.
@@ -394,9 +394,7 @@ mod tests {
             Crumb::ancestor(1, "Mid"),
             Crumb::leaf(2, "Here"),
         ];
-        let routes = Shortcuts::new()
-            .crumbs(&trail, &on_crumb)
-            .routes(LayoutDirection::Ltr);
+        let routes = Shortcuts::new().crumbs(&trail, &on_crumb).routes();
         let parent: Vec<_> = routes
             .iter()
             .filter(|r| r.action == ShortcutAction::Parent)
@@ -409,9 +407,7 @@ mod tests {
         );
 
         let lone = vec![Crumb::leaf(0u8, "Only")];
-        let routes = Shortcuts::new()
-            .crumbs(&lone, &on_crumb)
-            .routes(LayoutDirection::Ltr);
+        let routes = Shortcuts::new().crumbs(&lone, &on_crumb).routes();
         assert!(
             !actions(&routes).contains(&ShortcutAction::Parent),
             "a trail with no ancestor has a parent route: {:?}",
@@ -435,38 +431,29 @@ mod tests {
     /// **R-059, R-071: next and previous tab wrap, and with fewer than two tabs there are none.**
     #[test]
     fn next_and_previous_tab_wrap_and_need_two_tabs() {
-        let target = |count: u8, active: u8, action: ShortcutAction, dir: LayoutDirection| {
+        let target = |count: u8, active: u8, action: ShortcutAction| {
             Shortcuts::new()
                 .tabs(&bar(count, active), &on_tab)
-                .routes(dir)
+                .routes()
                 .into_iter()
                 .find(|r| r.action == action)
                 .map(|r| r.index)
         };
         use ShortcutAction::{NextTab, PreviousTab};
-        let ltr = LayoutDirection::Ltr;
+        // The tabs stay in declared order in the tree under both directions (RFC-132), so "next"
+        // is the declared next whichever way the window reads, and `routes()` takes no direction.
+        assert_eq!(target(4, 3, NextTab), Some(0), "next wraps from the last");
         assert_eq!(
-            target(4, 3, NextTab, ltr),
-            Some(0),
-            "next wraps from the last"
-        );
-        assert_eq!(
-            target(4, 0, PreviousTab, ltr),
+            target(4, 0, PreviousTab),
             Some(3),
             "previous wraps from the first"
         );
-        assert_eq!(target(4, 1, NextTab, ltr), Some(2));
-        assert_eq!(target(4, 1, PreviousTab, ltr), Some(0));
-        // Under RTL the tabs are placed from the right but stay in declared order in
-        // the tree (RFC-132): "next" is the declared next, as under LTR.
-        let rtl = LayoutDirection::Rtl;
-        assert_eq!(target(4, 1, NextTab, rtl), Some(2));
-        assert_eq!(target(4, 1, PreviousTab, rtl), Some(0));
-        assert_eq!(target(4, 3, NextTab, rtl), Some(0), "next wraps under RTL");
+        assert_eq!(target(4, 1, NextTab), Some(2));
+        assert_eq!(target(4, 1, PreviousTab), Some(0));
         for count in [0, 1] {
-            assert_eq!(target(count, 0, NextTab, ltr), None, "{count} tab(s)");
-            assert_eq!(target(count, 0, PreviousTab, ltr), None, "{count} tab(s)");
+            assert_eq!(target(count, 0, NextTab), None, "{count} tab(s)");
+            assert_eq!(target(count, 0, PreviousTab), None, "{count} tab(s)");
         }
-        assert!(target(2, 0, NextTab, ltr).is_some(), "two tabs are enough");
+        assert!(target(2, 0, NextTab).is_some(), "two tabs are enough");
     }
 }

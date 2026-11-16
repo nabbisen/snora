@@ -31,8 +31,13 @@ fn the_progress_label_shows_the_clamped_percentage_or_an_ellipsis() {
         (Some(-0.5), "Loading  0%"),
         (None, "Loading  …"),
     ] {
-        let el: Element<'static, Msg> =
-            snora::design::progress::row(t, "Loading", value, Tone::Accent);
+        let el: Element<'static, Msg> = snora::design::progress::row(
+            t,
+            "Loading",
+            value,
+            Tone::Accent,
+            snora::LayoutDirection::Ltr,
+        );
         let mut ui = iced_test::Simulator::new(el);
         assert!(
             ui.find(want).is_ok(),
@@ -201,7 +206,11 @@ fn the_headers_padding_and_gap_are_the_mapped_tokens_as_drawn() {
 #[test]
 fn the_footers_padding_is_the_mapped_token_as_drawn() {
     for (scale, t) in scales() {
-        let s = seen(dw::app_footer(t, text("Ready").into()));
+        let s = seen(dw::app_footer(
+            t,
+            text("Ready").into(),
+            snora::LayoutDirection::Ltr,
+        ));
         let label = s.text("Ready");
         near(
             &format!("{scale}: footer horizontal padding (lg)"),

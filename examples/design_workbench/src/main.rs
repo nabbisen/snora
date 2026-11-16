@@ -288,7 +288,7 @@ fn notices_section<'a>(t: &'a Tokens, dismissed: bool) -> Element<'a, Msg> {
             _ => "",
         };
         notices.push(
-            Notice::new(t, tone, label)
+            Notice::new(t, tone, label, snora::LayoutDirection::Ltr)
                 .action("View", Msg::Noop)
                 .render(),
         );
@@ -296,11 +296,16 @@ fn notices_section<'a>(t: &'a Tokens, dismissed: bool) -> Element<'a, Msg> {
     // One dismissible notice
     if !dismissed {
         notices.push(
-            Notice::new(t, Tone::Accent, "This notice can be dismissed.")
-                .title("Dismissible")
-                .action("Learn more", Msg::Noop)
-                .dismiss(Msg::DismissNotice)
-                .render(),
+            Notice::new(
+                t,
+                Tone::Accent,
+                "This notice can be dismissed.",
+                snora::LayoutDirection::Ltr,
+            )
+            .title("Dismissible")
+            .action("Learn more", Msg::Noop)
+            .dismiss(Msg::DismissNotice)
+            .render(),
         );
     }
     card::surface(
@@ -334,8 +339,22 @@ fn chips_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
             ]
             .spacing(t.spacing.sm),
             iced::widget::row![
-                chip::removable(t, "Rust", true, Msg::Noop, Msg::Noop),
-                chip::removable(t, "Design", false, Msg::Noop, Msg::Noop),
+                chip::removable(
+                    t,
+                    "Rust",
+                    true,
+                    Msg::Noop,
+                    Msg::Noop,
+                    snora::LayoutDirection::Ltr
+                ),
+                chip::removable(
+                    t,
+                    "Design",
+                    false,
+                    Msg::Noop,
+                    Msg::Noop,
+                    snora::LayoutDirection::Ltr
+                ),
             ]
             .spacing(t.spacing.sm),
         ]
@@ -352,10 +371,34 @@ fn progress_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
                 t,
                 "Inspect: bar fill at 0%/60%/100%, indeterminate (…), tone colors."
             ),
-            progress::row(t, "Indexing files", Some(0.6), Tone::Accent),
-            progress::row(t, "Upload complete", Some(1.0), Tone::Success),
-            progress::row(t, "Sync in progress", None, Tone::Info),
-            progress::row(t, "Low disk — backup", Some(0.85), Tone::Warning),
+            progress::row(
+                t,
+                "Indexing files",
+                Some(0.6),
+                Tone::Accent,
+                snora::LayoutDirection::Ltr
+            ),
+            progress::row(
+                t,
+                "Upload complete",
+                Some(1.0),
+                Tone::Success,
+                snora::LayoutDirection::Ltr
+            ),
+            progress::row(
+                t,
+                "Sync in progress",
+                None,
+                Tone::Info,
+                snora::LayoutDirection::Ltr
+            ),
+            progress::row(
+                t,
+                "Low disk — backup",
+                Some(0.85),
+                Tone::Warning,
+                snora::LayoutDirection::Ltr
+            ),
         ]
         .spacing(t.spacing.md),
     )
@@ -508,11 +551,15 @@ fn chrome_geometry_section<'a>(t: &'a Tokens) -> Element<'a, Msg> {
     .spacing(t.spacing.md);
 
     let footer_row = row![
-        labeled(t, "footer — unstyled", app_footer(note(t, "Ready"))),
+        labeled(
+            t,
+            "footer — unstyled",
+            app_footer(note(t, "Ready"), snora::LayoutDirection::Ltr)
+        ),
         labeled(
             t,
             "footer — styled",
-            styled::app_footer(t, note(t, "Ready"))
+            styled::app_footer(t, note(t, "Ready"), snora::LayoutDirection::Ltr)
         ),
     ]
     .spacing(t.spacing.md);

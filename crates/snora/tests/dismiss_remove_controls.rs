@@ -99,17 +99,27 @@ impl Control {
     ) -> Element<'a, Msg> {
         match (self, tooltip) {
             (Control::NoticeDismiss, tooltip) => {
-                let notice = Notice::new(tokens, Tone::Info, "Index rebuilt.")
-                    .action("Undo", Msg::Act)
-                    .dismiss(Msg::Dismiss);
+                let notice = Notice::new(
+                    tokens,
+                    Tone::Info,
+                    "Index rebuilt.",
+                    snora::LayoutDirection::Ltr,
+                )
+                .action("Undo", Msg::Act)
+                .dismiss(Msg::Dismiss);
                 match tooltip {
                     Some(tooltip) => notice.dismiss_tooltip(tooltip).render(),
                     None => notice.render(),
                 }
             }
-            (Control::ChipRemove, None) => {
-                chip::removable(tokens, "Rust", false, Msg::Toggle, Msg::Remove)
-            }
+            (Control::ChipRemove, None) => chip::removable(
+                tokens,
+                "Rust",
+                false,
+                Msg::Toggle,
+                Msg::Remove,
+                snora::LayoutDirection::Ltr,
+            ),
             (Control::ChipRemove, Some(tooltip)) => chip::removable_with_tooltip(
                 tokens,
                 "Rust",
@@ -117,6 +127,7 @@ impl Control {
                 Msg::Toggle,
                 Msg::Remove,
                 tooltip,
+                snora::LayoutDirection::Ltr,
             ),
         }
     }

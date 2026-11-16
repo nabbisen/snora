@@ -230,10 +230,10 @@ pub fn scenes() -> Vec<Scene> {
         name: "footer",
         covers: &["app_footer"],
         own_page: false,
-        directional: false,
+        directional: true,
         states: false,
         runs: &[("Ready", Word)],
-        make: Box::new(|t, _| dw::app_footer(t, text("Ready").into())),
+        make: Box::new(|t, dir| dw::app_footer(t, text("Ready").into(), dir)),
     });
     v.push(Scene {
         name: "tab bar",
@@ -354,7 +354,7 @@ pub fn scenes() -> Vec<Scene> {
             name,
             covers: if tn == "info" { &["Notice"] } else { &[] },
             own_page: false,
-            directional: false,
+            directional: true,
             states: true,
             runs: &[
                 ("Notice title", Word),
@@ -363,8 +363,8 @@ pub fn scenes() -> Vec<Scene> {
                 CLOSE[0],
                 CLOSE[1],
             ],
-            make: Box::new(move |t, _| {
-                Notice::new(t, tone, "Body text of the notice.")
+            make: Box::new(move |t, dir| {
+                Notice::new(t, tone, "Body text of the notice.", dir)
                     .title("Notice title")
                     .action("Act", Msg::Go)
                     .dismiss(Msg::Go)
@@ -402,10 +402,12 @@ pub fn scenes() -> Vec<Scene> {
                 &[]
             },
             own_page: false,
-            directional: false,
+            directional: true,
             states: true,
             runs: &[("Tag", Word), CLOSE[0], CLOSE[1]],
-            make: Box::new(move |t, _| chip::removable(t, "Tag", selected, Msg::Go, Msg::Go)),
+            make: Box::new(move |t, dir| {
+                chip::removable(t, "Tag", selected, Msg::Go, Msg::Go, dir)
+            }),
         });
     }
     type Btn = fn(&Tokens, &str, Msg) -> Element<'static, Msg>;
@@ -443,20 +445,22 @@ pub fn scenes() -> Vec<Scene> {
         name: "progress row",
         covers: &["row"],
         own_page: false,
-        directional: false,
+        directional: true,
         states: false,
         runs: &[("Progress  50%", Word)],
-        make: Box::new(|t, _| snora::design::progress::row(t, "Progress", Some(0.5), Tone::Accent)),
+        make: Box::new(|t, dir| {
+            snora::design::progress::row(t, "Progress", Some(0.5), Tone::Accent, dir)
+        }),
     });
     v.push(Scene {
         name: "progress card",
         covers: &["card"],
         own_page: false,
-        directional: false,
+        directional: true,
         states: false,
         runs: &[("Progress  50%", Word)],
-        make: Box::new(|t, _| {
-            snora::design::progress::card(t, "Progress", Some(0.5), Tone::Accent)
+        make: Box::new(|t, dir| {
+            snora::design::progress::card(t, "Progress", Some(0.5), Tone::Accent, dir)
         }),
     });
     for (name, covers) in [

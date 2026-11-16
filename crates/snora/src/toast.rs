@@ -292,11 +292,25 @@ where
     // iced's default is `Word`, which breaks at spaces only and so does
     // nothing for a string that has none; `WordOrGlyph` breaks between
     // glyphs when a word cannot fit, and leaves ordinary prose alone.
-    let mut title = text(toast.title).wrapping(Wrapping::WordOrGlyph);
+    //
+    // **The text is as wide as its cell and aligned to the start edge** (RFC-133 R-4): the left
+    // under LTR, the right under RTL. A shrink-wide text sat at the left of the cell whichever
+    // way the window read, so under RTL the cell was mirrored and its text was not.
+    let start = match direction {
+        LayoutDirection::Ltr => Horizontal::Left,
+        LayoutDirection::Rtl => Horizontal::Right,
+    };
+    let mut title = text(toast.title)
+        .width(Length::Fill)
+        .align_x(start)
+        .wrapping(Wrapping::WordOrGlyph);
     if let Some(size) = style.title_size {
         title = title.size(size);
     }
-    let mut message = text(toast.message).wrapping(Wrapping::WordOrGlyph);
+    let mut message = text(toast.message)
+        .width(Length::Fill)
+        .align_x(start)
+        .wrapping(Wrapping::WordOrGlyph);
     if let Some(size) = style.message_size {
         message = message.size(size);
     }

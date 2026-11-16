@@ -40,8 +40,8 @@ pub(crate) struct MenuGeometry {
     /// in a layer of its own: the context menu, RFC-124 R-4).
     pub(crate) anchored: Option<bool>,
     /// The direction the icon-and-label rows are laid out for (RFC-132): the icon
-    /// is at the start edge. The header passes its own; a bare [`render_menu`] has
-    /// none to be given and draws left to right (RFC-133).
+    /// is at the start edge. The header passes its own; a bare [`render_menu`] is given
+    /// one (RFC-133).
     pub(crate) direction: LayoutDirection,
 }
 
@@ -72,10 +72,16 @@ impl MenuGeometry {
 /// `snora::render` (as the header's menus and `AppLayout::context_menu` are): the engine's
 /// layer stack answers them. A `render_menu` placed in an application's own widget tree gets
 /// Tab, Enter and Space and **no arrows**.
+///
+/// # Direction
+///
+/// `direction` (RFC-133) lays out the icon-and-label rows of the trigger and of each item: the
+/// icon is at the start edge of the label, the left under LTR and the right under RTL.
 pub fn render_menu<'a, Message, MenuId, MenuItemId, F>(
     menu: Menu<MenuId, MenuItemId>,
     on_action: &'a F,
     is_active: bool,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -83,7 +89,15 @@ where
     MenuItemId: Clone + Debug + 'a,
     F: Fn(MenuAction<MenuId, MenuItemId>) -> Message + 'a,
 {
-    build_menu(menu, on_action, is_active, MenuGeometry::unstyled())
+    build_menu(
+        menu,
+        on_action,
+        is_active,
+        MenuGeometry {
+            direction,
+            ..MenuGeometry::unstyled()
+        },
+    )
 }
 
 pub(crate) fn build_menu<'a, Message, MenuId, MenuItemId, F>(
@@ -167,9 +181,15 @@ where
 
     match geometry.anchored {
         None => {
-            let mut stack = column![MenuPart::trigger(trigger)];
+            // The trigger and the items hug the start edge of the menu (RFC-133): the left under
+            // LTR, the right under RTL, where `column`'s own alignment is physical.
+            let start = match direction {
+                LayoutDirection::Ltr => iced::Alignment::Start,
+                LayoutDirection::Rtl => iced::Alignment::End,
+            };
+            let mut stack = column![MenuPart::trigger(trigger)].align_x(start);
             if !items.is_empty() {
-                stack = stack.push(MenuPart::items(column(items)));
+                stack = stack.push(MenuPart::items(column(items).align_x(start)));
             }
             container(stack).into()
         }

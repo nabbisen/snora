@@ -41,6 +41,45 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   `Cycle`, `cycle_zones` and `focus_zone` are unchanged. See the
   [0.60 → 0.61 migration guide](docs/src/guides/migration-0.60-to-0.61.md#1-f6-moves-focus-rfc-126).
 
+### Changed
+
+- **Breaking: every snora widget that has a reading order now takes the direction (RFC-133).** Eight
+  functions and one builder take a required `direction: snora::LayoutDirection` as their **last**
+  argument, and lay out from the start edge (the left under LTR, the right under RTL). Pass the
+  direction you already pass to `AppLayout::direction`:
+
+  | Was | Now |
+  |---|---|
+  | `design::chip::removable(t, label, selected, on_toggle, on_remove)` | `… , on_remove, direction)` |
+  | `design::chip::removable_with_tooltip(t, label, selected, on_toggle, on_remove, tip)` | `… , tip, direction)` |
+  | `design::progress::row(t, label, value, tone)` | `… , tone, direction)` |
+  | `design::progress::card(t, label, value, tone)` | `… , tone, direction)` |
+  | `widget::app_footer(content)` | `app_footer(content, direction)` |
+  | `design::widget::app_footer(t, content)` | `app_footer(t, content, direction)` |
+  | `widget::render_menu(menu, &on_action, is_active)` | `… , is_active, direction)` |
+  | `design::notice::Notice::new(t, tone, body)` | `Notice::new(t, tone, body, direction)` |
+
+  A call that has no direction of its own passes `LayoutDirection::Ltr`, which draws exactly what it
+  drew before: every left-to-right frame of the eight is unchanged (756 frames).
+- **`Shortcuts::routes()` takes no argument.** Its `direction` was ignored since 0.63 (RFC-132);
+  delete it.
+- **The progress bar is drawn by snora, not by iced's `progress_bar`,** because iced's has no
+  direction and always fills from the left. Under left-to-right it is pixel-identical to iced's (every
+  preset, tone and value, `five_widgets_mirrored.rs`); the fill is a ratio in ten-thousandths of the
+  track, under 0.1 px off at any width up to 10,000 px.
+
+### Fixed
+
+- **Under right-to-left, eight more things are mirrored (RFC-133).** The removable chip puts its
+  label first and the × after it; a notice has its accent bar at the start edge and its controls at
+  the end; a progress bar fills from the right and its label starts there; both footers put their
+  content at the start edge; and a bare `render_menu` puts the icon at the start of the label and
+  keeps its trigger and items at the start edge of the menu.
+- **Snora's own text aligns to the start edge of its cell (RFC-133 R-4).** Twenty-five text runs in
+  four widgets stayed at the left of a mirrored cell under RTL: the notice's title and body, the
+  progress label, the footer's content, and the toast's title and message. A new test reads where
+  the ink sits in every text run of the text sweep.
+
 ## [0.63.0] — 2026-11-16
 
 **Upgrading from 0.62:** read the [0.62 → 0.63 migration guide](docs/src/guides/migration-0.62-to-0.63.md).

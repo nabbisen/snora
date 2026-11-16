@@ -142,7 +142,12 @@ fn scene(page: Element<'static, Msg>, cover: Cover) -> Element<'static, Msg> {
             .sheet(Sheet::new(text("sheet").into()))
             .on_close_modals(Msg::CloseModals),
         Cover::ContextMenu => layout
-            .context_menu(snora::widget::render_menu(menu(1), &ON_MENU, true))
+            .context_menu(snora::widget::render_menu(
+                menu(1),
+                &ON_MENU,
+                true,
+                snora::LayoutDirection::Ltr,
+            ))
             .on_close_menus(Msg::CloseMenus),
         Cover::HeaderMenu => layout
             .header_menu(button(text("own menu content")).into())
@@ -688,7 +693,12 @@ fn a_header_menu_and_a_context_menu_together_are_both_live_and_close_once() {
                 .header_menu(snora::control(text("own")).on_press(Msg::Own).into())
                 // The menus draw where the application puts them; unpositioned, both sit at the
                 // top-left corner and one hides the other, so this one is placed.
-                .context_menu(placed(snora::widget::render_menu(menu(2), &ON_MENU, true)))
+                .context_menu(placed(snora::widget::render_menu(
+                    menu(2),
+                    &ON_MENU,
+                    true,
+                    snora::LayoutDirection::Ltr,
+                )))
                 .on_close_menus(Msg::CloseMenus),
         )
     };

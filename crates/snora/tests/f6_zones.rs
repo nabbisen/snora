@@ -208,7 +208,12 @@ impl Scene {
             l = l.header_menu(ctl("hm"));
         }
         if self.ctx_menu {
-            l = l.context_menu(snora::widget::render_menu(menu(), &ON_MENU, true));
+            l = l.context_menu(snora::widget::render_menu(
+                menu(),
+                &ON_MENU,
+                true,
+                snora::LayoutDirection::Ltr,
+            ));
         }
         snora::render(l)
     }

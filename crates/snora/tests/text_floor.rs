@@ -219,9 +219,10 @@ fn a_notice_actions_label_clears_the_floor_in_every_tone_of_every_preset() {
         for tone in TONES {
             for state in STATES {
                 cells += 1;
-                let el: Element<'static, Msg> = Notice::new(t, tone, "body")
-                    .action("Act", Msg::Press)
-                    .render();
+                let el: Element<'static, Msg> =
+                    Notice::new(t, tone, "body", snora::LayoutDirection::Ltr)
+                        .action("Act", Msg::Press)
+                        .render();
                 let r = look(el, state).ratio;
                 if r < floor(preset) - TOLERANCE {
                     failures.push(format!(
@@ -337,7 +338,7 @@ fn hovered_and_pressed_each_differ_from_rest_by_a_visible_step() {
         }
         for tone in TONES {
             let make = || -> Element<'static, Msg> {
-                Notice::new(t, tone, "body")
+                Notice::new(t, tone, "body", snora::LayoutDirection::Ltr)
                     .action("Act", Msg::Press)
                     .render()
             };
@@ -380,7 +381,7 @@ fn the_tone_still_shows_in_a_notices_bar_and_border() {
                 Tone::Neutral => t.palette.border,
             });
             for with_action in [false, true] {
-                let mut n = Notice::new(t, tone, "body");
+                let mut n = Notice::new(t, tone, "body", snora::LayoutDirection::Ltr);
                 if with_action {
                     n = n.action("Act", Msg::Press);
                 }

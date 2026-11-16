@@ -132,6 +132,7 @@ impl App {
             .align_y(Center)
             .spacing(12)
             .into(),
+            LayoutDirection::Ltr,
         );
 
         // Assemble. Each slot is a plain Element — no trait, no wrapper enum.

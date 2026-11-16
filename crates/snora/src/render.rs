@@ -230,7 +230,7 @@ where
     let routes = layout
         .shortcuts
         .as_ref()
-        .map(|s| router_routes(s, layout.direction))
+        .map(router_routes)
         .unwrap_or_default();
     let skeleton = Router::new(skeleton, routes);
 
@@ -386,13 +386,10 @@ fn bindings(action: ShortcutAction, platform: Platform) -> Vec<(KeyMatch, Modifi
 
 /// The router's routes for a layout: each action's keys on the platform, each
 /// key carrying the message a click on the target publishes and the target's tag.
-fn router_routes<Message: Clone>(
-    shortcuts: &Shortcuts<Message>,
-    direction: LayoutDirection,
-) -> Vec<Route<Message>> {
+fn router_routes<Message: Clone>(shortcuts: &Shortcuts<Message>) -> Vec<Route<Message>> {
     let platform = shortcuts.platform_in_use();
     let mut routes = Vec::new();
-    for route in shortcuts.routes(direction) {
+    for route in shortcuts.routes() {
         let role = match route.role {
             TargetRole::SideBarItem => Role::SideBarItem,
             TargetRole::Tab => Role::Tab,

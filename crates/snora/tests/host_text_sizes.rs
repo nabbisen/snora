@@ -148,12 +148,12 @@ fn unstyled_labels() -> Vec<(&'static str, Element<'static, Msg>, &'static str)>
         ),
         (
             "menu trigger",
-            snora::widget::render_menu(menu(), &ON_MENU, false),
+            snora::widget::render_menu(menu(), &ON_MENU, false, snora::LayoutDirection::Ltr),
             MENU_LABEL,
         ),
         (
             "menu item",
-            snora::widget::render_menu(menu(), &ON_MENU, true),
+            snora::widget::render_menu(menu(), &ON_MENU, true, snora::LayoutDirection::Ltr),
             MENU_ITEM_LABEL,
         ),
     ]

@@ -166,18 +166,27 @@ fn unbroken_text_is_shown_whole_in_toasts() {
     }
 }
 
-/// Ordinary prose is untouched: same size before and after, because
+/// Ordinary prose is untouched: one line, as tall as it is on its own, because
 /// `WordOrGlyph` only differs from `Word` for a word that cannot fit.
+///
+/// **Its box is as wide as its column, not as wide as its words** (RFC-133 R-4): the toast's text
+/// fills its cell and aligns to the start edge, so what is compared is the height (one line, not
+/// wrapped) and that the box is the column (`TOAST_TEXT_COLUMN`), where it used to be the words'
+/// own width.
 #[test]
 fn ordinary_prose_is_unchanged() {
+    /// The toast's message column, measured: a fixed 340 surface less its 12px padding on each
+    /// side, the 4px row gap and the 24px close button.
+    const TOAST_TEXT_COLUMN: f32 = 288.0;
     for (what, build, size) in surfaces() {
         let natural = natural_size(PROSE, size);
         let rendered = rendered_size(build(PROSE), PROSE);
         assert!(
-            (rendered.width - natural.width).abs() <= 0.5
+            (rendered.width - TOAST_TEXT_COLUMN).abs() <= 0.5
                 && (rendered.height - natural.height).abs() <= 0.5,
             "{what}: prose rendered {:.1}x{:.1} against its natural {:.1}x{:.1} — this string \
-             fits its column, so wrapping must not have touched it",
+             fits its column, so wrapping must not have touched it: one line as tall as its own, \
+             in a box as wide as the column",
             rendered.width,
             rendered.height,
             natural.width,
@@ -228,7 +237,12 @@ mod notice {
     }
 
     fn notice<'a>(tokens: &'a Tokens, title: Option<&str>, body: &str) -> Element<'a, Msg> {
-        let mut notice = Notice::new(tokens, Tone::Info, body.to_owned());
+        let mut notice = Notice::new(
+            tokens,
+            Tone::Info,
+            body.to_owned(),
+            snora::LayoutDirection::Ltr,
+        );
         if let Some(title) = title {
             notice = notice.title(title.to_owned());
         }
@@ -281,6 +295,9 @@ mod notice {
         );
     }
 
+    /// Prose is one line, as tall as it is on its own. **Its box is as wide as the notice's text
+    /// column, not as wide as its words** (RFC-133 R-4): the notice's text fills its cell and aligns
+    /// to the start edge.
     #[test]
     fn notice_prose_is_unchanged() {
         let tokens = Tokens::light();
@@ -288,7 +305,7 @@ mod notice {
         let natural = natural_size(PROSE, Some(body));
         let rendered = rendered_size(notice(&tokens, None, PROSE), PROSE);
         assert!(
-            (rendered.width - natural.width).abs() <= 0.5
+            (rendered.width - column(&tokens)).abs() <= 0.5
                 && (rendered.height - natural.height).abs() <= 0.5,
             "notice body: prose rendered {:.1}x{:.1} against its natural {:.1}x{:.1}",
             rendered.width,
