@@ -78,7 +78,7 @@ fn background_task_card<'a, Message: Clone + 'a>(
         text(task_name)
             .size(snora::design::style::text::label_size(t))
             .color(snora::design::style::color::to_iced_color(t.palette.text_primary)),
-        progress::row(t, task_name, value, tone),
+        progress::row(t, task_name, value, tone, direction),
         controls,
     ]
     .spacing(t.spacing.sm);

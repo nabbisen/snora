@@ -72,7 +72,7 @@ fn error_recovery_notice<'a, Message: Clone + 'a>(
         return None;
     }
 
-    let mut notice = Notice::new(tokens, Tone::Danger, description)
+    let mut notice = Notice::new(tokens, Tone::Danger, description, direction)
         .title(title)
         .action(action_label, on_action);
 

@@ -31,6 +31,7 @@ chip::removable(
     self.rust_selected,
     Message::ToggleRust,
     Message::RemoveRust,
+    direction,          // 0.64: the label then the × in reading order
 )
 ```
 

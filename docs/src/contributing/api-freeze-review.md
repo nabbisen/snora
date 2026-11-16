@@ -80,7 +80,9 @@ No renames, no removals from `snora-core`.
 
 **Three public types in `snora-core` were never covered by the audit**, all
 from RFC-060's zone navigation (0.39.0): `FocusZone`, `Cycle`, and
-`ZonePresence`. Put through the same seven questions:
+`ZonePresence`. *(`FocusZone` and `ZonePresence`, with `next_zone`, were deprecated in 0.61.0
+and removed in 0.64.0, RFC-126. The rows below are the review of their time; `Cycle` stays.)*
+Put through the same seven questions:
 
 | Question | `FocusZone` / `Cycle` / `ZonePresence` |
 |---|---|

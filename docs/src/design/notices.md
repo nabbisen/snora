@@ -10,14 +10,15 @@ whether a notice is shown, dismissed, or acted upon is always app-controlled.
 ```rust,ignore
 use snora::design::{Tokens, Tone, notice::Notice};
 
-Notice::new(&tokens, Tone::Info, "Background sync is running.")
+Notice::new(&tokens, Tone::Info, "Background sync is running.", direction)
     .title("Syncing")                               // optional
     .action("View details", Message::OpenSync)      // optional
     .dismiss(Message::DismissNotice)                // optional
     .render()
 ```
 
-`Notice::new(tokens, tone, body)` returns a builder. Call `.render()` to
+`Notice::new(tokens, tone, body, direction)` returns a builder (the direction since 0.64: the
+accent bar at the start edge, the controls at the end, the text aligned to the start). Call `.render()` to
 produce the `Element`.
 
 ## Tones
@@ -42,7 +43,7 @@ the view based on application state:
 
 ```rust,ignore
 if self.show_notice {
-    Notice::new(&tokens, Tone::Warning, "Index is stale.")
+    Notice::new(&tokens, Tone::Warning, "Index is stale.", direction)
         .dismiss(Message::DismissNotice)
         .render()
 } else {

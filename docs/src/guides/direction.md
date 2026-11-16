@@ -84,14 +84,19 @@ method on the result, no longer compiles. See the 0.62 → 0.63 migration guide.
 | `app_breadcrumb` | The trail, from the start edge; the separator (`›` / `‹`) |
 | Menus in the header | A trigger's and an item's icon and label |
 | `app_side_bar` | Tooltip side; the sidebar position is determined by `AppLayout::direction` |
-| Toast layer | Anchor side, when `ToastPosition` is `*Start` or `*End`; a toast's close mark (0.63) |
+| Toast layer | Anchor side, when `ToastPosition` is `*Start` or `*End`; a toast's close mark (0.63); its title and message aligned to the start (0.64) |
 | `Sheet` | Anchor side, when `SheetEdge` is `Start` or `End`. Inside-facing rounded corner also flips. `Top` / `Bottom` edges are unaffected. |
 | `Dialog` | Unaffected — centered, not edge-anchored |
+| `design::notice::Notice` | The accent bar at the start edge, the controls at the end; the title and body aligned to the start (0.64) |
+| `design::chip::removable` | The label, then the × (0.64) |
+| `design::progress` | The fill grows from the start edge; the label aligned to the start (0.64) |
+| `app_footer` | Its content at the start edge (0.64) |
+| `render_menu` | A trigger's and an item's icon and label, and the menu's stack at the start edge (0.64; this is also the engine's context menu) |
 
-**Five widgets take no direction yet, and draw left-to-right under RTL:** `design::notice::Notice`,
-`design::chip::removable` (and `removable_with_tooltip`), `design::progress` (its fill also runs
-from the left), `app_footer`, and `render_menu` used on its own (the header's menus do mirror).
-RFC-133 gives each a `direction` parameter.
+**Every snora widget whose layout has a reading order takes a `direction`** (since 0.64, RFC-133),
+and a test keeps it so: a public widget function either takes one or is on a written list of
+direction-free widgets, with the reason. **snora's own text aligns to the start edge of its box**
+under both directions.
 
 ## Live flip
 

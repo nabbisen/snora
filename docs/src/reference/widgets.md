@@ -88,12 +88,12 @@ always room. A rail you place yourself at the window's end edge does not have it
 ```rust,ignore
 pub fn app_footer<'a, Message>(
     content: Element<'a, Message>,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 ```
 
-Thin chrome-styled container. Direction is the caller's
-responsibility — pass a `row_dir`-built row if you need start/end
-layout inside.
+Thin chrome-styled container. Its content sits at the start edge of `direction` (0.64,
+RFC-133). For start and end parts inside it, pass a `row_dir` row.
 
 ### `render_menu`
 
@@ -102,10 +102,11 @@ pub fn render_menu<'a, Message, MenuId, MenuItemId, F>(
     menu: Menu<MenuId, MenuItemId>,
     on_action: &'a F,
     is_active: bool,
+    direction: LayoutDirection,
 ) -> Element<'a, Message>
 ```
 
-Used internally by `app_header`. You normally do not call this
+Used internally by `app_header`, which passes its own direction (0.64, RFC-133). You normally do not call this
 directly — `app_header` consumes a `Vec<Menu>` and renders all of
 them. Direct calls are for non-header menus.
 

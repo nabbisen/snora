@@ -10,7 +10,17 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
-
+- [0.63 → 0.64](migration-0.63-to-0.64.md) — **breaking, on purpose**: the F6 types removed
+  (`next_zone`, `FocusZone`, `ZonePresence`); eight widget functions take a required
+  `direction`, and they, the context menu and snora's own text mirror under RTL;
+  `Shortcuts::routes()` takes no argument.
+- [0.62 → 0.63](migration-0.62-to-0.63.md) — **one compile-time break**: `row_dir` returns a
+  `LogicalRow`. Right-to-left mirrored for real (the header, Tab order, focus across a flip);
+  every word and non-text element snora draws measured as drawn; what to re-check where the
+  second audit corrected the book.
+- [0.61 → 0.62](migration-0.61-to-0.62.md) — **nothing breaks at compile time**: a right-hand
+  sheet's width, F6 after a click, a notice's action colour, 17 state colours,
+  `Palette::text_contrast`, and `Ctrl+Enter` reaching your application.
 - [0.60 → 0.61](migration-0.60-to-0.61.md) — **nothing breaks**: F6 moves focus between
   zones (`keyboard::focus_zone`), and `next_zone`, `FocusZone` and `ZonePresence` are
   deprecated; a snora control takes `.id()`, so a dialog can choose where focus starts.

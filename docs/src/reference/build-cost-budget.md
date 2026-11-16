@@ -357,7 +357,33 @@ both builds move together. Here the denominator, a cold whole-graph build, moved
 numerator, a single crate. A large move in the ratio with no code to explain it should be read
 against both columns, not the ratio alone.
 
+### The 0.63.0 move (+16.4%), not reproduced
+
+`design_overhead_ratio` went from 0.047934 (0.62.0) to **0.055777 (0.63.0), +16.4%**, with the
+same compiler (rustc 1.100.0) and no dependency change. It was investigated in the 0.64
+housekeeping by the method above: `measure-compile-time.sh` on worktrees of both tags, five cold
+builds each, interleaved, each in a fresh target directory.
+- **Measured locally: +0.5% (median), +1.9% (mean), within the run-to-run spread.**
+  `cargo build --timings` puts 0.63's own cost at **+24 ms** across the snora crates
+  (`snora-style` +10, `snora-interaction` +6, `snora-widgets` +6, `snora` +2): its style and
+  mirrored-row work.
+- **On the runner,** both steps rose together, `example_hello_ms` +37% and `example_workbench_ms`
+  +59%. Locally neither moved by more than 1.7%. The move is not reproduced; the runner is not
+  claimed as the cause, only that a controlled build does not show it.
+- **No action.**
+
 ### Watch points
+
+**A crossing of the ~10% threshold is first re-measured, then attributed** (ruled 2026-11-17, at
+the 0.64 housekeeping). The runner's last four rows span about ±8% of their mean, so noise alone
+will sometimes cross it. Before reading a crossing as a regression:
+- re-measure the two tags **locally, interleaved and cold**, as above (five runs each is enough to
+  see a spread);
+- only a move that survives that is attributed, with `cargo build --timings`.
+
+The threshold stays at ~10%. Raising it after a reading that crossed it would move the goalposts,
+and the re-measurement keeps a crossing cheap to settle.
+
 
 No CI failures are triggered by compile time in the first iteration.
 

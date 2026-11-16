@@ -74,7 +74,9 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   label first and the × after it; a notice has its accent bar at the start edge and its controls at
   the end; a progress bar fills from the right and its label starts there; both footers put their
   content at the start edge; and a bare `render_menu` puts the icon at the start of the label and
-  keeps its trigger and items at the start edge of the menu.
+  keeps its trigger and items at the start edge of the menu. **The engine's context menu is a `render_menu`,** so under
+  RTL its items now sit at the menu's right edge. **Retake RTL screenshot baselines** of each of
+  these.
 - **Snora's own text aligns to the start edge of its cell (RFC-133 R-4).** Twenty-five text runs in
   four widgets stayed at the left of a mirrored cell under RTL: the notice's title and body, the
   progress label, the footer's content, and the toast's title and message. A new test reads where

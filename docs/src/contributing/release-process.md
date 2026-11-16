@@ -366,7 +366,9 @@ restate the guide's content.
     change; verify it entry by entry against the tag.
     # RFC-107: series, not size. A reader on 0.27 knows the entry is in
     # changelog/0.2x.md without looking, and a closed file never moves.
-[ ] If minor: write docs/guides/migration-X.Y-to-X.Z.md. **Unconditional
+[ ] If minor: write docs/guides/migration-X.Y-to-X.Z.md, AND its entry in
+    docs/src/guides/migrations.md and SUMMARY.md (the index missed 0.62 and
+    0.63 until the 0.64 book work). **Unconditional
     — no exceptions for "nothing broke."** A guide for a minor that
     changed nothing required says so in a sentence (RFC-079); it is
     never skipped.
@@ -436,7 +438,8 @@ restate the guide's content.
     rows, so this is ongoing monitoring, not a closure check — and it is
     monitoring with a stated floor: the ratio moved -4.44% across a release
     that changed no executable code, so treat a move under ~10% as noise
-    and investigate above it. The absolute millisecond columns are raw
+    and investigate above it, by first re-measuring the two tags locally,
+    interleaved and cold (build-cost-budget.md § Watch points). The absolute millisecond columns are raw
     record, never a trend (RFC-050).
 [ ] Update ROADMAP.md (move shipped items off; rewrite "Near-term"
     if priorities changed)

@@ -171,7 +171,7 @@ rail after the header in either direction. `snora::keyboard::cycle_zones(key, mo
 F6 and Shift+F6 into one, and `snora::keyboard::focus_zone(cycle)` moves focus (RFC-126). See
 [Accessibility](../guides/accessibility.md).
 
-**Deprecated in 0.61.0, removed in 0.64.0:** `FocusZone`, `ZonePresence` and
+**Removed in 0.64.0** (deprecated in 0.61.0): `FocusZone`, `ZonePresence` and
 `focus::next_zone`. They let an application hold the current zone and the slots it filled, so
 that `next_zone` could decide where F6 goes. From 0.61, snora reads both from the tree when the
 key is pressed, so there is nothing left for the application to hold.

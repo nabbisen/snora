@@ -219,8 +219,8 @@ it. That was never a ruled behaviour. RFC-084 had asked only that the dim block 
 
 *History.* Until 0.55 this law read "Keyboard dismissal is application-owned", and
 the engine answered no key at all. RFC-060 had already added a second keyboard
-decision of snora's own, frame-level zone cycling (`snora_core::focus::next_zone`,
-F6/Shift+F6 via `snora::keyboard::cycle_zones`).
+decision of snora's own, frame-level zone cycling (`snora_core::focus::next_zone`, removed in
+0.64.0; F6/Shift+F6 via `snora::keyboard::cycle_zones`).
 
 RFC-014-A added a documented recipe and a small opt-in helper,
 `snora::keyboard::dismiss_on_escape` (see [Keyboard
@@ -300,8 +300,8 @@ localization stack.
 - **Frame-level zone navigation** — guarded from 0.61 in
   `crates/snora/tests/f6_zones.rs`: every rule, every cover, RTL and the design path, with
   nine breakage rows each shown failing (RFC-126). `every_control.rs` reaches every zone by F6
-  with its ring. *The deprecated `next_zone`'s own tests in `snora-core` still pass. They
-  guarded a decision that moved no focus.*
+  with its ring. *`next_zone` and its tests were removed in 0.64.0. They guarded a decision that
+  moved no focus.*
 - **Tab inside an open modal** — guarded: the Tab order is dialog, sheet,
   toasts (`modal_keyboard.rs`).
 

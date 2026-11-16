@@ -20,7 +20,7 @@ visibility state.
 ```rust,ignore
 use snora::design::{Tokens, Tone, notice::Notice};
 
-Notice::new(&tokens, Tone::Warning, "Disk space low.")
+Notice::new(&tokens, Tone::Warning, "Disk space low.", direction)
     .title("Storage warning")
     .action("Free space", Message::FreeSpace)
     .dismiss(Message::DismissNotice)
@@ -45,7 +45,7 @@ A toggle chip built on snora's `control` (RFC-116; iced's `button` before 0.55).
 use snora::design::chip;
 
 chip::filter(&tokens, "Draft", self.show_drafts, Message::ToggleDrafts)
-chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove)
+chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove, direction)
 ```
 
 ### Accessibility (RFC-027)
@@ -68,8 +68,8 @@ animation; renders as 0% with a "…" suffix.
 ```rust,ignore
 use snora::design::{Tone, progress};
 
-progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent)
-progress::card(&tokens, "Syncing", None, Tone::Info)
+progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent, direction)
+progress::card(&tokens, "Syncing", None, Tone::Info, direction)
 ```
 
 Note: the `Tone` parameter was added beyond the RFC-032 sketch (which

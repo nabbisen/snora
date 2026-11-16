@@ -114,8 +114,8 @@ contributor-facing documents linked below, not duplicated here.
 
   *Until 0.61, snora offered only `next_zone`, a decision your application had to act on. With
   snora's controls it could not: it moved no focus, counted from a variable, and ignored a
-  covering menu. `next_zone`, `FocusZone` and `ZonePresence` are deprecated in 0.61, and removed
-  in 0.64.0.*
+  covering menu. `next_zone`, `FocusZone` and `ZonePresence` were deprecated in 0.61, and are
+  removed in 0.64.0.*
 
 ## If your application serves older readers (RFC-115)
 

@@ -39,7 +39,7 @@ fn view(state: &State) -> iced::Element<'_, Message> {
         LayoutDirection::Ltr,
     );
 
-    let footer = app_footer(iced::widget::text("status").into());
+    let footer = app_footer(iced::widget::text("status").into(), LayoutDirection::Ltr);
 
     let body: iced::Element<'_, Message> = state.body();
 
