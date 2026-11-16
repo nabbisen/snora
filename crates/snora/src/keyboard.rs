@@ -117,8 +117,8 @@ pub fn cycle_zones(key: Key, modifiers: Modifiers) -> Option<Cycle> {
 /// presses, so a position held by the application cannot go stale, and a focus moved by Tab, a
 /// click's starting point or a task is where the next F6 counts from.
 ///
-/// Replaces `snora_core::focus::next_zone` with `FocusZone` and `ZonePresence`, which are
-/// deprecated: an application no longer passes a stale answer, and has nothing left to pass.
+/// It replaced `snora_core::focus::next_zone` (with `FocusZone` and `ZonePresence`), removed in
+/// 0.64.0: an application no longer passes a stale answer, and has nothing left to pass.
 ///
 /// [`traverse`]: crate::keyboard::traverse
 pub fn focus_zone<Message: 'static>(cycle: Cycle) -> iced::Task<Message> {

@@ -38,12 +38,7 @@
 pub mod crumb;
 /// Reading direction and logical edges (`Start`, `End`).
 pub mod direction;
-/// Frame-level keyboard zone navigation — [`focus::Cycle`]. `FocusZone`, `ZonePresence` and
-/// `next_zone` are deprecated (RFC-126): use `snora::keyboard::focus_zone`.
-#[expect(
-    deprecated,
-    reason = "the deprecated zone vocabulary is defined, and still has to work, until it is removed in 0.64.0 (RFC-126)"
-)]
+/// Frame-level keyboard zone navigation — [`focus::Cycle`], the direction `snora::keyboard::focus_zone` takes.
 pub mod focus;
 /// Icon enum and its source variants (text, Lucide, SVG).
 pub mod icon;
@@ -63,11 +58,7 @@ pub mod toast;
 
 pub use crumb::{BreadcrumbAction, Crumb};
 pub use direction::{Edge, LayoutDirection};
-#[expect(
-    deprecated,
-    reason = "re-exported until it is removed in 0.64.0 (RFC-126)"
-)]
-pub use focus::{Cycle, FocusZone, ZonePresence};
+pub use focus::Cycle;
 pub use icon::Icon;
 pub use layout::AppLayout;
 pub use menu::{Menu, MenuAction, MenuItem};

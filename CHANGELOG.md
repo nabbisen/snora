@@ -26,7 +26,20 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Removed
+
+- **`snora::focus::next_zone`, `FocusZone` and `ZonePresence`**, deprecated since 0.61.0 (RFC-126).
+  They only returned a zone, from a zone your application held, and could not move focus. Replace the
+  call with `focus_zone`, and delete the field and the presence helper you kept for it:
+
+  ```rust,ignore
+  if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
+      return snora::keyboard::focus_zone(cycle);
+  }
+  ```
+
+  `Cycle`, `cycle_zones` and `focus_zone` are unchanged. See the
+  [0.60 → 0.61 migration guide](docs/src/guides/migration-0.60-to-0.61.md#1-f6-moves-focus-rfc-126).
 
 ## [0.63.0] — 2026-11-16
 
