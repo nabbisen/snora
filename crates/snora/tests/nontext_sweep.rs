@@ -510,13 +510,27 @@ struct Cell {
     outside: [u8; 3],
 }
 
+/// Every subject of `list`, in every preset, on every surface, in each state and each direction.
+///
+/// **Each frame is drawn once** (0.64 housekeeping, B-1 (i)): subjects are grouped by scene, and for a
+/// scene, a preset, a surface and a direction the rest frame is drawn once, and the hovered and the
+/// pressed frame of each control once, whatever number of subjects read it. The rig that found the
+/// subjects' elements is the one the rest frame is drawn on, so no rig is built only to look.
 fn sweep_list(list: Vec<Subject>) -> Vec<Cell> {
     let mut cells = Vec::new();
+    // Scenes in the order they first appear, each with the subjects that read it.
+    let mut by_scene: Vec<(&'static str, Vec<&Subject>)> = Vec::new();
+    for sub in &list {
+        match by_scene.iter_mut().find(|(name, _)| *name == sub.scene) {
+            Some((_, subs)) => subs.push(sub),
+            None => by_scene.push((sub.scene, vec![sub])),
+        }
+    }
     for (preset, tokens) in Tokens::presets() {
         let t = leak(tokens);
         let theme = design_theme(t);
-        for sub in &list {
-            let sc = scene_named(sub.scene);
+        for (scene_name, subs) in &by_scene {
+            let sc = scene_named(scene_name);
             let dirs: &[LayoutDirection] = if sc.directional {
                 &[LayoutDirection::Ltr, LayoutDirection::Rtl]
             } else {
@@ -529,46 +543,73 @@ fn sweep_list(list: Vec<Subject>) -> Vec<Cell> {
             };
             for &dir in dirs {
                 for &surface in surfaces {
-                    let mut rig = Rig::new(build(&sc, t, surface, dir));
-                    let els = elements(&mut rig);
+                    let mut rest = Rig::new(build(&sc, t, surface, dir));
+                    let els = elements(&mut rest);
                     let targets: Vec<Rectangle> =
-                        rig.targets().into_iter().map(|x| x.bounds).collect();
-                    let Some(first) = (sub.pick)(&els, &targets) else {
-                        panic!(
-                            "{preset} / {} / {surface} / {dir:?}: the subject's element was not found in the scene",
-                            sub.name
-                        );
-                    };
-                    let mut states: Vec<(&'static str, State)> = vec![("rest", State::Rest)];
-                    if first.target.is_some() && sc.states {
-                        states.push(("hovered", State::Hovered));
-                        states.push(("pressed", State::Pressed));
-                    }
-                    for (label, state) in states {
-                        let mut rig = Rig::new(build(&sc, t, surface, dir));
-                        if let (Some(i), true) = (first.target, state != State::Rest) {
-                            let tb = rig.targets()[i].bounds;
-                            apply_state(&mut rig, tb, state);
+                        rest.targets().into_iter().map(|x| x.bounds).collect();
+                    let firsts: Vec<Pick> = subs
+                        .iter()
+                        .map(|sub| {
+                            (sub.pick)(&els, &targets).unwrap_or_else(|| {
+                                panic!(
+                                    "{preset} / {} / {surface} / {dir:?}: the subject's element was not found in the scene",
+                                    sub.name
+                                )
+                            })
+                        })
+                        .collect();
+                    // The frames to draw: the rest frame, and the hovered and the pressed frame of
+                    // each control some subject's pointer states apply to.
+                    let mut frames: Vec<(&'static str, Option<usize>, State)> =
+                        vec![("rest", None, State::Rest)];
+                    if sc.states {
+                        for first in &firsts {
+                            let Some(i) = first.target else { continue };
+                            for (label, state) in
+                                [("hovered", State::Hovered), ("pressed", State::Pressed)]
+                            {
+                                if !frames.iter().any(|f| f.1 == Some(i) && f.2 == state) {
+                                    frames.push((label, Some(i), state));
+                                }
+                            }
                         }
-                        let els = elements(&mut rig);
+                    }
+                    let mut hot: Option<Rig<Msg>> = None;
+                    for (label, target, state) in frames {
+                        let rig: &mut Rig<Msg> = if state == State::Rest {
+                            &mut rest
+                        } else {
+                            let mut r = Rig::new(build(&sc, t, surface, dir));
+                            let tb =
+                                r.targets()[target.expect("a pointer state has a control")].bounds;
+                            apply_state(&mut r, tb, state);
+                            hot.insert(r)
+                        };
+                        let els = elements(rig);
                         let targets: Vec<Rectangle> =
                             rig.targets().into_iter().map(|x| x.bounds).collect();
-                        let Some(p) = (sub.pick)(&els, &targets) else {
-                            continue;
-                        };
                         let frame = rig.frame_scaled(&theme, EDGE as f32);
-                        if let Some((r, a, b)) = boundary(&frame, p.rect, p.sides) {
-                            cells.push(Cell {
-                                preset,
-                                subject: sub.name.to_owned(),
-                                row: sub.row,
-                                surface,
-                                direction: dir,
-                                state: label,
-                                ratio: r,
-                                inside: a,
-                                outside: b,
-                            });
+                        for (sub, first) in subs.iter().zip(&firsts) {
+                            // A subject reads the pointer states of its own control, and the rest frame.
+                            if state != State::Rest && first.target != target {
+                                continue;
+                            }
+                            let Some(p) = (sub.pick)(&els, &targets) else {
+                                continue;
+                            };
+                            if let Some((r, a, b)) = boundary(&frame, p.rect, p.sides) {
+                                cells.push(Cell {
+                                    preset,
+                                    subject: sub.name.to_owned(),
+                                    row: sub.row,
+                                    surface,
+                                    direction: dir,
+                                    state: label,
+                                    ratio: r,
+                                    inside: a,
+                                    outside: b,
+                                });
+                            }
                         }
                     }
                 }
