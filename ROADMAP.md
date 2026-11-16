@@ -253,7 +253,9 @@ crate short of the pixels**, and that is RFC-085's real subject.
 - **RFC-134's Unit 0:** keyboard-reachable form controls, measured control by control. The controls
   themselves land in 0.65.0, as additions.
 
-One breaking release, so adopters migrate once.
+One breaking release, so adopters migrate once. Handoffs:
+[`133-…`](rfcs/handoffs/133-five-snora-widgets-take-no-direction/implementation-handoff.md) and
+[`0-64-removals-and-housekeeping`](rfcs/handoffs/0-64-removals-and-housekeeping/implementation-handoff.md).
 
 ## Future wanted
 
