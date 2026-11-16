@@ -35,9 +35,77 @@ pub struct Target {
     pub focused: bool,
 }
 
+/// Headless renderers a finished rig gave back, for the next to take. A `static`, not a thread-local:
+/// a renderer dropped as a thread is torn down reaches thread-locals of the GPU stack that are gone by
+/// then, which aborts the process; a static is never dropped, and the process ends with it.
+static POOL: std::sync::Mutex<Vec<iced::Renderer>> = std::sync::Mutex::new(Vec::new());
+
+fn pool() -> std::sync::MutexGuard<'static, Vec<iced::Renderer>> {
+    POOL.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+/// A headless renderer **lent by the process's pool**, and given back when the rig that holds it is
+/// dropped.
+///
+/// Starting a headless renderer is the dearest thing a rig does: on a GPU about 70 ms, against 15 ms
+/// to draw a 2x frame, and the drawn sweeps start one for nearly every frame (5,484 for the non-text
+/// sweep, 3,450 for the text sweep: 550 s of the 790 s they took on wgpu, 0.64 housekeeping B-1). A
+/// renderer carries no state a rig reads: its layers are reset as it is taken (and
+/// `UserInterface::draw` resets them again), its fonts are the process's, and the default font and
+/// size are the ones every rig asks for. (B-1's comparison: every cell of both sweeps, on both
+/// renderers, reads exactly as it did with a renderer of its own.)
+struct Lent(Option<iced::Renderer>);
+
+impl Lent {
+    fn take(wanted: &str) -> Self {
+        let taken = pool().pop();
+        let mut renderer = taken.unwrap_or_else(|| {
+            iced::futures::executor::block_on(<iced::Renderer as Headless>::new(
+                Font::DEFAULT,
+                Pixels(16.0),
+                Some(wanted),
+            ))
+            .expect("the requested renderer starts")
+        });
+        assert_eq!(
+            Headless::name(&renderer),
+            wanted,
+            "another renderer drew: not the pixels under test"
+        );
+        iced_runtime::core::Renderer::reset(&mut renderer, Rectangle::with_size(WINDOW));
+        Self(Some(renderer))
+    }
+}
+
+impl std::ops::Deref for Lent {
+    type Target = iced::Renderer;
+    fn deref(&self) -> &iced::Renderer {
+        self.0
+            .as_ref()
+            .expect("a lent renderer is there until it is dropped")
+    }
+}
+
+impl std::ops::DerefMut for Lent {
+    fn deref_mut(&mut self) -> &mut iced::Renderer {
+        self.0
+            .as_mut()
+            .expect("a lent renderer is there until it is dropped")
+    }
+}
+
+impl Drop for Lent {
+    fn drop(&mut self) {
+        if let Some(renderer) = self.0.take() {
+            pool().push(renderer);
+        }
+    }
+}
+
 pub struct Rig<M: 'static> {
     ui: UserInterface<'static, M, Theme, iced::Renderer>,
-    renderer: iced::Renderer,
+    renderer: Lent,
     /// What the interface published, as the runtime would collect it.
     pub messages: Vec<M>,
     cursor: mouse::Cursor,
@@ -55,17 +123,7 @@ impl<M: Clone + 'static> Rig<M> {
     /// The same, in a window of another size.
     pub fn sized(root: Element<'static, M>, size: Size) -> Self {
         let wanted = backend();
-        let mut renderer = iced::futures::executor::block_on(<iced::Renderer as Headless>::new(
-            Font::DEFAULT,
-            Pixels(16.0),
-            Some(&wanted),
-        ))
-        .expect("the requested renderer starts");
-        assert_eq!(
-            Headless::name(&renderer),
-            wanted,
-            "another renderer drew: not the pixels under test"
-        );
+        let mut renderer = Lent::take(&wanted);
         let ui = UserInterface::build(root, size, user_interface::Cache::default(), &mut renderer);
         let mut rig = Self {
             ui,
@@ -111,7 +169,7 @@ impl<M: Clone + 'static> Rig<M> {
         let _ = self.ui.update(
             events,
             self.cursor,
-            &mut self.renderer,
+            &mut *self.renderer,
             &mut clipboard::Null,
             &mut self.messages,
         );
@@ -138,7 +196,7 @@ impl<M: Clone + 'static> Rig<M> {
                         delta: mouse::ScrollDelta::Lines { x: 0.0, y: -1.0 },
                     })],
                     self.cursor,
-                    &mut self.renderer,
+                    &mut *self.renderer,
                     &mut clipboard::Null,
                     &mut self.messages,
                 );
@@ -153,7 +211,7 @@ impl<M: Clone + 'static> Rig<M> {
         let (state, _) = self.ui.update(
             &[Event::Mouse(mouse::Event::CursorMoved { position: at })],
             self.cursor,
-            &mut self.renderer,
+            &mut *self.renderer,
             &mut clipboard::Null,
             &mut self.messages,
         );
@@ -223,7 +281,7 @@ impl<M: Clone + 'static> Rig<M> {
         let (_, statuses) = self.ui.update(
             &[event],
             self.cursor,
-            &mut self.renderer,
+            &mut *self.renderer,
             &mut clipboard::Null,
             &mut self.messages,
         );
@@ -241,7 +299,7 @@ impl<M: Clone + 'static> Rig<M> {
         let (_, statuses) = self.ui.update(
             events,
             self.cursor,
-            &mut self.renderer,
+            &mut *self.renderer,
             &mut clipboard::Null,
             &mut self.messages,
         );
@@ -266,7 +324,7 @@ impl<M: Clone + 'static> Rig<M> {
         let mut current = operation;
         loop {
             self.ui
-                .operate(&self.renderer, &mut operation::black_box(current.as_mut()));
+                .operate(&*self.renderer, &mut operation::black_box(current.as_mut()));
             match current.finish() {
                 Outcome::None | Outcome::Some(()) => return,
                 Outcome::Chain(next) => current = next,
@@ -304,7 +362,7 @@ impl<M: Clone + 'static> Rig<M> {
     /// Every focus target, in Tab order.
     pub fn targets(&mut self) -> Vec<Target> {
         let mut found = Collect::default();
-        self.ui.operate(&self.renderer, &mut found);
+        self.ui.operate(&*self.renderer, &mut found);
         found.0
     }
 
@@ -337,7 +395,7 @@ impl<M: Clone + 'static> Rig<M> {
         use iced::theme::Base;
         let base = theme.base();
         self.ui.draw(
-            &mut self.renderer,
+            &mut *self.renderer,
             theme,
             &iced_runtime::core::renderer::Style {
                 text_color: base.text_color,
@@ -345,7 +403,7 @@ impl<M: Clone + 'static> Rig<M> {
             self.cursor,
         );
         Headless::screenshot(
-            &mut self.renderer,
+            &mut *self.renderer,
             Size::new(
                 (self.size.width * scale) as u32,
                 (self.size.height * scale) as u32,
