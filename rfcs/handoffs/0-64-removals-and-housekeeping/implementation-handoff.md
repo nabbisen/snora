@@ -55,3 +55,35 @@ no measured ratio moves by more than the sweep's own slack** (0.05 text, 0.02 no
    - the measurements, with their method;
    - a change lands only if it passes its bar, with the breakage re-runs as evidence.
 3. Named `cp` backups and `sha256sum -c` for any plant; never `git checkout` or `git restore`.
+
+## Part C (added 2026-11-17, at Part B's landing) — run each sweep once per combination
+
+**What Part B's landing showed:**
+- `ci.yaml` still takes **26 min 19 s** of wall-clock time, and **the Rust quality gate is all of it
+  (26 min 16 s).** The rendered jobs, which run beside it, take 13 min 33 s (wgpu) and 9 min 26 s
+  (tiny-skia).
+- Inside the quality gate, two steps take almost all of the time:
+  - "Test engine, all features" (663 s);
+  - "Test engine, design without lucide-icons" (643 s).
+- They run the drawn-contrast sweeps again on tiny-skia, which the rendered jobs already run.
+- Part B cut the wgpu job, but the wall clock is set by the quality gate.
+
+**The rule:** every combination of renderer and feature set that is swept today is still swept,
+**exactly once,** on every push to `main`. No coverage is lost, and nothing runs twice.
+1. **Measure first:** which tests take the two steps' time (the sweeps, by name, and anything else
+   over 30 s), and which combinations each step and each rendered job covers today. The
+   no-`lucide-icons` build draws `×` where the others draw lucide's `X`, so its sweep is a coverage of
+   its own.
+2. **Propose,** then do it, in one commit: where each sweep runs, and how the others skip it. Use an
+   explicit mechanism a reader can find (an `#[ignore]` with `--include-ignored` in the job that owns
+   it, or a named feature or environment variable), stated in the test's doc and in `ci.yaml`'s
+   comment.
+   - The steps that skip a sweep must **still compile it** (`--no-run` or the build itself), so a
+     feature-specific break is caught.
+3. **Show the bar is met:**
+   - a table of combination against job, before and after, with every combination present once
+     after;
+   - ci.yaml's wall clock before and after, from main's runs.
+
+**Acceptance:** the table; the time; every plant of RFC-131, RFC-133 and RFC-135 still failing where
+its test now runs (re-run the three breakage scripts); the gates.
