@@ -368,8 +368,8 @@ fn outline(colors: Colors, radius: f32) -> Border {
 /// # }
 /// ```
 ///
-/// **Without a handler it is disabled**, as iced's is: it is no Tab stop, nothing toggles it, and
-/// it draws dimmed.
+/// **Disabled when it has no handler to publish with** (`on_toggle`, or `on_toggle_maybe(None)`),
+/// as `snora::control` and iced's own are: it is no Tab stop, nothing toggles it, and it draws dimmed.
 #[must_use = "a checkbox does nothing until it is added to a view"]
 pub struct Checkbox<'a, Message> {
     skin: Skin,
@@ -505,7 +505,8 @@ impl<'a, Message: Clone + 'a> From<Checkbox<'a, Message>> for Element<'a, Messag
 /// # }
 /// ```
 ///
-/// Without a handler it is disabled.
+/// **Disabled when it has no handler to publish with** (`on_toggle`, or `on_toggle_maybe(None)`): it
+/// is no Tab stop, nothing flips it, and it draws dimmed.
 #[must_use = "a toggler does nothing until it is added to a view"]
 pub struct Toggler<'a, Message> {
     skin: Skin,
@@ -642,9 +643,9 @@ impl<'a, Message: Clone + 'a> From<Toggler<'a, Message>> for Element<'a, Message
 /// ← → follow the screen: under RTL ← is forward.
 ///
 /// Made by [`radio_group`] or `snora::design::radio_group`. A click on an option selects it, and
-/// publishes the message an arrow does. **Space or Enter on the group publishes nothing**: the
-/// option it is on is already the choice, and a message that changes nothing is noise to every
-/// handler that logs or saves.
+/// publishes the message an arrow does. **A click on the option already selected, and Space or
+/// Enter on the group, publish nothing**: it is already the choice, and a message that changes
+/// nothing is noise to every handler that logs or saves.
 ///
 /// ```
 /// # use snora_widgets::radio_group;
@@ -658,6 +659,9 @@ impl<'a, Message: Clone + 'a> From<Toggler<'a, Message>> for Element<'a, Message
 ///
 /// With nothing selected, Tab still lands on the group, and → or ↓ selects the first option and ←
 /// or ↑ the last.
+///
+/// **Disabled by [`disabled(true)`](Self::disabled)**, because its handler is a required argument
+/// (as iced's own shape has it): it is no Tab stop, takes no key, ignores a click and draws dimmed.
 #[must_use = "a radio group does nothing until it is added to a view"]
 pub struct RadioGroup<'a, T, Message> {
     skin: Skin,
@@ -777,7 +781,10 @@ where
                 .push(dot)
                 .push(skin.label(option.to_string()));
             let mut area = mouse_area(content);
-            if enabled {
+            // A click on the option already selected publishes nothing, as Space and Enter do: a
+            // message that changes nothing is noise to every handler that logs or saves (RFC-134
+            // ruling 3, and R-3: a click and a key are one action with one result).
+            if enabled && !is_selected {
                 area = area
                     .on_press((g.on_select)(option.clone()))
                     .interaction(iced::mouse::Interaction::Pointer);
@@ -854,6 +861,9 @@ where
 ///
 /// Values are `f32`. (iced's slider is generic over the number type; this one is not, and an
 /// integer value is `value as f32`.)
+///
+/// **Disabled by [`disabled(true)`](Self::disabled)**, because its handler is a required argument (as
+/// iced's own shape has it): it is no Tab stop, takes no key, ignores the pointer and draws dimmed.
 #[must_use = "a slider does nothing until it is added to a view"]
 pub struct Slider<'a, Message> {
     skin: Skin,
@@ -1050,7 +1060,8 @@ impl<'a, Message: Clone + 'a> From<Slider<'a, Message>> for Element<'a, Message>
 /// # }
 /// ```
 ///
-/// **Without `on_open_change` it is disabled.**
+/// **Disabled when it has no handler to publish with** (`on_open_change`), as `snora::control` is: it
+/// is no Tab stop, nothing opens it and it draws dimmed.
 #[must_use = "a select does nothing until it is added to a view"]
 pub struct Select<'a, T, Message> {
     skin: Skin,
@@ -1163,7 +1174,13 @@ where
             border: outline(for_outline.colors(theme, enabled), 4.0),
             ..container::Style::default()
         });
-        let mut trigger = skin.control(face).padding(0);
+        // The control's own padding is the sides' only, and the outline sits inside it: the outline's
+        // start edge is where every other control's mark starts, in a column of the five.
+        let mut trigger = skin.control(face).padding(Padding {
+            top: 0.0,
+            bottom: 0.0,
+            ..skin.padding
+        });
         if let Some(on_open_change) = &s.on_open_change {
             let publish = Rc::clone(on_open_change);
             trigger = trigger.on_press_with(move || publish(!open));

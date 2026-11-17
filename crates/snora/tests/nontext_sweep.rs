@@ -611,7 +611,26 @@ fn subjects() -> Vec<Subject> {
             name: "select trigger outline vs its surface",
             row: "134",
             scene: "select, closed",
-            pick: |e, _| sized(e, (60.0, 300.0), (20.0, 40.0)).and_then(|r| all(r, Some(0))),
+            pick: |e, _| {
+                // The control reports its own box; the outline is the widest container inside it (the control's
+                // padding is the sides'), then comes the face's own content. So: the widest that is narrower than
+                // the widest.
+                let of_size: Vec<Rectangle> = e
+                    .iter()
+                    .filter(|(k, r)| {
+                        *k == El::Container
+                            && (60.0..300.0).contains(&r.width)
+                            && (20.0..40.0).contains(&r.height)
+                    })
+                    .map(|x| x.1)
+                    .collect();
+                let widest = of_size.iter().map(|r| r.width).fold(0.0, f32::max);
+                of_size
+                    .into_iter()
+                    .filter(|r| r.width < widest - 1.0)
+                    .max_by(|a, b| a.width.total_cmp(&b.width))
+                    .and_then(|r| all(r, Some(0)))
+            },
         },
         Subject {
             name: "select dropdown card vs the page",

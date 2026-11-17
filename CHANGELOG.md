@@ -43,7 +43,7 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   |---|---|
   | `checkbox(is_checked, direction).label(..).on_toggle(Fn(bool) -> Message)` | Enter or Space toggles |
   | `toggler(is_toggled, direction)` (the same builder) | Enter or Space flips it |
-  | `radio_group(options, selected, on_select, direction)` | **one stop for the group**; ↑ ↓ ← → move **and select**, wrapping; ← → follow the screen. Space on the option already selected publishes nothing |
+  | `radio_group(options, selected, on_select, direction)` | **one stop for the group**; ↑ ↓ ← → move **and select**, wrapping; ← → follow the screen. A click on the option already selected, and Space or Enter, publish nothing |
   | `select(options, selected, on_select, direction).opened(open).on_open_change(..)` | Enter, Space or ↓ opens; inside, ↓ ↑ Home End, Enter chooses, Escape closes, and focus returns to the trigger |
   | `slider(range, value, on_change, direction).step(..)` | ← → ↑ ↓ one step, Page Up and Page Down ten, Home and End the ends; ← → follow the screen. The step is a hundredth of the range unless set |
 

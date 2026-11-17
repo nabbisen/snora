@@ -541,25 +541,43 @@ fn space_and_enter_on_a_radio_group_publish_nothing() {
 }
 
 #[test]
-fn a_click_on_a_radio_option_publishes_what_an_arrow_does() {
+fn a_click_on_a_radio_option_publishes_what_an_arrow_does_and_on_the_selected_one_nothing() {
     both(|p, dir| {
-        for (i, label) in SIZES.iter().enumerate() {
-            let mut w = World::new(p, dir);
-            let at = text_at(&mut w, label).center();
-            assert_eq!(
-                w.click(at),
-                vec![Msg::Size(i)],
-                "{p:?} {dir:?}: a click on {label}"
-            );
-            assert!(
-                w.focused().is_empty(),
-                "{p:?} {dir:?}: a click focused the group"
-            );
+        for selected in [0usize, 2] {
+            for (i, label) in SIZES.iter().enumerate() {
+                let mut w = World::with(p, dir, |m| m.size = Some(selected));
+                let at = text_at(&mut w, label).center();
+                // The option already selected is no action: a click on it publishes nothing, as Space
+                // and Enter do (RFC-134 ruling 3; R-3: one action, one result).
+                let want = if i == selected {
+                    vec![]
+                } else {
+                    vec![Msg::Size(i)]
+                };
+                assert_eq!(
+                    w.click(at),
+                    want,
+                    "{p:?} {dir:?}: a click on {label} with {} selected",
+                    SIZES[selected]
+                );
+                assert!(
+                    w.focused().is_empty(),
+                    "{p:?} {dir:?}: a click focused the group"
+                );
+            }
         }
         // The arrow that reaches option 1 from option 0 publishes the same message as a click on it.
-        let mut w = World::new(p, dir);
-        w.focus(RADIO);
-        assert_eq!(w.key(Named::ArrowDown), vec![Msg::Size(1)]);
+        let mut by_key = World::new(p, dir);
+        by_key.focus(RADIO);
+        let k = by_key.key(Named::ArrowDown);
+        let mut by_click = World::new(p, dir);
+        let at = text_at(&mut by_click, "Medium").center();
+        assert_eq!(
+            k,
+            by_click.click(at),
+            "{p:?} {dir:?}: the arrow and the click differ"
+        );
+        assert_eq!(k, vec![Msg::Size(1)]);
     });
 }
 
@@ -1098,6 +1116,86 @@ fn a_key_a_control_answers_is_captured_and_another_is_left_to_the_application() 
             );
         }
     });
+}
+
+// ---- a column of the five: the marks start at one edge --------------------------------------------------------------------------
+
+/// The page the alignment is read on: the five in a column that hugs the start edge, the slider at 0 (its
+/// thumb is then at the bar's start edge), and nothing else.
+fn column_of_five(p: Path, t: &'static Tokens, dir: LayoutDirection) -> Element<'static, Msg> {
+    let start = match dir {
+        Ltr => iced::Alignment::Start,
+        Rtl => iced::Alignment::End,
+    };
+    container(
+        column![
+            checkbox(p, t, true, dir)
+                .label("Remember me")
+                .on_toggle(Msg::Checked),
+            toggler(p, t, true, dir)
+                .label("Dark mode")
+                .on_toggle(Msg::On),
+            radio(p, t, Some(1), dir),
+            slider(p, t, 0.0, dir).width(Length::Fixed(300.0)),
+            select(p, t, 1, dir).on_open_change(Msg::Open),
+        ]
+        .spacing(12)
+        .align_x(start),
+    )
+    .padding(24)
+    .width(Length::Fill)
+    .height(Length::Fill)
+    .into()
+}
+
+/// RFC-134 review, C-2: **an outline 8 px off its neighbours looks like a mistake.** In a column of the
+/// five, the first mark of each control (the box, the switch, the first dot, the thumb at 0, the select's
+/// outline) starts at the same edge: the left under LTR, the right under RTL.
+#[test]
+fn in_a_column_of_the_five_every_marks_start_edge_is_the_same() {
+    for p in PATHS {
+        for dir in [Ltr, Rtl] {
+            let t = leak(Tokens::light());
+            let mut rig = Rig::new(column_of_five(p, t, dir));
+            let stops = rig.targets();
+            assert_eq!(stops.len(), 5, "{p:?} {dir:?}");
+            let cs = containers(&mut rig);
+            let edges: Vec<f32> = stops
+                .iter()
+                .map(|stop| {
+                    // The marks: containers strictly inside the control, wider than a hair. **And a container as
+                    // big as the control, beyond the control's own** (a control reports one): that is a mark that
+                    // fills it, such as the select's outline when the control has no padding of its own around it.
+                    let same = |c: &Rectangle| {
+                        (c.x - stop.bounds.x).abs() < 0.5
+                            && (c.width - stop.bounds.width).abs() < 0.5
+                            && (c.y - stop.bounds.y).abs() < 0.5
+                            && (c.height - stop.bounds.height).abs() < 0.5
+                    };
+                    let fills_it = cs.iter().filter(|c| same(c)).count() > 1;
+                    let inner = cs.iter().filter(|c| {
+                        inside(**c, stop.bounds)
+                            && c.width > 2.0
+                            && c.height > 2.0
+                            && (c.width < stop.bounds.width - 1.0 || (fills_it && same(c)))
+                    });
+                    match dir {
+                        Ltr => inner.map(|c| c.x).fold(f32::MAX, f32::min),
+                        Rtl => inner.map(|c| c.x + c.width).fold(f32::MIN, f32::max),
+                    }
+                })
+                .collect();
+            let (lo, hi) = edges
+                .iter()
+                .fold((f32::MAX, f32::MIN), |(l, h), e| (l.min(*e), h.max(*e)));
+            assert!(
+                hi - lo <= 1.0,
+                "{p:?} {dir:?}: the marks of a checkbox, toggle, radio group, slider and select start at \
+                 {edges:?}, {:.1} px apart",
+                hi - lo
+            );
+        }
+    }
 }
 
 // ---- each is a mirror image ---------------------------------------------------------------------------------------------------

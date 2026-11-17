@@ -241,10 +241,20 @@ fn subjects() -> Vec<Subject> {
                     .into()
             },
             pick: |e| {
-                e.iter()
-                    .find(|r| {
+                // The control reports its own box (twice: its own and the one it is laid out in); the outline is
+                // the widest container inside it, then the face's own content. So: the widest that is narrower
+                // than the widest.
+                let of_size: Vec<&Rectangle> = e
+                    .iter()
+                    .filter(|r| {
                         r.width > 60.0 && r.width < 300.0 && r.height > 20.0 && r.height < 40.0
                     })
+                    .collect();
+                let widest = of_size.iter().map(|r| r.width).fold(0.0, f32::max);
+                of_size
+                    .into_iter()
+                    .filter(|r| r.width < widest - 1.0)
+                    .max_by(|a, b| a.width.total_cmp(&b.width))
                     .map(|r| (*r, false))
             },
         },

@@ -228,7 +228,9 @@ fn unstyled() -> Vec<Subject> {
         subject("radio group (one stop)", &["size(Medium)"], || {
             snora::radio_group(
                 ["Small", "Medium", "Large"],
-                Some(&"Medium"),
+                // Small is selected: a click at the group's centre lands on Medium, which is a change. (A click on the
+                // option already selected publishes nothing: `form_controls.rs`.)
+                Some(&"Small"),
                 |s| Msg(format!("size({s})")),
                 LayoutDirection::Ltr,
             )
@@ -462,7 +464,7 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
                 snora::design::radio_group(
                     tokens,
                     ["Small", "Medium", "Large"],
-                    Some(&"Medium"),
+                    Some(&"Small"),
                     |s| Msg(format!("size({s})")),
                     LayoutDirection::Ltr,
                 )

@@ -40,6 +40,11 @@ jobs:
         # so that a `const` cannot quietly reintroduce what RFC-104
         # removed.
         run: scripts/check-literal-sizes.sh
+      - name: Rendered targets (0.65, RFC-134 Unit 1 review)
+        # The rendered tiny-skia tests are split in two jobs (`rendered-tiny-skia` and `rendered-sweeps-tiny-skia`). This
+        # fails unless every integration-test target of `snora` is in exactly one of them, every sweep the script names is
+        # a test file, and ci.yaml runs each side once: a target nobody runs is the failure it is here to prevent.
+        run: scripts/rendered-targets.sh check
       - name: Check workspace
         run: cargo check --workspace --all-features
       - name: Clippy
@@ -513,6 +518,11 @@ jobs:
     # that `renderer-parity` has two files to compare. **It is also the one place the
     # engine's tests run on tiny-skia with every feature** (0.64 Part C): "Test engine,
     # all features" in the quality gate runs only the doc-tests and compiles the rest.
+    #
+    # **Every test target but the three sweeps** (0.65, RFC-134 Unit 1 review): the library's unit tests and each
+    # integration-test target that the targets script does not name a sweep. The sweeps are the next job. Each target
+    # runs in exactly one of the two; the script is the one place the sweeps are named, and the quality gate's
+    # "Rendered targets" step checks that the two lists partition `crates/snora/tests/`. The wgpu job above runs all of it.
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
@@ -525,7 +535,7 @@ jobs:
           # relative path lands in `crates/snora/` and the upload finds
           # nothing.
           SNORA_PARITY_OUT: ${{ github.workspace }}/parity-tiny-skia.tsv
-        run: cargo test -p snora --all-features --tests -- --test-threads=1 --nocapture
+        run: cargo test -p snora --all-features --lib $(scripts/rendered-targets.sh rest) -- --test-threads=1 --nocapture
       - name: Say which renderer drew
         run: |
           # Field 3 is the renderer; field 2 is the row's kind.
@@ -535,6 +545,23 @@ jobs:
         with:
           name: parity-tiny-skia
           path: parity-tiny-skia.tsv
+
+  rendered-sweeps-tiny-skia:
+    name: Rendered sweeps on tiny-skia
+    runs-on: ubuntu-latest
+    # The three sweeps (`nontext_sweep`, `text_sweep`, `form_unstyled_drawn`: every scene, in every preset, on every
+    # surface, in every state), which were part of the job above and about seven minutes of it. A job of its own, beside
+    # the others, as the no-lucide combination is (0.64 Part C): the combination (tiny-skia, all features) is still run once
+    # per target, split between the two jobs by the targets script. They record no parity rows, so `renderer-parity`
+    # reads nothing from here.
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Sweeps on tiny-skia
+        env:
+          ICED_TEST_BACKEND: tiny-skia
+        run: cargo test -p snora --all-features $(scripts/rendered-targets.sh sweeps) -- --test-threads=1 --nocapture
 
   rendered-tiny-skia-no-lucide:
     name: Rendered tests on tiny-skia, design without lucide-icons
