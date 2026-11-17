@@ -241,7 +241,8 @@ crate short of the pixels**, and that is RFC-085's real subject.
 - **Housekeeping: the sweeps' own time.** Draw the presets on parallel threads, measured first. The
   bar: every cell identical on both renderers, and every plant of RFC-131, RFC-133, RFC-134 and
   RFC-135 still failing. (The CI jobs are now split so that each runs once; the longest is the
-  tiny-skia sweeps' job, about 12 to 14 minutes.)
+  tiny-skia sweeps' job, about 12 to 14 minutes.) Handoff:
+  [`0-66-sweeps-own-time`](rfcs/handoffs/0-66-sweeps-own-time/implementation-handoff.md).
 
 ## Future wanted
 
