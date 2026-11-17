@@ -77,11 +77,22 @@ jobs:
         run: cargo test -p snora-design
       - name: Test engine (render semantics)
         run: cargo test -p snora
-      - name: Test engine, all features (RFC-087)
+      - name: Test engine, all features, doc-tests and compile (RFC-087, 0.64 Part C)
         # The default-features run above never exercised anything gated
         # behind widgets/design/lucide-icons/svg-icons — 10 additional
         # unit tests and 2 additional doc-tests, counted 2026-09-01.
-        run: cargo test -p snora --all-features
+        #
+        # **Each combination of renderer and feature set is run once** (0.64 Part C). This
+        # one, tiny-skia with every feature, is run by the "Rendered tests on tiny-skia" job:
+        # `cargo test -p snora --all-features --tests` there is every unit and integration test
+        # (495 of the 512 `cargo test -p snora --all-features` lists, counted 2026-11-17; the
+        # other 17 are doc-tests). This step used to run all 512 again, 663 s of the gate's
+        # 26 minutes, of which the two drawn sweeps were 420 s. So it runs what that job does not,
+        # the doc-tests, and **compiles** every test target (`--no-run`), so that a break
+        # in any of them shows here as well as there.
+        run: |
+          cargo test -p snora --all-features --doc
+          cargo test -p snora --all-features --tests --no-run
       - name: Test engine, design without lucide-icons (RFC-100)
         # The feature matrix below only runs `cargo check`, which does not
         # build integration tests, and the two steps above cover default
@@ -512,9 +523,9 @@ jobs:
     name: Rendered tests on tiny-skia
     runs-on: ubuntu-latest
     # The same tests on the renderer the harness pins by default, so
-    # that `renderer-parity` has two files to compare. Everything else
-    # in CI already runs on tiny-skia; this job exists for its parity
-    # output.
+    # that `renderer-parity` has two files to compare. **It is also the one place the
+    # engine's tests run on tiny-skia with every feature** (0.64 Part C): "Test engine,
+    # all features" in the quality gate runs only the doc-tests and compiles the rest.
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
