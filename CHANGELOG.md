@@ -26,6 +26,24 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.65.0] — 2026-11-18
+
+**Upgrading from 0.64:** read the [0.64 → 0.65 migration guide](docs/src/guides/migration-0.64-to-0.65.md).
+
+> **In short:** **a checkbox, a toggle, a radio group, a select and a slider that the keyboard can
+> reach** (RFC-134), on both paths: `snora::{checkbox, toggler, radio_group, select, slider}` and
+> `snora::design::…`. iced 0.14's own form controls cannot be reached by the keyboard. Each is one
+> snora control, with iced's shape and `direction` last.
+>
+> **Code:** additions only; nothing breaks.
+>
+> **Appearance:** unchanged for everything that existed in 0.64.
+>
+> **Security:** none. No dependency changed since 0.64.0, and the advisory gate is clean, with the
+> same accepted advisories.
+
 ### Added
 
 - **Five form controls the keyboard can reach (RFC-134): a checkbox, a toggle, a radio group, a
@@ -510,7 +528,8 @@ deprecated it.
 - **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
   page beneath it.** It no longer does.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.64.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.65.0...HEAD
+[0.65.0]: https://github.com/nabbisen/snora/compare/0.64.0...0.65.0
 [0.64.0]: https://github.com/nabbisen/snora/compare/0.63.0...0.64.0
 [0.63.0]: https://github.com/nabbisen/snora/compare/0.62.0...0.63.0
 [0.62.0]: https://github.com/nabbisen/snora/compare/0.61.0...0.62.0

@@ -182,6 +182,7 @@ Numbers remain stable forever and are never reused.
 | 132 | [Under RTL, snora reorders widgets instead of mirroring them: the header is not a mirror, and a flip loses focus](./done/132-under-rtl-snora-reorders-widgets-instead-of-mirroring-them.md) | **v0.63.0** — found by the 0.63 audit: `app_header` under RTL puts its end-controls beside the title, not at the end edge; a live direction flip loses focus, because mirroring reorders children and iced keys state by position; Tab order under RTL unmeasured. Proposed: mirroring becomes a layout, with children in logical order; the header mirrored whole; Tab follows reading order in both directions — **accepted 2026-11-15** |
 | 135 | [Four things snora draws fall under 3:1 against what they sit on, and no test measures a glyph](./done/135-four-non-text-boundaries-fall-under-three-to-one.md) | **v0.63.0** — from the drawn-contrast Unit 0: the progress track (1.00:1, invisible on the high-contrast presets), a `Debug` toast's fill, the menu's scrollbar and `card::raised`'s border against its shadow fall under 3:1; every glyph passes, and none is tested. Proposed: one non-text rule at 3:1 on drawn pixels (glyphs at 2x), the four fixed, a sweep with four tripwires — **accepted 2026-11-15** |
 | 133 | [Five snora widgets take no direction, so they cannot mirror under RTL](./done/133-five-snora-widgets-take-no-direction.md) | **v0.64.0** — found by RFC-132's Unit 0: the notice, the removable chip, the progress bar (its fill runs left to right in both directions), the footer and `render_menu` take no `LayoutDirection`. Proposed: a required `direction` parameter on each, as the header, sidebar, tab bar and breadcrumb have; each laid out by RFC-132's row; a test that every public widget with a row takes a direction — **accepted 2026-11-15** |
+| 134 | [No checkbox, toggle, radio, pick list or slider can be reached by the keyboard](./done/134-no-form-control-can-be-reached-by-the-keyboard.md) | **v0.65.0** — logolig's report, measured true: iced 0.14's checkbox, toggler, radio, pick_list, combo_box and slider are no Tab stop, and snora has none. Direction ruled by the owner (2026-11-15: "Yes. Preferred if available and reasonable"). Proposed: keyboard-reachable versions on snora's `Control`, both paths, keys by platform convention; the non-goal narrows — **accepted 2026-11-15** |
 
 ## Accepted
 
@@ -191,7 +192,6 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
-| 134 | [No checkbox, toggle, radio, pick list or slider can be reached by the keyboard](./accepted/134-no-form-control-can-be-reached-by-the-keyboard.md) | **0.65.0** — logolig's report, measured true: iced 0.14's checkbox, toggler, radio, pick_list, combo_box and slider are no Tab stop, and snora has none. Direction ruled by the owner (2026-11-15: "Yes. Preferred if available and reasonable"). Proposed: keyboard-reachable versions on snora's `Control`, both paths, keys by platform convention; the non-goal narrows — **accepted 2026-11-15** |
 
 ## Proposed
 

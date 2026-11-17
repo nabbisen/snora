@@ -70,7 +70,7 @@ for fuller fit guidance.
 ```toml
 [dependencies]
 iced  = { version = "0.14", features = ["tokio"] }
-snora = "0.64"
+snora = "0.65"
 ```
 
 ```rust

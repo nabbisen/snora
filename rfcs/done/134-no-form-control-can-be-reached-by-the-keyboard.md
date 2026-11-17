@@ -1,6 +1,6 @@
 # RFC-134 — No checkbox, toggle, radio, pick list or slider can be reached by the keyboard
 
-**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings). The
+**Status.** Done — shipped v0.65.0. Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings). The
 direction was ruled first: "Should snora provide focusable form controls? — Yes. Preferred if
 available and reasonable."
 **Handoff.** [`handoffs/134-…`](../handoffs/134-no-form-control-can-be-reached-by-the-keyboard/implementation-handoff.md).
