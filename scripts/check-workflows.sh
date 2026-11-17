@@ -43,9 +43,15 @@ set -euo pipefail
 # has now hit four times (RFC-087 D-1, RFC-086's alpha-blind assertion,
 # RFC-088's silent set -e exit, RFC-090's own short-SHA gap).
 #
+# **shellcheck is required** (0.65, the RFC-134 Unit 1 review). actionlint lints every `run:` script with `shellcheck` when
+# it finds one on PATH, and **skips that check without a word when it does not**. Locally that is a false pass: `b1d9e58`
+# went red on `main` (SC2046, an unquoted `$(...)` in a `run:`) with every local gate green, because this machine had no
+# shellcheck and nothing said so. So this script refuses when there is none, naming the tool and how to install it. The CI
+# runner (ubuntu-latest) has it.
+#
 # Exit codes:
-#   0  actionlint ran and found nothing to report
-#   1  actionlint is unavailable and could not be obtained, OR
+#   0  actionlint ran, with shellcheck, and found nothing to report
+#   1  shellcheck or actionlint is unavailable and could not be obtained, OR
 #      actionlint ran and found problems
 
 ACTIONLINT_VERSION="1.7.12"
@@ -68,6 +74,20 @@ darwin_arm64  aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f
 "
 
 cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v shellcheck >/dev/null 2>&1; then
+  cat >&2 <<'MSG'
+REFUSED: shellcheck is not on PATH, so this tree is unvalidated, not clean.
+actionlint lints each `run:` script of a workflow with shellcheck when it finds one, and skips that check silently when it
+does not: a finding such as SC2046 would then show only in CI, as it did for b1d9e58. Install it, and run this again:
+  Debian, Ubuntu   sudo apt install shellcheck
+  Arch             sudo pacman -S shellcheck
+  Fedora           sudo dnf install ShellCheck
+  macOS            brew install shellcheck
+  anywhere         https://github.com/koalaman/shellcheck#installing
+MSG
+  exit 1
+fi
 
 resolve_actionlint() {
   if command -v actionlint >/dev/null 2>&1; then
