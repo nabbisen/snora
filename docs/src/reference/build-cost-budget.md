@@ -372,7 +372,7 @@ builds each, interleaved, each in a fresh target directory.
   claimed as the cause, only that a controlled build does not show it.
 - **No action.**
 
-**The next row, 0.64.0: 0.050729, −9.0%,** inside the threshold, with the same compiler.
+**The next row, 0.64.0: 0.050729, −9.0%,** inside the threshold, with the same compiler. **0.65.0: 0.051448, +1.4%.**
 
 ### Watch points
 
