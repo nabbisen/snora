@@ -535,7 +535,9 @@ jobs:
           # relative path lands in `crates/snora/` and the upload finds
           # nothing.
           SNORA_PARITY_OUT: ${{ github.workspace }}/parity-tiny-skia.tsv
-        run: cargo test -p snora --all-features --lib $(scripts/rendered-targets.sh rest) -- --test-threads=1 --nocapture
+        run: |
+          read -r -a targets <<< "$(scripts/rendered-targets.sh rest)"
+          cargo test -p snora --all-features --lib "${targets[@]}" -- --test-threads=1 --nocapture
       - name: Say which renderer drew
         run: |
           # Field 3 is the renderer; field 2 is the row's kind.
@@ -561,7 +563,9 @@ jobs:
       - name: Sweeps on tiny-skia
         env:
           ICED_TEST_BACKEND: tiny-skia
-        run: cargo test -p snora --all-features $(scripts/rendered-targets.sh sweeps) -- --test-threads=1 --nocapture
+        run: |
+          read -r -a targets <<< "$(scripts/rendered-targets.sh sweeps)"
+          cargo test -p snora --all-features "${targets[@]}" -- --test-threads=1 --nocapture
 
   rendered-tiny-skia-no-lucide:
     name: Rendered tests on tiny-skia, design without lucide-icons
