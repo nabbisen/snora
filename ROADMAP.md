@@ -236,26 +236,11 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.64.0, a breaking release
+## Next — 0.65.0
 
-- **The deprecated F6 types are removed:** `next_zone`, `FocusZone`, `ZonePresence` (deprecated in 0.61,
-  RFC-126).
-- **RFC-133:** the notice, the removable chip, the progress bar, the footer and `render_menu` take a
-  required `direction`. snora's own text aligns to the start edge under RTL. `Shortcuts::routes`
-  loses its ignored direction.
-- **Housekeeping:** the drawn-contrast sweeps add 209 s on tiny-skia and 635 s on wgpu to CI. Cut that
-  by drawing each frame once and reading boundaries at 2x, kept only if no verdict changes on either
-  renderer.
-- **Housekeeping: the build-cost ratio.** It read 0.05578 at 0.63.0, +16% on 0.62.0's 0.04793,
-  with the same compiler. That is above the 10% noise floor, but the last four rows span
-  0.0479–0.0562 (0.60.0 read 0.0562). Measure the workbench build locally, before and after 0.63's
-  changes, to say whether 0.63 caused it, and whether the floor is right for so short a build.
-- **RFC-134's Unit 0:** keyboard-reachable form controls, measured control by control. The controls
-  themselves land in 0.65.0, as additions.
-
-One breaking release, so adopters migrate once. Handoffs:
-[`133-…`](rfcs/handoffs/133-five-snora-widgets-take-no-direction/implementation-handoff.md) and
-[`0-64-removals-and-housekeeping`](rfcs/handoffs/0-64-removals-and-housekeeping/implementation-handoff.md).
+- **RFC-134:** keyboard-reachable form controls (checkbox, toggle, radio group, select, slider) on
+  snora's `Control`, both paths, as additions. Unit 0 found all five reasonable. Handoff:
+  [`134-…`](rfcs/handoffs/134-no-form-control-can-be-reached-by-the-keyboard/implementation-handoff.md).
 
 ## Future wanted
 
@@ -276,6 +261,13 @@ One breaking release, so adopters migrate once. Handoffs:
   `design::control` with the same style takes one.
 
 ## Recently shipped
+
+- **0.64.0** — a breaking release, so adopters migrate once.
+  - **The F6 types deprecated in 0.61 are removed** (`next_zone`, `FocusZone`, `ZonePresence`).
+  - **Every snora widget with a reading order takes the direction** (RFC-133): the removable chip, the
+    notice, the progress bar, the footer and menus mirror under RTL, and snora's own text aligns to the
+    start edge. Every LTR frame is unchanged.
+  - **CI runs each renderer and feature set once:** 26 min 19 s to 14 min 39 s of wall clock.
 
 - **0.63.0** — an audit of every visual guarantee in the book: contrast, surfaces, typography,
   direction and stability.

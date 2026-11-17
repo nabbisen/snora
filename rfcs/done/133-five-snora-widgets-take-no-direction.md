@@ -1,6 +1,6 @@
 # RFC-133 — Five snora widgets take no direction, so they cannot mirror under RTL
 
-**Status.** Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.64.0. Accepted 2026-11-15 (owner), every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/133-…`](../handoffs/133-five-snora-widgets-take-no-direction/implementation-handoff.md).
 **Raised.** 2026-11-15, architect, from RFC-132's Unit 0, which measured them.
 **Release target.** 0.64.0 (Q-3).

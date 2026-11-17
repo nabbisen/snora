@@ -26,20 +26,27 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-### Removed
+Nothing yet.
 
-- **`snora::focus::next_zone`, `FocusZone` and `ZonePresence`**, deprecated since 0.61.0 (RFC-126).
-  They only returned a zone, from a zone your application held, and could not move focus. Replace the
-  call with `focus_zone`, and delete the field and the presence helper you kept for it:
+## [0.64.0] — 2026-11-17
 
-  ```rust,ignore
-  if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
-      return snora::keyboard::focus_zone(cycle);
-  }
-  ```
+**Upgrading from 0.63:** read the [0.63 → 0.64 migration guide](docs/src/guides/migration-0.63-to-0.64.md).
 
-  `Cycle`, `cycle_zones` and `focus_zone` are unchanged. See the
-  [0.60 → 0.61 migration guide](docs/src/guides/migration-0.60-to-0.61.md#1-f6-moves-focus-rfc-126).
+> **In short:** a breaking release, on purpose, so adopters migrate once. The F6 types deprecated in
+> 0.61 are removed. **Every snora widget with a reading order now takes the direction**, so under
+> right-to-left the removable chip, the notice, the progress bar (its fill too), the footer and a
+> menu (the context menu included) mirror, and snora's own text aligns to the start edge. Every
+> left-to-right frame is unchanged.
+>
+> **Code:** **breaking.** `next_zone`, `FocusZone` and `ZonePresence` are removed; use `focus_zone`.
+> Eight functions and `Notice::new` take a required `direction` as their last argument; pass
+> `LayoutDirection::Ltr` where you have none. `Shortcuts::routes()` takes no argument.
+>
+> **Appearance:** unchanged under left-to-right. Under right-to-left the widgets above mirror:
+> retake those screenshot baselines.
+>
+> **Security:** none. No dependency changed since 0.63.0, and the advisory gate is clean, with the
+> same accepted advisories.
 
 ### Changed
 
@@ -67,6 +74,21 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   direction and always fills from the left. Under left-to-right it is pixel-identical to iced's (every
   preset, tone and value, `five_widgets_mirrored.rs`); the fill is a ratio in ten-thousandths of the
   track, under 0.1 px off at any width up to 10,000 px.
+
+### Removed
+
+- **`snora::focus::next_zone`, `FocusZone` and `ZonePresence`**, deprecated since 0.61.0 (RFC-126).
+  They only returned a zone, from a zone your application held, and could not move focus. Replace the
+  call with `focus_zone`, and delete the field and the presence helper you kept for it:
+
+  ```rust,ignore
+  if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
+      return snora::keyboard::focus_zone(cycle);
+  }
+  ```
+
+  `Cycle`, `cycle_zones` and `focus_zone` are unchanged. See the
+  [0.60 → 0.61 migration guide](docs/src/guides/migration-0.60-to-0.61.md#1-f6-moves-focus-rfc-126).
 
 ### Fixed
 
@@ -447,7 +469,8 @@ deprecated it.
 - **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
   page beneath it.** It no longer does.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.63.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.64.0...HEAD
+[0.64.0]: https://github.com/nabbisen/snora/compare/0.63.0...0.64.0
 [0.63.0]: https://github.com/nabbisen/snora/compare/0.62.0...0.63.0
 [0.62.0]: https://github.com/nabbisen/snora/compare/0.61.0...0.62.0
 [0.61.0]: https://github.com/nabbisen/snora/compare/0.60.0...0.61.0
