@@ -10,6 +10,8 @@ This page is the index — pick the guide that matches your jump.
 
 ## Per-version guides
 
+- [0.64 → 0.65](migration-0.64-to-0.65.md) — **additions only**: a checkbox, a toggle, a radio
+  group, a select and a slider the keyboard can reach (iced 0.14's cannot).
 - [0.63 → 0.64](migration-0.63-to-0.64.md) — **breaking, on purpose**: the F6 types removed
   (`next_zone`, `FocusZone`, `ZonePresence`); eight widget functions take a required
   `direction`, and they, the context menu and snora's own text mirror under RTL;

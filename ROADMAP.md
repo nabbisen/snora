@@ -236,11 +236,12 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.65.0
+## Next — 0.66.0
 
-- **RFC-134:** keyboard-reachable form controls (checkbox, toggle, radio group, select, slider) on
-  snora's `Control`, both paths, as additions. Unit 0 found all five reasonable. Handoff:
-  [`134-…`](rfcs/handoffs/134-no-form-control-can-be-reached-by-the-keyboard/implementation-handoff.md).
+- **Housekeeping: the sweeps' own time.** Draw the presets on parallel threads, measured first. The
+  bar: every cell identical on both renderers, and every plant of RFC-131, RFC-133, RFC-134 and
+  RFC-135 still failing. (The CI jobs are now split so that each runs once; the longest is the
+  tiny-skia sweeps' job, about 12 to 14 minutes.)
 
 ## Future wanted
 
@@ -261,6 +262,11 @@ crate short of the pixels**, and that is RFC-085's real subject.
   `design::control` with the same style takes one.
 
 ## Recently shipped
+
+- **0.65.0** — additions only. **A checkbox, a toggle, a radio group, a select and a slider the
+  keyboard can reach** (RFC-134), on both paths, with iced's shapes and `direction` last. iced 0.14's
+  own form controls cannot be reached by the keyboard. CI runs each renderer and feature set once,
+  with the drawn sweeps in jobs of their own.
 
 - **0.64.0** — a breaking release, so adopters migrate once.
   - **The F6 types deprecated in 0.61 are removed** (`next_zone`, `FocusZone`, `ZonePresence`).

@@ -62,6 +62,7 @@
   - [0.61 → 0.62](guides/migration-0.61-to-0.62.md)
   - [0.62 → 0.63](guides/migration-0.62-to-0.63.md)
   - [0.63 → 0.64](guides/migration-0.63-to-0.64.md)
+  - [0.64 → 0.65](guides/migration-0.64-to-0.65.md)
   - [0.59 → 0.60](guides/migration-0.59-to-0.60.md)
   - [0.58 → 0.59](guides/migration-0.58-to-0.59.md)
   - [0.57 → 0.58](guides/migration-0.57-to-0.58.md)

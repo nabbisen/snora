@@ -48,10 +48,9 @@ contributor-facing documents linked below, not duplicated here.
   the sidebar's items are focus targets. Enter and Space press the focused
   one and publish the same message a click does, and a focus ring of at
   least 3:1 shows where focus is. A control with no handler is disabled and
-  skipped. **snora draws no form controls, and iced 0.14's checkbox, toggler,
-  radio, pick list, combo box and slider cannot be reached by the keyboard;**
-  see [Keyboard § Form controls](keyboard.md#form-controls) (RFC-134 plans
-  snora's own). **iced binds no Tab key, so your application routes it, in one
+  skipped. **From 0.65, snora's checkbox, toggle, radio group, select and slider are
+  among them** (RFC-134). iced 0.14's own form controls cannot be reached by
+  the keyboard: use snora's ([Keyboard § Form controls](keyboard.md#form-controls)). **iced binds no Tab key, so your application routes it, in one
   line of `update`:**
 
   ```rust,ignore

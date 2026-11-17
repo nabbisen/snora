@@ -135,8 +135,37 @@ Details: [Accessibility](accessibility.md), and the
 
 ## Form controls
 
-**snora has no checkbox, toggle, radio, pick list or slider, and iced 0.14's own cannot be reached
-by the keyboard** (measured, 2026-11-15):
+**From 0.65, snora has a checkbox, a toggle, a radio group, a select and a slider the keyboard
+can reach** (RFC-134), on both paths: `snora::{checkbox, toggler, radio_group, select, slider}`
+(styled from your iced theme) and `snora::design::{…}` (from `Tokens`, which come first). Each is
+one snora control, so Tab, the ring, Enter and Space, the 24 px target and "a disabled control is
+no stop" are the ones every snora control has.
+
+| Control | Constructor | Keys |
+|---|---|---|
+| Checkbox | `checkbox(is_checked, direction).label(..).on_toggle(Fn(bool) -> M)` | Enter or Space toggles |
+| Toggle | `toggler(is_toggled, direction)`, the same builder | the same; the thumb at the start edge when off |
+| Radio group | `radio_group(options, selected, on_select, direction)` | **one Tab stop**; ↑ ↓ ← → move **and select**, wrapping; ← → follow the screen. Space, Enter or a click on the option already selected publishes nothing |
+| Select | `select(options, selected, on_select, direction).opened(b).on_open_change(Fn(bool) -> M)` | Enter, Space or ↓ opens; inside, ↓ ↑ Home End move, Enter chooses, Escape closes and gives focus back |
+| Slider | `slider(range, value, on_change, direction).step(..)` | ← → ↑ ↓ one step, Page Up / Page Down ten, Home End the ends; ← → follow the screen |
+
+- **The shapes are iced's own, with `direction` last** (as every snora widget with a reading
+  order has since 0.64). Moving from iced's control is a name and a direction.
+- **Disabled when:**
+  - a checkbox, a toggle or a select has no handler to publish with (`on_toggle`,
+    `on_open_change`), as `snora::control` is;
+  - a radio group or a slider is disabled with `.disabled(true)`, because its handler is a
+    required argument, as in iced.
+- **The select's open state is yours,** as a header menu's is. Choosing publishes `on_select`
+  only: close it there. **Its arrows, its cover and its click-outside-to-close work inside
+  `snora::render`**, through the one `on_close_menus` your application sets for every open menu.
+  Outside the engine, a select keeps Tab, Enter, Space and Escape.
+- **Slider values are `f32`.** The step is a hundredth of the range unless you set one.
+- **Their outline is darker than a chip's,** because a form control is drawn on a tinted row and
+  the outline has to clear 3:1 against that tint, not only against the page.
+
+**iced 0.14's own form controls still cannot be reached by the keyboard** (measured, and a test
+reads iced's source, so an iced release that adds focus to one of them is noticed):
 
 | iced 0.14 control | A Tab stop? | Keys it answers |
 |---|---|---|
@@ -146,24 +175,8 @@ by the keyboard** (measured, 2026-11-15):
 | `combo_box` | no (its text input is not exposed to focus) | none by Tab |
 | `slider` | no | ↑ ↓, **only while the pointer is over it** |
 
-**A checkbox, toggle or radio: build it on `snora::control`.** The state you draw goes inside the
-control's content. The control is one Tab stop, and Enter, Space and a click each publish the
-same message once:
-
-```rust,ignore
-snora::control(row![text(if self.remember { "☑" } else { "☐" }), text("Remember me")].spacing(8))
-    .on_press(Message::ToggleRemember)
-```
-
-For a radio group, make one control per option, each publishing its own choice.
-
-**Do not wrap an iced `checkbox` in a control.** A click then publishes the checkbox's message,
-and Enter or Space the control's: two messages for one action, and an application that handles
-one and not the other is broken for half its readers.
-
-**A pick list or a slider has no keyboard route today.** For a short pick list, use a radio
-group as above. For a slider, add a "−" and a "+" control beside it, or answer the keys yourself.
-snora plans keyboard-reachable versions of these controls (RFC-134).
+**Do not wrap an iced `checkbox` in a snora control.** A click then publishes the checkbox's
+message, and Enter or Space the control's: two messages for one action.
 
 ## Keys snora's own controls use
 

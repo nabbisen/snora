@@ -48,8 +48,8 @@ reconsideration trigger, in
 **Most of iced 0.14's form controls are not Tab stops.** Measured: `checkbox`, `toggler`,
 `radio`, `pick_list`, `slider` and `combo_box` register no focus target, so Tab never reaches
 them. Only `text_input` does. `button` takes no keyboard input either, which is why snora's
-controls are its own `control`. See
-[Keyboard § Form controls](../guides/keyboard.md#form-controls) for what to use instead.
+controls are its own `control`, and why snora has its own checkbox, toggle, radio group, select and
+slider from 0.65 (RFC-134). See [Keyboard § Form controls](../guides/keyboard.md#form-controls).
 *(Corrected 2026-11-15, from logolig's report: this page recommended iced's checkbox, pick_list and slider as
 "native" controls without saying the keyboard cannot reach them.)*
 

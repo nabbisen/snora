@@ -503,6 +503,12 @@ restate the guide's content.
     # passing on a clean tree for several releases while still sitting in
     # this checklist. Do not tick a gate you have not seen pass.
 [ ] cargo check --workspace --all-features
+[ ] scripts/check-workflows.sh
+    # Needs actionlint (it fetches the pinned version) AND shellcheck on PATH.
+    # Since 0.65 it refuses to run without shellcheck: before, it linted
+    # without it and exited 0, and b1d9e58 went red on main (SC2046) with every
+    # local gate green. Read EVERY workflow's result after a push, not only
+    # ci.yaml's: Workflow lint is a separate workflow.
 [ ] cargo clippy --workspace --all-targets --all-features -- -D warnings
 [ ] cargo test -p snora-core
 [ ] cargo test -p snora-design
