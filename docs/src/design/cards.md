@@ -15,14 +15,7 @@ any `Element` as content.
 ## Basic usage
 
 ```rust,ignore
-use snora::design::{Tokens, card};
-use iced::widget::text;
-
-let t = &self.tokens;
-
-card::surface(t, text("Standard card content"))
-card::raised(t, text("Floating panel content"))
-card::selected(t, text("Currently active item"))
+{{#include ../../../examples/book_snippets/src/design_pages.rs:cards_variants}}
 ```
 
 ## Arbitrary content
@@ -30,13 +23,7 @@ card::selected(t, text("Currently active item"))
 Cards accept any `Element`, so you can nest layout, text, and controls:
 
 ```rust,ignore
-use iced::widget::{column, text};
-
-card::surface(t, column![
-    text("Title").size(style::text::title_size(t)),
-    text("Body text goes here."),
-    button::secondary(t, "Action", Message::DoSomething),
-])
+{{#include ../../../examples/book_snippets/src/design_pages.rs:cards_composition}}
 ```
 
 ## Managing selection state
@@ -45,12 +32,7 @@ Cards do not own selection state. Call the right variant based on your
 application state:
 
 ```rust,ignore
-let card_fn = if self.selected_id == Some(item.id) {
-    card::selected
-} else {
-    card::surface
-};
-card_fn(t, item_content)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:cards_selected}}
 ```
 
 ## Card padding
@@ -60,13 +42,7 @@ different padding (e.g. zero-padding for a full-bleed image), use the raw
 style bridge with your own `iced::widget::container`:
 
 ```rust,ignore
-use snora::design::style;
-use iced::widget::container;
-
-let tok = t.clone();
-container(my_content)
-    .padding(0)  // override padding
-    .style(move |_| style::container::card_surface(&tok))
+{{#include ../../../examples/book_snippets/src/design_pages.rs:cards_override}}
 ```
 
 ## Accessibility notes

@@ -50,6 +50,7 @@ empirical re-check.
 
 Early drafts (≤ 0.3) defined a trait that page-like objects implemented:
 
+<!-- not compiled: a rejected design, not code in snora: the `PageContract` trait was not adopted (the page says why) -->
 ```rust,ignore
 trait PageContract {
     type Node;

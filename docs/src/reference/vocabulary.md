@@ -6,8 +6,7 @@ a quick scan when you forget a variant name.
 ## Direction and edges
 
 ```rust,ignore
-pub enum LayoutDirection { Ltr, Rtl }
-pub enum Edge            { Start, End }
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_direction}}
 ```
 
 `LayoutDirection` is the framework-wide reading direction. `Edge`
@@ -17,27 +16,7 @@ left/right via `Edge::is_left_under(direction)`.
 ## Toasts
 
 ```rust,ignore
-pub enum ToastIntent {
-    Debug,
-    Info,
-    Success,
-    Warning,
-    Error,
-}
-
-pub enum ToastLifetime {
-    Transient(std::time::Duration),
-    Persistent,
-}
-
-pub enum ToastPosition {
-    TopEnd,        // default
-    TopStart,
-    TopCenter,
-    BottomEnd,
-    BottomStart,
-    BottomCenter,
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_toast}}
 ```
 
 `ToastIntent` maps to theme colors (intent → palette pair). Helpers:
@@ -72,20 +51,7 @@ token and cannot be overridden through the theme API.
 ## Sheets
 
 ```rust,ignore
-pub enum SheetEdge {
-    Bottom,             // default
-    Top,
-    Start,              // logical (LTR=left, RTL=right)
-    End,                // logical (LTR=right, RTL=left)
-}
-
-pub enum SheetSize {
-    OneThird,           // default
-    Half,
-    TwoThirds,
-    Ratio(f32),         // clamped 0.0..=1.0
-    Pixels(f32),
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_sheet}}
 ```
 
 `SheetSize` is interpreted along the axis perpendicular to the edge —
@@ -99,20 +65,13 @@ Helpers:
 ## Icons
 
 ```rust,ignore
-pub enum Icon {
-    Text(String),
-    #[cfg(feature = "lucide-icons")] Lucide(lucide_icons::Icon),
-    #[cfg(feature = "svg-icons")]    Svg(std::path::PathBuf),
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_icon}}
 ```
 
 ## Menu actions
 
 ```rust,ignore
-pub enum MenuAction<MenuId, MenuItemId> {
-    MenuPressed(MenuId),
-    MenuItemPressed { menu_id: MenuId, menu_item_id: MenuItemId },
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_menu_action}}
 ```
 
 `MenuId` and `MenuItemId` are application-defined. snora is generic
@@ -121,20 +80,7 @@ over both.
 ## Tabs
 
 ```rust,ignore
-pub struct Tab<TabId: Clone + PartialEq> {
-    pub id: TabId,
-    pub label: String,
-    pub icon: Option<Icon>,
-}
-
-pub struct TabBar<TabId: Clone + PartialEq> {
-    pub tabs: Vec<Tab<TabId>>,
-    pub active: TabId,
-}
-
-pub enum TabAction<TabId> {
-    Pressed(TabId),
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_tab}}
 ```
 
 `TabId` is application-defined (typically a small enum). The
@@ -143,15 +89,7 @@ widget renders the entry whose `id == active` with an underline.
 ## Breadcrumbs
 
 ```rust,ignore
-pub struct Crumb<CrumbId: Clone> {
-    pub id: CrumbId,
-    pub label: String,
-    pub is_leaf: bool,
-}
-
-pub enum BreadcrumbAction<CrumbId> {
-    Pressed(CrumbId),
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_crumb}}
 ```
 
 Helpers:
@@ -162,7 +100,7 @@ Helpers:
 ## Zone navigation
 
 ```rust,ignore
-pub enum Cycle { Forward, Backward }
+{{#include ../../../examples/book_snippets/src/listings.rs:vocab_cycle}}
 ```
 
 **`Cycle`** is the direction F6 moves in: `Forward` / `Backward`, in the logical order Header →

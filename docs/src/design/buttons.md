@@ -17,19 +17,7 @@ Design token styling applied, so each is reachable from the keyboard.
 ## Basic usage
 
 ```rust,ignore
-use snora::design::{Tokens, button};
-
-// In your app state, store tokens:
-struct App { tokens: Tokens }
-
-// In view():
-let t = &self.tokens;
-
-button::primary(t, "Save", Message::Save)
-button::secondary(t, "Cancel", Message::Cancel)
-button::ghost(t, "Skip", Message::Skip)
-button::link(t, "Choose another folder", Message::ChooseFolder)
-button::danger(t, "Delete", Message::Delete)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:buttons_variants}}
 ```
 
 ## Link or action
@@ -79,8 +67,7 @@ Each variant except `link` has a `*_maybe` counterpart that accepts
 is not a focus target: Tab skips it.
 
 ```rust,ignore
-button::primary_maybe(t, "Save", self.can_save.then_some(Message::Save))
-button::danger_maybe(t, "Delete", self.can_delete.then_some(Message::Delete))
+{{#include ../../../examples/book_snippets/src/design_pages.rs:buttons_maybe}}
 ```
 
 ## Using the raw style bridge
@@ -89,15 +76,7 @@ If you need finer control — custom padding, width, child element — use the
 style bridge directly:
 
 ```rust,ignore
-use snora::design::style;
-use iced::widget::button;
-
-let t = &self.tokens;
-let tok = t.clone();           // clone into the closure
-
-button(my_custom_content)
-    .on_press(Message::Save)
-    .style(move |_theme, status| style::button::primary(&tok, status))
+{{#include ../../../examples/book_snippets/src/design_pages.rs:buttons_iced_button}}
 ```
 
 **That is iced's `button`, which is pointer and touch only** in iced 0.14. For
@@ -106,9 +85,7 @@ same builder, so only the name changes, and it is keyboard-reachable, with a rin
 `Tokens::focus` and the floor from `Tokens::targets.min`:
 
 ```rust,ignore
-snora::design::control(&self.tokens, my_custom_content)
-    .on_press(Message::Save)
-    .style(move |_theme, status| style::button::primary(&tok, status))
+{{#include ../../../examples/book_snippets/src/design_pages.rs:buttons_control}}
 ```
 
 Without `.style(…)` it looks like `ghost`, so content of your own does not look like a

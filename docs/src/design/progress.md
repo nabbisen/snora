@@ -7,16 +7,7 @@ semantics.
 ## API
 
 ```rust,ignore
-use snora::design::{Tone, progress};
-
-// Compact inline (no outer card)
-progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent, direction)
-
-// Wrapped in a card::surface for visual prominence
-progress::card(&tokens, "Uploading", Some(1.0), Tone::Success, direction)
-
-// Indeterminate — pass None
-progress::row(&tokens, "Connecting…", None, Tone::Info, direction)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:progress_variants}}
 ```
 
 ## Value

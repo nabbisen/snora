@@ -56,48 +56,13 @@ primary recovery action, using `notice::Notice` with `Tone::Danger` or
 ## 7. Code example
 
 ```rust,ignore
-use snora::design::{Tokens, Tone, notice::Notice};
-use iced::Element;
-
-fn error_recovery_notice<'a, Message: Clone + 'a>(
-    tokens: &'a Tokens,
-    visible: bool,
-    title: &'a str,
-    description: &'a str,
-    action_label: &'a str,
-    on_action: Message,
-    on_dismiss: Option<Message>,
-) -> Option<Element<'a, Message>> {
-    if !visible {
-        return None;
-    }
-
-    let mut notice = Notice::new(tokens, Tone::Danger, description, direction)
-        .title(title)
-        .action(action_label, on_action);
-
-    if let Some(msg) = on_dismiss {
-        notice = notice.dismiss(msg);
-    }
-
-    Some(notice.render())
-}
+{{#include ../../../../examples/book_snippets/src/recipes_error_recovery.rs:recipe_error_recovery}}
 ```
 
 Usage in `view()`:
 
 ```rust,ignore
-if let Some(notice) = error_recovery_notice(
-    &self.tokens,
-    self.sync_error.is_some(),
-    "Sync failed",
-    "Could not reach the server. Check your connection.",
-    "Retry",
-    Message::RetrySyncing,
-    Some(Message::DismissSyncError),
-) {
-    main_col = main_col.push(notice);
-}
+{{#include ../../../../examples/book_snippets/src/recipes_error_recovery.rs:recipe_error_recovery_use}}
 ```
 
 ## 8. Customization points

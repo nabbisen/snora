@@ -7,49 +7,7 @@ or use the prefab helpers in `snora::widget`.
 ## Adding slots one at a time
 
 ```rust,ignore
-use snora::{
-    AppLayout, LayoutDirection, SideBar, SideBarItem,
-    render,
-    widget::{app_footer, app_header, app_side_bar},
-};
-
-fn view(state: &State) -> iced::Element<'_, Message> {
-    let header = app_header(
-        "My App",
-        Vec::<snora::Menu<(), ()>>::new(),  // no menus yet
-        &Message::HeaderAction,
-        None,                               // no menu open
-        None,                               // no end-of-row controls
-        LayoutDirection::Ltr,
-    );
-
-    let sidebar = app_side_bar(
-        SideBar {
-            items: vec![
-                SideBarItem {
-                    view_id: ViewId::Home,
-                    icon: "🏠".into(),
-                    tooltip: "Home".into(),
-                    on_press: Message::Switch(ViewId::Home),
-                },
-                // …
-            ],
-            active: state.active_view,
-        },
-        LayoutDirection::Ltr,
-    );
-
-    let footer = app_footer(iced::widget::text("status").into(), LayoutDirection::Ltr);
-
-    let body: iced::Element<'_, Message> = state.body();
-
-    let layout = AppLayout::new(body)
-        .header(header)
-        .side_bar(sidebar)
-        .footer(footer);
-
-    render(layout)
-}
+{{#include ../../../examples/book_snippets/src/getting_started_header.rs:header_view}}
 ```
 
 ## A note on direction
@@ -69,12 +27,7 @@ You are not required to use the prefab widgets. Anything that yields an
 `Element<'_, Message>` slots in:
 
 ```rust,ignore
-let custom_header = iced::widget::container(my_header_row())
-    .width(iced::Length::Fill)
-    .padding(12)
-    .into();
-
-let layout = AppLayout::new(body).header(custom_header);
+{{#include ../../../examples/book_snippets/src/getting_started_header.rs:header_custom}}
 ```
 
 snora draws the skeleton; what fills each slot is your decision.

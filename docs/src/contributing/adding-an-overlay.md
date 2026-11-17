@@ -42,6 +42,7 @@ edge" to (1) or (2), stop here.
 Place it in `src/overlay.rs` next to `Dialog` and `Sheet`. Keep
 the same shape:
 
+<!-- not compiled: pseudo-code: a walkthrough that adds a type snora does not have (`CommandPalette`), with its bodies elided (`/* sane default */`) -->
 ```rust,ignore
 pub struct CommandPalette<Node, Message> {
     pub content: Node,
@@ -85,6 +86,7 @@ correctness under both LTR and RTL.
 
 In `snora-core/src/layout.rs`:
 
+<!-- not compiled: pseudo-code: a walkthrough that adds a field and a method to `AppLayout` for a type snora does not have, with `// existing fields...` elided -->
 ```rust,ignore
 pub struct AppLayout<Node, Message> {
     // existing fields...
@@ -109,6 +111,7 @@ Update `AppLayout::new` to initialize it to `None`.
 
 Create `snora/src/overlay/command_palette.rs`:
 
+<!-- not compiled: pseudo-code: a walkthrough that adds a crate-internal function for a type snora does not have, with its body elided (`// ...`) -->
 ```rust,ignore
 pub(crate) fn render_command_palette<'a, Message>(
     palette: CommandPalette<Element<'a, Message>, Message>,

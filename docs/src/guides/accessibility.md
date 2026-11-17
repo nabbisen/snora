@@ -54,11 +54,7 @@ contributor-facing documents linked below, not duplicated here.
   line of `update`:**
 
   ```rust,ignore
-  Message::KeyPressed(key, modifiers) => {
-      if let Some(task) = snora::keyboard::traverse(key, modifiers) {
-          return task;
-      }
-  }
+{{#include ../../../examples/book_snippets/src/guide_accessibility.rs:accessibility_tab}}
   ```
 
   Subscribe with `iced::keyboard::listen()`, as the `tab` example does. Tab
@@ -87,9 +83,7 @@ contributor-facing documents linked below, not duplicated here.
   and the footer. Route the key, as you route Tab:
 
   ```rust,ignore
-  if let Some(cycle) = snora::keyboard::cycle_zones(key, modifiers) {
-      return snora::keyboard::focus_zone(cycle);
-  }
+{{#include ../../../examples/book_snippets/src/guide_accessibility.rs:accessibility_f6}}
   ```
 
   - **F6 / Shift+F6** move focus to the first control of the next / previous zone, **counted

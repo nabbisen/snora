@@ -8,6 +8,7 @@ after a removal) and RFC-121 (a click does not focus).
 
 iced binds no Tab key, and snora installs no subscription. Two things are yours:
 
+<!-- not compiled: a fragment spanning three functions of an application (its subscription, its `update` arm and its `view`), which is not one block -->
 ```rust,ignore
 // subscription: hand snora the keys
 iced::keyboard::listen().map(|event| match event {
@@ -108,9 +109,7 @@ Use `AppLayout::escape`. For an overlay of your own outside `AppLayout`, match t
 yourself:
 
 ```rust,ignore
-if key == iced::keyboard::Key::Named(iced::keyboard::key::Named::Escape) && self.my_overlay_open {
-    return self.update(Message::CloseMyOverlay);
-}
+{{#include ../../../examples/book_snippets/src/guide_keyboard.rs:keyboard_escape}}
 ```
 
 ## Where focus goes

@@ -7,19 +7,7 @@ public API — no code change to snora required.
 ## The six roles
 
 ```rust,ignore
-pub struct Typography {
-    pub body: TextRole,        // ordinary explanatory text
-    pub body_small: TextRole,  // secondary metadata, compact help
-    pub label: TextRole,       // button, field and chip labels
-    pub title: TextRole,       // card / dialog / notice title
-    pub heading: TextRole,     // page or section heading
-    pub display: TextRole,     // rare major page title
-}
-
-pub struct TextRole {
-    pub size: f32,        // logical pixels
-    pub line_height: f32, // multiplier, e.g. 1.4 = 140% of size
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:typography_structure}}
 ```
 
 **iced 0.14's own default line-height is `Relative(1.3)`** — text that

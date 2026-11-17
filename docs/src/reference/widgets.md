@@ -32,14 +32,7 @@ every `AppLayout` slot.
 ### `app_header`
 
 ```rust,ignore
-pub fn app_header<'a, Message, MenuId, MenuItemId, F>(
-    title: &'a str,
-    menus: Vec<Menu<MenuId, MenuItemId>>,
-    on_menu_action: &'a F,
-    active_menu_id: Option<&MenuId>,
-    end_controls: Option<Element<'a, Message>>,
-    direction: LayoutDirection,
-) -> Element<'a, Message>
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_app_header}}
 ```
 
 Bold title on the start edge, drop-down menus next to it, optional
@@ -48,10 +41,7 @@ controls anchored to the end edge. Direction-aware.
 ### `app_side_bar`
 
 ```rust,ignore
-pub fn app_side_bar<'a, Message, ViewId>(
-    side_bar: SideBar<Message, ViewId>,
-    direction: LayoutDirection,
-) -> Element<'a, Message>
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_app_side_bar}}
 ```
 
 The navigation rail. **Since 0.54 (RFC-114) each item shows its name,
@@ -86,10 +76,7 @@ always room. A rail you place yourself at the window's end edge does not have it
 ### `app_footer`
 
 ```rust,ignore
-pub fn app_footer<'a, Message>(
-    content: Element<'a, Message>,
-    direction: LayoutDirection,
-) -> Element<'a, Message>
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_app_footer}}
 ```
 
 Thin chrome-styled container. Its content sits at the start edge of `direction` (0.64,
@@ -98,12 +85,7 @@ RFC-133). For start and end parts inside it, pass a `row_dir` row.
 ### `render_menu`
 
 ```rust,ignore
-pub fn render_menu<'a, Message, MenuId, MenuItemId, F>(
-    menu: Menu<MenuId, MenuItemId>,
-    on_action: &'a F,
-    is_active: bool,
-    direction: LayoutDirection,
-) -> Element<'a, Message>
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_render_menu}}
 ```
 
 Used internally by `app_header`, which passes its own direction (0.64, RFC-133). You normally do not call this
@@ -113,8 +95,7 @@ them. Direct calls are for non-header menus.
 ### `icon_element` / `icon_element_sized`
 
 ```rust,ignore
-pub fn icon_element<'a, Message>(icon: &Icon) -> Element<'a, Message>;
-pub fn icon_element_sized<'a, Message>(icon: &Icon, size: f32) -> Element<'a, Message>;
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_icons}}
 ```
 
 Resolve an `Icon` to an iced element at the default (14 px) or a
@@ -123,13 +104,7 @@ specified size. Honors all enabled icon backends.
 ### `app_tab_bar`
 
 ```rust,ignore
-pub fn app_tab_bar<'a, Message, TabId, F>(
-    bar: TabBar<TabId>,
-    on_action: &'a F,
-    direction: LayoutDirection,
-) -> Element<'a, Message>
-where
-    F: Fn(TabAction<TabId>) -> Message + 'a;
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_app_tab_bar}}
 ```
 
 Horizontal tab strip for peer-level navigation. The active tab gets
@@ -139,13 +114,7 @@ the entire tab order mirrors under `Rtl`.
 ### `app_breadcrumb`
 
 ```rust,ignore
-pub fn app_breadcrumb<'a, Message, CrumbId, F>(
-    crumbs: Vec<Crumb<CrumbId>>,
-    on_action: &'a F,
-    direction: LayoutDirection,
-) -> Element<'a, Message>
-where
-    F: Fn(BreadcrumbAction<CrumbId>) -> Message + 'a;
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_app_breadcrumb}}
 ```
 
 Hierarchical position indicator. Ancestors render as clickable
@@ -157,8 +126,7 @@ plain text. The separator glyph flips with direction (`›` / `‹`).
 In `snora::direction`:
 
 ```rust,ignore
-pub fn row_dir<'a, M>(direction, start, end) -> LogicalRow<'a, M>;
-pub fn row_dir_three<'a, M>(direction, start, center, end) -> LogicalRow<'a, M>;
+{{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_row_dir}}
 ```
 
 The smallest tool for writing your own direction-aware widgets — see

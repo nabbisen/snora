@@ -66,6 +66,7 @@ change that touches positioning, alignment, mirroring, or anchoring.
 For any helper that resolves logical edges to physical sides, the
 comment must make the translation explicit:
 
+<!-- not compiled: a comment with no code in it -->
 ```rust,ignore
 // Resolve logical Start/End to the physical side required by iced layout.
 ```

@@ -10,7 +10,12 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
+[features]
+lucide-icons = ["snora/lucide-icons", "dep:lucide-icons"]
+svg-icons = ["snora/svg-icons"]
+
 [dependencies]
 snora = { workspace = true, features = ["design"] }
 snora-design = { workspace = true }
 iced = { workspace = true }
+lucide-icons = { workspace = true, optional = true }

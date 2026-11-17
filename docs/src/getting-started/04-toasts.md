@@ -8,63 +8,19 @@ sweep. The application stores `Vec<Toast<Message>>` and one
 ## Three pieces
 
 ```rust,ignore
-use std::time::Instant;
-use iced::{Subscription, Task};
-use snora::{Toast, ToastAttention, ToastIntent, ToastLifetime};
-use snora::toast::Holds;
-
-struct App {
-    toasts: Vec<Toast<Message>>,
-    holds: Holds,                     // which toasts the reader is attending to
-    next_id: u64,
-}
-
-#[derive(Debug, Clone)]
-enum Message {
-    ShowSaved,
-    Dismiss(u64),
-    ToastAttention(u64, ToastAttention), // pointer or keyboard came or went
-    ToastTick,                        // framework asks us to sweep
-}
+{{#include ../../../examples/book_snippets/src/getting_started_toasts.rs:toasts_state}}
 ```
 
 ### 1. Push a toast
 
 ```rust,ignore
-fn update(&mut self, msg: Message) -> Task<Message> {
-    if let Message::ShowSaved = msg {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.toasts.push(Toast::new(
-            id,
-            ToastIntent::Success,
-            "Saved",
-            "Document written to disk.",
-            Message::Dismiss(id),
-        ));
-    }
-    if let Message::Dismiss(id) = msg {
-        self.toasts.retain(|t| t.id != id);
-    }
-    if let Message::ToastAttention(id, attention) = msg {
-        // Held while the pointer rests on it or the keyboard is on its ×;
-        // when both have gone, the countdown restarts in full. `Holds`
-        // does the restart itself.
-        self.holds.attend(id, attention, &mut self.toasts, Instant::now());
-    }
-    if let Message::ToastTick = msg {
-        self.holds.sweep(&mut self.toasts, Instant::now());
-    }
-    Task::none()
-}
+{{#include ../../../examples/book_snippets/src/getting_started_toasts.rs:toasts_update}}
 ```
 
 ### 2. Subscribe to TTL ticks
 
 ```rust,ignore
-fn subscription(&self) -> Subscription<Message> {
-    snora::toast::subscription(&self.toasts, || Message::ToastTick)
-}
+{{#include ../../../examples/book_snippets/src/getting_started_toasts.rs:toasts_subscription}}
 ```
 
 `subscription` returns `Subscription::none()` when the queue holds only
@@ -74,13 +30,7 @@ an idle screen.
 ### 3. Pass the queue to the layout
 
 ```rust,ignore
-fn view(&self) -> iced::Element<'_, Message> {
-    let body: iced::Element<'_, Message> = /* … */;
-    let layout = snora::AppLayout::new(body)
-        .toasts(self.toasts.clone())
-        .on_toast_attention(Message::ToastAttention);
-    snora::render(layout)
-}
+{{#include ../../../examples/book_snippets/src/getting_started_toasts.rs:toasts_view}}
 ```
 
 ## Lifetime policies

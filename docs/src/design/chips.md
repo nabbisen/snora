@@ -10,10 +10,7 @@ The application owns selection state.
 A simple toggle chip. Shows a solid accent background with `accent_text` foreground when selected (WCAG AA ≥4.5:1 across all presets).
 
 ```rust,ignore
-use snora::design::chip;
-
-chip::filter(&tokens, "Draft",   self.show_drafts, Message::ToggleDrafts)
-chip::filter(&tokens, "Active",  self.show_active, Message::ToggleActive)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:chips_filter}}
 ```
 
 Pass `None` (or `Option::<Message>::None`) to render a disabled chip.
@@ -25,14 +22,7 @@ independent snora controls (`design_control`, since 0.55), each a focus target. 
 said `iced::widget::button`.)*
 
 ```rust,ignore
-chip::removable(
-    &tokens,
-    "Tag: Rust",
-    self.rust_selected,
-    Message::ToggleRust,
-    Message::RemoveRust,
-    direction,          // 0.64: the label then the × in reading order
-)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:chips_removable}}
 ```
 
 Pass `None` for either `on_toggle` or `on_remove` to disable that control
@@ -43,9 +33,7 @@ independently.
 Chips never store selection state internally. Drive them from your app:
 
 ```rust,ignore
-for tag in &self.active_tags {
-    chip::filter(&tokens, tag.as_str(), true, Message::RemoveTag(tag.clone()))
-}
+{{#include ../../../examples/book_snippets/src/design_pages.rs:chips_loop}}
 ```
 
 ## Accessibility

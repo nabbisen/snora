@@ -113,6 +113,10 @@ jobs:
         # sat for a long time before RFC-087. 15 unit tests counted at
         # the move.
         run: cargo test -p snora-interaction --all-features
+      - name: Test the book's compiled snippets, all features (RFC-136)
+        # `examples/book_snippets` is what the book's `{{#include}}`s compile (the build and the clippy steps above compile
+        # it); this runs its tests, which are the testing guide's own (`guides/testing.md` shows them, and they pass).
+        run: cargo test -p snora-book-snippets --all-features
       - name: Test widgets, all features (RFC-087)
         # snora-widgets had no test step in CI at all before this — not a
         # feature gap, an entire crate. 28 unit tests + 6 doc-tests
@@ -398,6 +402,13 @@ jobs:
         run: mdbook build docs
       - name: Test docs (classify fences)
         run: mdbook test docs
+      - name: Every book snippet is compiled or marked (RFC-136 R-3)
+        # 0.64 changed eight signatures and ten book pages kept the old ones, with no test failing: their snippets were
+        # `rust,ignore`, which `mdbook test` never compiles. A `rust,ignore` snippet outside the migration guides is now
+        # `{{#include}}`d from `examples/book_snippets` (which the workspace builds, so a signature change fails the build)
+        # or marked `<!-- not compiled: <reason> -->`. This fails on an unmarked snippet, on a marker with no reason and on
+        # an include whose file or anchor is not there.
+        run: python3 scripts/check-book-snippets.py
       - name: Built links resolve (RFC-073 / RFC-087)
         # Catches a page that exists on disk but was never wired into
         # SUMMARY.md — a source-level .md-link check can't see this,

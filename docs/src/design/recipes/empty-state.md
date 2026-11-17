@@ -56,38 +56,7 @@ with an optional call-to-action button.
 ## 7. Code example
 
 ```rust,ignore
-use snora::design::{Tokens, card, button, style};
-use iced::widget::{column, text};
-use iced::Element;
-
-fn empty_state<'a, Message: Clone + 'a>(
-    tokens: &'a Tokens,
-    title: &'a str,
-    description: &'a str,
-    cta_label: Option<&'a str>,
-    on_cta: Option<Message>,
-) -> Element<'a, Message> {
-    let t = tokens;
-    let text_col = style::color::to_iced_color(t.palette.text_primary);
-    let muted    = style::color::to_iced_color(t.palette.text_muted);
-
-    let mut col = column![
-        text(title)
-            .size(style::text::heading_size(t))
-            .color(text_col),
-        text(description)
-            .size(style::text::body_size(t))
-            .color(muted),
-    ]
-    .spacing(t.spacing.md)
-    .align_x(iced::Alignment::Center);
-
-    if let (Some(label), Some(msg)) = (cta_label, on_cta) {
-        col = col.push(button::primary(t, label, msg));
-    }
-
-    card::surface(t, col)
-}
+{{#include ../../../../examples/book_snippets/src/recipes_empty_state.rs:recipe_empty_state}}
 ```
 
 ## 8. Customization points

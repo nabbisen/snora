@@ -13,11 +13,41 @@
 //! than fought line-by-line in illustrative code that has no caller by
 //! design.
 
-#![allow(dead_code, unused_variables, unused_imports, unused_assignments)]
+#![allow(
+    dead_code,
+    unused_variables,
+    unused_imports,
+    unused_assignments,
+    unused_must_use
+)]
+// The page's text is the unit here, not clippy's opinion of it (a borrow the reader keeps for clarity, a `vec!` that is
+// the page's illustration, a function with more arguments than clippy likes).
+#![allow(clippy::all)]
 
+mod design_pages;
+mod getting_started_header;
+mod getting_started_hello;
+mod getting_started_toasts;
+mod guide_accessibility;
+mod guide_direction;
+mod guide_icons;
+mod guide_keyboard;
+mod guide_menus;
+mod guide_menus_items;
+mod guide_overlays;
+mod guide_responsive;
+mod guide_testing;
 mod high_contrast;
 mod iced_style_bridge;
+mod listings;
 mod readability;
+mod recipes_background_task;
+mod recipes_empty_state;
+mod recipes_error_recovery;
+mod recipes_result_card;
+mod reference_overlays;
+mod reference_widgets;
+mod scaffold;
 mod theme;
 mod tokens;
 mod typography;

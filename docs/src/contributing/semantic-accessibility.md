@@ -118,13 +118,7 @@ style bridge, which maps their statuses.
 `iced::widget::button::Status` has exactly four variants:
 
 ```rust,ignore
-pub enum Status {
-    Active,
-    Hovered,
-    Pressed,
-    Disabled,
-    // No Focused variant.
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:iced_button_status}}
 ```
 
 `iced::widget::container` has **no interaction status at all** in iced 0.14;

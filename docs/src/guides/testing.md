@@ -23,94 +23,13 @@ have `view` be the only function that touches iced widgets. Tests
 exercise `update`; the renderer is never invoked.
 
 ```rust,ignore
-// src/app.rs
-
-#[derive(Default)]
-pub struct App {
-    pub toasts: Vec<snora::Toast<Message>>,
-    pub next_id: u64,
-    pub active: ViewId,
-}
-
-impl App {
-    pub fn update(&mut self, msg: Message) -> iced::Task<Message> {
-        match msg {
-            Message::ExportCompleted(Ok(_)) => {
-                let id = self.issue_id();
-                self.toasts.push(
-                    snora::Toast::new(
-                        id,
-                        snora::ToastIntent::Success,
-                        "Export complete",
-                        "File written to disk.",
-                        Message::DismissToast(id),
-                    )
-                    .persistent(),
-                );
-            }
-            // ...
-        }
-        iced::Task::none()
-    }
-
-    pub fn view(&self) -> iced::Element<'_, Message> { /* … */ }
-}
+{{#include ../../../examples/book_snippets/src/guide_testing.rs:testing_app}}
 ```
 
 ## Pattern: assert against the queue
 
 ```rust,ignore
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn export_completion_pushes_persistent_success_toast() {
-        let mut app = App::default();
-
-        app.update(Message::ExportCompleted(Ok(fake_report())));
-
-        let last = app.toasts.last().expect("a toast was queued");
-        assert_eq!(last.intent, snora::ToastIntent::Success);
-        assert!(matches!(last.lifetime, snora::ToastLifetime::Persistent));
-    }
-
-    #[test]
-    fn cancel_clears_active_dialog_flag() {
-        let mut app = App {
-            show_export_dialog: true,
-            ..Default::default()
-        };
-
-        app.update(Message::CancelExport);
-
-        assert!(!app.show_export_dialog);
-    }
-
-    #[test]
-    fn ttl_sweep_drops_only_expired_transient() {
-        use std::time::{Duration, Instant};
-        use snora::ToastLifetime;
-
-        let now = Instant::now();
-        let mut app = App::default();
-        app.toasts.push(
-            snora::Toast::new(1, snora::ToastIntent::Info, "old", "", Message::DismissToast(1))
-                .with_lifetime(ToastLifetime::millis(100))
-                .with_created_at(now),
-        );
-        app.toasts.push(
-            snora::Toast::new(2, snora::ToastIntent::Error, "keep", "", Message::DismissToast(2))
-                .persistent()
-                .with_created_at(now),
-        );
-
-        snora::toast::Holds::default().sweep(&mut app.toasts, now + Duration::from_secs(1));
-
-        let ids: Vec<u64> = app.toasts.iter().map(|t| t.id).collect();
-        assert_eq!(ids, vec![2]);
-    }
-}
+{{#include ../../../examples/book_snippets/src/guide_testing.rs:testing_tests}}
 ```
 
 Three things to notice:

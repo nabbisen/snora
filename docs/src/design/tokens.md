@@ -7,15 +7,7 @@ value an application stores and passes to helpers.
 ## Structure
 
 ```rust,ignore
-pub struct Tokens {             // #[non_exhaustive]
-    pub palette:    Palette,    // semantic color roles
-    pub spacing:    Spacing,    // xs / sm / md / lg / xl / xxl
-    pub typography: Typography, // body / title / heading / …
-    pub radius:     Radius,     // sm / md / lg / pill
-    pub focus:      FocusTokens,// ring_width / ring_offset / ring_color
-    pub targets:    TargetTokens,// the minimum pointer target (0.55, RFC-115)
-    pub density:    Density,    // *spacing* density — Comfortable; Compact deferred
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:tokens_structure}}
 ```
 
 `Tokens` and `Palette` are `#[non_exhaustive]` — new fields can be added in

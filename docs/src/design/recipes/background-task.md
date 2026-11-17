@@ -56,35 +56,7 @@ and optional cancellation or pause control — inside a `card::surface`.
 ## 7. Code example
 
 ```rust,ignore
-use snora::design::{Tokens, Tone, card, button, progress};
-use iced::widget::{column, row, text};
-use iced::Element;
-
-fn background_task_card<'a, Message: Clone + 'a>(
-    tokens: &'a Tokens,
-    task_name: &'a str,
-    value: Option<f32>,
-    tone: Tone,
-    on_cancel: Option<Message>,
-) -> Element<'a, Message> {
-    let t = tokens;
-
-    let mut controls = row![].spacing(t.spacing.sm);
-    if let Some(msg) = on_cancel {
-        controls = controls.push(button::ghost(t, "Cancel", msg));
-    }
-
-    let inner = column![
-        text(task_name)
-            .size(snora::design::style::text::label_size(t))
-            .color(snora::design::style::color::to_iced_color(t.palette.text_primary)),
-        progress::row(t, task_name, value, tone, direction),
-        controls,
-    ]
-    .spacing(t.spacing.sm);
-
-    card::surface(t, inner)
-}
+{{#include ../../../../examples/book_snippets/src/recipes_background_task.rs:recipe_background_task}}
 ```
 
 ## 8. Customization points

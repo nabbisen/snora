@@ -16,21 +16,7 @@ Both share the `Menu` / `MenuItem` / `MenuAction` vocabulary from
 You define two enums for menu identities:
 
 ```rust,ignore
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum MyMenuId {
-    File,
-    View,
-    Help,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum MyMenuItemId {
-    New,
-    Open,
-    Quit,
-    ToggleStatus,
-    About,
-}
+{{#include ../../../examples/book_snippets/src/guide_menus_items.rs:menus_ids}}
 ```
 
 snora is generic over both. It does not impose any string-based naming
@@ -39,21 +25,7 @@ or numeric tagging — your enum is the source of truth.
 ## Building menus
 
 ```rust,ignore
-use snora::{Menu, MenuItem};
-
-let menus = vec![
-    Menu {
-        id: MyMenuId::File,
-        label: "File".into(),
-        icon: None,
-        items: vec![
-            MenuItem { menu_id: MyMenuId::File, id: MyMenuItemId::New,  label: "New".into(),  icon: None },
-            MenuItem { menu_id: MyMenuId::File, id: MyMenuItemId::Open, label: "Open…".into(), icon: None },
-            MenuItem { menu_id: MyMenuId::File, id: MyMenuItemId::Quit, label: "Quit".into(),  icon: None },
-        ],
-    },
-    // …View, Help…
-];
+{{#include ../../../examples/book_snippets/src/guide_menus_items.rs:menus_menus}}
 ```
 
 `MenuItem::menu_id` repeats the parent menu id so that the
@@ -63,35 +35,7 @@ lookup.
 ## Wiring into a header
 
 ```rust,ignore
-use snora::{
-    AppLayout, LayoutDirection, MenuAction,
-    render, widget::app_header,
-};
-
-#[derive(Debug, Clone)]
-enum Message {
-    HeaderAction(MenuAction<MyMenuId, MyMenuItemId>),
-    CloseMenus,
-}
-
-fn view(state: &State) -> iced::Element<'_, Message> {
-    let header = app_header(
-        "My App",
-        menus,                              // built above
-        &Message::HeaderAction,             // map MenuAction → Message
-        state.active_menu.as_ref(),         // which menu is open
-        None,                               // no end-controls
-        LayoutDirection::Ltr,
-    );
-
-    // From 0.59 that is all: snora sees the open dropdown in the tree, covers the
-    // page beneath it, and publishes `CloseMenus` on a click outside or Escape.
-    let layout = AppLayout::new(state.body())
-        .header(header)
-        .on_close_menus(Message::CloseMenus);
-
-    render(layout)
-}
+{{#include ../../../examples/book_snippets/src/guide_menus.rs:menus_view}}
 ```
 
 **How the open dropdown behaves (0.59, RFC-124):** it floats over the page, anchored
@@ -116,16 +60,7 @@ needed, is now harmless and no longer needed.)*
 `MenuAction` has two variants:
 
 ```rust,ignore
-match action {
-    MenuAction::MenuPressed(id) => {
-        // Toggle: same id closes; different id switches.
-        state.active_menu = if state.active_menu == Some(id) { None } else { Some(id) };
-    }
-    MenuAction::MenuItemPressed { menu_id, menu_item_id } => {
-        state.active_menu = None;            // close after pick
-        state.dispatch(menu_id, menu_item_id);
-    }
-}
+{{#include ../../../examples/book_snippets/src/guide_menus.rs:menus_update}}
 ```
 
 The "click the button to toggle, click an item to close" pattern is the

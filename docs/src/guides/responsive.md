@@ -5,19 +5,7 @@ application. It does not decide anything about what you do with it —
 **thresholds are your decision, not snora's.**
 
 ```rust,ignore
-use snora::{AppLayout, responsive_render};
-
-fn view(state: &State) -> Element<'_, Message> {
-    responsive_render(move |width| {
-        let layout = AppLayout::new(body(state));
-
-        if width < 600.0 {
-            layout // your own choice: no sidebar below 600px
-        } else {
-            layout.side_bar(sidebar(state))
-        }
-    })
-}
+{{#include ../../../examples/book_snippets/src/guide_responsive.rs:responsive_view}}
 ```
 
 `build` is called with the width available to the layout, in logical

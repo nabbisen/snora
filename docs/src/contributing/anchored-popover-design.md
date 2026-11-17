@@ -101,6 +101,7 @@ Modal state (layers 6–8) still dominates popover state.
 
 ## Proposed vocabulary (for reference, not adopted)
 
+<!-- not compiled: a proposed API that does not exist: a design document's sketch of `Popover`, which snora has not built -->
 ```rust,ignore
 pub struct Popover<Node, Message>
 where

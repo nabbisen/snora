@@ -18,13 +18,7 @@ snora's `control` (RFC-116), reachable from the keyboard from 0.55. App owns
 visibility state.
 
 ```rust,ignore
-use snora::design::{Tokens, Tone, notice::Notice};
-
-Notice::new(&tokens, Tone::Warning, "Disk space low.", direction)
-    .title("Storage warning")
-    .action("Free space", Message::FreeSpace)
-    .dismiss(Message::DismissNotice)
-    .render()
+{{#include ../../../examples/book_snippets/src/design_pages.rs:v021_notice}}
 ```
 
 ### Accessibility (RFC-027)
@@ -42,10 +36,7 @@ Notice::new(&tokens, Tone::Warning, "Disk space low.", direction)
 A toggle chip built on snora's `control` (RFC-116; iced's `button` before 0.55).
 
 ```rust,ignore
-use snora::design::chip;
-
-chip::filter(&tokens, "Draft", self.show_drafts, Message::ToggleDrafts)
-chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove, direction)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:v021_chips}}
 ```
 
 ### Accessibility (RFC-027)
@@ -66,10 +57,7 @@ Pass `None` for indeterminate state — iced 0.14 has no native indeterminate
 animation; renders as 0% with a "…" suffix.
 
 ```rust,ignore
-use snora::design::{Tone, progress};
-
-progress::row(&tokens, "Indexing files", Some(0.6), Tone::Accent, direction)
-progress::card(&tokens, "Syncing", None, Tone::Info, direction)
+{{#include ../../../examples/book_snippets/src/design_pages.rs:v021_progress}}
 ```
 
 Note: the `Tone` parameter was added beyond the RFC-032 sketch (which

@@ -13,9 +13,7 @@ and how the user dismisses them.
 ## One close sink, two channels
 
 ```rust,ignore
-let layout = AppLayout::new(body)
-    .on_close_modals(Message::CloseModals)   // dialog / sheet
-    .on_close_menus(Message::CloseMenus);    // context / header menus
+{{#include ../../../examples/book_snippets/src/guide_overlays.rs:overlays_close}}
 ```
 
 These are the **only** two close sinks. Individual `Dialog` and `Sheet`
@@ -39,6 +37,7 @@ first Tab reaches its first control. To start somewhere else, for example on "Ca
 destructive confirmation, give that control an id and focus it from the update that opens
 the dialog:
 
+<!-- not compiled: a fragment spanning two functions of an application (its `view` and an arm of its `update`), which is not one block -->
 ```rust,ignore
 const CANCEL: &str = "confirm-cancel";
 
@@ -80,11 +79,7 @@ border, an entire form. snora is a positioner, not a styler, **on this
 path**.
 
 ```rust,ignore
-use snora::{AppLayout, Dialog};
-
-let layout = AppLayout::new(body)
-    .dialog(Dialog::new(my_card_element()))
-    .on_close_modals(Message::CloseModals);
+{{#include ../../../examples/book_snippets/src/guide_overlays.rs:overlays_dialog}}
 ```
 
 **As of v0.27.0**, a token-styled card — fill, border, radius, all
@@ -125,15 +120,7 @@ A modal panel anchored to one of the four window edges, occupying a
 configurable size along the perpendicular axis.
 
 ```rust,ignore
-use snora::{AppLayout, Sheet, SheetEdge, SheetSize};
-
-let sheet = Sheet::new(my_drawer_content())
-    .at(SheetEdge::Bottom)
-    .with_size(SheetSize::Half);
-
-let layout = AppLayout::new(body)
-    .sheet(sheet)
-    .on_close_modals(Message::CloseModals);
+{{#include ../../../examples/book_snippets/src/guide_overlays.rs:overlays_sheet}}
 ```
 
 ### Edges
@@ -182,9 +169,7 @@ A floating menu (right-click style). It uses `on_close_menus`, not
 dismissing the other.
 
 ```rust,ignore
-let layout = AppLayout::new(body)
-    .context_menu(my_floating_menu(point))
-    .on_close_menus(Message::CloseMenus);
+{{#include ../../../examples/book_snippets/src/guide_overlays.rs:overlays_context_menu}}
 ```
 
 iced 0.14 does not surface the click coordinate alongside a button

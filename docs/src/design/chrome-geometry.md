@@ -9,13 +9,7 @@ inter-element gaps, and corner radii to the `Spacing`/`Radius` scales,
 leaving `snora::widget::*` exactly as it renders today.
 
 ```rust,ignore
-use snora::{AppLayout, LayoutDirection, widget::app_header};
-use snora::design::{Tokens, widget};
-
-let tokens = Tokens::light();
-let styled_header = widget::app_header(
-    &tokens, "My App", vec![], &on_menu_action, None, None, LayoutDirection::Ltr,
-);
+{{#include ../../../examples/book_snippets/src/design_pages.rs:chrome_header}}
 ```
 
 Snora never calls these on the application's behalf. Applications that

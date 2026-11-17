@@ -4,13 +4,7 @@
 source per call; nothing is global.
 
 ```rust,ignore
-pub enum Icon {
-    Text(String),                      // always available
-    #[cfg(feature = "lucide-icons")]
-    Lucide(lucide_icons::Icon),
-    #[cfg(feature = "svg-icons")]
-    Svg(std::path::PathBuf),
-}
+{{#include ../../../examples/book_snippets/src/listings.rs:icons_enum}}
 ```
 
 When a feature is disabled the variant does not exist in the enum. No
@@ -19,9 +13,7 @@ runtime "unknown icon kind" branch is reachable.
 ## `Icon::Text` — the always-available path
 
 ```rust,ignore
-let i: Icon = "★".into();                // From<&str>
-let i: Icon = String::from("★").into();  // From<String>
-let i = Icon::Text("✓".into());           // explicit
+{{#include ../../../examples/book_snippets/src/guide_icons.rs:icons_text}}
 ```
 
 Strings can be a single Unicode glyph (`★`, `✓`, `↓`, `🛠`) or a short
@@ -39,11 +31,7 @@ snora = { version = "0.65", features = ["lucide-icons"] }
 ```
 
 ```rust,ignore
-use snora::Icon;
-use snora::lucide;                     // re-exported variants
-
-let i: Icon = lucide::Home.into();
-let i = Icon::Lucide(lucide::Settings);
+{{#include ../../../examples/book_snippets/src/guide_icons.rs:icons_lucide}}
 ```
 
 `lucide-icons` ships every Lucide glyph as a variant. Cargo includes
@@ -57,7 +45,7 @@ snora = { version = "0.65", features = ["svg-icons"] }
 ```
 
 ```rust,ignore
-let i = Icon::Svg(std::path::PathBuf::from("assets/logo.svg"));
+{{#include ../../../examples/book_snippets/src/guide_icons.rs:icons_svg}}
 ```
 
 The engine reads the file at render time using iced's SVG widget.
@@ -91,9 +79,7 @@ their icons at the label token (`Typography::label`, 14), unchanged. The
 toast's × is 1.125 em. To name a size yourself:
 
 ```rust,ignore
-use snora::widget::icon::icon_element_sized;
-
-let big_logo = icon_element_sized(&Icon::Text("✓".into()), 24.0);
+{{#include ../../../examples/book_snippets/src/guide_icons.rs:icons_sized}}
 ```
 
 ## ABDD: icons should not be the only signal

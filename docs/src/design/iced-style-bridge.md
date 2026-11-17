@@ -64,6 +64,7 @@ that baseline before choosing.
 
 `iced::widget::button::Status` has exactly four variants:
 
+<!-- not compiled: pseudo-code: the variant names of iced's `button::Status` joined with `|`, not a Rust expression -->
 ```rust,ignore
 Active | Hovered | Pressed | Disabled   // no Focused
 ```

@@ -9,10 +9,7 @@ gives both surfaces token-derived styling, as a sibling to
 `snora::render`.
 
 ```rust,ignore
-use snora::design::{Tokens, render};
-
-let tokens = Tokens::light();
-let element = render(layout, &tokens);
+{{#include ../../../examples/book_snippets/src/design_pages.rs:engine_render}}
 ```
 
 Snora never calls this function on the application's behalf.
@@ -144,6 +141,7 @@ to prevent for derived theme tiers, here for a fixed constant instead of
 a derived one. The styled dim instead picks its base color from
 **`background`'s own darkness**, not a fixed pole:
 
+<!-- not compiled: pseudo-code: restates private engine arithmetic (`is_dark`, `DIM_ALPHA` are not public items) -->
 ```rust,ignore
 let base = if is_dark(background) { Color::WHITE } else { Color::BLACK };
 let dim_color = Color { a: DIM_ALPHA, ..base }; // DIM_ALPHA = 0.44

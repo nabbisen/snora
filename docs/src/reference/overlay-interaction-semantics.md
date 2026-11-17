@@ -323,40 +323,13 @@ localization stack.
 ### Opening a modal (close menus first)
 
 ```rust,ignore
-match msg {
-    Message::OpenSettingsDialog => {
-        // Law 2: clear menus before opening a modal.
-        self.header_menu = None;
-        self.context_menu = None;
-        self.dialog = Some(DialogState::Settings);
-    }
-    Message::CloseModals => {
-        self.dialog = None;
-        self.sheet = None;
-    }
-    Message::CloseMenus => {
-        self.header_menu = None;
-        self.context_menu = None;
-    }
-    _ => {}
-}
+{{#include ../../../examples/book_snippets/src/reference_overlays.rs:overlays_laws_update}}
 ```
 
 ### Escape dismissal recipe (by hand; see Law 7 for what the engine does)
 
 ```rust,ignore
-match msg {
-    // Prioritize modal over menu when both are present.
-    Message::EscapePressed if self.dialog.is_some() || self.sheet.is_some() => {
-        self.dialog = None;
-        self.sheet = None;
-    }
-    Message::EscapePressed => {
-        self.header_menu = None;
-        self.context_menu = None;
-    }
-    _ => {}
-}
+{{#include ../../../examples/book_snippets/src/reference_overlays.rs:overlays_escape_update}}
 ```
 
 ## Keyboard dismissal
@@ -365,11 +338,7 @@ match msg {
 message, or else its click-outside close message.
 
 ```rust,ignore
-let layout = snora::AppLayout::new(body)
-    .on_close_modals(Message::CloseModals)   // a click outside, and Escape
-    .on_close_menus(Message::CloseMenus)
-    // Optional: Escape alone, for a modal that a stray click must not close.
-    .escape(snora::keyboard::Escape { modal: Some(Message::CancelDelete), menu: None });
+{{#include ../../../examples/book_snippets/src/reference_overlays.rs:overlays_layout}}
 ```
 
 | Open | Escape publishes |

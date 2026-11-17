@@ -3039,6 +3039,7 @@ name = "snora-book-snippets"
 version = "0.65.0"
 dependencies = [
  "iced",
+ "lucide-icons",
  "snora",
  "snora-design",
 ]

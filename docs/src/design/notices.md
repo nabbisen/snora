@@ -8,13 +8,7 @@ whether a notice is shown, dismissed, or acted upon is always app-controlled.
 ## API
 
 ```rust,ignore
-use snora::design::{Tokens, Tone, notice::Notice};
-
-Notice::new(&tokens, Tone::Info, "Background sync is running.", direction)
-    .title("Syncing")                               // optional
-    .action("View details", Message::OpenSync)      // optional
-    .dismiss(Message::DismissNotice)                // optional
-    .render()
+{{#include ../../../examples/book_snippets/src/design_pages.rs:notices_builder}}
 ```
 
 `Notice::new(tokens, tone, body, direction)` returns a builder (the direction since 0.64: the
@@ -42,13 +36,7 @@ The notice has no internal visible/hidden state. Conditionally include it in
 the view based on application state:
 
 ```rust,ignore
-if self.show_notice {
-    Notice::new(&tokens, Tone::Warning, "Index is stale.", direction)
-        .dismiss(Message::DismissNotice)
-        .render()
-} else {
-    iced::widget::space().into()
-}
+{{#include ../../../examples/book_snippets/src/design_pages.rs:notices_conditional}}
 ```
 
 ## Accessibility

@@ -8,11 +8,7 @@ Arabic / Hebrew / Persian readers without a per-screen rewrite.
 ## Two switches
 
 ```rust,ignore
-use snora::{LayoutDirection, ToastPosition};
-
-let layout = AppLayout::new(body)
-    .direction(LayoutDirection::Rtl)            // body row mirrors
-    .toast_position(ToastPosition::TopEnd);      // toast anchor mirrors
+{{#include ../../../examples/book_snippets/src/guide_direction.rs:direction_layout}}
 ```
 
 `direction` controls how snora composes the **skeleton row** (where
@@ -28,7 +24,7 @@ same value. *(Corrected 2026-11-15, from the 0.63 audit: this said `AppLayout::d
 called it the central vocabulary type; nothing in snora takes one.)*
 
 ```rust,ignore
-pub enum Edge { Start, End }
+{{#include ../../../examples/book_snippets/src/listings.rs:direction_edge}}
 ```
 
 | Direction | `Edge::Start` | `Edge::End` |
@@ -47,14 +43,7 @@ build a **`LogicalRow`**: **the order is logical, and the positions mirror**
 both directions; under `Rtl` they are placed from the right edge.
 
 ```rust,ignore
-use snora::direction::row_dir;
-
-let bar = row_dir(
-    state.direction,
-    iced::widget::text("File: untitled"),       // start
-    iced::widget::button("Save")                // end
-        .on_press(Message::Save),
-);
+{{#include ../../../examples/book_snippets/src/guide_direction.rs:direction_row_dir}}
 ```
 
 Under `Ltr`, "File:" is on the left and the Save button on the right;
