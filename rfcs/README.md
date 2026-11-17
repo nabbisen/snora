@@ -192,6 +192,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 136 | [The book's code can go stale without a test failing](./accepted/136-the-books-code-can-go-stale-without-a-test-failing.md) | **0.66.0** — from the 0.64 book work: eight signature changes left ten pages wrong and no test failed, because about 80 `rust,ignore` snippets are compiled by nothing. Ruled: every snippet outside the migration guides is compiled from `book_snippets` or marked with its reason; signature listings compiled or linked; a CI check fails on an unmarked one — **accepted 2026-11-18** |
 
 ## Proposed
 

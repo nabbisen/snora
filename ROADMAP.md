@@ -238,11 +238,23 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.66.0
 
+**Scoped by the owner, 2026-11-18.**
+- **RFC-136: the book's code compiles, or says why not.** 0.64's signature changes left ten pages
+  wrong and no test failed. Every snippet outside the migration guides is compiled from
+  `book_snippets` or marked with its reason, and a CI check fails on an unmarked one. Handoff:
+  [`136-…`](rfcs/handoffs/136-the-books-code-can-go-stale-without-a-test-failing/implementation-handoff.md).
 - **Housekeeping: the sweeps' own time.** Draw the presets on parallel threads, measured first. The
   bar: every cell identical on both renderers, and every plant of RFC-131, RFC-133, RFC-134 and
   RFC-135 still failing. (The CI jobs are now split so that each runs once; the longest is the
   tiny-skia sweeps' job, about 12 to 14 minutes.) Handoff:
   [`0-66-sweeps-own-time`](rfcs/handoffs/0-66-sweeps-own-time/implementation-handoff.md).
+
+**Not in 0.66:**
+- 0.62's backlog (106 guide claims guarded in part), still deferred;
+- a third audit (getting-started, recipes, reference), which is a candidate for 0.67, after the
+  book's code is checked;
+- an iced upgrade (0.14.0 is the latest);
+- the future-wanted features, until an adopter asks.
 
 ## Future wanted
 
