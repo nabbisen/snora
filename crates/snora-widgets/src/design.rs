@@ -89,6 +89,12 @@ pub mod chip;
 /// 0% with a "…" suffix (iced 0.14 limitation).
 pub mod progress;
 
+/// The five form controls on the design path (RFC-134).
+///
+/// See [`form::checkbox`], [`form::toggler`], [`form::radio_group`], [`form::select`] and
+/// [`form::slider`]: the engine path's controls, drawn from the tokens.
+pub mod form;
+
 /// Token-derived chrome geometry — styled variants of the prefab chrome
 /// widgets (RFC-040).
 ///

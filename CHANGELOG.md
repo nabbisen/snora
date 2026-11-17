@@ -26,7 +26,48 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Five form controls the keyboard can reach (RFC-134): a checkbox, a toggle, a radio group, a
+  select and a slider.** iced 0.14's `checkbox`, `toggler`, `radio`, `pick_list` and `slider`
+  register no focus target (Tab cannot land on them and no key does anything to them; a slider
+  takes ↑ ↓ only while the pointer is over it), so snora draws its own. Each is **one** `Control`
+  around its own marks: Tab lands on it once, the focus ring shows, Enter and Space press it
+  (never a chord, once per press), a disabled one is no stop, the target is at least 24 px, and a
+  click and a key publish the same message. On both paths: `snora::checkbox`, `snora::toggler`,
+  `snora::radio_group`, `snora::select` and `snora::slider` (coloured by the host's iced theme),
+  and `snora::design::…` the same five, which take the tokens first. Every constructor takes the
+  `LayoutDirection` last, as every widget with a reading order does since 0.64.
+
+  | Control | Keys |
+  |---|---|
+  | `checkbox(is_checked, direction).label(..).on_toggle(Fn(bool) -> Message)` | Enter or Space toggles |
+  | `toggler(is_toggled, direction)` (the same builder) | Enter or Space flips it |
+  | `radio_group(options, selected, on_select, direction)` | **one stop for the group**; ↑ ↓ ← → move **and select**, wrapping; ← → follow the screen. Space on the option already selected publishes nothing |
+  | `select(options, selected, on_select, direction).opened(open).on_open_change(..)` | Enter, Space or ↓ opens; inside, ↓ ↑ Home End, Enter chooses, Escape closes, and focus returns to the trigger |
+  | `slider(range, value, on_change, direction).step(..)` | ← → ↑ ↓ one step, Page Up and Page Down ten, Home and End the ends; ← → follow the screen. The step is a hundredth of the range unless set |
+
+  Without a handler a checkbox or a toggle is disabled, as iced's is (`on_toggle_maybe(None)`); the
+  radio group, the slider and the select have `.disabled(bool)` or take their handler as the
+  select's `on_open_change`. A held arrow keeps moving; a held press presses once.
+
+  **The select is open when the application says so**, as a header menu is, and inside
+  `snora::render` it gets its ↓ ↑ Home End, its cover over the page and its click-outside; outside the
+  engine it gets Tab, Enter, Space and Escape. With two selects, map the one `on_close_menus`
+  message to "close whichever is open". Choosing an item publishes `on_select(item)` and nothing
+  else: close the list there.
+
+  A click on the slider means the value whose thumb is at that point, snapped to the step; a drag
+  follows the pointer outside the bar and the window and ends with the release, wherever it is, or
+  when the window loses focus. Slider values are `f32`.
+
+  **Not in this release:** validation, form layout, a key handler for an application's own
+  `snora::control`, and a select with its own cover outside the engine. The keyboard guide's
+  workaround stays the route for an iced control snora does not replace.
+
+  With the `lucide-icons` feature the tick and the select's chevron are lucide's `Check` and
+  `ChevronDown`, so the application loads the lucide font as it already does for lucide icons;
+  without it they are the text glyphs `✓` and `▾`.
 
 ## [0.64.0] — 2026-11-17
 

@@ -716,3 +716,177 @@ fn clip_cuts_overflowing_text_at_the_controls_edge() {
         "with clip set, {beyond_clipped} dark pixels were drawn past the control's edge",
     );
 }
+
+// -----------------------------------------------------------------
+// 6 — a key of its own, and a stop that publishes nothing (RFC-134)
+// -----------------------------------------------------------------
+
+/// A key press event with the modifiers and the `repeat` flag the test says.
+fn key_event(key: iced::keyboard::key::Named, repeat: bool, mods: keyboard::Modifiers) -> Event {
+    use iced::keyboard::{Key, Location, key::Physical};
+    Event::Keyboard(keyboard::Event::KeyPressed {
+        key: Key::Named(key),
+        modified_key: Key::Named(key),
+        physical_key: Physical::Unidentified(iced::keyboard::key::NativeCode::Unidentified),
+        location: Location::Standard,
+        modifiers: mods,
+        text: None,
+        repeat,
+    })
+}
+
+/// A control that turns the arrows into `A` (right) and `B` (left), and answers nothing else.
+fn arrows() -> Control<'static, Msg> {
+    use iced::keyboard::{Key, key::Named};
+    control(Msg::A).on_key(|key, mods| {
+        if !mods.is_empty() {
+            return None;
+        }
+        match key {
+            Key::Named(Named::ArrowRight) => Some(Msg::A),
+            Key::Named(Named::ArrowLeft) => Some(Msg::B),
+            _ => None,
+        }
+    })
+}
+
+fn send(rig: &mut Rig, event: Event) {
+    let _ = rig.ui.update(
+        &[event],
+        rig.cursor,
+        &mut rig.renderer,
+        &mut clipboard::Null,
+        &mut rig.messages,
+    );
+}
+
+fn focus_it(rig: &mut Rig) {
+    let _ = rig.run(iced_core::widget::operation::focusable::focus_next::<()>());
+}
+
+#[test]
+fn a_focused_control_answers_its_own_keys_and_captures_them() {
+    use iced::keyboard::key::Named;
+    let mut rig = Rig::new(arrows());
+    focus_it(&mut rig);
+    send(
+        &mut rig,
+        key_event(Named::ArrowRight, false, keyboard::Modifiers::empty()),
+    );
+    send(
+        &mut rig,
+        key_event(Named::ArrowLeft, false, keyboard::Modifiers::empty()),
+    );
+    assert_eq!(rig.messages, vec![Msg::A, Msg::B]);
+}
+
+#[test]
+fn a_key_it_does_not_answer_is_left_alone() {
+    use iced::keyboard::key::Named;
+    let mut rig = Rig::new(arrows());
+    focus_it(&mut rig);
+    send(
+        &mut rig,
+        key_event(Named::ArrowUp, false, keyboard::Modifiers::empty()),
+    );
+    assert!(rig.messages.is_empty(), "{:?}", rig.messages);
+}
+
+#[test]
+fn a_control_without_focus_answers_no_key() {
+    use iced::keyboard::key::Named;
+    let mut rig = Rig::new(arrows());
+    send(
+        &mut rig,
+        key_event(Named::ArrowRight, false, keyboard::Modifiers::empty()),
+    );
+    assert!(rig.messages.is_empty(), "{:?}", rig.messages);
+}
+
+#[test]
+fn a_disabled_control_answers_no_key() {
+    use iced::keyboard::key::Named;
+    let mut rig = Rig::new(arrows().on_press_maybe(None));
+    send(
+        &mut rig,
+        key_event(Named::ArrowRight, false, keyboard::Modifiers::empty()),
+    );
+    assert!(rig.messages.is_empty(), "{:?}", rig.messages);
+}
+
+/// RFC-123's rule: a held key keeps moving. A press does not repeat (RFC-121), a move does.
+#[test]
+fn a_held_key_keeps_answering_and_a_held_press_does_not() {
+    use iced::keyboard::key::Named;
+    let mut rig = Rig::new(arrows());
+    focus_it(&mut rig);
+    for repeat in [false, true, true, true] {
+        send(
+            &mut rig,
+            key_event(Named::ArrowRight, repeat, keyboard::Modifiers::empty()),
+        );
+    }
+    assert_eq!(rig.messages, vec![Msg::A; 4], "a held arrow stopped moving");
+
+    rig.messages.clear();
+    for repeat in [false, true, true] {
+        send(
+            &mut rig,
+            key_event(Named::Enter, repeat, keyboard::Modifiers::empty()),
+        );
+    }
+    assert_eq!(
+        rig.messages,
+        vec![Msg::A],
+        "a held Enter pressed more than once"
+    );
+}
+
+/// Moving never presses: Enter and Space are still the press, and the key handler is not asked
+/// about them.
+#[test]
+fn a_press_key_is_not_given_to_the_key_handler() {
+    use iced::keyboard::key::Named;
+    let mut rig = Rig::new(control(Msg::A).on_key(|_, _| Some(Msg::B)));
+    focus_it(&mut rig);
+    send(
+        &mut rig,
+        key_event(Named::Enter, false, keyboard::Modifiers::empty()),
+    );
+    assert_eq!(rig.messages, vec![Msg::A], "Enter was answered as a move");
+}
+
+#[test]
+fn a_focus_only_control_is_a_stop_and_publishes_nothing() {
+    use iced::keyboard::key::Named;
+    let focus_only = || {
+        Control::new(
+            space()
+                .width(Length::Fixed(40.0))
+                .height(Length::Fixed(30.0)),
+            plain_style(),
+            plain_ring(),
+        )
+        .width(Length::Fixed(40.0))
+        .height(Length::Fixed(30.0))
+        .focus_only()
+    };
+    let mut rig = Rig::new(focus_only());
+    assert_eq!(rig.focusables().len(), 1, "a focus-only control is a stop");
+    focus_it(&mut rig);
+    for key in [Named::Enter, Named::Space] {
+        send(
+            &mut rig,
+            key_event(key, false, keyboard::Modifiers::empty()),
+        );
+    }
+    // And a click on it.
+    let _ = rig.move_to(20.0, 15.0);
+    let _ = rig.press();
+    let _ = rig.release();
+    assert!(
+        rig.messages.is_empty(),
+        "a focus-only control published {:?}",
+        rig.messages,
+    );
+}

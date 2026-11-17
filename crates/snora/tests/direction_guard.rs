@@ -14,7 +14,9 @@
 //! not it: the first version of this parser read it as the return type and missed `render_menu`),
 //! and the type the function is an `impl` of. A function is a **widget function** if it returns an
 //! `Element` or a `LogicalRow`, or if it is the `new` of a type whose `render` returns an
-//! `Element` (a builder: `Notice`).
+//! `Element` (a builder: `Notice`), **or if it returns a type that converts into an `Element`**
+//! (`impl From<Checkbox> for Element`: RFC-134's five, whose constructors are `checkbox(is_checked,
+//! direction)` and the others, and whose builder methods return `Self` and are not constructors).
 //!
 //! Each widget function either has a `LayoutDirection` in its signature, or is in
 //! [`DIRECTION_FREE`] with the reason written beside it. A function that is neither fails.
@@ -287,9 +289,47 @@ fn widget_crate_functions() -> Vec<Func> {
     all
 }
 
-/// The widget functions: those that return an element (or a `LogicalRow`), and the constructor of a
-/// builder whose `render` does.
+/// The types that convert into an `Element`: `impl<..> From<Name<..>> for Element<..>`, read from the
+/// source text.
+fn element_types_in(src: &str) -> BTreeSet<String> {
+    let mut out = BTreeSet::new();
+    for (i, _) in src.match_indices("for Element<") {
+        // The header is what precedes it on the `impl` line(s): `impl<'a, M> From<Name<'a, M>> `.
+        let header_start = src[..i].rfind("impl").unwrap_or(0);
+        let header = &src[header_start..i];
+        if let Some(at) = header.find("From<") {
+            let name: String = header[at + 5..]
+                .chars()
+                .take_while(|c| c.is_alphanumeric() || *c == '_')
+                .collect();
+            if !name.is_empty() {
+                out.insert(name);
+            }
+        }
+    }
+    out
+}
+
+fn element_types() -> BTreeSet<String> {
+    let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join("snora-widgets")
+        .join("src");
+    let mut files = Vec::new();
+    walk(&src, &mut files);
+    files
+        .iter()
+        .flat_map(|p| element_types_in(&std::fs::read_to_string(p).unwrap()))
+        .collect()
+}
+
+/// The widget functions: those that return an element (or a `LogicalRow`, or a type that becomes an
+/// element), and the constructor of a builder whose `render` does.
 fn widget_functions(all: &[Func]) -> Vec<Func> {
+    widget_functions_of(all, &element_types())
+}
+
+fn widget_functions_of(all: &[Func], types: &BTreeSet<String>) -> Vec<Func> {
     let builders: BTreeSet<(String, String)> = all
         .iter()
         .filter(|f| f.name == "render" && return_type(&f.sig).contains("Element"))
@@ -300,6 +340,9 @@ fn widget_functions(all: &[Func]) -> Vec<Func> {
             let r = return_type(&f.sig);
             r.contains("Element")
                 || r.contains("LogicalRow")
+                || types
+                    .iter()
+                    .any(|t| r == *t || r.starts_with(&format!("{t}<")))
                 || (f.name == "new"
                     && f.owner
                         .clone()
@@ -326,7 +369,8 @@ fn every_widget_function_takes_a_direction_or_says_why_it_has_none() {
     let widgets = widget_functions(&widget_crate_functions());
     assert!(
         widgets.len() >= 30,
-        "the parser found {} widget functions; it found 36 when it was written. It has stopped reading the source",
+        "the parser found {} widget functions; it found 36 when it was written, and 46 with RFC-134's \
+         ten. It has stopped reading the source",
         widgets.len()
     );
     let missing = unclassified(&widgets);
@@ -416,6 +460,53 @@ fn a_planted_widget_with_no_direction_is_found() {
         after.contains(&"design/banner.rs::Banner::new".to_owned()),
         "a builder's constructor without a direction is not found: {after:?}"
     );
+}
+
+/// RFC-134: a function that returns a **builder type** that converts into an element is a widget
+/// function, though it does not return an `Element` itself, and so is checked for a direction. The real
+/// tree's ten (five on each path) are found, and a planted eleventh with no direction is reported.
+#[test]
+fn a_constructor_returning_a_type_that_becomes_an_element_is_a_widget_function() {
+    let types = element_types();
+    for t in ["Checkbox", "Toggler", "RadioGroup", "Select", "Slider"] {
+        assert!(
+            types.contains(t),
+            "{t} is not read as converting into an element: {types:?}"
+        );
+    }
+    let all = widget_crate_functions();
+    let found = widget_functions_of(&all, &types);
+    for f in [
+        "form.rs::checkbox",
+        "form.rs::toggler",
+        "form.rs::radio_group",
+        "form.rs::select",
+        "form.rs::slider",
+        "design/form.rs::checkbox",
+        "design/form.rs::toggler",
+        "design/form.rs::radio_group",
+        "design/form.rs::select",
+        "design/form.rs::slider",
+    ] {
+        assert!(
+            found.iter().any(|w| w.id() == f && w.takes_a_direction()),
+            "{f} is not read as a widget function that takes a direction"
+        );
+    }
+    // THE PLANT: a sixth builder, with a reading order and no direction.
+    let mut types = types;
+    types.extend(element_types_in(
+        "impl<'a, M> From<Dial<'a, M>> for Element<'a, M> { fn from(d: Dial<'a, M>) -> Self { todo!() } }",
+    ));
+    let mut all = all;
+    all.push(Func {
+        file: "form.rs".into(),
+        owner: None,
+        name: "dial".into(),
+        sig: "dial<'a, M>(value: f32) -> Dial<'a, M> ".into(),
+    });
+    let missing = unclassified(&widget_functions_of(&all, &types));
+    assert_eq!(missing, vec!["form.rs::dial".to_owned()], "{missing:?}");
 }
 
 /// The parser reads the return type after the first `->` outside every bracket, not the last one: a

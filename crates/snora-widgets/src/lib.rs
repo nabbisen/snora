@@ -34,6 +34,7 @@
 mod crumb;
 pub mod direction;
 mod footer;
+mod form;
 mod header;
 mod icon;
 mod menu;
@@ -63,6 +64,9 @@ pub mod design;
 
 pub use crumb::app_breadcrumb;
 pub use footer::app_footer;
+pub use form::{
+    Checkbox, RadioGroup, Select, Slider, Toggler, checkbox, radio_group, select, slider, toggler,
+};
 pub use header::app_header;
 pub use icon::{icon_element, icon_element_sized};
 pub use menu::render_menu;

@@ -86,6 +86,10 @@ struct Subject {
     /// A widget's `operate` does not reach an overlay, so the simulator and `tab_router`
     /// never see those controls: their ring is measured on the runtime's own interface.
     hosts_overlay: bool,
+    /// Its stops answer Enter and Space with **nothing** (RFC-134: a radio group, whose option
+    /// already selected is not a message, and a slider, whose keys are the arrows). A click still
+    /// publishes `publishes`.
+    silent_press: bool,
 }
 
 impl Subject {
@@ -108,12 +112,18 @@ fn subject(
         build: Box::new(build),
         publishes: publishes.iter().map(|m| msg(m)).collect(),
         hosts_overlay: false,
+        silent_press: false,
     }
 }
 
 impl Subject {
     fn hosting_overlay(mut self) -> Self {
         self.hosts_overlay = true;
+        self
+    }
+
+    fn silent_press(mut self) -> Self {
+        self.silent_press = true;
         self
     }
 }
@@ -202,6 +212,84 @@ fn unstyled() -> Vec<Subject> {
             snora::widget::render_menu(menu(), &ON_MENU, true, snora::LayoutDirection::Ltr)
         }),
         subject("toast close", &["dismiss"], || render(toast_layout())),
+        // RFC-134: the five form controls, on the engine path.
+        subject("checkbox", &["check(true)"], || {
+            snora::checkbox(false, LayoutDirection::Ltr)
+                .label("Remember me")
+                .on_toggle(|on| Msg(format!("check({on})")))
+                .into()
+        }),
+        subject("toggler", &["toggle(true)"], || {
+            snora::toggler(false, LayoutDirection::Ltr)
+                .label("Dark mode")
+                .on_toggle(|on| Msg(format!("toggle({on})")))
+                .into()
+        }),
+        subject("radio group (one stop)", &["size(Medium)"], || {
+            snora::radio_group(
+                ["Small", "Medium", "Large"],
+                Some(&"Medium"),
+                |s| Msg(format!("size({s})")),
+                LayoutDirection::Ltr,
+            )
+            .into()
+        })
+        .silent_press(),
+        subject("slider", &["volume(50)"], || {
+            snora::slider(
+                0.0..=100.0,
+                35.0,
+                |v| Msg(format!("volume({v})")),
+                LayoutDirection::Ltr,
+            )
+            .into()
+        })
+        .silent_press(),
+        subject("select (trigger)", &["open(true)"], || {
+            snora::select(
+                ["Apple", "Banana", "Cherry"],
+                Some(&"Banana"),
+                |s| Msg(format!("fruit({s})")),
+                LayoutDirection::Ltr,
+            )
+            .on_open_change(|open| Msg(format!("open({open})")))
+            .into()
+        }),
+        // A disabled form control is not a focus target: Tab skips it.
+        subject("checkbox without a handler", &[], || {
+            snora::checkbox(true, LayoutDirection::Ltr)
+                .label("Remember me")
+                .into()
+        }),
+        subject("radio group, disabled", &[], || {
+            snora::radio_group(
+                ["Small", "Medium"],
+                Some(&"Small"),
+                |s| Msg(format!("size({s})")),
+                LayoutDirection::Ltr,
+            )
+            .disabled(true)
+            .into()
+        }),
+        subject("slider, disabled", &[], || {
+            snora::slider(
+                0.0..=1.0,
+                0.5,
+                |v| Msg(format!("volume({v})")),
+                LayoutDirection::Ltr,
+            )
+            .disabled(true)
+            .into()
+        }),
+        subject("select without on_open_change", &[], || {
+            snora::select(
+                ["Apple"],
+                Some(&"Apple"),
+                |s| Msg(format!("fruit({s})")),
+                LayoutDirection::Ltr,
+            )
+            .into()
+        }),
         // RFC-122: aaai's cases on the public `snora::control`.
         subject("control: glyph beside a label", &["open"], || {
             common::aaai_cases::glyph_label_engine(msg("open"))
@@ -353,6 +441,93 @@ fn designed(tokens: &'static snora::design::Tokens) -> Vec<Subject> {
         // A disabled control is not a focus target: Tab skips it.
         subject("design control: on_press_maybe(None)", &[], move || {
             common::aaai_cases::disabled_design(tokens)
+        }),
+        // RFC-134: the five form controls, on the design path.
+        subject("design checkbox", &["check(true)"], move || {
+            snora::design::checkbox(tokens, false, LayoutDirection::Ltr)
+                .label("Remember me")
+                .on_toggle(|on| Msg(format!("check({on})")))
+                .into()
+        }),
+        subject("design toggler", &["toggle(true)"], move || {
+            snora::design::toggler(tokens, false, LayoutDirection::Ltr)
+                .label("Dark mode")
+                .on_toggle(|on| Msg(format!("toggle({on})")))
+                .into()
+        }),
+        subject(
+            "design radio group (one stop)",
+            &["size(Medium)"],
+            move || {
+                snora::design::radio_group(
+                    tokens,
+                    ["Small", "Medium", "Large"],
+                    Some(&"Medium"),
+                    |s| Msg(format!("size({s})")),
+                    LayoutDirection::Ltr,
+                )
+                .into()
+            },
+        )
+        .silent_press(),
+        subject("design slider", &["volume(50)"], move || {
+            snora::design::slider(
+                tokens,
+                0.0..=100.0,
+                35.0,
+                |v| Msg(format!("volume({v})")),
+                LayoutDirection::Ltr,
+            )
+            .into()
+        })
+        .silent_press(),
+        subject("design select (trigger)", &["open(true)"], move || {
+            snora::design::select(
+                tokens,
+                ["Apple", "Banana", "Cherry"],
+                Some(&"Banana"),
+                |s| Msg(format!("fruit({s})")),
+                LayoutDirection::Ltr,
+            )
+            .on_open_change(|open| Msg(format!("open({open})")))
+            .into()
+        }),
+        subject("design radio group, disabled", &[], move || {
+            snora::design::radio_group(
+                tokens,
+                ["Small", "Medium"],
+                Some(&"Small"),
+                |s| Msg(format!("size({s})")),
+                LayoutDirection::Ltr,
+            )
+            .disabled(true)
+            .into()
+        }),
+        subject("design slider, disabled", &[], move || {
+            snora::design::slider(
+                tokens,
+                0.0..=1.0,
+                0.5,
+                |v| Msg(format!("volume({v})")),
+                LayoutDirection::Ltr,
+            )
+            .disabled(true)
+            .into()
+        }),
+        subject("design select without on_open_change", &[], move || {
+            snora::design::select(
+                tokens,
+                ["Apple"],
+                Some(&"Apple"),
+                |s| Msg(format!("fruit({s})")),
+                LayoutDirection::Ltr,
+            )
+            .into()
+        }),
+        subject("design checkbox without a handler", &[], move || {
+            snora::design::checkbox(tokens, true, LayoutDirection::Ltr)
+                .label("Remember me")
+                .into()
         }),
         subject(
             "a snora::design::control page control under an open dialog is not reached",
@@ -660,9 +835,14 @@ fn keyboard_failures(context: &str, subject: &Subject) -> Vec<String> {
             let mut rig = fresh();
             rig.tab(k + 1);
             rig.key(key);
-            if rig.messages != vec![want.clone()] {
+            let expected = if subject.silent_press {
+                Vec::new()
+            } else {
+                vec![want.clone()]
+            };
+            if rig.messages != expected {
                 failures.push(format!(
-                    "{context} / {} #{k}: {name} published {:?}, expected {want:?}",
+                    "{context} / {} #{k}: {name} published {:?}, expected {expected:?}",
                     subject.name, rig.messages
                 ));
             }

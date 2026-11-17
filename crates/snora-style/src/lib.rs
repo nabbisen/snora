@@ -59,6 +59,9 @@ pub(crate) mod state;
 
 pub mod chip;
 
+/// The look of a form control's row (RFC-134).
+pub mod form;
+
 pub mod tab;
 
 /// Card and container style functions.

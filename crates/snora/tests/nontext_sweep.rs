@@ -256,6 +256,54 @@ fn all(rect: Rectangle, target: Option<usize>) -> Option<Pick> {
     })
 }
 
+// ---- finders for RFC-134's marks (what the form controls report as containers) ------------------------------------------------
+
+/// The `n`-th square mark of about an em and a quarter (a checkbox's box, a radio's ring), top to bottom: a mark is
+/// several nested containers of one size, so rectangles within a pixel of each other are one.
+fn square(els: &[(El, Rectangle)], n: usize) -> Option<Rectangle> {
+    let mut v: Vec<Rectangle> = els
+        .iter()
+        .filter(|(k, r)| {
+            *k == El::Container
+                && (r.width - r.height).abs() < 0.6
+                && (16.5..19.0).contains(&r.width)
+        })
+        .map(|x| x.1)
+        .collect();
+    v.sort_by(|a, b| a.y.total_cmp(&b.y).then(a.x.total_cmp(&b.x)));
+    v.dedup_by(|a, b| (a.y - b.y).abs() < 1.0 && (a.x - b.x).abs() < 1.0);
+    v.get(n).copied()
+}
+
+/// A toggler's track: twice as wide as it is tall.
+fn track_of_toggler(els: &[(El, Rectangle)]) -> Option<Rectangle> {
+    els.iter()
+        .find(|(k, r)| {
+            *k == El::Container
+                && (16.5..19.0).contains(&r.height)
+                && (r.width - 2.0 * r.height).abs() < 1.0
+        })
+        .map(|x| x.1)
+}
+
+/// A toggler's thumb: the disc inside a slot, a little under an em.
+fn thumb_of_toggler(els: &[(El, Rectangle)]) -> Option<Rectangle> {
+    els.iter()
+        .find(|(k, r)| {
+            *k == El::Container
+                && (r.width - r.height).abs() < 0.6
+                && (10.5..12.5).contains(&r.width)
+        })
+        .map(|x| x.1)
+}
+
+/// A part of a slider's bar the bar reports: a container as thin as a track, that `keep` holds.
+fn bar_part(els: &[(El, Rectangle)], keep: impl Fn(&Rectangle) -> bool) -> Option<Rectangle> {
+    els.iter()
+        .find(|(k, r)| *k == El::Container && r.height < 10.0 && r.height > 3.0 && keep(r))
+        .map(|x| x.1)
+}
+
 fn subjects() -> Vec<Subject> {
     vec![
         Subject {
@@ -449,6 +497,139 @@ fn subjects() -> Vec<Subject> {
             row: "39",
             scene: "card, selected",
             pick: |e, _| sized(e, (30.0, 200.0), (30.0, 80.0)).and_then(|r| all(r, None)),
+        },
+        // ---- RFC-134: the five form controls ----------------------------------------------------------------------------------
+        Subject {
+            name: "checkbox box (checked) vs its surface",
+            row: "134",
+            scene: "checkbox, checked",
+            pick: |e, _| square(e, 0).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "checkbox box (unchecked) outline vs its surface",
+            row: "134",
+            scene: "checkbox, unchecked",
+            pick: |e, _| square(e, 0).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "toggler track (on) vs its surface",
+            row: "134",
+            scene: "toggler, on",
+            pick: |e, _| track_of_toggler(e).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "toggler track (off) outline vs its surface",
+            row: "134",
+            scene: "toggler, off",
+            pick: |e, _| track_of_toggler(e).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "toggler thumb (on) vs its track",
+            row: "134",
+            scene: "toggler, on",
+            pick: |e, _| thumb_of_toggler(e).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "toggler thumb (off) vs its track",
+            row: "134",
+            scene: "toggler, off",
+            pick: |e, _| thumb_of_toggler(e).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "radio dot ring (unselected) vs its surface",
+            row: "134",
+            scene: "radio group",
+            pick: |e, _| square(e, 0).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "radio dot ring (selected) vs its surface",
+            row: "134",
+            scene: "radio group",
+            pick: |e, _| square(e, 1).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "radio dot (selected) vs its ring",
+            row: "134",
+            scene: "radio group",
+            pick: |e, _| {
+                // The three options each hold a disc; the selected one is the second.
+                let mut discs: Vec<Rectangle> = e
+                    .iter()
+                    .filter(|(k, r)| {
+                        *k == El::Container
+                            && (9.0..10.5).contains(&r.width)
+                            && (9.0..10.5).contains(&r.height)
+                    })
+                    .map(|x| x.1)
+                    .collect();
+                discs.sort_by(|a, b| a.y.total_cmp(&b.y));
+                discs.dedup_by(|a, b| (a.y - b.y).abs() < 1.0);
+                discs.get(1).copied().and_then(|r| all(r, Some(0)))
+            },
+        },
+        Subject {
+            name: "slider track vs its surface",
+            row: "134",
+            scene: "slider",
+            pick: |e, _| {
+                bar_part(e, |r| r.width > 100.0).map(|r| Pick {
+                    rect: r,
+                    sides: Sides::Vertical,
+                    target: Some(0),
+                })
+            },
+        },
+        Subject {
+            name: "slider fill vs its surface",
+            row: "134",
+            scene: "slider",
+            pick: |e, _| {
+                // The filled part is the thin container that is not the track: shorter than it.
+                let track = bar_part(e, |r| r.width > 100.0)?;
+                bar_part(e, |r| r.width < track.width - 1.0 && r.width > 10.0).map(|r| Pick {
+                    rect: r,
+                    sides: Sides::Vertical,
+                    target: Some(0),
+                })
+            },
+        },
+        Subject {
+            name: "slider thumb vs what is beside it",
+            row: "134",
+            scene: "slider",
+            pick: |e, _| {
+                e.iter()
+                    .find(|(k, r)| {
+                        *k == El::Container
+                            && (r.width - r.height).abs() < 0.6
+                            && (16.0..19.0).contains(&r.width)
+                    })
+                    .and_then(|x| all(x.1, Some(0)))
+            },
+        },
+        Subject {
+            name: "select trigger outline vs its surface",
+            row: "134",
+            scene: "select, closed",
+            pick: |e, _| sized(e, (60.0, 300.0), (20.0, 40.0)).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "select dropdown card vs the page",
+            row: "134",
+            scene: "select, open",
+            pick: |e, _| {
+                e.iter()
+                    .filter(|(k, r)| {
+                        *k == El::Container
+                            && r.width < 400.0
+                            && r.height >= 40.0
+                            && r.height < 300.0
+                            && r.y >= 27.0
+                            && r.y < 40.0
+                    })
+                    .max_by(|a, b| (a.1.width * a.1.height).total_cmp(&(b.1.width * b.1.height)))
+                    .and_then(|x| all(x.1, None))
+            },
         },
         Subject {
             name: "progress::card border vs the page",
@@ -1440,10 +1621,12 @@ fn the_exceptions_are_written_down_and_each_is_still_needed() {
 // ---- tripwire 4 -----------------------------------------------------------------------------------------------------------------
 
 /// The custom drawers of non-text elements: a file that calls `fill_quad(` itself draws something no `container` reports.
-/// Today: the focus ring (`control.rs`) and the link's underline (`underlined.rs`), each with its finder above
-/// (`ring_cells`, `link_cells`).
-const QUAD_DRAWERS: [&str; 2] = [
+/// Today: the focus ring (`control.rs`), the link's underline (`underlined.rs`) and the slider's bar
+/// (`slider_bar.rs`, RFC-134), each with its finder above (`ring_cells`, `link_cells`, and the slider's three
+/// subjects, which read the track, the fill and the thumb the bar reports as containers).
+const QUAD_DRAWERS: [&str; 3] = [
     "snora-interaction/src/control.rs",
+    "snora-interaction/src/slider_bar.rs",
     "snora-interaction/src/underlined.rs",
 ];
 

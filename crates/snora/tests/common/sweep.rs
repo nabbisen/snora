@@ -170,6 +170,14 @@ pub const TONES: [(&str, Tone); 6] = [
 
 use Kind::{App, Glyph, Word};
 
+/// The tick: lucide's `Check` under the `lucide-icons` feature, a text glyph without (RFC-100's rule for a mark).
+pub const TICK: [(&str, Kind); 2] = [("\u{e06c}", Glyph("tick")), ("\u{2713}", Glyph("tick"))];
+/// The select's chevron: lucide's `ChevronDown`, or a text glyph.
+pub const CHEVRON: [(&str, Kind); 2] = [
+    ("\u{e06d}", Glyph("chevron")),
+    ("\u{25be}", Glyph("chevron")),
+];
+
 /// Every scene the sweep draws. **A new design widget adds a scene here** (tripwire 3 fails until it
 /// does), and a new text run in a scene adds a row to its `runs` (tripwire 1).
 pub fn scenes() -> Vec<Scene> {
@@ -520,6 +528,132 @@ pub fn scenes() -> Vec<Scene> {
             }),
         });
     }
+    // RFC-134: the five form controls. Hovered and pressed apply to each (a tint of the label's colour
+    // behind it), and both directions are drawn.
+    v.push(Scene {
+        name: "checkbox, checked",
+        covers: &["checkbox"],
+        own_page: false,
+        directional: true,
+        states: true,
+        runs: &[("Remember me", Word), TICK[0], TICK[1]],
+        make: Box::new(|t, dir| {
+            snora::design::checkbox(t, true, dir)
+                .label("Remember me")
+                .on_toggle(|_| Msg::Go)
+                .into()
+        }),
+    });
+    v.push(Scene {
+        name: "checkbox, unchecked",
+        covers: &[],
+        own_page: false,
+        directional: true,
+        states: true,
+        runs: &[("Subscribe", Word)],
+        make: Box::new(|t, dir| {
+            snora::design::checkbox(t, false, dir)
+                .label("Subscribe")
+                .on_toggle(|_| Msg::Go)
+                .into()
+        }),
+    });
+    for (name, on) in [("toggler, on", true), ("toggler, off", false)] {
+        v.push(Scene {
+            name,
+            covers: if on { &["toggler"] } else { &[] },
+            own_page: false,
+            directional: true,
+            states: true,
+            runs: &[("Dark mode", Word)],
+            make: Box::new(move |t, dir| {
+                snora::design::toggler(t, on, dir)
+                    .label("Dark mode")
+                    .on_toggle(|_| Msg::Go)
+                    .into()
+            }),
+        });
+    }
+    v.push(Scene {
+        name: "radio group",
+        covers: &["radio_group"],
+        own_page: false,
+        directional: true,
+        states: true,
+        runs: &[("Small", Word), ("Medium", Word), ("Large", Word)],
+        make: Box::new(|t, dir| {
+            snora::design::radio_group(
+                t,
+                ["Small", "Medium", "Large"],
+                Some(&"Medium"),
+                |_| Msg::Go,
+                dir,
+            )
+            .into()
+        }),
+    });
+    v.push(Scene {
+        name: "slider",
+        covers: &["slider"],
+        own_page: false,
+        directional: true,
+        states: true,
+        runs: &[],
+        make: Box::new(|t, dir| {
+            snora::design::slider(t, 0.0..=100.0, 35.0, |_| Msg::Go, dir)
+                .width(Length::Fixed(300.0))
+                .into()
+        }),
+    });
+    v.push(Scene {
+        name: "select, closed",
+        covers: &["select"],
+        own_page: false,
+        directional: true,
+        states: true,
+        runs: &[("Banana", Word), CHEVRON[0], CHEVRON[1]],
+        make: Box::new(|t, dir| {
+            snora::design::select(
+                t,
+                ["Apple", "Banana", "Cherry"],
+                Some(&"Banana"),
+                |_| Msg::Go,
+                dir,
+            )
+            .on_open_change(|_| Msg::Go)
+            .into()
+        }),
+    });
+    v.push(Scene {
+        name: "select, open",
+        covers: &[],
+        own_page: true,
+        directional: true,
+        states: true,
+        runs: &[
+            ("Apple", Word),
+            ("Banana", Word),
+            ("Cherry", Word),
+            ("Page text", App),
+            TICK[0],
+            TICK[1],
+            CHEVRON[0],
+            CHEVRON[1],
+        ],
+        make: Box::new(|t, dir| {
+            let select = snora::design::select(
+                t,
+                ["Apple", "Banana", "Cherry"],
+                Some(&"Banana"),
+                |_| Msg::Go,
+                dir,
+            )
+            .opened(true)
+            .on_open_change(|_| Msg::Go);
+            let body: Element<'static, Msg> = column![select, page()].into();
+            snora::design::render(AppLayout::new(body).direction(dir), t)
+        }),
+    });
     v
 }
 

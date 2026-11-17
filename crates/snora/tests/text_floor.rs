@@ -238,8 +238,11 @@ fn a_notice_actions_label_clears_the_floor_in_every_tone_of_every_preset() {
 
 type Make = fn(&'static Tokens) -> Element<'static, Msg>;
 
-/// Every design control that draws a label: the five buttons and both chips.
-fn controls() -> [(&'static str, Make); 7] {
+/// Every design control that draws a label: the five buttons, both chips and (RFC-134) the five form
+/// controls except the slider, which draws no label (its row is the same hovered and pressed look as the
+/// others', `snora_style::form::row`).
+fn controls() -> [(&'static str, Make); 11] {
+    use snora::LayoutDirection::Ltr;
     use snora::design::{button, chip};
     [
         ("button::primary", |t| {
@@ -256,6 +259,27 @@ fn controls() -> [(&'static str, Make); 7] {
         }),
         ("chip::filter unselected", |t| {
             chip::filter(t, "Filter", false, Msg::Press)
+        }),
+        ("checkbox", |t| {
+            snora::design::checkbox(t, false, Ltr)
+                .label("Remember me")
+                .on_toggle(|_| Msg::Press)
+                .into()
+        }),
+        ("toggler", |t| {
+            snora::design::toggler(t, false, Ltr)
+                .label("Dark mode")
+                .on_toggle(|_| Msg::Press)
+                .into()
+        }),
+        ("radio group", |t| {
+            snora::design::radio_group(t, ["Small", "Medium"], Some(&"Small"), |_| Msg::Press, Ltr)
+                .into()
+        }),
+        ("select", |t| {
+            snora::design::select(t, ["Apple", "Banana"], Some(&"Apple"), |_| Msg::Press, Ltr)
+                .on_open_change(|_| Msg::Press)
+                .into()
         }),
     ]
 }

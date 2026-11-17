@@ -186,5 +186,14 @@ pub mod progress {
     pub use snora_widgets::design::progress::{card, row};
 }
 
+/// The five form controls on the design path (RFC-134): a checkbox, a toggle, a radio group, a
+/// select and a slider that the keyboard can reach, drawn from the tokens.
+///
+/// The engine path's are `snora::checkbox`, `snora::toggler`, `snora::radio_group`,
+/// `snora::select` and `snora::slider`; these are the same types, made with the tokens first.
+/// `widgets`-gated.
+#[cfg(feature = "widgets")]
+pub use snora_widgets::design::form::{checkbox, radio_group, select, slider, toggler};
+
 #[cfg(test)]
 mod tests;

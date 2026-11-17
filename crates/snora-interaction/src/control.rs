@@ -113,16 +113,24 @@ pub struct Ring<'a> {
 enum OnPress<'a, Message> {
     Direct(Message),
     Closure(Box<dyn Fn() -> Message + 'a>),
+    /// A control that is a focus stop and publishes nothing when pressed
+    /// ([`Control::focus_only`]).
+    Nothing,
 }
 
 impl<Message: Clone> OnPress<'_, Message> {
-    fn get(&self) -> Message {
+    fn get(&self) -> Option<Message> {
         match self {
-            OnPress::Direct(message) => message.clone(),
-            OnPress::Closure(f) => f(),
+            OnPress::Direct(message) => Some(message.clone()),
+            OnPress::Closure(f) => Some(f()),
+            OnPress::Nothing => None,
         }
     }
 }
+
+/// What a key means to a control that has focus (RFC-134): the key and the modifiers held, and
+/// the message that key makes, if any.
+type KeyFn<'a, Message> = Box<dyn Fn(&keyboard::Key, keyboard::Modifiers) -> Option<Message> + 'a>;
 
 /// What a press leaves for the tracker (RFC-120): shared with [`crate::Inert`],
 /// which reads and clears it through `operation::custom`.
@@ -202,6 +210,9 @@ pub struct Control<'a, Message> {
     removes: (usize, usize),
     /// Which control this is, for a shortcut that is a click on it (RFC-116 R-2).
     tag: Option<Tag>,
+    /// What a key other than a press means while the control has focus (RFC-134): an arrow on a
+    /// radio group or a slider. `None` for every control that only presses.
+    on_key: Option<KeyFn<'a, Message>>,
 }
 
 impl<Message> Control<'_, Message> {
@@ -252,6 +263,7 @@ impl<'a, Message> Control<'a, Message> {
             focus_change: None,
             removes: (0, 0),
             tag: None,
+            on_key: None,
         }
     }
 
@@ -317,6 +329,36 @@ impl<'a, Message> Control<'a, Message> {
     #[must_use]
     pub fn on_press_maybe(mut self, message: Option<Message>) -> Self {
         self.on_press = message.map(OnPress::Direct);
+        self
+    }
+
+    /// **A focus stop that publishes nothing when pressed**: Tab reaches it, a ring shows, Enter
+    /// and Space are the control's own and capture nothing else, and a press on its own surface
+    /// publishes nothing. For a control whose messages are made by what it holds or by its keys
+    /// ([`Control::on_key`]): a radio group, whose options publish their own click and whose
+    /// arrows publish the move, and whose Space on the option already selected is not a message
+    /// (RFC-134 ruling 3). Without a handler, `on_press_maybe(None)` is still the disabled one.
+    #[must_use]
+    pub fn focus_only(mut self) -> Self {
+        self.on_press = Some(OnPress::Nothing);
+        self
+    }
+
+    /// What a key other than Enter and Space means while this control has focus, and the message
+    /// it makes: `None` leaves the key to whoever else wants it. A key it answers is **captured**,
+    /// and answered again while it is held (a held arrow keeps moving), and **it never presses**:
+    /// no handler here counts as the control being pressed, which is what the focus rule for a
+    /// removal reads (RFC-120).
+    ///
+    /// Used by the radio group, the slider and the select (RFC-134). A disabled control answers
+    /// no key. This is the one key handler a control has: it is not offered through `snora`'s
+    /// own `Control`, which keeps Enter and Space only (RFC-134 ruling 1).
+    #[must_use]
+    pub fn on_key(
+        mut self,
+        handler: impl Fn(&keyboard::Key, keyboard::Modifiers) -> Option<Message> + 'a,
+    ) -> Self {
+        self.on_key = Some(Box::new(handler));
         self
     }
 
@@ -641,8 +683,10 @@ where
                     let state = tree.state.downcast_mut::<State>();
                     if state.is_pressed {
                         state.is_pressed = false;
-                        if cursor.is_over(bounds) {
-                            shell.publish(on_press.get());
+                        if cursor.is_over(bounds)
+                            && let Some(message) = on_press.get()
+                        {
+                            shell.publish(message);
                             state.mark.acted = true;
                         }
                         shell.capture_event();
@@ -676,10 +720,19 @@ where
                     // still the control's key while it has focus, so it is
                     // captured and not handed to the application as if no
                     // control had taken it.
-                    if !repeat {
-                        shell.publish(on_press.get());
+                    if !repeat && let Some(message) = on_press.get() {
+                        shell.publish(message);
                         state.mark.acted = true;
                     }
+                    shell.capture_event();
+                } else if enabled
+                    && state.is_focused
+                    && let Some(handler) = &self.on_key
+                    && let Some(message) = handler(key, *modifiers)
+                {
+                    // **A key of its own** (RFC-134): answered every time it is reported, a held
+                    // arrow included, and never a press (the removal mark stays as it was).
+                    shell.publish(message);
                     shell.capture_event();
                 }
             }

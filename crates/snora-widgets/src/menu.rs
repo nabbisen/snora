@@ -218,7 +218,7 @@ where
 
 /// The dropdown's own surface: it floats over the page, so it has a fill of its own
 /// (inline, it sat on the header's).
-fn dropdown_card(theme: &iced::Theme) -> container::Style {
+pub(crate) fn dropdown_card(theme: &iced::Theme) -> container::Style {
     container::Style {
         background: Some(iced::Background::Color(page_background(theme))),
         ..chrome_container_style(theme)

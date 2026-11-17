@@ -197,6 +197,18 @@ pub use snora_widgets::style;
 #[cfg(feature = "widgets")]
 pub mod widget;
 
+/// The five form controls the keyboard can reach (RFC-134), on the engine path: coloured by the
+/// host's iced theme. `snora::design::{checkbox, toggler, radio_group, select, slider}` are the
+/// same, drawn from the tokens.
+///
+/// Each is one control: Tab lands on it once, Enter and Space press it, the focus ring shows, and a
+/// click and a key publish the same message. See [`checkbox`], [`toggler`], [`radio_group`],
+/// [`select`] and [`slider`] for each one's keys.
+#[cfg(feature = "widgets")]
+pub use snora_widgets::{
+    Checkbox, RadioGroup, Select, Slider, Toggler, checkbox, radio_group, select, slider, toggler,
+};
+
 /// Convenience re-export of Lucide icon constants. Available when both
 /// `widgets` and `lucide-icons` features are enabled.
 #[cfg(all(feature = "widgets", feature = "lucide-icons"))]
