@@ -1,6 +1,6 @@
 # RFC-136 — The book's code can go stale without a test failing
 
-**Status.** Accepted 2026-11-18 (owner): the scope (Q-1) and the rule (Q-2) were ruled while scoping
+**Status.** Done — shipped in the book and CI on 2026-11-18, with no crate release (owner, 2026-11-18: no library code changed, so no 0.66.0 tag or publish; the number goes to the next release that changes a crate). Accepted 2026-11-18 (owner): the scope (Q-1) and the rule (Q-2) were ruled while scoping
 0.66.
 **Handoff.** [`handoffs/136-…`](../handoffs/136-the-books-code-can-go-stale-without-a-test-failing/implementation-handoff.md).
 **Raised.** 2026-11-18, architect, from the 0.64 book work.

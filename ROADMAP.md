@@ -238,23 +238,14 @@ crate short of the pixels**, and that is RFC-085's real subject.
 
 ## Next — 0.66.0
 
-**Scoped by the owner, 2026-11-18.**
-- **RFC-136: the book's code compiles, or says why not.** 0.64's signature changes left ten pages
-  wrong and no test failed. Every snippet outside the migration guides is compiled from
-  `book_snippets` or marked with its reason, and a CI check fails on an unmarked one. Handoff:
-  [`136-…`](rfcs/handoffs/136-the-books-code-can-go-stale-without-a-test-failing/implementation-handoff.md).
-- **Housekeeping: the sweeps' own time.** Draw the presets on parallel threads, measured first. The
-  bar: every cell identical on both renderers, and every plant of RFC-131, RFC-133, RFC-134 and
-  RFC-135 still failing. (The CI jobs are now split so that each runs once; the longest is the
-  tiny-skia sweeps' job, about 12 to 14 minutes.) Handoff:
-  [`0-66-sweeps-own-time`](rfcs/handoffs/0-66-sweeps-own-time/implementation-handoff.md).
+Not yet scoped. **0.66.0 is the next release that changes a crate.** The work scoped as 0.66 (below,
+under *Recently shipped*) changed no library code, so it shipped to the book and CI without a tag or
+a publish (owner, 2026-11-18).
 
-**Not in 0.66:**
-- 0.62's backlog (106 guide claims guarded in part), still deferred;
-- a third audit (getting-started, recipes, reference), which is a candidate for 0.67, after the
-  book's code is checked;
-- an iced upgrade (0.14.0 is the latest);
-- the future-wanted features, until an adopter asks.
+Candidates, from earlier scoping:
+- a third audit (getting-started, recipes, reference), now that the book's code is checked;
+- 0.62's backlog of 106 guide claims guarded in part;
+- the future-wanted features, when an adopter asks.
 
 ## Future wanted
 
@@ -275,6 +266,14 @@ crate short of the pixels**, and that is RFC-085's real subject.
   `design::control` with the same style takes one.
 
 ## Recently shipped
+
+- **Book and CI, 2026-11-18** (scoped as 0.66; no crate changed, so no release).
+  - **The book's code compiles, or says why not** (RFC-136). 87 snippets are compiled from
+    `examples/book_snippets`, and 10 are marked with their reason. A CI check fails on an unmarked
+    one. Four stale snippets were fixed, one contradictory one is now run as tests, and 17 that were
+    not valid Rust as a block were made valid.
+  - **The drawn sweeps run their presets on parallel threads,** with every cell identical. The sweeps
+    take 90 s instead of 346 s on four cores. CI's longest job is the wgpu tests (12 min 58 s).
 
 - **0.65.0** — additions only. **A checkbox, a toggle, a radio group, a select and a slider the
   keyboard can reach** (RFC-134), on both paths, with iced's shapes and `direction` last. iced 0.14's
