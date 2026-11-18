@@ -35,7 +35,33 @@ use snora::design::{Tokens, Tone, chip, notice::Notice, widget as dw};
 /// The sweep, drawn once for the tests that read it.
 fn shared() -> &'static Sweep {
     static SWEEP: std::sync::OnceLock<Sweep> = std::sync::OnceLock::new();
-    SWEEP.get_or_init(sweep)
+    SWEEP.get_or_init(|| {
+        let sweep = sweep();
+        common::par::dump_cells(
+            "text_sweep",
+            sweep
+                .cells
+                .iter()
+                .map(|c| {
+                    format!(
+                        "{}\t{}\t{}\t{:?}\t{}\t{:?}\t{:?}\t{:?}\t{}\t{}\t{:?}",
+                        c.preset,
+                        c.scene,
+                        c.surface,
+                        c.direction,
+                        c.state,
+                        c.target,
+                        c.text,
+                        c.kind,
+                        hex(c.ink),
+                        hex(c.bg),
+                        c.ratio
+                    )
+                })
+                .chain(sweep.unlisted.iter().map(|u| format!("unlisted\t{u}"))),
+        );
+        sweep
+    })
 }
 
 /// Cells under their floor, worded for a failure message. A word is held to the palette's level, a

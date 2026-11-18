@@ -41,6 +41,7 @@ use std::collections::BTreeMap;
 use std::fmt::Write as _;
 use std::sync::{Arc, Mutex};
 
+use common::par;
 use common::removal::Rig;
 use common::sweep::{
     Kind, Msg, NON_TEXT, ON_MENU, SURFACES, Scene, State, apply_state, build, design_theme, hex,
@@ -717,7 +718,6 @@ struct Cell {
 /// pressed frame of each control once, whatever number of subjects read it. The rig that found the
 /// subjects' elements is the one the rest frame is drawn on, so no rig is built only to look.
 fn sweep_list(list: Vec<Subject>) -> Vec<Cell> {
-    let mut cells = Vec::new();
     // Scenes in the order they first appear, each with the subjects that read it.
     let mut by_scene: Vec<(&'static str, Vec<&Subject>)> = Vec::new();
     for sub in &list {
@@ -726,7 +726,10 @@ fn sweep_list(list: Vec<Subject>) -> Vec<Cell> {
             None => by_scene.push((sub.scene, vec![sub])),
         }
     }
-    for (preset, tokens) in Tokens::presets() {
+    // The presets are drawn on threads of their own and put back in preset order (`common/par.rs`): the cells come out
+    // exactly as they did when one thread drew them all.
+    let parts = par::by_preset(|preset, tokens| {
+        let mut cells = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         for (scene_name, subs) in &by_scene {
@@ -815,10 +818,10 @@ fn sweep_list(list: Vec<Subject>) -> Vec<Cell> {
                 }
             }
         }
-    }
-    cells
+        cells
+    });
+    parts.into_iter().flatten().collect()
 }
-
 fn under(cells: &[Cell]) -> Vec<String> {
     cells
         .iter()
@@ -901,7 +904,8 @@ fn progress_cells(out: &mut Vec<Cell>) {
         ("info", Tone::Info),
         ("neutral", Tone::Neutral),
     ];
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         for (scene, surfaces) in [
@@ -955,7 +959,7 @@ fn progress_cells(out: &mut Vec<Cell>) {
                     );
                     let name = |what: &str| format!("progress {what} ({tn})");
                     if let Some((r, a, b)) = boundary(&frame, unfilled, top_and_bottom()) {
-                        out.push(cell(
+                        part.push(cell(
                             preset,
                             &name("track vs what it sits on"),
                             "41",
@@ -966,7 +970,7 @@ fn progress_cells(out: &mut Vec<Cell>) {
                             b,
                         ));
                     }
-                    out.push(cell(
+                    part.push(cell(
                         preset,
                         &name("bar vs the track"),
                         "42",
@@ -976,7 +980,7 @@ fn progress_cells(out: &mut Vec<Cell>) {
                         barc,
                         trackc,
                     ));
-                    out.push(cell(
+                    part.push(cell(
                         preset,
                         &name("bar vs what it sits on"),
                         "42",
@@ -989,7 +993,9 @@ fn progress_cells(out: &mut Vec<Cell>) {
                 }
             }
         }
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 fn scene_surface(scene: &str, surface: &'static str) -> &'static str {
@@ -1003,7 +1009,8 @@ fn scene_surface(scene: &str, surface: &'static str) -> &'static str {
 /// **The link's underline** (row 6): the label's colour, a rule under it, against the page; read as a run (ink against the
 /// modal colour) in the band under the label, at rest, hovered and pressed.
 fn link_cells(out: &mut Vec<Cell>) {
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         for surface in SURFACES {
@@ -1023,7 +1030,7 @@ fn link_cells(out: &mut Vec<Cell>) {
                     height: 6.0,
                 };
                 if let Some((ink, bg, r)) = common::sweep::read_run(&frame, band) {
-                    out.push(cell(
+                    part.push(cell(
                         preset,
                         "link underline vs the page",
                         "6",
@@ -1036,7 +1043,9 @@ fn link_cells(out: &mut Vec<Cell>) {
                 }
             }
         }
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 /// The pixels that differ between two frames, as a box, outside `skip` (grown by 2 logical px).
@@ -1086,7 +1095,8 @@ fn ring_cells(out: &mut Vec<Cell>) {
         ("toast, info", 0),
         ("removable chip, selected", 1),
     ];
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         for (name, idx) in rings {
@@ -1127,7 +1137,7 @@ fn ring_cells(out: &mut Vec<Cell>) {
                     .max_by_key(|(k, n)| (**n, k.0))
                     .map(|(k, _)| *k)
                     .unwrap();
-                out.push(cell(
+                part.push(cell(
                     preset,
                     &format!("focus ring vs what it covers ({name})"),
                     "10/11",
@@ -1139,14 +1149,16 @@ fn ring_cells(out: &mut Vec<Cell>) {
                 ));
             }
         }
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 /// **A tooltip's body border** (rows 26 to 28) against what it covers: found by what changes on hover. The sidebar's
 /// tooltip floats over the page (a neutral surface), and is held to 3:1 there; the chip's and the notice's float over
 /// their own, coloured, content, and are an exception (RFC-135: the tooltip is content, not a control).
 fn tooltip_cells(out: &mut Vec<Cell>) {
-    type MakeT = Box<dyn Fn(&'static Tokens) -> Element<'static, Msg>>;
+    type MakeT = Box<dyn Fn(&'static Tokens) -> Element<'static, Msg> + Send + Sync>;
     let tips: Vec<(&str, &str, usize, MakeT)> = vec![
         (
             "tooltip border vs the page (the sidebar's)",
@@ -1189,7 +1201,8 @@ fn tooltip_cells(out: &mut Vec<Cell>) {
             }),
         ),
     ];
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         for (name, row, idx, make) in &tips {
@@ -1235,7 +1248,7 @@ fn tooltip_cells(out: &mut Vec<Cell>) {
                 } else {
                     surface
                 };
-                out.push(cell(
+                part.push(cell(
                     preset,
                     name,
                     row,
@@ -1247,13 +1260,16 @@ fn tooltip_cells(out: &mut Vec<Cell>) {
                 ));
             }
         }
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 /// **A scrollbar** (row 32), in a menu taller than the window: its thumb against the page it sits on (the dropdown
 /// card) and against its track. The thumb is read where it is (the top of the rail), the track where it is not.
 fn scrollbar_cells(out: &mut Vec<Cell>) {
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         let h = dw::app_header(
@@ -1298,7 +1314,7 @@ fn scrollbar_cells(out: &mut Vec<Cell>) {
         };
         let thumb = strip(card.y + 15.0);
         let track = strip(card.y + 450.0);
-        out.push(cell(
+        part.push(cell(
             preset,
             "scrollbar thumb vs the page it sits on",
             "32",
@@ -1313,7 +1329,7 @@ fn scrollbar_cells(out: &mut Vec<Cell>) {
         } else {
             track
         };
-        out.push(cell(
+        part.push(cell(
             preset,
             "scrollbar thumb vs its track",
             "32",
@@ -1323,7 +1339,9 @@ fn scrollbar_cells(out: &mut Vec<Cell>) {
             thumb,
             against_track,
         ));
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 /// A scene with a modal over a page: the page's content, and the modal when `modal`.
@@ -1352,7 +1370,8 @@ fn modal_scene(kind: &'static str, modal: bool, t: &'static Tokens) -> Element<'
 /// sheet's **boundary** (the stronger of fill and border) against the dimmed page, with the border alone beside it,
 /// because the border alone is an exception (RFC-135): the fill is what a reader sees.
 fn modal_cells(out: &mut Vec<Cell>) {
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         for kind in ["dialog", "sheet"] {
@@ -1363,7 +1382,7 @@ fn modal_cells(out: &mut Vec<Cell>) {
             let f1 = rig.frame_scaled(&theme, EDGE as f32);
             let at = (100 * EDGE, 400 * EDGE);
             let (a, b) = (px(&f1, at.0, at.1), px(&f0, at.0, at.1));
-            out.push(cell(
+            part.push(cell(
                 preset,
                 &format!("modal dim vs the page ({kind})"),
                 "33/34",
@@ -1403,7 +1422,7 @@ fn modal_cells(out: &mut Vec<Cell>) {
                 ("36", "sheet")
             };
             if let Some((r, a, b)) = boundary(&f1, card, sides) {
-                out.push(cell(
+                part.push(cell(
                     preset,
                     &format!("{what} vs the dimmed page"),
                     row,
@@ -1415,7 +1434,7 @@ fn modal_cells(out: &mut Vec<Cell>) {
                 ));
             }
             if let Some(r) = border_only(&f1, card, sides) {
-                out.push(cell(
+                part.push(cell(
                     preset,
                     &format!("{what} border alone vs the dimmed page"),
                     row,
@@ -1427,12 +1446,15 @@ fn modal_cells(out: &mut Vec<Cell>) {
                 ));
             }
         }
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 /// **The drop shadow** (row 40), against the page it falls on: decorative, an exception, measured so the exception is live.
 fn shadow_cells(out: &mut Vec<Cell>) {
-    for (preset, tokens) in Tokens::presets() {
+    let parts = par::by_preset(|preset, tokens| {
+        let mut part = Vec::new();
         let t = leak(tokens);
         let theme = design_theme(t);
         let sc = scene_named("card, raised");
@@ -1445,7 +1467,7 @@ fn shadow_cells(out: &mut Vec<Cell>) {
             let below = ((card.y + card.height) * EDGE as f32) as usize + 6;
             let far = below + 40 * EDGE;
             let (a, b) = (px(&f, x, below), px(&f, x, far));
-            out.push(cell(
+            part.push(cell(
                 preset,
                 "drop shadow vs the page",
                 "40",
@@ -1456,7 +1478,9 @@ fn shadow_cells(out: &mut Vec<Cell>) {
                 b,
             ));
         }
-    }
+        part
+    });
+    out.extend(parts.into_iter().flatten());
 }
 
 /// A glyph's name in the table: the close mark is **one** subject whatever it is drawn with (lucide's `X` under the
@@ -1510,6 +1534,23 @@ fn all_cells() -> &'static Vec<Cell> {
         modal_cells(&mut v);
         shadow_cells(&mut v);
         glyph_cells(&mut v);
+        par::dump_cells(
+            "nontext_sweep",
+            v.iter().map(|c| {
+                format!(
+                    "{}\t{}\t{}\t{}\t{:?}\t{}\t{:?}\t{}\t{}",
+                    c.preset,
+                    c.subject,
+                    c.row,
+                    c.surface,
+                    c.direction,
+                    c.state,
+                    c.ratio,
+                    hex(c.inside),
+                    hex(c.outside)
+                )
+            }),
+        );
         v
     })
 }

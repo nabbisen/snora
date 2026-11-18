@@ -16,6 +16,7 @@ mod common;
 
 use std::sync::{Arc, Mutex};
 
+use common::par;
 use common::removal::Rig;
 use common::sweep::{Msg, NON_TEXT, State, apply_state, ratio};
 use iced::widget::{column, container};
@@ -271,10 +272,11 @@ fn page(el: Element<'static, Msg>) -> Element<'static, Msg> {
 
 #[test]
 fn every_mark_of_the_five_holds_3_to_1_on_every_stock_theme_in_every_state() {
-    let mut failures = Vec::new();
-    let mut cells = 0;
-    let mut lowest = (f32::MAX, String::new());
-    for theme in Theme::ALL {
+    // One theme to a thread (`common/par.rs`), put back in theme order: the lines come out as one thread drew them.
+    let themes: Vec<&Theme> = Theme::ALL.iter().collect();
+    let parts = par::map(&themes, |theme| {
+        let theme: &Theme = theme;
+        let mut lines = Vec::new();
         for sub in subjects() {
             // One direction: a colour does not depend on it (the text sweep pairs them), and what a
             // direction moves is read by `form_controls.rs`' mirror test.
@@ -291,18 +293,28 @@ fn every_mark_of_the_five_holds_3_to_1_on_every_stock_theme_in_every_state() {
                     }
                     let frame = rig.frame_scaled(theme, EDGE as f32);
                     let q = weakest_side(&frame, r, vertical);
-                    cells += 1;
-                    let what = format!("{theme} / {} / {dir:?} / {state:?}: {q:.2}:1", sub.name);
-                    if q < lowest.0 {
-                        lowest = (q, what.clone());
-                    }
-                    if q + TOLERANCE < NON_TEXT {
-                        failures.push(what);
-                    }
+                    lines.push((format!("{theme} / {} / {dir:?} / {state:?}", sub.name), q));
                 }
             }
         }
+        lines
+    });
+    let mut failures = Vec::new();
+    let mut cells = 0;
+    let mut lowest = (f32::MAX, String::new());
+    let mut dump = Vec::new();
+    for (what, q) in parts.into_iter().flatten() {
+        cells += 1;
+        dump.push(format!("{what}\t{q:?}"));
+        let what = format!("{what}: {q:.2}:1");
+        if q < lowest.0 {
+            lowest = (q, what.clone());
+        }
+        if q + TOLERANCE < NON_TEXT {
+            failures.push(what);
+        }
     }
+    par::dump_cells("form_unstyled_drawn", dump);
     println!("{cells} cells; the lowest is {}", lowest.1);
     assert!(cells > 750, "premise: {cells} cells read");
     assert!(

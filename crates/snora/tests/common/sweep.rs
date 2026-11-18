@@ -101,7 +101,9 @@ pub enum Kind {
     App,
 }
 
-pub type Make = Box<dyn Fn(&'static Tokens, LayoutDirection) -> Element<'static, Msg>>;
+/// `Send + Sync`: a sweep's presets are drawn on threads of their own (`par.rs`), each reading the same scenes.
+pub type Make =
+    Box<dyn Fn(&'static Tokens, LayoutDirection) -> Element<'static, Msg> + Send + Sync>;
 
 /// One scene snora draws, and every run it is expected to contain.
 pub struct Scene {
@@ -854,11 +856,13 @@ pub fn sweep() -> Sweep {
 
 /// The same for the given scenes, and for one preset if `only` names it (a plant needs one, not six).
 pub fn sweep_of(scenes: Vec<Scene>, only: Option<&str>) -> Sweep {
-    let mut cells = Vec::new();
-    let mut unlisted = Vec::new();
-    for (preset, tokens) in Tokens::presets() {
+    // The presets are drawn on threads of their own, and put back in preset order (`par.rs`): the cells and the
+    // `unlisted` runs come out as they did when one thread drew them all (a message names its preset, so none repeats).
+    let parts = super::par::by_preset(|preset, tokens| {
+        let mut cells = Vec::new();
+        let mut unlisted = Vec::new();
         if only.is_some_and(|o| o != preset) {
-            continue;
+            return (cells, unlisted);
         }
         let t = leak(tokens);
         let theme = design_theme(t);
@@ -937,6 +941,13 @@ pub fn sweep_of(scenes: Vec<Scene>, only: Option<&str>) -> Sweep {
                 }
             }
         }
+        (cells, unlisted)
+    });
+    let mut cells = Vec::new();
+    let mut unlisted = Vec::new();
+    for (c, u) in parts {
+        cells.extend(c);
+        unlisted.extend(u);
     }
     Sweep { cells, unlisted }
 }

@@ -103,6 +103,14 @@ impl Drop for Lent {
     }
 }
 
+/// Fills the pool with `n` renderers, **created one at a time, here**: a sweep that draws on several threads warms it first, so
+/// that no two threads start a renderer at once (the GPU stack does not take that: see `par.rs`).
+pub fn warm(n: usize) {
+    let wanted = backend();
+    let held: Vec<Lent> = (0..n).map(|_| Lent::take(&wanted)).collect();
+    drop(held);
+}
+
 pub struct Rig<M: 'static> {
     ui: UserInterface<'static, M, Theme, iced::Renderer>,
     renderer: Lent,

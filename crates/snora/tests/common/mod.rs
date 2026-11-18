@@ -26,6 +26,8 @@
 #![allow(dead_code)]
 
 pub mod aaai_cases;
+#[cfg(all(feature = "widgets", feature = "design"))]
+pub mod par;
 #[cfg(feature = "widgets")]
 pub mod removal;
 #[cfg(all(feature = "widgets", feature = "design"))]
