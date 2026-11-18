@@ -8,7 +8,27 @@ focused migration guide describing exactly what to change and why.
 
 This page is the index — pick the guide that matches your jump.
 
-## Per-version guides
+## Jumping several minors: what changes your code
+
+**From 0.40 to 0.65, these are the only releases whose guide can stop your code from compiling.**
+The others change behaviour or appearance, or correct what the book said. Read every guide in
+order, but expect code changes only here:
+
+| Release | What breaks at compile time, if you use it |
+|---|---|
+| [0.40](migration-0.39-to-0.40.md) | your own `iced::advanced` calls, if you relied on `lucide-icons` enabling `advanced` |
+| [0.41](migration-0.40-to-0.41.md) | nothing at compile time, but overlays contain the pointer now: a flow that relied on a click passing through changes |
+| [0.45](migration-0.44-to-0.45.md) | `snora_design::{Emphasis, Size}` removed |
+| [0.57](migration-0.56-to-0.57.md) | `sweep_expired` and `ToastLifetime::DEFAULT` removed; `snora-control` renamed `snora-interaction` |
+| [0.59](migration-0.58-to-0.59.md) | `on_toast_hover`, `ToastHover`, `Holds::hover` removed |
+| [0.60](migration-0.59-to-0.60.md) | `keyboard::dismiss_on_escape` removed |
+| [0.63](migration-0.62-to-0.63.md) | `row_dir` and `row_dir_three` return a `LogicalRow`: code that names `Row` or calls `wrap`, `clip` or `extend` on it |
+| [0.64](migration-0.63-to-0.64.md) | `next_zone`, `FocusZone`, `ZonePresence` removed; eight widget functions take a required `direction`; `Shortcuts::routes()` takes no argument |
+
+**These guides correct something the book told you,** and say what to re-check: **0.53** (a
+published guarantee), **0.54** (the keyboard claims), **0.62** and **0.63** (two audits of the book,
+each with a *"Re-check if you acted on…"* table).
+
 
 - [0.64 → 0.65](migration-0.64-to-0.65.md) — **additions only**: a checkbox, a toggle, a radio
   group, a select and a slider the keyboard can reach (iced 0.14's cannot).
