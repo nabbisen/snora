@@ -11,6 +11,7 @@ enum Message {
 struct App;
 
 impl App {
+    #[expect(clippy::single_match, reason = "the page shows one arm of the reader's own, larger `match`")]
     #[rustfmt::skip]
     fn update(&mut self, msg: Message) -> Task<Message> {
 match msg {

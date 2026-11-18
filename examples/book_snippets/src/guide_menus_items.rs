@@ -37,4 +37,7 @@ let menus = vec![
     // …View, Help…
 ];
 // ANCHOR_END: menus_menus
+// The reader hands the `Vec` to `app_header`; the scaffolding takes it as one.
+let menus: Vec<Menu<MyMenuId, MyMenuItemId>> = menus;
+drop(menus);
 }

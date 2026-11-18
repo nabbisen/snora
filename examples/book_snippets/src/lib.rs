@@ -20,9 +20,6 @@
     unused_assignments,
     unused_must_use
 )]
-// The page's text is the unit here, not clippy's opinion of it (a borrow the reader keeps for clarity, a `vec!` that is
-// the page's illustration, a function with more arguments than clippy likes).
-#![allow(clippy::all)]
 
 mod design_pages;
 mod getting_started_header;

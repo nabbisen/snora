@@ -1,7 +1,5 @@
 //! Anchored source for `docs/src/design/recipes/error-recovery.md` (RFC-136).
 
-use iced::widget::column;
-
 /// The application the second fragment is part of.
 struct App {
     tokens: snora::design::Tokens,
@@ -14,6 +12,14 @@ enum Message {
     DismissSyncError,
 }
 
+/// The recipe's function lives in a module of its own so the one lint it
+/// trips is allowed on that module, not on the page's text.
+#[expect(
+    clippy::too_many_arguments,
+    reason = "the recipe names each part of the notice as an argument, for the reader to see"
+)]
+#[rustfmt::skip]
+mod recipe {
 // ANCHOR: recipe_error_recovery
 use iced::Element;
 use snora::design::{Tokens, Tone, notice::Notice};
@@ -44,6 +50,9 @@ fn error_recovery_notice<'a, Message: Clone + 'a>(
 }
 // ANCHOR_END: recipe_error_recovery
 
+use super::{App, Message};
+use iced::widget::column;
+
 impl App {
     #[rustfmt::skip]
     fn view(&self, direction: snora::LayoutDirection) -> iced::Element<'_, Message> {
@@ -63,5 +72,6 @@ if let Some(notice) = error_recovery_notice(
 }
 // ANCHOR_END: recipe_error_recovery_use
 main_col.into()
+}
 }
 }

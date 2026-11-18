@@ -206,6 +206,7 @@ let element = render(layout, &tokens);
 }
 
 impl App {
+    #[expect(clippy::needless_borrow, reason = "the page writes `&tokens` for a reader whose `tokens` is an owned value; here the scaffolding holds a reference")]
     #[rustfmt::skip]
     fn notices_builder(&self, direction: LayoutDirection) -> impl Into<Element<'_, Message>> {
 let tokens = &self.tokens;
@@ -222,6 +223,7 @@ Notice::new(&tokens, Tone::Info, "Background sync is running.", direction)
 }
 
 impl App {
+    #[expect(clippy::needless_borrow, reason = "the page writes `&tokens` for a reader whose `tokens` is an owned value; here the scaffolding holds a reference")]
     #[rustfmt::skip]
     fn notices_conditional(&self, direction: LayoutDirection) -> Element<'_, Message> {
 use snora::design::{Tone, notice::Notice};
@@ -239,6 +241,7 @@ if self.show_notice {
 }
 
 impl App {
+    #[expect(clippy::needless_borrow, reason = "the page writes `&tokens` for a reader whose `tokens` is an owned value; here the scaffolding holds a reference")]
     #[rustfmt::skip]
     fn progress_variants(&self, direction: LayoutDirection) -> impl Into<Element<'_, Message>> {
 let tokens = &self.tokens;
@@ -261,6 +264,7 @@ column![
 }
 
 impl App {
+    #[expect(clippy::needless_borrow, reason = "the page writes `&tokens` for a reader whose `tokens` is an owned value; here the scaffolding holds a reference")]
     #[rustfmt::skip]
     fn v021_notice(&self, direction: LayoutDirection) -> impl Into<Element<'_, Message>> {
 let tokens = &self.tokens;
@@ -290,6 +294,7 @@ chip::removable(&tokens, "Tag: Rust", true, Message::Toggle, Message::Remove, di
 }
 
 impl App {
+    #[expect(clippy::needless_borrow, reason = "the page writes `&tokens` for a reader whose `tokens` is an owned value; here the scaffolding holds a reference")]
     #[rustfmt::skip]
     fn v021_progress(&self, direction: LayoutDirection) -> impl Into<Element<'_, Message>> {
 let tokens = &self.tokens;
