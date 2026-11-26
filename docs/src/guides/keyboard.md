@@ -162,6 +162,13 @@ no stop" are the ones every snora control has.
 - **Slider values are `f32`.** The step is a hundredth of the range unless you set one.
 - **Their outline is darker than a chip's,** because a form control is drawn on a tinted row and
   the outline has to clear 3:1 against that tint, not only against the page.
+- **Their labels take the page's one text size:** the host's `default_text_size` on the engine
+  path, and `Typography::label` on the design path. There is no per-control size, so a page keeps
+  one size. The 24 px target floor (`1.5 ×` the text, never under 24) follows it.
+- **On the engine path, a selected mark takes your theme's accent (`primary.strong`) only where
+  it holds 3:1** against the page and against the row's hover and press tints. Otherwise it is
+  black or white, whichever reads. On iced's own Light and Dark it is black or white: there the
+  accent reaches 3.7:1 against the page but only 2.0 to 2.8:1 against the tints.
 
 **iced 0.14's own form controls still cannot be reached by the keyboard** (measured, and a test
 reads iced's source, so an iced release that adds focus to one of them is noticed):
