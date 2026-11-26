@@ -118,6 +118,7 @@ yourself:
 |---|---|
 | a modal closes | back to the control that had it, unless the page changed or you moved it |
 | the focused control goes away (a chip removed, a notice dismissed, a toast closed) | its nearest neighbour in the same group: the next, or else the previous; otherwise nothing |
+| a control that keeps focus (`keeps_focus(id)`: a disclosure, a tree node) shows or hides others | **it keeps focus**, wherever it now is (0.66, RFC-137) |
 | a toast elsewhere expires | stays where it was |
 | a shortcut | taken away; Tab carries on from the target (rule 1) |
 | a click | unchanged by the click; Tab carries on from the clicked control |
@@ -131,6 +132,27 @@ Details: [Accessibility](accessibility.md), and the
 (design path) make any content of yours a control, under every rule above. They take iced
 `button`'s builder, so a `button` moves over by changing one name (0.58, RFC-122). An iced
 `button` left as it is takes no keyboard input.
+
+**A control that shows or hides others after it** (a disclosure such as "Advanced settings", a
+tree node, a "show details" row) **says so with `keeps_focus(id)`** (0.66, RFC-137). After a press
+from the keyboard, focus stays on it:
+
+```rust,ignore
+{{#include ../../../examples/book_snippets/src/guide_keyboard.rs:keeps_focus}}
+```
+
+- **Name the item, not its place.** The control is found again by its id, wherever it now is,
+  so controls added or removed before it do not matter. A row number would name a different node
+  once a folder above it opens.
+- **Without it, nothing is focused** after a press that changes how many controls follow. snora
+  cannot tell a disclosure, which stays, from a control that went.
+- **If the declaration is wrong** (the control did go away), or two controls have the id,
+  nothing is focused. Focus never goes to whichever control took its place.
+- **It is `.id(id)` plus the declaration,** so `focus(id)` reaches the control too. A click is
+  unchanged: it focuses nothing, and Tab carries on from the clicked control.
+- **A control that replaces itself is not a disclosure.** "Show more" goes and leaves new items
+  where it was. Do not declare it: focus the first new item by its id in the same `update`, and
+  your focus wins.
 
 ## Form controls
 

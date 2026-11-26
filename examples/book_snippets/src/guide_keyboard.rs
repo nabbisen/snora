@@ -27,3 +27,30 @@ if key == iced::keyboard::Key::Named(iced::keyboard::key::Named::Escape) && self
 Task::none()
 }
 }
+
+// RFC-137: a disclosure keeps focus.
+mod disclosure {
+    use iced::Element;
+    use iced::widget::text;
+
+    #[derive(Clone)]
+    enum Message {
+        Toggle(String),
+    }
+
+    struct Node {
+        path: String,
+        name: String,
+    }
+
+    #[rustfmt::skip]
+    fn node_row(node: &Node) -> Element<'_, Message> {
+// ANCHOR: keeps_focus
+snora::control(text(node.name.as_str()))
+    .on_press(Message::Toggle(node.path.clone()))
+    // The node's path names the node; a row number would name another one after a folder above opens.
+    .keeps_focus(format!("node:{}", node.path))
+    .into()
+// ANCHOR_END: keeps_focus
+}
+}

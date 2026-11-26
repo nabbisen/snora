@@ -240,6 +240,24 @@ them.
     control nobody chose.
   - **Your own focus wins.** If your `update` moves focus itself, snora
     leaves it there.
+  - **A control that stays keeps focus (0.66, RFC-137).** A disclosure, a tree
+    node or a "show details" row shows or hides controls after it and does
+    not go away. Declare it with `keeps_focus(id)`, and after a press from the
+    keyboard focus stays on it, found by its id wherever it now is. Without
+    the declaration, nothing is focused. With a false one (the control did go,
+    or two controls share the id), nothing is focused either. See
+    [Keyboard: your own content](keyboard.md#your-own-content).
+  - **A press that leaves the count unchanged** returns focus to the pressed
+    control's place **only if that place still holds the pressed control's
+    own state**. A control replaced by one of the same kind in the same place
+    (Play becoming Pause) therefore takes the focus, as a reader expects. If a
+    press removed as many controls earlier in the page as it added, the place
+    holds a different control, and nothing is focused (0.66).
+  - **A second known limit (0.66):** if the same press also adds or removes
+    controls *earlier in the page* than the group, snora can no longer match
+    the group, and nothing is focused instead of the neighbour. It never lands
+    on a control nobody pressed. If you need the neighbour there, set focus
+    yourself.
   - **A known limit (RFC-116 L-7):** in your own list, removing a *different*
     item from the one focused can still move focus to another control, because
     iced 0.14 keeps widget state by position, and snora has no identity for
