@@ -45,6 +45,17 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
     which still wins.
   - Nothing breaks: a control that does not call it behaves as in 0.65.0.
 
+### Fixed
+
+- **A press that also changes how many controls come *before* the pressed one no longer hands focus to
+  a stranger** (RFC-137 review). iced keeps a control's state by its place in the tree, which is not its
+  place in Tab order, so after such a rebuild the focus the pressed control's state carried could sit
+  on another control, and one more Enter pressed it. The tracker now recognises that focus by a flag the
+  press leaves on the state itself, not by a Tab index, so it is the tracker's to move. It affects
+  RFC-120's removal path as well as `keeps_focus` (measured on a chip's ×): in a page whose
+  toolbar grows in the same press, focus used to land on a control that was never pressed; it now goes
+  to the neighbour, or to nothing where snora cannot tell. (Not fixed: a press that adds exactly as many
+  controls before as it removes, whose count is unchanged, still reads as "nothing went".)
 
 ## [0.65.0] — 2026-11-18
 

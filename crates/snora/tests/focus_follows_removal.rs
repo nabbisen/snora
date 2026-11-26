@@ -453,3 +453,98 @@ fn a_plain_enter_that_removes_a_control_is_observed_and_a_chord_is_not() {
         "Ctrl+Enter triggered an observation: focus went to {focus:?}"
     );
 }
+
+/// **A change earlier in the page never hands focus to a stranger** (RFC-137 review, B-1, found in the
+/// removal path). iced keeps a control's state by its place in the **tree**; when a press also changes
+/// the number of controls before the removed one (a toolbar that grows), the focus its state carries can
+/// land on a control that was never pressed, at a different Tab index, and one more Enter presses it.
+/// The tracker recognises the inherited focus by a flag the press leaves on that state, not by its Tab
+/// index, so what it finds is its own to move.
+///
+/// Where focus goes then is the neighbour **or nothing**, never anything else: nothing is what RFC-120
+/// answers when it cannot tell, and these rows land there because the group's number is taken by
+/// traversal order, which an earlier control shifts (a stated limit, L-7). **Not asserted: a press
+/// that adds exactly as many controls before as it removes**, whose count is unchanged, so "nothing
+/// went" holds as far as the tracker can see (one lands on the control that took the place).
+#[test]
+fn a_change_earlier_in_the_page_never_hands_focus_to_a_stranger_in_a_removal_either() {
+    use common::disclosure_scenes::pressed;
+    use iced::widget::{column, row, text};
+    const TOOL2: u8 = 50;
+    const ABOVE: u8 = 100;
+
+    let plain = |name: &str| -> iced::Element<'static, common::removal_scenes::Msg> {
+        snora::control(text(name.to_owned()))
+            .on_press(msg(name))
+            .into()
+    };
+    let view = |items: &[u8]| {
+        let t = common::removal_scenes::tokens();
+        let mut tools = row![plain("tool 1")].spacing(8);
+        if items.contains(&TOOL2) {
+            tools = tools.push(plain("tool 2"));
+        }
+        let mut chips = row![].spacing(8);
+        for i in items.iter().filter(|i| **i < 10) {
+            chips = chips.push(snora::design::chip::removable(
+                t,
+                format!("chip {i}"),
+                false,
+                msg(format!("toggle {i}")),
+                msg(format!("remove {i}")),
+                snora::LayoutDirection::Ltr,
+            ));
+        }
+        let mut col = column![tools].spacing(16);
+        if items.contains(&ABOVE) {
+            col = col.push(plain("above"));
+        }
+        common::removal_scenes::page(col.push(chips).into(), snora::LayoutDirection::Ltr)
+    };
+    let mut off = Vec::new();
+    for (what, before, press, after, neighbour) in [
+        (
+            "an earlier row grows",
+            &[0u8, 1, 2][..],
+            "remove 0",
+            &[TOOL2, 1, 2][..],
+            "toggle 1",
+        ),
+        (
+            "an earlier row grows, middle chip",
+            &[0, 1, 2][..],
+            "remove 1",
+            &[TOOL2, 0, 2][..],
+            "toggle 2",
+        ),
+        (
+            "a control is inserted earlier",
+            &[0, 1, 2][..],
+            "remove 0",
+            &[ABOVE, 1, 2][..],
+            "toggle 1",
+        ),
+        (
+            "an earlier row shrinks",
+            &[TOOL2, 0, 1, 2][..],
+            "remove 0",
+            &[1, 2][..],
+            "toggle 1",
+        ),
+    ] {
+        let rig = pressed(&view, before, press);
+        let mut rig = rig.rebuilt(view(after));
+        let got = read(&mut rig, after, &view);
+        if got != Landing::on(neighbour) && got != Landing::nowhere() {
+            off.push(format!(
+                "{what}: pressing {press}: expected {neighbour:?} or nothing, got {got:?}"
+            ));
+        }
+    }
+    assert!(
+        off.is_empty(),
+        "{} row(s) off:\n  {}",
+        off.len(),
+        off.join("\n  ")
+    );
+}

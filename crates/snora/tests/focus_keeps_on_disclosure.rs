@@ -21,8 +21,8 @@
 
 mod common;
 use common::disclosure_scenes::{
-    ABOVE, DIRECTIONS, Decl, GONE, INPUT, PATHS, TWIN, clicked, disclosure, file_tree, press,
-    pressed,
+    ABOVE, DIRECTIONS, Decl, GONE, INPUT, PATHS, TOOL2, TWIN, clicked, disclosure, file_tree,
+    press, pressed, toolbar_disclosure,
 };
 use common::removal::Rig;
 use common::removal_scenes::{Landing, Msg, names, read};
@@ -162,6 +162,57 @@ fn a_control_inserted_before_the_header_does_not_move_focus_off_it() {
             press(&view, &[ABOVE], "header", &[0, 1]),
             Landing::on("header"),
         );
+        rows
+    });
+}
+
+/// **A change earlier in the page** (RFC-137 review, B-1). iced keeps a control's state by its place in
+/// the **tree**, which is not its place in Tab order: when the number of controls *before* the pressed one
+/// changes, the focus its state carries can end up on a **stranger**, at a different Tab index. The
+/// header is still found by its id, whatever moved, and `above` / `option 1` never get the focus.
+///
+/// The first two rows are the ones that held before the fix (the second only because the state stayed with
+/// the header itself, so the check passed for the wrong reason); the other three are the ones that did not.
+#[test]
+fn a_change_earlier_in_the_page_does_not_hand_focus_to_a_stranger() {
+    everywhere(|path, direction| {
+        let view = toolbar_disclosure(path, Decl::Keeps, direction);
+        let mut rows = Vec::new();
+        for (what, before, after) in [
+            ("same column: above appears", &[][..], &[ABOVE, 1, 2][..]),
+            (
+                "earlier container only: tool 2 appears",
+                &[][..],
+                &[TOOL2, 1, 2][..],
+            ),
+            (
+                "tool 2 appears and above appears",
+                &[][..],
+                &[ABOVE, TOOL2, 1, 2][..],
+            ),
+            (
+                "tool 2 appears and above goes",
+                &[ABOVE][..],
+                &[TOOL2, 1, 2][..],
+            ),
+            (
+                "tool 2 goes and above appears",
+                &[TOOL2][..],
+                &[ABOVE, 1, 2][..],
+            ),
+            (
+                "tool 2 goes and the options go",
+                &[TOOL2, 1, 2][..],
+                &[][..],
+            ),
+        ] {
+            expect(
+                &mut rows,
+                what,
+                press(&view, before, "header", after),
+                Landing::on("header"),
+            );
+        }
         rows
     });
 }

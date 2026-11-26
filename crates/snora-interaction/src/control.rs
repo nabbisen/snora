@@ -140,6 +140,11 @@ pub(crate) struct PressMark {
     pub(crate) acted: bool,
     /// What the control says its press does to the focus targets around it.
     pub(crate) effect: PressEffect,
+    /// A press of this control is waiting for the application's rebuild (RFC-137, B-1): set by the
+    /// tracker at the press, read and cleared by it at the rebuild. It lives in the control's own
+    /// state, so it goes **wherever iced carries that state**: a target that has focus **and** this
+    /// flag holds the focus the pressed control had, whatever the targets before it did meanwhile.
+    pub(crate) pending: bool,
 }
 
 /// What a control declares about its own press, for the tracker (RFC-120, RFC-137).

@@ -29,6 +29,8 @@ pub const GONE: u8 = 200;
 pub const TWIN: u8 = 150;
 /// A text input after everything else (the application's own focus can come from the pointer).
 pub const INPUT: u8 = 120;
+/// A second control in the toolbar row **before** the page's list ([`toolbar_disclosure`] only).
+pub const TOOL2: u8 = 50;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Path {
@@ -83,34 +85,60 @@ pub fn disclosure(
     direction: LayoutDirection,
 ) -> impl Fn(&[u8]) -> Element<'static, Msg> {
     move |items: &[u8]| {
-        let mut col = column![].spacing(8);
-        if items.contains(&ABOVE) {
-            col = col.push(plain(path, "above"));
-        }
-        if !items.contains(&GONE) {
-            col = col.push(declared(
-                path,
-                decl,
-                "header",
-                "advanced-settings",
-                text("Advanced settings").into(),
-            ));
-        }
-        for i in items.iter().filter(|i| **i < 10) {
-            col = col.push(plain(path, &format!("option {i}")));
-        }
-        if items.contains(&TWIN) {
-            let twin: Element<'static, Msg> = control(path, "twin", text("Twin").into())
-                .id("advanced-settings")
-                .into();
-            col = col.push(twin);
-        }
-        col = col.push(plain(path, "after"));
-        if items.contains(&INPUT) {
-            col = col.push(iced::widget::text_input("search", "").on_input(|_| msg("typed")));
-        }
-        page(container(col).padding(24).into(), direction)
+        page(
+            container(list(path, decl, items)).padding(24).into(),
+            direction,
+        )
     }
+}
+
+/// The same list, **under a toolbar row** (`tool 1`, and `tool 2` while [`TOOL2`] is present): a change
+/// in an earlier container of the page, which moves the tree position of everything after it. iced
+/// keeps a control's state by tree position, so what the press leaves behind may sit on another
+/// control, at another place in Tab order (RFC-137 review, B-1).
+pub fn toolbar_disclosure(
+    path: Path,
+    decl: Decl,
+    direction: LayoutDirection,
+) -> impl Fn(&[u8]) -> Element<'static, Msg> {
+    move |items: &[u8]| {
+        let mut tools = row![plain(path, "tool 1")].spacing(8);
+        if items.contains(&TOOL2) {
+            tools = tools.push(plain(path, "tool 2"));
+        }
+        let body = column![tools, list(path, decl, items)].spacing(16);
+        page(container(body).padding(24).into(), direction)
+    }
+}
+
+fn list(path: Path, decl: Decl, items: &[u8]) -> iced::widget::Column<'static, Msg> {
+    let mut col = column![].spacing(8);
+    if items.contains(&ABOVE) {
+        col = col.push(plain(path, "above"));
+    }
+    if !items.contains(&GONE) {
+        col = col.push(declared(
+            path,
+            decl,
+            "header",
+            "advanced-settings",
+            text("Advanced settings").into(),
+        ));
+    }
+    for i in items.iter().filter(|i| **i < 10) {
+        col = col.push(plain(path, &format!("option {i}")));
+    }
+    if items.contains(&TWIN) {
+        let twin: Element<'static, Msg> = control(path, "twin", text("Twin").into())
+            .id("advanced-settings")
+            .into();
+        col = col.push(twin);
+    }
+    col = col.push(plain(path, "after"));
+    if items.contains(&INPUT) {
+        col = col.push(iced::widget::text_input("search", "").on_input(|_| msg("typed")));
+    }
+    col
 }
 
 /// aaai's file tree: rows of `width(Fill)`, an indent, an icon and a name. Rows `1` and `2` are the

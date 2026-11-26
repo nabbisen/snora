@@ -89,8 +89,13 @@
 //!   focuses nothing, so it is left alone, and Tab carries on from the clicked control (RFC-121).
 //! - **At the next `RedrawRequested`**, before anything is drawn, or before an operation if one comes
 //!   first: if focus is anywhere **but** the pressed control's position (where the position left it),
-//!   the application put it there and it wins. Otherwise the focus the position inherited is taken
-//!   off, and then one of two rules decides:
+//!   the application put it there and it wins. **"Inherited" is recognised by the state, not by Tab
+//!   index:** iced keeps a control's state by its place in the *tree*, so when a press also changes how
+//!   many controls come before the pressed one, the focus its state carried can sit on another
+//!   control, at another place in Tab order. The press leaves a flag on the pressed control's own
+//!   state ([`PressMark`](crate::control)), the rebuild reads it with each target, and a focused target
+//!   that carries it holds the inherited focus (RFC-137 review, B-1). That focus is taken off, and then
+//!   one of two rules decides:
 //!   - **The control declared `keeps_focus`** (RFC-137): focus goes to the one target whose `Id` is
 //!     the pressed control's, wherever it now is in Tab order. **The count is not read.** If no target
 //!     has the id (the control went away against its declaration), or more than one has it, nothing is
@@ -132,11 +137,11 @@ use iced::{Element, Length, Rectangle, Size, Theme, Vector};
 use iced_core::layout::{self, Layout};
 use iced_core::widget::operation::Focusable;
 use iced_core::widget::{Id, Operation, Tree, tree};
-
-use crate::control::PressEffect;
 use iced_core::{
     Clipboard, Event, Shell, Widget, keyboard, mouse, overlay, renderer, touch, window,
 };
+
+use crate::control::PressEffect;
 
 /// What `Inert` remembers while its layer is covered.
 #[derive(Default)]
@@ -170,6 +175,11 @@ struct Pending {
 #[derive(Clone)]
 struct Seen {
     focused: bool,
+    /// The target carries the flag of a press that is waiting for the rebuild
+    /// ([`PressMark::pending`](crate::control::PressMark)): if it is also `focused`, that focus is
+    /// **inherited** from the pressed control, because iced keeps a control's state by its place in
+    /// the tree and not by its place in Tab order. Only read at the rebuild.
+    inherited: bool,
     scopes: Vec<usize>,
     /// The target's `Id`: made afresh each build unless the application chose one, so it
     /// identifies a control across a rebuild only when `keeps_focus` (which always sets it) says so.
@@ -190,6 +200,9 @@ struct Track {
     group_next: bool,
     /// The containers that are groups which stay (by their number).
     stays: Vec<usize>,
+    /// `true` at the press (`observe`): mark the pressed control's state, and clear the mark on every
+    /// other. `false` at the rebuild (`resolve`): read the mark, and clear it.
+    marking: bool,
 }
 
 impl Operation for Track {
@@ -206,6 +219,7 @@ impl Operation for Track {
     fn focusable(&mut self, id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
         self.seen.push(Seen {
             focused: state.is_focused(),
+            inherited: false,
             scopes: self.stack.clone(),
             id: id.cloned(),
             acted: false,
@@ -225,6 +239,13 @@ impl Operation for Track {
         ) {
             last.acted = mark.acted;
             last.effect = mark.effect;
+            if self.marking {
+                // The pressed control, and only it, is waiting for the rebuild.
+                mark.pending = last.focused && mark.acted;
+            } else {
+                last.inherited = mark.pending;
+                mark.pending = false;
+            }
             mark.acted = false;
         }
     }
@@ -618,7 +639,10 @@ impl<Message: Clone> Inert<'_, Message> {
     /// focuses) is not the focused control going away, and is left alone: that
     /// is the stated limit.
     fn observe(&mut self, tree: &mut Tree, layout: Layout<'_>, renderer: &iced::Renderer) {
-        let mut track = Track::default();
+        let mut track = Track {
+            marking: true,
+            ..Track::default()
+        };
         self.content
             .as_widget_mut()
             .operate(&mut tree.children[0], layout, renderer, &mut track);
@@ -651,15 +675,12 @@ impl<Message: Clone> Inert<'_, Message> {
             .operate(&mut tree.children[0], layout, renderer, &mut track);
         let after = track.seen;
 
-        // Focus is either where iced's positional state left it (on the pressed
-        // control's position, or nowhere), which this replaces, or somewhere
-        // else, which only the application can have put there (a focus task,
-        // a click into a text input): its choice wins.
-        if after
-            .iter()
-            .enumerate()
-            .any(|(i, s)| s.focused && i != pending.at)
-        {
+        // Focus is either what the pressed control's **state** carried over the rebuild (iced keeps
+        // state by place in the tree, so it may now sit on a stranger, at any Tab index: it is
+        // recognised by the flag the press left on that state, not by where it is in Tab order),
+        // which this replaces, or somewhere else, which only the application can have put there (a
+        // focus task, a click into a text input): its choice wins.
+        if after.iter().any(|s| s.focused && !s.inherited) {
             return;
         }
         let to = match pending.effect {
