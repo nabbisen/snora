@@ -264,6 +264,14 @@ read, in four requests:
 That is about 5,100 lines. A claim that something is complete ("every", "all", an inventory) is checked by enumerating the
 API or what is drawn, never by searching. It can start during 0.66, because it is read-only.
 
+**Already carried in** from request A's review and RFC-138's Unit 0 (2026-11-26):
+- `ShortcutRoute` and `TargetRole` re-exported from `snora::keyboard`. `Shortcuts::routes()` returns them, and an
+  application on `snora` alone cannot name them.
+- Guards: every `pub enum` of `snora-core` is on the vocabulary page, by enumeration; every type in a public signature
+  of `snora` can be named through `snora`; `check-migration-guides.sh` reads the index page's table.
+- To measure first: whether `responsive_body`'s unit tests run in CI, and what a form control does when one label
+  alone is wider than the room.
+
 ## After 0.67
 
 - **A coverage release, the one after 0.67's follow-up.** It takes every row "guarded in part" or "unguarded, true" from

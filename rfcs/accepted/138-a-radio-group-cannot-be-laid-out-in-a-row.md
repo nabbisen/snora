@@ -84,6 +84,17 @@ overflows clips an option, which RFC-105 rules out. A setting to turn wrapping o
 - **Q-3:** a horizontal group always wraps. There is no setting to turn wrapping off.
 - **Q-4:** 0.66.0, as an addition.
 
+**Unit 0's review, 2026-11-26 (architect).**
+- **Q-2 ruled: the space between options is twice the space between a mark and its label,** on both paths: 16 px on
+  the engine path (`2 × 8`) and `2 × tokens.spacing.sm` on the design path (16 with the stock tokens). It is derived
+  from a token rather than taken from `spacing.lg`, because the rule is relative and `Spacing`'s fields are public: an
+  application's scale with `lg` at or below `sm` would break it silently. Measured: an ink ratio of 1.8 to 1.9 against
+  the mark-to-label gap, where 8 px gives 0.9 to 1.0.
+- **R-2's "never clipped or squeezed" has a limit, measured in Unit 0.** A line breaks between options, so no option is
+  pushed out of the room by the ones before it. An option that alone is wider than the room is laid out as the column
+  lays it out, which is squeezed (100 px window, both paths). That limit is the column's too, so it is carried into
+  0.67 to be measured on its own, and the doc and the book state it.
+
 ## Review against snora's principles
 
 - **Nobody is confused.**
