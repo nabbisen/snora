@@ -199,6 +199,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 138 | [A radio group cannot be laid out in a row](./proposed/138-a-radio-group-cannot-be-laid-out-in-a-row.md) | **0.66.0** — from logolig's 2026-11-19 letter: snora's `radio_group` is a column only, so a move from iced's radios loses the row layout they allow. Proposed: `horizontal(bool)`; a row that always wraps, in logical order, mirrored line by line under RTL; the same keys in either layout; every floor drawn and swept |
 
 ## Archive
 
