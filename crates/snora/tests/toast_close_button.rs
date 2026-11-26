@@ -23,12 +23,13 @@
 
 #![cfg(feature = "widgets")]
 
-use iced::{Element, Rectangle};
+use iced::{Element, Rectangle, Size};
 use iced_test::Simulator;
 
 use snora::{AppLayout, Toast, ToastIntent, render};
 
 mod common;
+use common::removal::Rig;
 use common::{MIN_TARGET, TOLERANCE, containers, pointer_target, simulator};
 
 /// The width the message column had at 0.50.0: the toast's fixed 340,
@@ -83,13 +84,12 @@ fn body() -> Element<'static, Msg> {
 /// A toast rendered through the public engine path, as an application
 /// would get it.
 fn toast(intent: ToastIntent) -> Element<'static, Msg> {
-    let toast = Toast::new(
-        TOAST_ID,
-        intent,
-        "Saved",
-        "All good.",
-        Msg::Dismiss(TOAST_ID),
-    );
+    toast_with(intent, "All good.")
+}
+
+/// The same with the message `message`.
+fn toast_with(intent: ToastIntent, message: &str) -> Element<'static, Msg> {
+    let toast = Toast::new(TOAST_ID, intent, "Saved", message, Msg::Dismiss(TOAST_ID));
     render(AppLayout::new(body()).toasts(vec![toast]))
 }
 
@@ -135,12 +135,16 @@ fn reference_glyph_size() -> iced::Size {
 // (a) The pointer target
 // ---------------------------------------------------------------------------
 
-/// The target is **exactly** the floor, not merely above it.
+/// The target a pointer reaches is **the floor, not merely above it**, read by clicking the corners.
 ///
 /// `>=` would pass just as well with the `[0, 8]` padding this RFC
 /// removed, which made the button 40 x 24: over the floor, and 15px of it
 /// taken from the message column. On a fixed-width toast those are the
 /// same 15px. Asserting equality is what stops padding creeping back.
+///
+/// **This is the pointer reading, and it keeps its tolerance** (`TOLERANCE`, half a pixel): it is
+/// what says a click reaches the corners, and it cannot tell 23.75 from 24. The laid-out size is
+/// asserted exactly by `close_control_is_laid_out_at_exactly_the_floor` below.
 #[test]
 fn close_button_target_is_exactly_the_floor() {
     for (label, intent) in intents() {
@@ -148,13 +152,69 @@ fn close_button_target_is_exactly_the_floor() {
         assert!(
             (target.width - MIN_TARGET).abs() <= TOLERANCE
                 && (target.height - MIN_TARGET).abs() <= TOLERANCE,
-            "{label}: the toast close button's pointer target is {}x{}, not \
-             {MIN_TARGET}x{MIN_TARGET} — below the floor is a WCAG 2.5.8 defect, and above it \
-             is room taken from the message column of a fixed-width toast",
+            "{label}: the toast close button's pointer target (the corner-click reading, within \
+             {TOLERANCE} px) is {}x{}, not {MIN_TARGET}x{MIN_TARGET} — below the floor is a WCAG \
+             2.5.8 defect, and above it is room taken from the message column of a fixed-width toast",
             target.width,
             target.height,
         );
     }
+}
+
+/// **The laid-out size of the close control is exactly the floor, with no tolerance** (0.66
+/// housekeeping H-1). logolig measured 23.75 x 23.75 at a fractional `y`; that was the edge's
+/// antialiasing counted in whole pixels, and the laid-out target is 24.0 x 24.0. But the reading
+/// above allows half a pixel either way, so a real 23.75 would have passed it and nothing else
+/// would catch it. This reads the focus target's own bounds from the layout (what
+/// `mirrored_layout.rs` reads), and compares them with `==`.
+///
+/// Three intents, three message lengths (a short one, none, and one that wraps) and two window
+/// widths, as the architect's probe covered. If a case is ever a fraction, that is a layout that is
+/// not 24, and the message names it: do not widen the comparison.
+#[test]
+fn close_control_is_laid_out_at_exactly_the_floor() {
+    let long =
+        "A message long enough that it wraps onto more than one line in a toast of this width, \
+                so that the close control sits beside a taller column. "
+            .repeat(2);
+    let messages: [(&str, &str); 3] = [("short", "All good."), ("empty", ""), ("wrapping", &long)];
+    let mut off = Vec::new();
+    let mut cases = 0;
+    for intent in [ToastIntent::Info, ToastIntent::Debug, ToastIntent::Error] {
+        for (length, message) in messages {
+            for width in [800.0f32, 320.0] {
+                cases += 1;
+                let mut rig = Rig::sized(toast_with(intent, message), Size::new(width, 600.0));
+                let targets = rig.targets();
+                let what = format!("{intent:?}, {length} message, {width} px wide");
+                if targets.len() != 1 {
+                    off.push(format!(
+                        "{what}: expected the close control to be the one focus target, found {}",
+                        targets.len()
+                    ));
+                    continue;
+                }
+                let b = targets[0].bounds;
+                if b.width != MIN_TARGET || b.height != MIN_TARGET {
+                    off.push(format!(
+                        "{what}: the close control is laid out {}x{}, not exactly \
+                         {MIN_TARGET}x{MIN_TARGET} (the layout's own bounds, compared with ==)",
+                        b.width, b.height
+                    ));
+                }
+            }
+        }
+    }
+    assert_eq!(
+        cases, 18,
+        "premise: three intents, three lengths, two widths"
+    );
+    assert!(
+        off.is_empty(),
+        "{} of {cases} case(s) are not exactly the floor:\n  {}",
+        off.len(),
+        off.join("\n  ")
+    );
 }
 
 /// The message column keeps the room it had at 0.50.0.
