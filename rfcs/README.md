@@ -200,6 +200,7 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 139 | [Turning on `lucide-icons` breaks the marks snora draws itself](./proposed/139-turning-on-lucide-icons-breaks-snoras-own-marks.md) | **0.66.0** — from the 0.67 audit's request A (A2-082), probed in a real window: with the feature on and the font not loaded (an adopter's starting state, and reachable through feature unification by an application that never chose Lucide), the toast's close mark is a missing-glyph box; the notice and chip marks, the checkbox tick and the select chevron take the same font. Proposed: a feature never changes how snora's own marks are drawn (the text glyphs, as the no-lucide jobs already sweep); the pages tell an application with Lucide icons to load the font; a test in the starting state |
 
 ## Archive
 

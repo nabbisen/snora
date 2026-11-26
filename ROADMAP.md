@@ -249,6 +249,9 @@ publish (owner, 2026-11-18).
 - **[RFC-138](rfcs/accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md), a horizontal `radio_group`** (logolig), accepted. A move from iced's radios must not lose the row layout they allow. The
   keys stay the same in either layout.
 - **Housekeeping:** the toast close-target test asserts the floor exactly (it allowed ±0.5 px).
+- **[RFC-139](rfcs/proposed/139-turning-on-lucide-icons-breaks-snoras-own-marks.md), a fix** (owner, 2026-11-27), proposed.
+  With `lucide-icons` on and the font not loaded, the toast's close mark is a box, and four more marks snora draws take
+  the same font. A crate elsewhere in the dependency graph can turn the feature on. Found by the 0.67 audit.
 - **Then cut 0.66.0,** without waiting for the audit below, so that the focus fix reaches logolig and aaai.
 
 ## Then — 0.67.0: the third audit
