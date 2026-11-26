@@ -27,6 +27,8 @@
 
 pub mod aaai_cases;
 #[cfg(all(feature = "widgets", feature = "design"))]
+pub mod disclosure_scenes;
+#[cfg(all(feature = "widgets", feature = "design"))]
 pub mod par;
 #[cfg(feature = "widgets")]
 pub mod removal;

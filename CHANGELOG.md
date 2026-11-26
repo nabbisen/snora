@@ -26,7 +26,25 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`keeps_focus(id)` on `snora::Control`** (RFC-137), for a control that stays where it is when
+  pressed and shows or hides others after it: a disclosure ("Advanced settings"), a tree node, a
+  "show details" row. Built by `snora::control` and `snora::design::control` alike.
+  - **The fix.** After a press from the keyboard such a control used to leave **nothing**
+    focused whenever the press changed how many controls followed it (RFC-120: position and
+    count cannot tell a disclosure, which stays, from a replacement, which goes), so the next
+    Tab started at the top of the window. Declared with `keeps_focus(id)`, focus stays on it.
+  - **It is found by `id`,** wherever it now is in Tab order, so controls added or removed before it
+    do not matter; name the item (a node's path), not its row number. It is `.id(id)` plus the
+    declaration, so `focus(id)` reaches it too.
+  - **Misuse is safe.** If no target has the id after the rebuild (the control went away after all),
+    or two have it, nothing is focused: never the neighbour that moved into the place.
+  - **Unchanged:** an undeclared press, a click (it focuses nothing; Tab carries on from the clicked
+    control, RFC-121), and the application's own focus (a focus task, a click into a text input),
+    which still wins.
+  - Nothing breaks: a control that does not call it behaves as in 0.65.0.
+
 
 ## [0.65.0] — 2026-11-18
 

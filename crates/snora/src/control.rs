@@ -70,8 +70,10 @@ impl RingConfig {
 /// [`style`](Control::style), which takes iced's own
 /// `Fn(&Theme, button::Status) -> button::Style`, so an existing style closure, and
 /// iced's own style functions (`iced::widget::button::primary`), work unchanged. The
-/// builder has one more method that `button` does not: [`id`](Control::id), which
-/// iced's `focus(id)` and `is_focused(id)` reach (RFC-127).
+/// builder has two more methods that `button` does not: [`id`](Control::id), which
+/// iced's `focus(id)` and `is_focused(id)` reach (RFC-127), and
+/// [`keeps_focus`](Control::keeps_focus), for a control that shows or hides others after it
+/// (RFC-137).
 ///
 /// `snora::design::style::button::*` take the tokens and not the theme
 /// (`fn(&Tokens, button::Status) -> button::Style`), so they go in a closure that
@@ -107,7 +109,8 @@ impl RingConfig {
 /// - a target no smaller than `max(24, 1.5 × the label's text size)` (WCAG 2.5.8);
 /// - out of reach while a dialog or sheet is open over it;
 /// - when it goes away after being pressed, focus follows snora's rule for a
-///   removal (RFC-120).
+///   removal (RFC-120); a control that **stays** while it shows or hides others (a
+///   disclosure) says so with [`keeps_focus`](Control::keeps_focus), and keeps focus (RFC-137).
 ///
 /// ## The ring
 ///
@@ -157,6 +160,8 @@ pub struct Control<'a, Message> {
     text_size: Option<f32>,
     /// Chosen by the application (RFC-127); `None` keeps the one the control makes.
     id: Option<widget::Id>,
+    /// Declared with [`keeps_focus`](Control::keeps_focus) (RFC-137).
+    keeps_focus: bool,
 }
 
 /// Make `content` a control the keyboard can reach. The **engine path**: no tokens.
@@ -198,6 +203,7 @@ pub fn control<'a, Message: Clone + 'a>(
         min_target: 0.0,
         text_size: None,
         id: None,
+        keeps_focus: false,
     }
 }
 
@@ -228,6 +234,7 @@ pub(crate) fn designed<'a, Message: Clone + 'a>(
         // this path is drawn at the label size.
         text_size: Some(tokens.typography.label.size),
         id: None,
+        keeps_focus: false,
     }
 }
 
@@ -306,6 +313,59 @@ impl<'a, Message: Clone + 'a> Control<'a, Message> {
         self
     }
 
+    /// **A disclosure keeps focus** (RFC-137): pressing this control never removes it, and after a
+    /// press **from the keyboard** focus stays on it, whatever else the press adds or removes. It
+    /// is found by `id`, so the id must name what the control is, not where it sits.
+    ///
+    /// A *disclosure* is a control that stays where it is when pressed and shows or hides other
+    /// controls after it: "Advanced settings", a tree node, a "show details" row.
+    ///
+    /// ```
+    /// # use iced::widget::text;
+    /// # #[derive(Clone)] enum Message { ToggleAdvanced }
+    /// # fn view<'a>() -> iced::Element<'a, Message> {
+    /// snora::control(text("Advanced settings"))
+    ///     .on_press(Message::ToggleAdvanced)
+    ///     .keeps_focus("advanced-settings")
+    ///     .into()
+    /// # }
+    /// ```
+    ///
+    /// # What it does
+    ///
+    /// - It is [`id`](Self::id) plus the declaration, so `focus(id)` reaches the control too. If
+    ///   `id` is called **after** it, that later id is the control's and the one that is looked
+    ///   for.
+    /// - After a press **from the keyboard** (Tab to it, Enter or Space), focus goes to the one
+    ///   focus target that has this id, **wherever it now is in Tab order**: controls added or
+    ///   removed before it do not matter, and the number of controls is not read.
+    /// - **Name the item, not its place:** a tree node's path, not its row number. A row number
+    ///   names a different node after one above it opens.
+    /// - **The application's own focus still wins:** a focus task from the same `update`, or a
+    ///   click into a text input, is not overridden.
+    /// - **A click is unchanged.** It focuses nothing, and Tab carries on from the clicked
+    ///   control (RFC-121).
+    ///
+    /// # What it does when the declaration is false
+    ///
+    /// - **If no focus target has the id after the rebuild** (the control went away after all),
+    ///   **nothing is focused.** Focus never falls to the neighbour that moved into its place.
+    /// - **If two focus targets have the id, nothing is focused.** Ids must be unique in the
+    ///   window, as for `focus(id)`.
+    /// - A **disabled** control (no handler, or `on_press_maybe(None)`) is not a focus target, so
+    ///   the declaration has no effect on it.
+    ///
+    /// Without this, a press that changes how many controls follow leaves **nothing** focused
+    /// (RFC-120): snora cannot tell a disclosure, which stays, from a replacement, which goes. A
+    /// control that **replaces itself** ("Show more", which goes and leaves new items in its
+    /// place) is not a disclosure: do not declare it, and focus the first new item by its id in
+    /// the same `update`.
+    pub fn keeps_focus(mut self, id: impl Into<widget::Id>) -> Self {
+        self.id = Some(id.into());
+        self.keeps_focus = true;
+        self
+    }
+
     /// Padding between the control's bounds and its content. Defaults to
     /// `[5, 10]`, what `iced::widget::button` pads with.
     pub fn padding(mut self, padding: impl Into<Padding>) -> Self {
@@ -366,7 +426,11 @@ impl<'a, Message: Clone + 'a> From<Control<'a, Message>> for Element<'a, Message
             inner = inner.text_size(size);
         }
         if let Some(id) = control.id {
-            inner = inner.id(id);
+            inner = if control.keeps_focus {
+                inner.keeps_focus(id)
+            } else {
+                inner.id(id)
+            };
         }
         inner = match control.on_press {
             Some(OnPress::Direct(message)) => inner.on_press(message),

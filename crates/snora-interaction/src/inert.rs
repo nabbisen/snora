@@ -67,43 +67,50 @@
 //! > focused something itself. Then focus is wherever the application put it,
 //! > or nowhere.**
 //!
-//! # After a removal (RFC-120)
+//! # After a press (RFC-120, RFC-137)
 //!
-//! `Inert` is also the **tracker** for where focus goes when the focused control
-//! goes away, because it is always in the tree, keeps its state across the
-//! application's rebuilds, and can run an operation over its content in
-//! `update`. Nothing else can: a control's own `update` sees no sibling, and a
-//! `Shell` cannot run an operation.
+//! `Inert` is also the **tracker** for where focus goes after the focused control is pressed and the
+//! application rebuilds: when it goes away (RFC-120), and when it stays while others come or go
+//! (RFC-137). It is always in the tree, keeps its state across the application's rebuilds, and can
+//! run an operation over its content in `update`. Nothing else can: a control's own `update` sees no
+//! sibling, and a `Shell` cannot run an operation.
 //!
-//! > **When the focused control goes away, focus moves to its nearest neighbour
-//! > in the same group: the next one, or else the previous one. Otherwise,
-//! > nothing is focused.**
+//! > **When the focused control goes away, focus moves to its nearest neighbour in the same group:
+//! > the next one, or else the previous one. Otherwise, nothing is focused.**
+//! >
+//! > **A control that declared [`keeps_focus`](Control::keeps_focus) keeps focus after a press from
+//! > the keyboard, whatever else the press adds or removes.**
 //!
-//! - **After a press** of the focused control ([`Control`](crate::Control)
-//!   marks itself when it publishes), `Inert` surveys its content's focus
-//!   targets in Tab order, with the containers each sits in, and remembers the
-//!   survey. (iced keeps state by position: 0.55.0 left focus on whichever
-//!   control moved into the removed one's place, and one more Enter pressed it.)
-//! - **At the next `RedrawRequested`**, before anything is drawn, or before an
-//!   operation if one comes first: if focus is anywhere **but** the pressed
-//!   control's position (where the position left it), the application put it
-//!   there and it wins; otherwise that inherited focus is taken off, and if the
-//!   count is unchanged, nothing went and focus returns to the same position;
-//!   otherwise the targets
-//!   that went are the span the control declared ([`Control::removes`]), and
-//!   focus goes to the next target in the same group, or the previous.
-//! - **The group** is the innermost container that held the control and is
-//!   still there, and **never wider than this layer**: `Inert` surveys only its
-//!   own content. With no target left in the group, or if the counts do not add
-//!   up to exactly the declared removal, nothing is focused.
+//! - **After a press** of the focused control ([`Control`](crate::Control) marks itself when it
+//!   publishes), `Inert` surveys its content's focus targets in Tab order, with the containers each
+//!   sits in and each one's `Id`, and remembers the survey. (iced keeps state by position: 0.55.0 left
+//!   focus on whichever control moved into the removed one's place, and one more Enter pressed it.)
+//!   Only a press **of the focused control** is surveyed, which is a press from the keyboard: a click
+//!   focuses nothing, so it is left alone, and Tab carries on from the clicked control (RFC-121).
+//! - **At the next `RedrawRequested`**, before anything is drawn, or before an operation if one comes
+//!   first: if focus is anywhere **but** the pressed control's position (where the position left it),
+//!   the application put it there and it wins. Otherwise the focus the position inherited is taken
+//!   off, and then one of two rules decides:
+//!   - **The control declared `keeps_focus`** (RFC-137): focus goes to the one target whose `Id` is
+//!     the pressed control's, wherever it now is in Tab order. **The count is not read.** If no target
+//!     has the id (the control went away against its declaration), or more than one has it, nothing is
+//!     focused: never the position, which would be the neighbour that moved into the place.
+//!   - **Otherwise** (RFC-120): if the count is unchanged, nothing went and focus returns to the same
+//!     position; if not, the targets that went are the span the control declared
+//!     ([`Control::removes`]), and focus goes to the next target in the same group, or the previous.
+//! - **A control declares one or the other** (`PressEffect`): it goes, with a span, or it stays. Both
+//!   cannot be said of one control.
+//! - **The group** is the innermost container that held the control and is still there, and **never
+//!   wider than this layer**: `Inert` surveys only its own content. With no target left in the group,
+//!   or if the counts do not add up to exactly the declared removal, nothing is focused.
 //!
-//! If your container is left with no control in it, snora cannot tell that it is
-//! still there, and treats it as gone: focus moves to the nearest control in the
-//! container around it.
+//! If your container is left with no control in it, snora cannot tell that it is still there, and
+//! treats it as gone: focus moves to the nearest control in the container around it.
 //!
-//! **Not covered (a stated limit, RFC-116 L-7):** a removal *elsewhere* in an
-//! application's list can still move focus, because nothing says which control
-//! went.
+//! **Not covered (a stated limit, RFC-116 L-7):** a removal *elsewhere* in an application's list can
+//! still move focus, because nothing says which control went. A control that **replaces itself**
+//! (a "Show more" that goes and leaves new items in its place) is not a disclosure; the application
+//! focuses the first new item by its id in the same `update`.
 //!
 //! # Overlays
 //!
@@ -125,6 +132,8 @@ use iced::{Element, Length, Rectangle, Size, Theme, Vector};
 use iced_core::layout::{self, Layout};
 use iced_core::widget::operation::Focusable;
 use iced_core::widget::{Id, Operation, Tree, tree};
+
+use crate::control::PressEffect;
 use iced_core::{
     Clipboard, Event, Shell, Widget, keyboard, mouse, overlay, renderer, touch, window,
 };
@@ -148,8 +157,10 @@ struct Pending {
     before: Vec<Seen>,
     /// The pressed control's position in `before`.
     at: usize,
-    /// How many targets go with it, before it and after it.
-    removes: (usize, usize),
+    /// What it declared about its press: how many targets go with it, or that focus stays on it.
+    effect: PressEffect,
+    /// The pressed control's `Id`, which is how a control that keeps focus is found again.
+    id: Option<Id>,
     /// The containers that were groups which stay ([`crate::Group`]).
     stays: Vec<usize>,
 }
@@ -160,8 +171,11 @@ struct Pending {
 struct Seen {
     focused: bool,
     scopes: Vec<usize>,
+    /// The target's `Id`: made afresh each build unless the application chose one, so it
+    /// identifies a control across a rebuild only when `keeps_focus` (which always sets it) says so.
+    id: Option<Id>,
     acted: bool,
-    removes: (usize, usize),
+    effect: PressEffect,
 }
 
 /// Lists the focus targets in Tab order. A container is numbered by the order
@@ -189,12 +203,13 @@ impl Operation for Track {
         self.stack.pop();
     }
 
-    fn focusable(&mut self, _id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
+    fn focusable(&mut self, id: Option<&Id>, _bounds: Rectangle, state: &mut dyn Focusable) {
         self.seen.push(Seen {
             focused: state.is_focused(),
             scopes: self.stack.clone(),
+            id: id.cloned(),
             acted: false,
-            removes: (0, 0),
+            effect: PressEffect::default(),
         });
     }
 
@@ -209,7 +224,7 @@ impl Operation for Track {
             self.seen.last_mut(),
         ) {
             last.acted = mark.acted;
-            last.removes = mark.removes;
+            last.effect = mark.effect;
             mark.acted = false;
         }
     }
@@ -610,11 +625,13 @@ impl<Message: Clone> Inert<'_, Message> {
         let Some(at) = track.seen.iter().position(|s| s.focused && s.acted) else {
             return;
         };
-        let removes = track.seen[at].removes;
+        let effect = track.seen[at].effect;
+        let id = track.seen[at].id.clone();
         tree.state.downcast_mut::<State>().pending = Some(Pending {
             before: track.seen,
             at,
-            removes,
+            effect,
+            id,
             stays: track.stays,
         });
     }
@@ -645,19 +662,32 @@ impl<Message: Clone> Inert<'_, Message> {
         {
             return;
         }
-        let to = if after.len() == pending.before.len() {
+        let to = match pending.effect {
+            // The control declared that it stays (RFC-137): it is found by its id, wherever it
+            // now is, and the count is not read. Exactly one target with the id, or nothing: a
+            // missing id (the control went after all) or a doubled one is a misuse snora cannot
+            // resolve, and "nothing is focused" is the safe answer, never the position.
+            PressEffect::KeepsFocus => {
+                let mut found = after
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, s)| pending.id.is_some() && s.id == pending.id)
+                    .map(|(i, _)| i);
+                match (found.next(), found.next()) {
+                    (Some(only), None) => Some(only),
+                    _ => None,
+                }
+            }
             // Nothing went: the control is still there.
-            Some(pending.at)
-        } else {
-            let (bef, aft) = pending.removes;
-            pending
+            PressEffect::Removes(..) if after.len() == pending.before.len() => Some(pending.at),
+            PressEffect::Removes(bef, aft) => pending
                 .at
                 .checked_sub(bef)
                 .and_then(|start| {
                     let end = pending.at + aft + 1;
                     (end <= pending.before.len()).then_some(start..end)
                 })
-                .and_then(|span| nearest_in_group(&pending.before, &pending.stays, span, &after))
+                .and_then(|span| nearest_in_group(&pending.before, &pending.stays, span, &after)),
         };
         // Whatever focus the position inherited goes, then the neighbour gets it.
         self.content

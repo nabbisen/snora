@@ -138,8 +138,28 @@ type KeyFn<'a, Message> = Box<dyn Fn(&keyboard::Key, keyboard::Modifiers) -> Opt
 pub(crate) struct PressMark {
     /// The control published its message since the tracker last looked.
     pub(crate) acted: bool,
-    /// Targets that go with it, before and after it ([`Control::removes`]).
-    pub(crate) removes: (usize, usize),
+    /// What the control says its press does to the focus targets around it.
+    pub(crate) effect: PressEffect,
+}
+
+/// What a control declares about its own press, for the tracker (RFC-120, RFC-137).
+///
+/// **One or the other, never both:** a control that goes away cannot also keep focus, and a
+/// control that keeps it removes no span of its own. The type is how that is said.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum PressEffect {
+    /// Targets that go with the control, before it and after it
+    /// ([`Control::removes`]). `(0, 0)` is "only this one", and is the undeclared default.
+    Removes(usize, usize),
+    /// The control stays, and focus stays on it whatever else the press adds or removes
+    /// ([`Control::keeps_focus`]); it is found again by its `Id`.
+    KeepsFocus,
+}
+
+impl Default for PressEffect {
+    fn default() -> Self {
+        Self::Removes(0, 0)
+    }
 }
 
 #[derive(Debug, Default)]
@@ -205,9 +225,10 @@ pub struct Control<'a, Message> {
     /// Told to the application when focus arrives and when it leaves
     /// (`gained`, `lost`), for what depends on it: the toast hold (RFC-120 R-3).
     focus_change: Option<(Message, Message)>,
-    /// How many focus targets go with this control when it is pressed: before
-    /// it and after it, in Tab order (RFC-120). `(0, 0)` is "only this one".
-    removes: (usize, usize),
+    /// What the control declares about its press (RFC-120, RFC-137): how many focus targets go
+    /// with it, before it and after it in Tab order (`Removes(0, 0)`, "only this one", when
+    /// undeclared), or that focus stays on it.
+    effect: PressEffect,
     /// Which control this is, for a shortcut that is a click on it (RFC-116 R-2).
     tag: Option<Tag>,
     /// What a key other than a press means while the control has focus (RFC-134): an arrow on a
@@ -261,7 +282,7 @@ impl<'a, Message> Control<'a, Message> {
             min_target: 0.0,
             text_size: None,
             focus_change: None,
-            removes: (0, 0),
+            effect: PressEffect::default(),
             tag: None,
             on_key: None,
         }
@@ -299,7 +320,34 @@ impl<'a, Message> Control<'a, Message> {
     /// cannot say which controls went. Undeclared is `(0, 0)`: only this one.
     #[must_use]
     pub fn removes(mut self, before: usize, after: usize) -> Self {
-        self.removes = (before, after);
+        self.effect = PressEffect::Removes(before, after);
+        self
+    }
+
+    /// Say that pressing this control **never removes it**, and that after a press **from the
+    /// keyboard** focus stays on it, whatever else the press adds or removes (RFC-137): a
+    /// disclosure ("Advanced settings"), a tree node, a "show details" row.
+    ///
+    /// The control is found again by `id`, so `id` must name what the control **is**, not where
+    /// it sits (a node's path, not its row number): controls added or removed before it do not
+    /// matter. This sets the control's id, so it is [`id`](Self::id) plus the declaration; if
+    /// `id` is called after it, that later id is the control's, and the one that is looked for.
+    ///
+    /// - **Misuse is safe.** If no focus target has the id after the rebuild (the control did go
+    ///   away), or more than one has it, nothing is focused. Focus never falls to the neighbour
+    ///   that moved into the place.
+    /// - **A click is unchanged:** it focuses nothing, and Tab carries on from the clicked
+    ///   control (RFC-121).
+    /// - **The application's own focus wins:** a focus task in the same update, or a click into a
+    ///   text input, is not overridden.
+    /// - **It replaces [`removes`](Self::removes)**, and the last one declared is the one that
+    ///   counts: a control either goes or stays.
+    /// - A **disabled** control (no handler) registers no focus target, so there is nothing for
+    ///   the declaration to act on.
+    #[must_use]
+    pub fn keeps_focus(mut self, id: Id) -> Self {
+        self.id = id;
+        self.effect = PressEffect::KeepsFocus;
         self
     }
 
@@ -547,7 +595,7 @@ where
             operation.custom(Some(&self.id), bounds, &mut state.start_here);
             // What the tracker needs to act after a press (RFC-120): whether
             // this control was just pressed, and how many targets go with it.
-            state.mark.removes = self.removes;
+            state.mark.effect = self.effect;
             operation.custom(Some(&self.id), bounds, &mut state.mark);
             // Who this is, and (if a shortcut asks) make it Tab's starting point.
             if let Some(tag) = self.tag {
