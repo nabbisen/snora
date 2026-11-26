@@ -194,12 +194,12 @@ state.
 | ID | Title | Target |
 |----|-------|--------|
 | 137 | [A keyboard press on a disclosure leaves nothing focused](./accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md) | **0.66.0** — from logolig's 2026-11-22 letter, measured true on 0.65.0: a `snora::control` that shows or hides controls after it (a disclosure, aaai's file tree) leaves nothing focused after Enter, against RFC-120's "when the focused control goes away". Proposed: `keeps_focus(id)` on the public control; `Inert` returns focus to that id, and focuses nothing if it is gone; undeclared changes and clicks unchanged — **accepted 2026-11-26** |
+| 138 | [A radio group cannot be laid out in a row](./accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md) | **0.66.0** — from logolig's 2026-11-19 letter: snora's `radio_group` is a column only, so a move from iced's radios loses the row layout they allow. Proposed: `horizontal(bool)`; a row that always wraps, in logical order, mirrored line by line under RTL; the same keys in either layout; every floor drawn and swept — **accepted 2026-11-26** |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 138 | [A radio group cannot be laid out in a row](./proposed/138-a-radio-group-cannot-be-laid-out-in-a-row.md) | **0.66.0** — from logolig's 2026-11-19 letter: snora's `radio_group` is a column only, so a move from iced's radios loses the row layout they allow. Proposed: `horizontal(bool)`; a row that always wraps, in logical order, mirrored line by line under RTL; the same keys in either layout; every floor drawn and swept |
 
 ## Archive
 

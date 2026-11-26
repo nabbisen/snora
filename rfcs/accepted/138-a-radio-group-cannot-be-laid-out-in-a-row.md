@@ -1,6 +1,6 @@
 # RFC-138 — A radio group cannot be laid out in a row
 
-**Status.** Proposed, 2026-11-26.
+**Status.** Accepted 2026-11-26 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-26, architect, from logolig's letter of 2026-11-19 (F-2 in
 `.git-exclude/upstream/receive/0.65.0/architect-triage-2026-11-26.md`). Scoped into 0.66 by the owner on 2026-11-26.
 **Release target.** 0.66.0, as an addition.
@@ -74,6 +74,15 @@ on the design path (the literal-size gate forbids a literal), and one constant o
 overflows clips an option, which RFC-105 rules out. A setting to turn wrapping off would be an opt-in to a defect.
 
 **Q-4 — when.** **Suggest: 0.66.0,** with H-1 (the toast-target tolerance) in the same unit or beside it.
+
+## Rulings, 2026-11-26 (owner)
+
+"Yes." Every question as suggested:
+- **Q-1:** `horizontal(bool)`. No orientation enum.
+- **Q-2:** Unit 0 measures the candidates for the space between options and proposes one, to the rule above. It is a
+  token on the design path and one constant on the engine path. The architect rules on the proposal at Unit 0's review.
+- **Q-3:** a horizontal group always wraps. There is no setting to turn wrapping off.
+- **Q-4:** 0.66.0, as an addition.
 
 ## Review against snora's principles
 

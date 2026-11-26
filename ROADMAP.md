@@ -246,7 +246,7 @@ publish (owner, 2026-11-18).
 - **[RFC-137](rfcs/accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md), done on `main`.** A
   disclosure built on `snora::control` (a section header, aaai's file tree) keeps focus with `keeps_focus(id)`. The same
   work fixed RFC-120's removal path, which could hand focus to a control nobody pressed. It was found by logolig on 0.65.0.
-- **[RFC-138](rfcs/proposed/138-a-radio-group-cannot-be-laid-out-in-a-row.md), a horizontal `radio_group`** (logolig), proposed. A move from iced's radios must not lose the row layout they allow. The
+- **[RFC-138](rfcs/accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md), a horizontal `radio_group`** (logolig), accepted. A move from iced's radios must not lose the row layout they allow. The
   keys stay the same in either layout.
 - **Housekeeping:** the toast close-target test asserts the floor exactly (it allowed ±0.5 px).
 - **Then cut 0.66.0,** without waiting for the audit below, so that the focus fix reaches logolig and aaai.
