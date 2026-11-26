@@ -195,12 +195,12 @@ state.
 |----|-------|--------|
 | 137 | [A keyboard press on a disclosure leaves nothing focused](./accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md) | **0.66.0** — from logolig's 2026-11-22 letter, measured true on 0.65.0: a `snora::control` that shows or hides controls after it (a disclosure, aaai's file tree) leaves nothing focused after Enter, against RFC-120's "when the focused control goes away". Proposed: `keeps_focus(id)` on the public control; `Inert` returns focus to that id, and focuses nothing if it is gone; undeclared changes and clicks unchanged — **accepted 2026-11-26** |
 | 138 | [A radio group cannot be laid out in a row](./accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md) | **0.66.0** — from logolig's 2026-11-19 letter: snora's `radio_group` is a column only, so a move from iced's radios loses the row layout they allow. Proposed: `horizontal(bool)`; a row that always wraps, in logical order, mirrored line by line under RTL; the same keys in either layout; every floor drawn and swept — **accepted 2026-11-26** |
+| 139 | [Turning on `lucide-icons` breaks the marks snora draws itself](./accepted/139-turning-on-lucide-icons-breaks-snoras-own-marks.md) | **0.66.0** — from the 0.67 audit's request A (A2-082), probed in a real window: with the feature on and the font not loaded (an adopter's starting state, and reachable through feature unification by an application that never chose Lucide), the toast's close mark is a missing-glyph box; the notice and chip marks, the checkbox tick and the select chevron take the same font. Proposed: a feature never changes how snora's own marks are drawn (the text glyphs, as the no-lucide jobs already sweep); the pages tell an application with Lucide icons to load the font; a test in the starting state — **accepted 2026-11-27** |
 
 ## Proposed
 
 | ID | Title | Target |
 |----|-------|--------|
-| 139 | [Turning on `lucide-icons` breaks the marks snora draws itself](./proposed/139-turning-on-lucide-icons-breaks-snoras-own-marks.md) | **0.66.0** — from the 0.67 audit's request A (A2-082), probed in a real window: with the feature on and the font not loaded (an adopter's starting state, and reachable through feature unification by an application that never chose Lucide), the toast's close mark is a missing-glyph box; the notice and chip marks, the checkbox tick and the select chevron take the same font. Proposed: a feature never changes how snora's own marks are drawn (the text glyphs, as the no-lucide jobs already sweep); the pages tell an application with Lucide icons to load the font; a test in the starting state |
 
 ## Archive
 

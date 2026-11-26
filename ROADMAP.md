@@ -249,7 +249,7 @@ publish (owner, 2026-11-18).
 - **[RFC-138](rfcs/accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md), a horizontal `radio_group`** (logolig), accepted. A move from iced's radios must not lose the row layout they allow. The
   keys stay the same in either layout.
 - **Housekeeping:** the toast close-target test asserts the floor exactly (it allowed ±0.5 px).
-- **[RFC-139](rfcs/proposed/139-turning-on-lucide-icons-breaks-snoras-own-marks.md), a fix** (owner, 2026-11-27), proposed.
+- **[RFC-139](rfcs/accepted/139-turning-on-lucide-icons-breaks-snoras-own-marks.md), a fix** (owner, 2026-11-27), accepted.
   With `lucide-icons` on and the font not loaded, the toast's close mark is a box, and four more marks snora draws take
   the same font. A crate elsewhere in the dependency graph can turn the feature on. Found by the 0.67 audit.
 - **Then cut 0.66.0,** without waiting for the audit below, so that the focus fix reaches logolig and aaai.
@@ -277,11 +277,38 @@ API or what is drawn, never by searching. It can start during 0.66, because it i
 
 ## After 0.67
 
-- **A coverage release, the one after 0.67's follow-up.** It takes every row "guarded in part" or "unguarded, true" from
+**Ruled by the owner on 2026-11-27: selectable and customizable themes, for older and visually impaired people and for
+everyone.** The shape:
+- **Standard in snora, opt-in for each application, and outside the core components.** A user's appearance resolves to
+  the `Tokens` (and the `iced::Theme` derived from them) before `view` runs, so no widget learns what an appearance
+  is.
+- **Inert until called.** Nothing changes for an application that does not call it, and no feature changes behaviour
+  (RFC-139's principle).
+- **Three layers:**
+  - data and checks in `snora-design`: the colour axes (light or dark, × low glare, standard, more or high contrast;
+    eight palettes, six of which exist today), a text scale and a target size for any `Tokens`, and a report on a
+    custom palette's failing pairs;
+  - following the system's scheme, contrast and accent, as an opt-in subscription, measured on each OS first;
+  - a settings screen as a book recipe and a section of the starter example, not API, until two adopters ask for a
+    widget.
+
+**The schedule:**
+- **0.67:** the architect writes the themes RFC after the audit's request B is reviewed (B reads the design pages the
+  themes build on). The owner rules on it before 0.67 is cut. No themes code.
+- **0.68:** the coverage release below. No themes code.
+- **0.69, step 1, colour:** the check report, the two low-glare palettes, the colour axes and the recipe. The public
+  rustdoc audit runs alongside, read-only.
+- **0.70, step 2, size:** a text scale, and large targets on the design path. Layouts are measured at 150% and 200%,
+  and the deferred engine-path floor's trigger (below) is re-examined there.
+- **0.71, step 3, following the system:** the opt-in subscription, and the book recommending it from the
+  getting-started pages.
+- **Letters to every team at 0.69 and at 0.71 only.**
+
+- **0.68, a coverage release, the one after 0.67's follow-up.** It takes every row "guarded in part" or "unguarded, true" from
   the three audits: 0.62's 106, plus 0.67's. Each row ends with a test shown able to fail, or with a stated reason why
   none can exist.
-- **The next audit: the public rustdoc** outside keyboard and overlays (0.62 read those). It is what developers read on
-  docs.rs, about 9,000 doc lines.
+- **The next audit: the public rustdoc** outside keyboard and overlays (0.62 read those), alongside 0.69. It is what
+  developers read on docs.rs, about 9,000 doc lines.
 - **Deferred, with a trigger:** a target floor on the engine path above `max(24, 1.5 × text)`. The design path's
   `targets.min` already raises every floor (to AAA's 44, say), and the accessibility guide says the engine path has no such
   setting. Revisit when a second adopter asks, or when iced gains a way to carry a page-wide value to a widget's layout.

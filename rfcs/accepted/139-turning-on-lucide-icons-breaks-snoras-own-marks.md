@@ -1,6 +1,6 @@
 # RFC-139 — Turning on `lucide-icons` breaks the marks snora draws itself
 
-**Status.** Proposed, 2026-11-27.
+**Status.** Accepted 2026-11-27 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-26, the 0.67 audit's request A (row A2-082, probed in a real window by the dev team), reviewed by
 the architect (`.git-exclude/reviewed/audit-0-67-a/review-result.md`). The owner asked for this RFC for 0.66 on
 2026-11-27.
@@ -72,6 +72,19 @@ runner. If a common desktop setup lacks them, drawing the marks as shapes is a s
 part of this 0.66 fix. Nobody has reported a box on the feature-off path.
 
 **Q-4. When.** **Suggest: 0.66.0, as a fix,** after RFC-138 Unit 1 or beside it.
+
+## Rulings, 2026-11-27 (owner)
+
+"Authorized." Every question as suggested:
+- **Q-1:** no way to keep Lucide's shapes for snora's marks. If an adopter asks, it is a separate RFC, and a run-time
+  setting, never a feature.
+- **Q-2:** snora does not try to detect a missing font. R-2's sentences and R-3's test are the route.
+- **Q-3:** Unit 0 measures the system fonts' coverage of "✓" and "▾". Drawing the marks as shapes, if needed, is a
+  separate RFC.
+- **Q-4:** 0.66.0, as a fix.
+
+**The principle this sets, for every RFC after it:** a Cargo feature may only make an API available. It never changes
+how something snora already draws looks or behaves, because a feature can be turned on by another crate in the graph.
 
 ## Review against snora's principles
 
