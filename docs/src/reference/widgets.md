@@ -1,12 +1,19 @@
 # Built-in widgets
 
 snora ships a small set of prefab `iced::Element` builders for the
-common chrome — header, sidebar, footer, menu, icon. They are all
+common chrome — header, sidebar, footer, menu, tab bar, breadcrumb,
+icon. They are all
 plain functions, available under `snora::widget` (re-exported from
 the [`snora-widgets`](https://docs.rs/snora-widgets) crate when
 the `widgets` feature is enabled, which is the default), and they
 are entirely **optional**: any `iced::Element` works in an
 `AppLayout` slot.
+
+**Not on this page:** snora's controls that the keyboard can reach live at
+the crate root, not in `snora::widget`. They are `snora::control`, which makes
+your own content a control (0.58), and the five form controls,
+`snora::{checkbox, toggler, radio_group, select, slider}` (0.65). Each has a
+`snora::design::` twin. See [Keyboard](../guides/keyboard.md#your-own-content).
 
 ## When to use the prefabs
 

@@ -242,22 +242,41 @@ crate short of the pixels**, and that is RFC-085's real subject.
 *Recently shipped*) changed no library code, so it shipped to the book and CI without a tag or a
 publish (owner, 2026-11-18).
 
-**First item (owner, 2026-11-26): [RFC-137](rfcs/accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md),
-accepted the same day.** A keyboard press on a disclosure built on `snora::control` (a section header, aaai's
-file tree) leaves nothing focused. It was found by logolig on 0.65.0.
+**Scoped by the owner on 2026-11-26:**
+- **[RFC-137](rfcs/accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md), done on `main`.** A
+  disclosure built on `snora::control` (a section header, aaai's file tree) keeps focus with `keeps_focus(id)`. The same
+  work fixed RFC-120's removal path, which could hand focus to a control nobody pressed. It was found by logolig on 0.65.0.
+- **RFC-138, a horizontal `radio_group`** (logolig). A move from iced's radios must not lose the row layout they allow. The
+  keys stay the same in either layout.
+- **Housekeeping:** the toast close-target test asserts the floor exactly (it allowed ±0.5 px).
+- **Then cut 0.66.0,** without waiting for the audit below, so that the focus fix reaches logolig and aaai.
 
-Candidates, not yet scoped:
-- from logolig's 0.65.0 feedback: a horizontal `radio_group`, and a page-wide target floor on the
-  engine path (the design path has `Tokens::targets.min`);
-- a third audit (getting-started, recipes, reference), now that the book's code is checked;
-- 0.62's backlog of 106 guide claims guarded in part;
-- the future-wanted features, when an adopter asks.
+## Then — 0.67.0: the third audit
+
+**What the audit finds decides 0.67**, as it did for 0.62. It reads every page an adopter relies on that no audit has
+read, in four requests:
+- A: the introduction, getting-started and the unread guides;
+- B: the unread design pages and recipes;
+- C: the reference, except Laws 1–8;
+- D: the contributing pages that make promises to adopters (versioning, API governance, the CI feature matrix, the
+  consumer-requirements register, feedback and scope).
+
+That is about 5,100 lines. A claim that something is complete ("every", "all", an inventory) is checked by enumerating the
+API or what is drawn, never by searching. It can start during 0.66, because it is read-only.
+
+## After 0.67
+
+- **A coverage release, the one after 0.67's follow-up.** It takes every row "guarded in part" or "unguarded, true" from
+  the three audits: 0.62's 106, plus 0.67's. Each row ends with a test shown able to fail, or with a stated reason why
+  none can exist.
+- **The next audit: the public rustdoc** outside keyboard and overlays (0.62 read those). It is what developers read on
+  docs.rs, about 9,000 doc lines.
+- **Deferred, with a trigger:** a target floor on the engine path above `max(24, 1.5 × text)`. The design path's
+  `targets.min` already raises every floor (to AAA's 44, say), and the accessibility guide says the engine path has no such
+  setting. Revisit when a second adopter asks, or when iced gains a way to carry a page-wide value to a widget's layout.
 
 ## Future wanted
 
-- **A contrast sweep for glyphs** (a notice's dismiss mark, a removable chip's close mark) at the
-  3:1 non-text floor, by a measure that does not false-fail on thin SVG strokes (RFC-128 Unit 1).
-  Their text is guarded; their glyphs are not yet.
 - Type-ahead in menus, and arrow keys in the tab bar (RFC-116 L-10, L-11). Built when an
   adopter asks.
 - A public way for an application to declare its structure to the focus rule: a

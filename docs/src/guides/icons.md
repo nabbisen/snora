@@ -51,6 +51,13 @@ snora = { version = "0.65", features = ["svg-icons"] }
 The engine reads the file at render time using iced's SVG widget.
 Pixel size is the same default as the other variants.
 
+**An SVG icon keeps the file's own colours.** snora draws it with iced's
+`svg` widget and no style, so neither the theme nor the tokens recolour it,
+and none of snora's contrast guarantees covers it. A black icon stays black on a
+dark theme. Draw it in colours that hold 3:1 against every surface it can sit
+on, in every theme you ship. A `Text` or `Lucide` icon is different: it is drawn
+as text, in the colour of the text around it.
+
 ### The path is yours to trust
 
 **snora does not validate the path or the file.** `Icon::Svg` hands the path to
