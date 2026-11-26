@@ -1,6 +1,7 @@
 # RFC-137 — A keyboard press on a disclosure leaves nothing focused
 
-**Status.** Proposed, 2026-11-26.
+**Status.** Accepted 2026-11-26 (owner), every open question ruled as suggested (see Rulings).
+**Handoff.** [`handoffs/137-…`](../handoffs/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused/implementation-handoff.md).
 **Raised.** 2026-11-26, architect, from logolig's letter of 2026-11-22. They found it on 0.65.0 and
 then withdrew the request, because they found a workaround in the application. It was measured true
 on `main` at `2be698f`: see the triage,
@@ -138,6 +139,16 @@ for this.** R-1 removes the workaround it was needed for. A pointer/keyboard sig
 changes is indirect. If some other use for it appears, weigh it then on its own case.
 
 **Q-5 — when.** **Suggest: 0.66.0,** as an addition. Unit 0 can start on acceptance.
+
+## Rulings, 2026-11-26 (owner)
+
+"Yes. Accepted." Every question as suggested:
+- **Q-1:** `keeps_focus(id)`, resolved by id. No bare `stays()` by position.
+- **Q-2:** the name is `keeps_focus`.
+- **Q-3:** public on both paths (`snora::Control`), and on the internal control. `removes` stays internal.
+- **Q-4:** `on_focus_change` is not exposed for this.
+- **Q-5:** 0.66.0, as an addition. Unit 0 starts now.
+- **"Show more"** (a control that replaces itself): no new API; the book gives the route.
 
 ## Review against snora's principles
 

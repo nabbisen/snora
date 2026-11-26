@@ -242,8 +242,8 @@ crate short of the pixels**, and that is RFC-085's real subject.
 *Recently shipped*) changed no library code, so it shipped to the book and CI without a tag or a
 publish (owner, 2026-11-18).
 
-**First item (owner, 2026-11-26): [RFC-137](rfcs/proposed/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md),
-proposed.** A keyboard press on a disclosure built on `snora::control` (a section header, aaai's
+**First item (owner, 2026-11-26): [RFC-137](rfcs/accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md),
+accepted the same day.** A keyboard press on a disclosure built on `snora::control` (a section header, aaai's
 file tree) leaves nothing focused. It was found by logolig on 0.65.0.
 
 Candidates, not yet scoped:
