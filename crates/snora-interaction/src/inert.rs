@@ -699,8 +699,14 @@ impl<Message: Clone> Inert<'_, Message> {
                     _ => None,
                 }
             }
-            // Nothing went: the control is still there.
-            PressEffect::Removes(..) if after.len() == pending.before.len() => Some(pending.at),
+            // The count is unchanged: back to where the press was, but only if the pressed control's
+            // own state is still at that place in Tab order (the flag says where it went). If a
+            // change before it and another after it cancelled out, the place now holds a stranger,
+            // and nothing is focused.
+            PressEffect::Removes(..) if after.len() == pending.before.len() => after
+                .get(pending.at)
+                .is_some_and(|s| s.inherited)
+                .then_some(pending.at),
             PressEffect::Removes(bef, aft) => pending
                 .at
                 .checked_sub(bef)

@@ -54,8 +54,10 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   press leaves on the state itself, not by a Tab index, so it is the tracker's to move. It affects
   RFC-120's removal path as well as `keeps_focus` (measured on a chip's ×): in a page whose
   toolbar grows in the same press, focus used to land on a control that was never pressed; it now goes
-  to the neighbour, or to nothing where snora cannot tell. (Not fixed: a press that adds exactly as many
-  controls before as it removes, whose count is unchanged, still reads as "nothing went".)
+  to the neighbour, or to nothing where snora cannot tell. When the press leaves the count unchanged
+  (it removes as many controls before as it adds), focus goes back to the old place only if the pressed
+  control's own state is still there, and otherwise nowhere. A control replaced by one of the same kind
+  in the same place (Play becomes Pause) gives its focus to the replacement.
 
 ## [0.65.0] — 2026-11-18
 

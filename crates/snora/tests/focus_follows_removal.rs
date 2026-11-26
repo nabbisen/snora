@@ -462,10 +462,11 @@ fn a_plain_enter_that_removes_a_control_is_observed_and_a_chord_is_not() {
 /// index, so what it finds is its own to move.
 ///
 /// Where focus goes then is the neighbour **or nothing**, never anything else: nothing is what RFC-120
-/// answers when it cannot tell, and these rows land there because the group's number is taken by
-/// traversal order, which an earlier control shifts (a stated limit, L-7). **Not asserted: a press
-/// that adds exactly as many controls before as it removes**, whose count is unchanged, so "nothing
-/// went" holds as far as the tracker can see (one lands on the control that took the place).
+/// answers when it cannot tell, and some rows land there because the group's number is taken by
+/// traversal order, which an earlier control shifts (a stated limit, L-7). **The last row is a press
+/// that adds exactly as many controls before as it removes** (RFC-137 review, R-1): the count is
+/// unchanged, and the same-count rule goes back to the old place only if the pressed control's own
+/// state, found by its flag, is still there. It is not, so nothing is focused, never `above`.
 #[test]
 fn a_change_earlier_in_the_page_never_hands_focus_to_a_stranger_in_a_removal_either() {
     use common::disclosure_scenes::pressed;
@@ -531,6 +532,13 @@ fn a_change_earlier_in_the_page_never_hands_focus_to_a_stranger_in_a_removal_eit
             &[1, 2][..],
             "toggle 1",
         ),
+        (
+            "the count is unchanged: two go, two are added before",
+            &[0, 1, 2][..],
+            "remove 0",
+            &[TOOL2, ABOVE, 1, 2][..],
+            "toggle 1",
+        ),
     ] {
         let rig = pressed(&view, before, press);
         let mut rig = rig.rebuilt(view(after));
@@ -547,4 +555,34 @@ fn a_change_earlier_in_the_page_never_hands_focus_to_a_stranger_in_a_removal_eit
         off.len(),
         off.join("\n  ")
     );
+}
+
+/// **A control replaced by one of the same kind in the same place keeps the focus** (RFC-137 review,
+/// R-1, stated): Play becomes Pause, the count is unchanged, and the pressed control's own state is
+/// still at that place in Tab order, so the same-count rule gives focus to the replacement. That is
+/// what a toggle-shaped control is expected to do, and no rule without an identity could do otherwise.
+#[test]
+fn a_control_replaced_by_one_of_its_kind_in_its_place_keeps_focus() {
+    use common::removal::Rig;
+    use iced::widget::text;
+    let view = |playing: bool| -> iced::Element<'static, common::removal_scenes::Msg> {
+        let plain = |name: &str| -> iced::Element<'static, common::removal_scenes::Msg> {
+            snora::control(text(name.to_owned()))
+                .on_press(msg(name))
+                .into()
+        };
+        let toggle = plain(if playing { "Pause" } else { "Play" });
+        common::removal_scenes::page(
+            iced::widget::column![plain("Previous"), toggle, plain("Next")].into(),
+            snora::LayoutDirection::Ltr,
+        )
+    };
+    let mut rig = Rig::new(view(false));
+    for _ in 0..2 {
+        rig.tab(false); // Previous, then Play
+    }
+    assert_eq!(rig.focused(), vec![1]);
+    rig.enter();
+    let mut rig = rig.rebuilt(view(true));
+    assert_eq!(rig.focused(), vec![1], "Pause, where Play was");
 }
