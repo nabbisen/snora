@@ -1613,8 +1613,6 @@ fn two_unfocused_frames_are_identical() {
 fn settings_at(host: f32) -> iced::Settings {
     iced::Settings {
         default_text_size: host.into(),
-        #[cfg(feature = "lucide-icons")]
-        fonts: vec![lucide_icons::LUCIDE_FONT_BYTES.into()],
         ..iced::Settings::default()
     }
 }
@@ -1773,19 +1771,14 @@ fn same_size(a: Rectangle, b: Rectangle) -> bool {
     (a.width - b.width).abs() <= 0.1 && (a.height - b.height).abs() <= 0.1
 }
 
-#[cfg(feature = "lucide-icons")]
-const CLOSE_GLYPH: &str = "\u{e1b2}";
-#[cfg(not(feature = "lucide-icons"))]
+/// The toast's close mark: "×" in every build (RFC-139). It was lucide's `X` under `lucide-icons`, and the settings above
+/// loaded the Lucide font for it; nothing in this file draws a Lucide glyph any more.
 const CLOSE_GLYPH: &str = "×";
 
 fn reference_text(content: &str, size: Option<f32>) -> Element<'static, Msg> {
     let mut t = iced::widget::text(content.to_owned());
     if let Some(size) = size {
         t = t.size(size);
-    }
-    #[cfg(feature = "lucide-icons")]
-    if content == CLOSE_GLYPH {
-        t = t.font(Font::with_name("lucide"));
     }
     t.into()
 }

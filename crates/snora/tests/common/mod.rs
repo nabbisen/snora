@@ -7,10 +7,13 @@
 //! - [`pointer_target`] measures what a pointer can actually hit, by
 //!   clicking, rather than by picking a rectangle out of the widget tree
 //!   (RFC-100). Several containers hold any given control.
-//! - [`simulator`] loads the lucide font, and
-//!   [`assert_lucide_font_loaded`] fails if it did not. iced's font system
-//!   is process-global, so a "with the font versus without it" comparison
-//!   inside one binary measures whichever test ran first (RFC-100 §3).
+//! - [`simulator`] loads the lucide font. **What needs the font
+//!   is an application's own `Icon::Lucide`, never a mark snora draws itself**
+//!   (RFC-139: those are text glyphs in every build). iced's font system is
+//!   process-global, so a "with the font versus without it" comparison inside
+//!   one binary measures whichever test ran first (RFC-100 §3); the adopter's
+//!   starting state, no font loaded, therefore has a binary of its own
+//!   (`lucide_marks_in_the_starting_state.rs`, which never calls `simulator`).
 //! - [`frame_hash`] reads a frame as a SHA-256 digest, which answers
 //!   "did this frame change?" and nothing else.
 //! - [`frame_pixels`] reads the frame itself (RFC-108 R-1), by taking the
@@ -44,8 +47,6 @@ pub mod tab_router;
 use std::path::Path;
 
 use iced::{Element, Point, Rectangle, Theme};
-#[cfg(feature = "lucide-icons")]
-use iced::{Size, widget::text};
 use iced_test::Simulator;
 use iced_test::selector::Candidate;
 
@@ -62,18 +63,13 @@ pub const MIN_TARGET: f32 = 24.0;
 /// misplacement worth catching (RFC-099's uncentred glyph was ~10px off).
 pub const TOLERANCE: f32 = 0.5;
 
-/// lucide's `X` codepoint, as `snora_widgets::icon` and
-/// `snora::toast` both obtain it from `char::from(lucide_icons::Icon::X)`.
-#[cfg(feature = "lucide-icons")]
-pub const LUCIDE_X: &str = "\u{e1b2}";
-
 /// Builds a simulator, loading the lucide font under `lucide-icons`.
 ///
-/// **Every simulator in a test that measures a lucide glyph must come from
-/// here.** Without the font, `Font::with_name("lucide")` falls back and the
-/// codepoint renders as whatever the fallback font does with it — and a
-/// natural-size-then-centre comparison still passes, because the glyph and
-/// its reference are then the same fallback, measured consistently.
+/// **Every simulator in a test that measures an application's own Lucide icon (`Icon::Lucide`) must come from
+/// here.** Without the font, `Font::with_name("lucide")` falls back and the codepoint renders as whatever the fallback
+/// font does with it, and a natural-size-then-centre comparison still passes, because the glyph and its reference are
+/// then the same fallback, measured consistently. **A mark snora draws itself needs no font** (RFC-139), and the
+/// adopter's starting state, no font loaded, is `lucide_marks_in_the_starting_state.rs`'s, which never calls this.
 pub fn simulator<'a, Message>(element: impl Into<Element<'a, Message>>) -> Simulator<'a, Message> {
     #[cfg(feature = "lucide-icons")]
     let settings = iced::Settings {
@@ -84,39 +80,6 @@ pub fn simulator<'a, Message>(element: impl Into<Element<'a, Message>>) -> Simul
     let settings = iced::Settings::default();
 
     Simulator::with_settings(settings, element)
-}
-
-/// The rendered size of `glyph` on its own, in the lucide font.
-#[cfg(feature = "lucide-icons")]
-pub fn lucide_glyph_size(glyph: &str, size: f32) -> Size {
-    let element: Element<'_, ()> = text(glyph.to_owned())
-        .size(size)
-        .font(iced::Font::with_name("lucide"))
-        .into();
-    let mut ui = simulator(element);
-    ui.find(glyph)
-        .expect("the glyph renders on its own")
-        .visible_bounds()
-        .expect("the glyph is visible")
-        .size()
-}
-
-/// Fails if the lucide font was not loaded.
-///
-/// Lucide glyphs have a square 1em advance: rendered at size `s`, the `X`
-/// box is exactly `s` wide. Unloaded, the codepoint falls back to a glyph
-/// of a different width — measured 7.2px at size 12, where the loaded
-/// glyph measures 12. This checks a property of the glyph itself, so it
-/// holds whichever test in the process loaded the font first.
-#[cfg(feature = "lucide-icons")]
-pub fn assert_lucide_font_loaded(label: &str, size: f32) {
-    let width = lucide_glyph_size(LUCIDE_X, size).width;
-    assert!(
-        (width - size).abs() <= 0.01,
-        "{label}: lucide X is {width}px wide at size {size}; a loaded lucide glyph is exactly 1em \
-         wide — the lucide font did not load, and every lucide measurement here is of a fallback \
-         glyph",
-    );
 }
 
 /// Every container-like widget's bounds, in tree order. iced reports

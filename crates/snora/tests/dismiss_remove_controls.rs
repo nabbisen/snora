@@ -1,28 +1,13 @@
 //! Rendered-layout tests for the notice dismiss control and the removable
 //! chip's remove control (RFC-100).
 //!
-//! Both controls render one shared glyph: lucide `X` under `lucide-icons`,
-//! text `"×"` otherwise. Every test here runs in both feature states — the
-//! expected glyph is chosen by `cfg` below — for both controls and all four
-//! built-in presets.
+//! Both controls render one shared glyph, the text `"×"`, **in every build** (RFC-139: a Cargo feature never changes how a
+//! mark snora draws itself is drawn; before 0.66 it was lucide `X` under `lucide-icons`). Every test here runs in both
+//! feature states for both controls and all four built-in presets.
 //!
-//! # The lucide font must actually be loaded
-//!
-//! Lucide glyphs render through `Font::with_name("lucide")`, which resolves
-//! only once `lucide_icons::LUCIDE_FONT_BYTES` has been loaded. A plain
-//! `iced_test::simulator` never loads it, and the codepoint then renders as
-//! a fallback glyph. A natural-size-then-centre comparison would still pass,
-//! because the control's glyph and the reference glyph would be the same
-//! fallback, measured consistently. So every simulator here is built by
-//! [`ui`], which loads the font under `lucide-icons`, and
-//! `lucide::font_is_loaded` fails if it did not.
-//!
-//! iced's font system is **process-global**: once any simulator in this
-//! binary loads the font, every later simulator sees it. A "with the font
-//! versus without it" control inside one binary would therefore measure
-//! whichever test happened to run first. The control instead asserts a
-//! property the loaded font has and the fallback does not — see
-//! `lucide::font_is_loaded`.
+//! The Lucide font is irrelevant to them: `common::simulator` still loads it under `lucide-icons` (other tests draw an
+//! application's own `Icon::Lucide`), and nothing here reads it. What the marks draw with **no** font loaded is pinned
+//! by `lucide_marks_in_the_starting_state.rs`.
 //!
 //! # Tooltips are observed through rendered frames
 //!
@@ -39,22 +24,13 @@ use iced_test::Simulator;
 use iced_test::selector::Candidate;
 
 mod common;
-#[cfg(feature = "lucide-icons")]
-use common::assert_lucide_font_loaded;
 use common::{MIN_TARGET, TOLERANCE, frame_hash, pointer_target, simulator as ui};
 
 use snora::design::style::text::label_size;
 use snora::design::{Tokens, Tone, chip, notice::Notice};
 
-/// The glyph the controls must render in this feature state, and the one
-/// they must not.
-#[cfg(feature = "lucide-icons")]
-const GLYPH: &str = "\u{e1b2}";
-#[cfg(feature = "lucide-icons")]
-const NOT_GLYPH: &str = "×";
-#[cfg(not(feature = "lucide-icons"))]
+/// The glyph the controls must render, and the one they must not: "×" in every build, never Lucide's `X` (U+E1B2).
 const GLYPH: &str = "×";
-#[cfg(not(feature = "lucide-icons"))]
 const NOT_GLYPH: &str = "\u{e1b2}";
 
 #[derive(Debug, Clone, PartialEq)]
@@ -139,13 +115,11 @@ fn presets() -> Vec<(&'static str, Tokens)> {
     Tokens::presets()
 }
 
-/// The glyph rendered alone at the given size, in the font this feature
-/// state uses — built independently of the production helper, so a wrong
+/// The glyph rendered alone at the given size, in the text's font
+/// — built independently of the production helper, so a wrong
 /// glyph or font there cannot also be the reference.
 fn reference_glyph<'a>(size: iced::Pixels) -> Element<'a, Msg> {
     let glyph = text(GLYPH).size(size);
-    #[cfg(feature = "lucide-icons")]
-    let glyph = glyph.font(iced::Font::with_name("lucide"));
     glyph.into()
 }
 
@@ -178,7 +152,7 @@ fn control_target(control: Control, tokens: &Tokens, label: &str) -> Rectangle {
 // ---------------------------------------------------------------------------
 
 #[test]
-fn controls_render_the_feature_state_glyph() {
+fn controls_render_the_text_glyph_in_every_build() {
     for control in Control::ALL {
         for (preset, tokens) in presets() {
             let label = format!("{control:?} / {preset}");
@@ -189,7 +163,7 @@ fn controls_render_the_feature_state_glyph() {
             );
             assert!(
                 ui.find(NOT_GLYPH).is_err(),
-                "{label}: glyph {NOT_GLYPH:?} is rendered, but this feature state must render {GLYPH:?}"
+                "{label}: glyph {NOT_GLYPH:?} (Lucide's X) is rendered, but both builds must render {GLYPH:?} (RFC-139)"
             );
         }
     }
@@ -254,26 +228,6 @@ fn glyph_is_natural_size_and_centred_in_its_target() {
                 "{label}: glyph centre {g:?} is not within {TOLERANCE}px of the target centre {t:?} \
                  (target {target:?}, glyph {glyph:?})",
             );
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Lucide font control
-// ---------------------------------------------------------------------------
-
-#[cfg(feature = "lucide-icons")]
-mod lucide {
-    use super::*;
-
-    /// Fails if the lucide font was not loaded, at each preset's label
-    /// size. The check itself is [`common::assert_lucide_font_loaded`];
-    /// see its documentation for why it measures a 1em advance rather
-    /// than comparing a loaded glyph with an unloaded one.
-    #[test]
-    fn font_is_loaded() {
-        for (preset, tokens) in presets() {
-            assert_lucide_font_loaded(preset, label_size(&tokens).0);
         }
     }
 }

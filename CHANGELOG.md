@@ -61,7 +61,29 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
   - **One limit, shared with the column:** an option that alone is wider than the room is laid out as the column
     lays it out (it is not wrapped inside, and it can reach the window's edge).
 
+### Changed
+
+- **The five marks snora draws itself are the same in every build, so turning on `lucide-icons` no longer changes
+  them** (RFC-139): the toast's close mark, the design notice's dismiss mark, the design chip's remove mark, the
+  checkbox's tick and the select's chevron. They are "×", "✓" and "▾" in the text's own font, which is what they
+  already were with the feature off.
+  - **A visible change for an application that loads `LUCIDE_FONT_BYTES`:** its five marks change from Lucide's
+    `X`, check and chevron to the text glyphs, and the controls around them change size by a few pixels (a notice's
+    dismiss control was 34.0 px wide with the font loaded and is 28.0, a select up to 8 px narrower), because the
+    layout no longer follows the font.
+  - **`lucide-icons` now means what its name says:** it adds the Lucide set for the application's own icons
+    (`Icon::Lucide`, `snora::lucide`), and nothing else. A Cargo feature can be turned on by any crate in the
+    dependency graph, so it may only make an API available; it never changes how something snora already draws
+    looks or behaves.
+
 ### Fixed
+
+- **Turning on `lucide-icons` no longer breaks the marks snora draws itself** (RFC-139). With the feature on and
+  `LUCIDE_FONT_BYTES` not loaded (the state of an application that never asked for Lucide, because another crate in its
+  graph enabled the feature), the toast's close mark, the notice's dismiss mark and the chip's remove mark drew a
+  missing-glyph box, **a checked checkbox drew a "1" and the select's arrow a "3"**, and each of those controls was laid
+  out at a different size. snora never loads the font, and no page said an application must. All five marks now draw
+  the text glyph in every build.
 
 - **A press that also changes how many controls come *before* the pressed one no longer hands focus to
   a stranger** (RFC-137 review). iced keeps a control's state by its place in the tree, which is not its

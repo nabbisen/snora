@@ -26,8 +26,8 @@
 //! - The focus ring is drawn by the control, from `Tokens::focus`, in
 //!   whichever of that colour or black and white clears 3:1 against the
 //!   surface the notice sits on.
-//! - The dismiss button shows lucide `X` under the `lucide-icons` feature and
-//!   `"×"` otherwise, the same glyph as the removable chip (RFC-100).
+//! - The dismiss button shows `"×"` in every build, the same glyph as the
+//!   removable chip (RFC-100, RFC-139).
 //!   [`Notice::dismiss_tooltip`](crate::design::notice::Notice::dismiss_tooltip)
 //!   adds a short hover text such as `"Dismiss"`. **It is a visual tooltip
 //!   only and is not exposed to assistive technology:** iced 0.14 has no
@@ -137,8 +137,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         self
     }
 
-    /// Adds a dismiss button: lucide `X` under the `lucide-icons` feature,
-    /// `"×"` otherwise.
+    /// Adds a dismiss button: `"×"` in every build (RFC-139).
     #[must_use]
     pub fn dismiss(mut self, on_press: Message) -> Self {
         self.dismiss = Some(on_press);

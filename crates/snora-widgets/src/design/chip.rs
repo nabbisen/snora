@@ -38,9 +38,10 @@
 //!
 //! # The remove glyph, and what a tooltip is not
 //!
-//! The remove button shows lucide `X` when the `lucide-icons` feature is
-//! enabled, and the text glyph `"×"` otherwise (RFC-100). The notice's
-//! dismiss button shares the same glyph.
+//! The remove button shows the text glyph `"×"`, in every build (RFC-139: a Cargo
+//! feature never changes how a mark snora draws itself is drawn; before 0.66 it
+//! was lucide `X` under the `lucide-icons` feature). The notice's dismiss button
+//! shares the same glyph.
 //!
 //! [`removable_with_tooltip`](crate::design::chip::removable_with_tooltip)
 //! adds a short text shown when the pointer hovers the remove button, such
@@ -102,43 +103,21 @@ fn remove_btn_target_size(tokens: &Tokens) -> f32 {
 /// The close glyph shared by the removable chip's remove control and the
 /// notice's dismiss control (RFC-100), sized to the label text.
 ///
-/// One function, so the two controls cannot drift apart and the
-/// `lucide-icons` `cfg` lives in one place. Lucide `X` under that feature;
-/// text `"×"` otherwise, exactly as before.
+/// One function, so the two controls cannot drift apart. The text `"×"` in every
+/// build (RFC-139: a Cargo feature never changes how a mark snora draws itself is
+/// drawn).
 ///
-/// `color` of `None` inherits the enclosing button's text colour. Under
-/// `lucide-icons` the glyph comes from [`crate::icon::icon_element_sized`],
-/// which returns an [`Element`] that cannot be recoloured afterwards, so the
-/// colour is applied through a container's default text colour instead —
-/// otherwise the notice's glyph would silently take its ghost button's
-/// `accent` colour in place of `text_primary`.
+/// `color` of `None` inherits the enclosing button's text colour.
 pub(super) fn close_glyph<'a, Message: 'a>(
     tokens: &Tokens,
     color: Option<Color>,
 ) -> Element<'a, Message> {
     let size = style::text::label_size(tokens);
 
-    #[cfg(feature = "lucide-icons")]
-    {
-        let glyph = crate::icon::icon_element_sized(
-            &snora_core::Icon::Lucide(lucide_icons::Icon::X),
-            size.0,
-        );
-        container(glyph)
-            .style(move |_| container::Style {
-                text_color: color,
-                ..container::Style::default()
-            })
-            .into()
-    }
-
-    #[cfg(not(feature = "lucide-icons"))]
-    {
-        let glyph = text("×").size(size);
-        match color {
-            Some(color) => glyph.color(color).into(),
-            None => glyph.into(),
-        }
+    let glyph = text("×").size(size);
+    match color {
+        Some(color) => glyph.color(color).into(),
+        None => glyph.into(),
     }
 }
 
@@ -225,8 +204,8 @@ pub fn filter<'a, Message: Clone + 'a>(
 ///
 /// The chip label toggles via `on_toggle`; the remove button emits
 /// `on_remove`. Both controls are focusable, in that order, and Enter and
-/// Space press the focused one (RFC-116). The remove button shows lucide
-/// `X` under the `lucide-icons` feature and `"×"` otherwise.
+/// Space press the focused one (RFC-116). The remove button shows `"×"` in
+/// every build (RFC-139).
 ///
 /// **Where focus goes when the chip is removed (RFC-120):** if the × had focus
 /// and the application removes the chip, focus moves to the **next chip's
@@ -317,7 +296,7 @@ fn build_removable<'a, Message: Clone + 'a>(
     // Pointer-target size (RFC-061): the glyph's own advance width is
     // not token-derivable (font/shaping-dependent — measured at 15.0px
     // total for the shipped fallback font at the current tokens, well
-    // under the 24px WCAG 2.5.8 floor; lucide `X` is 1em wide, also short).
+    // under the 24px WCAG 2.5.8 floor).
     // Padding alone cannot fix this
     // reliably: even bumping to `spacing.sm` only reaches 23.0px on that
     // same font, still short. Instead, the *content* box inside the

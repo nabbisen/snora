@@ -1517,8 +1517,8 @@ fn shadow_cells(out: &mut Vec<Cell>) {
     out.extend(parts.into_iter().flatten());
 }
 
-/// A glyph's name in the table: the close mark is **one** subject whatever it is drawn with (lucide's `X` under the
-/// `lucide-icons` feature, a plain `×` without it), so the table holds in every feature combination CI builds.
+/// A glyph's name in the table: the close mark is **one** subject in every feature combination CI builds (a plain `×`
+/// in every build since RFC-139; it was lucide's `X` under the `lucide-icons` feature before), so one table holds in all.
 fn glyph_name(why: &str, text: &str) -> String {
     if why == "close mark" {
         "close mark".to_owned()

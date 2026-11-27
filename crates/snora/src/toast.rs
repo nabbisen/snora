@@ -316,53 +316,21 @@ where
     }
     let text_col = column![title, message].spacing(4);
 
-    // The close glyph. **Two sites must agree on it**: this one and
-    // `snora_widgets::icon::icon_element_sized`, which renders
-    // `Icon::Lucide` for the widget layer. The engine cannot call that
-    // one — it does not depend on `snora-widgets` — so it repeats the
-    // construction: the codepoint from `char::from`, drawn in the lucide
-    // font. `toast_close_button.rs`'s
-    // `engine_and_widgets_draw_the_same_lucide_glyph` fails if either site
-    // changes codepoint, or if what either draws is not a lucide glyph
-    // (RFC-101 Q-1 (a)). Dropping the `.font(..)` below is not among them:
-    // with the font loaded, cosmic-text resolves this codepoint by coverage
-    // and draws the same glyph either way — measured, not assumed.
+    // The close glyph is "×", in the text's own font, in every build: a Cargo feature never changes how a mark snora
+    // draws itself is drawn (RFC-139), because another crate in the graph can turn the feature on. `lucide-icons` adds
+    // Lucide for the application's own icons, and nothing else.
     //
-    // **The call still earns its place.** Coverage-based fallback picks
-    // whichever loaded font covers the codepoint, and U+E1B2 is in the
-    // private use area: an application that also loads another PUA icon
-    // font covering it could get that font's glyph instead. Naming the
-    // font here settles it. The harness loads lucide alone, so no test can
-    // see that case.
+    // **Sized with the text it sits with** (RFC-115's amendment: × is 1.125 em). Which text that is depends on the path:
     //
-    // **Sized with the text it sits with** (RFC-115's amendment: × is 1.125
-    // em). Which text that is depends on the path:
-    //
-    // - **unstyled:** the host's `default_text_size`, which view code never
-    //   sees, so `Glyph` reads it when the layout runs;
-    // - **design:** the toast's own message, `Typography::body`
-    //   (`style.message_size`), so raising the body text grows the × with it,
-    //   and raising the host's size with default tokens does not — the two
-    //   move together or the × would follow a size the toast's text does not
-    //   use. A pixel size is exact here, so `text` does it.
-    #[cfg(feature = "lucide-icons")]
-    let close_content = char::from(lucide_icons::Icon::X).to_string();
-    #[cfg(not(feature = "lucide-icons"))]
+    // - **unstyled:** the host's `default_text_size`, which view code never sees, so `Glyph` reads it when the layout
+    //   runs;
+    // - **design:** the toast's own message, `Typography::body` (`style.message_size`), so raising the body text grows
+    //   the × with it, and raising the host's size with default tokens does not: the two move together or the × would
+    //   follow a size the toast's text does not use. A pixel size is exact here, so `text` does it.
     let close_content = String::from("×");
     let close_glyph: Element<'a, Message> = match style.message_size {
-        Some(message) => {
-            let mark = CLOSE_GLYPH_EM * message;
-            let glyph = text(close_content).size(mark);
-            #[cfg(feature = "lucide-icons")]
-            let glyph = glyph.font(iced::Font::with_name("lucide"));
-            glyph.into()
-        }
-        None => {
-            let glyph = snora_interaction::Glyph::new(close_content, CLOSE_GLYPH_EM);
-            #[cfg(feature = "lucide-icons")]
-            let glyph = glyph.font(iced::Font::with_name("lucide"));
-            glyph.into()
-        }
+        Some(message) => text(close_content).size(CLOSE_GLYPH_EM * message).into(),
+        None => snora_interaction::Glyph::new(close_content, CLOSE_GLYPH_EM).into(),
     };
 
     // `control` in place of `button` (RFC-116): the close mark is a focus

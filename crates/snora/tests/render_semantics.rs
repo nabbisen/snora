@@ -75,7 +75,7 @@ use snora::{AppLayout, Dialog, Sheet, SheetEdge, SheetSize, Toast, ToastIntent, 
 // Shared message type for all render-semantics tests.
 // ---------------------------------------------------------------------------
 
-/// The glyph the toast's close button draws in this feature state.
+/// The glyph the toast's close button draws: "×" in every build (RFC-139).
 ///
 /// **Test-local on purpose (RFC-101 Q-3).** An integration test sees only
 /// snora's public API, so sharing a constant with the implementation would
@@ -86,16 +86,10 @@ use snora::{AppLayout, Dialog, Sheet, SheetEdge, SheetSize, Toast, ToastIntent, 
 /// **The two tests below assert reachability**, not which glyph is drawn:
 /// that the close button can be found and pressed above a modal, and under
 /// RTL. Which glyph it is belongs to
-/// `toast_close_button.rs::close_button_draws_the_feature_state_glyph`, so
-/// this constant tracking the implementation does not make those tests
-/// tautological — it only keeps them able to find the button in both
-/// feature states.
+/// `toast_close_button.rs::close_button_draws_the_text_glyph_in_every_build`.
 ///
 /// No font is loaded here, and none is needed: `find` matches a text
 /// widget by its **content**, not by whether the font can draw it.
-#[cfg(feature = "lucide-icons")]
-const TOAST_CLOSE_GLYPH: &str = "\u{e1b2}";
-#[cfg(not(feature = "lucide-icons"))]
 const TOAST_CLOSE_GLYPH: &str = "×";
 
 #[derive(Debug, Clone, PartialEq, Eq)]

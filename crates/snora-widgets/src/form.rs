@@ -245,8 +245,8 @@ impl Skin {
         }
     }
 
-    /// A mark drawn as an icon at the label's size: lucide's under `lucide-icons`, a text glyph
-    /// without (the close mark's own rule, RFC-100).
+    /// A mark drawn as a text glyph at the label's size, in every build (RFC-139: a Cargo feature never
+    /// changes how a mark snora draws itself is drawn).
     fn mark<'a, Message: 'a>(&self, mark: Mark) -> Element<'a, Message> {
         let icon = mark.icon();
         match self.label_size {
@@ -270,23 +270,13 @@ enum Mark {
 
 impl Mark {
     fn icon(self) -> Icon {
-        #[cfg(feature = "lucide-icons")]
-        {
-            Icon::Lucide(match self {
-                Mark::Tick => lucide_icons::Icon::Check,
-                Mark::Chevron => lucide_icons::Icon::ChevronDown,
-            })
-        }
-        #[cfg(not(feature = "lucide-icons"))]
-        {
-            Icon::Text(
-                match self {
-                    Mark::Tick => "\u{2713}",
-                    Mark::Chevron => "\u{25be}",
-                }
-                .to_owned(),
-            )
-        }
+        Icon::Text(
+            match self {
+                Mark::Tick => "\u{2713}",
+                Mark::Chevron => "\u{25be}",
+            }
+            .to_owned(),
+        )
     }
 }
 

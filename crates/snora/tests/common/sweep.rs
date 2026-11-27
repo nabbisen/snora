@@ -121,11 +121,10 @@ pub struct Scene {
     pub make: Make,
 }
 
-/// The close mark: lucide's `X` under the `lucide-icons` feature, a plain `×` without it.
-pub const CLOSE: [(&str, Kind); 2] = [
-    ("\u{e1b2}", Kind::Glyph("close mark")),
-    ("\u{d7}", Kind::Glyph("close mark")),
-];
+/// The close mark: a plain `×` in every build (RFC-139). It used to be lucide's `X` under the `lucide-icons` feature, and
+/// the list held both so one table served both builds; it holds one glyph now, so a sweep that finds a Lucide codepoint
+/// where a mark should be is looking at a mark that is not the one snora means.
+pub const CLOSE: (&str, Kind) = ("\u{d7}", Kind::Glyph("close mark"));
 
 pub fn menu(id: u8, label: &str, items: u8) -> Menu<u8, u8> {
     Menu {
@@ -172,13 +171,10 @@ pub const TONES: [(&str, Tone); 6] = [
 
 use Kind::{App, Glyph, Word};
 
-/// The tick: lucide's `Check` under the `lucide-icons` feature, a text glyph without (RFC-100's rule for a mark).
-pub const TICK: [(&str, Kind); 2] = [("\u{e06c}", Glyph("tick")), ("\u{2713}", Glyph("tick"))];
-/// The select's chevron: lucide's `ChevronDown`, or a text glyph.
-pub const CHEVRON: [(&str, Kind); 2] = [
-    ("\u{e06d}", Glyph("chevron")),
-    ("\u{25be}", Glyph("chevron")),
-];
+/// The tick: a text glyph in every build (RFC-139).
+pub const TICK: (&str, Kind) = ("\u{2713}", Glyph("tick"));
+/// The select's chevron: a text glyph in every build (RFC-139).
+pub const CHEVRON: (&str, Kind) = ("\u{25be}", Glyph("chevron"));
 
 /// Every scene the sweep draws. **A new design widget adds a scene here** (tripwire 3 fails until it
 /// does), and a new text run in a scene adds a row to its `runs` (tripwire 1).
@@ -370,8 +366,7 @@ pub fn scenes() -> Vec<Scene> {
                 ("Notice title", Word),
                 ("Body text of the notice.", Word),
                 ("Act", Word),
-                CLOSE[0],
-                CLOSE[1],
+                CLOSE,
             ],
             make: Box::new(move |t, dir| {
                 Notice::new(t, tone, "Body text of the notice.", dir)
@@ -414,7 +409,7 @@ pub fn scenes() -> Vec<Scene> {
             own_page: false,
             directional: true,
             states: true,
-            runs: &[("Tag", Word), CLOSE[0], CLOSE[1]],
+            runs: &[("Tag", Word), CLOSE],
             make: Box::new(move |t, dir| {
                 chip::removable(t, "Tag", selected, Msg::Go, Msg::Go, dir)
             }),
@@ -513,8 +508,7 @@ pub fn scenes() -> Vec<Scene> {
                 ("Toast title", Word),
                 ("Toast message", Word),
                 ("Page text", App),
-                CLOSE[0],
-                CLOSE[1],
+                CLOSE,
             ],
             make: Box::new(move |t, dir| {
                 let l = AppLayout::new(page())
@@ -538,7 +532,7 @@ pub fn scenes() -> Vec<Scene> {
         own_page: false,
         directional: true,
         states: true,
-        runs: &[("Remember me", Word), TICK[0], TICK[1]],
+        runs: &[("Remember me", Word), TICK],
         make: Box::new(|t, dir| {
             snora::design::checkbox(t, true, dir)
                 .label("Remember me")
@@ -637,7 +631,7 @@ pub fn scenes() -> Vec<Scene> {
         own_page: false,
         directional: true,
         states: true,
-        runs: &[("Banana", Word), CHEVRON[0], CHEVRON[1]],
+        runs: &[("Banana", Word), CHEVRON],
         make: Box::new(|t, dir| {
             snora::design::select(
                 t,
@@ -661,10 +655,8 @@ pub fn scenes() -> Vec<Scene> {
             ("Banana", Word),
             ("Cherry", Word),
             ("Page text", App),
-            TICK[0],
-            TICK[1],
-            CHEVRON[0],
-            CHEVRON[1],
+            TICK,
+            CHEVRON,
         ],
         make: Box::new(|t, dir| {
             let select = snora::design::select(
