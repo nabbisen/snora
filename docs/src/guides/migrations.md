@@ -10,7 +10,7 @@ This page is the index — pick the guide that matches your jump.
 
 ## Jumping several minors: what changes your code
 
-**From 0.40 to 0.65, these are the only releases whose guide can stop your code from compiling.**
+**From 0.40 to 0.66, these are the only releases whose guide can stop your code from compiling.**
 The others change behaviour or appearance, or correct what the book said. Read every guide in
 order, but expect code changes only here:
 
@@ -27,9 +27,13 @@ order, but expect code changes only here:
 
 **These guides correct something the book told you,** and say what to re-check: **0.53** (a
 published guarantee), **0.54** (the keyboard claims), **0.62** and **0.63** (two audits of the book,
-each with a *"Re-check if you acted on…"* table).
+each with a *"Re-check if you acted on…"* table), and **0.66** (the icons page: a toast's intent, the
+Lucide font, an SVG icon's colours).
 
 
+- [0.65 → 0.66](migration-0.65-to-0.66.md) — **nothing breaks at compile time**: `keeps_focus(id)`
+  for a disclosure, a radio group in a row, snora's own marks fixed under `lucide-icons` (and
+  changed in shape where the font is loaded), focus no longer landing on a control nobody pressed.
 - [0.64 → 0.65](migration-0.64-to-0.65.md) — **additions only**: a checkbox, a toggle, a radio
   group, a select and a slider the keyboard can reach (iced 0.14's cannot).
 - [0.63 → 0.64](migration-0.63-to-0.64.md) — **breaking, on purpose**: the F6 types removed
