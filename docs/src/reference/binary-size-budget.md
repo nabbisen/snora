@@ -116,9 +116,9 @@ The flow is split between automation and human discipline:
 
 The script that produces a row is
 [`scripts/measure-binary-size.sh`](https://github.com/nabbisen/snora/blob/main/scripts/measure-binary-size.sh).
-It is intentionally simple — `cargo build` × 2, `strip --strip-all`
-× 2, `stat -c '%s'` × 2 — so that the values are reproducible
-locally:
+It is intentionally simple — for each of its three probes (engine,
+widgets, design), `cargo build`, `strip --strip-all` and `stat -c '%s'` —
+so that the values are reproducible locally:
 
 ```text
 scripts/measure-binary-size.sh 0.10.0
@@ -225,7 +225,7 @@ defect, not a real marginal cost, and are **not comparable** to any row
 from 0.25.4 onward, which uses the corrected feature-exercising probes.
 Do not treat the 0.25.3 diffs as a baseline for drift detection.
 
-The 150 KB threshold from
+The 150 KiB (153,600 B) threshold from
 [`feature-gating-criteria.md`](../contributing/feature-gating-criteria.md)
 indicator (2) applies to `diff_bytes`. If a release crosses that
 threshold, the criteria document specifies what to do (it does

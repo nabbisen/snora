@@ -6,8 +6,8 @@ depends only on `snora-design` and `iced`; `snora-interaction` (how the
 reader operates snora: the focusable control, focus, Escape, covered
 layers) depends on `iced` alone and is internal (RFC-116; named
 `snora-control` until 0.57, whose last release is a deprecation notice);
-`snora-widgets` depends on `snora-core`, `snora-interaction`,
-`snora-design`, and (opt-in) `snora-style`; `snora` depends on
+`snora-widgets` depends on `snora-core` and `snora-interaction`, and on
+`snora-design` and `snora-style` behind its own `design` feature; `snora` depends on
 `snora-core` and `snora-interaction`
 always and on the other three behind its `widgets` / `design` features
 — independently of each other (RFC-055).
@@ -32,8 +32,8 @@ your application
                 │
                 ├──► snora-core
                 ├──► snora-interaction
-                ├──► snora-design
-                └──► snora-style   (opt-in, when its own `design` feature is on)
+                ├──► snora-design  (opt-in, when its own `design` feature is on)
+                └──► snora-style   (opt-in, the same feature)
 ```
 
 Applications normally depend on a single crate, `snora`, which
@@ -46,12 +46,13 @@ independent of `widgets`) the design tokens and iced style bridge from
 ## `snora-core` — vocabulary
 
 This crate owns the **shape of the conversation** between an
-application and a renderer. It contains:
+application and a renderer. Among what it contains:
 
 - `AppLayout<Node, Message>` — the data structure describing what
   should be on screen.
 - Vocabulary enums — `LayoutDirection`, `Edge`, `ToastIntent`,
-  `ToastLifetime`, `ToastPosition`, `SheetEdge`, `SheetSize`, `Icon`.
+  `ToastLifetime`, `ToastPosition`, `SheetEdge`, `SheetSize`, `Icon`, and
+  the rest listed on the [vocabulary page](vocabulary.md).
 - Plain-data overlay types — `Dialog<Node, Message>`,
   `Sheet<Node, Message>`, `Menu`, `MenuItem`, `MenuAction`,
   `SideBar`, `SideBarItem`, `Toast`.
@@ -64,12 +65,14 @@ a WGPU frontend, an HTML renderer).
 
 This crate owns the **visuals of the prefab parts** — the bordered
 header bar, the icon-rail sidebar, the chrome-styled footer, the
-drop-down menu rendering, the icon resolver. Each is a function
+drop-down menu rendering, the tab bar, the breadcrumb, the icon
+resolver, and the five form controls (`checkbox`, `toggler`,
+`radio_group`, `select`, `slider`). Each is a function
 returning an `iced::Element`, so they slot into any `AppLayout`
 position by hand.
 
-`snora-widgets` depends on `snora-core` (vocabulary) and `iced`. It
-does **not** depend on `snora` — the widgets work against any engine
+`snora-widgets` depends on `snora-core` (vocabulary), `snora-interaction`
+and `iced`. It does **not** depend on `snora` — the widgets work against any engine
 that consumes `snora-core`.
 
 Applications normally do not depend on `snora-widgets` directly.
@@ -97,10 +100,11 @@ which re-exports the token types under `snora::design`.
 
 ## `snora-style` — the iced style bridge
 
-This crate owns the **mapping from tokens to iced values**: six
-modules — `color`, `button`, `container`, `text`, `progress` (each
-taking `&Tokens` and returning a plain `iced` style value), and `theme`
-(taking `&Tokens` and returning a complete `iced::Theme`). No
+This crate owns the **mapping from tokens to iced values**: nine
+modules — `color`, `button`, `chip`, `container`, `form`, `progress`,
+`tab`, `text` (each taking `&Tokens` and returning a plain `iced` style
+value), and `theme` (taking `&Tokens` and returning a complete
+`iced::Theme`). No
 `Element`, no layout, no message — a style, not a widget.
 
 Extracted from `snora-widgets` by RFC-055: the style layer has three
@@ -156,8 +160,10 @@ This crate binds the vocabulary to iced 0.14:
 Three reasons matter in practice:
 
 1. **One iced upgrade only touches the iced-dependent crates.** When
-   iced 0.15 ships, `snora-core`'s vocabulary stays the same; only
-   `snora` and `snora-widgets` need their dependency line bumped.
+   iced 0.15 ships, `snora-core`'s vocabulary and `snora-design`'s tokens
+   stay the same; `snora`, `snora-widgets`, `snora-style` and
+   `snora-interaction` need their iced lines bumped, including the
+   `iced_core` and `iced_runtime` lines in `snora-interaction` and `snora`.
    Applications that depend only on the re-exported names see no
    churn.
 
@@ -168,7 +174,7 @@ Three reasons matter in practice:
    without dragging the other.
 
 3. **The vocabulary is the smallest reviewable surface.** Reading
-   `snora-core`'s few hundred lines is a quick way to understand
+   `snora-core`, a few thousand lines, is a quick way to understand
    what *can* be on screen in a snora application. Implementation
    details (z-stacks, dim layers, padding constants, widget styles)
    stay out of the conceptual model.
@@ -187,7 +193,7 @@ The `render` function composes layers in this order, bottom to top:
 1. menu backdrop     transparent click sink (if a menu is open)
 2. header_menu
 3. context_menu
-4. modal dim         40 % dim click sink (if a modal is present)
+4. modal dim         44 % dim click sink (if a modal is present)
 5. dialog
 6. sheet
 7. toasts            always on top, even over modals
@@ -199,21 +205,27 @@ click-to-close behavior is driven by `on_close_modals` /
 `on_close_menus`; if those are `None`, the layers still render but
 without click-outside dismissal.
 
-**The `40 %` above is this `render` function's own (unstyled engine
-path) dim alpha.** `snora::design::render` (the `design`-active path)
-composites the modal dim at `44 %` (`DIM_ALPHA`, RFC-065) instead —
-the two were symmetric at `0.40` by coincidence, not by design, and
-they diverge deliberately. See [Token-derived engine
-surfaces](../design/engine-surfaces.md#the-modal-dim) for the styled
-path's derivation.
+**Both paths dim at `44 %`.** `snora::design::render` composites the
+modal dim at `44 %` (`DIM_ALPHA`, RFC-065), and this `render` function's
+own engine path takes the same `0.44` (`UNSTYLED_DIM_ALPHA`), so the two
+paths agree; `overlay_laws.rs` pins both. See [Token-derived engine
+surfaces](../design/engine-surfaces.md#the-modal-dim) for the derivation.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said the engine path
+dims at 40 % and diverges deliberately; it also listed six `snora-style`
+modules, said only two crates need an iced bump, and called `snora-core`
+a few hundred lines.)*
 
 ## What is not in any of these crates
 
-- Form widgets (validation, fields). Use iced's primitives.
+- Field widgets and validation. Use iced's `text_input`, which the
+  keyboard can reach. (snora has five form controls of its own from
+  0.65; see [Keyboard § Form controls](../guides/keyboard.md#form-controls).)
 - Data-table or chart components. Use iced's `canvas` or a
   data-visualization crate.
-- Theming definitions. snora consumes the active iced `Theme` to
-  resolve intent colors and chrome styling; the theme itself is
-  iced's concern.
+- A theming system on the engine path. There, snora consumes the active
+  iced `Theme` to resolve intent colors and chrome styling. Opt-in
+  themes are `snora-design`'s presets, with `snora::design::theme`
+  deriving an iced `Theme` from them.
 - Persistence, networking, business logic. snora is a presentation
   layer.

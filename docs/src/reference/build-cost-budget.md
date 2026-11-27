@@ -24,8 +24,9 @@ unintended growth before it becomes invisible.
 | `example_workbench_ms` | `cargo build --profile release-baseline -p snora-example-design-workbench` |
 | `design_overhead_ratio` (RFC-050) | derived: `example_workbench_ms / example_hello_ms`, at 5 significant figures. **This is the trend signal** — see the note below. No new build; both inputs are already collected above. |
 
-"Cold" means `snora-core`, `snora-design`, `snora-widgets`, and `snora`
-are cleaned before each measurement, across every profile a measurement
+"Cold" means snora's six crates (`snora-core`, `snora-design`,
+`snora-style`, `snora-interaction`, `snora-widgets` and `snora`) are cleaned
+before each measurement, across every profile a measurement
 in this run builds with — dev, `release`, and `release-baseline` — as of
 the RFC-052 fix; see that note below for why this was not true before it
 for two of the six columns. **And**, from the release after 0.25.3
@@ -47,8 +48,9 @@ The workbench binary itself is also cleaned before `example_workbench_ms`.
 - Wall-clock timing has ±5–15 % variance even on the same machine. A
   single data point cannot distinguish signal from noise; look at the
   trend over two or more releases.
-- The `build_widgets_ms` measurement is the closest proxy for
-  `feature-gating-criteria.md` indicator 1 (30-second threshold).
+- `build_widgets_ms` is **not** a proxy for `feature-gating-criteria.md`'s
+  indicator 1: that indicator is assessed by its own measurement (RFC-062),
+  and a cold `build_widgets_ms` exceeds 30 s on every row but one.
 
 ### Data integrity note (RFC-041)
 
@@ -224,7 +226,7 @@ Five rows now share runner, rustc and post-RFC-052 methodology — 0.31.0,
 | `build_engine_only_ms` | 448 | 355 | 506 | **42.5%** |
 | `example_hello_ms` | 143 227 | 111 226 | 156 549 | **40.7%** |
 | `build_widgets_design_ms` | 552 | 453 | 618 | **36.4%** |
-| `example_workbench_ms` | 6 061 | 4 690 | 6 564 | **41.6%** |
+| `example_workbench_ms` | 6 061 | 4 690 | 6 641 | **41.6%** |
 
 Two directional controls, both against the same numbers, make the case that
 this is runner noise and not signal:
@@ -269,10 +271,11 @@ third**, moving **−1.05%**.
 | 0.39.1 | 1.97.1 | −1.05% |
 | **0.39.3** | **1.98.0** | **−6.35%** |
 
-**Read the ~10% investigate threshold against −6.35%, not against −4.44%.** The
-threshold was set when the largest zero-code move on record was 4.44%; a single
-observation on the new compiler is already 6.35%, which leaves far less margin
-than the figure implies. **One observation is not a floor** — but it is enough
+**Read the ~10% investigate threshold against −6.35%.** The threshold was set
+when the largest move then believed zero-code was 4.44% (0.36.0 → 0.36.1); that
+pair changed 16 files under `crates/`, so it was not zero-code. The real
+zero-code moves are the four in the table, and a single observation on the new
+compiler is already 6.35%, which leaves far less margin than the figure implies. **One observation is not a floor** — but it is enough
 that the next release's move should not be called signal on the strength of the
 old number.
 
@@ -389,19 +392,26 @@ and the re-measurement keeps a crossing cheap to settle.
 
 No CI failures are triggered by compile time in the first iteration.
 
-**Trend — watch `design_overhead_ratio`, not the absolute columns.** Its
-spread on identical-runner data is ~2.5%, so a ~5% move between releases is
-visible above noise; the absolute columns cannot distinguish a real 50%
-regression from ordinary runner variance (see the note above). Investigate
+**Trend — watch `design_overhead_ratio`, not the absolute columns.** It is far
+steadier than they are, but not as steady as first measured: its spread on the
+five RFC-050 rows was ~2.5%, zero-code moves since have reached 6.35%, and
+consecutive moves have reached 18.22% (0.60.0). So read a single move against
+the ~10% threshold above, and a trend over several releases. The absolute
+columns cannot distinguish a real 50% regression from ordinary runner variance
+(see the note above). Investigate
 a step-change in the ratio without a corresponding, explicable change to
 `example_workbench_ms`'s or `example_hello_ms`'s own dependency graph.
 
-**Absolute ceiling — `build_widgets_ms` exceeding 30 000 ms** on the GitHub
-`ubuntu-latest` runner still applies, unchanged. This maps to indicator 1
-in the feature-gating criteria, and — unlike the trend watch points above —
-it is a ceiling on developer experience, not a trend measurement, so
-runner-to-runner noise does not weaken it: 30 s is 30 s regardless of which
-host measured it.
+**No absolute ceiling on `build_widgets_ms`.** A 30 000 ms ceiling stood here,
+mapped to indicator 1. A cold build exceeds it on 55 of the 56 rows, so it
+warned on every release and told nobody anything, and RFC-062 had already
+moved indicator 1 to its own measurement. It is retired here, and the warning
+in `build-cost.yaml` goes with it in 0.67.
+
+*(Corrected 2026-11-28, from the 0.67 audit: the cold clean covers six crates,
+not four; the workbench maximum is 6,641; the 4.44% move was not zero-code; the
+ratio's ~2.5% spread no longer describes it; and the ceiling fired on every
+row.)*
 
 ### Running locally
 

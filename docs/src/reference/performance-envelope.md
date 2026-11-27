@@ -48,11 +48,18 @@ of two examples as a proxy for layout-composition compilation cost:
 | `hello_ms` | Minimal skeleton: smallest Snora app |
 | `workbench_ms` | All surfaces: header, sidebar, menus, dialog, sheet, toasts, tabs, breadcrumb |
 
-The `workbench_ms` delta over `hello_ms` reflects the cost of the full
-surface set in user code. These are **trend signals**, not gates.
+**There is one measurement, from 0.17.0**
+([`performance-envelope/render-cost.csv`](performance-envelope/render-cost.csv)),
+taken by hand. No workflow runs the script, so nothing appends a row per
+release, and it is not a trend. Its `workbench_ms` (15,128) is below its
+`hello_ms` (182,000), which the measurement does not explain, so read it as
+a record, not a cost. What *is* checked on every push is that the toast layer's
+layout grows no faster than allowed: `bounded_work.rs`'s
+`laying_out_toasts_is_not_quadratic` (release, tiny-skia).
 
-Per-release values (appended on tags):
-[`performance-envelope/render-cost.csv`](performance-envelope/render-cost.csv)
+*(Corrected 2026-11-28, from the 0.67 audit: this said the values were
+appended on tags, and that the workbench delta reflects the full surface's
+cost.)*
 
 For binary size and compile time of the framework crates themselves, see
 [build cost budget](build-cost-budget.md).

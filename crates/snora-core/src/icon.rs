@@ -55,6 +55,14 @@ pub enum Icon {
     /// A custom SVG file loaded from disk. Requires the `svg-icons`
     /// feature. The engine is responsible for reading and rasterizing
     /// the file.
+    ///
+    /// **snora does not validate the path or the file.** It is read from
+    /// disk at render time and parsed as SVG. If the path or the file can
+    /// come from somewhere you do not control (a plugin, a user-installed
+    /// theme, a download), validate it before constructing the `Icon`.
+    ///
+    /// **It keeps the file's own colours.** No theme or token recolours it,
+    /// so its contrast is yours to check, in every theme you ship.
     #[cfg(feature = "svg-icons")]
     Svg(std::path::PathBuf),
 }

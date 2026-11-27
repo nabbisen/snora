@@ -1,8 +1,11 @@
 # Rendered surface identifiers
 
-snora attaches a stable `iced::widget::Id` to every surface it renders
-itself — the backdrops, the dialog card, the sheet panel, the toast
-stack, the skeleton regions. An application can label its own content;
+snora attaches a stable `iced::widget::Id` to each surface listed below —
+the backdrops, the dialog card, the sheet panel, the toast stack, the
+skeleton regions — when that surface is drawn: a slot's id exists only when
+the slot is filled, and a toast's only while the toast is shown. Not every
+element snora draws has a stable id: a prefab control's focus id is unique
+per build (`Id::unique()`), so it is not listed and cannot be relied on. An application can label its own content;
 it cannot label these, because it never sees them.
 
 **This provides labels on snora-rendered output — nothing more.** It is
@@ -65,9 +68,10 @@ compositor, no injection path to fail. It exposes `tap_key`, `press_key` and
 `typewrite`, and `snapshot(&Theme)` renders to pixels for comparison against a
 stored PNG.
 
-snora's own `render_semantics` suite uses this simulator (for clicks; we have
-never used `snapshot`). We assert composition rather than pixels by choice —
-RFC-011-D — so treat our experience as covering the input half only.
+snora's own suites use this simulator for clicks and keys, and they call
+`snapshot` to *read* pixels (contrast, ink, where a mark is drawn), not to
+compare frames against stored PNGs. So our experience covers the input half,
+and reading pixels; not the stored-reference workflow below.
 
 **Prefer the in-process route for input.** `tap_key` removes the entire class of
 problem described below. **The `snapshot` half is a weaker recommendation** — see
@@ -105,8 +109,14 @@ few things needing human judgement, kept out of CI."* Snapshot testing would
 rebuild the problem they are removing.
 
 We are not telling you not to use it. We are telling you the cost is recurring
-and paid by you, on our schedule — and that we have never run it, so we cannot
-tell you whether it needs a GPU in CI.
+and paid by you, on our schedule. What we can tell you about a GPU: snora's CI
+draws its rendered tests both with tiny-skia and with wgpu on lavapipe, a
+software Vulkan driver, so neither needs a GPU. We have not run a
+stored-reference suite.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this page said snora had never used
+`snapshot` and could not say whether it needs a GPU in CI, and that every
+surface snora renders carries an identifier.)*
 
 ### External, real window: verified bounds
 
@@ -197,7 +207,7 @@ to identify — snora does not, and will not, attach identifiers inside
 content an application supplies. This includes: the application's
 header/sidebar/footer/body content, dialog and sheet content, and
 individual buttons or controls the application builds. Only the
-surfaces snora itself composes (listed above) carry an identifier.
+surfaces listed above carry a stable identifier.
 
 ## Why the two dim variants share a name
 

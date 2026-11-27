@@ -85,10 +85,15 @@ We do not audit those by hand, and a page claiming we did would be worth
 nothing. What we do is stated in
 [the supply-chain section](#supply-chain-and-release) below.
 
-**Zero `unsafe`.** snora's own five crates contain no `unsafe` code, and
+**Zero `unsafe`.** snora's own six crates contain no `unsafe` code, and
 every one of them carries `#![forbid(unsafe_code)]` — so this holds
 **by mechanism, not by habit**: an `unsafe` block anywhere in
 snora's own source fails to compile, rather than passing review unnoticed.
+**What does not yet hold by mechanism is the attribute itself:** no gate
+fails if a crate's `lib.rs` loses it. That gate is 0.67's.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said five crates, and did not
+say the attribute itself is unchecked.)*
 Our dependencies contain a great deal of `unsafe`, as any GPU-backed
 renderer must.
 
@@ -175,8 +180,9 @@ be able to find out why here rather than by asking.)*
 for you.** Two independent reasons, and both were found by consumers
 rather than by us:
 
-- **Feature selection.** snora declares `iced` with `features =
-  ["tokio"]`. A consumer enabling more of iced's features resolves
+- **Feature selection.** snora declares `iced` with `default-features = false`
+  and `features = ["tokio", "web-colors", "crisp"]`, and passes iced's
+  defaults through its own default-on `iced-default` feature (RFC-112). A consumer enabling more of iced's features resolves
   packages we never see. knotra enables `["tokio", "image", "svg",
   "advanced"]` and so carries `crossbeam-epoch` — via `image → exr →
   rayon-core → crossbeam-deque` — which is **not in snora's lockfile at

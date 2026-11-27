@@ -9,8 +9,9 @@ the `widgets` feature is enabled, which is the default), and they
 are entirely **optional**: any `iced::Element` works in an
 `AppLayout` slot.
 
-**Not on this page:** snora's controls that the keyboard can reach live at
-the crate root, not in `snora::widget`. They are `snora::control`, which makes
+**Not on this page:** the controls for *your own* content and form input live
+at the crate root, not in `snora::widget`. (The prefab chrome on this page is
+reachable by the keyboard too.) They are `snora::control`, which makes
 your own content a control (0.58), and the five form controls,
 `snora::{checkbox, toggler, radio_group, select, slider}` (0.65). Each has a
 `snora::design::` twin. See [Keyboard](../guides/keyboard.md#your-own-content).
@@ -105,8 +106,9 @@ them. Direct calls are for non-header menus.
 {{#include ../../../examples/book_snippets/src/reference_widgets.rs:widgets_icons}}
 ```
 
-Resolve an `Icon` to an iced element at the default (14 px) or a
-specified size. Honors all enabled icon backends.
+Resolve an `Icon` to an iced element at 1 em of the host's text (16 px at
+iced's default `default_text_size`, RFC-115) or a specified size. Honors all
+enabled icon backends.
 
 ### `app_tab_bar`
 
