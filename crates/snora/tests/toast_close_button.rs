@@ -180,6 +180,9 @@ fn close_control_is_laid_out_at_exactly_the_floor() {
     let messages: [(&str, &str); 3] = [("short", "All good."), ("empty", ""), ("wrapping", &long)];
     let mut off = Vec::new();
     let mut cases = 0;
+    // Where the centred close control sits, by (intent, width, length): the "wrapping" message must make the toast taller than
+    // the short one, or the case is a second "short" one and says nothing (the architect's H-1 review).
+    let mut centre_y = std::collections::BTreeMap::new();
     for intent in [ToastIntent::Info, ToastIntent::Debug, ToastIntent::Error] {
         for (length, message) in messages {
             for width in [800.0f32, 320.0] {
@@ -195,6 +198,7 @@ fn close_control_is_laid_out_at_exactly_the_floor() {
                     continue;
                 }
                 let b = targets[0].bounds;
+                centre_y.insert((format!("{intent:?}"), width as u32, length), b.center().y);
                 if b.width != MIN_TARGET || b.height != MIN_TARGET {
                     off.push(format!(
                         "{what}: the close control is laid out {}x{}, not exactly \
@@ -203,6 +207,21 @@ fn close_control_is_laid_out_at_exactly_the_floor() {
                     ));
                 }
             }
+        }
+    }
+    for intent in [ToastIntent::Info, ToastIntent::Debug, ToastIntent::Error] {
+        for width in [800u32, 320] {
+            let at = |length: &'static str| {
+                centre_y
+                    .get(&(format!("{intent:?}"), width, length))
+                    .copied()
+            };
+            let (short, wrapping) = (at("short"), at("wrapping"));
+            assert!(
+                matches!((short, wrapping), (Some(s), Some(w)) if w > s + 1.0),
+                "premise: {intent:?} at {width} px: the wrapping message should make the toast taller than the short one \
+                 (its centred close control lower), got {short:?} and {wrapping:?}"
+            );
         }
     }
     assert_eq!(
