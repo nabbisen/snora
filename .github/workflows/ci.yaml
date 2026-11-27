@@ -581,12 +581,13 @@ jobs:
   rendered-tiny-skia-no-lucide:
     name: Rendered tests on tiny-skia, design without lucide-icons
     runs-on: ubuntu-latest
-    # A job of its own (0.64 Part C) because it is the one place this combination runs.
-    # Without `lucide-icons` the close mark is `×` and not lucide's `X`, which is a
-    # coverage of its own and cannot be folded into the all-features run. It was a step
-    # of "Rust quality gate" (RFC-100), 643 s of which 419 s were the two drawn sweeps;
-    # as a step it was the longest in that job, and so the floor of the whole workflow.
-    # Beside the rendered jobs it is one more thing running at once.
+    # A job of its own (0.64 Part C) because it is the one place the build without the `lucide-icons` dependency is linked and
+    # tested. Since RFC-139 the marks snora draws itself are the same text glyphs in every build, so this job draws the same
+    # pixels as the all-features jobs; what it covers is the build (the `Icon::Lucide` variant and `snora::lucide` absent), the
+    # doc-tests of that feature set, and R-3's test (`lucide_marks_in_the_starting_state.rs`) in the state with no Lucide
+    # dependency at all. It was a step of "Rust quality gate" (RFC-100), 643 s of which 419 s were the two drawn sweeps;
+    # as a step it was the longest in that job, and so the floor of the whole workflow. Beside the rendered jobs it is one
+    # more thing running at once.
     #
     # **Everything but the three sweeps** (0.65, the RFC-134 Unit 1 review's addendum): the doc-tests, the library's unit
     # tests and each integration-test target that the targets script does not name a sweep. The sweeps are the next job,
@@ -615,9 +616,10 @@ jobs:
   rendered-sweeps-tiny-skia-no-lucide:
     name: Rendered sweeps on tiny-skia, design without lucide-icons
     runs-on: ubuntu-latest
-    # The three sweeps of the combination above (without lucide-icons the tick and the chevron are the text glyphs `✓` and
-    # `▾`, and the close mark `×`: the same scenes, drawn differently), in a job of their own, as for the all-features
-    # combination. The combination (tiny-skia, widgets and design, no lucide-icons) is still run once per target.
+    # The three sweeps of the combination above, in a job of their own, as for the all-features combination. Since RFC-139 the
+    # tick, the chevron and the close mark are the same text glyphs (`✓`, `▾`, `×`) in every build, so these sweeps read the
+    # same pixels as the all-features sweeps (the non-text table is identical, row for row); the job runs them without the
+    # `lucide-icons` dependency. The combination (tiny-skia, widgets and design, no lucide-icons) is still run once per target.
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
