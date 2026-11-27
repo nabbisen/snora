@@ -216,6 +216,41 @@ fn subjects() -> Vec<Subject> {
             },
             pick: |e| disc(e, 1).map(|r| (r, false)),
         },
+        // RFC-138: the same group laid out in a row: the three options on one line, the middle one selected.
+        Subject {
+            name: "radio ring (unselected), horizontal",
+            make: |d| {
+                container(
+                    snora::radio_group(
+                        ["Small", "Medium", "Large"],
+                        Some(&"Medium"),
+                        |_| Msg::Go,
+                        d,
+                    )
+                    .horizontal(true),
+                )
+                .width(Length::Fixed(340.0))
+                .into()
+            },
+            pick: |e| nth_square(e, 0).map(|r| (r, false)),
+        },
+        Subject {
+            name: "radio ring (selected), horizontal",
+            make: |d| {
+                container(
+                    snora::radio_group(
+                        ["Small", "Medium", "Large"],
+                        Some(&"Medium"),
+                        |_| Msg::Go,
+                        d,
+                    )
+                    .horizontal(true),
+                )
+                .width(Length::Fixed(340.0))
+                .into()
+            },
+            pick: |e| nth_square(e, 1).map(|r| (r, false)),
+        },
         Subject {
             name: "slider track",
             make: |d| {

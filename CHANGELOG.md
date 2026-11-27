@@ -45,6 +45,22 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
     which still wins.
   - Nothing breaks: a control that does not call it behaves as in 0.65.0.
 
+- **`horizontal(bool)` on the radio group** (RFC-138), on `snora::radio_group` and `snora::design::radio_group`:
+  `.horizontal(true)` lays the options out in a row, as iced's separate radios could be, for two or three
+  short options ("View as: List, Grid") that would sit on one line.
+  - **The column stays the default.** `horizontal(false)`, or no call, is today's group, pixel for pixel. The
+    argument is a `bool` like `disabled(bool)`, so a responsive layout can pass its own condition.
+  - **The row always wraps**, at the room the group has: a line breaks between options, in logical order, and the
+    options sit at the start edge of each line. Under right-to-left each line is mirrored. The lines stack at
+    the column's pitch. There is no setting to turn wrapping off.
+  - **The space between options is twice the space between a mark and its label** (16 px with the stock
+    tokens), on both paths, so a label never reads as belonging to the next option. It follows the token set's
+    own `sm`, so the rule holds for any tokens.
+  - **The keys are unchanged**: one Tab stop; ↓ and → move to the next option and ↑ and ← to the previous one,
+    with ← → following the screen. In a wrapped row ↓ is "next", not "the option below".
+  - **One limit, shared with the column:** an option that alone is wider than the room is laid out as the column
+    lays it out (it is not wrapped inside, and it can reach the window's edge).
+
 ### Fixed
 
 - **A press that also changes how many controls come *before* the pressed one no longer hands focus to

@@ -594,6 +594,30 @@ pub fn scenes() -> Vec<Scene> {
             .into()
         }),
     });
+    // RFC-138: the same group laid out in a row, the three options on one line with the middle one selected (so that a
+    // finder can name it by position whichever way the line is mirrored). Its marks and labels are the column's.
+    v.push(Scene {
+        name: "radio group, horizontal",
+        covers: &[],
+        own_page: false,
+        directional: true,
+        states: true,
+        runs: &[("Small", Word), ("Medium", Word), ("Large", Word)],
+        make: Box::new(|t, dir| {
+            container(
+                snora::design::radio_group(
+                    t,
+                    ["Small", "Medium", "Large"],
+                    Some(&"Medium"),
+                    |_| Msg::Go,
+                    dir,
+                )
+                .horizontal(true),
+            )
+            .width(Length::Fixed(320.0))
+            .into()
+        }),
+    });
     v.push(Scene {
         name: "slider",
         covers: &["slider"],

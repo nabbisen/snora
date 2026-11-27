@@ -42,7 +42,7 @@ use iced::keyboard::{Key, key::Named};
 use iced::widget::{Id, button, column, container, mouse_area, scrollable, space, text};
 use iced::{Alignment, Background, Border, Color, Element, Length, Padding, Theme};
 use snora_core::{Icon, LayoutDirection};
-use snora_interaction::{BarColors, EmBox, MenuAnchor, OnEscape, SliderBar};
+use snora_interaction::{BarColors, EmBox, MenuAnchor, MirroredRow, OnEscape, SliderBar};
 
 use crate::direction::LogicalRow;
 use crate::icon::{icon_element, icon_element_sized};
@@ -109,6 +109,10 @@ pub(crate) struct Skin {
     label_size: Option<f32>,
     /// Between a mark and its label.
     gap: f32,
+    /// Between two options of a radio group laid out in a row (RFC-138): **twice [`gap`](Self::gap)**,
+    /// on both paths, so that a label is never nearer the next option's mark than its own. Defined
+    /// from `gap` and not given a token of its own, so the rule holds for any token set.
+    between: f32,
     padding: Padding,
 }
 
@@ -120,6 +124,7 @@ impl Skin {
             geometry: ControlGeometry::unstyled(),
             label_size: None,
             gap: 8.0,
+            between: 2.0 * 8.0,
             padding: BUTTON_DEFAULT_PADDING,
         }
     }
@@ -132,6 +137,7 @@ impl Skin {
             geometry: ControlGeometry::from_tokens(tokens),
             label_size: Some(snora_style::text::label_size(tokens).0),
             gap: tokens.spacing.sm,
+            between: 2.0 * tokens.spacing.sm,
             padding: Padding::from([tokens.spacing.xs, tokens.spacing.sm]),
         }
     }
@@ -662,6 +668,8 @@ impl<'a, Message: Clone + 'a> From<Toggler<'a, Message>> for Element<'a, Message
 ///
 /// **Disabled by [`disabled(true)`](Self::disabled)**, because its handler is a required argument
 /// (as iced's own shape has it): it is no Tab stop, takes no key, ignores a click and draws dimmed.
+///
+/// **In a column, or in a row: [`horizontal(true)`](Self::horizontal).** The column is the default.
 #[must_use = "a radio group does nothing until it is added to a view"]
 pub struct RadioGroup<'a, T, Message> {
     skin: Skin,
@@ -670,6 +678,7 @@ pub struct RadioGroup<'a, T, Message> {
     on_select: Rc<dyn Fn(T) -> Message + 'a>,
     direction: LayoutDirection,
     disabled: bool,
+    horizontal: bool,
     id: Option<Id>,
 }
 
@@ -709,8 +718,41 @@ where
             on_select: Rc::new(on_select),
             direction,
             disabled: false,
+            horizontal: false,
             id: None,
         }
+    }
+
+    /// Lays the options out in a row that wraps (RFC-138). **The column is the default**: with
+    /// `horizontal(false)` the group is drawn exactly as it is without the call, so a responsive layout
+    /// can pass its own condition (`.horizontal(window_is_wide)`).
+    ///
+    /// ```
+    /// # use snora_widgets::radio_group;
+    /// # use snora_core::LayoutDirection;
+    /// # #[derive(Clone)] enum Message { ViewAs(&'static str) }
+    /// # fn view<'a>(view: &'a &'static str) -> iced::Element<'a, Message> {
+    /// radio_group(["List", "Grid"], Some(view), Message::ViewAs, LayoutDirection::Ltr)
+    ///     .horizontal(true)
+    ///     .into()
+    /// # }
+    /// ```
+    ///
+    /// - **The row always wraps.** When the options do not fit the room the group has, it continues on
+    ///   the next line; there is no setting to turn wrapping off.
+    /// - **The options keep their logical order, line by line,** and sit at the start edge of each
+    ///   line. Under right-to-left each line is mirrored: the first option is at the right end of the
+    ///   first line, and a shorter line starts from the right edge too.
+    /// - **The space between options is twice the space between a mark and its label**, so a label
+    ///   never reads as belonging to the next option. The lines are stacked at the column's pitch.
+    /// - **The keys are the same in either layout**: one Tab stop; ↓ and → move to the next option and
+    ///   ↑ and ← to the previous one, wrapping at the ends, with ← → following the screen. **There is
+    ///   no two-dimensional movement in a wrapped row: ↓ is "next", not "the option below".**
+    /// - **One limit, shared with the column:** a line breaks between options, never inside one. An
+    ///   option that alone is wider than the room is laid out as the column lays it out.
+    pub fn horizontal(mut self, horizontal: bool) -> Self {
+        self.horizontal = horizontal;
+        self
     }
 
     /// A disabled group is no Tab stop, takes no key and ignores a click, and draws dimmed.
@@ -792,10 +834,25 @@ where
             Element::from(area)
         });
         // The options hug the start edge of the group, as a menu's items do.
-        let group = column(rows).align_x(match direction {
-            LayoutDirection::Ltr => Alignment::Start,
-            LayoutDirection::Rtl => Alignment::End,
-        });
+        let group: Element<'a, Message> = if g.horizontal {
+            // A row that wraps, its direct children the options in logical order: `MirroredRow`
+            // reflects each child's x within the row's width, which is, line by line, the mirror
+            // image under RTL (a shorter line starts from the right edge too). The tree is never
+            // reversed. The space between lines is the column's: each option carries its own
+            // vertical padding, so there is none here.
+            let wrapped = iced::widget::Row::with_children(rows)
+                .spacing(skin.between)
+                .wrap()
+                .vertical_spacing(0.0);
+            MirroredRow::new(wrapped, direction == LayoutDirection::Rtl).into()
+        } else {
+            column(rows)
+                .align_x(match direction {
+                    LayoutDirection::Ltr => Alignment::Start,
+                    LayoutDirection::Rtl => Alignment::End,
+                })
+                .into()
+        };
 
         let mut control = skin.control(group).width(Length::Shrink);
         if enabled {

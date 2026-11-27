@@ -568,6 +568,40 @@ fn subjects() -> Vec<Subject> {
                 discs.get(1).copied().and_then(|r| all(r, Some(0)))
             },
         },
+        // RFC-138: the same marks of the group laid out in a row (the three options share a line, the selected one the middle).
+        Subject {
+            name: "radio dot ring (unselected), horizontal, vs its surface",
+            row: "138",
+            scene: "radio group, horizontal",
+            pick: |e, _| square(e, 0).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "radio dot ring (selected), horizontal, vs its surface",
+            row: "138",
+            scene: "radio group, horizontal",
+            pick: |e, _| square(e, 1).and_then(|r| all(r, Some(0))),
+        },
+        Subject {
+            name: "radio dot (selected), horizontal, vs its ring",
+            row: "138",
+            scene: "radio group, horizontal",
+            pick: |e, _| {
+                // The three options share a line and the selected one is the middle one, so by x it is the second disc
+                // whichever way the line is mirrored.
+                let mut discs: Vec<Rectangle> = e
+                    .iter()
+                    .filter(|(k, r)| {
+                        *k == El::Container
+                            && (9.0..10.5).contains(&r.width)
+                            && (9.0..10.5).contains(&r.height)
+                    })
+                    .map(|x| x.1)
+                    .collect();
+                discs.sort_by(|a, b| a.x.total_cmp(&b.x));
+                discs.dedup_by(|a, b| (a.y - b.y).abs() < 1.0 && (a.x - b.x).abs() < 1.0);
+                discs.get(1).copied().and_then(|r| all(r, Some(0)))
+            },
+        },
         Subject {
             name: "slider track vs its surface",
             row: "134",
