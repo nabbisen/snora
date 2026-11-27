@@ -1,6 +1,6 @@
 # RFC-141 — A read-only tag has no primitive, and the recipe's is drawn disabled
 
-**Status.** Proposed, 2026-11-28.
+**Status.** Accepted 2026-11-28 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-27, the 0.67 audit's request B (row B3-043, measured), reviewed by the architect
 (`.git-exclude/reviewed/audit-0-67-b/review-result.md`). The owner asked for this RFC for 0.67 on 2026-11-28.
 **Release target.** 0.67.0, as an addition.
@@ -73,6 +73,15 @@ Both renderers.
 be the first chip there, which is a separate question.
 
 **Q-4. When.** **Suggest: 0.67.0,** with the audit's follow-up.
+
+## Rulings, 2026-11-28 (owner)
+
+"Authorized." The owner first asked for the purpose and the reasoning, and accepted them. Every question is ruled as
+suggested:
+- **Q-1:** the name is `tag`.
+- **Q-2:** no tones now. Ruled together with the toast's colour-only intent, in 0.67.
+- **Q-3:** the design path only.
+- **Q-4:** 0.67.0, as an addition.
 
 ## Review against snora's principles
 

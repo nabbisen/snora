@@ -1,6 +1,6 @@
 # RFC-140 — The release path runs third-party actions from refs that can move
 
-**Status.** Proposed, 2026-11-28.
+**Status.** Accepted 2026-11-28 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-28, the 0.67 audit's request C (row C3-T-45, reported first and as its class only), verified by
 the architect (`.git-exclude/reviewed/audit-0-67-c/review-result.md`). The owner asked for this RFC for 0.67 on
 2026-11-28.
@@ -103,6 +103,17 @@ so it is the owner's to switch on, and our gate remains the check a contributor 
 
 **Q-4. When.** **Suggest: 0.67.0.** It is CI and the book only, so it needs no crate release. Under the 2026-11-18
 ruling it could land before 0.67.0 is cut, and the cut would carry it.
+
+## Rulings, 2026-11-28 (owner)
+
+"Authorized." The owner first asked for the purpose and the reasoning, and accepted them. Every question is ruled as
+suggested:
+- **Q-1:** Dependabot keeps the pins current, for `github-actions` only, weekly. The owner reviews and merges its
+  proposals.
+- **Q-2:** the publish job verifies the tag's signature against a public key in the repository, with the limit
+  stated.
+- **Q-3:** the owner switches on the repository's "require SHA pinning" setting after R-1 lands.
+- **Q-4:** 0.67.0. CI and the book only.
 
 ## Review against snora's principles
 

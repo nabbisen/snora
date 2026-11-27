@@ -249,10 +249,10 @@ read, in four requests:
 That is about 5,100 lines. A claim that something is complete ("every", "all", an inventory) is checked by enumerating the
 API or what is drawn, never by searching. It can start during 0.66, because it is read-only.
 
-**Two RFCs from the audit, asked for by the owner on 2026-11-28:**
-- [RFC-140](rfcs/proposed/140-the-release-path-runs-actions-from-refs-that-can-move.md): the release path runs
+**Two RFCs from the audit, asked for and accepted by the owner on 2026-11-28:**
+- [RFC-140](rfcs/accepted/140-the-release-path-runs-actions-from-refs-that-can-move.md): the release path runs
   third-party actions from refs that can move, and the tag's signature is not verified (request C).
-- [RFC-141](rfcs/proposed/141-a-read-only-tag-has-no-primitive.md): a read-only tag primitive, because the recipe's is
+- [RFC-141](rfcs/accepted/141-a-read-only-tag-has-no-primitive.md): a read-only tag primitive, because the recipe's is
   a disabled chip at under 2:1 (request B).
 
 **Already carried in** from request A's review and RFC-138's Unit 0 (2026-11-26):
