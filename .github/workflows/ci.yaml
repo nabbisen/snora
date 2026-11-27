@@ -590,8 +590,10 @@ jobs:
     # more thing running at once.
     #
     # **Everything but the three sweeps** (0.65, the RFC-134 Unit 1 review's addendum): the doc-tests, the library's unit
-    # tests and each integration-test target that the targets script does not name a sweep. The sweeps are the next job,
-    # as for the all-features combination above; each target runs in exactly one of the two.
+    # tests and each integration-test target that the targets script does not name a sweep. **The sweeps are not run in
+    # this combination** (RFC-139 round 3): the marks are the same glyphs in every build, the non-text table the sweeps
+    # record is identical row for row with and without `lucide-icons`, and R-3's test (run here) guards that the marks
+    # cannot diverge again; they run once, in "Rendered sweeps on tiny-skia" above and in the wgpu job.
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
@@ -612,22 +614,6 @@ jobs:
           cargo test -p snora --no-default-features --features widgets,design,iced-default --doc
           read -r -a targets <<< "$(scripts/rendered-targets.sh rest no-lucide)"
           cargo test -p snora --no-default-features --features widgets,design,iced-default --lib "${targets[@]}"
-
-  rendered-sweeps-tiny-skia-no-lucide:
-    name: Rendered sweeps on tiny-skia, design without lucide-icons
-    runs-on: ubuntu-latest
-    # The three sweeps of the combination above, in a job of their own, as for the all-features combination. Since RFC-139 the
-    # tick, the chevron and the close mark are the same text glyphs (`✓`, `▾`, `×`) in every build, so these sweeps read the
-    # same pixels as the all-features sweeps (the non-text table is identical, row for row); the job runs them without the
-    # `lucide-icons` dependency. The combination (tiny-skia, widgets and design, no lucide-icons) is still run once per target.
-    steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Sweeps on tiny-skia, design without lucide-icons
-        run: |
-          read -r -a targets <<< "$(scripts/rendered-targets.sh sweeps no-lucide)"
-          cargo test -p snora --no-default-features --features widgets,design,iced-default "${targets[@]}"
 
   renderer-parity:
     name: The two renderers draw the same elements
