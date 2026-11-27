@@ -42,11 +42,11 @@ in chronological order; the engine honors the invariant automatically.
 Top anchors render newest at the top; bottom anchors render newest at
 the bottom.
 
-`ToastIntent::Warning` note: iced's extended palette has no warning
-semantic pair. Snora uses a private fallback color (stable amber/orange)
-for this intent. The fallback is an implementation detail and may
-change when iced adds a warning semantic — it is not a public design
-token and cannot be overridden through the theme API.
+`ToastIntent::Warning` takes iced's own warning pair (`extended_palette().warning`),
+as every other intent takes its pair from the theme (RFC-104).
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said iced has no warning pair and
+snora used a private fallback colour. iced 0.14 has one, and snora uses it.)*
 
 ## Sheets
 
@@ -113,6 +113,28 @@ F6 and Shift+F6 into one, and `snora::keyboard::focus_zone(cycle)` moves focus (
 `focus::next_zone`. They let an application hold the current zone and the slots it filled, so
 that `next_zone` could decide where F6 goes. From 0.61, snora reads both from the tree when the
 key is pressed, so there is nothing left for the application to hold.
+
+## Keyboard shortcuts
+
+The vocabulary of [`Shortcuts`](../guides/keyboard.md#the-keys), the router built in `view`
+from the same data the application hands its widgets (RFC-116 R-2):
+
+- **`Platform::{Other, MacOs}`**: whose bindings apply. `Ctrl` is the command key on `Other`
+  (Windows, Linux and the rest), `Cmd` on `MacOs`. `Platform::current()` is the one the build
+  targets. `#[non_exhaustive]`.
+- **`Digits::{Tabs, SideBar}`**: what the digits `1…9` choose, the *n*th tab or the *n*th side
+  bar item. `#[non_exhaustive]`.
+- **`ShortcutAction::{NextTab, PreviousTab, Parent, Digit(u8)}`**: what a route does, before
+  the platform turns it into keys. `#[non_exhaustive]`.
+- **`TargetRole::{SideBarItem, Tab, Crumb}`**: which kind of control a route's target is.
+  `#[non_exhaustive]`.
+
+`snora::keyboard` re-exports `Platform`, `Digits` and `ShortcutAction`. `TargetRole`, and
+`ShortcutRoute`, the type `Shortcuts::routes()` returns, are re-exported from 0.67; until then
+code that names them depends on `snora-core`.
+
+*(Added 2026-11-28, from the 0.67 audit: the page says it lists every public enum in
+`snora-core`, and these four were missing. The check that it stays so is 0.67's.)*
 
 `Tab` and `Crumb` are **not** zones: they are content an application places *inside* a zone.
 The [0.38 → 0.39 migration guide](../guides/migration-0.38-to-0.39.md) says why the vocabulary

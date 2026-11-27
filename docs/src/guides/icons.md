@@ -167,5 +167,11 @@ snora = { version = "0.66", features = ["widgets", "lucide-icons", "svg-icons"] 
 ```
 
 `lucide-icons` and `svg-icons` are **subordinate** to `widgets`: they
-gate widget-side rendering and are not meaningful without it. The CI
-feature matrix tests all of these combinations on every PR.
+gate widget-side rendering and are not meaningful without it. CI's feature
+matrix compiles each of these combinations on every push, with two
+differences: the engine-only build is compiled with `iced-default` on (an
+application's own `iced` line supplies it), and the last row is compiled only
+together with `design`, as part of `--all-features`.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said CI tests all of these
+combinations.)*

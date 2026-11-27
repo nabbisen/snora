@@ -2,8 +2,11 @@
 
 Add snora and iced to your `Cargo.toml`. snora targets **iced 0.14** and
 **Rust edition 2024**. The declared minimum supported Rust version is
-**rustc ≥ 1.88** — snora's own code needs only the edition-2024 minimum of
-1.85, but the floor is inherited from `iced`/`wgpu`, which require 1.88.
+**rustc ≥ 1.88**, which `iced` and `wgpu` require, and which snora's own code
+needs too (it uses `let` chains, stable from 1.88).
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said snora's own code needs
+only 1.85.)*
 
 ```toml
 [dependencies]
@@ -12,9 +15,11 @@ snora = "0.66"
 ```
 
 You normally do **not** depend on `snora-core` directly. The `snora` crate
-re-exports the entire vocabulary (`AppLayout`, `Toast`, `ToastPosition`,
+re-exports the vocabulary (`AppLayout`, `Toast`, `ToastPosition`,
 `Dialog`, `Sheet`, `LayoutDirection`, …), so a single `use snora::…`
-suffices.
+suffices. **Two exceptions until 0.67:** `ShortcutRoute` and `TargetRole`, the
+types `Shortcuts::routes()` returns, are not re-exported, so code that names
+them needs `snora-core`. Most applications never call `routes()`.
 
 ## Which crate should I depend on?
 
@@ -31,7 +36,9 @@ Advanced users who want to depend on `snora-core` without iced can do so — the
 
 | Feature | What it adds | When to enable |
 |---|---|---|
-| `widgets` | Prefab `app_header` / `app_side_bar` / `app_footer` / `render_menu` / `icon_element`. **On by default.** | You want a working app on screen quickly without writing chrome from scratch |
+| `widgets` | Prefab `app_header` / `app_side_bar` / `app_footer` / `app_tab_bar` / `app_breadcrumb` / `render_menu` / `icon_element`, and the five form controls (`snora::{checkbox, toggler, radio_group, select, slider}`). **On by default.** | You want a working app on screen quickly without writing chrome from scratch |
+| `iced-default` | iced's own default features (the renderers, the windowing backends, `linux-theme-detection`). **On by default.** | Leave it on unless you name your own iced features; see [Engine-only build](#engine-only-build) |
+| `design` | Snora Design: `snora::design` (tokens, the token-derived iced theme, the design primitives with `widgets`) | You want snora's tokens, presets and design components |
 | `lucide-icons` | `Icon::Lucide` variant + `snora::lucide` re-exports | You want the [Lucide icon set](https://lucide.dev/). **Your application must load the font** (`snora::lucide::LUCIDE_FONT_BYTES`): see [Icons](../guides/icons.md#iconlucide--the-curated-icon-set) |
 | `svg-icons` | `Icon::Svg(PathBuf)` variant | You want to load custom SVG files at runtime |
 

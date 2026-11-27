@@ -34,8 +34,8 @@ support; see [snora's position](../contributing/semantic-accessibility.md#positi
 
 You can ship with snora, but the framework gives you less leverage:
 
-- **Form-heavy applications.** snora has nothing form-specific (no
-  field widgets, no validation primitives). From 0.65 it has a checkbox, a
+- **Form-heavy applications.** snora has no field widgets of its own and no
+  validation primitives. From 0.65 it has a checkbox, a
   toggle, a radio group, a select and a slider the keyboard can reach
   ([Keyboard § Form controls](../guides/keyboard.md#form-controls)); iced 0.14's
   own are not reachable. Text fields are iced's `text_input`, which is.

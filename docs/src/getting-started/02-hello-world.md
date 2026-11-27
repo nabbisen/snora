@@ -26,8 +26,9 @@ on `AppLayout` — see the [next page](03-add-a-header.md).
 
 ## Try it locally
 
-The `examples/hello/` directory in the snora workspace is exactly the
-program above. Run it with:
+The `examples/hello/` directory in the snora workspace is a slightly
+fuller version of the program above: a centred title and a line of text,
+in a window titled "snora — hello". Run it with:
 
 ```text
 cargo run -p snora-example-hello

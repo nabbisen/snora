@@ -3,8 +3,10 @@
 Snora is in pre-1.0 SemVer: minor version bumps may carry small
 breaking changes when justified. A deprecated item is removed in the
 third minor after the one that deprecated it, and its note names that
-version from the start. Each minor release ships a
-focused migration guide describing exactly what to change and why.
+version from the start. Each minor release since 0.39 ships a
+focused migration guide describing exactly what to change and why
+(`scripts/check-migration-guides.sh` enforces it from 0.39; some earlier
+minors have none).
 
 This page is the index — pick the guide that matches your jump.
 
@@ -17,19 +19,30 @@ order, but expect code changes only here:
 | Release | What breaks at compile time, if you use it |
 |---|---|
 | [0.40](migration-0.39-to-0.40.md) | your own `iced::advanced` calls, if you relied on `lucide-icons` enabling `advanced` |
-| [0.41](migration-0.40-to-0.41.md) | nothing at compile time, but overlays contain the pointer now: a flow that relied on a click passing through changes |
+| [0.42](migration-0.41-to-0.42.md) | `iced::widget::canvas` or `iced/tokio`, if your code relied on them arriving through `snora` |
 | [0.45](migration-0.44-to-0.45.md) | `snora_design::{Emphasis, Size}` removed |
+| [0.54](migration-0.53-to-0.54.md) | `default-features = false` on `snora`, `snora-widgets` or `snora-style` also turns off iced's defaults, if your own `iced` line does not keep them |
 | [0.57](migration-0.56-to-0.57.md) | `sweep_expired` and `ToastLifetime::DEFAULT` removed; `snora-control` renamed `snora-interaction` |
 | [0.59](migration-0.58-to-0.59.md) | `on_toast_hover`, `ToastHover`, `Holds::hover` removed |
 | [0.60](migration-0.59-to-0.60.md) | `keyboard::dismiss_on_escape` removed |
 | [0.63](migration-0.62-to-0.63.md) | `row_dir` and `row_dir_three` return a `LogicalRow`: code that names `Row` or calls `wrap`, `clip` or `extend` on it |
 | [0.64](migration-0.63-to-0.64.md) | `next_zone`, `FocusZone`, `ZonePresence` removed; eight widget functions take a required `direction`; `Shortcuts::routes()` takes no argument |
 
-**These guides correct something the book told you,** and say what to re-check: **0.53** (a
-published guarantee), **0.54** (the keyboard claims), **0.62** and **0.63** (two audits of the book,
+**0.41 changes no code, but it changes behaviour you may rely on:** overlays contain the pointer,
+so a flow that relied on a click passing through an overlay changes.
+
+**These guides correct something the book told you,** and say what to re-check: **0.50** (the
+test harness's renderer), **0.52** (a record statement about non-colour status), **0.53** (a
+published guarantee), **0.54** (the keyboard claims), **0.59** (the header's dropdown),
+**0.62** and **0.63** (two audits of the book,
 each with a *"Re-check if you acted on…"* table), and **0.66** (the icons page: a toast's intent, the
 Lucide font, an SVG icon's colours).
 
+*(Corrected 2026-11-28, from the 0.67 audit: the table listed 0.41, which breaks no code, and
+missed 0.42 and 0.54; the list of correcting guides missed 0.50, 0.52 and 0.59; and this page had
+no "Per-version guides" heading for the instruction below to point at.)*
+
+## Per-version guides
 
 - [0.65 → 0.66](migration-0.65-to-0.66.md) — **nothing breaks at compile time**: `keeps_focus(id)`
   for a disclosure, a radio group in a row, snora's own marks fixed under `lucide-icons` (and
@@ -245,8 +258,8 @@ The full pre-1.0 versioning policy is summarized at the top of
 ## Writing a migration guide
 
 Copy [`migration-template.md`](migration-template.md) to
-`migration-X.Y-to-X.Z.md`, fill in the seven sections, and add a link
-to the "Per-version guides" list above.
+`migration-X.Y-to-X.Z.md`, fill in the seven sections, add a link to the
+"Per-version guides" list above, and add the page to `docs/src/SUMMARY.md`.
 
 The [versioning policy](../contributing/versioning-policy.md) defines
 when a migration guide is required and what changelog label to use.

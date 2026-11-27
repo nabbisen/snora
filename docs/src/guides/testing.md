@@ -52,12 +52,15 @@ Three things to notice:
 
 ## Pattern: hash captures to check a snora upgrade changed nothing
 
-Contributed by the **arama** team, who used it to produce the only
-pixel-level confirmation snora's no-visual-change guarantee has.
+Contributed by the **arama** team, who used it to confirm at pixel level that
+a snora upgrade changed nothing they drew. snora no longer promises that an
+upgrade changes nothing visible: the guarantee was withdrawn in 0.53, and each
+migration guide names the appearance changes of its release.
 
 Everything above tests *logic*. This tests *rendered output*, and it is the
-one technique that closes the gap `render_semantics` leaves — that suite
-asserts composition, not pixels, and nothing in snora's CI compares images.
+one technique that closes the gap snora's own suite leaves: snora's drawn tests
+read pixels of what snora draws, but nothing in snora's CI compares *your*
+application's frames across an upgrade.
 
 The method is ordinary and the discipline is the point:
 
@@ -88,9 +91,10 @@ When it differs you still need the images. Determinism also depends on your
 own fixtures: fonts, scaling, animation, timestamps and any real content will
 each break it before snora does.
 
-If you adopt it, snora would like to hear the result either way — a hash that
-*differs* across a snora upgrade with your own code unchanged is a bug report
-we would want.
+If you adopt it, snora would like to hear the result either way. A hash that
+*differs* across a snora upgrade, with your own code unchanged and no
+appearance change named in that release's migration guide, is a bug report we
+would want.
 
 ## What Snora tests internally
 
@@ -98,17 +102,25 @@ Snora uses [`iced_test`](https://crates.io/crates/iced_test) — a
 headless renderer — to verify the engine's own behavioral contract. The
 engine's tests live in `crates/snora/tests/render_semantics.rs`, and
 the sidebar's rendered geometry is measured in
-`crates/snora/tests/side_bar_fit.rs` (RFC-099). `render_semantics.rs`
-covers:
+`crates/snora/tests/side_bar_fit.rs` (RFC-099). `render_semantics.rs` has 20
+tests. Among them:
 
 - skeleton body is reachable (layer 0 renders and handles clicks);
 - outside-click on a modal emits `on_close_modals` (layer 4 backdrop);
 - dialog interactive content is reachable above the dim (layer 5);
-- missing `on_close_modals` sink omits the backdrop but still renders
-  content (Law 5);
+- without an `on_close_modals` sink the content still renders, and the dim
+  still paints and still blocks the pointer; it only publishes no dismiss
+  message (Law 5);
 - toast dismiss button fires above a modal (layer 7 above layers 4–6);
 - sheet content is reachable via its `opaque` wrapper (layer 6);
 - toast ordering policy (unit tests in `crates/snora/src/toast.rs`).
+
+The others cover menus, right-to-left, wheel blocking, and a dialog and a
+sheet stacked.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this listed seven items as what
+the suite covers, and said a missing sink omits the backdrop. The dim stays; a
+*menu's* backdrop is what a missing `on_close_menus` omits.)*
 
 `iced_test` is a `[dev-dependencies]` entry only — it does not affect
 the public API, feature flags, or binary size.
@@ -159,10 +171,12 @@ covers the common application-testing cases, as shown in this guide.
 
 ### What rendered evidence from this harness does and does not show
 
-Because snora's suite pins `ICED_TEST_BACKEND = "tiny-skia"`, **every pixel a
-snora test reads comes from tiny-skia**, iced's software renderer, and not from
-wgpu, which is what an application with a working GPU uses. **The two renderers
-are proven to draw some primitives differently.** A shadow behind a transparent
+snora's suite draws with tiny-skia, iced's software renderer, unless
+`ICED_TEST_BACKEND` names another. **CI runs the rendered tests on both:** on
+tiny-skia, and on wgpu through lavapipe, which is the real wgpu pipeline
+rasterised in software, the pipeline an application with a GPU uses. A parity
+job (`scripts/check-renderer-parity.py`) compares what the two draw. **The two
+renderers are proven to draw some primitives differently.** A shadow behind a transparent
 quad is the known case: wgpu draws it only *outside* the quad's shape, and
 tiny-skia fills its whole shape. At 0.50.0 that made the active tab a filled
 block under tiny-skia and a thin underline under wgpu, from the same code
@@ -175,9 +189,13 @@ So:
   rendered-bounds and click-probe tests (`side_bar_fit.rs`,
   `dismiss_remove_controls.rs`, `tab_bar_edges.rs`) measure properties that do
   not depend on the renderer.
-- **Pixels need not agree.** Frame-hash and pixel-sample evidence describes
-  tiny-skia. Treat it as evidence for the software-fallback path, and check a
-  pixel-level conclusion against a real wgpu render before generalising it.
+- **Pixels need not agree.** A frame hash or pixel sample describes the
+  renderer that drew it. Check a pixel-level conclusion on both renderers
+  before generalising it, as CI does for snora's own.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said every pixel a snora test
+reads comes from tiny-skia. CI has run the rendered tests on wgpu too since
+2026-10-20.)*
 - **The safer fix is to stop depending on a primitive the renderers disagree
   on**, rather than asserting what one of them draws. snora no longer uses a
   shadow for anything a user must see.

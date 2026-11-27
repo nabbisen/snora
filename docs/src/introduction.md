@@ -24,11 +24,16 @@ Read these in order. Each is short and self-contained.
 3. [Add a header, sidebar, footer](getting-started/03-add-a-header.md) — fill the skeleton.
 4. [Toasts](getting-started/04-toasts.md) — notifications with framework-managed lifetime.
 5. [When to use snora](getting-started/05-when-to-use.md) — fit and non-fit guidance.
+6. [The workbench example](getting-started/06-workbench.md) — the chrome and overlays together.
+7. [Starter application](getting-started/07-starter-application.md) — a small complete app to copy.
 
 ## I have used snora before
 
-Pick the topic you need.
+Pick the topic you need. These are some starting points; the sidebar lists
+every guide.
 
+- [Keyboard](guides/keyboard.md) — what the keyboard reaches, and how
+- [Accessibility](guides/accessibility.md) — what snora guarantees, and what is yours
 - [Overlays — dialogs, bottom sheets, context menus](guides/overlays.md)
 - [Header and context menus](guides/menus.md)
 - [Direction and ABDD](guides/direction.md)
@@ -38,6 +43,8 @@ Pick the topic you need.
 
 ## I want to look up a specific symbol or layout
 
+Some starting points; the sidebar lists every reference page.
+
 - API reference (per-symbol): [docs.rs/snora](https://docs.rs/snora) / [docs.rs/snora-core](https://docs.rs/snora-core)
 - [Architecture overview](reference/architecture.md) — what `snora-core` and `snora` each contribute
 - [Vocabulary cheatsheet](reference/vocabulary.md) — every public enum at a glance
@@ -46,7 +53,7 @@ Pick the topic you need.
 
 ## I want to contribute
 
-Welcome — see the contributor docs:
+Welcome. Some starting points; the sidebar lists every contributor page:
 
 - [Internal architecture](contributing/architecture.md)
 - [Design decisions](contributing/design-decisions.md) — why the API looks the way it does

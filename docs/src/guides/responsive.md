@@ -15,8 +15,8 @@ called again whenever the available size changes.
 ## Why exposure, not behavior
 
 snora has consistently declined to make decisions like this on your
-behalf — no theming layer beyond opt-in tokens, no form widgets, no
-prescribed layout beyond the skeleton itself. A `Breakpoint` enum or an
+behalf — no theming layer beyond opt-in tokens, no validation or
+form-layout primitives, no prescribed layout beyond the skeleton itself. A `Breakpoint` enum or an
 auto-collapsing sidebar would decide *for* you: which threshold, which
 element, what "collapsed" means. `responsive_render` prescribes nothing.
 You supply the content and the thresholds; snora supplies the number.

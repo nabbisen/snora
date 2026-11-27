@@ -26,10 +26,12 @@ cargo run -p snora-example-starter
 
 ## Code walkthrough
 
-The 177 ELOC are split into four sections with inline comments:
+The source is split into five sections with inline comments: State,
+Message, Update, View and Main.
 
 1. **State** (`struct App`) — only overlay flags, navigation state, and
-   the toast queue. Nothing Snora-specific beyond `LayoutDirection`.
+   the toast queue. Nothing Snora-specific beyond `LayoutDirection` and the
+   toasts' `snora::toast::Holds`.
 2. **Message** — one variant per user action. `CloseMenus` / `CloseModals`
    are the Snora close-sink messages; everything else is app logic.
 3. **Update** — pure state mutation. Shows the Law 2 pattern (clear menus
@@ -39,6 +41,10 @@ The 177 ELOC are split into four sections with inline comments:
 4. **View** — builds slots with prefab widgets, assembles `AppLayout`,
    hands it to `snora::render`. The comment on `direction` explains why
    one field drives all mirroring.
+5. **Main** — `iced::application`, with the subscriptions.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this gave a line count and
+four sections, and said `LayoutDirection` was the only snora state.)*
 
 ## Expanding the starter
 

@@ -1,22 +1,31 @@
 # 6 — The workbench example
 
-The **Snora Workbench** is a single application that exercises every
-major framework surface together. It is the recommended starting point
-for manual QA, and its source is useful as a copy-paste reference for
-wiring surfaces you haven't used before.
+The **Snora Workbench** is a single application that exercises snora's
+chrome and overlays together: the header, menus, dialog, sheet, toasts,
+sidebar, tab bar, breadcrumb, footer and the reading direction. It is the
+recommended starting point for manual QA of those, and its source is a
+copy-paste reference for wiring them.
+
+**What it does not show:** the form controls, `snora::control`, the design
+path (`snora::design`) and `responsive_render`. The
+[keyboard guide](../guides/keyboard.md) and the design pages cover those.
+
+*(Corrected 2026-11-28, from the 0.67 audit: this said the workbench
+exercises every major framework surface, and listed a "File ▾" button, a
+4-second toast and a dialog and a sheet open together.)*
 
 ## What it demonstrates
 
 | Surface | Where to find it |
 |---|---|
-| Header with menu button | Top bar — "File ▾" button |
-| File menu dropdown | Click "File ▾" |
+| Header with menu button | Top bar — "File" button |
+| File menu dropdown | Click "File" |
 | Context menu | Click "Context menu" in the header |
 | Dialog | Click "Dialog" in the header |
 | Sheet (End-anchored) | Click "Sheet" in the header |
 | Toasts — all five intents | "Toast Lab" tab |
 | Toasts — all six positions | "Toast Lab" tab |
-| Toast TTL lifecycle | Transient toasts auto-dismiss after 4 s |
+| Toast TTL lifecycle | Transient toasts dismiss themselves after a reading time: two seconds plus one per six characters, never under six (RFC-113). An Error toast stays until closed |
 | LTR ↔ RTL toggle | "→ RTL" / "→ LTR" button in the header |
 | Sidebar navigation | Left rail (mirrors under RTL) |
 | Tab bar | Body area below breadcrumb |
@@ -40,7 +49,6 @@ Overlays
 [ ] Dialog opens, dim layer visible, close button works.
 [ ] Outside click on dim dismisses dialog.
 [ ] Sheet opens at the End edge, close button works.
-[ ] Dialog and sheet can be open simultaneously (advanced, Law 3).
 [ ] Toasts are visible above an open dialog.
 [ ] Toast × button fires even while dialog is open.
 
@@ -48,7 +56,8 @@ Toasts
 [ ] All five intent buttons add a toast with the correct color.
 [ ] All six position buttons reanchor the toast stack.
 [ ] Newest toast is closest to the anchor edge.
-[ ] Transient toasts auto-dismiss after ~4 seconds.
+[ ] Transient toasts dismiss themselves after their reading time (the
+    workbench's are 8 s); an Error toast stays until closed.
 
 Direction (ABDD)
 [ ] "→ RTL" button toggles the label to "→ LTR" and vice versa.
