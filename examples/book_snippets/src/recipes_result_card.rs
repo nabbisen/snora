@@ -1,9 +1,9 @@
 //! Anchored source for `docs/src/design/recipes/` (RFC-136): the recipe's function, as the page shows it.
 
 // ANCHOR: recipe_result_card
-use iced::widget::{column, row, text};
+use iced::widget::{column, container, row, text};
 use iced::{Element, Length};
-use snora::design::{Tokens, card, chip, style};
+use snora::design::{Tokens, card, style};
 
 fn result_card<'a, Message: Clone + 'a>(
     tokens: &'a Tokens,
@@ -35,8 +35,13 @@ fn result_card<'a, Message: Clone + 'a>(
     if !tags.is_empty() {
         let mut tag_row = row![].spacing(t.spacing.xs);
         for tag in tags {
-            // Display-only tags: selected = true, on_toggle = None
-            tag_row = tag_row.push(chip::filter(t, *tag, true, Option::<Message>::None));
+            // A read-only tag: `text_primary` on `surface`, a pair the contrast suite holds in every
+            // preset. Not a chip with no handler: that is a disabled chip, drawn faded.
+            tag_row = tag_row.push(
+                container(text(*tag).size(style::text::label_size(t)))
+                    .padding([t.spacing.xs, t.spacing.sm])
+                    .style(move |_| style::container::card_surface(t)),
+            );
         }
         content = content.push(tag_row.wrap());
     }

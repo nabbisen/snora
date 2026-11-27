@@ -39,8 +39,12 @@ primary action.
 
 - `snora::design::card::surface` — default (unselected) card.
 - `snora::design::card::selected` — selected state.
-- `snora::design::chip::filter` — metadata chips (read-only tags use
-  `selected = true`, no `on_toggle`).
+- `snora::design::style::container::card_surface` — read-only tags: the label in
+  `text_primary` on `surface`, a pair the contrast suite holds in every preset.
+  **Not `chip::filter` with no handler:** `None` disables a chip, and a disabled chip
+  is drawn faded, at 1.5 to 2.0:1, because nobody needs to read a disabled control.
+  A tag is information. `snora::design::chip::tag` arrives in 0.67 (RFC-141), and this
+  recipe will move to it.
 - `snora::design::button::primary` or `ghost` — optional explicit action.
 - `snora::design::style::text::{label_size, body_size}`.
 
@@ -56,8 +60,8 @@ primary action.
   `button::primary`, `ghost` or `link`: snora controls, reachable from the
   keyboard from 0.55 once the application routes Tab with
   `snora::keyboard::traverse`.
-- Metadata chips with `on_toggle = None` are display-only and are not in
-  the tab order.
+- The read-only tags are containers, not controls, so they are not in the tab
+  order, and their label reads at the preset's text level.
 - Selected state is communicated via `card::selected`'s border color — not
   color-only, because the border width also changes.
 
@@ -69,18 +73,23 @@ primary action.
 
 ## 8. Customization points
 
-- Remove the outer `button` wrapper if the card is display-only and
+- Remove the outer `snora::design::control` if the card is display-only and
   interaction is driven by a separate action button inside.
 - Use `card::raised` instead of `card::surface` for the selected state if
   you want elevation rather than a heavier border.
 - Add a secondary `button::ghost` ("Open", "Archive") to the bottom of the
   content column for explicit actions.
-- Use `Tone`-colored chips (see `chip::filter` with accent tint) to
-  distinguish tag categories.
+- Distinguish tag categories by their words, not by colour alone. `chip::filter`
+  takes no tone, and a coloured tag would carry its meaning by colour.
 
 ## 9. Promotion status
 
-**Recipe.** The outer-button-wrapping-a-card pattern is app-specific enough
+*(Corrected 2026-11-28, from the 0.67 audit: this recipe made read-only tags from
+`chip::filter` with no handler, which draws them disabled, at under 2:1; it named an
+outer `button`, which is `snora::design::control`; and it suggested tone-coloured chips,
+which `chip::filter` cannot draw.)*
+
+**Recipe.** The control-wrapping-a-card pattern is app-specific enough
 (different apps want different content shapes) that a stable helper would
 be over-parameterized. The recipe documents the key insight (wrap the card
 in `snora::design::control`, so the whole card is one target for the pointer and the keyboard) which is not obvious

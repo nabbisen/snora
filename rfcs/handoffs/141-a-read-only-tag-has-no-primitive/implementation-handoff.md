@@ -22,6 +22,9 @@ output beside it.
   the tag and the resting chip cannot drift apart, and so that the tag never looks selected.
 - **The module doc** of `design/chip.rs` gains the third variant. Its "every control on a chip is focusable" sentence
   says that a tag is not a control.
+- **`crates/snora/src/design.rs`:** `snora::design::chip` re-exports its functions by name
+  (`filter, removable, removable_with_tooltip`). Add `tag`, or `snora::design::chip::tag` will not exist.
+  *(Added 2026-11-28 by the architect, found while correcting the book.)*
 - **`crates/snora/tests/direction_guard.rs`:** `tag` takes no direction, because a single label has nothing to order.
   Add it to the guard's list of functions that say why, with that reason.
 - **Do not touch `filter`.** `None` still disables it. The rustdoc line pointing to `tag` is the architect's.

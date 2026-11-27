@@ -49,9 +49,12 @@ style bridge with your own `iced::widget::container`:
 
 - Cards in v0.20 are **non-interactive visual grouping surfaces**. They do
   not emit events and must not appear to be interactive controls.
-- If a card must be clickable (e.g. navigating to a detail view), wrap or
-  replace the card content with an `iced::widget::button` styled as a card
-  surface. See [Semantic accessibility](../contributing/semantic-accessibility.md).
+- If a card must be clickable (e.g. navigating to a detail view), wrap it in
+  `snora::design::control`, as the [result card recipe](recipes/result-card.md)
+  does: the whole card is then one target for the pointer and one Tab stop.
+  **Not `iced::widget::button`:** it takes no keyboard input in iced 0.14. See
+  [Semantic accessibility](../contributing/semantic-accessibility.md).
+  *(Corrected 2026-11-28, from the 0.67 audit.)*
 - The `selected` card communicates selection via an accent-colored border
   only; do not rely on color alone if your application must be accessible
   without color vision.

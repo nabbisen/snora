@@ -1,6 +1,6 @@
 //! iced style bridge for Snora Design tokens (RFC-055).
 //!
-//! Six modules, each mapping [`snora_design::Tokens`] to a plain `iced`
+//! Nine modules, each mapping [`snora_design::Tokens`] to a plain `iced`
 //! style struct or a complete `iced::Theme` — no `Element`, no layout,
 //! no message. RFC-054 established this layer is structurally *below*
 //! the widget layer: it imports nothing from `snora-widgets` or

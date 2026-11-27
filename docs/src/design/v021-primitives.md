@@ -52,7 +52,7 @@ A toggle chip built on snora's `control` (RFC-116; iced's `button` before 0.55).
 
 ## Progress
 
-Backed by `iced::widget::progress_bar`. Display-only; emits no events.
+Drawn by snora itself since 0.64 (RFC-133), not by `iced::widget::progress_bar`, which has no direction. Display-only; emits no events.
 Pass `None` for indeterminate state — iced 0.14 has no native indeterminate
 animation; renders as 0% with a "…" suffix.
 
@@ -66,7 +66,7 @@ It is `Tone::Accent` for neutral progress.
 
 ### Accessibility (RFC-027)
 
-1. **Native primitive:** `iced::widget::progress_bar`.
+1. **Native primitive:** none; snora draws the track and the fill (0.64, RFC-133).
 2. **Keyboard reachable:** N/A (display only).
 3. **Focus visible:** N/A.
 4. **Semantic limitation:** no ARIA progressbar role in iced 0.14.

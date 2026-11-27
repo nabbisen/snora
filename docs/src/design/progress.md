@@ -48,7 +48,7 @@ the progress item is a primary focus of a region.
 
 ## Accessibility
 
-Uses `iced::widget::progress_bar`. Display-only; no keyboard interaction.
+Drawn by snora itself since 0.64 (RFC-133): iced's `progress_bar` has no direction and always fills from the left. Only its `progress_bar::Style` type is still used. Display-only; no keyboard interaction.
 No ARIA progressbar role is exposed in iced 0.14. If assistive-technology
 support is required, supplement the progress indicator with a visible
 percentage label (the helper already renders the percentage as text).

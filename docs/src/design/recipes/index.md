@@ -12,9 +12,9 @@ nine-section format, promotion criteria, and the dogfood feedback template.
 | Recipe | Primitives used | Promotion status | Added |
 |---|---|---|---|
 | [Empty state](empty-state.md) | `card::surface`, `button::primary` | Recipe | v0.23 |
-| [Background task card](background-task.md) | `card::surface`, `progress::row`, `chip::filter` | Recipe | v0.23 |
-| [Friendly error recovery notice](error-recovery.md) | `notice::Notice`, `button::secondary` | Recipe | v0.23 |
-| [Result card](result-card.md) | `card::surface`, `card::raised`, `chip::filter` | Recipe | v0.23 |
+| [Background task card](background-task.md) | `card::surface`, `progress::row`, `button::ghost` (and optionally `chip::filter` for a pause toggle) | Recipe | v0.23 |
+| [Friendly error recovery notice](error-recovery.md) | `notice::Notice` (its `action` and `dismiss`) | Recipe | v0.23 |
+| [Result card](result-card.md) | `card::surface`, `card::selected`, `design::control`, `style::container::card_surface` (tags) | Recipe | v0.23 |
 
 ## Status key
 

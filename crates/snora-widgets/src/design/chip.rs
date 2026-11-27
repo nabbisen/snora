@@ -31,11 +31,6 @@
 //! surface and stay visibly different from rest; see [`snora_style::chip`], where the chips'
 //! style functions live (they moved there from this module, RFC-129 Q-5).
 //!
-//! # iced 0.14 focus limitation
-//!
-//! No custom focus ring — `button::Status` has no `Focused` variant.
-//! Documented limitation, not a regression (RFC-025, RFC-027).
-//!
 //! # The remove glyph, and what a tooltip is not
 //!
 //! The remove button shows the text glyph `"×"`, in every build (RFC-139: a Cargo

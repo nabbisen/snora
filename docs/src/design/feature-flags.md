@@ -5,15 +5,16 @@
 ```text
 snora
   ├── (always)          snora-core          — iced-free vocabulary
+  ├── (always)          snora-interaction   — the control, focus and overlay machinery
   ├── (feature=widgets) snora-widgets       — prefab iced elements
-  │                       └── (feature=design, opt-in) snora-style — used internally
+  │                       └── (feature=design) snora-design, snora-style — used internally
   └── (feature=design)  snora-design        — iced-free design tokens
                         snora-style         — iced style bridge (RFC-055)
 ```
 
 `widgets` and `design` are **independent** (RFC-055) — neither requires
 the other. `snora-widgets` also takes `snora-style` as an optional
-dependency, activated by its own `design` feature, because its own
+dependency (with `snora-design`), activated by its own `design` feature, because its own
 prefab widgets (`button`, `card`, `notice`, `chip`, `progress`) style
 themselves with it internally — not to re-export it; `snora_widgets::
 design::{style, theme}` were removed in RFC-056. That edge does not
@@ -24,8 +25,8 @@ make `snora`'s `design` feature depend on `widgets`.
 | Flag | Default | Activates |
 |---|---|---|
 | `widgets` | ✅ | `snora-widgets` crate; `snora::widget::*` re-exports |
-| `iced-default` | ✅ | iced's own default features: renderers, windowing, `thread-pool`, `linux-theme-detection` (RFC-112). Also on `snora-widgets` and `snora-style`. |
-| `design` | ❌ | `snora-design` token crate; `snora-style` iced style bridge; `snora::design::*` re-exports (`style`, `theme`, `render`, `responsive_render`, and — additionally, only when `widgets` is *also* on — `widget`, `button`, `card`, `notice`, `chip`, `progress`) |
+| `iced-default` | ✅ | iced's own default features: renderers, windowing, `thread-pool`, `linux-theme-detection` (RFC-112). Also on `snora-interaction`, `snora-widgets` and `snora-style`. |
+| `design` | ❌ | `snora-design` token crate; `snora-style` iced style bridge; `snora::design::*` re-exports: the token types (`Tokens`, `Palette`, `Typography` and the rest), `contrast`, `style`, `theme`, `control`, `render`, `responsive_render`, and, only when `widgets` is *also* on, `widget`, `button`, `card`, `notice`, `chip`, `progress` and the five form controls |
 | `lucide-icons` | ❌ | `Icon::Lucide`; `snora::lucide` constants. Independent of `design`. |
 | `svg-icons` | ❌ | `Icon::Svg`; iced svg feature. Independent of `design`. |
 
@@ -44,10 +45,15 @@ are reachable — three existed before RFC-055, `design` alone is new:
 No existing configuration lost a path; `design` alone is purely
 additive.
 
+*(Corrected 2026-11-28, from the 0.67 audit: the graph left out
+`snora-interaction`, the default was given as `["widgets"]`, and the
+`design` row's re-export list was partial.)*
+
 ## Key invariants
 
 - **`design` stays opt-in** until binary-size and build-cost are measured
-  with and without it. `default = ["widgets"]` is unchanged. (RFC-054
+  with and without it. The default is `["widgets", "iced-default"]`
+  (`iced-default` since 0.54, RFC-112); `design` is not in it. (RFC-054
   measured this: a `widgets`+`design` consumer with no widget call sites
   can recover ~95% of what `design` costs over engine-only by dropping
   `widgets`.)

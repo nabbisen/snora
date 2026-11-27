@@ -40,7 +40,7 @@ from v0.25" with `design` inactive, as "a guarantee, not an aspiration". It has
 not been true since at least 0.42.0, when the toast colours changed on the default
 path, and no release amended it until this correction.)*
 
-Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
+Enabled via the `design` feature (opt-in; the default is `["widgets", "iced-default"]`).
 
 ## What it provides
 
@@ -63,7 +63,9 @@ Enabled via the `design` feature (opt-in; the default is `["widgets"]`).
 - Replace iced's `Theme` or the snora layout engine.
 - Guarantee that arbitrary app content is accessible (see
   [Accessibility checklist](../contributing/accessibility-checklist.md)).
-- Provide forms, data tables, charts, or domain-specific widgets.
+- Provide field widgets, validation, data tables, charts, or domain-specific widgets.
+  (It does provide five form controls the keyboard can reach: `checkbox`, `toggler`,
+  `radio_group`, `select` and `slider`, from 0.65.)
 - Apply OS contrast or reduced-motion settings automatically.
 
 ## Three usage paths
@@ -77,7 +79,7 @@ snora = { version = "0.66", default-features = false }
 **Default** — snora's existing layout + prefab widgets, no design tokens:
 
 ```toml
-snora = { version = "0.66" }   # default = ["widgets"]
+snora = { version = "0.66" }   # default = ["widgets", "iced-default"]
 ```
 
 **Design** — layout + widgets + Snora Design tokens and helpers:

@@ -161,7 +161,7 @@ pub mod card {
 
 /// Notice banner primitive (RFC-032).
 ///
-/// Builder: `Notice::new(tokens, tone, body).title(…).action(…).dismiss(…).render()`.
+/// Builder: `Notice::new(tokens, tone, body, direction).title(…).action(…).dismiss(…).render()`.
 ///
 /// `widgets`-gated (RFC-055).
 #[cfg(feature = "widgets")]

@@ -45,7 +45,11 @@ primary recovery action, using `notice::Notice` with `Tone::Danger` or
 - The recovery action and dismiss buttons are snora controls, reachable from
   the keyboard from 0.55 once the application routes Tab with
   `snora::keyboard::traverse` (RFC-116). Dismissing moves focus to the nearest
-  control after the notice in its container, or else before it (RFC-120). *(Corrected 2026-11-07: up to 0.54 they were
+  control after the notice in its container, or else before it (RFC-120).
+  **Retry that removes the notice leaves nothing focused,** RFC-120's safe answer
+  when the pressed control and its neighbour go together; the next Tab starts
+  from the top. To keep the reader's place, send focus where they should go next
+  with a focus task (`iced::widget::operation::focus(id)` on that control's id). *(Corrected 2026-11-07: up to 0.54 they were
   iced buttons, which take no keyboard input.)*
 - Tone color (red/orange) is supplemented by the notice text — not
   color-only.
@@ -69,9 +73,9 @@ Usage in `view()`:
 
 - Use `Tone::Warning` for recoverable problems that are not strictly errors
   (e.g. "Index is stale — rebuild recommended").
-- Add a `button::link` ("Learn more") alongside the recovery action for
-  complex errors: it takes the reader somewhere, so it is a link, not a
-  `ghost`.
+- For a second action ("Learn more") on a complex error, put a `button::link`
+  beside the notice, not in it: `Notice` has one action. It takes the reader
+  somewhere, so it is a link, not a `ghost`.
 - Omit `.dismiss()` if the error must be acknowledged via the action button
   (i.e. it is not optional).
 

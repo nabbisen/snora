@@ -47,7 +47,7 @@ and optional cancellation or pause control — inside a `card::surface`.
   controls, reachable from the keyboard from 0.55 once the application routes
   Tab with `snora::keyboard::traverse` (RFC-116). *(Corrected 2026-11-07:
   up to 0.54 they were iced buttons, which take no keyboard input.)*
-- Progress bar uses `iced::widget::progress_bar` — the percentage is also
+- The progress bar is drawn by snora (0.64, RFC-133); the percentage is also
   rendered as a text label so the value is not color-only.
 - For indeterminate tasks, the "…" suffix is the only signal that the task
   is still running. If a more explicit indication is needed, add a text
