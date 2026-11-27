@@ -130,9 +130,9 @@ small, and stable before a gate is pointed at it.
 
 ### Current counts
 
-As of **0.65.0**, re-counted at the cut (`cargo test --workspace --all-features
---doc`). Against the table's previous figures: `snora-widgets` +5 (the form controls' examples,
-RFC-134) and `snora-style` +1 (`form`'s). No new `ignore`.
+As of **0.66.0**, re-counted at the cut (`cargo test --workspace --all-features
+--doc`). Against the table's previous figures: `snora` +1 (`keeps_focus`'s example, RFC-137) and
+`snora-widgets` +1 (`horizontal`'s, RFC-138). No new `ignore`.
 
 | Crate | Full run + `no_run` | `ignore` |
 |---|---|---|
@@ -140,9 +140,9 @@ RFC-134) and `snora-style` +1 (`form`'s). No new `ignore`.
 | `snora-design` | 11 | 0 |
 | `snora-style` | 6 | 1 |
 | `snora-interaction` | 0 | 0 |
-| `snora-widgets` | 11 | 0 |
-| `snora` | 16 | 1 |
-| **Total** | **69** | **2** |
+| `snora-widgets` | 12 | 0 |
+| `snora` | 17 | 1 |
+| **Total** | **71** | **2** |
 
 Tracked in the [release checklist](release-process.md). Do not
 accidentally break these by changing vocabulary without updating the

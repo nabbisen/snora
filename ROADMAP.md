@@ -236,25 +236,7 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.66.0
-
-**0.66.0 is the next release that changes a crate.** The work first scoped as 0.66 (below, under
-*Recently shipped*) changed no library code, so it shipped to the book and CI without a tag or a
-publish (owner, 2026-11-18).
-
-**Scoped by the owner on 2026-11-26:**
-- **[RFC-137](rfcs/accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md), done on `main`.** A
-  disclosure built on `snora::control` (a section header, aaai's file tree) keeps focus with `keeps_focus(id)`. The same
-  work fixed RFC-120's removal path, which could hand focus to a control nobody pressed. It was found by logolig on 0.65.0.
-- **[RFC-138](rfcs/accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md), a horizontal `radio_group`** (logolig), accepted. A move from iced's radios must not lose the row layout they allow. The
-  keys stay the same in either layout.
-- **Housekeeping:** the toast close-target test asserts the floor exactly (it allowed ±0.5 px).
-- **[RFC-139](rfcs/accepted/139-turning-on-lucide-icons-breaks-snoras-own-marks.md), a fix** (owner, 2026-11-27), accepted.
-  With `lucide-icons` on and the font not loaded, the toast's close mark is a box, and four more marks snora draws take
-  the same font. A crate elsewhere in the dependency graph can turn the feature on. Found by the 0.67 audit.
-- **Then cut 0.66.0,** without waiting for the audit below, so that the focus fix reaches logolig and aaai.
-
-## Then — 0.67.0: the third audit
+## Next — 0.67.0: the third audit
 
 **What the audit finds decides 0.67**, as it did for 0.62. It reads every page an adopter relies on that no audit has
 read, in four requests:
@@ -276,6 +258,8 @@ API or what is drawn, never by searching. It can start during 0.66, because it i
   alone is wider than the room.
 - A toast's intent is shown by colour alone (request A, row A2-096; WCAG 1.4.1). Whether snora carries it by more
   than colour is ruled in 0.67. The book now says so, and tells applications to say what happened in the words.
+  **RFC-093 Q-1's reopening sign has fired:** it was closed in 2026-09 to reopen when someone expected the prefab to
+  carry intent by more than colour, and the book itself said it did.
 
 ## After 0.67
 
@@ -331,6 +315,17 @@ everyone.** The shape:
   `design::control` with the same style takes one.
 
 ## Recently shipped
+
+- **0.66.0** — nothing breaks at compile time.
+  - **`keeps_focus(id)`** (RFC-137): a control that shows or hides others after it (a disclosure, a tree node) keeps
+    focus after Enter. Found by logolig on 0.65.0. The same work stopped RFC-120's removal path from handing focus
+    to a control nobody pressed.
+  - **A radio group in a row** (`.horizontal(true)`, RFC-138), from logolig's letter: it wraps, mirrors line by line,
+    and keeps the column's keys.
+  - **`lucide-icons` changes nothing snora draws itself** (RFC-139), found by the 0.67 audit: with the feature on and
+    the font not loaded, the toast's × was a box, and a checked checkbox showed a "1". The principle it set: a Cargo
+    feature may only make an API available.
+  - The toast close target asserted exactly (housekeeping H-1).
 
 - **Book and CI, 2026-11-18** (scoped as 0.66; no crate changed, so no release).
   - **The book's code compiles, or says why not** (RFC-136). 87 snippets are compiled from

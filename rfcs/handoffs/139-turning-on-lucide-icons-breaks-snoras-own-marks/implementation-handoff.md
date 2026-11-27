@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-139: snora's own marks never take the Lucide font
 
-**RFC.** `rfcs/accepted/139-turning-on-lucide-icons-breaks-snoras-own-marks.md`. Read the finding, R-1 to R-3 and the
+**RFC.** `rfcs/done/139-turning-on-lucide-icons-breaks-snoras-own-marks.md`. Read the finding, R-1 to R-3 and the
 Rulings (every question as suggested, and the principle they set).
 **Release target.** 0.66.0, as a fix.
 **Starts** now (owner, 2026-11-27). **Order:** RFC-138's Unit 1 first if it is under way, then this. Both come before

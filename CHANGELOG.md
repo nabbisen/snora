@@ -26,6 +26,26 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.66.0] — 2026-11-27
+
+**Upgrading from 0.65:** read the [0.65 → 0.66 migration guide](docs/src/guides/migration-0.65-to-0.66.md).
+
+> **In short:** **`keeps_focus(id)`** keeps focus on a control that shows or hides others after it, such as a
+> disclosure or a tree node (RFC-137). **A radio group can be laid out in a row** (`.horizontal(true)`,
+> RFC-138). **The marks snora draws itself no longer break when `lucide-icons` is on and its font is not
+> loaded** (RFC-139), and focus no longer lands on a control nobody pressed.
+>
+> **Code:** additions only; nothing breaks.
+>
+> **Appearance:** unchanged, except under `lucide-icons` with its font loaded: the toast's ×, a notice's dismiss,
+> a chip's remove, the checkbox's tick and the select's chevron become "×", "✓" and "▾", and those controls
+> narrow by a few pixels.
+>
+> **Security:** none. No third-party dependency changed since 0.65.0, and the advisory gate is clean, with the
+> same accepted advisories.
+
 ### Added
 
 - **`keeps_focus(id)` on `snora::Control`** (RFC-137), for a control that stays where it is when
@@ -597,7 +617,8 @@ deprecated it.
 - **A wheel over a context menu's or an application `header_menu`'s backdrop scrolled the
   page beneath it.** It no longer does.
 
-[Unreleased]: https://github.com/nabbisen/snora/compare/0.65.0...HEAD
+[Unreleased]: https://github.com/nabbisen/snora/compare/0.66.0...HEAD
+[0.66.0]: https://github.com/nabbisen/snora/compare/0.65.0...0.66.0
 [0.65.0]: https://github.com/nabbisen/snora/compare/0.64.0...0.65.0
 [0.64.0]: https://github.com/nabbisen/snora/compare/0.63.0...0.64.0
 [0.63.0]: https://github.com/nabbisen/snora/compare/0.62.0...0.63.0

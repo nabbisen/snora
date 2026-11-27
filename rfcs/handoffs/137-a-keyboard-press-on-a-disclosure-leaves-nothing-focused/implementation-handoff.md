@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-137: `keeps_focus(id)`, focus that stays on a disclosure
 
-**RFC.** `rfcs/accepted/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md`. Read the
+**RFC.** `rfcs/done/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused.md`. Read the
 finding, R-1 to R-3 and the Rulings (every question as suggested).
 **Release target.** 0.66.0, as an addition.
 **Starts** now (owner, 2026-11-26).

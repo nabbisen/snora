@@ -1,6 +1,6 @@
 # RFC-138 — A radio group cannot be laid out in a row
 
-**Status.** Accepted 2026-11-26 (owner), every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.66.0. Accepted 2026-11-26 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-26, architect, from logolig's letter of 2026-11-19 (F-2 in
 `.git-exclude/upstream/receive/0.65.0/architect-triage-2026-11-26.md`). Scoped into 0.66 by the owner on 2026-11-26.
 **Release target.** 0.66.0, as an addition.

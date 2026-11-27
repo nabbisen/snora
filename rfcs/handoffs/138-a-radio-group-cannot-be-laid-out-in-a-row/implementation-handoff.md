@@ -1,6 +1,6 @@
 # Implementation handoff — RFC-138: `horizontal(bool)`, a radio group laid out in a row
 
-**RFC.** `rfcs/accepted/138-a-radio-group-cannot-be-laid-out-in-a-row.md`. Read the finding, R-1 to R-4 and the Rulings
+**RFC.** `rfcs/done/138-a-radio-group-cannot-be-laid-out-in-a-row.md`. Read the finding, R-1 to R-4 and the Rulings
 (every question as suggested).
 **Release target.** 0.66.0, as an addition.
 **Starts** now (owner, 2026-11-26). **It comes before the 0.67 audit's request A**, since it ships in 0.66. H-1

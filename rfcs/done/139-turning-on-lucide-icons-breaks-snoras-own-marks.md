@@ -1,6 +1,6 @@
 # RFC-139 — Turning on `lucide-icons` breaks the marks snora draws itself
 
-**Status.** Accepted 2026-11-27 (owner), every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.66.0. Accepted 2026-11-27 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-26, the 0.67 audit's request A (row A2-082, probed in a real window by the dev team), reviewed by
 the architect (`.git-exclude/reviewed/audit-0-67-a/review-result.md`). The owner asked for this RFC for 0.66 on
 2026-11-27.

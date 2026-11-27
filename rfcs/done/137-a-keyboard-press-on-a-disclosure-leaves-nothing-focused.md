@@ -1,6 +1,6 @@
 # RFC-137 — A keyboard press on a disclosure leaves nothing focused
 
-**Status.** Accepted 2026-11-26 (owner), every open question ruled as suggested (see Rulings).
+**Status.** Done — shipped v0.66.0. Accepted 2026-11-26 (owner), every open question ruled as suggested (see Rulings).
 **Handoff.** [`handoffs/137-…`](../handoffs/137-a-keyboard-press-on-a-disclosure-leaves-nothing-focused/implementation-handoff.md).
 **Raised.** 2026-11-26, architect, from logolig's letter of 2026-11-22. They found it on 0.65.0 and
 then withdrew the request, because they found a workaround in the application. It was measured true
