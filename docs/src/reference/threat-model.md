@@ -103,6 +103,16 @@ Before any upload the workflow refuses if the tag disagrees with
 `[workspace.package].version`, or if the tagged commit has no completed,
 successful CI run. Both refusals have been demonstrated firing.
 
+**Not yet guarded: the release path's own dependencies** (found by the 0.67
+audit, 2026-11-28; RFC-140 in the [RFC index](https://github.com/nabbisen/snora/blob/main/rfcs/README.md)).
+The workflows run GitHub Actions by tag or branch, not by commit, including
+third-party actions inside the job that publishes. Whoever controls one of
+those refs controls code that runs with that job's authority. The workflow
+also matches the tag's *name*: it does not verify the tag's signature. Neither
+affects the crates you build; both concern how they are published. RFC-140
+pins every action to a commit, adds a gate for it, and verifies the
+signature. This paragraph is replaced by the guards once they ship.
+
 **Advisory scanning:** the `supply-chain` workflow runs `cargo-deny`
 weekly over the resolved `--all-features` graph — the same graph the
 rest of CI builds. Advisories are fatal; licences, bans and

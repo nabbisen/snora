@@ -201,6 +201,8 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 140 | [The release path runs third-party actions from refs that can move](./proposed/140-the-release-path-runs-actions-from-refs-that-can-move.md) | **0.67.0** — from the 0.67 audit's request C (C3-T-45): no `uses:` in the workflows is pinned to a commit, including `rust-lang/crates-io-auth-action@v1` inside the `id-token: write` publish job; nothing keeps pins current or checks them; the tag's signature is never verified; four workflows declare no `permissions:`. Proposed: every `uses:` a full SHA with a gate, explicit permissions everywhere, Dependabot for actions, `git verify-tag` before publishing, and the threat model rewritten |
+| 141 | [A read-only tag has no primitive, and the recipe's is drawn disabled](./proposed/141-a-read-only-tag-has-no-primitive.md) | **0.67.0** — from the 0.67 audit's request B (B3-043, measured): the result-card recipe's "read-only" tag is a disabled chip, its label 1.52 to 1.97:1. Proposed: `chip::tag(tokens, label)`, not a Tab stop, its label at the palette's level, swept; the recipe moves to it |
 
 ## Archive
 
