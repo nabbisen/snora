@@ -76,10 +76,12 @@ design = ["dep:snora-design", "dep:snora-style", "snora-widgets?/design"]
 
 # Icon-source features. They configure both `snora-core` (vocabulary)
 # and `snora-widgets` (rendering) when the latter is enabled.
+#
+# `lucide-icons` brings the crate in through `snora-core` and `snora-widgets` only: `snora`'s own source draws no Lucide
+# glyph (RFC-139: a Cargo feature never changes how a mark snora draws itself is drawn), so it has no `dep:` of its own.
 lucide-icons = [
     "snora-core/lucide-icons",
     "snora-widgets?/lucide-icons",
-    "dep:lucide-icons",
 ]
 svg-icons = [
     "snora-core/svg-icons",
@@ -104,7 +106,6 @@ snora-design = { workspace = true, optional = true }
 # snora-widgets. Optional, tied to the `design` feature.
 snora-style = { workspace = true, optional = true }
 iced = { workspace = true }
-lucide-icons = { workspace = true, optional = true }
 
 [dev-dependencies]
 # Headless test harness for render-semantics tests (RFC-011-D).

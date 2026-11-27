@@ -63,7 +63,7 @@ pub const MIN_TARGET: f32 = 24.0;
 /// misplacement worth catching (RFC-099's uncentred glyph was ~10px off).
 pub const TOLERANCE: f32 = 0.5;
 
-/// Builds a simulator, loading the lucide font under `lucide-icons`.
+/// Builds a simulator, loading the lucide font under `lucide-icons` (through `snora::lucide`, the path an adopter is told to use).
 ///
 /// **Every simulator in a test that measures an application's own Lucide icon (`Icon::Lucide`) must come from
 /// here.** Without the font, `Font::with_name("lucide")` falls back and the codepoint renders as whatever the fallback
@@ -71,12 +71,12 @@ pub const TOLERANCE: f32 = 0.5;
 /// then the same fallback, measured consistently. **A mark snora draws itself needs no font** (RFC-139), and the
 /// adopter's starting state, no font loaded, is `lucide_marks_in_the_starting_state.rs`'s, which never calls this.
 pub fn simulator<'a, Message>(element: impl Into<Element<'a, Message>>) -> Simulator<'a, Message> {
-    #[cfg(feature = "lucide-icons")]
+    #[cfg(all(feature = "lucide-icons", feature = "widgets"))]
     let settings = iced::Settings {
-        fonts: vec![lucide_icons::LUCIDE_FONT_BYTES.into()],
+        fonts: vec![snora::lucide::LUCIDE_FONT_BYTES.into()],
         ..iced::Settings::default()
     };
-    #[cfg(not(feature = "lucide-icons"))]
+    #[cfg(not(all(feature = "lucide-icons", feature = "widgets")))]
     let settings = iced::Settings::default();
 
     Simulator::with_settings(settings, element)
