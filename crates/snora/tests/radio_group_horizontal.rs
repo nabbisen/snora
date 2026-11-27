@@ -345,20 +345,25 @@ fn the_options_are_drawn_on_one_line_when_there_is_room() {
 fn a_narrow_room_wraps_nothing_is_clipped_and_the_lines_are_at_the_columns_pitch() {
     for path in PATHS {
         for dir in DIRECTIONS {
-            let ls = labels(6, false);
-            let (_, column) = measure(path, ls, 800.0, dir, Some(false));
+            let (_, column) = measure(path, labels(3, false), 800.0, dir, Some(false));
             let ys: Vec<f32> = column.iter().map(|(_, r)| r.y).collect();
             let pitch = ys[1] - ys[0];
-            for width in [300.0f32, 160.0] {
+            // **Every option must fit the room on its own, with margin, on any default font.** An option wider than the
+            // room wraps its own label (the limit the doc comment states), which makes its line taller, and then the
+            // lines are not at the column's pitch: CI's wider default font did that to the six-label set at 160 px,
+            // where "Extra large" is within a few pixels of the room on this machine's font. So the narrowest room is
+            // used only with the three short-enough labels.
+            for (count, width) in [(6usize, 300.0f32), (3, 160.0)] {
+                let ls = labels(count, false);
                 let (g, opts) = measure(path, ls, width, dir, Some(true));
                 let found = lines(&opts);
                 assert!(
                     found.len() >= 2,
-                    "{path:?} {dir:?} at {width} px: six options must wrap, got {found:?}"
+                    "{path:?} {dir:?} at {width} px: {count} options must wrap, got {found:?}"
                 );
                 assert_eq!(
                     opts.len(),
-                    6,
+                    count,
                     "{path:?} {dir:?} at {width} px: every option has a target"
                 );
                 // Nothing is clipped: every option is inside the window and the group's box.
@@ -454,7 +459,7 @@ fn the_ring_encloses_every_option_and_hugs_the_widest_line() {
 fn under_rtl_each_line_is_the_mirror_image_and_breaks_at_the_same_options() {
     for path in PATHS {
         let mut shorter_line_seen = false;
-        for (count, width) in [(3usize, 300.0f32), (6, 300.0), (6, 160.0)] {
+        for (count, width) in [(3usize, 300.0f32), (6, 300.0), (3, 160.0)] {
             let ls = labels(count, false);
             let (gl, l) = measure(path, ls, width, Ltr, Some(true));
             let found = lines(&l);
