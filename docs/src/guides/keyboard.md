@@ -166,7 +166,7 @@ no stop" are the ones every snora control has.
 |---|---|---|
 | Checkbox | `checkbox(is_checked, direction).label(..).on_toggle(Fn(bool) -> M)` | Enter or Space toggles |
 | Toggle | `toggler(is_toggled, direction)`, the same builder | the same; the thumb at the start edge when off |
-| Radio group | `radio_group(options, selected, on_select, direction)` | **one Tab stop**; ↑ ↓ ← → move **and select**, wrapping; ← → follow the screen. Space, Enter or a click on the option already selected publishes nothing |
+| Radio group | `radio_group(options, selected, on_select, direction)`, a column; `.horizontal(true)` for a row (0.66) | **one Tab stop**; ↑ ↓ ← → move **and select**, wrapping; ← → follow the screen. Space, Enter or a click on the option already selected publishes nothing. **The same keys in a row:** ↓ is the next option, not the one below it |
 | Select | `select(options, selected, on_select, direction).opened(b).on_open_change(Fn(bool) -> M)` | Enter, Space or ↓ opens; inside, ↓ ↑ Home End move, Enter chooses, Escape closes and gives focus back |
 | Slider | `slider(range, value, on_change, direction).step(..)` | ← → ↑ ↓ one step, Page Up / Page Down ten, Home End the ends; ← → follow the screen |
 
@@ -177,6 +177,11 @@ no stop" are the ones every snora control has.
     `on_open_change`), as `snora::control` is;
   - a radio group or a slider is disabled with `.disabled(true)`, because its handler is a
     required argument, as in iced.
+- **A radio group in a row** (`.horizontal(true)`, 0.66, RFC-138) wraps when the options do not fit,
+  keeps their order line by line, and mirrors each line under right-to-left. The column is the
+  default, and the argument is a `bool`, so a layout that changes with the window's width can pass
+  its own condition. **One limit, shared with the column:** a line breaks between options, never
+  inside one, so an option that alone is wider than the room is laid out as the column lays it out.
 - **The select's open state is yours,** as a header menu's is. Choosing publishes `on_select`
   only: close it there. **Its arrows, its cover and its click-outside-to-close work inside
   `snora::render`**, through the one `on_close_menus` your application sets for every open menu.

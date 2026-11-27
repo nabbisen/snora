@@ -274,6 +274,8 @@ API or what is drawn, never by searching. It can start during 0.66, because it i
   of `snora` can be named through `snora`; `check-migration-guides.sh` reads the index page's table.
 - To measure first: whether `responsive_body`'s unit tests run in CI, and what a form control does when one label
   alone is wider than the room.
+- A toast's intent is shown by colour alone (request A, row A2-096; WCAG 1.4.1). Whether snora carries it by more
+  than colour is ruled in 0.67. The book now says so, and tells applications to say what happened in the words.
 
 ## After 0.67
 

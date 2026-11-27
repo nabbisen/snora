@@ -77,7 +77,7 @@ today's would make them false, so they are neither compiled nor marked.
 
 | | Snippets |
 |---|---|
-| Compiled, through `\{{#include}}` | 88 |
+| Compiled, through `\{{#include}}` | 89 |
 | Marked, with a reason | 10 |
 | Migration guides (out of scope) | 39 |
 

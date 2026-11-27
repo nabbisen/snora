@@ -44,6 +44,11 @@ pub enum Icon {
     Text(String),
 
     /// A built-in Lucide icon. Requires the `lucide-icons` feature.
+    ///
+    /// **It is drawn as a glyph of the Lucide font, which the application
+    /// must load** once, at start-up (`.font(snora::lucide::LUCIDE_FONT_BYTES)`
+    /// on `iced::application`). Without it the icon draws as a stray glyph or
+    /// a missing-glyph box.
     #[cfg(feature = "lucide-icons")]
     Lucide(lucide_icons::Icon),
 

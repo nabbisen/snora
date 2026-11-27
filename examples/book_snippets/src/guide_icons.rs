@@ -23,6 +23,33 @@ let i = Icon::Lucide(lucide::Settings);
 // ANCHOR_END: icons_lucide
 }
 
+#[cfg(feature = "lucide-icons")]
+mod lucide_font {
+    #[derive(Debug, Clone)]
+    enum Message {}
+
+    #[derive(Default)]
+    struct App;
+
+    impl App {
+        fn update(&mut self, _message: Message) {}
+
+        fn view(&self) -> iced::Element<'_, Message> {
+            snora::widget::icon_element(&snora::lucide::Home.into())
+        }
+    }
+
+    #[rustfmt::skip]
+    fn main() -> iced::Result {
+// ANCHOR: icons_lucide_font
+iced::application(App::default, App::update, App::view)
+    // Once, at start-up: without it every `Icon::Lucide` draws as a stray glyph or a box.
+    .font(snora::lucide::LUCIDE_FONT_BYTES)
+    .run()
+// ANCHOR_END: icons_lucide_font
+    }
+}
+
 #[cfg(feature = "svg-icons")]
 #[rustfmt::skip]
 fn icons_svg() {

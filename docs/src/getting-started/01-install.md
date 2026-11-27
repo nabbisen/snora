@@ -32,7 +32,7 @@ Advanced users who want to depend on `snora-core` without iced can do so — the
 | Feature | What it adds | When to enable |
 |---|---|---|
 | `widgets` | Prefab `app_header` / `app_side_bar` / `app_footer` / `render_menu` / `icon_element`. **On by default.** | You want a working app on screen quickly without writing chrome from scratch |
-| `lucide-icons` | `Icon::Lucide` variant + `snora::lucide` re-exports | You want the [Lucide icon set](https://lucide.dev/) |
+| `lucide-icons` | `Icon::Lucide` variant + `snora::lucide` re-exports | You want the [Lucide icon set](https://lucide.dev/). **Your application must load the font** (`snora::lucide::LUCIDE_FONT_BYTES`): see [Icons](../guides/icons.md#iconlucide--the-curated-icon-set) |
 | `svg-icons` | `Icon::Svg(PathBuf)` variant | You want to load custom SVG files at runtime |
 
 Enable them on the `snora` line:

@@ -34,9 +34,30 @@ snora = { version = "0.65", features = ["lucide-icons"] }
 {{#include ../../../examples/book_snippets/src/guide_icons.rs:icons_lucide}}
 ```
 
-`lucide-icons` ships every Lucide glyph as a variant. Cargo includes
-only the ones you reference at compile time — `Icon::Lucide(lucide::Home)`
-does not pull `lucide::Settings` into the binary.
+**Load the Lucide font when your application starts.** A Lucide icon is
+drawn as a glyph of the Lucide font, and snora cannot load a font for you: only
+your application can, with `.font(..)` on `iced::application`. Without it, every
+`Icon::Lucide` draws as a stray glyph or a missing-glyph box (▯).
+
+```rust,ignore
+{{#include ../../../examples/book_snippets/src/guide_icons.rs:icons_lucide_font}}
+```
+
+**snora's own marks do not need the font** (0.66, RFC-139). The toast's close
+mark, a notice's dismiss mark, a chip's remove mark, the checkbox's tick and the
+select's chevron are the text glyphs "×", "✓" and "▾" in every build. Turning on
+`lucide-icons` adds the Lucide set for *your* icons and changes nothing snora
+draws itself. That matters because a Cargo feature can be turned on by any crate
+in your dependency graph, not only by you. *(Before 0.66, with the feature on and
+the font not loaded, those marks drew a box, a "1" in a checked checkbox, and a
+"3" for the select's arrow.)*
+
+**The feature brings the whole set:** one enum with a variant for every Lucide
+glyph, and one font file that holds them all. Referencing one icon does not
+leave the others out of the font you load.
+
+*(Corrected 2026-11-27, from the 0.67 audit: this said Cargo includes only the
+icons you reference, and it did not say the font must be loaded.)*
 
 ## `Icon::Svg` — your own assets
 
@@ -102,17 +123,22 @@ widgets.
 *(Corrected 2026-11-07: this said a tooltip served keyboard and
 screen-reader users.)*
 
-In the same spirit, the toast renderer encodes intent via *both* the
-background color and the surrounding text, so red is never the sole
-signal of an error.
+**A toast's intent (information, success, warning, error) is shown by
+colour alone.** Nothing else in the toast changes with it, and snora's own
+tests assert exactly that. So say what happened in the toast's title and
+message ("Could not save", not only a red toast). Whether snora should carry
+intent by more than colour is a question for 0.67.
+
+*(Corrected 2026-11-27, from the 0.67 audit: this said the toast encodes
+intent by both its background colour and the surrounding text.)*
 
 ## Why icons are feature-gated
 
 `Icon::Text` has no extra dependencies and is always available. The
 richer icon sources are optional because:
 
-- The `lucide-icons` crate ships ~1500 constants and contributes non-trivial
-  compile time. Projects that only need emoji or text glyphs should not pay
+- The `lucide-icons` crate ships a constant for every Lucide glyph, and a font
+  file, and contributes non-trivial compile time. Projects that only need emoji or text glyphs should not pay
   that cost.
 - `Icon::Svg` requires iced's `svg` feature and a file path. Not all
   applications need SVG rendering.

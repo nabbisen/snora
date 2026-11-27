@@ -16,10 +16,14 @@ the architect (`.git-exclude/reviewed/audit-0-67-a/review-result.md`). The owner
 | Mark | Where | Without the font |
 |---|---|---|
 | The toast's close mark | `crates/snora/src/toast.rs` (RFC-101 Q-1 (a)) | **a missing-glyph box (▯)**, measured in a real window (`s5-nofont.png`) |
-| The design-path notice's dismiss mark | `snora-widgets/src/design/chip.rs`, `close_glyph`, used by `notice.rs` | by the code, the same |
-| The design-path chip's remove mark | the same `close_glyph` | by the code, the same |
-| The checkbox's tick | `snora-widgets/src/form.rs`, `Mark::Tick` | by the code, the same: **a checked box would not show that it is checked** |
-| The select's chevron | `form.rs`, `Mark::Chevron` | by the code, the same |
+| The design-path notice's dismiss mark | `snora-widgets/src/design/chip.rs`, `close_glyph`, used by `notice.rs` | a missing-glyph box (measured in Unit 0) |
+| The design-path chip's remove mark | the same `close_glyph` | a missing-glyph box (measured) |
+| The checkbox's tick | `snora-widgets/src/form.rs`, `Mark::Tick` | **a "1" in the checked box** (measured): the private-use codepoint falls through to another font's digit |
+| The select's chevron | `form.rs`, `Mark::Chevron` | **a "3"** (measured) |
+
+*(Measured in Unit 0, 2026-11-27, on both renderers; this table first said "by the code, the same" for the last four.)*
+**The layout moved with the state too:** the notice's dismiss control was 28.0 px wide with the feature off, 28.4 with it
+on and no font, and 34.0 with the font loaded. A select differed by up to 8 px.
 
 - **snora never loads the font.** Only the application can, with `iced::application(..).font(LUCIDE_FONT_BYTES)`, and
   **no adopter-facing page or rustdoc says that it must.** The only mention is the 0.40 migration guide's remark that
@@ -28,8 +32,13 @@ the architect (`.git-exclude/reviewed/audit-0-67-a/review-result.md`). The owner
   enables `snora/lucide-icons` for its own icons turns it on for the whole application. Every toast's close mark then
   becomes a box, and every checked checkbox loses its tick, in an application whose authors never chose Lucide.
 - **Why no test saw it.** `crates/snora/tests/common/mod.rs`'s `simulator` loads the Lucide font whenever the feature is
-  on. Every rendered test therefore ran in the state an adopter reaches only *after* finding the byte slice. **No test
-  ran in the state an adopter starts in**: the feature on, and the font not loaded.
+  on. Every test built on it therefore ran in the state an adopter reaches only *after* finding the byte slice, and
+  **no test asserted what a mark is in the state an adopter starts in**: the feature on, and the font not loaded.
+  *(Corrected after Unit 0: this said no test ran in that state at all.)*
+- **And the tests that did sit in that state measured the wrong glyph and passed** (found in Unit 0). The drawn sweeps
+  use a rig that never loads the font, so in the all-features job they read the boxes, the "1" and the "3" as the
+  marks, and passed, because a box has ink and contrast. **A contrast sweep proves that a mark is visible, not that it
+  is the right one.** R-3's test compares each mark with the intended glyph.
 
 ## Proposal
 

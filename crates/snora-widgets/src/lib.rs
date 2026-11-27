@@ -75,6 +75,12 @@ pub use tab::app_tab_bar;
 
 /// Convenience re-export of the Lucide icon constants, available when
 /// the `lucide-icons` feature is enabled.
+///
+/// **The application must load [`LUCIDE_FONT_BYTES`](lucide::LUCIDE_FONT_BYTES) once, at start-up**
+/// (`iced::application(..).font(LUCIDE_FONT_BYTES)`): a Lucide icon is drawn
+/// as a glyph of that font, and a library cannot load a font. Without it,
+/// every `Icon::Lucide` draws as a stray glyph or a missing-glyph box.
+/// snora's own marks never use this font (RFC-139).
 #[cfg(feature = "lucide-icons")]
 pub mod lucide {
     pub use lucide_icons::{Icon::*, LUCIDE_FONT_BYTES};

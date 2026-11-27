@@ -211,6 +211,12 @@ pub use snora_widgets::{
 
 /// Convenience re-export of Lucide icon constants. Available when both
 /// `widgets` and `lucide-icons` features are enabled.
+///
+/// **The application must load [`lucide::LUCIDE_FONT_BYTES`] once, at
+/// start-up** (`iced::application(..).font(snora::lucide::LUCIDE_FONT_BYTES)`):
+/// a Lucide icon is drawn as a glyph of that font, and a library cannot load a
+/// font. Without it, every `Icon::Lucide` draws as a stray glyph or a
+/// missing-glyph box. snora's own marks never use this font (RFC-139).
 #[cfg(all(feature = "widgets", feature = "lucide-icons"))]
 pub use snora_widgets::lucide;
 
