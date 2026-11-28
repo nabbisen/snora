@@ -137,7 +137,7 @@ jobs:
 
       - name: Commit and push to main
         if: startsWith(github.ref, 'refs/tags/')
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7.2.1
         with:
           # `[skip ci]` is the primary recursion guard.
           commit_message: |
