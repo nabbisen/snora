@@ -470,7 +470,7 @@ jobs:
       # cache key is its hash (so a bump fetches once and caches). Whoever bumps it reads the
       # script's header for how, and runs both rendered jobs and parity on the new version: if
       # the pixels differ, that is a baseline change and its own decision.
-      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ runner.temp }}/lavapipe-cache
           key: lavapipe-debs-${{ hashFiles('scripts/install-lavapipe.sh') }}
