@@ -46,7 +46,7 @@ jobs:
       id-token: write  # required for crates.io Trusted Publishing (OIDC)
     steps:
       - name: Checkout the tag
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Refuse if the tag does not match Cargo.toml's version
         run: scripts/check-tag-matches-version.sh "${{ github.ref_name }}"
@@ -124,7 +124,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout the tag
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # This is the one job that holds `contents: write`, and it
           # runs repository scripts. Nothing here pushes — `gh` reads
