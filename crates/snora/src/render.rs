@@ -317,6 +317,7 @@ where
         layout.direction,
         style.toast,
         layout.on_toast_attention,
+        layout.toast_marks,
     ) {
         layers = layers.push(toast_layer);
     }

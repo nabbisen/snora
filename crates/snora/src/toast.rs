@@ -99,6 +99,14 @@ impl ToastIntentColors {
 /// 14pt text at default font sizes.
 const TOAST_WIDTH: f32 = 340.0;
 
+/// What a toast's mark adds to its width (RFC-143): the mark's slot, 1 em, which is 16 px at the
+/// default text size, and the 4 px the row puts between it and the text. **Added**, so a toast
+/// with a mark keeps the message column it had without one (288 px at the default size, against
+/// 0.50.0's 287, which `message_column_keeps_its_width` holds). At a larger text size the slot
+/// grows with the text and the column gives up the difference, as the text it holds grows too.
+/// A toast with the mark off is [`TOAST_WIDTH`] exactly: the toast of 0.66.
+const TOAST_MARK_ROOM: f32 = 20.0;
+
 /// The close mark's size, in ems of the text the toast sits with (RFC-115's
 /// amendment): 1.125, because an × fills less of its em than a pictogram
 /// does. On the unstyled path that text is the host's, so at the default
@@ -179,6 +187,7 @@ pub(crate) fn render_toasts<'a, Message>(
     direction: LayoutDirection,
     style: ToastStyle,
     on_attention: Option<fn(u64, ToastAttention) -> Message>,
+    marks: bool,
 ) -> Option<Element<'a, Message>>
 where
     Message: Clone + 'a,
@@ -192,7 +201,7 @@ where
     // that asserts the toast layer's composition has to change.
     let wrap = |toast: Toast<Message>| -> Element<'a, Message> {
         let id = toast.id;
-        let single = render_single_toast(toast, style, on_attention, direction);
+        let single = render_single_toast(toast, style, on_attention, direction, marks);
         match on_attention {
             Some(f) => mouse_area(single)
                 .on_enter(f(id, ToastAttention::PointerEntered))
@@ -274,6 +283,7 @@ fn render_single_toast<'a, Message>(
     style: ToastStyle,
     on_attention: Option<fn(u64, ToastAttention) -> Message>,
     direction: LayoutDirection,
+    marks: bool,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -376,12 +386,19 @@ where
 
     // A logical row (RFC-132): the text at the start edge and the close mark at
     // the end, whichever way the window reads.
-    let body = snora_interaction::MirroredRow::new(
-        row![container(text_col).width(Length::Fill), close_btn]
-            .align_y(Center)
-            .spacing(4),
-        direction == LayoutDirection::Rtl,
-    );
+    //
+    // **The intent's mark, first** (RFC-143): at the start edge, in the same logical row, so it is on the right
+    // under RTL with the text and the close mark. It takes the intent's own `(fill, text)` pair, the one the
+    // toast's text and close mark take, with the fill as the ground its cut-outs are painted in, so it cannot be
+    // given a pairing of its own.
+    let mut line = row![].align_y(Center).spacing(4);
+    if marks {
+        line = line.push(intent_mark(intent, intents, style.message_size));
+    }
+    let line = line
+        .push(container(text_col).width(Length::Fill))
+        .push(close_btn);
+    let body = snora_interaction::MirroredRow::new(line, direction == LayoutDirection::Rtl);
 
     // Wrapped in `opaque` (RFC-084 F-04): only the `×` button captured
     // clicks before this, because it is a button — a click anywhere else on
@@ -389,11 +406,52 @@ where
     // to whatever rendered beneath it.
     opaque(
         container(body)
-            .width(Length::Fixed(TOAST_WIDTH))
+            .width(Length::Fixed(toast_width(marks)))
             .padding(12)
             .style(move |theme| toast_style(theme, intent, intents))
             .id(crate::identifiers::toast_id(toast.id)),
     )
+}
+
+/// A toast's width: [`TOAST_WIDTH`], and [`TOAST_MARK_ROOM`] more with a mark.
+fn toast_width(marks: bool) -> f32 {
+    if marks {
+        TOAST_WIDTH + TOAST_MARK_ROOM
+    } else {
+        TOAST_WIDTH
+    }
+}
+
+/// Which mark an intent takes (RFC-143). Exhaustive on `intent` (RFC-063's pattern): a sixth intent fails to compile
+/// until it has a mark. The channel register asserts that the five differ.
+fn mark_kind(intent: ToastIntent) -> snora_interaction::StatusKind {
+    use snora_interaction::StatusKind;
+    match intent {
+        ToastIntent::Info => StatusKind::Info,
+        ToastIntent::Success => StatusKind::Success,
+        ToastIntent::Warning => StatusKind::Warning,
+        ToastIntent::Error => StatusKind::Error,
+        ToastIntent::Debug => StatusKind::Debug,
+    }
+}
+
+/// The mark for `intent` (RFC-143), in the intent's pair: the text colour for the shape, the fill for what is cut
+/// out of it. Sized with the text it sits with: 1 em of the host's text on the unstyled path (resolved when the
+/// layout runs), the message's own size on the design path, as the close mark is (RFC-115).
+fn intent_mark<'a, Message: 'a>(
+    intent: ToastIntent,
+    intents: Option<ToastIntentColors>,
+    message_size: Option<f32>,
+) -> Element<'a, Message> {
+    use snora_interaction::StatusMark;
+    let mark = StatusMark::new(mark_kind(intent), move |theme| {
+        let (fill, text) = intent_colors(theme, intent, intents);
+        (text, fill)
+    });
+    match message_size {
+        Some(size) => mark.pixels(size).into(),
+        None => mark.into(),
+    }
 }
 
 // The readable-text rule is `snora_interaction::contrast`'s (RFC-122 Unit 1). It was a

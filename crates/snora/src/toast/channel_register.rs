@@ -1,4 +1,18 @@
-//! RFC-093's channel register for the engine's own toast surface.
+//! RFC-093's channel register for the engine's own toast surface, **as RFC-143 corrected it.**
+//!
+//! **The channel is no longer colour alone.** RFC-093 recorded that a toast's intent changed
+//! colour and nothing else, and ruled that no cue would be added. RFC-143 (2026-11-28, the
+//! owner) reversed that for WCAG 1.4.1: an intent now changes its colours **and its mark**, a
+//! different shape for each of the five. This register therefore asserts both halves, and each
+//! in both directions:
+//!
+//! - **colour:** [`toast_style`] and [`close_button_style`] still vary by intent only through
+//!   colour-bearing fields (the two tests that were here before), so a cue is never carried by
+//!   a border width, a shadow or a radius that nobody drew a mark for;
+//! - **the mark:** [`mark_kind`] gives each intent a mark of its own
+//!   (`every_intent_takes_a_mark_of_its_own`): if the mark stopped depending on the intent, the
+//!   channel would be colour alone again, and this fails. What each mark *looks like* is
+//!   `tests/status_marks.rs`'s, which reads the drawn pixels.
 //!
 //! **What this proves and what it does not.** Same scope note as
 //! `crates/snora-widgets/src/design/channel_register.rs`, which this
@@ -42,7 +56,7 @@ use iced::{Background, Color, Theme};
 
 use snora_core::ToastIntent;
 
-use super::{close_button_style, toast_style};
+use super::{close_button_style, mark_kind, toast_style};
 
 const ALL_INTENTS: [ToastIntent; 5] = [
     ToastIntent::Debug,
@@ -167,4 +181,30 @@ fn toast_surface_varies_by_colour_only() {
 #[test]
 fn toast_dismiss_mark_varies_by_colour_only() {
     assert_colour_only("toast dismiss mark", canonical_close_button_style);
+}
+
+/// **The mark is the second channel** (RFC-143): every intent takes a mark that no other intent takes.
+/// Were it one mark for all, a toast would again say its intent by colour alone.
+#[test]
+fn every_intent_takes_a_mark_of_its_own() {
+    let marks: Vec<_> = ALL_INTENTS
+        .iter()
+        .map(|i| (intent_label(*i), mark_kind(*i)))
+        .collect();
+    let mut failures = Vec::new();
+    for (a, (name_a, mark_a)) in marks.iter().enumerate() {
+        for (name_b, mark_b) in marks.iter().skip(a + 1) {
+            if mark_a == mark_b {
+                failures.push(format!(
+                    "{name_a} and {name_b} take the same mark, {mark_a:?}"
+                ));
+            }
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} channel-register failure(s): the intent is colour alone again\n  {}",
+        failures.len(),
+        failures.join("\n  "),
+    );
 }

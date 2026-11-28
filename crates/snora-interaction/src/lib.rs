@@ -5,7 +5,7 @@
 //! **Renamed from `snora-control` in 0.57.0.** Beside `snora-widgets`, "control"
 //! read as another word for widget, and the crate holds far more than the
 //! control now (`Inert`, `OnEscape`, `Keyed`, `Group`, `sequential_focus`, `Glyph`,
-//! `EmBox`, `Underlined`). The widgets are what is drawn; this crate is how it is
+//! `EmBox`, `Underlined`, `StatusMark`). The widgets are what is drawn; this crate is how it is
 //! operated. The type [`Control`] keeps its name: it is a control. Every item moved
 //! unchanged.
 //!
@@ -75,6 +75,7 @@ mod escape;
 mod group;
 mod inert;
 mod keyed;
+mod mark;
 mod menu_anchor;
 mod menu_keys;
 mod mirror;
@@ -92,6 +93,7 @@ pub use escape::OnEscape;
 pub use group::Group;
 pub use inert::Inert;
 pub use keyed::Keyed;
+pub use mark::{StatusKind, StatusMark};
 pub use menu_anchor::MenuAnchor;
 pub use menu_keys::{MenuKeys, MenuPart};
 pub use mirror::MirroredRow;

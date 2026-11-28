@@ -231,18 +231,37 @@ mod notice {
     use snora::design::{Tokens, Tone, notice::Notice};
 
     /// The notice's text column: its parent's width, less the 4px accent
-    /// bar and the container's own `spacing.md` padding on each side.
+    /// bar and the container's own `spacing.md` padding on each side, **and, with its mark (RFC-143, on by
+    /// default), the mark's slot (1 body line) and the `spacing.sm` between it and the text**. The notice
+    /// below is `Info`, a status tone, so it has one.
     fn column(tokens: &Tokens) -> f32 {
+        column_without_mark(tokens)
+            - snora::design::style::text::body_size(tokens).0
+            - tokens.spacing.sm
+    }
+
+    /// The column with the mark switched off: the 0.66 notice's, exactly.
+    fn column_without_mark(tokens: &Tokens) -> f32 {
         NOTICE_PARENT_WIDTH - 4.0 - 2.0 * tokens.spacing.md
     }
 
     fn notice<'a>(tokens: &'a Tokens, title: Option<&str>, body: &str) -> Element<'a, Msg> {
+        notice_with(tokens, title, body, true)
+    }
+
+    fn notice_with<'a>(
+        tokens: &'a Tokens,
+        title: Option<&str>,
+        body: &str,
+        mark: bool,
+    ) -> Element<'a, Msg> {
         let mut notice = Notice::new(
             tokens,
             Tone::Info,
             body.to_owned(),
             snora::LayoutDirection::Ltr,
-        );
+        )
+        .mark(mark);
         if let Some(title) = title {
             notice = notice.title(title.to_owned());
         }
@@ -312,6 +331,24 @@ mod notice {
             rendered.height,
             natural.width,
             natural.height,
+        );
+    }
+
+    /// **With the mark off the notice is the 0.66 notice**: its prose fills the column it filled before the mark
+    /// existed, which is `column_without_mark`, and the mark's room is not taken from it (RFC-143 R-3).
+    #[test]
+    fn notice_prose_with_the_mark_off_is_unchanged() {
+        let tokens = Tokens::light();
+        let body = snora::design::style::text::body_size(&tokens).0;
+        let natural = natural_size(PROSE, Some(body));
+        let rendered = rendered_size(notice_with(&tokens, None, PROSE, false), PROSE);
+        assert!(
+            (rendered.width - column_without_mark(&tokens)).abs() <= 0.5
+                && (rendered.height - natural.height).abs() <= 0.5,
+            "notice body, mark off: prose rendered {:.1}x{:.1}, against a column of {:.1}",
+            rendered.width,
+            rendered.height,
+            column_without_mark(&tokens),
         );
     }
 

@@ -163,6 +163,10 @@ where
     /// [`ToastPosition::TopEnd`] (top-right under LTR, top-left under RTL).
     pub toast_position: ToastPosition,
 
+    /// Whether each toast carries a **mark** that says its intent by shape (RFC-143).
+    /// Defaults to `true`. See [`Self::toast_marks`].
+    pub toast_marks: bool,
+
     // -----------------------------------------------------------------
     // Global configuration.
     // -----------------------------------------------------------------
@@ -231,6 +235,7 @@ where
             sheet: None,
             toasts: Vec::new(),
             toast_position: ToastPosition::default(),
+            toast_marks: true,
             direction: LayoutDirection::default(),
             on_close_menus: None,
             on_close_modals: None,
@@ -369,6 +374,36 @@ where
     #[must_use]
     pub fn escape(mut self, escape: Escape<Message>) -> Self {
         self.escape = escape;
+        self
+    }
+
+    /// Whether each toast shows a mark for its intent (RFC-143). **On by default.**
+    ///
+    /// A toast says its intent (Info, Success, Warning, Error, Debug) by its colours, and colour
+    /// alone fails a reader who cannot tell the colours apart (WCAG 1.4.1, Use of Colour,
+    /// Level A). So each toast carries a small mark at its start edge, a different **shape** for
+    /// each intent, drawn by snora and needing no font. A toast with a mark is 20 px wider than
+    /// one without, at the default text size, so that its message keeps the room it always had.
+    ///
+    /// **This switch is for one case only:** an application that already supplies its own
+    /// non-colour channel for the intent (an icon of its own in the title, say), so that it
+    /// does not show two. Turning the mark off for any other reason takes away the one thing
+    /// that tells these readers what kind of message it is. Turned off, the toast is exactly
+    /// the toast of 0.66: the same width, with no mark.
+    ///
+    /// ```
+    /// use snora_core::AppLayout;
+    ///
+    /// let layout: AppLayout<(), ()> = AppLayout::new(());
+    /// assert!(layout.toast_marks, "on by default");
+    ///
+    /// // An application that draws its own channel:
+    /// let layout = layout.toast_marks(false);
+    /// assert!(!layout.toast_marks);
+    /// ```
+    #[must_use]
+    pub fn toast_marks(mut self, marks: bool) -> Self {
+        self.toast_marks = marks;
         self
     }
 

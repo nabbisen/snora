@@ -85,8 +85,17 @@ fn toast(intent: ToastIntent) -> Element<'static, Msg> {
 
 /// The same with the message `message`.
 fn toast_with(intent: ToastIntent, message: &str) -> Element<'static, Msg> {
+    toast_marked(intent, message, true)
+}
+
+/// The same with the intent's mark on or off (RFC-143): on is the default.
+fn toast_marked(intent: ToastIntent, message: &str, marks: bool) -> Element<'static, Msg> {
     let toast = Toast::new(TOAST_ID, intent, "Saved", message, Msg::Dismiss(TOAST_ID));
-    render(AppLayout::new(body()).toasts(vec![toast]))
+    render(
+        AppLayout::new(body())
+            .toasts(vec![toast])
+            .toast_marks(marks),
+    )
 }
 
 fn glyph_bounds(ui: &mut Simulator<'_, Msg>, label: &str) -> Rectangle {
@@ -236,8 +245,19 @@ fn close_control_is_laid_out_at_exactly_the_floor() {
 /// the text column inside it is smaller.
 #[test]
 fn message_column_keeps_its_width() {
+    assert_message_column_keeps_its_width(true);
+}
+
+/// **And with the mark off** (RFC-143 R-3): the 340 px toast of 0.66, with the room it had. The mark's 20 px is added to
+/// the toast only while the mark is shown, so an application with its own channel sees no change at all.
+#[test]
+fn message_column_keeps_its_width_with_the_mark_off() {
+    assert_message_column_keeps_its_width(false);
+}
+
+fn assert_message_column_keeps_its_width(marks: bool) {
     for (label, intent) in intents() {
-        let mut ui = simulator(toast(intent));
+        let mut ui = simulator(toast_marked(intent, "All good.", marks));
         let message = ui
             .find("All good.")
             .expect("the toast renders its message")
@@ -254,9 +274,10 @@ fn message_column_keeps_its_width() {
 
         assert!(
             column.width >= MESSAGE_COLUMN_MIN,
-            "{label}: the message column is {}px wide, under 0.50.0's {MESSAGE_COLUMN_MIN}px — \
-             the close button has taken room from it, so longer messages wrap earlier and the \
-             toast grows taller",
+            "{label} (mark {}): the message column is {}px wide, under 0.50.0's {MESSAGE_COLUMN_MIN}px — \
+             the close button or the mark has taken room from it, so longer messages wrap earlier \
+             and the toast grows taller",
+            if marks { "on" } else { "off" },
             column.width,
         );
     }

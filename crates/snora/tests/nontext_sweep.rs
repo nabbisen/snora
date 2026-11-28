@@ -276,6 +276,40 @@ fn square(els: &[(El, Rectangle)], n: usize) -> Option<Rectangle> {
     v.get(n).copied()
 }
 
+/// **The status mark's slot** (RFC-143): the square container of about an em that a toast or a notice reports for its mark
+/// (`StatusMark` reports its slot as a container, as the slider bar reports its parts). The body text of the presets is 14 to 18
+/// px, so the slot is a square of 12 to 20 px; no other container in a toast or a notice scene is.
+fn status_slot(els: &[(El, Rectangle)]) -> Option<Rectangle> {
+    els.iter()
+        .find(|(k, r)| {
+            *k == El::Container
+                && (r.width - r.height).abs() < 0.6
+                && (12.0..20.0).contains(&r.width)
+        })
+        .map(|x| x.1)
+}
+
+/// The mark's slot, as a pick whose every side counts: for the four marks whose outline reaches the slot's edges.
+fn mark_outline(els: &[(El, Rectangle)], _t: &[Rectangle]) -> Option<Pick> {
+    status_slot(els).and_then(|r| all(r, None))
+}
+
+/// The `Debug` mark is a dot in the middle of its slot (5 to 11 of 16), so its outline is the dot's box, not the slot's.
+fn mark_dot(els: &[(El, Rectangle)], _t: &[Rectangle]) -> Option<Pick> {
+    status_slot(els).and_then(|r| {
+        let k = r.width / 16.0;
+        all(
+            Rectangle {
+                x: r.x + 5.0 * k,
+                y: r.y + 5.0 * k,
+                width: 6.0 * k,
+                height: 6.0 * k,
+            },
+            None,
+        )
+    })
+}
+
 /// A toggler's track: twice as wide as it is tall.
 fn track_of_toggler(els: &[(El, Rectangle)]) -> Option<Rectangle> {
     els.iter()
@@ -377,31 +411,85 @@ fn subjects() -> Vec<Subject> {
             name: "toast fill vs the page (info)",
             row: "16",
             scene: "toast, info",
-            pick: |e, _| rect_of(e, El::Container, 340.0, 72.0).and_then(|r| all(r, None)),
+            pick: |e, _| rect_of(e, El::Container, 360.0, 72.0).and_then(|r| all(r, None)),
         },
         Subject {
             name: "toast fill vs the page (error)",
             row: "16",
             scene: "toast, error",
-            pick: |e, _| rect_of(e, El::Container, 340.0, 72.0).and_then(|r| all(r, None)),
+            pick: |e, _| rect_of(e, El::Container, 360.0, 72.0).and_then(|r| all(r, None)),
         },
         Subject {
             name: "toast fill vs the page (success)",
             row: "16",
             scene: "toast, success",
-            pick: |e, _| rect_of(e, El::Container, 340.0, 72.0).and_then(|r| all(r, None)),
+            pick: |e, _| rect_of(e, El::Container, 360.0, 72.0).and_then(|r| all(r, None)),
         },
         Subject {
             name: "toast fill vs the page (warning)",
             row: "16",
             scene: "toast, warning",
-            pick: |e, _| rect_of(e, El::Container, 340.0, 72.0).and_then(|r| all(r, None)),
+            pick: |e, _| rect_of(e, El::Container, 360.0, 72.0).and_then(|r| all(r, None)),
         },
         Subject {
             name: "toast fill vs the page (Debug)",
             row: "16",
             scene: "toast, debug",
-            pick: |e, _| rect_of(e, El::Container, 340.0, 72.0).and_then(|r| all(r, None)),
+            pick: |e, _| rect_of(e, El::Container, 360.0, 72.0).and_then(|r| all(r, None)),
+        },
+        Subject {
+            name: "toast mark vs its fill (info)",
+            row: "143",
+            scene: "toast, info",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "toast mark vs its fill (success)",
+            row: "143",
+            scene: "toast, success",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "toast mark vs its fill (warning)",
+            row: "143",
+            scene: "toast, warning",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "toast mark vs its fill (error)",
+            row: "143",
+            scene: "toast, error",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "toast mark vs its fill (Debug)",
+            row: "143",
+            scene: "toast, debug",
+            pick: mark_dot,
+        },
+        Subject {
+            name: "notice mark vs the notice (info)",
+            row: "143",
+            scene: "notice, info",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "notice mark vs the notice (success)",
+            row: "143",
+            scene: "notice, success",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "notice mark vs the notice (warning)",
+            row: "143",
+            scene: "notice, warning",
+            pick: mark_outline,
+        },
+        Subject {
+            name: "notice mark vs the notice (danger)",
+            row: "143",
+            scene: "notice, danger",
+            pick: mark_outline,
         },
         Subject {
             name: "tab bar rule vs the page",
@@ -1716,10 +1804,12 @@ fn the_exceptions_are_written_down_and_each_is_still_needed() {
 
 /// The custom drawers of non-text elements: a file that calls `fill_quad(` itself draws something no `container` reports.
 /// Today: the focus ring (`control.rs`), the link's underline (`underlined.rs`) and the slider's bar
-/// (`slider_bar.rs`, RFC-134), each with its finder above (`ring_cells`, `link_cells`, and the slider's three
-/// subjects, which read the track, the fill and the thumb the bar reports as containers).
-const QUAD_DRAWERS: [&str; 3] = [
+/// (`slider_bar.rs`, RFC-134) and the status mark (`mark.rs`, RFC-143), each with its finder above (`ring_cells`,
+/// `link_cells`, and the slider's three subjects, which read the track, the fill and the thumb the bar reports as
+/// containers; and the mark's nine, which read the slot it reports as a container, `status_slot`).
+const QUAD_DRAWERS: [&str; 4] = [
     "snora-interaction/src/control.rs",
+    "snora-interaction/src/mark.rs",
     "snora-interaction/src/slider_bar.rs",
     "snora-interaction/src/underlined.rs",
 ];

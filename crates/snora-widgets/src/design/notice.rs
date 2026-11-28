@@ -22,6 +22,12 @@
 //!   If your container is left with no control in it, snora cannot tell that it is
 //!   still there, and treats it as gone: focus moves to the nearest control in the
 //!   container around it.
+//! - **A status tone carries a mark, by shape** (RFC-143, WCAG 1.4.1): at the start edge, after the
+//!   accent bar, a small mark that is a different shape for each of `Info`, `Success`, `Warning` and
+//!   `Danger` (`Danger` takes the error mark). `Neutral` and `Accent` say no status, so they have none.
+//!   It is drawn by snora in the notice's text colour on its surface, needs no font, and takes no Tab
+//!   stop and no press. **On by default.** [`Notice::mark`](crate::design::notice::Notice::mark)`(false)`
+//!   is for an application that already supplies its own non-colour channel, and only for that.
 //! - Tone colors all pass WCAG AA contrast (verified in `snora-design` tests).
 //! - The focus ring is drawn by the control, from `Tokens::focus`, in
 //!   whichever of that colour or black and white clears 3:1 against the
@@ -61,6 +67,7 @@ use iced::{
 };
 use snora_core::LayoutDirection;
 use snora_design::{Tokens, Tone};
+use snora_interaction::{StatusKind, StatusMark};
 
 use snora_style as style;
 
@@ -91,6 +98,7 @@ pub struct Notice<'a, Message> {
     action: Option<NoticeAction<Message>>,
     dismiss: Option<Message>,
     dismiss_tooltip: Option<String>,
+    mark: bool,
 }
 
 impl<'a, Message: Clone + 'a> Notice<'a, Message> {
@@ -115,6 +123,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
             action: None,
             dismiss: None,
             dismiss_tooltip: None,
+            mark: true,
         }
     }
 
@@ -153,6 +162,22 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
     #[must_use]
     pub fn dismiss_tooltip(mut self, tooltip: impl Into<String>) -> Self {
         self.dismiss_tooltip = Some(tooltip.into());
+        self
+    }
+
+    /// Whether a status tone shows its **mark** (RFC-143). **On by default.**
+    ///
+    /// `Info`, `Success`, `Warning` and `Danger` say what kind of message this is by the colour of
+    /// the bar and the border, and colour alone fails a reader who cannot tell the colours apart
+    /// (WCAG 1.4.1, Level A). So each carries a small mark, a different shape for each tone.
+    ///
+    /// **This switch is for one case only:** an application that already supplies its own
+    /// non-colour channel for the tone (its own icon, say), so that it does not show two. Turning
+    /// the mark off for any other reason takes away the one thing that tells these readers what
+    /// kind of message it is. It has no effect on `Neutral` and `Accent`, which have no mark.
+    #[must_use]
+    pub fn mark(mut self, mark: bool) -> Self {
+        self.mark = mark;
         self
     }
 
@@ -242,6 +267,21 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         // Main row: the accent bar at the start edge, then the content, then the controls: a logical
         // row, so under RTL the bar is on the right and the controls on the left.
         let content_area: Element<'a, Message> = column(content_col).spacing(t.spacing.xs).into();
+        // The tone's mark, at the start edge of the content (RFC-143), centred on it. A logical row, so under
+        // RTL it is on the right with the text. It is 1 body line of the text it sits with.
+        let content_area: Element<'a, Message> = match tone_mark(self.tone).filter(|_| self.mark) {
+            Some(kind) => {
+                let mark = StatusMark::new(kind, move |_theme: &Theme| (text_color, surface))
+                    .pixels(style::text::body_size(t).0);
+                LogicalRow::new(direction)
+                    .spacing(t.spacing.sm)
+                    .align_y(iced::Alignment::Center)
+                    .push(mark)
+                    .push(container(content_area).width(Length::Fill))
+                    .into()
+            }
+            None => content_area,
+        };
 
         let mut main_row = LogicalRow::new(direction);
 
@@ -282,6 +322,19 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         container(main_row)
             .style(move |_| notice_outer_style(surface, accent_color, radius))
             .into()
+    }
+}
+
+/// The mark each tone takes (RFC-143): the matching intent's, with `Danger` taking `Error`'s, and none for the two
+/// tones that say no status. Exhaustive on purpose (RFC-063's pattern): a seventh [`Tone`] fails to compile here
+/// until it is given a mark, or none.
+pub(super) fn tone_mark(tone: Tone) -> Option<StatusKind> {
+    match tone {
+        Tone::Info => Some(StatusKind::Info),
+        Tone::Success => Some(StatusKind::Success),
+        Tone::Warning => Some(StatusKind::Warning),
+        Tone::Danger => Some(StatusKind::Error),
+        Tone::Neutral | Tone::Accent => None,
     }
 }
 

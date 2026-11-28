@@ -26,7 +26,42 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`AppLayout::toast_marks(bool)` and `Notice::mark(bool)`** (RFC-143): the two switches for the marks below, **on by
+  default**. They are for one case only: an application that already supplies its own non-colour channel for a toast's
+  intent or a notice's tone (an icon of its own, say), so that it does not show two. Off, a toast is exactly the toast
+  of 0.66 (340 px wide, no mark), and a notice is its 0.66 self.
+
+### Changed
+
+- **Every toast and every status notice now carries a mark that says what kind of message it is, by shape** (RFC-143,
+  WCAG 1.4.1, Use of Colour, Level A). A toast's intent and a notice's tone were said by colour alone: a reader who cannot
+  tell the colours apart could not tell an error from a success. **A visible change on every default toast and every
+  `Info`, `Success`, `Warning` and `Danger` notice.** It reverses RFC-093's "no cue" ruling: the owner ruled on 2026-11-27 that snora
+  serves older and visually impaired people as a standard feature, and on 2026-11-28 that the mark is on by default.
+  - **The marks** (each its own outline, so that the five survive blur; filled means *attention*, hollow means *calm*):
+
+    | Intent / tone | Mark |
+    |---|---|
+    | `Error` (`Danger`) | a filled disc with a bar cut out |
+    | `Warning` | a filled rounded square with a "!" cut out |
+    | `Info` | a ring with an "i" |
+    | `Success` | a rounded-square ring |
+    | `Debug` (toasts only) | a small dot |
+
+    `Neutral` and `Accent` notices say no status, so they have no mark.
+  - **Drawn by snora, needing no font:** rounded rectangles, so a Cargo feature or a missing font cannot take a mark
+    away (an uncovered glyph draws nothing at all, which would have made the toast colour-alone again). Drawn in the
+    text colour of the toast's own `(fill, text)` pair, or the notice's text colour on its surface, so the mark holds
+    at least 3:1 wherever the text does.
+  - **A mark is information, not a control:** no Tab stop, no press.
+  - **It is 1 em of the text it sits with, at the start edge,** and so on the right under right-to-left, with the
+    text and the close mark mirrored around it.
+  - **A toast with its mark is 360 px wide** (it was 340: the 20 px is the mark and its gap), so its message keeps the
+    288 px column it always had. With `toast_marks(false)` it is 340 px.
+  - **A notice's text has less room by the mark and its gap** (a body line and 8 px at the stock tokens), because a
+    notice takes its width from its parent. `Notice::mark(false)` gives the room back.
 
 ## [0.66.0] — 2026-11-27
 

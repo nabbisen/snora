@@ -1,4 +1,17 @@
-//! RFC-093's channel register for `snora-widgets`' prefab surfaces.
+//! RFC-093's channel register for `snora-widgets`' prefab surfaces, **as RFC-143 corrected it.**
+//!
+//! **A status tone's channel is no longer colour alone.** RFC-093 recorded that a notice's
+//! tone changed colour and nothing else, and ruled that no cue would be added. RFC-143
+//! (2026-11-28, the owner) reversed that for WCAG 1.4.1: the four status tones (`Info`,
+//! `Success`, `Warning`, `Danger`) now change their colours **and a mark**, a different shape
+//! for each; `Neutral` and `Accent` say no status and have none. This register asserts both:
+//!
+//! - **colour:** the notice's accent bar, outer container and the progress bar still vary
+//!   by tone only through colour-bearing fields (the three tests that were here before);
+//! - **the mark:** [`tone_mark`] gives each status tone a mark of its own, `Danger` takes
+//!   `Error`'s, and the two tones with no status have none
+//!   (`every_status_tone_takes_a_mark_of_its_own`). What each looks like is
+//!   `snora`'s `tests/status_marks.rs`, which reads the drawn pixels.
 //!
 //! **What this proves and what it does not.** WCAG 1.4.1 (Use of
 //! Colour) is a property of everything rendered on a surface, not of
@@ -59,7 +72,7 @@ use iced::widget::{container, progress_bar};
 use iced::{Background, Color};
 use snora_design::{Tokens, Tone};
 
-use super::notice::{notice_accent_bar_style, notice_accent_color, notice_outer_style};
+use super::notice::{notice_accent_bar_style, notice_accent_color, notice_outer_style, tone_mark};
 
 /// All six [`Tone`] variants. Hand-listed — see module doc.
 const ALL_TONES: [Tone; 6] = [
@@ -193,4 +206,44 @@ fn notice_outer_container_varies_by_colour_only() {
 #[test]
 fn progress_bar_varies_by_colour_only() {
     assert_colour_only("progress bar", canonical_progress_style);
+}
+
+/// **The mark is the second channel** (RFC-143): each of the four status tones takes a mark that no other tone takes,
+/// except `Danger`, which takes `Error`'s (its own), and `Neutral` and `Accent` take none. Were it one mark for all, a
+/// status tone would again say what it is by colour alone.
+#[test]
+fn every_status_tone_takes_a_mark_of_its_own() {
+    let marks: Vec<_> = ALL_TONES
+        .iter()
+        .map(|t| (tone_label(*t), tone_mark(*t)))
+        .collect();
+    let mut failures = Vec::new();
+    let status: Vec<_> = marks.iter().filter(|(_, m)| m.is_some()).collect();
+    if status.len() != 4 {
+        failures.push(format!(
+            "{} tones take a mark, but four say a status: {marks:?}",
+            status.len()
+        ));
+    }
+    for (a, (name_a, mark_a)) in status.iter().enumerate() {
+        for (name_b, mark_b) in status.iter().skip(a + 1) {
+            if mark_a == mark_b {
+                failures.push(format!(
+                    "{name_a} and {name_b} take the same mark, {mark_a:?}"
+                ));
+            }
+        }
+    }
+    for (name, mark) in &marks {
+        let says_no_status = matches!(*name, "Neutral" | "Accent");
+        if says_no_status && mark.is_some() {
+            failures.push(format!("{name} says no status and takes {mark:?}"));
+        }
+    }
+    assert!(
+        failures.is_empty(),
+        "{} channel-register failure(s): the tone is colour alone again\n  {}",
+        failures.len(),
+        failures.join("\n  "),
+    );
 }
