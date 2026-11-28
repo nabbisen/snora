@@ -1,6 +1,6 @@
 # RFC-143 — A toast's intent, and a notice's tone, are shown by colour alone
 
-**Status.** Proposed, 2026-11-28.
+**Status.** Accepted 2026-11-28 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-27, the 0.67 audit's request A (row A2-096): the icons guide said a toast shows its intent by its
 background colour *and* the text around it. Two tests assert that only colour changes. The owner asked for this RFC
 for 0.67 on 2026-11-28.
@@ -78,6 +78,16 @@ The criteria: told apart in greyscale; at least 3:1; no optional font; legible a
 telling applications to say what happened in the words.
 
 **Q-4. When.** **Suggest: 0.67.0.**
+
+## Rulings, 2026-11-28 (owner)
+
+"Yes." Every question as suggested:
+- **Q-1: on by default.** This reverses RFC-093's opt-in pre-ruling, for the reason given: the beneficiary is now
+  every snora application's users (the owner's 2026-11-27 ruling), and WCAG 1.4.1 is Level A. There is one switch,
+  for an application with its own channel.
+- **Q-2:** glyphs or drawn shapes, decided by Unit 0's measurement at its review.
+- **Q-3:** no textual prefix.
+- **Q-4:** 0.67.0.
 
 ## Review against snora's principles
 

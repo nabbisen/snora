@@ -1,6 +1,6 @@
 # RFC-142 — A feature turned on elsewhere breaks an exhaustive `match` on `Icon`
 
-**Status.** Proposed, 2026-11-28.
+**Status.** Accepted 2026-11-28 (owner), every open question ruled as suggested (see Rulings).
 **Raised.** 2026-11-28, the architect, while checking the 0.67 audit's request D (item 5, the exhaustive enums;
 `.git-exclude/reviewed/audit-0-67-d/review-result.md`). The owner asked for this RFC for 0.67 on 2026-11-28.
 **Release target.** 0.67.0. **A breaking change**, small and stated.
@@ -61,6 +61,13 @@ hazard. Whether they stay exhaustive before 1.0 is part of the owner's 1.0 revie
 records the list.
 
 **Q-3. When.** **Suggest: 0.67.0.** It is breaking, and 0.67 is a minor that may break, with its guide.
+
+## Rulings, 2026-11-28 (owner)
+
+"Yes." Every question as suggested:
+- **Q-1:** `#[non_exhaustive]`, not variants that always exist.
+- **Q-2:** the other eleven exhaustive enums are left to the owner's 1.0 review.
+- **Q-3:** 0.67.0, breaking, named in the migration guide.
 
 ## Review against snora's principles
 

@@ -247,10 +247,10 @@ on `main`. **Scoped by the owner on 2026-11-28** from the four reviews:
     for actions, and the tag's signature verified before publishing (request C). In progress.
   - [RFC-141](rfcs/accepted/141-a-read-only-tag-has-no-primitive.md), `chip::tag`, a read-only tag, because the
     recipe's was a disabled chip at under 2:1 (request B).
-- **Proposed RFCs, for 0.67:**
-  - [RFC-142](rfcs/proposed/142-a-feature-turned-on-elsewhere-breaks-an-exhaustive-match-on-icon.md): `Icon` becomes
+- **Accepted 2026-11-28, for 0.67:**
+  - [RFC-142](rfcs/accepted/142-a-feature-turned-on-elsewhere-breaks-an-exhaustive-match-on-icon.md): `Icon` becomes
     `#[non_exhaustive]`, because a feature turned on by another crate breaks an exhaustive match (request D). Breaking.
-  - [RFC-143](rfcs/proposed/143-a-toasts-intent-is-shown-by-colour-alone.md): a toast's intent and a notice's tone
+  - [RFC-143](rfcs/accepted/143-a-toasts-intent-is-shown-by-colour-alone.md): a toast's intent and a notice's tone
     carry a mark that differs by shape (WCAG 1.4.1, request A). RFC-093 Q-1's reopening sign fired: the book itself
     said the toast carried it.
 - **The themes RFC is written** (the owner's 2026-11-27 ruling), for building from 0.69.
