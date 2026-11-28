@@ -236,36 +236,38 @@ has no contrast assertion of any kind. Every containment test is positive, so a
 dialog that dismissed itself passed all of them. **The suites' reach ends one
 crate short of the pixels**, and that is RFC-085's real subject.
 
-## Next — 0.67.0: the third audit
+## Next — 0.67.0: the third audit's follow-up
 
-**What the audit finds decides 0.67**, as it did for 0.62. It reads every page an adopter relies on that no audit has
-read, in four requests:
-- A: the introduction, getting-started and the unread guides;
-- B: the unread design pages and recipes;
-- C: the reference, except Laws 1–8;
-- D: the contributing pages that make promises to adopters (versioning, API governance, the CI feature matrix, the
-  consumer-requirements register, feedback and scope).
+**The audit is done** (2026-11-28): four requests, 950 claim rows across 37 pages, 125 false. The book corrections are
+on `main`. **Scoped by the owner on 2026-11-28** from the four reviews:
 
-That is about 5,100 lines. A claim that something is complete ("every", "all", an inventory) is checked by enumerating the
-API or what is drawn, never by searching. It can start during 0.66, because it is read-only.
-
-**Two RFCs from the audit, asked for and accepted by the owner on 2026-11-28:**
-- [RFC-140](rfcs/accepted/140-the-release-path-runs-actions-from-refs-that-can-move.md): the release path runs
-  third-party actions from refs that can move, and the tag's signature is not verified (request C).
-- [RFC-141](rfcs/accepted/141-a-read-only-tag-has-no-primitive.md): a read-only tag primitive, because the recipe's is
-  a disabled chip at under 2:1 (request B).
-
-**Already carried in** from request A's review and RFC-138's Unit 0 (2026-11-26):
-- `ShortcutRoute` and `TargetRole` re-exported from `snora::keyboard`. `Shortcuts::routes()` returns them, and an
-  application on `snora` alone cannot name them.
-- Guards: every `pub enum` of `snora-core` is on the vocabulary page, by enumeration; every type in a public signature
-  of `snora` can be named through `snora`; `check-migration-guides.sh` reads the index page's table.
-- To measure first: whether `responsive_body`'s unit tests run in CI, and what a form control does when one label
+- **Accepted RFCs:**
+  - [RFC-140](rfcs/accepted/140-the-release-path-runs-actions-from-refs-that-can-move.md), the release path's own
+    supply chain: every action pinned by commit or replaced by `rustup`, a pin gate, explicit permissions, Dependabot
+    for actions, and the tag's signature verified before publishing (request C). In progress.
+  - [RFC-141](rfcs/accepted/141-a-read-only-tag-has-no-primitive.md), `chip::tag`, a read-only tag, because the
+    recipe's was a disabled chip at under 2:1 (request B).
+- **Proposed RFCs, for 0.67:**
+  - [RFC-142](rfcs/proposed/142-a-feature-turned-on-elsewhere-breaks-an-exhaustive-match-on-icon.md): `Icon` becomes
+    `#[non_exhaustive]`, because a feature turned on by another crate breaks an exhaustive match (request D). Breaking.
+  - [RFC-143](rfcs/proposed/143-a-toasts-intent-is-shown-by-colour-alone.md): a toast's intent and a notice's tone
+    carry a mark that differs by shape (WCAG 1.4.1, request A). RFC-093 Q-1's reopening sign fired: the book itself
+    said the toast carried it.
+- **The themes RFC is written** (the owner's 2026-11-27 ruling), for building from 0.69.
+- **Small changes:** `ShortcutRoute` and `TargetRole` re-exported from `snora::keyboard`; `build-cost.yaml`'s 30 s
+  warning removed (it fired on 55 of 56 rows).
+- **Nine guards,** each shown failing:
+  - every `pub enum` of `snora-core` on the vocabulary page;
+  - every type in a public signature nameable through `snora`;
+  - the migration index's table read by `check-migration-guides.sh`;
+  - the book's `default = [...]` lines;
+  - the budget pages' numbers against their CSVs;
+  - the identifiers pinned by literal strings;
+  - `#![forbid(unsafe_code)]` in every crate;
+  - the register's current status first;
+  - fragments in the link check.
+- **To measure first:** whether `responsive_body`'s unit tests run in CI, and what a form control does when one label
   alone is wider than the room.
-- A toast's intent is shown by colour alone (request A, row A2-096; WCAG 1.4.1). Whether snora carries it by more
-  than colour is ruled in 0.67. The book now says so, and tells applications to say what happened in the words.
-  **RFC-093 Q-1's reopening sign has fired:** it was closed in 2026-09 to reopen when someone expected the prefab to
-  carry intent by more than colour, and the book itself said it did.
 
 ## After 0.67
 

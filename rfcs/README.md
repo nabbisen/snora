@@ -203,6 +203,8 @@ state.
 
 | ID | Title | Target |
 |----|-------|--------|
+| 142 | [A feature turned on elsewhere breaks an exhaustive `match` on `Icon`](./proposed/142-a-feature-turned-on-elsewhere-breaks-an-exhaustive-match-on-icon.md) | **0.67.0**, breaking — found checking the 0.67 audit's request D: `Icon`'s `Lucide` and `Svg` variants exist only under their features, so another crate turning one on breaks an application's exhaustive match (RFC-139's class). Proposed: `#[non_exhaustive]`, with `snora-widgets`' exhaustiveness held by a test |
+| 143 | [A toast's intent, and a notice's tone, are shown by colour alone](./proposed/143-a-toasts-intent-is-shown-by-colour-alone.md) | **0.67.0** — from the 0.67 audit's request A (A2-096), WCAG 1.4.1: the book said the toast carried intent by more than colour; RFC-093 Q-1's reopening sign. Proposed: a mark per intent that differs by shape, no optional font, on by default (reversing RFC-093's opt-in pre-ruling, the owner's to rule), one switch for an application with its own channel |
 
 ## Archive
 
