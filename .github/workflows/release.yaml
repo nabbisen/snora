@@ -46,7 +46,7 @@ jobs:
       id-token: write  # required for crates.io Trusted Publishing (OIDC)
     steps:
       - name: Checkout the tag
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Refuse if the tag does not match Cargo.toml's version
         run: scripts/check-tag-matches-version.sh "${{ github.ref_name }}"
@@ -56,8 +56,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: scripts/check-commit-ci-green.sh "${{ github.sha }}"
 
+      - name: Refuse unless the tag is signed by the release key
+        # RFC-140 R-7. This workflow triggers on a tag *name*, and a name proves nothing about who pushed it. The tag must be an
+        # annotated tag whose signature verifies against the public key kept in this repository
+        # (`.github/release-signing-key.asc`), imported into an otherwise empty keyring. Before the toolchain on purpose: an
+        # unsigned tag is stopped before anything is installed or run beyond the two refusals above and this script.
+        # `scripts/test-check-tag-signature.sh` proves the script and `gpg` on this runner image on every push (Workflow lint).
+        env:
+          TAG: ${{ github.ref_name }}
+        run: scripts/check-tag-signature.sh "$TAG"
+
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        run: scripts/install-rust-toolchain.sh stable
 
       - name: Plan the publish (skip what crates.io already has)
         # RFC-116 Unit 2b. A new crate's first version is published from
@@ -75,7 +85,7 @@ jobs:
 
       - name: Authenticate to crates.io (Trusted Publishing)
         if: steps.plan.outputs.remaining != '0'
-        uses: rust-lang/crates-io-auth-action@v1
+        uses: rust-lang/crates-io-auth-action@3268eb413133e2960fa4ae0e963ca76380c54cd9 # v1.0.6
         id: auth
 
       - name: cargo publish --workspace
@@ -114,7 +124,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout the tag
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           # This is the one job that holds `contents: write`, and it
           # runs repository scripts. Nothing here pushes — `gh` reads

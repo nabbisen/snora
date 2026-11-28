@@ -10,14 +10,20 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Least authority (RFC-140): the floor for every job in this file. Nothing here writes to the repository, and no job
+# needs a token beyond reading it; a job that ever does must say so itself.
+permissions:
+  contents: read
+
 jobs:
   rust-quality:
     name: Rust quality gate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable rustfmt,clippy
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: Formatting
         # Runs first and cheapest. This gate was absent until 0.28.1, and in
         # its absence `cargo fmt --check` silently stopped passing on a clean
@@ -188,9 +194,10 @@ jobs:
             package: snora-interaction
             args: "--no-default-features --features iced-default"
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: Check feature combination
         # Every `--no-default-features` row carries `iced-default`
         # (RFC-112). Without it the row turns off iced's renderers and
@@ -222,9 +229,10 @@ jobs:
     name: Design feature isolation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: widgets compiles without design (Q2-B)
         # `iced-default` for the same reason as the feature matrix
         # (RFC-112): without it this checks a build with no renderer.
@@ -298,9 +306,10 @@ jobs:
     name: A consumer can turn iced's defaults off
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: The opt-out resolves as RFC-112 specifies
         run: scripts/check-opt-out-probe.sh
 
@@ -320,7 +329,7 @@ jobs:
     name: MSRV holds against the committed lockfile
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - name: Determine the declared MSRV
         # Deliberately the same extraction as `unpinned-build.yaml`
         # rather than a hardcoded `1.88`: one declaration of where the
@@ -341,9 +350,10 @@ jobs:
           fi
           echo "msrv=$MSRV" >> "$GITHUB_OUTPUT"
           echo "Declared MSRV: $MSRV"
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ steps.msrv.outputs.msrv }}
+      - name: Install the Rust toolchain at the declared MSRV
+        env:
+          MSRV: ${{ steps.msrv.outputs.msrv }}
+        run: scripts/install-rust-toolchain.sh "$MSRV"
       - name: Check workspace against the committed lockfile at the declared MSRV
         run: cargo "+${{ steps.msrv.outputs.msrv }}" check --workspace --all-features --locked
 
@@ -363,7 +373,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
       - name: 'Check any "Docs-only: yes" commits in this push'
@@ -385,7 +395,7 @@ jobs:
     name: Docs build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           # check-migration-guides.sh derives every minor pair it checks
           # from `git tag`. The default checkout fetches no tags, which
@@ -395,7 +405,8 @@ jobs:
           # that silence (RFC-107). The link and snippet gates read the
           # working tree and do not need this.
           fetch-depth: 0
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
       - name: Install mdBook
         run: cargo install mdbook --no-default-features --features search --vers "^0.5" --locked
       - name: Build docs
@@ -437,9 +448,10 @@ jobs:
     # at 194-293s on wgpu against tiny-skia's 23-35s, so this is the
     # longest job here and sets the floor on the run's wall time.
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       # The default runner has no GPU. lavapipe rasterises in software, which is slow but is
       # the real wgpu pipeline, and it is the pipeline applications get, which tiny-skia is not.
       #
@@ -458,7 +470,7 @@ jobs:
       # cache key is its hash (so a bump fetches once and caches). Whoever bumps it reads the
       # script's header for how, and runs both rendered jobs and parity on the new version: if
       # the pixels differ, that is a baseline change and its own decision.
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ runner.temp }}/lavapipe-cache
           key: lavapipe-debs-${{ hashFiles('scripts/install-lavapipe.sh') }}
@@ -517,7 +529,7 @@ jobs:
           # Field 3 is the renderer; field 2 is the row's kind.
           cut -f3 parity-wgpu.tsv | sort -u | sed 's/^/renderer=/'
           test "$(cut -f3 parity-wgpu.tsv | sort -u)" = "wgpu"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: parity-wgpu
           path: parity-wgpu.tsv
@@ -535,9 +547,10 @@ jobs:
     # runs in exactly one of the two; the script is the one place the sweeps are named, and the quality gate's
     # "Rendered targets" step checks that the two lists partition `crates/snora/tests/`. The wgpu job above runs all of it.
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: Rendered tests on tiny-skia
         env:
           ICED_TEST_BACKEND: tiny-skia
@@ -554,7 +567,7 @@ jobs:
           # Field 3 is the renderer; field 2 is the row's kind.
           cut -f3 parity-tiny-skia.tsv | sort -u | sed 's/^/renderer=/'
           test "$(cut -f3 parity-tiny-skia.tsv | sort -u)" = "tiny-skia"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: parity-tiny-skia
           path: parity-tiny-skia.tsv
@@ -568,9 +581,10 @@ jobs:
     # per target, split between the two jobs by the targets script. They record no parity rows, so `renderer-parity`
     # reads nothing from here.
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: Sweeps on tiny-skia
         env:
           ICED_TEST_BACKEND: tiny-skia
@@ -595,9 +609,10 @@ jobs:
     # record is identical row for row with and without `lucide-icons`, and R-3's test (run here) guards that the marks
     # cannot diverge again; they run once, in "Rendered sweeps on tiny-skia" above and in the wgpu job.
     steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - name: Install the Rust toolchain
+        run: scripts/install-rust-toolchain.sh stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - name: Test engine, design without lucide-icons (RFC-100)
         # The feature matrix only runs `cargo check`, which does not
         # build integration tests, and the default-features and
@@ -620,11 +635,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [rendered-wgpu, rendered-tiny-skia]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: parity-wgpu
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: parity-tiny-skia
       - name: Compare the two renderers' drawn elements (RFC-108 R-4)

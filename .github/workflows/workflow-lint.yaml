@@ -38,12 +38,17 @@ concurrency:
   group: workflow-lint-${{ github.ref }}
   cancel-in-progress: true
 
+# Least authority (RFC-140): the floor for every job in this file. Nothing here writes to the repository, and no job
+# needs a token beyond reading it; a job that ever does must say so itself.
+permissions:
+  contents: read
+
 jobs:
   lint:
     name: actionlint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       # GitHub's release server answered 504 twice in two days, with nothing
       # wrong in the workflows. So the pinned actionlint **archive** is cached
       # (never the unpacked binary: that would run with no check at all), and
@@ -52,8 +57,20 @@ jobs:
       # is the pinned version and platform; a changed pin is a new entry.
       - id: pin
         run: echo "version=$(sed -n 's/^ACTIONLINT_VERSION="\(.*\)"/\1/p' scripts/check-workflows.sh)" >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: target/actionlint-cache
           key: actionlint-archive-${{ steps.pin.outputs.version }}-linux-amd64
       - run: scripts/check-workflows.sh
+      # RFC-140. Three cheap checks that need no network, so they sit here beside the validator and not in ci.yaml: this file
+      # is the one that cannot be taken down by the failure it reports (see the head of this file).
+      #   1. every `uses:` in every workflow is a full commit SHA with a release comment, and every workflow declares
+      #      `permissions:` (a pin to a tag or a branch can move under a release);
+      #   2. the tests of the release's tag-signature check, with scratch keys: `gpg` and the script on this runner image
+      #      are proven on every push, before a release depends on them;
+      #   3. the tests of the toolchain installer that replaced `dtolnay/rust-toolchain`, against a fake `rustup`.
+      - name: Actions are pinned, and the release path's own scripts behave
+        run: |
+          scripts/check-action-pins.sh
+          scripts/test-check-tag-signature.sh
+          scripts/test-install-rust-toolchain.sh

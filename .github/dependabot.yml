@@ -1,0 +1,12 @@
+# RFC-140 R-6. Keeps the commit SHAs of the GitHub Actions the workflows use current: a pin that nobody bumps is a frozen
+# dependency, and the pin gate (`scripts/check-action-pins.sh`) refuses anything that is not a full SHA with a release
+# comment. Dependabot reads that comment and rewrites it with the SHA (dependabot-core, `github_actions/.../workflow_updater.rb`).
+#
+# Only the `github-actions` ecosystem. Not `cargo`: the crate graph has its own gates (`unpinned-build`, `supply-chain`), and a
+# stream of lockfile pull requests on a one-`main` repository would be noise next to them.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

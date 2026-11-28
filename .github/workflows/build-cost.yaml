@@ -25,10 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        run: scripts/install-rust-toolchain.sh stable
 
       # Deliberately NOT using Swatinem/rust-cache here (RFC-043). This
       # workflow measures *cold* compile time, including iced's full
@@ -105,7 +105,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload measurement artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: build-cost-${{ steps.version.outputs.version }}
           path: /tmp/snora-build-cost-*.log
@@ -121,7 +121,7 @@ jobs:
 
       - name: Commit and push to main
         if: startsWith(github.ref, 'refs/tags/')
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
         with:
           commit_message: |
             docs: append build cost for ${{ github.ref_name }} [skip ci]

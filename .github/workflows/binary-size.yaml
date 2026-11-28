@@ -35,15 +35,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       # We need rustc + cargo, plus the strip binary (already in the
       # ubuntu-latest image as part of binutils).
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        run: scripts/install-rust-toolchain.sh stable
 
       - name: Cache build
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           # Distinct cache key from the main build cache so the
           # release-baseline profile doesn't fight the dev profile
@@ -116,7 +116,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload measurement artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: binary-size-${{ steps.version.outputs.version }}
           path: |
@@ -137,7 +137,7 @@ jobs:
 
       - name: Commit and push to main
         if: startsWith(github.ref, 'refs/tags/')
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
         with:
           # `[skip ci]` is the primary recursion guard.
           commit_message: |
