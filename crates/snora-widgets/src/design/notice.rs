@@ -204,6 +204,7 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         // so it does nothing for a string that has none; ordinary prose
         // is unaffected either way.
         let mut content_col: Vec<Element<'a, Message>> = Vec::new();
+        let has_title = self.title.is_some();
         if let Some(title) = self.title {
             content_col.push(
                 text(title)
@@ -267,15 +268,22 @@ impl<'a, Message: Clone + 'a> Notice<'a, Message> {
         // Main row: the accent bar at the start edge, then the content, then the controls: a logical
         // row, so under RTL the bar is on the right and the controls on the left.
         let content_area: Element<'a, Message> = column(content_col).spacing(t.spacing.xs).into();
-        // The tone's mark, at the start edge of the content (RFC-143), centred on it. A logical row, so under
-        // RTL it is on the right with the text. It is 1 body line of the text it sits with.
+        // The tone's mark, at the start edge of the content (RFC-143), **level with its first line** (round 3): the
+        // title's, or the body's when there is none. A logical row aligned to the top, so under RTL it is on the
+        // right with the text. It is 1 body line square, in a slot as tall as that first line.
         let content_area: Element<'a, Message> = match tone_mark(self.tone).filter(|_| self.mark) {
             Some(kind) => {
+                let first_line = if has_title {
+                    style::text::label_size(t).0
+                } else {
+                    style::text::body_size(t).0
+                };
                 let mark = StatusMark::new(kind, move |_theme: &Theme| (text_color, surface))
-                    .pixels(style::text::body_size(t).0);
+                    .pixels(style::text::body_size(t).0)
+                    .beside_line(Some(first_line));
                 LogicalRow::new(direction)
                     .spacing(t.spacing.sm)
-                    .align_y(iced::Alignment::Center)
+                    .align_y(iced::Alignment::Start)
                     .push(mark)
                     .push(container(content_area).width(Length::Fill))
                     .into()

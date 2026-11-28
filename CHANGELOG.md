@@ -47,7 +47,7 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
     | `Error` (`Danger`) | a filled disc with a bar cut out |
     | `Warning` | a filled rounded square with a "!" cut out |
     | `Info` | a ring with an "i" |
-    | `Success` | a rounded-square ring |
+    | `Success` | a ring with a filled disc in its middle |
     | `Debug` (toasts only) | a small dot |
 
     `Neutral` and `Accent` notices say no status, so they have no mark.
@@ -57,7 +57,8 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
     at least 3:1 wherever the text does.
   - **A mark is information, not a control:** no Tab stop, no press.
   - **It is 1 em of the text it sits with, at the start edge,** and so on the right under right-to-left, with the
-    text and the close mark mirrored around it.
+    text and the close mark mirrored around it. **It is level with the first line** (the title's, or a notice's
+    body's when it has no title), not the middle of the block, so on a message that wraps it stays beside the title.
   - **A toast with its mark is 360 px wide** (it was 340: the 20 px is the mark and its gap), so its message keeps the
     288 px column it always had. With `toast_marks(false)` it is 340 px.
   - **A notice's text has less room by the mark and its gap** (a body line and 8 px at the stock tokens), because a

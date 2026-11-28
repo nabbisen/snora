@@ -391,14 +391,29 @@ where
     // under RTL with the text and the close mark. It takes the intent's own `(fill, text)` pair, the one the
     // toast's text and close mark take, with the fill as the ground its cut-outs are painted in, so it cannot be
     // given a pairing of its own.
-    let mut line = row![].align_y(Center).spacing(4);
-    if marks {
-        line = line.push(intent_mark(intent, intents, style.message_size));
-    }
-    let line = line
-        .push(container(text_col).width(Length::Fill))
-        .push(close_btn);
-    let body = snora_interaction::MirroredRow::new(line, direction == LayoutDirection::Rtl);
+    //
+    // **Beside the title, not the middle of the block** (round 3): the mark and the text column are their own
+    // row, aligned to the top, so the mark is level with the title's first line whatever the message's length;
+    // that row is a logical row too (a mirrored row moves only its direct children), then set against the close
+    // mark, centred as it has always been. With the mark off this is the row of 0.66.
+    let rtl = direction == LayoutDirection::Rtl;
+    let text_cell = container(text_col).width(Length::Fill);
+    let lead: Element<'a, Message> = if marks {
+        snora_interaction::MirroredRow::new(
+            row![
+                intent_mark(intent, intents, style.message_size, style.title_size),
+                text_cell
+            ]
+            .align_y(iced::Alignment::Start)
+            .spacing(4),
+            rtl,
+        )
+        .into()
+    } else {
+        text_cell.into()
+    };
+    let line = row![lead, close_btn].align_y(Center).spacing(4);
+    let body = snora_interaction::MirroredRow::new(line, rtl);
 
     // Wrapped in `opaque` (RFC-084 F-04): only the `×` button captured
     // clicks before this, because it is a button — a click anywhere else on
@@ -414,6 +429,9 @@ where
 }
 
 /// A toast's width: [`TOAST_WIDTH`], and [`TOAST_MARK_ROOM`] more with a mark.
+///
+/// The room is a **flat** 20 px, the mark at the default text size and its gap. At a larger host text size the mark
+/// is larger, and the message column gives up the difference, as it already does for the text it holds.
 fn toast_width(marks: bool) -> f32 {
     if marks {
         TOAST_WIDTH + TOAST_MARK_ROOM
@@ -437,17 +455,20 @@ fn mark_kind(intent: ToastIntent) -> snora_interaction::StatusKind {
 
 /// The mark for `intent` (RFC-143), in the intent's pair: the text colour for the shape, the fill for what is cut
 /// out of it. Sized with the text it sits with: 1 em of the host's text on the unstyled path (resolved when the
-/// layout runs), the message's own size on the design path, as the close mark is (RFC-115).
+/// layout runs), the message's own size on the design path, as the close mark is (RFC-115). Level with the
+/// **title's** first line, whose size is `title_size` (the host's default when `None`).
 fn intent_mark<'a, Message: 'a>(
     intent: ToastIntent,
     intents: Option<ToastIntentColors>,
     message_size: Option<f32>,
+    title_size: Option<f32>,
 ) -> Element<'a, Message> {
     use snora_interaction::StatusMark;
     let mark = StatusMark::new(mark_kind(intent), move |theme| {
         let (fill, text) = intent_colors(theme, intent, intents);
         (text, fill)
-    });
+    })
+    .beside_line(title_size);
     match message_size {
         Some(size) => mark.pixels(size).into(),
         None => mark.into(),

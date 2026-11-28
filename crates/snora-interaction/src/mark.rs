@@ -20,12 +20,23 @@
 //! | [`Error`](StatusKind::Error) | circle | filled | a bar cut out (the "no entry" sign) |
 //! | [`Warning`](StatusKind::Warning) | rounded square | filled | a "!" cut out |
 //! | [`Info`](StatusKind::Info) | circle | hollow | an "i" |
-//! | [`Success`](StatusKind::Success) | rounded square | hollow | none |
+//! | [`Success`](StatusKind::Success) | circle | hollow | a filled centre disc |
 //! | [`Debug`](StatusKind::Debug) | a small dot | filled | none |
 //!
 //! Success has no conventional picture (a check mark needs a diagonal, which rounded
 //! rectangles cannot draw). It is arbitrary, but nothing contradicts its meaning, and it
-//! sits in the calm half of the rule.
+//! sits in the calm half of the rule. **It is not a square**: round 3 of RFC-143 found that
+//! a hollow rounded square at card size is an unchecked checkbox, which snora draws itself,
+//! and an empty checkbox says "not done", the opposite of success. A centre disc suggests no
+//! control to tick. A 6-unit disc survives blur far longer than Info's "i" does, so the two
+//! rings still part when blur has taken the inner parts.
+//!
+//! # Beside its line
+//!
+//! A mark belongs beside the line it labels, not the middle of a block of lines: a mark centred
+//! on a many-line message floats away from the title. [`beside_line`](StatusMark::beside_line)
+//! makes the mark's slot as tall as the first line of text and draws the shape centred in it, so
+//! a row that aligns its children to the top puts the shape level with that line.
 //!
 //! # Not interactive
 //!
@@ -37,15 +48,21 @@
 //! on, which the cut-out parts and the hollow centres are painted in). They come from a
 //! function of the theme, read when the mark is drawn, so a toast's mark follows the same
 //! colour pair the toast's text does and cannot be given a pairing of its own.
+//!
+//! **Not for applications.** Public because `snora` (the toast) and `snora-widgets` (the notice)
+//! both draw it, so one function draws both and the two cannot drift. An application chooses a
+//! toast's intent or a notice's tone; the mark follows, and `AppLayout::toast_marks` and
+//! `Notice::mark` are the switches.
 
-use iced::{Background, Border, Color, Length, Rectangle, Size, Theme};
+use iced::{Background, Border, Color, Length, Pixels, Rectangle, Size, Theme};
 use iced_core::layout::{self, Layout, Limits};
 use iced_core::renderer::{self, Quad};
-use iced_core::text::Renderer as _;
+use iced_core::text::{LineHeight, Renderer as _};
 use iced_core::widget::{Operation, Tree};
 use iced_core::{Renderer as _, Widget, mouse};
 
-/// Which message a [`StatusMark`] stands for.
+/// Which message a [`StatusMark`] stands for. Not for applications: a toast's intent and a notice's tone
+/// choose it.
 ///
 /// Exhaustive on purpose: a sixth kind fails to compile in `parts` until it has a drawing
 /// (RFC-063's pattern). This crate is internal, so the enum is not `#[non_exhaustive]`.
@@ -53,7 +70,7 @@ use iced_core::{Renderer as _, Widget, mouse};
 pub enum StatusKind {
     /// Information: a ring with an "i".
     Info,
-    /// Success: a rounded-square ring.
+    /// Success: a ring with a filled disc in the middle.
     Success,
     /// Warning: a filled rounded square with a "!" cut out.
     Warning,
@@ -78,8 +95,9 @@ type Part = (f32, f32, f32, f32, f32, Paint);
 /// The side of the design slot every [`Part`] is expressed in.
 const SLOT: f32 = 16.0;
 
-/// A mark's parts, painted in this order. Exactly what RFC-143's Unit 0b measured, in pixels
-/// at 16: nothing here is derived, so the drawing cannot change by accident.
+/// A mark's parts, painted in this order, in pixels at 16: nothing here is derived, so the
+/// drawing cannot change by accident. (Unit 0b measured the first version of these; round 3
+/// replaced Success's.)
 fn parts(kind: StatusKind) -> &'static [Part] {
     use Paint::{Ground, Ink};
     match kind {
@@ -90,10 +108,11 @@ fn parts(kind: StatusKind) -> &'static [Part] {
             (7.0, 4.0, 2.0, 2.0, 1.0, Ink),
             (7.0, 7.0, 2.0, 5.0, 1.0, Ink),
         ],
-        // A rounded-square ring: the same two-layer construction, square.
+        // A ring with a filled centre disc. Not a square: a hollow square is an unchecked checkbox.
         StatusKind::Success => &[
-            (0.0, 0.0, 16.0, 16.0, 3.0, Ink),
-            (2.0, 2.0, 12.0, 12.0, 1.0, Ground),
+            (0.0, 0.0, 16.0, 16.0, 8.0, Ink),
+            (2.0, 2.0, 12.0, 12.0, 6.0, Ground),
+            (5.0, 5.0, 6.0, 6.0, 3.0, Ink),
         ],
         // A filled rounded square with a "!" cut out: a bar over a dot.
         StatusKind::Warning => &[
@@ -111,10 +130,22 @@ fn parts(kind: StatusKind) -> &'static [Part] {
     }
 }
 
+/// The first line of text a mark sits beside, if it sits beside one.
+#[derive(Clone, Copy)]
+enum Line {
+    /// Not beside a line: the slot is the shape's square.
+    None,
+    /// The host's default text size, which view code never sees, so it is read when the layout runs.
+    Default,
+    /// A text of exactly this size.
+    Pixels(f32),
+}
+
 /// The two colours a mark is drawn in, as `(ink, ground)`.
 type Colors<'a> = Box<dyn Fn(&Theme) -> (Color, Color) + 'a>;
 
-/// A status mark: a square slot with the kind's shape in it. See the module documentation.
+/// A status mark: a square slot with the kind's shape in it. See the module documentation. Built by `snora`
+/// and `snora-widgets`; not for applications.
 ///
 /// Sized in **ems of the host's text** by default (1 em, resolved when the layout runs, so it
 /// follows `default_text_size` as [`Glyph`](crate::Glyph) does), or in pixels
@@ -123,6 +154,7 @@ pub struct StatusMark<'a> {
     kind: StatusKind,
     em: f32,
     pixels: Option<f32>,
+    line: Line,
     colors: Colors<'a>,
 }
 
@@ -134,6 +166,7 @@ impl<'a> StatusMark<'a> {
             kind,
             em: 1.0,
             pixels: None,
+            line: Line::None,
             colors: Box::new(colors),
         }
     }
@@ -152,6 +185,29 @@ impl<'a> StatusMark<'a> {
         self.pixels = Some(pixels);
         self
     }
+
+    /// Sits **beside the first line** of a text of `text_size` pixels (`None`: the host's default
+    /// size): the slot is as tall as that line (iced's own line height, 1.3 times the size) and the
+    /// shape is drawn centred in it, so the shape is level with the line when the row that holds the
+    /// mark aligns its children to the top. A mark taller than the line keeps its own height.
+    #[must_use]
+    pub fn beside_line(mut self, text_size: Option<f32>) -> Self {
+        self.line = text_size.map_or(Line::Default, Line::Pixels);
+        self
+    }
+}
+
+/// Where the shape is drawn in `bounds`: a square of the node's width, centred on the node's height and
+/// **on a whole logical pixel**, so that every part of the shape falls on the same pixel grid (each part
+/// is snapped separately, and a slot at a fractional position would round its parts differently).
+fn shape_in(bounds: Rectangle) -> Rectangle {
+    let side = bounds.width;
+    Rectangle {
+        x: bounds.x.round(),
+        y: (bounds.y + (bounds.height - side) / 2.0).round(),
+        width: side,
+        height: side,
+    }
 }
 
 impl<Message> Widget<Message, Theme, iced::Renderer> for StatusMark<'_> {
@@ -165,15 +221,20 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for StatusMark<'_> {
         renderer: &iced::Renderer,
         _limits: &Limits,
     ) -> layout::Node {
-        let side = self
-            .pixels
-            .unwrap_or_else(|| self.em * renderer.default_size().0);
-        layout::Node::new(Size::new(side, side))
+        let default = renderer.default_size().0;
+        let side = self.pixels.unwrap_or(self.em * default);
+        let line_of = |size: f32| LineHeight::default().to_absolute(Pixels(size)).0;
+        let line = match self.line {
+            Line::None => 0.0,
+            Line::Default => line_of(default),
+            Line::Pixels(size) => line_of(size),
+        };
+        layout::Node::new(Size::new(side, side.max(line)))
     }
 
-    /// Reports the slot as a container, as the slider bar reports its track and thumb: a sweep that
-    /// reads the drawn pixels (`nontext_sweep.rs`) finds the mark by it. It is not a focus target and
-    /// takes no event, so nothing else reads it.
+    /// Reports the **shape's** square as a container (not the taller slot a mark beside a line has), as the
+    /// slider bar reports its track and thumb: a sweep that reads the drawn pixels (`nontext_sweep.rs`) finds
+    /// the mark by it. It is not a focus target and takes no event, so nothing else reads it.
     fn operate(
         &mut self,
         _tree: &mut Tree,
@@ -181,7 +242,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for StatusMark<'_> {
         _renderer: &iced::Renderer,
         operation: &mut dyn Operation,
     ) {
-        operation.container(None, layout.bounds());
+        operation.container(None, shape_in(layout.bounds()));
     }
 
     fn draw(
@@ -195,7 +256,7 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for StatusMark<'_> {
         _viewport: &Rectangle,
     ) {
         let (ink, ground) = (self.colors)(theme);
-        let bounds = layout.bounds();
+        let bounds = shape_in(layout.bounds());
         let k = bounds.width / SLOT;
         for &(x, y, w, h, radius, paint) in parts(self.kind) {
             renderer.fill_quad(
@@ -210,8 +271,9 @@ impl<Message> Widget<Message, Theme, iced::Renderer> for StatusMark<'_> {
                         radius: (radius * k).into(),
                         ..Border::default()
                     },
-                    // iced's own default, which is what a container's quad takes: the
-                    // mark is measured (RFC-143 Unit 0b) in the pixels a container draws.
+                    // Snapped to the device grid (round 3): a mark is a figure, and an edge that
+                    // falls between two pixels is drawn as a soft one, thinner than it is.
+                    snap: true,
                     ..Quad::default()
                 },
                 Background::Color(match paint {
