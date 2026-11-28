@@ -57,7 +57,7 @@ impl Func {
 }
 
 /// The widget functions with **no reading order**, each with why. A reader checks each reason once.
-const DIRECTION_FREE: [(&str, &str); 16] = [
+const DIRECTION_FREE: [(&str, &str); 17] = [
     (
         "design/button.rs::primary",
         "one centred label in one button",
@@ -101,6 +101,10 @@ const DIRECTION_FREE: [(&str, &str); 16] = [
         "a container around the caller's content; it lays out nothing of its own",
     ),
     ("design/chip.rs::filter", "one label in one button"),
+    (
+        "design/chip.rs::tag",
+        "one label in a container; a single label has nothing to order",
+    ),
     (
         "design/notice.rs::Notice::render",
         "the builder: `Notice::new` takes the direction",

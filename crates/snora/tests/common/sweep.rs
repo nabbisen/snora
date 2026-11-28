@@ -395,6 +395,16 @@ pub fn scenes() -> Vec<Scene> {
         runs: &[("Filter", Word)],
         make: Box::new(|t, _| chip::filter(t, "Filter", false, Msg::Go)),
     });
+    // RFC-141: the read-only tag. Not a control: no states, no direction, no Tab stop; its label is read at the preset's level.
+    v.push(Scene {
+        name: "tag",
+        covers: &["tag"],
+        own_page: false,
+        directional: false,
+        states: false,
+        runs: &[("Tag", Word)],
+        make: Box::new(|t, _| chip::tag(t, "Tag")),
+    });
     for (name, selected) in [
         ("removable chip, selected", true),
         ("removable chip, unselected", false),

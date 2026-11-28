@@ -165,3 +165,44 @@ fn both_disabled_arms_dim_their_label_and_border() {
         }
     }
 }
+
+// ---- the tag (RFC-141) -----------------------------------------------------------------------------------------------------
+
+/// **A tag is an unselected chip at rest**, field for field, in every preset: the label colour, the fill, the border and
+/// the rest. It cannot drift, and it is never the selected chip's fill.
+#[test]
+fn a_tag_is_an_unselected_chip_at_rest_in_every_preset() {
+    for (name, t) in Tokens::presets() {
+        let rest = unselected(&t, Status::Active);
+        let tag = tag(&t);
+        assert_eq!(
+            tag.text_color,
+            Some(rest.text_color),
+            "{name}: label colour"
+        );
+        assert_eq!(tag.background, rest.background, "{name}: fill");
+        assert_eq!(tag.border, rest.border, "{name}: border");
+        assert_eq!(tag.shadow, rest.shadow, "{name}: shadow");
+        assert_ne!(
+            tag.background,
+            selected(&t, Status::Active).background,
+            "{name}: a tag must not be drawn with the selected chip's fill"
+        );
+    }
+}
+
+/// **The tag is not drawn disabled**: its label is at full strength, not the half alpha a disabled chip's is
+/// (the recipe's read-only chip was this, 1.52 to 1.97:1).
+#[test]
+fn a_tag_is_not_drawn_disabled() {
+    for (name, t) in Tokens::presets() {
+        let tag = tag(&t);
+        let disabled = unselected(&t, Status::Disabled);
+        assert_ne!(tag.text_color, Some(disabled.text_color), "{name}: label");
+        assert_eq!(
+            tag.text_color.map(|c| c.a),
+            Some(1.0),
+            "{name}: the label is opaque"
+        );
+    }
+}

@@ -28,6 +28,16 @@ per-version migration guides under [`docs/guides/`](docs/src/guides/).
 
 ### Added
 
+- **`snora::design::chip::tag(tokens, label)`: a read-only tag** (RFC-141). A label that is **information, not a control**:
+  a file's type, a result's status, a category. **It is not a Tab stop, takes no press, and has no hover or pressed
+  state**, and it is **drawn at full contrast** (its label held at the palette's `text_contrast`, its boundary at 3:1), as an
+  unselected chip at rest, in the same height and padding as `filter`, so a row of tags and chips lines up. It never looks
+  selected. The book's advice for a read-only tag, `chip::filter(.., None)`, drew a *disabled* chip: its label measured **1.52
+  to 1.97:1** against its own fill, under the text floor that exempts a disabled control. A tag is the primitive for that.
+  - It takes no `direction` (a single label has nothing to order) and is on the design path only.
+  - **It does not grow to `targets.min`**: the minimum target is for what the pointer must hit, so in a design that raises
+    it a filter chip is taller than a tag beside it.
+  - `snora_style::chip::tag(tokens)` is its container style, derived from `unselected(tokens, Status::Active)`.
 - **`AppLayout::toast_marks(bool)` and `Notice::mark(bool)`** (RFC-143): the two switches for the marks below, **on by
   default**. They are for one case only: an application that already supplies its own non-colour channel for a toast's
   intent or a notice's tone (an icon of its own, say), so that it does not show two. Off, a toast is exactly the toast

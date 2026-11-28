@@ -1,13 +1,17 @@
 //! Chip primitives for Snora Design (RFC-032).
 //!
-//! Two variants:
+//! Three variants:
 //!
 //! * `filter` — a toggle chip for filtering or categorizing. Solid accent
 //!   background + `accent_text` foreground when selected; neutral border at
 //!   rest.
 //! * `removable` — a chip with a separate remove (×) button.
+//! * `tag` — a read-only label: **information, not a control** (RFC-141). It is
+//!   not a Tab stop, takes no press and has no hover or pressed state, and it is
+//!   drawn at full contrast, as an unselected chip at rest.
 //!
-//! Every control on a chip is **focusable** (RFC-116): they are `control`s,
+//! Every **control** on a chip is **focusable** (RFC-116), and a tag is not a
+//! control: they are `control`s,
 //! not iced buttons, and iced 0.14's `button` registers no focus target.
 //! Tab reaches the label and, on a removable chip, the remove button, once
 //! the application routes the key with `snora::keyboard::traverse`; Enter
@@ -60,6 +64,7 @@
 //!
 //! let _draft_chip: iced::Element<'_, Message> =
 //!     chip::filter(&tokens, "Draft", show_drafts, Message::ToggleDrafts);
+//! let _file_type: iced::Element<'_, Message> = chip::tag(&tokens, "PDF");
 //! let _tag_chip: iced::Element<'_, Message> = chip::removable(
 //!     &tokens,
 //!     "Tag: Rust",
@@ -193,6 +198,45 @@ pub fn filter<'a, Message: Clone + 'a>(
     .on_press_maybe(on_toggle.into())
     .padding([tokens.spacing.xs, tokens.spacing.sm])
     .into()
+}
+
+/// A read-only tag: a label that is **information, not a control** (RFC-141).
+///
+/// Use it for a file's type, a result's status, a category: something to read, with nothing to do. It
+/// **is not a Tab stop, takes no press, and has no hover or pressed state**, so the keyboard does not stop on it.
+/// For a choice, use [`filter`].
+///
+/// **It is drawn at full contrast.** It is an unselected chip's resting style
+/// ([`snora_style::chip::tag`], derived from it), so its label is held at the palette's
+/// [`text_contrast`](snora_design::Palette::text_contrast) against its fill, and its boundary at 3:1 against every neutral
+/// surface, as a chip's is. **It never looks selected**, because that would claim a state it does not have. A chip
+/// with no handler is *disabled* (`filter`'s `None`), which is drawn at reduced contrast that the text floor exempts:
+/// not a tag.
+///
+/// It has the same padding as [`filter`], so a row of tags and filter chips lines up. **It is as tall as its label and
+/// that padding, and does not grow to `targets.min`**: the minimum target is for what the pointer must hit, and a tag is
+/// not that. In a design that raises the minimum, a chip is taller than a tag beside it, which says which one to press.
+///
+/// It takes no `direction`: a single label has nothing to order.
+///
+/// ```rust,no_run
+/// use iced::widget::row;
+/// use snora_design::Tokens;
+/// use snora_widgets::design::chip;
+///
+/// # #[derive(Clone)] enum Message {}
+/// let tokens = Tokens::light();
+/// let _tags: iced::Element<'_, Message> = row![chip::tag(&tokens, "PDF"), chip::tag(&tokens, "Shared")]
+///     .spacing(tokens.spacing.xs)
+///     .into();
+/// ```
+#[must_use]
+pub fn tag<'a, Message: 'a>(tokens: &Tokens, label: impl Into<String>) -> Element<'a, Message> {
+    let t = tokens.clone();
+    container(text(label.into()).size(style::text::label_size(tokens)))
+        .padding([tokens.spacing.xs, tokens.spacing.sm])
+        .style(move |_theme: &Theme| style::chip::tag(&t))
+        .into()
 }
 
 /// A chip with a separate remove button.

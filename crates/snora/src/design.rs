@@ -169,12 +169,12 @@ pub mod notice {
     pub use snora_widgets::design::notice::Notice;
 }
 
-/// Filter and removable chip primitives (RFC-032).
+/// Filter and removable chip primitives (RFC-032), and the read-only [`tag`](chip::tag) (RFC-141).
 ///
 /// `widgets`-gated (RFC-055).
 #[cfg(feature = "widgets")]
 pub mod chip {
-    pub use snora_widgets::design::chip::{filter, removable, removable_with_tooltip};
+    pub use snora_widgets::design::chip::{filter, removable, removable_with_tooltip, tag};
 }
 
 /// Progress row and card primitives (RFC-032).

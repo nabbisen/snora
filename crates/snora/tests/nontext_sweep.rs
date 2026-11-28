@@ -310,6 +310,18 @@ fn mark_dot(els: &[(El, Rectangle)], _t: &[Rectangle]) -> Option<Pick> {
     })
 }
 
+/// **A tag's box** (RFC-141): a container a label's line plus a chip's padding tall (20 to 40 px at the presets' sizes) and
+/// a few labels wide, which the tag scene holds one of (the page's containers are far larger).
+fn tag_box(els: &[(El, Rectangle)]) -> Option<Rectangle> {
+    els.iter()
+        .find(|(k, r)| {
+            *k == El::Container
+                && (20.0..40.0).contains(&r.height)
+                && (20.0..200.0).contains(&r.width)
+        })
+        .map(|x| x.1)
+}
+
 /// A toggler's track: twice as wide as it is tall.
 fn track_of_toggler(els: &[(El, Rectangle)]) -> Option<Rectangle> {
     els.iter()
@@ -370,6 +382,14 @@ fn subjects() -> Vec<Subject> {
             row: "8",
             scene: "filter chip, unselected",
             pick: |_, t| all(t[0], Some(0)),
+        },
+        Subject {
+            // RFC-141: a tag is not a control, so there is no focus target to take the box from: it is the one
+            // container of a chip's size in the scene (a label's line and a chip's padding).
+            name: "tag outline vs its surface",
+            row: "141",
+            scene: "tag",
+            pick: |e, _| tag_box(e).and_then(|r| all(r, None)),
         },
         Subject {
             name: "notice tone bar vs the notice (info)",

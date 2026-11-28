@@ -1,7 +1,8 @@
 //! Chip style functions (RFC-032, RFC-129).
 //!
 //! * [`selected`]: a solid `accent` fill with `accent_text` on it;
-//! * [`unselected`]: the `surface` fill, a `border` outline and a `text_secondary` label.
+//! * [`unselected`]: the `surface` fill, a `border` outline and a `text_secondary` label;
+//! * [`tag`]: a read-only tag (RFC-141), a **container** style that is an unselected chip's resting style.
 //!
 //! These were `snora-widgets`' private `chip_style_selected` and `chip_style_unselected`, and
 //! moved here (RFC-129 Q-5) with the rest of the style functions (RFC-055): they are pure
@@ -27,7 +28,10 @@
 //! # let _: iced::widget::Button<'_, (), iced::Theme, iced::Renderer> = chip_button;
 //! ```
 
-use iced::{Border, Color, Shadow, widget::button};
+use iced::{
+    Border, Color, Shadow,
+    widget::{button, container},
+};
 use snora_design::Tokens;
 
 use super::button::disabled_alpha;
@@ -116,6 +120,35 @@ pub fn unselected(tokens: &Tokens, status: button::Status) -> button::Style {
             .width(1.0),
         shadow: Shadow::default(),
         snap: true,
+    }
+}
+
+/// A read-only tag's style (RFC-141): [`unselected`]'s resting style, as a **container** style.
+///
+/// A tag is information, not a control, so it has no hovered, pressed or disabled state, and it is drawn **at full
+/// contrast**: its label is the resting chip's, `text_secondary` on `surface`, which the palette holds at its
+/// [`text_contrast`](snora_design::Palette::text_contrast) on every neutral surface, and its boundary is the resting
+/// chip's `border`, held at 3:1 as a chip's is. It is **derived from `unselected(tokens, Status::Active)`**, field by
+/// field, and not written out again, so the tag and the resting chip cannot drift apart, and so that the tag never looks
+/// selected (a selected chip is a state the tag does not have).
+///
+/// ```rust,no_run
+/// use snora_design::Tokens;
+/// use snora_style::chip;
+///
+/// let tokens = Tokens::light();
+/// let tag = iced::widget::container("PDF").style(move |_theme| chip::tag(&tokens));
+/// # let _: iced::widget::Container<'_, (), iced::Theme, iced::Renderer> = tag;
+/// ```
+#[must_use]
+pub fn tag(tokens: &Tokens) -> container::Style {
+    let rest = unselected(tokens, button::Status::Active);
+    container::Style {
+        text_color: Some(rest.text_color),
+        background: rest.background,
+        border: rest.border,
+        shadow: rest.shadow,
+        snap: rest.snap,
     }
 }
 
